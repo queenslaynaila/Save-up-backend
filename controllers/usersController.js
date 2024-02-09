@@ -38,7 +38,9 @@ const login = async (req, res) => {
         const user = result.rows[0];
   
     if (user && (await bcrypt.compare(password, user.password_hash))) {
-      res.json({user,token:generateToken(user.id)});
+      const token = generateToken(user.id);
+      user.token = token;
+      res.json(user);
     } 
   } catch (error) {
     return res.status(500).json({ error: error.message });
