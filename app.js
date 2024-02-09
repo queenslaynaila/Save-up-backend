@@ -22,6 +22,8 @@ app.use('/contributions', contributionsRouter);
 app.use('/expenses', expensesRouter);
 
 // Error handling middleware
+app.use('/', 'Welcome');
+
 app.use((req, res, next) => {
   const error = new Error('Not found');
   error.status = 404;
