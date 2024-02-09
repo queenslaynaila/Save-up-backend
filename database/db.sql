@@ -16,11 +16,11 @@ CREATE TABLE IF NOT EXISTS savings (
       description VARCHAR(255) NOT NULL,
       category VARCHAR(255),
       targetAmount DECIMAL(10, 2) NOT NULL,
-      contributedAmount DECIMAL(10, 2) DEFAULT 0.00,
+      contributedAmount NUMERIC DEFAULT 0,
       priority VARCHAR(255),
       status VARCHAR(255) DEFAULT 'In Progress',
       targetDate DATE,
-      startDate DATE DEFAULT NOW(),
+      startDate DATE DEFAULT CURRENT_DATE,
       created_at TIMESTAMP DEFAULT NOW(),
       updated_at TIMESTAMP DEFAULT NOW()
 );
