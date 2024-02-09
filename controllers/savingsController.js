@@ -2,12 +2,12 @@ const pool = require('../db');
 
 const createSaving = async (req, res) => {
     try {
-        const { user_id, description, category, target_amount, priority, status, target_date} = req.body;
+        const { user_id, description, category, target_amount, priority, target_date} = req.body;
         const query = `
-            INSERT INTO savings (user_id, description, category, targetAmount, priority, status, targetDate) 
-            VALUES ($1, $2, $3, $4, $5, $6, $7) 
+            INSERT INTO savings (user_id, description, category, targetAmount, priority,  targetDate) 
+            VALUES ($1, $2, $3, $4, $5, $6) 
             RETURNING *`;
-        const values = [user_id, description, category, target_amount, priority, status, target_date];
+        const values = [user_id, description, category, target_amount, priority, target_date];
         const result = await pool.query(query, values);
         return res.status(201).json(result.rows[0]);
     } catch (error) {
