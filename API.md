@@ -2,8 +2,8 @@
 # USERS
 
 ### POST /users
- - **Description:** Updates an existing user's information.
-- **Endpoint:** `https://save-up-3w7t.onrender.com/users/{id}`
+ - **Description:** Creates a user.
+- **Endpoint:** `https://save-up-3w7t.onrender.com/users/`
 - **Method:** POST
 - **REQUEST BODY:** 
     ``` json
