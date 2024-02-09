@@ -47,18 +47,19 @@
     ```
 - **SUCCESFUL RESPONSE:** user object with auth token
    ``` json
-  {
-    "user": {
+  
+     {
       "id": 2,
       "username": "queenslayjema",
       "email": "queenslayjema@gmail.com",
       "phone_no": "0713518356",
       "password_hash": "$2b$10$0WbxmxmVtEmCZsyboiiHlOW2nzG1WSMaM0o/aC0hUYVQl07eYlpEW",
       "created_at": "2024-02-09T12:48:23.564Z",
-      "updated_at": "2024-02-09T12:48:23.564Z"
+      "updated_at": "2024-02-09T12:48:23.564Z",
+      "token": "sample token here"
     },
-    "token": "sample token here"
-  }
+ 
+  
   ```
 - **FAILED RESPONSE:** 
  ``` json
@@ -75,7 +76,6 @@
     Headers:
        Cookie: auth_token=actual token;
        Body: user
-    ```
 - **SUCCESFUL RESPONSE:** res 2004 NO BODY
 - - **FAILED RESPONSE:** res 2004 ok
  ``` json
