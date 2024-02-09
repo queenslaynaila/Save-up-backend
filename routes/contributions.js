@@ -9,19 +9,19 @@ router.get('/', (req, res) => {
 
 
 router.get('/:id', (req, res) => {
-    contributionsController.getContributionById(req, res);
+    contributionsController.getContributionsById(req, res);
 });
 
 router.patch('/:id', (req, res) => {
-    contributionsController.updateContribution(req, res);
+    contributionsController.updateContributions(req, res);
 });
 
 router.delete('/:id', (req, res) => {
-    contributionsController.deleteContribution(req, res);
+    contributionsController.deleteContributions(req, res);
 });
 
 router.post('/', (req, res) => {
-    contributionsController.createContribution(req,res)
+    contributionsController.createContributions(req,res)
 });
 
 
