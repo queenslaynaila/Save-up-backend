@@ -1,4 +1,7 @@
-# Save-up-backend Api doc
+
+## Database Schema
+You can check the database schema [here](./db_schema.dbml).
+
 # USERS
 
 ### POST /users
@@ -80,7 +83,7 @@
  ``` json
 
  {"error":"sample error is shown here"}
- 
+
   ```
 
 ## UPDATE /users/{id}

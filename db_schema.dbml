@@ -1,0 +1,44 @@
+
+Table users {
+  id int [primary key]
+  username varchar [not null]
+  email varchar [not null, unique]
+  phone_no varchar [not null, unique]
+  password_hash varchar [not null]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+}
+
+Table savings {
+  id int [primary key]
+  user_id int [ref: > users.id]
+  description varchar [not null]
+  category varchar
+  targetAmount decimal(10, 2) [not null]
+  contributedAmount numeric [default: 0, note: 'Total amount contributed towards the saving goal. Updated whenever there is a corresponding update in the contributions table']
+  priority varchar [note: 'Priority of the saving goal: High, Low, Intermediate']
+  status varchar [note: 'Status of the saving goal: In Progress or Complete', default: 'In Progress']
+  targetDate date
+  startDate date [default: `current_date`]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+}
+
+Table contributions {
+  id int [primary key]
+  saving_id int [ref: > savings.id]
+  amount decimal(10, 2) [not null]
+  date date [not null]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+}
+
+Table expenses {
+  id int [primary key]
+  user_id int [ref: > users.id]
+  category varchar [not null]
+  amount decimal(10, 2) [not null]
+  date date [not null]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+}
