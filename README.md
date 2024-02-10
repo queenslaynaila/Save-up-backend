@@ -1,6 +1,6 @@
 
 ## Database Schema
-You can check the database schema [here](./db_schema.dbml).
+You can check the database schema [here](./schema.md).
 
 # USERS
 
