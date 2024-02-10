@@ -13,12 +13,14 @@ You can check the database schema [here](./schema.md).
     - [POST /savings](#post-savings)
     - [GET /savings/user/:id](#get-savingsuserid)
     - [GET /savings/status/:status](#get-savingsstatusstatus)
-    - [GET /savings/category/:category](#get-savingscategorycategory)
+    - [GET /savings/priority/:priority](#get-savingsprioritypriority)
+    - [GET /savings/user/:id](#get-savingsuserid-1)
 - [CONTRIBUTIONS](#contributions)
     - [POST /contributions](#post-contributions)
 - [EXPENSE](#expense)
     - [POST /expenses](#post-expenses)
     - [GET /expenses/category/:category](#get-expensescategorycategory)
+
 
 # USERS
 
@@ -243,6 +245,35 @@ You can check the database schema [here](./schema.md).
     }
   ]
 
+### GET /savings/category/:category
+- **Description:** Retrieve savings goals by category.
+- **Endpoint:** `https://save-up-3w7t.onrender.com/savings/category/:category`
+- **Method:** GET
+- **Parameters:**
+  - `:category` (string, required): The category of the savings goals to retrieve.
+- **SUCCESSFUL RESPONSE:** status code 200.If none matches an empty array is sent
+  ```json
+  [
+    {
+      "id": 1,
+      "user_id": 2,
+      "description": "Get insurance",
+      "category": "Sample category",
+      "target_amount": 2000,
+      "contributed_amount": 0,
+      "priority": "High",
+      "status": "In Progress",
+      "target_date": "2024-02-09T00:00:00.000Z",
+      "start_date": "2024-02-09T00:00:00.000Z",
+      "created_at": "2024-02-09T13:35:20.280Z",
+      "updated_at": "2024-02-09T13:35:20.280Z"
+    }
+  ]
+  - **FAILED RESPONSE:** 
+ ``` json
+ {"error":"sample error is shown here"}
+  ```
+
 ### GET /savings/priority/:priority
 - **Description:** Retrieve savings goals by priority.
 - **Endpoint:** `https://save-up-3w7t.onrender.com/savings/priority/:priority`
@@ -286,33 +317,49 @@ You can check the database schema [here](./schema.md).
  {"error":"sample error is shown here"}
   ```
 
-### GET /savings/category/:category
-- **Description:** Retrieve savings goals by category.
-- **Endpoint:** `https://save-up-3w7t.onrender.com/savings/category/:category`
+### GET /savings/user/:id
+- **Description:** Retrieves all savings goals associated with a specific user.
+- **Endpoint:** `https://save-up-3w7t.onrender.com/savings/user/:id`
 - **Method:** GET
 - **Parameters:**
-  - `:category` (string, required): The category of the savings goals to retrieve.
-- **SUCCESSFUL RESPONSE:** status code 200.If none matches an empty array is sent
-  ```json
-  [
-    {
-      "id": 1,
-      "user_id": 2,
-      "description": "Get insurance",
-      "category": "Sample category",
-      "target_amount": 2000,
-      "contributed_amount": 0,
-      "priority": "High",
-      "status": "In Progress",
-      "target_date": "2024-02-09T00:00:00.000Z",
-      "start_date": "2024-02-09T00:00:00.000Z",
-      "created_at": "2024-02-09T13:35:20.280Z",
-      "updated_at": "2024-02-09T13:35:20.280Z"
-    }
-  ]
-  - **FAILED RESPONSE:** 
+  - `:id` (integer, required): The unique identifier of the user whose savings goals to retrieve.
+- **Successful Response:** Status code 200
+    ```json
+    [
+      {
+        "id": 1,
+        "user_id": 2,
+        "description": "Get insurance",
+        "category": "Sample category",
+        "target_amount": 2000,
+        "contributed_amount": 0,
+        "priority": "High",
+        "status": "In Progress",
+        "target_date": "2024-02-09T00:00:00.000Z",
+        "start_date": "2024-02-09T00:00:00.000Z",
+        "created_at": "2024-02-09T13:35:20.280Z",
+        "updated_at": "2024-02-09T13:35:20.280Z"
+      },
+      {
+        "id": 2,
+        "user_id": 2,
+        "description": "Get a new car",
+        "category": "Sample category",
+        "target_amount": 10000,
+        "contributed_amount": 5000,
+        "priority": "High",
+        "status": "In Progress",
+        "target_date": "2024-02-09T00:00:00.000Z",
+        "start_date": "2024-02-09T00:00:00.000Z",
+        "created_at": "2024-02-09T13:35:20.280Z",
+        "updated_at": "2024-02-09T13:35:20.280Z"
+      }
+    ]
+   ```
+
+- **FAILED RESPONSE:** 
  ``` json
- {"error":"sample error is shown here"}
+{"error":"sample error is shown here"}
   ```
 
 
