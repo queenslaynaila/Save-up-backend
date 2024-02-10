@@ -126,7 +126,7 @@ const getSavingsByPriority = async (req, res) => {
 };
 
 const getUserSavings = async (req, res) => {
-    const userId = req.params.userId;
+    const userId = req.params;
     try {
         const query = 'SELECT * FROM savings WHERE user_id = $1';
         const { rows } = await pool.query(query, [userId]);
