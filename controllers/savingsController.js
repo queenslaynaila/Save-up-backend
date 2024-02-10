@@ -83,10 +83,55 @@ const deleteSaving = async (req, res) => {
     }
 };
 
+const getSavingsByCategory = async (req, res) => {
+    const { category } = req.params;
+    try {
+        const query = `
+            SELECT * FROM savings
+            WHERE category = $1
+        `;
+        const result = await pool.query(query, [category]);
+        res.json(result.rows);
+    } catch (error) {
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+const getSavingsByStatus = async (req, res) => {
+    const { status } = req.params;
+    try {
+        const query = `
+            SELECT * FROM savings
+            WHERE status = $1
+        `;
+        const result = await pool.query(query, [status]);
+        res.json(result.rows);
+    } catch (error) {
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+const getSavingsByPriority = async (req, res) => {
+    const { priority } = req.params;
+    try {
+        const query = `
+            SELECT * FROM savings
+            WHERE priority = $1
+        `;
+        const result = await pool.query(query, [priority]);
+        res.json(result.rows);
+    } catch (error) {
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
 module.exports = {
     createSaving,
     getAllSavings,
     getSavingById,
     updateSaving,
-    deleteSaving
+    deleteSaving,
+    getSavingsByCategory,
+    getSavingsByPriority,
+    getSavingsByStatus
 };
