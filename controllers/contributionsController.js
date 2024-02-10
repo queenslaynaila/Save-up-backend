@@ -26,9 +26,6 @@ const getContributionsById = async (req, res) => {
     try {
         const query = 'SELECT * FROM contributions WHERE id = $1';
         const result = await pool.query(query, [id]);
-        if (result.rows.length === 0) {
-            return res.status(404).json({ error: 'Contributions not found' });
-        }
         return res.status(200).json(result.rows[0]);
     } catch (error) {
         return res.status(500).json({ error: error.message });
@@ -42,9 +39,6 @@ const updateContributions = async (req, res) => {
         const query = 'UPDATE contributions SET amount = $1, date = $2 WHERE id = $3 RETURNING *';
         const values = [ amount, date, id];
         const result = await pool.query(query, values);
-        if (result.rows.length === 0) {
-            return res.status(404).json({ error: 'Contributions not found' });
-        }
         return res.status(200).json(result.rows[0]);
     } catch (error) {
         return res.status(500).json({ error: error.message });
@@ -65,10 +59,22 @@ const deleteContributions = async (req, res) => {
     }
 };
 
+const getContributionsBySaving = async (req, res) => {
+    const { saving_id } = req.params;
+    try {
+        const query = 'SELECT * FROM contributions WHERE saving_id = $1';
+        const result = await pool.query(query, [saving_id]);
+        return res.status(200).json(result);
+    } catch (error) {
+        return res.status(500).json({ error: error.message });
+    }
+};
+
 module.exports = {
     createContributions,
     getAllContributions,
     getContributionsById,
     updateContributions,
-    deleteContributions
+    deleteContributions,
+    getContributionsBySaving
 };

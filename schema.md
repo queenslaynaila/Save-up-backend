@@ -2,8 +2,6 @@
 
 ### Table: users
 
-### Table: users
-
 | Column Name    | Data Type | Constraints                 |
 |----------------|-----------|-----------------------------|
 | id             | SERIAL    | Primary Key                 |

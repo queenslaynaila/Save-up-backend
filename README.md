@@ -17,6 +17,7 @@ You can check the database schema [here](./schema.md).
     - [GET /savings/user/:id](#get-savingsuserid-1)
 - [CONTRIBUTIONS](#contributions)
     - [POST /contributions](#post-contributions)
+    - [GET /contributions/saving/:id](#get-contributionssavingid)
 - [EXPENSE](#expense)
     - [POST /expenses](#post-expenses)
     - [GET /expenses/category/:category](#get-expensescategorycategory)
@@ -388,6 +389,39 @@ You can check the database schema [here](./schema.md).
     "updated_at": "2024-02-09T13:42:23.011Z"
   }
   ```
+### GET /contributions/saving/:id
+
+- **Description:** Retrieves all contributions associated with a specific saving.
+- **Endpoint:** `https://save-up-3w7t.onrender.com/contributions/saving/:id`
+- **Method:** GET
+- **Parameters:**
+  - `:saving_id` (integer, required): The unique identifier of the saving whose contributions to retrieve.
+- **Successful Response:** Status code 200
+    ```json
+    [
+        {
+            "id": 1,
+            "saving_id": 1,
+            "amount": 100,
+            "date": "2024-02-10T12:00:00Z",
+            "created_at": "2024-02-10T08:00:00Z",
+            "updated_at": "2024-02-10T08:00:00Z"
+        },
+        {
+            "id": 2,
+            "saving_id": 1,
+            "amount": 150,
+            "date": "2024-02-11T12:00:00Z",
+            "created_at": "2024-02-11T08:00:00Z",
+            "updated_at": "2024-02-11T08:00:00Z"
+        }
+    ]
+    ```
+- **Failed Response:** Status code 500
+    ```json
+    { "error": "Internal Server Error" }
+    ```
+
 # EXPENSE
 
 ### POST /expenses

@@ -24,7 +24,9 @@ router.post('/', (req, res) => {
     contributionsController.createContributions(req,res)
 });
 
-
+router.get('/saving/:id', (req, res) => {
+    contributionsController.getContributionsBySaving(req,res)
+});
 
 
 module.exports = router;
