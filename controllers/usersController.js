@@ -5,26 +5,25 @@ const bcrypt = require('bcrypt');
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "1h" });
 };
-
-const createUser = async (req,res) => {
+const createUser = async (req, res) => {
   try {
-    const {username, email, password, phone_no} = req.body
+    const { first_name, last_name, email, password } = req.body;
     const password_hash = bcrypt.hashSync(password, 10);
     const userQuery = `
-      INSERT INTO users (username, email, password_hash, phone_no, created_at, updated_at) 
+      INSERT INTO users (first_name, last_name, email, password_hash, created_at, updated_at) 
       VALUES ($1, $2, $3, $4, NOW(), NOW())
       RETURNING *`;
-    const userValues = [username, email, password_hash, phone_no];
+    const userValues = [first_name, last_name, email, password_hash];
     const userResult = await pool.query(userQuery, userValues);
     const user = userResult.rows[0];
     const token = generateToken(user.id);
     user.token = token;
-    return res.json( user );
-    
+    return res.json(user);
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
 };
+
 
 const login = async (req, res) => {
   try {
