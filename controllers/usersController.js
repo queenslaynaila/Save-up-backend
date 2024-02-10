@@ -27,25 +27,20 @@ const createUser = async (req, res) => {
 
 const login = async (req, res) => {
   try {
-    const { email, password,username } = req.body;
-    const query = email
-        ? 'SELECT * FROM users WHERE email = $1'
-        : 'SELECT * FROM users WHERE username = $1';
-  
-        const params = [email || username]; 
-        const result = await pool.query(query, params);
-        const user = result.rows[0];
-  
-    if (user && (await bcrypt.compare(password, user.password_hash))) {
-      const token = generateToken(user.id);
-      user.token = token;
-      res.json(user);
+    const { email, password, phone_no } = req.body;
+    const query = email ? 'SELECT * FROM users WHERE email = $1' : 'SELECT * FROM users WHERE phone_no = $1';
+    const params = [email || phone_no];
+    const result = await pool.query(query, params);
+    const user = result.rows[0];
+   if (user && (await bcrypt.compare(password, user.password_hash))) {
+        const token = generateToken(user.id);
+        user.token = token;
+        res.json(user);
     } 
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
- 
-}
+};
 
   
 
