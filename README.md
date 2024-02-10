@@ -307,6 +307,7 @@ You can check the database schema [here](./schema.md).
         "user_id": 1,
         "amount": "2000",
         "category":"category",
+        "description":"find description",
         "date": "2024-02-09T12:48:23.564Z"
       }
     ```
@@ -316,6 +317,7 @@ You can check the database schema [here](./schema.md).
     "id": 2,
     "saving_id": 2,
     "amount": "2000.00",
+         "description":"find description",
     "date": "2024-02-09T00:00:00.000Z",
     "created_at": "2024-02-09T13:42:23.011Z",
     "updated_at": "2024-02-09T13:42:23.011Z"
@@ -336,6 +338,7 @@ You can check the database schema [here](./schema.md).
         "user_id": 1222,
         "category": "Groceries",
         "amount": "50.00",
+             "description":"find description",
         "date": "2024-02-08T21:00:00.000Z",
         "created_at": "2024-02-09T05:56:42.049Z",
         "updated_at": "2024-02-09T05:56:42.049Z"

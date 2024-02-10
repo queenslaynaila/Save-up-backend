@@ -40,6 +40,7 @@ CREATE TABLE IF NOT EXISTS expenses (
       id SERIAL PRIMARY KEY,
       user_id INT REFERENCES users(id) ON DELETE CASCADE,
       category VARCHAR(255) NOT NULL,
+      description VARCHAR(255) ,
       amount DECIMAL(10, 2) NOT NULL,
       date DATE NOT NULL,
       created_at TIMESTAMP DEFAULT NOW(),

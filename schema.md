@@ -51,6 +51,7 @@
 | id          | int       | Primary Key                 |
 | user_id     | int       | Foreign Key (References: users.id, On Delete: Cascade) |
 | category    | varchar   | Not Null                    |
+| description   | varchar   |                    |
 | amount      | decimal   | Not Null                    |
 | date        | date      | Not Null                    |
 | created_at  | timestamp | Default: `now()`            |

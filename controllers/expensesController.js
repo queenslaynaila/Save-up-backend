@@ -1,15 +1,16 @@
 const pool = require('../db')
 const createExpense = async (req, res) => {
     try {
-        const { category, amount, date,user_id } = req.body;
-        const query = 'INSERT INTO expenses (category, amount, date,user_id) VALUES ($1, $2, $3,$4) RETURNING *';
-        const values = [category, amount, date,user_id];
+        const { description, category, amount, date, user_id } = req.body;
+        const query = 'INSERT INTO expenses (description, category, amount, date, user_id) VALUES ($1, $2, $3, $4, $5) RETURNING *';
+        const values = [description, category, amount, date, user_id];
         const result = await pool.query(query, values);
         return res.status(201).json(result.rows[0]);
     } catch (error) {
         return res.status(500).json({ error: error.message });
     }
 };
+
 
 const getAllExpenses = async (req, res) => {
     try {
@@ -38,9 +39,9 @@ const getExpenseById = async (req, res) => {
 const updateExpense = async (req, res) => {
     const { id } = req.params;
     try {
-        const { category, amount, date } = req.body;
-        const query = 'UPDATE expenses SET category = $1, amount = $2, date = $3 WHERE id = $4 RETURNING *';
-        const values = [category, amount, date, id];
+        const { description, category, amount, date } = req.body;
+        const query = 'UPDATE expenses SET description = $1, category = $2, amount = $3, date = $4 WHERE id = $5 RETURNING *';
+        const values = [description, category, amount, date, id];
         const result = await pool.query(query, values);
         if (result.rows.length === 0) {
             return res.status(404).json({ error: 'Expense not found' });
@@ -50,6 +51,7 @@ const updateExpense = async (req, res) => {
         return res.status(500).json({ error: error.message });
     }
 };
+
 
 const deleteExpense = async (req, res) => {
     const { id } = req.params;
