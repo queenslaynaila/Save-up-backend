@@ -56,7 +56,7 @@ You can check the database schema [here](./schema.md).
 - **Description:** Sign in.
 - **Endpoint:** `https://save-up-3w7t.onrender.com/users/signin`
 - **Method:** POST
-- **REQUEST BODY:** Accepts either email or password, whatever the user sends
+- **REQUEST BODY:** Accepts either email or phone_no, whatever the user prefers
     ``` json
       {
         "phone_no": "phone_no", || "email": "email",
