@@ -11,6 +11,7 @@ You can check the database schema [here](./schema.md).
   - [DELETE /users/{id}](#delete-usersid)
 - [SAVINGS](#savings)
     - [POST /savings](#post-savings)
+    - [GET /savings/user/:id](#get-savingsuserid)
     - [GET /savings/status/:status](#get-savingsstatusstatus)
     - [GET /savings/category/:category](#get-savingscategorycategory)
 - [CONTRIBUTIONS](#contributions)
@@ -76,9 +77,8 @@ You can check the database schema [here](./schema.md).
       "updated_at": "2024-02-09T12:48:23.564Z",
       "token": "sample token here"
     },
- 
-  
   ```
+  
 - **FAILED RESPONSE:** 
  ``` json
  {"error":"sample error is shown here"}
@@ -154,6 +154,51 @@ You can check the database schema [here](./schema.md).
         "updated_at": "2024-02-09T13:35:20.280Z"
     }
   ```
+- **FAILED RESPONSE:** 
+ ``` json
+ {"error":"sample error is shown here"}
+  ```
+
+### GET /savings/user/:id
+
+- **Description:** Retrieves all savings goals associated with a specific user.
+- **Endpoint:** `https://save-up-3w7t.onrender.com/savings/user/:id`
+- **Method:** GET
+- **Parameters:**
+  - `:id` (integer, required): The unique identifier of the user whose savings goals to retrieve.
+- **Successful Response:** Status code 200
+  ```json
+  [
+    {
+      "id": 1,
+      "user_id": 2,
+      "description": "Get insurance",
+      "category": "Sample category",
+      "target_amount": 2000,
+      "contributed_amount": 0,
+      "priority": "High",
+      "status": "In Progress",
+      "target_date": "2024-02-09T00:00:00.000Z",
+      "start_date": "2024-02-09T00:00:00.000Z",
+      "created_at": "2024-02-09T13:35:20.280Z",
+      "updated_at": "2024-02-09T13:35:20.280Z"
+    },
+    {
+      "id": 2,
+      "user_id": 2,
+      "description": "Get a new car",
+      "category": "Sample category",
+      "target_amount": 10000,
+      "contributed_amount": 5000,
+      "priority": "High",
+      "status": "In Progress",
+      "target_date": "2024-02-09T00:00:00.000Z",
+      "start_date": "2024-02-09T00:00:00.000Z",
+      "created_at": "2024-02-09T13:35:20.280Z",
+      "updated_at": "2024-02-09T13:35:20.280Z"
+    }
+  ]
+
 - **FAILED RESPONSE:** 
  ``` json
  {"error":"sample error is shown here"}
