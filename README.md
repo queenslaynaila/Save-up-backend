@@ -28,23 +28,24 @@ You can check the database schema [here](./schema.md).
 - **REQUEST BODY:** 
     ``` json
       {
-        "username": "username",
-        "email": "email",
-        "phone_no": "0713518356",
-        "password": "Writepassword@2000"
+        "first_name": "John",
+        "last_name": "Doe",
+         "email": "johndoe@example.com",
+          "password": "strongPassword123"
       }
     ```
 - **SUCCESFUL RESPONSE:** 
    ``` json
   {
-      "id": 2,
-      "username": "queenslayjema",
-      "email": "queenslayjema@gmail.com",
-      "phone_no": "0713518356",
-      "password_hash": "$2b$10$0WbxmxmVtEmCZsyboiiHlOW2nzG1WSMaM0o/aC0hUYVQl07eYlpEW",
-      "created_at": "2024-02-09T12:48:23.564Z",
-      "updated_at": "2024-02-09T12:48:23.564Z",
-      "token": "sample token here"
+      "id": 7,
+    "email": "johndoe@example.com",
+    "phone_no": null,
+    "password_hash": "$2b$10$ZYwb3WBIhqfAgkvfKAB3tuiTfgqnk9UF2r2iArXA.BsegXUdHDJky",
+    "created_at": "2024-02-10T06:42:14.162Z",
+    "updated_at": "2024-02-10T06:42:14.162Z",
+    "first_name": "John",
+    "last_name": "Doe",
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NywiaWF0IjoxNzA3NTQ3MzM0LCJleHAiOjE3MDc1NTA5MzR9.iYTHAt9MfI6Oa_NpL1tUdog6XzE5KeXI6L8f_GC1K1U"
   }
   ```
 - **FAILED RESPONSE:** 
@@ -58,8 +59,7 @@ You can check the database schema [here](./schema.md).
 - **REQUEST BODY:** Accepts either email or password, whatever the user sends
     ``` json
       {
-        "username": "username", || "email": "email",
-        "email": "email",
+        "phone_no": "phone_no", || "email": "email",
         "password": "Writepassword@2000"
       }
     ```

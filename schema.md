@@ -2,15 +2,19 @@
 
 ### Table: users
 
+### Table: users
+
 | Column Name    | Data Type | Constraints                 |
 |----------------|-----------|-----------------------------|
-| id             | int       | Primary Key                 |
-| username       | varchar   | Not Null                    |
-| email          | varchar   | Not Null, Unique            |
-| phone_no       | varchar   | Not Null, Unique            |
-| password_hash  | varchar   | Not Null                    |
-| created_at     | timestamp | Default: `now()`            |
-| updated_at     | timestamp | Default: `now()`            |
+| id             | SERIAL    | Primary Key                 |
+| first_name     | VARCHAR   | Not Null                    |
+| last_name      | VARCHAR   | Not Null                    |
+| email          | VARCHAR   | Not Null, Unique            |
+| phone_no       | VARCHAR   | Unique                      |
+| password_hash  | VARCHAR   | Not Null                    |
+| created_at     | TIMESTAMP | Default: `now()`            |
+| updated_at     | TIMESTAMP | Default: `now()`            |
+
 
 ### Table: savings
 
