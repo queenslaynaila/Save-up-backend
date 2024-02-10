@@ -142,6 +142,118 @@ You can check the database schema [here](./schema.md).
  {"error":"sample error is shown here"}
   ```
 
+### GET /savings/status/:status
+- **Description:** Retrieve savings goals by status.
+- **Endpoint:** `https://save-up-3w7t.onrender.com/savings/status/:status`
+- **Method:** GET
+- **Parameters:**
+  - `:status` (string, required): The status of the savings goals to retrieve.
+- **SUCCESSFUL RESPONSE:** status code 200
+  ```json
+  [
+    {
+      "id": 1,
+      "user_id": 2,
+      "description": "Get insurance",
+      "category": "Sample category",
+      "target_amount": 2000,
+      "contributed_amount": 0,
+      "priority": "High",
+      "status": "In Progress",
+      "target_date": "2024-02-09T00:00:00.000Z",
+      "start_date": "2024-02-09T00:00:00.000Z",
+      "created_at": "2024-02-09T13:35:20.280Z",
+      "updated_at": "2024-02-09T13:35:20.280Z"
+    },
+    {
+      "id": 2,
+      "user_id": 2,
+      "description": "Get a new car",
+      "category": "Sample category",
+      "target_amount": 10000,
+      "contributed_amount": 5000,
+      "priority": "High",
+      "status": "In Progress",
+      "target_date": "2024-02-09T00:00:00.000Z",
+      "start_date": "2024-02-09T00:00:00.000Z",
+      "created_at": "2024-02-09T13:35:20.280Z",
+      "updated_at": "2024-02-09T13:35:20.280Z"
+    }
+  ]
+
+### GET /savings/priority/:priority
+- **Description:** Retrieve savings goals by priority.
+- **Endpoint:** `https://save-up-3w7t.onrender.com/savings/priority/:priority`
+- **Method:** GET
+- **Parameters:**
+  - `:priority` (string, required): The priority of the savings goals to retrieve.
+- **SUCCESSFUL RESPONSE:** status code 200.If no entry matches an empty array is sent []
+  ```json
+  [
+    {
+      "id": 1,
+      "user_id": 2,
+      "description": "Get insurance",
+      "category": "Sample category",
+      "target_amount": 2000,
+      "contributed_amount": 0,
+      "priority": "High",
+      "status": "In Progress",
+      "target_date": "2024-02-09T00:00:00.000Z",
+      "start_date": "2024-02-09T00:00:00.000Z",
+      "created_at": "2024-02-09T13:35:20.280Z",
+      "updated_at": "2024-02-09T13:35:20.280Z"
+    },
+    {
+      "id": 2,
+      "user_id": 2,
+      "description": "Get a new car",
+      "category": "Sample category",
+      "target_amount": 10000,
+      "contributed_amount": 5000,
+      "priority": "High",
+      "status": "In Progress",
+      "target_date": "2024-02-09T00:00:00.000Z",
+      "start_date": "2024-02-09T00:00:00.000Z",
+      "created_at": "2024-02-09T13:35:20.280Z",
+      "updated_at": "2024-02-09T13:35:20.280Z"
+    }
+  ]
+- **FAILED RESPONSE:** 
+ ``` json
+ {"error":"sample error is shown here"}
+  ```
+
+### GET /savings/category/:category
+- **Description:** Retrieve savings goals by category.
+- **Endpoint:** `https://save-up-3w7t.onrender.com/savings/category/:category`
+- **Method:** GET
+- **Parameters:**
+  - `:category` (string, required): The category of the savings goals to retrieve.
+- **SUCCESSFUL RESPONSE:** status code 200.If none matches an empty array is sent
+  ```json
+  [
+    {
+      "id": 1,
+      "user_id": 2,
+      "description": "Get insurance",
+      "category": "Sample category",
+      "target_amount": 2000,
+      "contributed_amount": 0,
+      "priority": "High",
+      "status": "In Progress",
+      "target_date": "2024-02-09T00:00:00.000Z",
+      "start_date": "2024-02-09T00:00:00.000Z",
+      "created_at": "2024-02-09T13:35:20.280Z",
+      "updated_at": "2024-02-09T13:35:20.280Z"
+    }
+  ]
+  - **FAILED RESPONSE:** 
+ ``` json
+ {"error":"sample error is shown here"}
+  ```
+
+
 # CONTRIBUTIONS
 
 ### POST /contributions
