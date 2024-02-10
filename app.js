@@ -16,14 +16,14 @@ const usersRouter = require('./routes/users');
 const savingsRouter = require('./routes/savings');
 const contributionsRouter = require('./routes/contributions');
 const expensesRouter = require('./routes/expenses');
-app.use('/', (req, res) => {
-  res.json({ message: 'Welcome to the Save Up API!' });
-});
+
 app.use('/users', usersRouter);
 app.use('/savings', savingsRouter);
 app.use('/contributions', contributionsRouter);
 app.use('/expenses', expensesRouter);
-
+app.use('/', (req, res) => {
+  res.json({ message: 'Welcome to the Save Up API!' });
+});
 
 app.use((req, res, next) => {
   const error = new Error('Not found');
