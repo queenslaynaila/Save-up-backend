@@ -126,10 +126,10 @@ const getSavingsByPriority = async (req, res) => {
 };
 
 const getUserSavings = async (req, res) => {
-    const userId = req.params;
+    const { id } = req.params;
     try {
         const query = 'SELECT * FROM savings WHERE user_id = $1';
-        const { rows } = await pool.query(query, [userId]);
+        const { rows } = await pool.query(query, [id]);
         return res.status(200).json(rows);
     } catch (error) {
         return res.status(500).json({ error: error.message });
