@@ -35,7 +35,7 @@ router.get('/priority/:priority', (req, res) => {
     savingsController.getSavingsByPriority(req, res);
 });
 
-router.get('/mysavings', (req, res) => {
+router.get('/:user_id', (req, res) => {
     savingsController.getUserSavings(req, res);
 });
 
