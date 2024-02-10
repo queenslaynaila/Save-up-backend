@@ -9,5 +9,6 @@
 
 # production
 /build
+/generate_schema.js
 .env
 .vscode
