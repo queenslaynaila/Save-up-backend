@@ -7,8 +7,9 @@
 # testing
 /coverage
 
-# production
-/build
+#dev
 /generate_schema.js
 .env
 .vscode
+# production
+/build

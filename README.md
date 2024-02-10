@@ -2,6 +2,22 @@
 ## Database Schema
 You can check the database schema [here](./schema.md).
 
+## Table of Contents
+- [USERS](#users)
+    - [POST /users](#post-users)
+    - [POST /signin](#post-signin)
+    - [POST /signout](#post-signout)
+  - [UPDATE /users/{id}](#update-usersid)
+  - [DELETE /users/{id}](#delete-usersid)
+- [SAVINGS](#savings)
+    - [POST /savings](#post-savings)
+    - [GET /savings/status/:status](#get-savingsstatusstatus)
+    - [GET /savings/category/:category](#get-savingscategorycategory)
+- [CONTRIBUTIONS](#contributions)
+    - [POST /contributions](#post-contributions)
+- [EXPENSE](#expense)
+    - [POST /expenses](#post-expenses)
+
 # USERS
 
 ### POST /users
