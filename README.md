@@ -17,6 +17,7 @@ You can check the database schema [here](./schema.md).
     - [POST /contributions](#post-contributions)
 - [EXPENSE](#expense)
     - [POST /expenses](#post-expenses)
+    - [GET /expenses/category/:category](#get-expensescategorycategory)
 
 # USERS
 
@@ -320,3 +321,29 @@ You can check the database schema [here](./schema.md).
     "updated_at": "2024-02-09T13:42:23.011Z"
   }
   ```
+
+### GET /expenses/category/:category
+- **Description:** Retrieve expenses by category.
+- **Endpoint:** `https://save-up-3w7t.onrender.com/savings/category/:category`
+- **Method:** GET
+- **Parameters:**
+  - `:category` (string, required): The category of the expense to retrieve.
+- **SUCCESSFUL RESPONSE:** status code 200.If none matches an empty array is sent
+  ```json
+  [
+      {
+        "id": 1,
+        "user_id": 1222,
+        "category": "Groceries",
+        "amount": "50.00",
+        "date": "2024-02-08T21:00:00.000Z",
+        "created_at": "2024-02-09T05:56:42.049Z",
+        "updated_at": "2024-02-09T05:56:42.049Z"
+    },
+  ]
+  - **FAILED RESPONSE:** 
+ ``` json
+ {"error":"sample error is shown here"}
+  ```
+
+

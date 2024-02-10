@@ -64,11 +64,24 @@ const deleteExpense = async (req, res) => {
         return res.status(500).json({ error: error.message });
     }
 };
-
+const getExpenseByCategory = async (req, res) => {
+    const { category } = req.params;
+    try {
+        const query = `
+            SELECT * FROM expenses
+            WHERE category = $1
+        `;
+        const result = await pool.query(query, [category]);
+        res.json(result.rows);
+    } catch (error) {
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
 module.exports = {
     createExpense,
     getAllExpenses,
     getExpenseById,
     updateExpense,
-    deleteExpense
+    deleteExpense,
+    getExpenseByCategory
 };

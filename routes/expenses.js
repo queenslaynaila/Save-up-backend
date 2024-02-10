@@ -22,4 +22,8 @@ router.delete('/:id', (req, res) => {
     expenseController.deleteExpense(req, res);
 });
 
+router.get('/category/:category', (req, res) => {
+    expenseController.getExpenseByCategory(req, res);
+});
+
 module.exports = router;
