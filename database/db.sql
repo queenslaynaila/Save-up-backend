@@ -48,4 +48,7 @@ CREATE TABLE IF NOT EXISTS expenses (
       updated_at TIMESTAMP DEFAULT NOW()
 );
 
+
+
 COMMIT;
+
