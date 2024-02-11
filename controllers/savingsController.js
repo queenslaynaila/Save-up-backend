@@ -4,7 +4,7 @@ const createSaving = async (req, res) => {
     try {
         const { user_id, description, category, target_amount, priority, target_date} = req.body;
         const query = `
-            INSERT INTO savings (user_id, description, category, targetAmount, priority,  targetDate) 
+            INSERT INTO savings (user_id, description, category, target_amount, priority,  target_date) 
             VALUES ($1, $2, $3, $4, $5, $6) 
             RETURNING *`;
         const values = [user_id, description, category, target_amount, priority, target_date];
@@ -49,12 +49,12 @@ const updateSaving = async (req, res) => {
                             user_id = $1,
                             description = $2,
                             category = $3,
-                            targetAmount = $4,
+                            target_amount = $4,
                             contributedAmount = $5,
                             priority = $6,
                             status = $7,
-                            targetDate = $8,
-                            startDate = $9 
+                            target_date = $8,
+                            start_date = $9 
                         WHERE 
                             id = $10 
                         RETURNING *`;
