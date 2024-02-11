@@ -4,7 +4,7 @@
 
 | Column Name    | Data Type | Constraints                 |
 |----------------|-----------|-----------------------------|
-| id             | SERIAL    | Primary Key                 |
+| id             | UUID    | Primary Key                 |
 | first_name     | VARCHAR   | Not Null                    |
 | last_name      | VARCHAR   | Not Null                    |
 | email          | VARCHAR   | Not Null, Unique            |
@@ -18,8 +18,8 @@
 
 | Column Name        | Data Type | Constraints                                                                                                   |
 |--------------------|-----------|---------------------------------------------------------------------------------------------------------------|
-| id                 | int       | Primary Key                                                                                                   |
-| user_id            | int       | Foreign Key (References: users.id, On Delete: Cascade)                                                         |
+| id                 | UUID       | Primary Key                                                                                                   |
+| user_id            | UUID       | Foreign Key (References: users.id, On Delete: Cascade)                                                         |
 | description        | varchar   | Not Null                                                                                                      |
 | category           | varchar   |                                                                                                               |
 | targetAmount       | decimal   | Not Null                                                                                                      |
@@ -35,8 +35,8 @@
 
 | Column Name | Data Type | Constraints                                                      |
 |-------------|-----------|------------------------------------------------------------------|
-| id          | int       | Primary Key                                                      |
-| saving_id   | int       | Foreign Key (References: savings.id, On Delete: Cascade)          |
+| id          | UUID       | Primary Key                                                      |
+| saving_id   | UUID       | Foreign Key (References: savings.id, On Delete: Cascade)          |
 | amount      | decimal   | Not Null  Note:An updated to it updates the contrbted amount cumulatively in savings table.                                       |
 | date        | date      | Not Null                                                         |
 | created_at  | timestamp | Default: `now()`                                                 |
@@ -46,8 +46,8 @@
 
 | Column Name | Data Type | Constraints                 |
 |-------------|-----------|-----------------------------|
-| id          | int       | Primary Key                 |
-| user_id     | int       | Foreign Key (References: users.id, On Delete: Cascade) |
+| id          | UUID       | Primary Key                 |
+| user_id     | UUID       | Foreign Key (References: users.id, On Delete: Cascade) |
 | category    | varchar   | Not Null                    |
 | description   | varchar   |                    |
 | amount      | decimal   | Not Null                    |

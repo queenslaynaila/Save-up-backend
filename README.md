@@ -41,7 +41,7 @@ You can check the database schema [here](./schema.md).
 - **SUCCESFUL RESPONSE:** 
    ``` json
   {
-      "id": 7,
+    "id": "0a2f5453-47e5-4512-9f56-7c698d0b4847",
     "email": "johndoe@example.com",
     "phone_no": null,
     "password_hash": "$2b$10$ZYwb3WBIhqfAgkvfKAB3tuiTfgqnk9UF2r2iArXA.BsegXUdHDJky",
@@ -71,7 +71,7 @@ You can check the database schema [here](./schema.md).
    ``` json
   
      {
-      "id": 2,
+      "id": "0a2f5453-47e5-4512-9f56-7c698d0b4847",
       "username": "queenslayjema",
       "email": "queenslayjema@gmail.com",
       "phone_no": "0713518356",
@@ -132,7 +132,7 @@ You can check the database schema [here](./schema.md).
 - **REQUEST BODY:** 
     ``` json
       {
-        " user_id": "username",
+       "user_id": "0a2f5453-47e5-4512-9f56-7c698d0b4847",
         "description": "email",
         "category": "Sample category",
         "target_amount": "2000",
@@ -144,7 +144,7 @@ You can check the database schema [here](./schema.md).
    ``` json
     {
         "id": 2,
-        "user_id": 2,
+        "user_id": "0a2f5453-47e5-4512-9f56-7c698d0b4847",
         "description": "get insurance",
         "category": "Sample category",
         "targetamount": "2000.00",
@@ -173,8 +173,8 @@ You can check the database schema [here](./schema.md).
   ```json
   [
     {
-      "id": 1,
-      "user_id": 2,
+     "id": "0a2f5453-47e5-4512-9f56-7c698d0b4847",
+      "user_id": "0a2f5453-47e5-4512-9f56-7c698d0b4847",
       "description": "Get insurance",
       "category": "Sample category",
       "target_amount": 2000,
@@ -187,8 +187,8 @@ You can check the database schema [here](./schema.md).
       "updated_at": "2024-02-09T13:35:20.280Z"
     },
     {
-      "id": 2,
-      "user_id": 2,
+      "id": "0a2f5453-47e5-4512-9f56-7c698d0b4847",
+      "user_id": "0a2f54-47e5-4512-9f56-7c698d0b4847",
       "description": "Get a new car",
       "category": "Sample category",
       "target_amount": 10000,
@@ -217,8 +217,8 @@ You can check the database schema [here](./schema.md).
   ```json
   [
     {
-      "id": 1,
-      "user_id": 2,
+      "id": "0a2f5453-47e5-4512-9f56-7c698d0b4847",
+      "user_id": "0a2f5453-47e5-4512-9f56-7c698d0b4847",
       "description": "Get insurance",
       "category": "Sample category",
       "target_amount": 2000,
@@ -231,8 +231,8 @@ You can check the database schema [here](./schema.md).
       "updated_at": "2024-02-09T13:35:20.280Z"
     },
     {
-      "id": 2,
-      "user_id": 2,
+      "id": "0a2f5453-47e5-4512-9f56-7c698d0b4847",
+      "user_id": "0a2f5453-47e5-4512-9f56-7c698d0b4847",
       "description": "Get a new car",
       "category": "Sample category",
       "target_amount": 10000,
@@ -256,8 +256,8 @@ You can check the database schema [here](./schema.md).
   ```json
   [
     {
-      "id": 1,
-      "user_id": 2,
+      "id": "0a2f5453-47e5-4512-9f56-7c698d0b4847",
+      "user_id": "0a2f5453-47e5-4512-9f56-7c698d0b4847",
       "description": "Get insurance",
       "category": "Sample category",
       "target_amount": 2000,
@@ -285,8 +285,8 @@ You can check the database schema [here](./schema.md).
   ```json
   [
     {
-      "id": 1,
-      "user_id": 2,
+      "id": "0a2f5453-47e5-4512-9f56-7c698d0b4847",
+      "user_id": "0a2f5453-47e5-4512-9f56-7c698d0b4847",
       "description": "Get insurance",
       "category": "Sample category",
       "target_amount": 2000,
@@ -299,8 +299,8 @@ You can check the database schema [here](./schema.md).
       "updated_at": "2024-02-09T13:35:20.280Z"
     },
     {
-      "id": 2,
-      "user_id": 2,
+      "id": "0a2f5453-47e5-4512-9f56-7c698d0b4847",
+      "user_id": "0a2f5453-47e5-4512-9f56-7c698d0b4847",
       "description": "Get a new car",
       "category": "Sample category",
       "target_amount": 10000,
@@ -328,8 +328,8 @@ You can check the database schema [here](./schema.md).
     ```json
     [
       {
-        "id": 1,
-        "user_id": 2,
+        "id": "0a2f5453-47e5-4512-9f56-7c698d0b4847",
+        "user_id": "0a2f5453-47e5-4512-9f56-7c698d0b4847",
         "description": "Get insurance",
         "category": "Sample category",
         "target_amount": 2000,
@@ -342,7 +342,7 @@ You can check the database schema [here](./schema.md).
         "updated_at": "2024-02-09T13:35:20.280Z"
       },
       {
-        "id": 2,
+        "id": "0a2f5453-47e5-4512-9f56-7c698d0b4847",
         "user_id": 2,
         "description": "Get a new car",
         "category": "Sample category",
@@ -381,7 +381,7 @@ You can check the database schema [here](./schema.md).
 - **SUCCESFUL RESPONSE:** status code 201
    ``` json
     {
-    "id": 2,
+    "id": "0a2f5453-47e5-4512-9f56-7c698d0b4847",
     "saving_id": 2,
     "amount": "2000.00",
     "date": "2024-02-09T00:00:00.000Z",
@@ -400,7 +400,7 @@ You can check the database schema [here](./schema.md).
     ```json
     [
         {
-            "id": 1,
+            "id": "0a2f5453-47e5-4512-9f56-7c698d0b4847",
             "saving_id": 1,
             "amount": 100,
             "date": "2024-02-10T12:00:00Z",
@@ -408,7 +408,7 @@ You can check the database schema [here](./schema.md).
             "updated_at": "2024-02-10T08:00:00Z"
         },
         {
-            "id": 2,
+            "id": "0a2f5453-47e5-4512-9f56-7c698d0b4847",
             "saving_id": 1,
             "amount": 150,
             "date": "2024-02-11T12:00:00Z",
@@ -440,7 +440,7 @@ You can check the database schema [here](./schema.md).
 - **SUCCESFUL RESPONSE:** status code 201
    ``` json
     {
-    "id": 2,
+    "id": "0a2f5453-47e5-4512-9f56-7c698d0b4847",
     "saving_id": 2,
     "amount": "2000.00",
          "description":"find description",
