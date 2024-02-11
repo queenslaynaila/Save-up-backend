@@ -1,15 +1,23 @@
 const pool = require('../db')
 const createContributions = async (req, res) => {
     try {
-        const { saving_id, amount, date} = req.body;
-        const query = 'INSERT INTO contributions (saving_id, amount, date) VALUES ($1, $2, $3) RETURNING *';
-        const values = [saving_id, amount, date];
-        const result = await pool.query(query, values);
-        return res.status(201).json(result.rows[0]);
+        const { saving_id, amount, date } = req.body;
+        // Insert contribution 
+        const contributionQuery = 'INSERT INTO contributions (saving_id, amount, date) VALUES ($1, $2, $3) RETURNING *';
+        const contributionValues = [saving_id, amount, date];
+        const contributionResult = await pool.query(contributionQuery, contributionValues);
+
+        // Update the contributed_amount in the coresponding savings table
+        const updateQuery = 'UPDATE savings SET contributed_amount = contributed_amount + $1 WHERE id = $2';
+        const updateValues = [amount, saving_id];
+        await pool.query(updateQuery, updateValues);
+
+        return res.status(201).json(contributionResult.rows[0]);
     } catch (error) {
         return res.status(500).json({ error: error.message });
     }
 };
+
 
 const getAllContributions = async (req, res) => {
     try {

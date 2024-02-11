@@ -147,12 +147,12 @@ You can check the database schema [here](./schema.md).
         "user_id": "0a2f5453-47e5-4512-9f56-7c698d0b4847",
         "description": "get insurance",
         "category": "Sample category",
-        "targetamount": "2000.00",
-        "contributedamount": "0", //automtically starts at 0 whe a user uploads ocntribution we upadet
+        "target_amount": "2000.00",
+        "contributed_amount": "0", //automtically starts at 0 whe a user uploads ocntribution it automatically updates
         "priority": "High",
         "status": "In Progress",  //automatically set to in progreess, update sttaus to complete when user finishes
-        "targetdate": "2024-02-09T00:00:00.000Z",
-        "startdate": "2024-02-09T00:00:00.000Z",  //autommatically set to savings caretion date
+        "target_date": "2024-02-09T00:00:00.000Z",
+        "start_date": "2024-02-09T00:00:00.000Z",  //autommatically set to savings caretion date
         "created_at": "2024-02-09T13:35:20.280Z",
         "updated_at": "2024-02-09T13:35:20.280Z"
     }
