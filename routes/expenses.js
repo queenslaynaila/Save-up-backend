@@ -25,5 +25,9 @@ router.delete('/:id', (req, res) => {
 router.get('/category/:category', (req, res) => {
     expenseController.getExpenseByCategory(req, res);
 });
+router.get('/month/:month', (req, res) => {
+    expenseController.getExpensesByMonth(req, res);
+});
+
 
 module.exports = router;

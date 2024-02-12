@@ -21,6 +21,7 @@ You can check the database schema [here](./schema.md).
 - [EXPENSE](#expense)
     - [POST /expenses](#post-expenses)
     - [GET /expenses/category/:category](#get-expensescategorycategory)
+    - [GET /expenses/date/:date](#get-expensesdatedate)
 
 
 # USERS
@@ -426,7 +427,7 @@ You can check the database schema [here](./schema.md).
 
 ### POST /expenses
 - **Endpoint:** `https://save-up-3w7t.onrender.com/expenses`
-- **Method:** POST saving_id, amount, date
+- **Method:** POST user_id, amount, date, category , description
 - **REQUEST BODY:** 
     ``` json
       {
@@ -452,10 +453,35 @@ You can check the database schema [here](./schema.md).
 
 ### GET /expenses/category/:category
 - **Description:** Retrieve expenses by category.
-- **Endpoint:** `https://save-up-3w7t.onrender.com/savings/category/:category`
+- **Endpoint:** `https://save-up-3w7t.onrender.com/expense/category/:category`
 - **Method:** GET
 - **Parameters:**
   - `:category` (string, required): The category of the expense to retrieve.
+- **SUCCESSFUL RESPONSE:** status code 200.If none matches an empty array is sent
+  ```json
+  [
+      {
+        "id": 1,
+        "user_id": 1222,
+        "category": "Groceries",
+        "amount": "50.00",
+             "description":"find description",
+        "date": "2024-02-08T21:00:00.000Z",
+        "created_at": "2024-02-09T05:56:42.049Z",
+        "updated_at": "2024-02-09T05:56:42.049Z"
+    },
+  ]
+  - **FAILED RESPONSE:** 
+ ``` json
+ {"error":"sample error is shown here"}
+  ```
+
+### GET /expenses/date/:date
+- **Description:** Retrieve expenses by date.
+- **Endpoint:** `https://save-up-3w7t.onrender.com/expense/month/:month`
+- **Method:** GET
+- **Parameters:**
+  - `:month`  The month of the expense to retrieve in numerical formart eeg `http://localhost:3001/expenses/month/12` to get expenses for december.
 - **SUCCESSFUL RESPONSE:** status code 200.If none matches an empty array is sent
   ```json
   [

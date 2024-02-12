@@ -79,11 +79,30 @@ const getExpenseByCategory = async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 };
+
+const getExpensesByMonth = async (req, res) => {
+    const { month } = req.params;
+    try {
+        let query = `
+            SELECT * FROM expenses
+            WHERE EXTRACT(MONTH FROM date) = $1
+        `;
+        const values = [month];
+
+        const result = await pool.query(query, values);
+        res.json(result.rows);
+    } catch (error) {
+        res.status(500).json({ error: 'Internal server error' });
+    }
+}
+
+
 module.exports = {
     createExpense,
     getAllExpenses,
     getExpenseById,
     updateExpense,
     deleteExpense,
-    getExpenseByCategory
+    getExpenseByCategory,
+    getExpensesByMonth
 };
