@@ -1,12 +1,36 @@
 const pool = require('../db')
+
+const updateUserTotalExpenseAmount = async (userId, newExpenseAmount) => {
+    try {
+        const query = `
+            UPDATE users
+            SET  total_expenses_amount  =  total_expenses_amount + $1
+            WHERE id = $2
+            RETURNING *`;
+        const result = await pool.query(query, [newExpenseAmount, userId]);
+        return result.rows[0];
+    } catch (error) {
+        throw new Error('Failed to update total contributions amount for the user');
+    }
+};
+
 const createExpense = async (req, res) => {
     try {
+        await pool.query('BEGIN');
+
         const { description, category, amount, date, user_id } = req.body;
         const query = 'INSERT INTO expenses (description, category, amount, date, user_id) VALUES ($1, $2, $3, $4, $5) RETURNING *';
         const values = [description, category, amount, date, user_id];
         const result = await pool.query(query, values);
+        
+        await updateUserTotalExpenseAmount(user_id, amount);
+
+        await pool.query('COMMIT');
+
         return res.status(201).json(result.rows[0]);
+      
     } catch (error) {
+        await pool.query('ROLLBACK');
         return res.status(500).json({ error: error.message });
     }
 };
