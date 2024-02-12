@@ -28,47 +28,47 @@ const updateUserTotalTargetedAmount = async (userId, newSavingTargetAmount) => {
 //     }
 // };
 
-// const createSaving = async (req, res) => {
-//     try {
-//         const { user_id, description, category, target_amount, priority, target_date} = req.body;
-//         const query = `
-//             INSERT INTO savings (user_id, description, category, target_amount, priority,  target_date) 
-//             VALUES ($1, $2, $3, $4, $5, $6) 
-//             RETURNING *`;
-//         const values = [user_id, description, category, target_amount, priority, target_date];
-//         const result = await pool.query(query, values);
-//         await updateUserTotalTargetedAmount(user_id, target_amount);
-//         return res.status(201).json(result.rows[0]);
-        
-//     } catch (error) {
-//         return res.status(500).json({ error: error.message });
-//     }
-// };
 const createSaving = async (req, res) => {
     try {
-        await pool.query('BEGIN');
-
-        const { user_id, description, category, target_amount, priority, target_date } = req.body;
-        const savingQuery = `
-            INSERT INTO savings (user_id, description, category, target_amount, priority, target_date) 
+        const { user_id, description, category, target_amount, priority, target_date} = req.body;
+        const query = `
+            INSERT INTO savings (user_id, description, category, target_amount, priority,  target_date) 
             VALUES ($1, $2, $3, $4, $5, $6) 
             RETURNING *`;
-        const savingValues = [user_id, description, category, target_amount, priority, target_date];
-        const savingResult = await pool.query(savingQuery, savingValues);
-
-        // Update total targeted amount for the user
-        await updateUserTotalTargetedAmount(client, user_id, target_amount);
-
-        await pool.query('COMMIT');
-
-        return res.status(201).json(savingResult.rows[0]);
+        const values = [user_id, description, category, target_amount, priority, target_date];
+        const result = await pool.query(query, values);
+        await updateUserTotalTargetedAmount(user_id, target_amount);
+        return res.status(201).json(result.rows[0]);
+        
     } catch (error) {
-        await pool.query('ROLLBACK');
         return res.status(500).json({ error: error.message });
-    } finally {
-        pool.release();
     }
 };
+// const createSaving = async (req, res) => {
+//     try {
+//         await pool.query('BEGIN');
+
+//         const { user_id, description, category, target_amount, priority, target_date } = req.body;
+//         const savingQuery = `
+//             INSERT INTO savings (user_id, description, category, target_amount, priority, target_date) 
+//             VALUES ($1, $2, $3, $4, $5, $6) 
+//             RETURNING *`;
+//         const savingValues = [user_id, description, category, target_amount, priority, target_date];
+//         const savingResult = await pool.query(savingQuery, savingValues);
+
+//         // Update total targeted amount for the user
+//         await updateUserTotalTargetedAmount(client, user_id, target_amount);
+
+//         await pool.query('COMMIT');
+
+//         return res.status(201).json(savingResult.rows[0]);
+//     } catch (error) {
+//         await pool.query('ROLLBACK');
+//         return res.status(500).json({ error: error.message });
+//     } finally {
+//         pool.release();
+//     }
+// };
 
 
 const getAllSavings = async (req, res) => {
