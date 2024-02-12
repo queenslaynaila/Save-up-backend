@@ -7,13 +7,13 @@ const generateToken = (id) => {
 };
 const createUser = async (req, res) => {
   try {
-    const { first_name, last_name, email, password } = req.body;
+    const { first_name, last_name, email, phone_no , password} = req.body;
     const password_hash = bcrypt.hashSync(password, 10);
     const userQuery = `
-      INSERT INTO users (first_name, last_name, email, password_hash, created_at, updated_at) 
-      VALUES ($1, $2, $3, $4, NOW(), NOW())
+      INSERT INTO users (first_name, last_name, email, phone_no, password_hash, created_at, updated_at) 
+      VALUES ($1, $2, $3, $4, $5, NOW(), NOW())
       RETURNING *`;
-    const userValues = [first_name, last_name, email, password_hash];
+    const userValues = [first_name, last_name, email, phone_no, password_hash];
     const userResult = await pool.query(userQuery, userValues);
     const user = userResult.rows[0];
     const token = generateToken(user.id);
@@ -87,18 +87,16 @@ const getUserById = async (req, res) => {
 const updateUser = async (req, res) => {
   try {
     const { id } = req.params;
-    const { username, email, phone_no } = req.body;
-    const query = 'UPDATE users SET username = $1, email = $2, phone_no = $3 WHERE id = $4 RETURNING *';
-    const result = await pool.query(query, [username, email, phone_no, id]);
+    const { first_name, last_name, email, phone_no } = req.body;
+    const query = 'UPDATE users SET first_name = $1, last_name = $2, email = $3, phone_no = $4 WHERE id = $5 RETURNING *';
+    const result = await pool.query(query, [first_name, last_name, email, phone_no, id]);
     const updatedUser = result.rows[0];
-    if (updatedUser) {
       return res.status(200).json(updatedUser);
-    }
-    throw new Error('User not found');
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
 };
+
 
   const deleteUser = async (req, res) => {
     try {
