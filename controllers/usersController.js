@@ -36,8 +36,8 @@ const login = async (req, res) => {
         const token = generateToken(user.id);
         user.token = token;
         res.json(user);
-    } else {
-      return res.status(500).json({ error:"user not found" });
+    } else{
+      return res.status(401).json({ error: 'Invalid email, phone number, or password combination' });
     }
   } catch (error) {
     return res.status(500).json({ error: error.message });
