@@ -11,7 +11,7 @@
 /generate_schema.js
 .env
 .vscode
-/concern.notes
+/concerns.notes
 
 # production
 /build
