@@ -1,19 +1,38 @@
 const pool = require('../db')
+
+
+const updateUserTotalContributionsAmount = async (userId, newContributionAmount) => {
+    try {
+        const query = `
+            UPDATE users
+            SET total_contributions_amount = total_contributions_amount + $1
+            WHERE id = $2
+            RETURNING *`;
+        await pool.query(query, [newContributionAmount, userId]);
+    } catch (error) {
+        throw new Error('Failed to update total contributions amount for the user');
+    }
+};
 const createContributions = async (req, res) => {
     try {
+        await pool.query('BEGIN');
+
         const { saving_id, amount, date } = req.body;
-        // Insert contribution 
         const contributionQuery = 'INSERT INTO contributions (saving_id, amount, date) VALUES ($1, $2, $3) RETURNING *';
         const contributionValues = [saving_id, amount, date];
         const contributionResult = await pool.query(contributionQuery, contributionValues);
 
-        // Update the contributed_amount in the coresponding savings table
-        const updateQuery = 'UPDATE savings SET contributed_amount = contributed_amount + $1 WHERE id = $2';
-        const updateValues = [amount, saving_id];
-        await pool.query(updateQuery, updateValues);
+        const getUserQuery = 'SELECT user_id FROM savings WHERE id = $1';
+        const getUserResult = await pool.query(getUserQuery, [saving_id]);
+        const user_id = getUserResult.rows[0].user_id;
 
+        await updateUserTotalContributionsAmount(user_id, amount);
+
+        await pool.query('COMMIT');
+        
         return res.status(201).json(contributionResult.rows[0]);
     } catch (error) {
+        await pool.query('ROLLBACK');
         return res.status(500).json({ error: error.message });
     }
 };
