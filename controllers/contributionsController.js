@@ -91,7 +91,7 @@ const getContributionsBySaving = async (req, res) => {
     try {
         const query = 'SELECT * FROM contributions WHERE saving_id = $1';
         const result = await pool.query(query, [saving_id]);
-        return res.status(200).json(result);
+        return res.status(200).json(result.rows);
     } catch (error) {
         return res.status(500).json({ error: error.message });
     }
