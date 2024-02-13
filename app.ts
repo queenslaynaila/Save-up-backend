@@ -1,0 +1,34 @@
+import express, { Request, Response } from 'express';
+import morgan from 'morgan';
+import cors from 'cors';
+import usersRouter from './routes/users';
+import savingsRouter from './routes/savings';
+import contributionsRouter from './routes/contributions';
+import expensesRouter from './routes/expenses';
+
+const app = express();
+
+// Middleware
+app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
+app.use(morgan('dev'));
+app.use(cors());
+
+// Routes
+app.use('/users', usersRouter);
+app.use('/savings', savingsRouter);
+app.use('/contributions', contributionsRouter);
+app.use('/expenses', expensesRouter);
+
+// 404 Error handler
+app.use((req: Request, res: Response) => {
+  const error = new Error('Not found');
+  res.status(404).json({ error: { message: error.message } });
+});
+
+// Global error handler
+app.use((error: Error, req: Request, res: Response) => {
+  res.status(res.statusCode || 500).json({ error: { message: error.message } });
+});
+
+export default app;
