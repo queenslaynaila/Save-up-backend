@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { Request, Response  } from 'express';
 import pool from '../db';
 import jwt, { Secret } from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
@@ -8,28 +8,27 @@ const generateToken = (id: string): string => {
   return jwt.sign({ id }, process.env.JWT_SECRET as Secret, { expiresIn: '1h' });
 };
 
-export const createUser = async (req: Request, res: Response) => {
-  const validatedUser = userSchema.parse(req.body);
-  const { first_name, last_name, email, phone_no, password } = validatedUser;
-  const password_hash = bcrypt.hashSync(password, 10);
-  const userQuery = `
-    INSERT INTO users (first_name, last_name, email, phone_no, password_hash, created_at, updated_at) 
-    VALUES ($1, $2, $3, $4, $5, NOW(), NOW())
-    RETURNING *`;
-  const userValues = [first_name, last_name, email, phone_no, password_hash];
-
+export const createUser = async (req: Request, res: Response ) => {
   try {
+    const validatedUser = userSchema.parse(req.body);
+    const { first_name, last_name, email, phone_no, password } = validatedUser;
+    const password_hash = bcrypt.hashSync(password, 10);
+    const userQuery = `
+      INSERT INTO users (first_name, last_name, email, phone_no, password_hash, created_at, updated_at) 
+      VALUES ($1, $2, $3, $4, $5, NOW(), NOW())
+      RETURNING *`;
+    const userValues = [first_name, last_name, email, phone_no, password_hash];
     const userResult = await pool.query(userQuery, userValues);
     const user = userResult.rows[0];
     const token = generateToken(user.id);
     user.token = token;
     return res.json(user);
   } catch (error) {
-    throw new HttpError(400, (error as Error).message);
+    res.status(400).json({ error: (error as Error).message });
   }
 };
 
-export const login = async (req: Request, res: Response) => {
+export const login = async (req: Request, res: Response ) => {
   try {
     const { email, password, phone_no } = req.body;
     const query = email
@@ -39,26 +38,26 @@ export const login = async (req: Request, res: Response) => {
     const result = await pool.query(query, params);
     const user = result.rows[0];
     if (!user || !(await bcrypt.compare(password, user.password_hash))) {
-      throw new Error('Invalid email, phone number, or password combination');
+      throw new HttpError(400, 'Invalid email, phone number, or password combination');
     }
     const token = generateToken(user.id);
     user.token = token;
     res.json(user);
   } catch (error) {
-    throw new HttpError(400, (error as Error).message);
+    res.status(400).json({ error: (error as Error).message });
   }
 };
 
-export const signout = async (req: Request, res: Response) => {
+export const signout = async (req: Request, res: Response ) => {
   try {
     const authToken = req.cookies.auth_token;
     if (!authToken) {
-      throw new Error('Invalid request');
+      throw new HttpError(400, 'Invalid request');
     }
     res.clearCookie('auth_token');
     return res.status(200).json({ message: 'Logout successful' });
   } catch (error) {
-    throw new HttpError(400, (error as Error).message);
+    res.status(400).json({ error: (error as Error).message });
   }
 };
 
@@ -68,11 +67,11 @@ export const getAllUsers = async (req: Request, res: Response) => {
     const result = await pool.query(query);
     const users = result.rows;
     if (!users) {
-      throw new Error('No users found');
+      throw new HttpError(400, 'No users found');
     }
     return res.status(200).json(users);
   } catch (error) {
-    throw new HttpError(400, (error as Error).message);
+    res.status(400).json({ error: (error as Error).message });
   }
 };
 
@@ -86,11 +85,11 @@ export const getUserById = async (req: Request, res: Response) => {
     const result = await pool.query(query, [id]);
     const user = result.rows[0];
     if (!user) {
-      throw new Error('User not found');
+      throw new HttpError(400, 'User not found');
     }
     return res.status(200).json(user);
   } catch (error) {
-    throw new HttpError(400, (error as Error).message);
+    res.status(400).json({ error: (error as Error).message });
   }
 };
 
@@ -103,11 +102,11 @@ export const updateUser = async (req: Request, res: Response) => {
     const result = await pool.query(query, [first_name, last_name, email, phone_no, id]);
     const updatedUser = result.rows[0];
     if (!updatedUser) {
-      throw new Error('User not found');
+      throw new HttpError(400, 'User not found');
     }
     return res.status(200).json(updatedUser);
   } catch (error) {
-    throw new HttpError(400, (error as Error).message);
+    res.status(400).json({ error: (error as Error).message });
   }
 };
 
@@ -120,9 +119,9 @@ export const deleteUser = async (req: Request, res: Response) => {
     if (result.rowCount != null && result.rowCount > 0) {
       return res.status(204).json({ message: 'User deleted' });
     } else {
-      throw new Error('User not found');
+      throw new HttpError(400, 'User not found');
     }
   } catch (error) {
-    throw new HttpError(400, (error as Error).message);
+    res.status(400).json({ error: (error as Error).message });
   }
 };
