@@ -1,13 +1,13 @@
 import { Request, Response } from 'express';
-import pool from "../db";
-import jwt, { Secret } from "jsonwebtoken";
-import bcrypt from "bcrypt";
-import { userSchema,HttpError } from "../types";
+import pool from '../db';
+import jwt, { Secret } from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
+import { userSchema, HttpError } from '../types';
 
 const generateToken = (id: string): string => {
-  return jwt.sign({ id }, process.env.JWT_SECRET as Secret, { expiresIn: "1h" });
+  return jwt.sign({ id }, process.env.JWT_SECRET as Secret, { expiresIn: '1h' });
 };
- 
+
 export const createUser = async (req: Request, res: Response) => {
   const validatedUser = userSchema.parse(req.body);
   const { first_name, last_name, email, phone_no, password } = validatedUser;
@@ -17,7 +17,7 @@ export const createUser = async (req: Request, res: Response) => {
     VALUES ($1, $2, $3, $4, $5, NOW(), NOW())
     RETURNING *`;
   const userValues = [first_name, last_name, email, phone_no, password_hash];
-  
+
   try {
     const userResult = await pool.query(userQuery, userValues);
     const user = userResult.rows[0];
@@ -29,16 +29,17 @@ export const createUser = async (req: Request, res: Response) => {
   }
 };
 
-
 export const login = async (req: Request, res: Response) => {
   try {
     const { email, password, phone_no } = req.body;
-    const query = email ? 'SELECT * FROM users WHERE email = $1' : 'SELECT * FROM users WHERE phone_no = $1';
+    const query = email
+      ? 'SELECT * FROM users WHERE email = $1'
+      : 'SELECT * FROM users WHERE phone_no = $1';
     const params = [email || phone_no];
     const result = await pool.query(query, params);
     const user = result.rows[0];
     if (!user || !(await bcrypt.compare(password, user.password_hash))) {
-        throw new Error('Invalid email, phone number, or password combination');
+      throw new Error('Invalid email, phone number, or password combination');
     }
     const token = generateToken(user.id);
     user.token = token;
@@ -49,7 +50,7 @@ export const login = async (req: Request, res: Response) => {
 };
 
 export const signout = async (req: Request, res: Response) => {
-  try { 
+  try {
     const authToken = req.cookies.auth_token;
     if (!authToken) {
       throw new Error('Invalid request');
@@ -60,8 +61,6 @@ export const signout = async (req: Request, res: Response) => {
     throw new HttpError(400, (error as Error).message);
   }
 };
-
-
 
 export const getAllUsers = async (req: Request, res: Response) => {
   try {
@@ -99,7 +98,8 @@ export const updateUser = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const { first_name, last_name, email, phone_no } = req.body;
-    const query = 'UPDATE users SET first_name = $1, last_name = $2, email = $3, phone_no = $4 WHERE id = $5 RETURNING *';
+    const query =
+      'UPDATE users SET first_name = $1, last_name = $2, email = $3, phone_no = $4 WHERE id = $5 RETURNING *';
     const result = await pool.query(query, [first_name, last_name, email, phone_no, id]);
     const updatedUser = result.rows[0];
     if (!updatedUser) {
@@ -110,7 +110,6 @@ export const updateUser = async (req: Request, res: Response) => {
     throw new HttpError(400, (error as Error).message);
   }
 };
-
 
 export const deleteUser = async (req: Request, res: Response) => {
   try {
