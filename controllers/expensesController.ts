@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { expenseSchema, HttpError } from '../types';
+import { expenseSchema } from '../types';
 import pool from '../db';
 
 export const updateUserTotalExpenseAmount = async (userId: string, newExpenseAmount: number) => {
@@ -9,13 +9,17 @@ export const updateUserTotalExpenseAmount = async (userId: string, newExpenseAmo
         WHERE id = $2
         RETURNING *`;
 
-  const result = await pool.query(query, [newExpenseAmount, userId]);
+  try {
+    const result = await pool.query(query, [newExpenseAmount, userId]);
 
-  if (result.rows.length === 0) {
-    throw new HttpError(500, 'Failed to update total expenses amount for the user');
+    if (result.rows.length === 0) {
+      return { error: 'Failed to update total expenses amount for the user' };
+    }
+
+    return result.rows[0];
+  } catch (error) {
+    return { error: 'Failed to update total expenses amount for the user' };
   }
-
-  return result.rows[0];
 };
 
 export const createExpense = async (req: Request, res: Response) => {
@@ -29,14 +33,14 @@ export const createExpense = async (req: Request, res: Response) => {
     const result = await pool.query(query, values);
     if (result.rows.length === 0) {
       await pool.query('ROLLBACK');
-      throw new HttpError(500, 'Failed to create expense');
+      return res.status(500).json({ error: 'Failed to create expense' });
     }
     await updateUserTotalExpenseAmount(user_id, amount);
     await pool.query('COMMIT');
     return res.status(201).json(result.rows[0]);
   } catch (error) {
     await pool.query('ROLLBACK');
-    throw new HttpError(400, (error as Error).message);
+    return res.status(400).json({ message: (error as Error).message });
   }
 };
 
@@ -46,7 +50,7 @@ export const getAllExpenses = async (req: Request, res: Response) => {
     const result = await pool.query(query);
     return res.status(200).json(result.rows);
   } catch (error) {
-    throw new HttpError(400, (error as Error).message);
+    return res.status(400).json({ message: (error as Error).message });
   }
 };
 
@@ -56,11 +60,11 @@ export const getExpenseById = async (req: Request, res: Response) => {
     const query = 'SELECT * FROM expenses WHERE id = $1';
     const result = await pool.query(query, [id]);
     if (result.rows.length === 0) {
-      throw new HttpError(404, 'Expense not found');
+      return res.status(404).json({ error: 'Expense not found' });
     }
     return res.status(200).json(result.rows[0]);
   } catch (error) {
-    throw new HttpError(400, (error as Error).message);
+    return res.status(400).json({ message: (error as Error).message });
   }
 };
 
@@ -74,11 +78,11 @@ export const updateExpense = async (req: Request, res: Response) => {
     const values = [description, category, amount, date, id];
     const result = await pool.query(query, values);
     if (result.rows.length === 0) {
-      throw new HttpError(404, 'Expense not found');
+      return res.status(404).json({ error: 'Expense not found' });
     }
     return res.status(200).json(result.rows[0]);
   } catch (error) {
-    throw new HttpError(400, (error as Error).message);
+    return res.status(400).json({ message: (error as Error).message });
   }
 };
 
@@ -88,11 +92,11 @@ export const deleteExpense = async (req: Request, res: Response) => {
     const query = 'DELETE FROM expenses WHERE id = $1';
     const result = await pool.query(query, [id]);
     if (result.rowCount === 0) {
-      throw new HttpError(404, 'Expense not found');
+      return res.status(404).json({ error: 'Expense not found' });
     }
     return res.status(204).json({ message: 'Expense deleted' });
   } catch (error) {
-    throw new HttpError(400, (error as Error).message);
+    return res.status(400).json({ message: (error as Error).message });
   }
 };
 
@@ -103,7 +107,7 @@ export const getExpenseByCategory = async (req: Request, res: Response) => {
     const result = await pool.query(query, [category]);
     res.json(result.rows);
   } catch (error) {
-    throw new HttpError(400, (error as Error).message);
+    return res.status(400).json({ message: (error as Error).message });
   }
 };
 
@@ -115,6 +119,6 @@ export const getExpensesByMonth = async (req: Request, res: Response) => {
     const result = await pool.query(query, values);
     res.json(result.rows);
   } catch (error) {
-    throw new HttpError(400, (error as Error).message);
+    return res.status(400).json({ message: (error as Error).message });
   }
 };

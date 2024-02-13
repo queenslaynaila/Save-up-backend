@@ -1,10 +1,11 @@
 import { Request, Response } from 'express';
-import { savingSchema, HttpError } from '../types';
+import { savingSchema } from '../types';
 import pool from '../db';
 
 export const updateUserTotalTargetedAmount = async (
   userId: string,
-  newSavingTargetAmount: number
+  newSavingTargetAmount: number,
+  res: Response
 ) => {
   const query = `
         UPDATE users
@@ -13,8 +14,9 @@ export const updateUserTotalTargetedAmount = async (
         RETURNING *`;
   try {
     await pool.query(query, [newSavingTargetAmount, userId]);
+    res.status(200).json({ message: 'Total targeted amount for the user updated successfully' });
   } catch (error) {
-    throw new HttpError(500, 'Failed to update total targeted amount for the user');
+    res.status(500).json({ message: 'Failed to update total targeted amount for the user' });
   }
 };
 
@@ -22,9 +24,9 @@ export const getAllSavings = async (req: Request, res: Response) => {
   try {
     const query = 'SELECT * FROM savings';
     const result = await pool.query(query);
-    return res.status(200).json(result.rows);
+    res.status(200).json(result.rows);
   } catch (error) {
-    throw new HttpError(400, (error as Error).message);
+    res.status(400).json({ message: (error as Error).message });
   }
 };
 
@@ -40,12 +42,12 @@ export const createSaving = async (req: Request, res: Response) => {
             RETURNING *`;
     const savingValues = [user_id, description, category, target_amount, priority, target_date];
     const savingResult = await pool.query(savingQuery, savingValues);
-    await updateUserTotalTargetedAmount(user_id, target_amount);
+    await updateUserTotalTargetedAmount(user_id, target_amount, res);
     await pool.query('COMMIT');
-    return res.status(201).json(savingResult.rows[0]);
+    res.status(201).json(savingResult.rows[0]);
   } catch (error) {
     await pool.query('ROLLBACK');
-    throw new HttpError(400, (error as Error).message);
+    res.status(400).json({ message: (error as Error).message });
   }
 };
 
@@ -55,11 +57,12 @@ export const getSavingById = async (req: Request, res: Response) => {
     const query = 'SELECT * FROM savings WHERE id = $1';
     const result = await pool.query(query, [id]);
     if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'Saving not found' });
+      res.status(404).json({ error: 'Saving not found' });
+    } else {
+      res.status(200).json(result.rows[0]);
     }
-    return res.status(200).json(result.rows[0]);
   } catch (error) {
-    throw new HttpError(400, (error as Error).message);
+    res.status(400).json({ message: (error as Error).message });
   }
 };
 
@@ -104,11 +107,12 @@ export const updateSaving = async (req: Request, res: Response) => {
     ];
     const result = await pool.query(query, values);
     if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'Saving not found' });
+      res.status(404).json({ error: 'Saving not found' });
+    } else {
+      res.status(200).json(result.rows[0]);
     }
-    return res.status(200).json(result.rows[0]);
   } catch (error) {
-    throw new HttpError(400, (error as Error).message);
+    res.status(400).json({ message: (error as Error).message });
   }
 };
 
@@ -118,11 +122,12 @@ export const deleteSaving = async (req: Request, res: Response) => {
     const query = 'DELETE FROM savings WHERE id = $1';
     const result = await pool.query(query, [id]);
     if (result.rowCount === 0) {
-      return res.status(404).json({ error: 'Saving not found' });
+      res.status(404).json({ error: 'Saving not found' });
+    } else {
+      res.status(204).json();
     }
-    return res.status(204).json();
   } catch (error) {
-    throw new HttpError(400, (error as Error).message);
+    res.status(400).json({ message: (error as Error).message });
   }
 };
 
@@ -133,7 +138,7 @@ export const getSavingsByCategory = async (req: Request, res: Response) => {
     const result = await pool.query(query, [category]);
     res.json(result.rows);
   } catch (error) {
-    throw new HttpError(400, (error as Error).message);
+    res.status(400).json({ message: (error as Error).message });
   }
 };
 
@@ -144,7 +149,7 @@ export const getSavingsByStatus = async (req: Request, res: Response) => {
     const result = await pool.query(query, [status]);
     res.json(result.rows);
   } catch (error) {
-    throw new HttpError(400, (error as Error).message);
+    res.status(400).json({ message: (error as Error).message });
   }
 };
 
@@ -155,7 +160,7 @@ export const getSavingsByPriority = async (req: Request, res: Response) => {
     const result = await pool.query(query, [priority]);
     res.json(result.rows);
   } catch (error) {
-    throw new HttpError(400, (error as Error).message);
+    res.status(400).json({ message: (error as Error).message });
   }
 };
 
@@ -164,8 +169,9 @@ export const getUserSavings = async (req: Request, res: Response) => {
     const id = req.params.id;
     const query = 'SELECT * FROM savings WHERE user_id = $1';
     const { rows } = await pool.query(query, [id]);
-    return res.status(200).json(rows);
+    res.status(200).json(rows);
   } catch (error) {
-    throw new HttpError(400, (error as Error).message);
+    res.status(400).json({ message: (error as Error).message });
   }
 };
+
