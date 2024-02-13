@@ -49,21 +49,14 @@ export const login = async (req: Request, res: Response) => {
 };
 
 export const signout = async (req: Request, res: Response) => {
-  try {
-    // Assuming you have a way to retrieve the user ID or any necessary information
+  try { 
     const authToken = req.cookies.auth_token;
-
     if (!authToken) {
       throw new Error('Invalid request');
     }
-
-    // Clear the JWT token from the client-side storage (cookie)
     res.clearCookie('auth_token');
-
-    // Optionally, you can send a response indicating successful sign-out
     return res.status(200).json({ message: 'Logout successful' });
   } catch (error) {
-    // Handle any errors that occur during sign-out
     throw new HttpError(400, (error as Error).message);
   }
 };
