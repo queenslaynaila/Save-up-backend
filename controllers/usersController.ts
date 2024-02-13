@@ -1,4 +1,4 @@
-import { Request, Response  } from 'express';
+import { Request, Response } from 'express';
 import pool from '../db';
 import jwt, { Secret } from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
@@ -8,7 +8,7 @@ const generateToken = (id: string): string => {
   return jwt.sign({ id }, process.env.JWT_SECRET as Secret, { expiresIn: '1h' });
 };
 
-export const createUser = async (req: Request, res: Response ) => {
+export const createUser = async (req: Request, res: Response) => {
   try {
     const validatedUser = userSchema.parse(req.body);
     const { first_name, last_name, email, phone_no, password } = validatedUser;
@@ -28,7 +28,7 @@ export const createUser = async (req: Request, res: Response ) => {
   }
 };
 
-export const login = async (req: Request, res: Response ) => {
+export const login = async (req: Request, res: Response) => {
   try {
     const { email, password, phone_no } = req.body;
     const query = email
@@ -48,7 +48,7 @@ export const login = async (req: Request, res: Response ) => {
   }
 };
 
-export const signout = async (req: Request, res: Response ) => {
+export const signout = async (req: Request, res: Response) => {
   try {
     const authToken = req.cookies.auth_token;
     if (!authToken) {

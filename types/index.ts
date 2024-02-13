@@ -34,8 +34,6 @@ export const contributionsSchema = z.object({
   date: z.date(),
 });
 
-
-
 export class HttpError extends Error {
   statusCode: number;
   constructor(statusCode: number, message: string) {
@@ -44,7 +42,6 @@ export class HttpError extends Error {
   }
 }
 
- 
 export type User = z.infer<typeof userSchema>;
 export type Saving = z.infer<typeof savingSchema>;
 export type Contribution = z.infer<typeof savingSchema>;
