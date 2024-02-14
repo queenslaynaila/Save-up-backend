@@ -19,9 +19,9 @@ const authenticateToken = (req: Request, res: Response, next: NextFunction) => {
       jwt.verify(tokenValue, process.env.JWT_SECRET as Secret, (err, decoded) => {
           if (err) {
               if (err.name === 'TokenExpiredError') {
-                  return res.status(401).json({ message: 'Token expired' });
+                  return res.status(401).json({ message: 'Token expired,please log in again' });
               } else {
-                  return res.status(401).json({ message: 'Invalid token' });
+                  return res.status(401).json({ message: 'Invalid token,please log in again' });
               }
           }
           
