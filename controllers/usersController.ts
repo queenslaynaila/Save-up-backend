@@ -99,7 +99,7 @@ export const updateUser = async (req: Request, res: Response) => {
     return res.status(403).json({ error: 'You are not authorized to update this user information' });
   }
   const validationResultBody = updateUserSchema.safeParse(req.body);
-  console.log(req.user)
+ 
   if (!validationResultBody.success) {
     return res.status(400).json({ error: new HttpError(400, 'Invalid user data. Please provide valid values for all user fields.').message });
   }
