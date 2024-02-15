@@ -176,7 +176,7 @@ const executeQuery = async (res: Response, query: string, values: any[], errorMe
 
 export const getSavings = async (req: Request, res: Response) => {
   const { user_id, category, priority, status } = req.query;
-  const logged_in_user_id = req.user.id; // assuming the logged-in user ID is available in the request
+  const logged_in_user_id = req.user?.id; // assuming the logged-in user ID is available in the request
 
   let query = 'SELECT * FROM savings WHERE user_id = $1';
   const values = [user_id];
