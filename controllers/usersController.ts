@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import pool from '../db';
 import jwt, { Secret } from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
-import { userSchema, HttpError,userLoginSchema,idSchema ,updateUserSchema} from '../types';
+import { userSchema, HttpError, userLoginSchema, idSchema, updateUserSchema } from '../types';
 
 const generateToken = (id: string): string => {
   return jwt.sign({ id }, process.env.JWT_SECRET as Secret, { expiresIn: '1h' });
@@ -11,7 +11,9 @@ const generateToken = (id: string): string => {
 export const createUser = async (req: Request, res: Response) => {
   const validationResult = userSchema.safeParse(req.body);
   if (!validationResult.success) {
-    return res.status(400).json({ error: new HttpError(400, 'Invalid email, phone number, or password').message });
+    return res
+      .status(400)
+      .json({ error: new HttpError(400, 'Invalid email, phone number, or password').message });
   }
   const { first_name, last_name, email, phone_no, password } = validationResult.data;
   const password_hash = bcrypt.hashSync(password, 10);
@@ -27,35 +29,50 @@ export const createUser = async (req: Request, res: Response) => {
     user.token = token;
     return res.json(user);
   } catch (error) {
-    return res.status(400).json({ error: new HttpError(400, 'An account with the provided email or phone number already exists').message });
+    return res
+      .status(400)
+      .json({
+        error: new HttpError(
+          400,
+          'An account with the provided email or phone number already exists'
+        ).message,
+      });
   }
-}
+};
 
 export const login = async (req: Request, res: Response) => {
   const validationResult = userLoginSchema.safeParse(req.body);
   if (!validationResult.success) {
-    return res.status(400).json({ error: new HttpError(400, 'Invalid email, phone number, or password').message });
+    return res
+      .status(400)
+      .json({ error: new HttpError(400, 'Invalid email, phone number, or password').message });
   }
   const { email, password, phone_no } = req.body;
-  const params = [email || phone_no]; 
+  const params = [email || phone_no];
   const query = email
     ? 'SELECT * FROM users WHERE email = $1'
     : 'SELECT * FROM users WHERE phone_no = $1';
 
-    const result = await pool.query(query, params);
-    const user = result.rows[0];
-    if (!user || !(await bcrypt.compare(password, user.password_hash))) {
-      return res.status(400).json({ error: new HttpError(400, 'Invalid email, phone number, or password combination').message });
-    }
-    const token = generateToken(user.id);
-    user.token = token;
-    res.json(user);
+  const result = await pool.query(query, params);
+  const user = result.rows[0];
+  if (!user || !(await bcrypt.compare(password, user.password_hash))) {
+    return res
+      .status(400)
+      .json({
+        error: new HttpError(400, 'Invalid email, phone number, or password combination').message,
+      });
+  }
+  const token = generateToken(user.id);
+  user.token = token;
+  res.json(user);
 };
 
 export const signout = async (req: Request, res: Response) => {
   const authToken = req.cookies.auth_token;
   if (!authToken) {
-    return res.status(400).json({ error: new HttpError(400, 'Invalid request: no auth token provided').message });
+    return res
+      .status(400)
+      .json({ error: new HttpError(400, 'Invalid request: no auth token provided').message });
   }
   res.clearCookie('auth_token');
   return res.status(200).json({ message: 'Logout successful' });
@@ -71,22 +88,21 @@ export const getAllUsers = async (req: Request, res: Response) => {
   return res.status(200).json(users);
 };
 
-
-
 export const getUserById = async (req: Request, res: Response) => {
   const validationResult = idSchema.safeParse(req.params.id);
   if (!validationResult.success) {
     return res.status(400).json({ error: new HttpError(400, 'Invalid user ID').message });
   }
-    const id = validationResult.data
-    const query = 'SELECT * FROM users WHERE id = $1';
-    const result = await pool.query(query, [id]);
-    const user = result.rows[0];
-    if (!user) {
-      return res.status(400).json({ error: new HttpError(400, 'User with submitted ID not found').message });
-    }
-    return res.status(200).json(user);
-
+  const id = validationResult.data;
+  const query = 'SELECT * FROM users WHERE id = $1';
+  const result = await pool.query(query, [id]);
+  const user = result.rows[0];
+  if (!user) {
+    return res
+      .status(400)
+      .json({ error: new HttpError(400, 'User with submitted ID not found').message });
+  }
+  return res.status(200).json(user);
 };
 
 export const updateUser = async (req: Request, res: Response) => {
@@ -94,20 +110,29 @@ export const updateUser = async (req: Request, res: Response) => {
   if (!validationResult.success) {
     return res.status(400).json({ error: new HttpError(400, 'Invalid user ID').message });
   }
-  const userId = validationResult.data
+  const userId = validationResult.data;
   if (userId !== req.user?.id) {
-    return res.status(403).json({ error: 'You are not authorized to update this user information' });
+    return res
+      .status(403)
+      .json({ error: 'You are not authorized to update this user information' });
   }
   const validationResultBody = updateUserSchema.safeParse(req.body);
- 
+
   if (!validationResultBody.success) {
-    return res.status(400).json({ error: new HttpError(400, 'Invalid user data. Please provide valid values for all user fields.').message });
+    return res
+      .status(400)
+      .json({
+        error: new HttpError(
+          400,
+          'Invalid user data. Please provide valid values for all user fields.'
+        ).message,
+      });
   }
 
   const { first_name, last_name, email, phone_no } = validationResultBody.data;
   let query = 'UPDATE users SET ';
   const values = [];
-  
+
   if (first_name) {
     query += `first_name = $${values.length + 1}, `;
     values.push(first_name);
@@ -132,16 +157,15 @@ export const updateUser = async (req: Request, res: Response) => {
 
   const result = await pool.query(query, values);
   const updatedUser = result.rows[0];
-  
+
   if (!updatedUser) {
-    return res.status(400).json({ error: new HttpError(400, 'User with given ID not found').message });
+    return res
+      .status(400)
+      .json({ error: new HttpError(400, 'User with given ID not found').message });
   }
-  
+
   return res.status(200).json(updatedUser);
 };
-
-
-
 
 export const deleteUser = async (req: Request, res: Response) => {
   const validationResult = idSchema.safeParse(req.params.id);
@@ -150,16 +174,19 @@ export const deleteUser = async (req: Request, res: Response) => {
   }
   const id = validationResult.data;
   if (id !== req.user?.id) {
-    return res.status(403).json({ error: 'You are not authorized to delete this user information' });
+    return res
+      .status(403)
+      .json({ error: 'You are not authorized to delete this user information' });
   }
 
-    const query = 'DELETE FROM users WHERE id = $1 RETURNING *';
-    const result = await pool.query(query, [id]);
+  const query = 'DELETE FROM users WHERE id = $1 RETURNING *';
+  const result = await pool.query(query, [id]);
 
-    if (result.rowCount != null && result.rowCount > 0) {
-      return res.status(204).json({ error: new HttpError(400, 'User deleted successfully').message });
-    } else {
-      return res.status(400).json({ error: new HttpError(400, 'User with provided ID not found').message });
-    }
- 
+  if (result.rowCount != null && result.rowCount > 0) {
+    return res.status(204).json({ error: new HttpError(400, 'User deleted successfully').message });
+  } else {
+    return res
+      .status(400)
+      .json({ error: new HttpError(400, 'User with provided ID not found').message });
+  }
 };

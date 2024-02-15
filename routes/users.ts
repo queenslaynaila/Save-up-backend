@@ -12,11 +12,11 @@ router.get('/:id', (req: Request, res: Response) => {
   usersController.getUserById(req, res);
 });
 
-router.patch('/:id',authenticateToken, (req: Request, res: Response) => {
+router.patch('/:id', authenticateToken, (req: Request, res: Response) => {
   usersController.updateUser(req, res);
 });
 
-router.delete('/:id', authenticateToken,(req: Request, res: Response) => {
+router.delete('/:id', authenticateToken, (req: Request, res: Response) => {
   usersController.deleteUser(req, res);
 });
 
@@ -27,7 +27,7 @@ router.post('/', (req: Request, res: Response) => {
 router.post('/signin', (req: Request, res: Response) => {
   usersController.login(req, res);
 });
-router.post('/signout', authenticateToken,(req: Request, res: Response) => {
+router.post('/signout', authenticateToken, (req: Request, res: Response) => {
   usersController.signout(req, res);
 });
 

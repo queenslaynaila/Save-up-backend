@@ -24,7 +24,6 @@ const authenticateToken = (req: Request, res: Response, next: NextFunction) => {
         return res.status(401).json({ message: 'Invalid token,please log in again' });
       }
     }
-    
 
     req.user = decoded as User;
     next();

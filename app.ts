@@ -29,11 +29,7 @@ app.use((req: Request, res: Response) => {
 // Global error handler
 /* eslint-disable @typescript-eslint/no-unused-vars */
 app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
-  
- 
-   
-    return res.status(500).json({ error: 'Internal Server Error' });
-  
+  return res.status(500).json({ error: 'Internal Server Error' });
 });
 
 export default app;

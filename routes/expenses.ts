@@ -24,6 +24,4 @@ router.delete('/:id', authenticateToken, (req: Request, res: Response) => {
   expenseController.deleteExpense(req, res);
 });
 
-
-
 export default router;
