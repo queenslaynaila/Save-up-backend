@@ -19,7 +19,7 @@ router.delete('/:id', authenticateToken, (req: Request, res: Response) => {
   savingsController.deleteSaving(req, res);
 });
 
-router.get('/', async (req: Request, res: Response) => {
+router.get('/',authenticateToken, (req: Request, res: Response) => {
   savingsController.getSavings(req, res);
 });
 

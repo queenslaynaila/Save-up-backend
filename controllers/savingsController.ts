@@ -176,29 +176,32 @@ const executeQuery = async (res: Response, query: string, values: any[], errorMe
 
 export const getSavings = async (req: Request, res: Response) => {
   const { user_id, category, priority, status } = req.query;
+  const logged_in_user_id = req.user.id; // assuming the logged-in user ID is available in the request
 
-  let query;
-  const values = [];
-  let errorMessage;
+  let query = 'SELECT * FROM savings WHERE user_id = $1';
+  const values = [user_id];
+  let errorMessage = 'No savings found for the provided user ID';
 
-  if (user_id) {
-    query = 'SELECT * FROM savings WHERE user_id = $1';
-    values.push(user_id);
-    errorMessage = 'No savings found for the provided user ID';
-  } else if (category) {
-    query = 'SELECT * FROM savings WHERE category = $1';
+  if (user_id !== logged_in_user_id) {
+    return res.status(403).json({ error: new HttpError(403, 'Unauthorized access').message });
+  }
+
+  if (category) {
+    query += ' AND category = $2';
     values.push(category);
     errorMessage = 'No savings found with the provided category';
-  } else if (priority) {
-    query = 'SELECT * FROM savings WHERE priority = $1';
+  }
+
+  if (priority) {
+    query += ' AND priority = $' + (values.length + 1);
     values.push(priority);
     errorMessage = 'No savings found with the provided priority';
-  } else if (status) {
-    query = 'SELECT * FROM savings WHERE status = $1';
+  }
+
+  if (status) {
+    query += ' AND status = $' + (values.length + 1);
     values.push(status);
     errorMessage = 'No savings found with the provided status';
-  } else {
-    return res.status(400).json({ error: new HttpError(400, 'Invalid query parameters').message });
   }
 
   await executeQuery(res, query, values, errorMessage);
