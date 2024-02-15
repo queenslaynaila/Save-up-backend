@@ -7,6 +7,7 @@ export const categorySchema = z.string()
 export const statusSchema = z.string()
 export const prioritySchema = z.string()
 export const userSchema = z.object({
+  
   first_name: z.string(),
   last_name: z.string(),
   email: z.string().email(),
@@ -82,8 +83,16 @@ export class HttpError extends Error {
     this.statusCode = statusCode;
   }
 }
+export const usersSchema = z.object({
+  id: z.string().uuid(),
+  first_name: z.string(),
+  last_name: z.string(),
+  email: z.string().email(),
+  phone_no: z.string().regex(phoneRegex, 'Invalid Number!'),
+  password: z.string(),
+});
 
-export type User = z.infer<typeof userSchema>;
+export type User = z.infer<typeof usersSchema>;
 export type Saving = z.infer<typeof savingSchema>;
 export type Contribution = z.infer<typeof savingSchema>;
 export type Expense = z.infer<typeof savingSchema>;
