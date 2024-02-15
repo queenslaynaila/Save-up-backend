@@ -65,16 +65,26 @@ export const updateContributions = async (req: Request, res: Response) => {
   const validationResultBody = updateContributionsSchema.safeParse(req.body);
 
   if (!validationResultBody.success) {
-    return res
-      .status(400)
-      .json({
-        error: new HttpError(
-          400,
-          'Invalid contributions data. Please provide valid values for all user fields.'
-        ).message,
-      });
+    return res.status(400).json({
+      error: new HttpError(
+        400,
+        'Invalid contributions data. Please provide valid values for all user fields.'
+      ).message,
+    });
   }
   const { amount, date } = validationResultBody.data;
+  const getUserIdQuery = `
+  SELECT s.user_id
+  FROM contributions c
+  JOIN savings s ON c.savings_id = s.id
+  WHERE c.id = $1
+`;
+  const userIdResult = await pool.query(getUserIdQuery, [id]);
+  const userId = userIdResult.rows[0]?.user_id;
+  if (req.user?.id !== userId) {
+    return res.status(403).json({ error: 'Unauthorized to update contribution for this user' });
+  }
+
   const query = 'UPDATE contributions SET amount = $1, date = $2 WHERE id = $3 RETURNING *';
   const values = [amount, date, id];
   const result = await pool.query(query, values);

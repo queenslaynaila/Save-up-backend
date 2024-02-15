@@ -10,7 +10,9 @@ export const userSchema = z.object({
   first_name: z.string(),
   last_name: z.string(),
   email: z.string().email(),
-  phone_no: z.string().refine(value => /^\+\d{1,3}\d{5,15}$/.test(value), "Invalid phone number format"),
+  phone_no: z
+    .string()
+    .refine((value) => /^\+\d{1,3}\d{5,15}$/.test(value), 'Invalid phone number format'),
   password: z.string(),
 });
 export const userLoginSchema = z.object({

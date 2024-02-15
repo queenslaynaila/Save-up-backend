@@ -1,4 +1,4 @@
-import jwt ,{ Secret } from 'jsonwebtoken';
+import jwt, { Secret } from 'jsonwebtoken';
 import { Request, Response } from 'express';
 import pool from '../db';
 import { HttpError } from '../types';
@@ -21,11 +21,16 @@ export const resetPassword = async (req: Request, res: Response) => {
   const { newPassword, resetToken } = req.body;
 
   try {
-    const decodedToken = jwt.verify(resetToken, process.env.JWT_SECRET as Secret) as { phone_no: string };
+    const decodedToken = jwt.verify(resetToken, process.env.JWT_SECRET as Secret) as {
+      phone_no: string;
+    };
     const phoneNo = decodedToken.phone_no;
     const hashPassword = bcrypt.hashSync(newPassword, 10);
 
-    await pool.query('UPDATE users SET password_hash = $1 WHERE phone_no = $2', [hashPassword, phoneNo]);
+    await pool.query('UPDATE users SET password_hash = $1 WHERE phone_no = $2', [
+      hashPassword,
+      phoneNo,
+    ]);
 
     res.status(200).json({ message: 'Password updated successfully. Login' });
   } catch (err) {

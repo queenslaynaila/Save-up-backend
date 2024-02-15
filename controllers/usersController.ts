@@ -29,17 +29,12 @@ export const createUser = async (req: Request, res: Response) => {
     user.token = token;
     return res.json(user);
   } catch (error) {
-    return res
-      .status(400)
-      .json({
-        error: new HttpError(
-          400,
-          'An account with the provided email or phone number already exists'
-        ).message,
-      });
+    return res.status(400).json({
+      error: new HttpError(400, 'An account with the provided email or phone number already exists')
+        .message,
+    });
   }
 };
-
 export const login = async (req: Request, res: Response) => {
   const validationResult = userLoginSchema.safeParse(req.body);
   if (!validationResult.success) {
@@ -56,12 +51,11 @@ export const login = async (req: Request, res: Response) => {
   const result = await pool.query(query, params);
   const user = result.rows[0];
   if (!user || !(await bcrypt.compare(password, user.password_hash))) {
-    return res
-      .status(400)
-      .json({
-        error: new HttpError(400, 'Invalid email, phone number, or password combination').message,
-      });
+    return res.status(400).json({
+      error: new HttpError(400, 'Invalid email, phone number, or password combination').message,
+    });
   }
+
   const token = generateToken(user.id);
   user.token = token;
   res.json(user);
@@ -119,14 +113,12 @@ export const updateUser = async (req: Request, res: Response) => {
   const validationResultBody = updateUserSchema.safeParse(req.body);
 
   if (!validationResultBody.success) {
-    return res
-      .status(400)
-      .json({
-        error: new HttpError(
-          400,
-          'Invalid user data. Please provide valid values for all user fields.'
-        ).message,
-      });
+    return res.status(400).json({
+      error: new HttpError(
+        400,
+        'Invalid user data. Please provide valid values for all user fields.'
+      ).message,
+    });
   }
 
   const { first_name, last_name, email, phone_no } = validationResultBody.data;

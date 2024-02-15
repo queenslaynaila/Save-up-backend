@@ -1,4 +1,3 @@
-
 import twilio from 'twilio';
 
 import { config } from 'dotenv';
@@ -13,12 +12,12 @@ const sendSms = (phone: string, message: string): void => {
   const client = twilio(accountSid, authToken);
   client.messages
     .create({
-       body: message,
-       from: twilioPhoneNumber,
-       to: phone
-     })
+      body: message,
+      from: twilioPhoneNumber,
+      to: phone,
+    })
     .then((message) => console.log(message.sid))
-    .catch((error) => console.error(error)); 
-}
+    .catch((error) => console.error(error));
+};
 
 export default sendSms;
