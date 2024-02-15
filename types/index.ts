@@ -10,13 +10,12 @@ export const userSchema = z.object({
   first_name: z.string(),
   last_name: z.string(),
   email: z.string().email(),
-  phone_no: z.string().regex(phoneRegex, 'Invalid Number!'),
+  phone_no: z.string().refine(value => /^\+\d{1,3}\d{5,15}$/.test(value), "Invalid phone number format"),
   password: z.string(),
 });
-
 export const userLoginSchema = z.object({
   email: z.string().email().optional(),
-  phone_no: z.string().regex(phoneRegex, 'Invalid Number!').optional(),
+  phone_no: z.string(),
   password: z.string(),
 });
 
@@ -84,6 +83,8 @@ export const usersSchema = z.object({
   password: z.string(),
 });
 
+export const phoneSchema = z.string().uuid();
+export type Phone = z.infer<typeof phoneSchema>;
 export type User = z.infer<typeof usersSchema>;
 export type Saving = z.infer<typeof savingSchema>;
 export type Contribution = z.infer<typeof savingSchema>;

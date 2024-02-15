@@ -5,7 +5,7 @@ import usersRouter from './routes/users';
 import savingsRouter from './routes/savings';
 import contributionsRouter from './routes/contributions';
 import expensesRouter from './routes/expenses';
-import { HttpError } from './types';
+import passwordRouter from './routes/resetpasswors';
 const app = express();
 
 // Middleware
@@ -19,6 +19,7 @@ app.use('/users', usersRouter);
 app.use('/savings', savingsRouter);
 app.use('/contributions', contributionsRouter);
 app.use('/expenses', expensesRouter);
+app.use('/', passwordRouter);
 
 // 404 Error handler
 app.use((req: Request, res: Response) => {
