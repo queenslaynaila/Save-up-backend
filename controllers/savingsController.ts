@@ -33,7 +33,7 @@ export const createSaving = async (req: Request, res: Response) => {
   }
   const { user_id, description, category, target_amount, priority, target_date } =
   validationResult.data;
-  try {
+  
     await pool.query('BEGIN');
    
     const savingQuery = `
@@ -42,14 +42,14 @@ export const createSaving = async (req: Request, res: Response) => {
             RETURNING *`;
     const savingValues = [user_id, description, category, target_amount, priority, target_date];
     const savingResult = await pool.query(savingQuery, savingValues);
+    if (savingResult.rows.length === 0) {
+      await pool.query('ROLLBACK');
+      return res.status(400).json({ error: new HttpError(400, 'User with provided ID not found').message });
+    }
     await updateUserTotalTargetedAmount(user_id, target_amount);
     await pool.query('COMMIT');
     res.status(201).json(savingResult.rows[0]);
-  } catch {
-    await pool.query('ROLLBACK');
-  }
-  
-  
+
 };
 
 export const getSavingById = async (req: Request, res: Response) => {
