@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Request, Response } from 'express';
 import { expenseSchema,HttpError,idSchema,updateExpenseSchema } from '../types';
 import pool from '../db';
@@ -104,26 +105,39 @@ export const deleteExpense = async (req: Request, res: Response) => {
     }
   
 };
-
-export const getExpenseByCategory = async (req: Request, res: Response) => {
-  const { category } = req.params;
-  try {
-    const query = 'SELECT * FROM expenses WHERE category = $1';
-    const result = await pool.query(query, [category]);
-    res.json(result.rows);
-  } catch (error) {
-    return res.status(400).json({ message: (error as Error).message });
+const executeQuery = async (res: Response, query: string, values: any[], errorMessage: string) => {
+  const result = await pool.query(query, values);
+  if (result.rows.length > 0) {
+    res.status(200).json(result.rows);
+  } else {
+    return res.status(404).json({ error: new HttpError(404, errorMessage).message });
   }
 };
 
-export const getExpensesByMonth = async (req: Request, res: Response) => {
-  const { month } = req.params;
-  try {
-    const query = 'SELECT * FROM expenses WHERE EXTRACT(MONTH FROM date) = $1';
-    const values = [month];
-    const result = await pool.query(query, values);
-    res.json(result.rows);
-  } catch (error) {
-    return res.status(400).json({ message: (error as Error).message });
-  }
+export const getExpenses = async (req: Request, res: Response) => {
+const { user_id, category, month } = req.query;
+
+let query;
+const values = [];
+let errorMessage;
+
+if (user_id) {
+  query = 'SELECT * FROM expenses WHERE user_id = $1';
+  values.push(user_id);
+  errorMessage = 'No savings found for the provided user ID';
+} else if (category) {
+  query = 'SELECT * FROM expenses WHERE category = $1';
+  values.push(category);
+  errorMessage = 'No savings found with the provided category';
+} else if (month) {
+  query = 'SELECT * FROM expenses WHERE EXTRACT(MONTH FROM date) = $1';
+  values.push(month);
+  errorMessage = 'No savings found for provided date';
+} else {
+  return res.status(400).json({ error: new HttpError(400, 'Invalid query parameters').message });
+}
+
+await executeQuery(res, query, values, errorMessage);
 };
+
+

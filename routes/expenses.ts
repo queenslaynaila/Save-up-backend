@@ -2,10 +2,12 @@ import express, { Request, Response } from 'express';
 const router = express.Router();
 import * as expenseController from '../controllers/expensesController';
 import authenticateToken from '../middleware/auth';
-router.post('/', (req: Request, res: Response) => {
+router.post('/all', (req: Request, res: Response) => {
   expenseController.createExpense(req, res);
 });
-
+router.get('/', async (req: Request, res: Response) => {
+  expenseController.getExpenses(req, res);
+});
 router.get('/', (req: Request, res: Response) => {
   expenseController.getAllExpenses(req, res);
 });
@@ -22,11 +24,6 @@ router.delete('/:id', authenticateToken, (req: Request, res: Response) => {
   expenseController.deleteExpense(req, res);
 });
 
-router.get('/category/:category', authenticateToken, (req: Request, res: Response) => {
-  expenseController.getExpenseByCategory(req, res);
-});
-router.get('/month/:month', authenticateToken, (req: Request, res: Response) => {
-  expenseController.getExpensesByMonth(req, res);
-});
+
 
 export default router;
