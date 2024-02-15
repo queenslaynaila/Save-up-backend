@@ -1,7 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Request, Response,  } from 'express';
-
 import pool from '../db';
-import { savingSchema, HttpError,idSchema,categorySchema,statusSchema,prioritySchema} from '../types';
+import { savingSchema, HttpError,idSchema,updateSavingSchema } from '../types';
 
 export const updateUserTotalTargetedAmount = async (
   userId: string,
@@ -69,58 +69,62 @@ export const getSavingById = async (req: Request, res: Response) => {
   
 };
 export const updateSaving = async (req: Request, res: Response) => {
-  const { id } = req.params;
-  try {
-    const validatedSavings = savingSchema.parse(req.body);
-    const {
-      description,
-      category,
-      target_amount,
-     
-      priority,
-   
-      target_date
-     
-    } = validatedSavings;
-    const query = `
-            UPDATE savings 
-            SET 
-                description = $1,
-                category = $2,
-                target_amount = $3,
-              
-                priority = $4,
-                
-                target_date = $5,
-               
-            WHERE 
-                id = $9 
-            RETURNING *`;
-    const values = [
-      description,
-      category,
-      target_amount,
-     
-      priority,
-    
-      target_date,
-    
-      id
-    ];
-    const result = await pool.query(query, values);
-    if (result.rows.length === 0) {
-      res.status(404).json({ error: 'Saving not found' });
-    } else {
-      res.status(200).json(result.rows[0]);
-    }
-  } catch (error) {
-    res.status(400).json({ message: (error as Error).message });
+  const savingId = req.params.id;
+
+  const validationResult = idSchema.safeParse(savingId);
+  if (!validationResult.success) {
+    return res.status(400).json({ error: new HttpError(400, 'Invalid saving ID').message });
   }
+
+  const userIdQuery = 'SELECT user_id FROM savings WHERE id = $1';
+  const userIdResult = await pool.query(userIdQuery, [savingId]);
+  const userId = userIdResult.rows[0]?.user_id;
+
+  if (userId !== req.user?.id) {
+    return res.status(403).json({ error: 'You are not authorized to update this saving' });
+  }
+
+  const validatedSavings = updateSavingSchema.safeParse(req.body);
+  if (!validatedSavings.success) {
+    return res.status(400).json({ error: new HttpError(400, 'Invalid saving data').message });
+  }
+  const { description, category, target_amount, priority, target_date } = validatedSavings.data;
+
+  let query = 'UPDATE savings SET ';
+  const values = [];
+  if (description) {
+    query += `description = $${values.length + 1}, `;
+    values.push(description);
+  }
+  if (category) {
+    query += `category = $${values.length + 1}, `;
+    values.push(category);
+  }
+  if (target_amount) {
+    query += `target_amount = $${values.length + 1}, `;
+    values.push(target_amount);
+  }
+  if (priority) {
+    query += `priority = $${values.length + 1}, `;
+    values.push(priority);
+  }
+  if (target_date) {
+    query += `target_date = $${values.length + 1}, `;
+    values.push(target_date);
+  }
+  query = query.slice(0, -2);
+  query += ` WHERE id = $${values.length + 1} RETURNING *`;
+  values.push(savingId);
+
+  const result = await pool.query(query, values);
+  const updatedSaving = result.rows[0];
+
+  if (!updatedSaving) {
+    return res.status(400).json({ error: new HttpError(400, 'Saving with given ID not found').message });
+  }
+
+  return res.status(200).json(updatedSaving);
 };
-
-
-
-
 
 export const deleteSaving = async (req: Request, res: Response) => {
   const validationResult = idSchema.safeParse(req.params.id);
@@ -138,82 +142,43 @@ export const deleteSaving = async (req: Request, res: Response) => {
     }
   
 };
-
-export const getSavingsByCategory = async (req: Request, res: Response) => {
-  const validationResult = categorySchema.safeParse(req.params.category);
-  
-  if (!validationResult.success) {
-    return res.status(400).json({ error: new HttpError(400, 'Invalid category').message });
-  }
-  
-  const category = validationResult.data;
-  const query = 'SELECT * FROM savings WHERE category = $1';
-  
-  
-    const result = await pool.query(query, [category]);
+const executeQuery = async (res: Response, query: string, values: any[], errorMessage: string) => {
+    const result = await pool.query(query, values);
     if (result.rows.length > 0) {
       res.status(200).json(result.rows);
     } else {
-      return res.status(404).json({ error: new HttpError(404, 'No savings found with the provided category').message });
+      return res.status(404).json({ error: new HttpError(404, errorMessage).message });
     }
-  } 
+};
 
-export const getSavingsByStatus = async (req: Request, res: Response) => {
-  const validationResult = statusSchema.safeParse(req.params.status);
+export const getSavings = async (req: Request, res: Response) => {
+  const { user_id, category, priority, status } = req.query;
   
-  if (!validationResult.success) {
-    return res.status(400).json({ error: new HttpError(400, 'Invalid status params').message });
+  let query;
+  const values = [];
+  let errorMessage;
+
+  if (user_id) {
+    query = 'SELECT * FROM savings WHERE user_id = $1';
+    values.push(user_id);
+    errorMessage = 'No savings found for the provided user ID';
+  } else if (category) {
+    query = 'SELECT * FROM savings WHERE category = $1';
+    values.push(category);
+    errorMessage = 'No savings found with the provided category';
+  } else if (priority) {
+    query = 'SELECT * FROM savings WHERE priority = $1';
+    values.push(priority);
+    errorMessage = 'No savings found with the provided priority';
+  } else if (status) {
+    query = 'SELECT * FROM savings WHERE status = $1';
+    values.push(status);
+    errorMessage = 'No savings found with the provided status';
+  } else {
+    return res.status(400).json({ error: new HttpError(400, 'Invalid query parameters').message });
   }
-  
-  const status = validationResult.data;
-  const query = 'SELECT * FROM savings WHERE status = $1';
-  
-  
-    const result = await pool.query(query, [status]);
-    if (result.rows.length > 0) {
-      res.status(200).json(result.rows);
-    } else {
-      return res.status(404).json({ error: new HttpError(404, 'No savings found with the provided status').message });
-    }
-  
+
+  await executeQuery(res, query, values, errorMessage);
 };
 
 
-export const getSavingsByPriority = async (req: Request, res: Response) => {
-  const validationResult = prioritySchema.safeParse(req.params.status);
-  
-  if (!validationResult.success) {
-    return res.status(400).json({ error: new HttpError(400, 'Invalid priority params').message });
-  }
-  
-  const priority = validationResult.data;
-  const query = 'SELECT * FROM savings WHERE priority = $1';
-  
-    const result = await pool.query(query, [priority]);
-    if (result.rows.length > 0) {
-      res.status(200).json(result.rows);
-    } else {
-      return res.status(404).json({ error: new HttpError(404, 'No savings found with the provided priority').message });
-    }
-  
-};
-
-export const getUserSavings = async (req: Request, res: Response) => {
-  const validationResult = idSchema.safeParse(req.params.id);
-  
-  if (!validationResult.success) {
-    return res.status(400).json({ error: new HttpError(400, 'Invalid user ID').message });
-  }
-  
-  const id = validationResult.data;
-  
-  const query = 'SELECT * FROM savings WHERE user_id = $1';
-  
-
-    const { rows } = await pool.query(query, [id]);
-    if (rows.length > 0) {
-      res.status(200).json(rows);
-    } else {
-      return res.status(404).json({ error: new HttpError(404, 'No savings found for the provided user ID').message });
-    }
-  } 
