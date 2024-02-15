@@ -12,6 +12,6 @@
 .env
 .vscode
 /concerns.notes
-
+/try.ts
 # production
 /build
