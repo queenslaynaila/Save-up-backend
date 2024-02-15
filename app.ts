@@ -1,11 +1,11 @@
-import express, { Request, Response } from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 import morgan from 'morgan';
 import cors from 'cors';
 import usersRouter from './routes/users';
 import savingsRouter from './routes/savings';
 import contributionsRouter from './routes/contributions';
 import expensesRouter from './routes/expenses';
-
+import { HttpError } from './types';
 const app = express();
 
 // Middleware
@@ -27,8 +27,13 @@ app.use((req: Request, res: Response) => {
 });
 
 // Global error handler
-app.use((error: Error, req: Request, res: Response) => {
-  res.status(res.statusCode || 500).json({ error: { message: error.message } });
+/* eslint-disable @typescript-eslint/no-unused-vars */
+app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
+  
+ 
+   
+    return res.status(500).json({ error: 'Internal Server Error' });
+  
 });
 
 export default app;
