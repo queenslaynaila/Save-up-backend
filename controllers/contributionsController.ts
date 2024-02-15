@@ -64,20 +64,6 @@ export const getAllContributions = async (req: Request, res: Response) => {
   
 };
 
-export const getContributionsById = async (req: Request, res: Response) => {
-  const validationResult = idSchema.safeParse(req.params.id);
-  if (!validationResult.success) {
-    return res.status(400).json({ error: new HttpError(400, 'Invalid contributions ID').message });
-  }
-  const id = validationResult.data
-    const query = 'SELECT * FROM contributions WHERE id = $1';
-    const result = await pool.query(query, [id]);
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: new HttpError(404, 'Contribution with provided ID not found').message });
-    }
-    return res.status(200).json(result.rows[0]);
-  
-};
 
 export const updateContributions = async (req: Request, res: Response) => {
   const { id } = req.params;
@@ -115,6 +101,22 @@ export const deleteContributions = async (req: Request, res: Response) => {
     return res.status(204).json({ message: 'Contribution deleted' });
   
 };
+
+export const getContributionsById = async (req: Request, res: Response) => {
+  const validationResult = idSchema.safeParse(req.params.id);
+  if (!validationResult.success) {
+    return res.status(400).json({ error: new HttpError(400, 'Invalid contributions ID').message });
+  }
+  const id = validationResult.data
+    const query = 'SELECT * FROM contributions WHERE id = $1';
+    const result = await pool.query(query, [id]);
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: new HttpError(404, 'Contribution with provided ID not found').message });
+    }
+    return res.status(200).json(result.rows[0]);
+  
+};
+
 
 export const getContributionsBySaving = async (req: Request, res: Response) => {
  
