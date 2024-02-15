@@ -90,9 +90,16 @@ export const getUserById = async (req: Request, res: Response) => {
 };
 
 export const updateUser = async (req: Request, res: Response) => {
-  const userId = req.params.id; 
+  const validationResult = idSchema.safeParse(req.params.id);
+  if (!validationResult.success) {
+    return res.status(400).json({ error: new HttpError(400, 'Invalid user ID').message });
+  }
+  const userId = validationResult.data
+  if (userId !== req.user?.id) {
+    return res.status(403).json({ error: 'You are not authorized to update this user information' });
+  }
   const validationResultBody = updateUserSchema.safeParse(req.body);
-  
+  console.log(req.user)
   if (!validationResultBody.success) {
     return res.status(400).json({ error: new HttpError(400, 'Invalid user data. Please provide valid values for all user fields.').message });
   }
@@ -102,25 +109,25 @@ export const updateUser = async (req: Request, res: Response) => {
   const values = [];
   
   if (first_name) {
-    query += 'first_name = $1, ';
+    query += `first_name = $${values.length + 1}, `;
     values.push(first_name);
   }
   if (last_name) {
-    query += 'last_name = $2, ';
+    query += `last_name = $${values.length + 1}, `;
     values.push(last_name);
   }
   if (email) {
-    query += 'email = $3, ';
+    query += `email = $${values.length + 1}, `;
     values.push(email);
   }
   if (phone_no) {
-    query += 'phone_no = $4, ';
+    query += `phone_no = $${values.length + 1}, `;
     values.push(phone_no);
   }
 
   query = query.slice(0, -2);
 
-  query += ' WHERE id = $' + (values.length + 1) + ' RETURNING *';
+  query += ` WHERE id = $${values.length + 1} RETURNING *`;
   values.push(userId);
 
   const result = await pool.query(query, values);
@@ -135,13 +142,17 @@ export const updateUser = async (req: Request, res: Response) => {
 
 
 
+
 export const deleteUser = async (req: Request, res: Response) => {
   const validationResult = idSchema.safeParse(req.params.id);
-  
   if (!validationResult.success) {
     return res.status(400).json({ error: new HttpError(400, 'Invalid user ID').message });
   }
-    const id = validationResult.data;
+  const id = validationResult.data;
+  if (id !== req.user?.id) {
+    return res.status(403).json({ error: 'You are not authorized to delete this user information' });
+  }
+
     const query = 'DELETE FROM users WHERE id = $1 RETURNING *';
     const result = await pool.query(query, [id]);
 
