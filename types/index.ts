@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-const phoneRegex = new RegExp(/^([+]?[\s0-9]+)?(\d{3}|[(]?[0-9]+[)])?([-]?[\s]?[0-9])+$/);
+
 
 export const idSchema = z.string().uuid();
 export const categorySchema = z.string();
@@ -66,7 +66,9 @@ export const updateUserSchema = z.object({
   first_name: z.string().optional(),
   last_name: z.string().optional(),
   email: z.string().email().optional(),
-  phone_no: z.string().regex(phoneRegex, 'Invalid Number!').optional(),
+  phone_no: z
+    .string()
+    .refine((value) => /^\+\d{1,3}\d{5,15}$/.test(value), 'Invalid phone number format')
 });
 
 export class HttpError extends Error {
@@ -81,7 +83,9 @@ export const usersSchema = z.object({
   first_name: z.string(),
   last_name: z.string(),
   email: z.string().email(),
-  phone_no: z.string().regex(phoneRegex, 'Invalid Number!'),
+  phone_no: z
+    .string()
+    .refine((value) => /^\+\d{1,3}\d{5,15}$/.test(value), 'Invalid phone number format'),
   password: z.string(),
 });
 
