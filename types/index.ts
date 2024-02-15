@@ -1,10 +1,22 @@
 import { z } from 'zod';
 
+const phoneRegex = new RegExp(/^([+]?[\s0-9]+)?(\d{3}|[(]?[0-9]+[)])?([-]?[\s]?[0-9])+$/);
+
+export const idSchema = z.string().uuid();
+export const categorySchema = z.string()
+export const statusSchema = z.string()
+export const prioritySchema = z.string()
 export const userSchema = z.object({
   first_name: z.string(),
   last_name: z.string(),
-  email: z.string(),
-  phone_no: z.string(),
+  email: z.string().email(),
+  phone_no: z.string().regex(phoneRegex, 'Invalid Number!'),
+  password: z.string(),
+});
+
+export const userLoginSchema = z.object({
+  email: z.string().email().optional(),
+  phone_no: z.string().regex(phoneRegex, 'Invalid Number!').optional(),
   password: z.string(),
 });
 
@@ -13,11 +25,24 @@ export const savingSchema = z.object({
   description: z.string(),
   category: z.string(),
   target_amount: z.number(),
-  contributed_amount: z.number(),
   priority: z.string(),
-  target_date: z.date(),
+  target_date: z.string(),
+});
+export const updateSavingSchema = z.object({
+
+  description: z.string().optional(),
+  category: z.string().optional(),
+  target_amount: z.number().optional(),
+  priority: z.string().optional(),
+  target_date: z.date().optional(),
   status: z.string().optional(),
-  start_date: z.date().optional(),
+ 
+});
+export const updateContributionsSchema = z.object({
+
+  amount: z.number(),
+  date: z.date(),
+ 
 });
 
 export const expenseSchema = z.object({
@@ -26,12 +51,28 @@ export const expenseSchema = z.object({
   description: z.string(),
   amount: z.number(),
   date: z.date(),
+  
 });
 
+export const updateExpenseSchema = z.object({
+ 
+  category: z.string(),
+  description: z.string(),
+  amount: z.number(),
+  date: z.date(),
+  
+});
 export const contributionsSchema = z.object({
   saving_id: z.string().uuid(),
   amount: z.number(),
   date: z.date(),
+});
+
+export const updateUserSchema = z.object({
+  first_name: z.string().optional(),
+  last_name: z.string().optional(),
+  email: z.string().email().optional(),
+  phone_no: z.string().regex(phoneRegex, 'Invalid Number!').optional(),
 });
 
 export class HttpError extends Error {
