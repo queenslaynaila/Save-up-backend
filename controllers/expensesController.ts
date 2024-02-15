@@ -70,6 +70,14 @@ export const updateExpense = async (req: Request, res: Response) => {
   if (!validationResultId.success) {
     return res.status(400).json({ error: new HttpError(400, 'Invalid saving ID').message });}
   const id = validationResultId.data
+
+  const userIdQuery = 'SELECT user_id FROM expenses WHERE id = $1';
+  const userIdResult = await pool.query(userIdQuery, [id]);
+  const userId = userIdResult.rows[0]?.user_id;
+
+  if (userId !== req.user?.id) {
+    return res.status(403).json({ error: 'You are not authorized to update this expense' });
+  }
   const validationResult = updateExpenseSchema.safeParse(req.body);
   if (!validationResult.success) {
     return res.status(400).json({ error: new HttpError(400, 'Invalid data').message });
@@ -95,6 +103,14 @@ export const deleteExpense = async (req: Request, res: Response) => {
     return res.status(400).json({ error: new HttpError(400, 'Invalid expense ID').message });
   }
   const id = validationResult.data;
+  
+  const userIdQuery = 'SELECT user_id FROM expenses WHERE id = $1';
+  const userIdResult = await pool.query(userIdQuery, [id]);
+  const userId = userIdResult.rows[0]?.user_id;
+
+  if (userId !== req.user?.id) {
+    return res.status(403).json({ error: 'You are not authorized to delete this expense' });
+  }
   
     const query = 'DELETE FROM expenses WHERE id = $1';
     const result = await pool.query(query, [id]);
