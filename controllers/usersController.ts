@@ -3,7 +3,6 @@ import pool from '../db';
 import jwt, { Secret } from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import { userSchema, HttpError, userLoginSchema, idSchema, updateUserSchema } from '../types';
-import e from 'cors';
 
 const generateToken = (id: string): string => {
   return jwt.sign({ id }, process.env.JWT_SECRET as Secret, { expiresIn: '1h' });
@@ -29,8 +28,11 @@ export const createUser = async (req: Request, res: Response) => {
     const token = generateToken(user.id);
     user.token = token;
     return res.json(user);
-  }   catch (error:unknown) {
-    console.log(error);
+  } catch (error) {
+    return res.status(400).json({
+      error: new HttpError(400, 'An account with the provided email or phone number already exists')
+        .message,
+    });
   }
 };
 export const login = async (req: Request, res: Response) => {
