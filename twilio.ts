@@ -1,4 +1,4 @@
-import twilio, { Twilio } from 'twilio';
+import twilio from 'twilio';
 
 import { config } from 'dotenv';
 
