@@ -1,4 +1,4 @@
-import twilio from 'twilio';
+import twilio, { Twilio } from 'twilio';
 
 import { config } from 'dotenv';
 
@@ -17,7 +17,7 @@ const sendSms = (phone: string, message: string): void => {
       to: phone,
     })
     .then((message) => console.log(message.sid))
-    .catch((error) => console.error(error));
+    .catch((error:Error) => console.error(error));
 };
 
 export default sendSms;
