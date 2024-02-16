@@ -19,7 +19,7 @@ router.delete('/:id', authenticateToken, (req: Request, res: Response) => {
   contributionsController.deleteContributions(req, res);
 });
 
-router.post('/', (req: Request, res: Response) => {
+router.post('/', authenticateToken,(req: Request, res: Response) => {
   contributionsController.createContributions(req, res);
 });
 

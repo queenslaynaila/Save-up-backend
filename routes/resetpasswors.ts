@@ -2,7 +2,7 @@ import express, { Request, Response } from 'express';
 import * as resetPasswordController from '../controllers/resetPassword';
 const router = express.Router();
 
-router.post('/ini-password', (req: Request, res: Response) => {
+router.post('/initiate-password', (req: Request, res: Response) => {
   resetPasswordController.initiatePasswordReset(req, res);
 });
 
