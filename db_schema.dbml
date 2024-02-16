@@ -1,44 +1,82 @@
-
 Table users {
-  id int [primary key]
-  username varchar [not null]
-  email varchar [not null, unique]
-  phone_no varchar [not null, unique]
-  password_hash varchar [not null]
-  created_at timestamp [default: `now()`]
-  updated_at timestamp [default: `now()`]
+    id UUID [primary key, default: `uuid_generate_v4()`]
+    first_name VARCHAR(255) [not null]
+    last_name VARCHAR(255) [not null]
+    email VARCHAR(255) [not null, unique]
+    phone_no VARCHAR(255) [unique]
+    password_hash VARCHAR(255) [not null]
+    total_targeted_amount DECIMAL(10, 2) [default: 0]
+    total_contributions_amount DECIMAL(10, 2) [default: 0]
+    total_expenses_amount DECIMAL(10, 2) [default: 0]
+    created_at TIMESTAMP [default: `NOW()`]
+    updated_at TIMESTAMP [default: `NOW()`]
+
+    constraint email_format_check { check: "email ~* '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$'" }
+    constraint phone_no_format_check { check: "phone_no ~* '^[0-9]{10}$'" }
 }
 
 Table savings {
-  id int [primary key]
-  user_id int [ref: > users.id]
-  description varchar [not null]
-  category varchar
-  targetAmount decimal(10, 2) [not null]
-  contributedAmount numeric [default: 0, note: 'Total amount contributed towards the saving goal. Updated whenever there is a corresponding update in the contributions table']
-  priority varchar [note: 'Priority of the saving goal: High, Low, Intermediate']
-  status varchar [note: 'Status of the saving goal: In Progress or Complete', default: 'In Progress']
-  targetDate date
-  startDate date [default: `current_date`]
-  created_at timestamp [default: `now()`]
-  updated_at timestamp [default: `now()`]
+    id UUID [primary key, default: `uuid_generate_v4()`]
+    user_id UUID [ref: > users.id]
+    description VARCHAR(255) [not null]
+    category VARCHAR(255)]
+    target_amount DECIMAL(10, 2) [not null]
+    contributed_amount NUMERIC [default: 0]
+    priority VARCHAR(255)
+    status VARCHAR(255) [default: 'In Progress']
+    target_date DATE
+    start_date DATE [default: `CURRENT_DATE`]
+    created_at TIMESTAMP [default: `NOW()`]
+    updated_at TIMESTAMP [default: `NOW()`]
+
+    constraint status_check { check: "status IN ('In Progress', 'Complete')" }
 }
 
 Table contributions {
-  id int [primary key]
-  saving_id int [ref: > savings.id]
-  amount decimal(10, 2) [not null]
-  date date [not null]
-  created_at timestamp [default: `now()`]
-  updated_at timestamp [default: `now()`]
+    id UUID [primary key, default: `uuid_generate_v4()`]
+    saving_id UUID [not null, ref: > savings.id]
+    amount DECIMAL(10, 2) [not null]
+    date DATE [not null]
+    created_at TIMESTAMP [default: `NOW()`]
+    updated_at TIMESTAMP [default: `NOW()`]
 }
 
 Table expenses {
-  id int [primary key]
-  user_id int [ref: > users.id]
-  category varchar [not null]
-  amount decimal(10, 2) [not null]
-  date date [not null]
-  created_at timestamp [default: `now()`]
-  updated_at timestamp [default: `now()`]
+    id UUID [primary key, default: `uuid_generate_v4()`]
+    user_id UUID [ref: > users.id]
+    category VARCHAR(255) [not null]
+    description VARCHAR(255)
+    amount DECIMAL(10, 2) [not null]
+    date DATE [not null]
+    month_extracted INTEGER [generated always as (EXTRACT(MONTH FROM date)) stored]
+    created_at TIMESTAMP [default: `NOW()`]
+    updated_at TIMESTAMP [default: `NOW()`]
+}
+
+Index savings_user_id {
+    savings.user_id
+}
+
+Index savings_category {
+    savings.category
+}
+
+Index savings_priority {
+    savings.priority
+}
+
+Index savings_status {
+    savings.status
+}
+
+Index expenses_user_id {
+    expenses.user_id
+}
+
+Index expenses_category {
+    expenses.category
+}
+
+Index expenses_month {
+    expenses.month_extracted
 }
