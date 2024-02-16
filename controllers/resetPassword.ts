@@ -10,7 +10,7 @@ export const initiatePasswordReset = async (req: Request, res: Response) => {
   const userQuery = 'SELECT * FROM users WHERE phone_no = $1';
   const userResult = await pool.query(userQuery, [phoneNo]);
   if (userResult.rows.length === 0) {
-    return res.status(200).json({ message: 'User with provided phone number does not exist' });
+    return res.status(400).json({ message: 'User with provided phone number does not exist' });
    
   }
   const resetToken = jwt.sign({ phoneNo }, process.env.JWT_SECRET as Secret, { expiresIn: '10m' });
