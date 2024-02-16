@@ -6,15 +6,17 @@ export const idSchema = z.string().uuid();
 export const categorySchema = z.string();
 export const statusSchema = z.string();
 export const prioritySchema = z.string();
+
 export const userSchema = z.object({
   first_name: z.string(),
   last_name: z.string(),
-  email: z.string().email(),
+  email: z.string().email().optional(),  
   phone_no: z
     .string()
     .refine((value) => /^\+\d{1,3}\d{5,15}$/.test(value), 'Invalid phone number format'),
   password: z.string(),
 });
+
 export const userLoginSchema = z.object({
   email: z.string().email().optional(),
   phone_no: z.string(),

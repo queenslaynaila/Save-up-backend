@@ -15,13 +15,13 @@ export const createUser = async (req: Request, res: Response) => {
       .status(400)
       .json({ error: new HttpError(400, 'Invalid email, phone number, or password').message });
   }
-  const { first_name, last_name, email, phone_no, password } = validationResult.data;
+  const { first_name, last_name, phone_no, password } = validationResult.data;
   const password_hash = bcrypt.hashSync(password, 10);
   const userQuery = `
-    INSERT INTO users (first_name, last_name, email, phone_no, password_hash, created_at, updated_at) 
-    VALUES ($1, $2, $3, $4, $5, NOW(), NOW())
+    INSERT INTO users (first_name, last_name, phone_no, password_hash, created_at, updated_at) 
+    VALUES ($1, $2, $3, $4, NOW(), NOW())
     RETURNING *`;
-  const userValues = [first_name, last_name, email, phone_no, password_hash];
+  const userValues = [first_name, last_name, phone_no, password_hash];
   try {
     const userResult = await pool.query(userQuery, userValues);
     const user = userResult.rows[0];
