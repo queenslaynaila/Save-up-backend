@@ -13,6 +13,7 @@ export const initiatePasswordReset = async (req: Request, res: Response) => {
     throw new HttpError(400, 'User with provided phone number does not exist');
   }
   const resetToken = jwt.sign({ phoneNo }, process.env.JWT_SECRET as Secret, { expiresIn: '10m' });
+  console.log('Reset token:', resetToken);
   sendSms(phoneNo, `Here is your reset token ${resetToken}. Do not share this with anyone.`);
   return res.status(200).json({ message: 'Reset token generated and sent successfully.' });
 };
