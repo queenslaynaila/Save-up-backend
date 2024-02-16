@@ -1,6 +1,6 @@
 
 ## Database Schema
-You can check the database schema [here](./schema.md).
+You can check the database schema [here](./db_schema.dbml) and the table diagram [here](./schema.md).
 
 ## Table of Contents
 - [Users API](#users-api)

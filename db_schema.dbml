@@ -19,7 +19,7 @@ Table savings {
     id UUID [primary key, default: `uuid_generate_v4()`]
     user_id UUID [ref: > users.id]
     description VARCHAR(255) [not null]
-    category VARCHAR(255)]
+    category VARCHAR(255)
     target_amount DECIMAL(10, 2) [not null]
     contributed_amount NUMERIC [default: 0]
     priority VARCHAR(255)
