@@ -13,7 +13,7 @@ export const userSchema = z.object({
   email: z.string().email().optional(),  
   phone_no: z
     .string()
-    .refine((value) => /^\+\d{1,3}\d{9}$/.test(value), 'Invalid phone number format'),
+    .refine((value) => /^\+254\d{9}$/.test(value), 'Invalid phone number format'),
   password: z.string(),
 });
 
@@ -70,7 +70,7 @@ export const updateUserSchema = z.object({
   email: z.string().email().optional(),
   phone_no: z
     .string()
-    .refine((value) => /^\+\d{1,3}\d{9}$/.test(value), 'Invalid phone number format'),
+    .refine((value) => /^\+254\d{9}$/.test(value),'Invalid phone number format'),
 });
 
 export class HttpError extends Error {
@@ -87,7 +87,7 @@ export const usersSchema = z.object({
   email: z.string().email(),
   phone_no: z
     .string()
-    .refine((value) => /^\+\d{1,3}\d{9}$/.test(value), 'Invalid phone number format'),
+    .refine((value) => /^\+254\d{9}$/.test(value), 'Invalid phone number format'),
   password: z.string(),
 });
 
