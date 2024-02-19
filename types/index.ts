@@ -29,14 +29,14 @@ export const savingSchema = z.object({
   category: z.string(),
   target_amount: z.number(),
   priority: z.string(),
-  target_date: z.string(),
+  target_date: z.string()
 });
 export const updateSavingSchema = z.object({
   description: z.string().optional(),
   category: z.string().optional(),
   target_amount: z.number().optional(),
   priority: z.string().optional(),
-  target_date: z.date().optional(),
+  target_date: z.string().optional(),
   status: z.string().optional(),
 });
 export const updateContributionsSchema = z.object({
