@@ -113,9 +113,7 @@ export const deleteExpense = async (req: Request, res: Response) => {
   const query = 'DELETE FROM expenses WHERE id = $1';
   const result = await pool.query(query, [id]);
   if (result.rowCount != null && result.rowCount > 0) {
-    return res
-      .status(204)
-      .json({ error: new HttpError(400, 'Expense deleted successfully').message });
+      return res.status(204).json({ message: 'Expense deleted successfully' });
   } else {
     return res
       .status(400)
