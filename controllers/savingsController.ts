@@ -156,9 +156,7 @@ export const deleteSaving = async (req: Request, res: Response) => {
   const query = 'DELETE FROM savings WHERE id = $1';
   const result = await pool.query(query, [id]);
   if (result.rowCount != null && result.rowCount > 0) {
-    return res
-      .status(204)
-      .json({ error: new HttpError(400, 'Saving deleted successfully').message });
+      return res.status(204).json({ message: 'Savings deleted successfully' });
   } else {
     return res
       .status(400)
