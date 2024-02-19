@@ -16,9 +16,7 @@ export const updateUserTotalExpenseAmount = async (userId: string, newExpenseAmo
 export const createExpense = async (req: Request, res: Response) => {
   const validationResult = expenseSchema.safeParse(req.body);
   if (!validationResult.success) {
-    return res
-      .status(400)
-      .json({ error: new HttpError(400, 'Invalid expense data provided').message });
+    throw new HttpError(400, 'Invalid expense data provided');
   }
   const { description, category, amount, date, user_id } = validationResult.data;
 
@@ -29,9 +27,7 @@ export const createExpense = async (req: Request, res: Response) => {
   const result = await pool.query(query, values);
   if (result.rows.length === 0) {
     await pool.query('ROLLBACK');
-    return res
-      .status(400)
-      .json({ error: new HttpError(400, 'User with provided ID not found').message });
+    throw new HttpError(400, 'User with provided ID not found');
   }
   await updateUserTotalExpenseAmount(user_id, amount);
   await pool.query('COMMIT');
@@ -43,7 +39,7 @@ export const getAllExpenses = async (req: Request, res: Response) => {
   const result = await pool.query(query);
   const expenses = result.rows;
   if (!expenses || expenses.length === 0) {
-    return res.status(404).json({ error: new HttpError(404, 'No expenses found').message });
+    throw new HttpError(404, 'No expenses found');
   }
   return res.status(200).json(expenses);
 };
@@ -51,14 +47,14 @@ export const getAllExpenses = async (req: Request, res: Response) => {
 export const getExpenseById = async (req: Request, res: Response) => {
   const validationResult = idSchema.safeParse(req.params.id);
   if (!validationResult.success) {
-    return res.status(400).json({ error: new HttpError(400, 'Invalid expense ID').message });
+    throw new HttpError(400, 'Invalid expense ID');
   }
   const id = validationResult.data;
 
   const query = 'SELECT * FROM expenses WHERE id = $1';
   const result = await pool.query(query, [id]);
   if (result.rows.length === 0) {
-    return res.status(404).json({ error: 'Expense with submitted ID not found' });
+    throw new HttpError(404, 'Expense with submitted ID not found');
   }
   return res.status(200).json(result.rows[0]);
 };
@@ -75,11 +71,11 @@ export const updateExpense = async (req: Request, res: Response) => {
   const userId = userIdResult.rows[0]?.user_id;
 
   if (userId !== req.user?.id) {
-    return res.status(403).json({ error: 'You are not authorized to update this expense' });
+    throw new HttpError(403, 'You are not authorized to update this expense');
   }
   const validationResult = updateExpenseSchema.safeParse(req.body);
   if (!validationResult.success) {
-    return res.status(400).json({ error: new HttpError(400, 'Invalid data').message });
+    throw new HttpError(400, 'Invalid data');
   }
 
   const { description, category, amount, date } = validationResult.data;
@@ -89,7 +85,7 @@ export const updateExpense = async (req: Request, res: Response) => {
   const values = [description, category, amount, date, id];
   const result = await pool.query(query, values);
   if (result.rows.length === 0) {
-    return res.status(404).json({ error: 'Expense not found' });
+    throw new HttpError(404, 'Expense not found');
   }
   return res.status(200).json(result.rows[0]);
 };
@@ -98,7 +94,7 @@ export const deleteExpense = async (req: Request, res: Response) => {
   const validationResult = idSchema.safeParse(req.params.id);
 
   if (!validationResult.success) {
-    return res.status(400).json({ error: new HttpError(400, 'Invalid expense ID').message });
+    throw new HttpError(400, 'Invalid expense ID');
   }
   const id = validationResult.data;
 
@@ -107,19 +103,15 @@ export const deleteExpense = async (req: Request, res: Response) => {
   const userId = userIdResult.rows[0]?.user_id;
 
   if (userId !== req.user?.id) {
-    return res.status(403).json({ error: 'You are not authorized to delete this expense' });
+    throw new HttpError(403, 'You are not authorized to delete this expense');
   }
 
   const query = 'DELETE FROM expenses WHERE id = $1';
   const result = await pool.query(query, [id]);
   if (result.rowCount != null && result.rowCount > 0) {
-    return res
-      .status(204)
-      .json({ error: new HttpError(400, 'Expense deleted successfully').message });
+    return res.status(204).json({ message: 'Expense deleted successfully' });
   } else {
-    return res
-      .status(400)
-      .json({ error: new HttpError(400, 'Expense with provided ID not found').message });
+    throw new HttpError(400, 'Expense with provided ID not found');
   }
 };
 const executeQuery = async (res: Response, query: string, values: any[], errorMessage: string) => {
