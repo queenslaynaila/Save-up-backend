@@ -175,7 +175,7 @@ export const deleteUser = async (req: Request, res: Response) => {
   const result = await pool.query(query, [id]);
 
   if (result.rowCount != null && result.rowCount > 0) {
-    return res.status(204).json({ error: new HttpError(400, 'User deleted successfully').message });
+     return res.status(204).json({ message: 'User deleted successfully' });
   } else {
     return res
       .status(400)
