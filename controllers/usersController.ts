@@ -1,12 +1,9 @@
 import { Request, Response } from 'express';
 import pool from '../db';
-import jwt, { Secret } from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import { userSchema, HttpError, userLoginSchema, idSchema, updateUserSchema } from '../types';
+import { generateToken } from '../middleware/generatetoken';
 
-const generateToken = (id: string): string => {
-  return jwt.sign({ id }, process.env.JWT_SECRET as Secret, { expiresIn: '1h' });
-};
 
 export const createUser = async (req: Request, res: Response) => {
   const validationResult = userSchema.safeParse(req.body);
