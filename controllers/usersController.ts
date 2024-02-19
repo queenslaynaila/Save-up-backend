@@ -8,7 +8,7 @@ import { generateToken } from '../middleware/generatetoken';
 export const createUser = async (req: Request, res: Response) => {
   const validationResult = userSchema.safeParse(req.body);
   if (!validationResult.success) {
-    throw new HttpError(400, 'Invalid phone number or password');
+    throw new HttpError(422, 'Invalid phone number or password');
   }
   const { first_name, last_name, phone_no, password } = validationResult.data;
   const password_hash = bcrypt.hashSync(password, 10);
@@ -43,7 +43,7 @@ export const createUser = async (req: Request, res: Response) => {
 export const login = async (req: Request, res: Response) => {
   const validationResult = userLoginSchema.safeParse(req.body);
   if (!validationResult.success) {
-    throw new HttpError(400, 'Invalid phone number or password');
+    throw new HttpError(422, 'Invalid phone number or password');
   }
   const { password, phone_no } = req.body;
   const params = [phone_no];
@@ -82,11 +82,15 @@ export const getAllUsers = async (req: Request, res: Response) => {
 export const getUserById = async (req: Request, res: Response) => {
   const validationResult = idSchema.safeParse(req.params.id);
   if (!validationResult.success) {
-    throw new HttpError(400, 'Invalid user ID');
+    throw new HttpError(422, 'Invalid user ID');
   }
+  const loggedInUser = req.user?.id
   const id = validationResult.data;
+  if (loggedInUser !== id) {
+    throw new HttpError(401, 'Unauthorized access ');
+  }
   const query = 'SELECT * FROM users WHERE id = $1';
-  const result = await pool.query(query, [id]);
+  const result = await pool.query(query, [id,loggedInUser]);
   const user = result.rows[0];
   if (!user) {
     throw new HttpError(404, 'User with submitted ID not found');
@@ -98,17 +102,17 @@ export const getUserById = async (req: Request, res: Response) => {
 export const updateUser = async (req: Request, res: Response) => {
   const validationResult = idSchema.safeParse(req.params.id);
   if (!validationResult.success) {
-    throw new HttpError(400, 'Invalid user ID');
+    throw new HttpError(422, 'Invalid user ID');
   }
   const userId = validationResult.data;
   if (userId !== req.user?.id) {
-    throw new HttpError(403, 'You are not authorized to update this user information');
+    throw new HttpError(401, 'Unauthorized access ');
   }
   const validationResultBody = updateUserSchema.safeParse(req.body);
 
   if (!validationResultBody.success) {
     throw new HttpError(
-      400,
+      422,
       'Invalid user data. Please provide valid values for all user fields.'
     );
   }
@@ -153,12 +157,14 @@ export const updateUser = async (req: Request, res: Response) => {
 
 export const deleteUser = async (req: Request, res: Response) => {
   const validationResult = idSchema.safeParse(req.params.id);
+ 
+
   if (!validationResult.success) {
-    throw new HttpError(400, 'Invalid user ID');
+    throw new HttpError(422, 'Invalid user ID');
   }
   const id = validationResult.data;
   if (id !== req.user?.id) {
-      throw new HttpError(400, 'You are not authorized to delete this user information');
+      throw new HttpError(401, 'Unauthorized access');
   }
 
   const query = 'DELETE FROM users WHERE id = $1 RETURNING *';
