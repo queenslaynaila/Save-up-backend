@@ -1,26 +1,47 @@
-import express, { Request, Response } from 'express';
+import express, { Request, Response,NextFunction } from 'express';
 import * as savingsController from '../controllers/savingsController';
 import authenticateToken from '../middleware/auth';
 const router = express.Router();
 
-router.post('/', (req: Request, res: Response) => {
-  savingsController.createSaving(req, res);
+router.post('/', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    await savingsController.createSaving(req, res);
+  } catch (error) {
+    next(error);
+  }
 });
 
-router.get('/all', (req: Request, res: Response) => {
-  savingsController.getAllSavings(req, res);
+router.get('/all', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    await savingsController.getAllSavings(req, res);
+  } catch (error) {
+    next(error);
+  }
 });
 
-router.patch('/:id', authenticateToken, (req: Request, res: Response) => {
-  savingsController.updateSaving(req, res);
+router.patch('/:id', authenticateToken, async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    await savingsController.updateSaving(req, res);
+  } catch (error) {
+    next(error);
+  }
 });
 
-router.delete('/:id', authenticateToken, (req: Request, res: Response) => {
-  savingsController.deleteSaving(req, res);
+router.delete('/:id', authenticateToken, async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    await savingsController.deleteSaving(req, res);
+  } catch (error) {
+    next(error);
+  }
 });
 
-router.get('/',authenticateToken, (req: Request, res: Response) => {
-  savingsController.getSavings(req, res);
+router.get('/', authenticateToken, async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    await savingsController.getSavings(req, res);
+  } catch (error) {
+    next(error);
+  }
 });
+
 
 export default router;

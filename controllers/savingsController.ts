@@ -56,19 +56,19 @@ export const createSaving = async (req: Request, res: Response) => {
 export const getSavingById = async (req: Request, res: Response) => {
   const validationResult = idSchema.safeParse(req.params.id);
   if (!validationResult.success) {
-    return res.status(400).json({ error: new HttpError(400, 'Invalid saving ID').message });
+    throw new HttpError(400, 'Invalid saving ID');
   }
   const id = validationResult.data;
-
-  const query = 'SELECT * FROM savings WHERE id = $1';
-  const result = await pool.query(query, [id]);
+  const userId = req.user?.id;
+  const query = `SELECT * FROM savings WHERE id = $${id} AND user_id = $${userId}`;
+  const result = await pool.query(query);
+  
   if (!result || result.rows.length === 0) {
-    return res
-      .status(400)
-      .json({ error: new HttpError(400, 'Saving with submitted ID not found').message });
+    throw new HttpError(400, 'Saving with submitted ID not found');
   }
   res.status(200).json(result.rows[0]);
 };
+
 
 export const updateSaving = async (req: Request, res: Response) => {
   // Extract saving ID from request parameters
@@ -85,11 +85,7 @@ export const updateSaving = async (req: Request, res: Response) => {
   const userIdResult = await pool.query(userIdQuery, [savingId]);
   const userId = userIdResult.rows[0]?.user_id;
 
-  // Check if the user is authorized to update the saving
-  if (userId !== req.user?.id) {
-    return res.status(403).json({ error: 'You are not authorized to update this saving' });
-  }
-
+  
   // Validate and extract saving data from the request body
   const validatedSavings = updateSavingSchema.safeParse(req.body);
   if (!validatedSavings.success) {
@@ -121,8 +117,9 @@ export const updateSaving = async (req: Request, res: Response) => {
     values.push(target_date);
   }
   query = query.slice(0, -2);
-  query += ` WHERE id = $${values.length + 1} RETURNING *`;
-  values.push(savingId);
+  query += ` WHERE user_id = $${userId} AND id = $${values.length + 1} RETURNING *`;
+  values.push(userId)
+
 
   // Execute the update query and retrieve the updated saving
   const result = await pool.query(query, values);
@@ -141,30 +138,22 @@ export const updateSaving = async (req: Request, res: Response) => {
 
 export const deleteSaving = async (req: Request, res: Response) => {
   const validationResult = idSchema.safeParse(req.params.id);
-
   if (!validationResult.success) {
-    return res.status(400).json({ error: new HttpError(400, 'Invalid user ID').message });
+    throw new HttpError(400, 'Invalid saving ID');
   }
   const id = validationResult.data;
-  const userIdQuery = 'SELECT user_id FROM savings WHERE id = $1';
-  const userIdResult = await pool.query(userIdQuery, [id]);
-  const userId = userIdResult.rows[0]?.user_id;
-
-  if (userId !== req.user?.id) {
-    return res.status(403).json({ error: 'You are not authorized to update this saving' });
-  }
-  const query = 'DELETE FROM savings WHERE id = $1';
-  const result = await pool.query(query, [id]);
+  const userId = req.user?.id;
+  const query = 'DELETE FROM savings WHERE id = $1 AND user_id = $2';
+  const result = await pool.query(query, [id, userId]);
+  
+  
   if (result.rowCount != null && result.rowCount > 0) {
-    return res
-      .status(204)
-      .json({ error: new HttpError(400, 'Saving deleted successfully').message });
+    res.status(204).json({ message: 'Saving deleted successfully' });
   } else {
-    return res
-      .status(400)
-      .json({ error: new HttpError(400, 'Saving with provided ID not found').message });
+    throw new HttpError(400, 'Saving with provided ID not found');
   }
 };
+
 const executeQuery = async (res: Response, query: string, values: any[], errorMessage: string) => {
   const result = await pool.query(query, values);
   if (result.rows.length > 0) {
@@ -176,13 +165,13 @@ const executeQuery = async (res: Response, query: string, values: any[], errorMe
 
 export const getSavings = async (req: Request, res: Response) => {
   const { user_id, category, priority, status } = req.query;
-  const logged_in_user_id = req.user?.id; // Get the logged-in user ID
+  const logged_in_user_id = req.user?.id;
   let query = 'SELECT * FROM savings WHERE user_id = $1';
   const values = [user_id];
   let errorMessage = 'No savings found for the provided user ID';
 
   if (user_id !== logged_in_user_id) {
-    return res.status(403).json({ error: new HttpError(403, 'Unauthorized access').message });
+    throw new HttpError(403, 'Unauthorized access') ;
   }
 
   if (category) {
