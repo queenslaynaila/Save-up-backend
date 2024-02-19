@@ -3,7 +3,7 @@ import * as savingsController from '../controllers/savingsController';
 import authenticateToken from '../middleware/auth';
 const router = express.Router();
 
-router.post('/', async (req: Request, res: Response, next: NextFunction) => {
+router.post('/',authenticateToken, async (req: Request, res: Response, next: NextFunction) => {
   try {
     await savingsController.createSaving(req, res);
   } catch (error) {
@@ -22,6 +22,13 @@ router.get('/all', async (req: Request, res: Response, next: NextFunction) => {
 router.patch('/:id', authenticateToken, async (req: Request, res: Response, next: NextFunction) => {
   try {
     await savingsController.updateSaving(req, res);
+  } catch (error) {
+    next(error);
+  }
+});
+router.get('/:id', authenticateToken, async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    await savingsController.getSavingById(req, res);
   } catch (error) {
     next(error);
   }
