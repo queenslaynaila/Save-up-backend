@@ -1,19 +1,15 @@
 import { Request, Response } from 'express';
 import pool from '../db';
-import jwt, { Secret } from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
-import { userSchema, HttpError, userLoginSchema, idSchema, updateUserSchema } from '../types';
+import { CreateUserSchema, HttpError, UserLoginSchema, idSchema, UpdateUserSchema } from '../types';
+import { generateToken } from '../middleware/generatetoken';
+import {Schema} from "zod";
 
-const generateToken = (id: string): string => {
-  return jwt.sign({ id }, process.env.JWT_SECRET as Secret, { expiresIn: '1h' });
-};
 
 export const createUser = async (req: Request, res: Response) => {
-  const validationResult = userSchema.safeParse(req.body);
+  const validationResult = CreateUserSchema.safeParse(req.body);
   if (!validationResult.success) {
-    return res
-      .status(400)
-      .json({ error: new HttpError(400, 'Invalid email, phone number, or password').message });
+    throw new HttpError(422, 'Invalid phone number or password');
   }
   const { first_name, last_name, phone_no, password } = validationResult.data;
   const password_hash = bcrypt.hashSync(password, 10);
@@ -24,101 +20,118 @@ export const createUser = async (req: Request, res: Response) => {
   const userValues = [first_name, last_name, phone_no, password_hash];
   try {
     const userResult = await pool.query(userQuery, userValues);
-    const user = userResult.rows[0];
-    const token = generateToken(user.id);
-    user.token = token;
-    return res.json(user);
+    const newUser = userResult.rows[0];
+
+    const userDataToSend = {
+      id: newUser.id,
+      first_name: newUser.first_name,
+      last_name: newUser.last_name,
+      email: newUser.email,
+      phone_no: newUser.phone_no,
+      created_at: newUser.created_at,
+      updated_at: newUser.updated_at,
+      total_targeted_amount: newUser.total_targeted_amount,
+      total_contributions_amount: newUser.total_contributions_amount,
+      total_expenses_amount: newUser.total_expenses_amount
+    };
+    const token = generateToken(newUser.id);
+    res.cookie('token', token, { httpOnly: true, secure: true }).json(userDataToSend);
   } catch (error) {
-    return res.status(400).json({
-      error: new HttpError(400, 'An account with the provided email or phone number already exists')
-        .message,
-    });
+    throw new HttpError(400, 'An account with the provided email or phone number already exists');
   }
 };
+
 export const login = async (req: Request, res: Response) => {
-  const validationResult = userLoginSchema.safeParse(req.body);
+  const validationResult = UserLoginSchema.safeParse(req.body);
   if (!validationResult.success) {
-    return res
-      .status(400)
-      .json({ error: new HttpError(400, 'Invalid email, phone number, or password').message });
+    throw new HttpError(422, 'Invalid phone number or password');
   }
-  const { email, password, phone_no } = req.body;
-  const params = [email || phone_no];
-  const query = email
-    ? 'SELECT * FROM users WHERE email = $1'
-    : 'SELECT * FROM users WHERE phone_no = $1';
+  const { password, phone_no } = req.body;
+  const params = [phone_no];
+  const query = 'SELECT * FROM users WHERE phone_no = $1';
 
   const result = await pool.query(query, params);
   const user = result.rows[0];
+
   if (!user || !(await bcrypt.compare(password, user.password_hash))) {
-    return res.status(400).json({
-      error: new HttpError(400, 'Invalid email, phone number, or password combination').message,
-    });
+    throw new HttpError(400, 'Invalid phone number or password combination');
   }
 
   const token = generateToken(user.id);
-  user.token = token;
-  res.json(user);
+  res.cookie('token', token, { httpOnly: true, secure: true }).json(user);
 };
 
 export const signout = async (req: Request, res: Response) => {
-  const authToken = req.cookies.auth_token;
-  if (!authToken) {
-    return res
-      .status(400)
-      .json({ error: new HttpError(400, 'Invalid request: no auth token provided').message });
-  }
   res.clearCookie('auth_token');
-  return res.status(200).json({ message: 'Logout successful' });
+  return res.json({ message: 'Logout successful' });
 };
 
 export const getAllUsers = async (req: Request, res: Response) => {
-  const query = 'SELECT * FROM users';
+  const query = 'SELECT * FROM users limit 10';
   const result = await pool.query(query);
-  const users = result.rows;
-  if (!users || users.length === 0) {
-    return res.status(404).json({ error: new HttpError(404, 'No users found').message });
-  }
-  return res.status(200).json(users);
+  const users = result.rows || [];
+  res.json(users);
 };
 
-export const getUserById = async (req: Request, res: Response) => {
-  const validationResult = idSchema.safeParse(req.params.id);
-  if (!validationResult.success) {
-    return res.status(400).json({ error: new HttpError(400, 'Invalid user ID').message });
+interface ValidateOptions {
+  body?: Schema
+  params?: Schema
+}
+
+function validate(options: ValidateOptions) {
+  return async function (req: Request, res: Response) {
+    // params
+    options.params?.safeParse(req.params);
+
+    req.params =
+
+    // body
+    options.body.safeParse(req.body);
+
+    const validationResult = idSchema.safeParse(req.params.id);
+    if (!validationResult.success) {
+      throw new HttpError(400, 'Invalid user ID');
+    }
+    throw new HttpError(400, 'Invalid user ID');
   }
-  const id = validationResult.data;
+}
+
+
+export const getUserById = async (req: Request, res: Response) => {
+  const id = req.params.id;
+
+  const authenticatedUserId = req.user?.id
+  if (authenticatedUserId !== id) {
+    throw new HttpError(404, 'Not found');
+  }
+
   const query = 'SELECT * FROM users WHERE id = $1';
-  const result = await pool.query(query, [id]);
+  const result = await pool.query(query, [id,authenticatedUserId]);
   const user = result.rows[0];
   if (!user) {
-    return res
-      .status(400)
-      .json({ error: new HttpError(400, 'User with submitted ID not found').message });
+    throw new HttpError(404, 'User with submitted ID not found');
   }
-  return res.status(200).json(user);
+
+  res.json(user);
 };
+
 
 export const updateUser = async (req: Request, res: Response) => {
   const validationResult = idSchema.safeParse(req.params.id);
   if (!validationResult.success) {
-    return res.status(400).json({ error: new HttpError(400, 'Invalid user ID').message });
+    throw new HttpError(422, 'Invalid user ID');
   }
   const userId = validationResult.data;
   if (userId !== req.user?.id) {
-    return res
-      .status(403)
-      .json({ error: 'You are not authorized to update this user information' });
+    throw new HttpError(401, 'Unauthorized access ');
   }
-  const validationResultBody = updateUserSchema.safeParse(req.body);
+  const validationResultBody = UpdateUserSchema.safeParse(req.body);
 
   if (!validationResultBody.success) {
-    return res.status(400).json({
-      error: new HttpError(
-        400,
-        'Invalid user data. Please provide valid values for all user fields.'
-      ).message,
-    });
+    throw new HttpError(
+      422,
+      'Invalid user data. Please provide valid values for all user fields.'
+    );
   }
 
   const { first_name, last_name, email, phone_no } = validationResultBody.data;
@@ -151,34 +164,8 @@ export const updateUser = async (req: Request, res: Response) => {
   const updatedUser = result.rows[0];
 
   if (!updatedUser) {
-    return res
-      .status(400)
-      .json({ error: new HttpError(400, 'User with given ID not found').message });
+    throw new HttpError(400, 'User with given ID not found');
   }
 
-  return res.status(200).json(updatedUser);
-};
-
-export const deleteUser = async (req: Request, res: Response) => {
-  const validationResult = idSchema.safeParse(req.params.id);
-  if (!validationResult.success) {
-    return res.status(400).json({ error: new HttpError(400, 'Invalid user ID').message });
-  }
-  const id = validationResult.data;
-  if (id !== req.user?.id) {
-    return res
-      .status(403)
-      .json({ error: 'You are not authorized to delete this user information' });
-  }
-
-  const query = 'DELETE FROM users WHERE id = $1 RETURNING *';
-  const result = await pool.query(query, [id]);
-
-  if (result.rowCount != null && result.rowCount > 0) {
-     return res.status(204).json({ message: 'User deleted successfully' });
-  } else {
-    return res
-      .status(400)
-      .json({ error: new HttpError(400, 'User with provided ID not found').message });
-  }
+  res.status(200).json(updatedUser);
 };

@@ -1,33 +1,50 @@
-import { NextFunction, Request, Response } from 'express';
-import jwt, { Secret } from 'jsonwebtoken';
-import { User } from '../types';
+import {NextFunction, Request, Response} from "express";
+import jwt, {Secret} from "jsonwebtoken";
+import {HttpError, User} from "../types";
 
-declare module 'express-serve-static-core' {
+declare module "express-serve-static-core" {
   interface Request {
     user?: User;
   }
 }
 
-const authenticateToken = (req: Request, res: Response, next: NextFunction) => {
-  const token = req.headers['authorization'];
+export const enum UserRole {
+  ADMIN = "admin",
+  USER = "user"
+}
 
-  if (!token) {
-    return res.status(401).json({ message: 'Token does not exist.Login first' });
-  }
+interface  AuthMiddlewareOptions {
+  roles?: UserRole[] | UserRole;
+}
 
-  const tokenValue = token.split(' ')[1];
-  jwt.verify(tokenValue, process.env.JWT_SECRET as Secret, (err, decoded) => {
-    if (err) {
-      if (err.name === 'TokenExpiredError') {
-        return res.status(401).json({ message: 'Token expired,please log in again' });
-      } else {
-        return res.status(401).json({ message: 'Invalid token,please log in again' });
-      }
+function authMiddleware(options: AuthMiddlewareOptions = {}) {
+  const roles = options.roles || [];
+
+  return (req: Request, res: Response, next: NextFunction) => {
+    const token = req.headers["authorization"];
+
+    if (!token) {
+      return res.status(401).json({message: "Token does not exist.Login first"});
     }
 
-    req.user = decoded as User;
-    next();
-  });
-};
+    const tokenValue = token.split(" ")[1];
+    jwt.verify(
+      tokenValue,
+      process.env.JWT_SECRET as Secret,
+      (err, decoded) => {
+        if (err) {
+          return res.status(401).json({message: "Invalid token,please log in again"});
+        }
 
-export default authenticateToken;
+        const user = decoded as User;
+        if (roles.length && !roles.includes(user.role)) {
+          throw new HttpError(403, "You do not have permission to access this resource");
+        }
+
+        req.user = user;
+        next();
+      });
+  };
+}
+
+export default authMiddleware;

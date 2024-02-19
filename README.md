@@ -50,7 +50,7 @@ You can check the database schema [here](./db_schema.dbml) and the table diagram
   - `password` (string, required): The password for the user account.
 - **Response**:
   - Status Code: `200 OK`
-  - Body: The created user object including a JWT token.
+  - Body: The created user object including a JWT token sent over as a cookie called token .
 - **Error Responses**:
   - Status Code: `400 Bad Request`
     - Description: Returned when the request body is invalid or an account with the provided email or phone number already exists.
@@ -71,7 +71,7 @@ You can check the database schema [here](./db_schema.dbml) and the table diagram
   - `password` (string, required): The password for the user account.
 - **Response**:
   - Status Code: `200 OK`
-  - Body: The authenticated user object including a JWT token.
+  - Body: The authenticated user object including a JWT token sent over as a cookie called token .
 - **Error Responses**:
   - Status Code: `400 Bad Request`
     - Description: Returned when the request body is invalid or the provided credentials are incorrect.

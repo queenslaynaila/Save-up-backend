@@ -1,96 +1,91 @@
-import pool from '../db';
-import { Request, Response } from 'express';
-import { HttpError, idSchema, updateContributionsSchema, contributionsSchema } from '../types';
+import pool from "../db";
+import {Request, Response} from "express";
+import {contributionSchema, HttpError, idSchema, updateContributionSchema} from "../types";
+
 export const updateUserTotalContributionsAmount = async (
   userId: string,
   newContributionAmount: number
 ) => {
   const query = `
-        UPDATE users
-        SET total_contributions_amount = total_contributions_amount + $1
-        WHERE id = $2
-        RETURNING *`;
+    UPDATE users
+    SET total_contributions_amount = total_contributions_amount + $1
+    WHERE id = $2
+    RETURNING *`;
   await pool.query(query, [newContributionAmount, userId]);
 };
 
 export const createContributions = async (req: Request, res: Response) => {
-  const validationResult = contributionsSchema.safeParse(req.body);
+  const validationResult = contributionSchema.safeParse(req.body);
   if (!validationResult.success) {
-    return res
-      .status(400)
-      .json({ error: new HttpError(400, 'Invalid saving id, amount, or date').message });
+    throw new HttpError(400, "Invalid saving id, amount, or date");
   }
 
-  const { saving_id, amount, date } = validationResult.data;
+  const {saving_id, amount, date} = validationResult.data;
 
   try {
-    await pool.query('BEGIN');
+    await pool.query("BEGIN");
 
     const contributionQuery = `
-        INSERT INTO contributions (saving_id, amount, date) 
-        VALUES ($1, $2, $3) 
-        RETURNING *`;
+      INSERT INTO contributions (saving_id, amount, date)
+      VALUES ($1, $2, $3)
+      RETURNING *`;
     const contributionValues = [saving_id, amount, date];
 
     const contributionResult = await pool.query(contributionQuery, contributionValues);
 
-    const getUserQuery = 'SELECT user_id FROM savings WHERE id = $1';
+    const getUserQuery =
+      "SELECT user_id FROM savings WHERE id = $1";
     const getUserResult = await pool.query(getUserQuery, [saving_id]);
     const user_id = getUserResult.rows[0].user_id;
 
     await updateUserTotalContributionsAmount(user_id, amount);
 
-    await pool.query('COMMIT');
+    await pool.query("COMMIT");
 
     return res.status(201).json(contributionResult.rows[0]);
   } catch (error) {
-    await pool.query('ROLLBACK');
-    return res.status(400).json({ error: new HttpError(400, 'Invalid saving id').message });
+    await pool.query("ROLLBACK");
+    throw new HttpError(400, "Invalid saving id");
   }
 };
 
 export const getAllContributions = async (req: Request, res: Response) => {
-  const query = 'SELECT * FROM contributions';
+  const query = "SELECT * FROM contributions";
   const result = await pool.query(query);
   const contributions = result.rows;
   if (!contributions || contributions.length === 0) {
-    return res.status(404).json({ error: new HttpError(404, 'No contributions found').message });
+    throw new HttpError(404, "No contributions found");
   }
   return res.status(200).json(contributions);
 };
 
 export const updateContributions = async (req: Request, res: Response) => {
-  const { id } = req.params;
+  const {id} = req.params;
 
-  const validationResultBody = updateContributionsSchema.safeParse(req.body);
+  const validationResultBody = updateContributionSchema.safeParse(req.body);
 
   if (!validationResultBody.success) {
-    return res.status(400).json({
-      error: new HttpError(
-        400,
-        'Invalid contributions data. Please provide valid values for all user fields.'
-      ).message,
-    });
+    throw new HttpError(400, "Invalid contributions data. Please provide valid values for all user fields.");
   }
-  const { amount, date } = validationResultBody.data;
+  const {amount, date} = validationResultBody.data;
   const getUserIdQuery = `
-  SELECT s.user_id
-  FROM contributions c
-  JOIN savings s ON c.savings_id = s.id
-  WHERE c.id = $1
-`;
+    SELECT s.user_id
+    FROM contributions c
+           JOIN savings s ON c.savings_id = s.id
+    WHERE c.id = $1
+  `;
   const userIdResult = await pool.query(getUserIdQuery, [id]);
   const userId = userIdResult.rows[0]?.user_id;
   if (req.user?.id !== userId) {
-    return res.status(403).json({ error: 'Unauthorized to update contribution for this user' });
+    throw new HttpError(403, "Unauthorized to update contribution for this user");
   }
 
-  const query = 'UPDATE contributions SET amount = $1, date = $2 WHERE id = $3 RETURNING *';
+  const query = "UPDATE contributions SET amount = $1, date = $2 WHERE id = $3 RETURNING *";
   const values = [amount, date, id];
   const result = await pool.query(query, values);
-  const updatedcontribution = result.rows[0];
-  if (!updatedcontribution) {
-    return res.status(404).json({ error: 'Contribution with given ID not found' });
+  const updatedContribution = result.rows[0];
+  if (!updatedContribution) {
+    throw new HttpError(404, "Contribution with given ID not found");
   }
   return res.status(200).json(updateContributions);
 };
@@ -99,30 +94,28 @@ export const deleteContributions = async (req: Request, res: Response) => {
   const validationResult = idSchema.safeParse(req.params.id);
 
   if (!validationResult.success) {
-    return res.status(400).json({ error: new HttpError(400, 'Invalid user ID').message });
+    throw new HttpError(400, "Invalid user ID");
   }
   const id = validationResult.data;
 
-  const query = 'DELETE FROM contributions WHERE id = $1';
+  const query = "DELETE FROM contributions WHERE id = $1";
   const result = await pool.query(query, [id]);
   if (result.rowCount === 0) {
-    return res.status(404).json({ error: 'Contribution with given ID not found' });
+    throw new HttpError(404, "Contribution with given ID not found");
   }
-  return res.status(204).json({ message: 'Contribution deleted' });
+  return res.status(204).json({message: "Contribution deleted"});
 };
 
 export const getContributionsById = async (req: Request, res: Response) => {
   const validationResult = idSchema.safeParse(req.params.id);
   if (!validationResult.success) {
-    return res.status(400).json({ error: new HttpError(400, 'Invalid contributions ID').message });
+    throw new HttpError(400, "Invalid contributions ID");
   }
   const id = validationResult.data;
-  const query = 'SELECT * FROM contributions WHERE id = $1';
+  const query = "SELECT * FROM contributions WHERE id = $1";
   const result = await pool.query(query, [id]);
   if (result.rows.length === 0) {
-    return res
-      .status(404)
-      .json({ error: new HttpError(404, 'Contribution with provided ID not found').message });
+    throw new HttpError(404, "Contribution with provided ID not found");
   }
   return res.status(200).json(result.rows[0]);
 };
@@ -131,14 +124,14 @@ export const getContributionsBySaving = async (req: Request, res: Response) => {
   const validationResult = idSchema.safeParse(req.params.saving_id);
 
   if (!validationResult.success) {
-    return res.status(400).json({ error: new HttpError(400, 'Invalid saving ID').message });
+    throw new HttpError(400, "Invalid saving ID");
   }
   const saving_id = validationResult.data;
 
-  const query = 'SELECT * FROM contributions WHERE saving_id = $1';
+  const query = "SELECT * FROM contributions WHERE saving_id = $1";
   const result = await pool.query(query, [saving_id]);
   if (result.rows.length === 0) {
-    return res.status(404).json({ error: 'Contribution with given savingID not found' });
+    throw new HttpError(404, "Contribution with given savingID not found");
   }
   return res.status(200).json(result.rows);
 };

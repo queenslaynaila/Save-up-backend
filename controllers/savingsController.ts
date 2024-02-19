@@ -20,8 +20,8 @@ export const getAllSavings = async (req: Request, res: Response) => {
   const query = 'SELECT * FROM savings';
   const result = await pool.query(query);
   const savings = result.rows;
-  if (!savings || savings.length === 0) {
-    return res.status(404).json({ error: new HttpError(404, 'No savings found').message });
+  if (!savings ) {
+    throw new HttpError(404, 'No savings found');
   }
   return res.status(200).json(savings);
 };
@@ -29,11 +29,14 @@ export const getAllSavings = async (req: Request, res: Response) => {
 export const createSaving = async (req: Request, res: Response) => {
   const validationResult = savingSchema.safeParse(req.body);
   if (!validationResult.success) {
-    return res.status(400).json({ error: new HttpError(400, 'Invalid saving data').message });
+    throw new HttpError(400, 'Invalid saving data');
   }
+  const loggedInUser = req.user?.id
   const { user_id, description, category, target_amount, priority, target_date } =
-    validationResult.data;
-
+  validationResult.data;
+  if (loggedInUser !== user_id) {
+    throw new HttpError(401, 'Unauthorized access ');
+  }
   await pool.query('BEGIN');
 
   const savingQuery = `
@@ -44,9 +47,7 @@ export const createSaving = async (req: Request, res: Response) => {
   const savingResult = await pool.query(savingQuery, savingValues);
   if (savingResult.rows.length === 0) {
     await pool.query('ROLLBACK');
-    return res
-      .status(400)
-      .json({ error: new HttpError(400, 'User with provided ID not found').message });
+   throw new HttpError(400, 'User with provided ID not found');
   }
   await updateUserTotalTargetedAmount(user_id, target_amount);
   await pool.query('COMMIT');
@@ -56,48 +57,36 @@ export const createSaving = async (req: Request, res: Response) => {
 export const getSavingById = async (req: Request, res: Response) => {
   const validationResult = idSchema.safeParse(req.params.id);
   if (!validationResult.success) {
-    return res.status(400).json({ error: new HttpError(400, 'Invalid saving ID').message });
+    throw new HttpError(400, 'Invalid saving ID');
   }
   const id = validationResult.data;
-
-  const query = 'SELECT * FROM savings WHERE id = $1';
-  const result = await pool.query(query, [id]);
+  const userId = req.user?.id;
+  
+  const query = 'SELECT * FROM savings WHERE id = $1 AND user_id = $2';
+  const result = await pool.query(query, [id, userId]);
+  
   if (!result || result.rows.length === 0) {
-    return res
-      .status(400)
-      .json({ error: new HttpError(400, 'Saving with submitted ID not found').message });
+    throw new HttpError(400, 'Saving with submitted ID not found');
   }
+  
   res.status(200).json(result.rows[0]);
 };
 
-export const updateSaving = async (req: Request, res: Response) => {
-  // Extract saving ID from request parameters
-  const savingId = req.params.id;
 
-  // Validate saving ID
+export const updateSaving = async (req: Request, res: Response) => {
+  const savingId = req.params.id;
   const validationResult = idSchema.safeParse(savingId);
   if (!validationResult.success) {
     return res.status(400).json({ error: new HttpError(400, 'Invalid saving ID').message });
   }
+  const userId = req.user?.id;
 
-  // Retrieve user ID associated with the saving
-  const userIdQuery = 'SELECT user_id FROM savings WHERE id = $1';
-  const userIdResult = await pool.query(userIdQuery, [savingId]);
-  const userId = userIdResult.rows[0]?.user_id;
-
-  // Check if the user is authorized to update the saving
-  if (userId !== req.user?.id) {
-    return res.status(403).json({ error: 'You are not authorized to update this saving' });
-  }
-
-  // Validate and extract saving data from the request body
   const validatedSavings = updateSavingSchema.safeParse(req.body);
   if (!validatedSavings.success) {
-    return res.status(400).json({ error: new HttpError(400, 'Invalid saving data').message });
+    throw new HttpError(422, 'Invalid saving data');
   }
   const { description, category, target_amount, priority, target_date } = validatedSavings.data;
 
-  // Construct the SQL update query based on provided fields
   let query = 'UPDATE savings SET ';
   const values = [];
   if (description) {
@@ -121,85 +110,77 @@ export const updateSaving = async (req: Request, res: Response) => {
     values.push(target_date);
   }
   query = query.slice(0, -2);
-  query += ` WHERE id = $${values.length + 1} RETURNING *`;
-  values.push(savingId);
+  query += ` WHERE user_id = $${userId} AND id = $${values.length + 1} RETURNING *`;
+  values.push(userId)
 
-  // Execute the update query and retrieve the updated saving
   const result = await pool.query(query, values);
   const updatedSaving = result.rows[0];
 
-  // Check if the saving was successfully updated
   if (!updatedSaving) {
-    return res
-      .status(400)
-      .json({ error: new HttpError(400, 'Saving with given ID not found').message });
+    throw new HttpError(422, 'Saving with given ID not found')
   }
 
-  // Return the updated saving
   return res.status(200).json(updatedSaving);
 };
 
 export const deleteSaving = async (req: Request, res: Response) => {
   const validationResult = idSchema.safeParse(req.params.id);
-
   if (!validationResult.success) {
-    return res.status(400).json({ error: new HttpError(400, 'Invalid user ID').message });
+    throw new HttpError(400, 'Invalid saving ID');
   }
   const id = validationResult.data;
-  const userIdQuery = 'SELECT user_id FROM savings WHERE id = $1';
-  const userIdResult = await pool.query(userIdQuery, [id]);
-  const userId = userIdResult.rows[0]?.user_id;
-
-  if (userId !== req.user?.id) {
-    return res.status(403).json({ error: 'You are not authorized to update this saving' });
-  }
-  const query = 'DELETE FROM savings WHERE id = $1';
-  const result = await pool.query(query, [id]);
+  const userId = req.user?.id;
+  const query = 'DELETE FROM savings WHERE id = $1 AND user_id = $2';
+  const result = await pool.query(query, [id, userId]);
+  
+  
   if (result.rowCount != null && result.rowCount > 0) {
+<<<<<<< HEAD
       return res.status(204).json({ message: 'Savings deleted successfully' });
+=======
+    res.status(204).json({ message: 'Saving deleted successfully' });
+>>>>>>> ab8b2830f4ded0534c13f2069fd361df90cedd8c
   } else {
-    return res
-      .status(400)
-      .json({ error: new HttpError(400, 'Saving with provided ID not found').message });
+    throw new HttpError(400, 'Saving with provided ID not found');
   }
 };
+
 const executeQuery = async (res: Response, query: string, values: any[], errorMessage: string) => {
   const result = await pool.query(query, values);
   if (result.rows.length > 0) {
     res.status(200).json(result.rows);
   } else {
-    return res.status(404).json({ error: new HttpError(404, errorMessage).message });
+    throw new HttpError(404, errorMessage)
   }
 };
 
 export const getSavings = async (req: Request, res: Response) => {
   const { user_id, category, priority, status } = req.query;
-  const logged_in_user_id = req.user?.id; // Get the logged-in user ID
+  const logged_in_user_id = req.user?.id;
   let query = 'SELECT * FROM savings WHERE user_id = $1';
   const values = [user_id];
   let errorMessage = 'No savings found for the provided user ID';
 
   if (user_id !== logged_in_user_id) {
-    return res.status(403).json({ error: new HttpError(403, 'Unauthorized access').message });
+    throw new HttpError(403, 'Unauthorized access') ;
   }
 
   if (category) {
     query += ' AND category = $2';
     values.push(category);
-    errorMessage = 'No savings found with the provided category';
   }
 
   if (priority) {
     query += ' AND priority = $' + (values.length + 1);
     values.push(priority);
-    errorMessage = 'No savings found with the provided priority';
   }
 
   if (status) {
     query += ' AND status = $' + (values.length + 1);
     values.push(status);
-    errorMessage = 'No savings found with the provided status';
   }
 
+  errorMessage = 'No savings found for the given query';
+
   await executeQuery(res, query, values, errorMessage);
-};
+}
