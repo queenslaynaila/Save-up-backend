@@ -10,7 +10,6 @@ export const prioritySchema = z.string();
 export const userSchema = z.object({
   first_name: z.string(),
   last_name: z.string(),
-  email: z.string().email().optional(),  
   phone_no: z
     .string()
     .refine((value) => /^\+254\d{9}$/.test(value), 'Invalid phone number format'),
@@ -18,9 +17,10 @@ export const userSchema = z.object({
 });
 
 export const userLoginSchema = z.object({
-  email: z.string().email().optional(),
-  phone_no: z.string(),
-  password: z.string(),
+  phone_no: z
+    .string()
+    .refine((value) => /^\+254\d{9}$/.test(value), 'Invalid phone number format'),
+  password: z.string()
 });
 
 export const savingSchema = z.object({
