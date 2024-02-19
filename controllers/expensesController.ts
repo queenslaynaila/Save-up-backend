@@ -38,7 +38,7 @@ export const getAllExpenses = async (req: Request, res: Response) => {
   const query = 'SELECT * FROM expenses';
   const result = await pool.query(query);
   const expenses = result.rows;
-  if (!expenses || expenses.length === 0) {
+  if (!expenses) {
     throw new HttpError(404, 'No expenses found');
   }
   return res.status(200).json(expenses);
@@ -50,9 +50,9 @@ export const getExpenseById = async (req: Request, res: Response) => {
     throw new HttpError(400, 'Invalid expense ID');
   }
   const id = validationResult.data;
-
-  const query = 'SELECT * FROM expenses WHERE id = $1';
-  const result = await pool.query(query, [id]);
+  const userId = req.user?.id;
+  const query = 'SELECT * FROM expenses WHERE id = $1 AND user_id = $2';
+  const result = await pool.query(query, [id,userId]);
   if (result.rows.length === 0) {
     throw new HttpError(404, 'Expense with submitted ID not found');
   }
@@ -65,24 +65,18 @@ export const updateExpense = async (req: Request, res: Response) => {
     return res.status(400).json({ error: new HttpError(400, 'Invalid saving ID').message });
   }
   const id = validationResultId.data;
+  const userId = req.user?.id;
 
-  const userIdQuery = 'SELECT user_id FROM expenses WHERE id = $1';
-  const userIdResult = await pool.query(userIdQuery, [id]);
-  const userId = userIdResult.rows[0]?.user_id;
-
-  if (userId !== req.user?.id) {
-    throw new HttpError(403, 'You are not authorized to update this expense');
-  }
   const validationResult = updateExpenseSchema.safeParse(req.body);
   if (!validationResult.success) {
-    throw new HttpError(400, 'Invalid data');
+    throw new HttpError(403, 'Invalid data');
   }
 
   const { description, category, amount, date } = validationResult.data;
 
   const query =
-    'UPDATE expenses SET description = $1, category = $2, amount = $3, date = $4 WHERE id = $5 RETURNING *';
-  const values = [description, category, amount, date, id];
+    'UPDATE expenses SET description = $1, category = $2, amount = $3, date = $4 WHERE id = $5 AND user_id = $6 RETURNING *';
+  const values = [description, category, amount, date, id,userId];
   const result = await pool.query(query, values);
   if (result.rows.length === 0) {
     throw new HttpError(404, 'Expense not found');
@@ -94,20 +88,12 @@ export const deleteExpense = async (req: Request, res: Response) => {
   const validationResult = idSchema.safeParse(req.params.id);
 
   if (!validationResult.success) {
-    throw new HttpError(400, 'Invalid expense ID');
+    throw new HttpError(403, 'Invalid expense ID');
   }
   const id = validationResult.data;
-
-  const userIdQuery = 'SELECT user_id FROM expenses WHERE id = $1';
-  const userIdResult = await pool.query(userIdQuery, [id]);
-  const userId = userIdResult.rows[0]?.user_id;
-
-  if (userId !== req.user?.id) {
-    throw new HttpError(403, 'You are not authorized to delete this expense');
-  }
-
-  const query = 'DELETE FROM expenses WHERE id = $1';
-  const result = await pool.query(query, [id]);
+  const userId = req.user?.id;
+  const query = 'DELETE FROM expenses WHERE id = $1 AND user_id = $2';
+  const result = await pool.query(query, [id,userId]);
   if (result.rowCount != null && result.rowCount > 0) {
     return res.status(204).json({ message: 'Expense deleted successfully' });
   } else {
@@ -123,28 +109,31 @@ const executeQuery = async (res: Response, query: string, values: any[], errorMe
   }
 };
 
+
+
 export const getExpenses = async (req: Request, res: Response) => {
   const { user_id, category, month } = req.query;
+  const logged_in_user_id = req.user?.id;
+  let query = 'SELECT * FROM expenses WHERE user_id = $1';
+  const values = [user_id];
+  let errorMessage = 'No expenses found for the provided user ID';
 
-  let query;
-  const values = [];
-  let errorMessage;
-
-  if (user_id) {
-    query = 'SELECT * FROM expenses WHERE user_id = $1';
-    values.push(user_id);
-    errorMessage = 'No savings found for the provided user ID';
-  } else if (category) {
-    query = 'SELECT * FROM expenses WHERE category = $1';
-    values.push(category);
-    errorMessage = 'No savings found with the provided category';
-  } else if (month) {
-    query = 'SELECT * FROM expenses WHERE EXTRACT(MONTH FROM date) = $1';
-    values.push(month);
-    errorMessage = 'No savings found for provided date';
-  } else {
-    return res.status(400).json({ error: new HttpError(400, 'Invalid query parameters').message });
+  if (user_id !== logged_in_user_id) {
+    throw new HttpError(403, 'Unauthorized access') ;
   }
 
+  if (category) {
+    query += ' AND category = $2';
+    values.push(category);
+  }
+
+  if (month) {
+    query += ' AND EXTRACT(MONTH FROM date) = $'  + (values.length + 1);
+    values.push(month);
+  }
+
+  errorMessage = 'No expenses found for the given query';
+
   await executeQuery(res, query, values, errorMessage);
-};
+}
+
