@@ -36,7 +36,7 @@ export const updateSavingSchema = z.object({
   category: z.string().optional(),
   target_amount: z.number().optional(),
   priority: z.string().optional(),
-  target_date: z.date().optional(),
+  target_date: z.string().optional(),
   status: z.string().optional(),
 });
 export const updateContributionsSchema = z.object({
