@@ -31,7 +31,7 @@ export default (router: Router) => {
       if (result.rows.length === 0) {
         throw new HttpError(404, 'Expense not found');
       }
-      return res.status(200).json(result.rows[0]);
+      return res.json(result.rows[0]);
     }
   );
 };

@@ -25,7 +25,7 @@ export default (router: Router) => {
           phoneNo,
         ]);
 
-        res.status(200).json({ message: 'Password updated successfully. Login' });
+        res.json({ message: 'Password updated successfully. Login' });
       } catch (err) {
         if (err instanceof jwt.TokenExpiredError) {
           return res.status(400).json({

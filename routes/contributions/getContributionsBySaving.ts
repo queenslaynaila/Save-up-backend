@@ -22,7 +22,7 @@ export default (router: Router) => {
       if (result.rows.length === 0) {
         throw new HttpError(404, 'Contribution with given savingID not found');
       }
-      return res.status(200).json(result.rows);
+      return res.json(result.rows);
     }
   );
 };

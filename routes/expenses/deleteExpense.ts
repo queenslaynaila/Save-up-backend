@@ -20,7 +20,7 @@ export default (router: Router) => {
       const query = 'DELETE FROM expenses WHERE id = $1 AND user_id = $2';
       const result = await pool.query(query, [id, userId]);
       if (result.rowCount != null && result.rowCount > 0) {
-        return res.status(204).json({ message: 'Expense deleted successfully' });
+        return res.json({ message: 'Expense deleted successfully' });
       } else {
         throw new HttpError(400, 'Expense with provided ID not found');
       }

@@ -5,9 +5,9 @@ import pool from '../../db';
 
 export default (router: Router) => {
   router.get('/', authMiddleware({ roles: [UserRole.ADMIN, UserRole.USER] }), async (req, res) => {
-    const query = 'SELECT * FROM expenses';
+    const query = 'SELECT * FROM expenses LIMIT 10';
     const result = await pool.query(query);
     const expenses = result.rows || [];
-    return res.status(200).json(expenses);
+    return res.json(expenses);
   });
 };

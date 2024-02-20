@@ -3,13 +3,11 @@ import authMiddleware from '../../middleware/auth';
 import { UserRole } from '../../types';
 import pool from '../../db';
 
-const getAllUsersRouter = Router();
-
-getAllUsersRouter.get('/', authMiddleware({ roles: [UserRole.ADMIN, UserRole.USER] }), async (_, res) => {
-  const query = 'SELECT * FROM users LIMIT 10';
-  const result = await pool.query(query);
-  const users = result.rows || [];
-  res.json(users);
-});
-
-export default getAllUsersRouter;
+export default (router: Router) => {
+  router.get('/', authMiddleware({ roles: [UserRole.ADMIN, UserRole.USER] }), async (_, res) => {
+    const query = 'SELECT * FROM users LIMIT 10';
+    const result = await pool.query(query);
+    const users = result.rows || [];
+    res.json(users);
+  });
+};

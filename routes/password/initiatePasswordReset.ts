@@ -20,7 +20,7 @@ export default (router: Router) => {
       });
       console.log('Reset token:', resetToken);
       sendSms(phoneNo, `Here is your reset token ${resetToken}. Do not share this with anyone.`);
-      return res.status(200).json({ message: 'Reset token generated and sent successfully.' });
+      return res.json({ message: 'Reset token generated and sent successfully.' });
     }
   );
 };

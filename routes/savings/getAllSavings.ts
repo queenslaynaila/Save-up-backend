@@ -8,6 +8,6 @@ export default (router: Router) => {
     const query = 'SELECT * FROM contributions';
     const result = await pool.query(query);
     const savings = result.rows || [];
-    return res.status(200).json(savings);
+    return res.json(savings);
   });
 };

@@ -29,7 +29,7 @@ export default (router: Router) => {
         query += `description = $${values.length + 1}, `;
         values.push(description);
       }
-  
+
       if (target_amount) {
         query += `target_amount = $${values.length + 1}, `;
         values.push(target_amount);
@@ -53,7 +53,7 @@ export default (router: Router) => {
         throw new HttpError(422, 'Saving with given ID not found');
       }
 
-      return res.status(200).json(updatedSaving);
+      return res.json(updatedSaving);
     }
   );
 };

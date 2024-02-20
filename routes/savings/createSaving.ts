@@ -28,6 +28,6 @@ export default (router: Router) => {
       throw new HttpError(400, 'User with provided ID not found');
     }
 
-    res.status(201).json(savingResult.rows[0]);
+    res.json(savingResult.rows[0]);
   });
 };

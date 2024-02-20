@@ -21,6 +21,6 @@ export default (router: Router) => {
       throw new HttpError(400, 'User with provided ID not found');
     }
 
-    return res.status(201).json(result.rows[0]);
+    return res.json(result.rows[0]);
   });
 };

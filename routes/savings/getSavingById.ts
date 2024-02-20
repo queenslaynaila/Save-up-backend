@@ -25,7 +25,7 @@ export default (router: Router) => {
         throw new HttpError(400, 'Saving with submitted ID not found');
       }
 
-      res.status(200).json(result.rows[0]);
+      res.json(result.rows[0]);
     }
   );
 };

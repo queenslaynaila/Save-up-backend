@@ -6,16 +6,11 @@ import signOut from './signOut';
 import updateUser from './updateUser';
 
 export default (baseRouter: Router) => {
-  const router = Router(); 
-
-  
-  router.use( createUser);
-  router.use( getAllUsers);
-  router.use( login);
+  const router = Router();
+  router.use(createUser);
+  router.use(getAllUsers);
+  router.use(login);
   router.use(signOut);
-  router.use( updateUser);
-
-
-  baseRouter.use('/users', router); 
-  
+  router.use(updateUser);
+  baseRouter.use('/users', router);
 };

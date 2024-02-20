@@ -10,16 +10,12 @@ import contributionsRoutes from './routes/contributions/index';
 import passwordRoutes from './routes/password/index';
 const app = express();
 
-
 // Middleware
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(morgan('dev'));
 app.use(cors());
-app.get('/', (req, res) => {
-  res.send('hello world')
-})
-// 40
+
 // Routes
 app.use(usersRoutes);
 app.use(savingsRoutes);
@@ -27,6 +23,7 @@ app.use(expensesRoutes);
 app.use(contributionsRoutes);
 app.use(passwordRoutes);
 
+// 404 handler
 app.use(() => {
   throw new HttpError(404, 'Not found');
 });

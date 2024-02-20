@@ -27,7 +27,7 @@ export default (router: Router) => {
         );
       }
 
-      const { first_name, last_name, phone_no } = validationResultBody.data;
+      const { first_name, last_name } = validationResultBody.data;
       let query = 'UPDATE users SET ';
       const values = [];
 
@@ -38,11 +38,6 @@ export default (router: Router) => {
       if (last_name) {
         query += `last_name = $${values.length + 1}, `;
         values.push(last_name);
-      }
-
-      if (phone_no) {
-        query += `phone_no = $${values.length + 1}, `;
-        values.push(phone_no);
       }
 
       query = query.slice(0, -2);

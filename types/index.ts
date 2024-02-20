@@ -1,6 +1,6 @@
 import { z } from 'zod';
-
 // Schemas for Saving
+// ----------------------------------------------
 export const idSchema = z.string().uuid();
 
 export const savingSchema = z.object({
@@ -22,6 +22,7 @@ export const updateSavingSchema = z.object({
 });
 
 // Schema for Contribution
+// ----------------------------------------------
 export const contributionSchema = z.object({
   saving_id: z.string().uuid(),
   amount: z.number(),
@@ -34,6 +35,7 @@ export const updateContributionSchema = z.object({
 });
 
 // Schema for Expense
+// ----------------------------------------------
 export const expenseSchema = z.object({
   user_id: z.string().uuid(),
   category: z.string(),
@@ -51,11 +53,6 @@ export const updateExpenseSchema = z.object({
 
 // User Schemas
 // ----------------------------------------------
-export const UpdateUserSchema = z.object({
-  first_name: z.string().optional(),
-  last_name: z.string().optional(),
-  phone_no: z.string().refine((value) => /^\+254\d{9}$/.test(value), 'Invalid phone number format'),
-});
 
 export enum UserRole {
   ADMIN = 'admin',
@@ -63,9 +60,16 @@ export enum UserRole {
   MODERATOR = 'moderator',
 }
 
+export const UpdateUserSchema = z.object({
+  first_name: z.string().optional(),
+  last_name: z.string().optional(),
+});
+
 export const CreateUserSchema = UpdateUserSchema.extend({
+  phone_number: z
+    .string()
+    .refine((value) => /^\+254\d{9}$/.test(value), 'Invalid phone number format'),
   password: z.string(),
-  role: z.enum([UserRole.ADMIN, UserRole.USER]),
 });
 
 export const UserSchema = CreateUserSchema.extend({
@@ -87,5 +91,15 @@ export const UpdateCategorySchema = z.object({
 });
 export const CreateCategorySchema = UpdateCategorySchema.extend({
   user_id: z.string().uuid(),
-})
+});
 
+//Security Answer Schema
+// ----------------------------------------------
+export const updateSecurityAnswerSchema = z.object({
+  question_id: z.string().uuid(),
+  answer: z.string(),
+});
+
+export const createSecurityAnswerSchema = updateSecurityAnswerSchema.extend({
+  user_id: z.string().uuid(),
+});

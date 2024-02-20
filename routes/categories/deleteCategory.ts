@@ -5,6 +5,7 @@ import { idSchema } from '../../types';
 import { HttpError } from '../../middleware/errorMiddleware';
 import pool from '../../db';
 
+// Route for deleting a category (accessible to standard users and admins)
 export default (router: Router) => {
   router.delete(
     '/',

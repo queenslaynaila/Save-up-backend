@@ -1,10 +1,9 @@
 import { Router } from 'express';
 import authMiddleware from '../../middleware/auth';
 import { UserRole } from '../../types';
-import { UpdateCategorySchema,idSchema } from '../../types';
+import { UpdateCategorySchema, idSchema } from '../../types';
 import { HttpError } from '../../middleware/errorMiddleware';
 import pool from '../../db';
-import { z } from 'zod';
 
 export default (router: Router) => {
   router.patch(
@@ -17,7 +16,7 @@ export default (router: Router) => {
       }
       const id = validationResultId.data;
       const userId = req.user?.id;
-      // Parse and validate the update data against the schema
+
       const validationResultBody = UpdateCategorySchema.safeParse(req.body);
       if (!validationResultBody.success) {
         throw new HttpError(422, 'Invalid category data');
@@ -36,7 +35,7 @@ export default (router: Router) => {
         values.push(description);
       }
 
-      query += `updated_at = NOW() WHERE id = $${values.length + 1} RETURNING *`;
+      query += `updated_at = NOW() WHERE id = $${values.length + 1} AND user_id = $${userId} RETURNING *`;
       values.push(id);
 
       const result = await pool.query(query, values);

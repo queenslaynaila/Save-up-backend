@@ -20,7 +20,7 @@ export default (router: Router) => {
       const result = await pool.query(query, [id, userId]);
 
       if (result.rowCount != null && result.rowCount > 0) {
-        return res.status(204).json({ message: 'Savings deleted successfully' });
+        return res.json({ message: 'Savings deleted successfully' });
       } else {
         throw new HttpError(400, 'Saving with provided ID not found');
       }

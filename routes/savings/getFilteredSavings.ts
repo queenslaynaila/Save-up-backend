@@ -36,7 +36,7 @@ export default (router: Router) => {
 
     const result = await pool.query(query, values);
     if (result.rows.length > 0) {
-      res.status(200).json(result.rows);
+      res.json(result.rows);
     } else {
       throw new HttpError(404, errorMessage);
     }
