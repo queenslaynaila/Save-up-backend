@@ -13,16 +13,19 @@ export default (router: Router) => {
     async (req, res) => {
       const validationResult = idSchema.safeParse(req.params.id);
       if (!validationResult.success) {
-        throw new HttpError(400, 'Invalid expense ID');
+        throw new HttpError(400, 'Invalid saving ID');
       }
       const id = validationResult.data;
       const userId = req.user?.id;
-      const query = 'SELECT * FROM expenses WHERE id = $1 AND user_id = $2';
+
+      const query = 'SELECT * FROM savings WHERE id = $1 AND user_id = $2';
       const result = await pool.query(query, [id, userId]);
-      if (result.rows.length === 0) {
-        throw new HttpError(404, 'Expense with submitted ID not found');
+
+      if (!result || result.rows.length === 0) {
+        throw new HttpError(400, 'Saving with submitted ID not found');
       }
-      return res.status(200).json(result.rows[0]);
+
+      res.status(200).json(result.rows[0]);
     }
   );
 };

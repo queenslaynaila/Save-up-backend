@@ -6,23 +6,24 @@ import { HttpError } from '../../middleware/errorMiddleware';
 import pool from '../../db';
 
 export default (router: Router) => {
-  router.get(
-    '/:id',
+  router.delete(
+    '/',
     authMiddleware({ roles: [UserRole.ADMIN, UserRole.USER] }),
-    //validate(),
     async (req, res) => {
       const validationResult = idSchema.safeParse(req.params.id);
       if (!validationResult.success) {
-        throw new HttpError(400, 'Invalid expense ID');
+        throw new HttpError(400, 'Invalid saving ID');
       }
       const id = validationResult.data;
       const userId = req.user?.id;
-      const query = 'SELECT * FROM expenses WHERE id = $1 AND user_id = $2';
+      const query = 'DELETE FROM savings WHERE id = $1 AND user_id = $2';
       const result = await pool.query(query, [id, userId]);
-      if (result.rows.length === 0) {
-        throw new HttpError(404, 'Expense with submitted ID not found');
+
+      if (result.rowCount != null && result.rowCount > 0) {
+        return res.status(204).json({ message: 'Savings deleted successfully' });
+      } else {
+        throw new HttpError(400, 'Saving with provided ID not found');
       }
-      return res.status(200).json(result.rows[0]);
     }
   );
 };
