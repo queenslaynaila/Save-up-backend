@@ -3,15 +3,14 @@ import { Router } from 'express';
 import bcrypt from 'bcrypt';
 import { CreateUserSchema } from '../../types';
 import { HttpError } from '../../middleware/errorMiddleware';
-import authMiddleware from '../../middleware/auth';
-import { UserRole } from '../../types';
+
 import pool from '../../db';
 import { generateToken } from '../../middleware/generatetoken';
 
 export default (router: Router) => {
   router.post(
     '/',
-    authMiddleware(),
+  
     async (req, res) => {
       const validationResult = CreateUserSchema.safeParse(req.body);
       if (!validationResult.success) {
