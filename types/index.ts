@@ -1,6 +1,6 @@
 import { z } from 'zod';
 // Schemas for Saving
-// ----------------------------------------------
+// ---------------------------------------------------------------------------------------------------------
 export const idSchema = z.string().uuid();
 
 export const savingSchema = z.object({
@@ -22,7 +22,7 @@ export const updateSavingSchema = z.object({
 });
 
 // Schema for Contribution
-// ----------------------------------------------
+// ---------------------------------------------------------------------------------------------------------
 export const contributionSchema = z.object({
   saving_id: z.string().uuid(),
   amount: z.number(),
@@ -35,7 +35,7 @@ export const updateContributionSchema = z.object({
 });
 
 // Schema for Expense
-// ----------------------------------------------
+// ---------------------------------------------------------------------------------------------------------
 export const expenseSchema = z.object({
   user_id: z.string().uuid(),
   category_id: z.string().uuid(),
@@ -52,7 +52,7 @@ export const updateExpenseSchema = z.object({
 });
 
 // User Schemas
-// ----------------------------------------------
+// ---------------------------------------------------------------------------------------------------------
 export const enum UserRole {
   ADMIN = 'admin',
   USER = 'user',
@@ -88,7 +88,7 @@ export const UserLoginSchema = CreateUserSchema.pick({
 export type User = z.infer<typeof UserSchema>;
 
 // Category Schemas
-// ----------------------------------------------
+// ----------------------------------------------------------------------------------------------------------
 export const UpdateCategorySchema = z.object({
   name: z.string().optional(),
   description: z.string().optional(),
@@ -98,7 +98,7 @@ export const CreateCategorySchema = UpdateCategorySchema.extend({
 });
 
 //Security Answer Schema
-// ----------------------------------------------
+// ---------------------------------------------------------------------------------------------------------
 export const updateSecurityAnswerSchema = z.object({
   question_id: z.string().uuid(),
   answer: z.string(),

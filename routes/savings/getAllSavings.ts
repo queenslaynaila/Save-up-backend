@@ -8,7 +8,7 @@ export default (router: Router) => {
     '/all',
     authMiddleware({ roles: [UserRole.ADMIN, UserRole.MODERATOR] }),
     async (req, res) => {
-      const query = 'SELECT * FROM contributions';
+      const query = 'SELECT * FROM savings LIMIT 10';
       const result = await pool.query(query);
       const savings = result.rows || [];
       return res.json(savings);
