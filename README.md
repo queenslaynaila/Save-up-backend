@@ -336,7 +336,7 @@ You can check the database schema [here](./db_schema.dbml) and the table diagram
 
 ### 5. Get Savings
 
-- **Route**: `GET /savings`
+- **Route**: `GET /savings?user_id=sample&priority=high&you can add other queries`
 - **Description**: Retrieves savings data based on the provided filters.
 - **Query Parameters**:
   - `user_id` (string, required): The ID of the user whose savings are to be retrieved.
