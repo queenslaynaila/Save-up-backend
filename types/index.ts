@@ -14,12 +14,13 @@ export const savingSchema = z.object({
 
 export const updateSavingSchema = z.object({
   description: z.string().optional(),
-  category: z.string().optional(),
+  category_id: z.string().uuid().optional(),
   target_amount: z.number().optional(),
   priority: z.string().optional(),
   target_date: z.string().optional(),
   status: z.string().optional(),
 });
+
 
 // Schema for Contribution
 // ---------------------------------------------------------------------------------------------------------
@@ -29,9 +30,9 @@ export const contributionSchema = z.object({
   date: z.string(),
 });
 
-export const updateContributionSchema = z.object({
-  amount: z.number(),
-  date: z.date(),
+export const updateContributionSchema = contributionSchema.pick({
+   amount: true, 
+   date: true 
 });
 
 // Schema for Expense
