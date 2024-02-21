@@ -16,14 +16,6 @@ CREATE TABLE IF NOT EXISTS users (
   CONSTRAINT    phone_number_format_check CHECK (phone_number ~* '^\+?254[0-9]{9}$')
 );
 
--- Create the first user with the role of 'admin'
-INSERT INTO users (first_name, last_name, phone_number, role, password)
-VALUES ('Admin', 'User', '+254123456789', 'admin', 'admin_password');
-
--- Create the second user with the role of 'moderator'
-INSERT INTO users (first_name, last_name, phone_number, role, password)
-VALUES ('Moderator', 'User', '+254987654321', 'moderator', 'moderator_password');
-
 
 CREATE TABLE IF NOT EXISTS categories (
   id          uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -113,7 +105,6 @@ CREATE TABLE IF NOT EXISTS expenses (
   description     VARCHAR(255),
   amount          NUMERIC(30, 3) NOT NULL,
   date            TIMESTAMP WITH TIME ZONE,
-  month           INTEGER GENERATED ALWAYS AS (EXTRACT(MONTH FROM date)) STORED,
   created_at      TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at      TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
