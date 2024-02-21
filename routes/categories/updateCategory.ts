@@ -7,8 +7,8 @@ import pool from '../../db';
 
 export default (router: Router) => {
   router.patch(
-    '/',
-    authMiddleware({ roles: [UserRole.ADMIN, UserRole.USER] }),
+    '/:id',
+    authMiddleware({ roles: [UserRole.USER] }),
     async (req, res) => {
       const validationResultId = idSchema.safeParse(req.params.id);
       if (!validationResultId.success) {
@@ -35,8 +35,9 @@ export default (router: Router) => {
         values.push(description);
       }
 
-      query += `updated_at = NOW() WHERE id = $${values.length + 1} AND user_id = $${userId} RETURNING *`;
+      query += `updated_at = NOW() WHERE id = $${values.length + 1} AND user_id = $${values.length + 2} RETURNING *`;
       values.push(id);
+      values.push(userId);
 
       const result = await pool.query(query, values);
       const updatedCategory = result.rows[0];

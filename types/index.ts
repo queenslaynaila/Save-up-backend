@@ -90,8 +90,8 @@ export type User = z.infer<typeof UserSchema>;
 // Category Schemas
 // ----------------------------------------------
 export const UpdateCategorySchema = z.object({
-  name: z.string(),
-  description: z.string(),
+  name: z.string().optional(),
+  description: z.string().optional(),
 });
 export const CreateCategorySchema = UpdateCategorySchema.extend({
   user_id: z.string().uuid(),
