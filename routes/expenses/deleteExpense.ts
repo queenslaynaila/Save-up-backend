@@ -8,7 +8,7 @@ import pool from '../../db';
 export default (router: Router) => {
   router.delete(
     '/',
-    authMiddleware({ roles: [UserRole.ADMIN, UserRole.USER] }),
+    authMiddleware({ roles: [UserRole.USER] }),
     async (req, res) => {
       const validationResult = idSchema.safeParse(req.params.id);
 
