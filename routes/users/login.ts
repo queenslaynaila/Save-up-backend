@@ -22,6 +22,7 @@ export default (router: Router) => {
     if (!user || !(await bcrypt.compare(password, user.password))) {
       throw new HttpError(400, 'Invalid phone number or password combination');
     }
+    delete user.password;
 
     const token = generateToken(user.id, user.role);
     res.setHeader('X-Auth-Token', token).json(user);
