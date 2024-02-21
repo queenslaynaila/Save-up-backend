@@ -34,22 +34,12 @@ You can check the database schema [here](./db_schema.dbml) and the table diagram
     - [4. Update Expense](#4-update-expense)
     - [5. Delete Expense](#5-delete-expense)
     - [6. Get Expenses by Query](#6-get-expenses-by-query)
-- [Route: Create Category](#route-create-category)
-  - [Description](#description)
-  - [Endpoint](#endpoint)
-  - [Request Body Schema](#request-body-schema)
-  - [Response Body Schema](#response-body-schema)
-  - [Request Example](#request-example)
-  - [Response Example](#response-example)
-  - [Error Responses](#error-responses)
-- [Route: Get Categories](#route-get-categories)
-  - [Description](#description-1)
-  - [Endpoint](#endpoint-1)
-  - [Request Parameters](#request-parameters)
-  - [Request Headers](#request-headers)
-  - [Response](#response)
-  - [Response Body Schema](#response-body-schema-1)
-    - [Error Responses](#error-responses-1)
+- [Categories API](#categories-api)
+    - [1. Create Category](#1-create-category)
+    - [2. Update Category](#2-update-category)
+    - [3. Get Categories](#3-get-categories)
+    - [4. Delete Category](#4-delete-category)
+    - [5. Get Categories by User\_id ID](#5-get-categories-by-user_id-id)
 
 
 # Users API
@@ -161,7 +151,7 @@ You can check the database schema [here](./db_schema.dbml) and the table diagram
   - `Authorization`: Token for user authentication.
 - **Request Parameters**:
   - `id` (string, required): The ID of the user to update.
-- **Request Body**: Fields to be updated.
+- **Request Body**: Fields to be updated.CAN BE either first_name or last_name
 - **Response**:
   - Status Code: `200 OK`
   - Body: The updated user object.includeing either first_name or last_name
@@ -701,101 +691,121 @@ You can check the database schema [here](./db_schema.dbml) and the table diagram
       }
       ```
 
-# Route: Create Category
+# Categories API
 
-## Description
-This route is used to create a new category. It is accessible to standard users only.
+### 1. Create Category
 
-## Endpoint
-`POST /categories`
+- **Route**: `POST /categories`
+- **Description**: Creates a new category.
+- **Request Body**:
+  - `user_id` (string,uuid, required): The UUID of the user creating the category.
+  - `name` (string, required): The name of the category.
+  - `description` (string, optional): The description of the category.
+- **Response**:
+  - Status Code: `200 OK`
+  - Body: The created category object
+  - Header: Token with name X-Auth-Token
+- **Error Responses**:
+  - Status Code: `400 Bad Request`
+    - Description: Returned when the request body is invalid.
+    - Body:
+      ```json
+      {
+        "error": "Invalid category data"
+      }
+      ```
+  - Status Code: `500 Internal Server Error`
+    - Description: Returned when there's a server-side error.
+- **Sample request**:
+    ```json
+    {
+      "user_id": "123e4567-e89b-12d3-a456-426614174000",
+      "name": "Food",
+      "description": "All food related expenses"
+    }
+    ```
 
-## Request Body Schema
-```typescript
-{
-  user_id: string; // UUID of the user creating the category
-  name?: string; // Name of the category (optional)
-  description?: string; // Description of the category (optional)
-}
-```
+### 2. Update Category
 
-## Response Body Schema
-```typescript
-{
-  id: string; // UUID of the created category
-  user_id: string; // UUID of the user who created the category
-  name: string; // Name of the category
-  description: string; // Description of the category
-  created_at: string; // Timestamp of when the category was created
-  updated_at: string; // Timestamp of when the category was last updated
-}
-```
-
-## Request Example
-```json
-{
-  "user_id": "123e4567-e89b-12d3-a456-426614174000",
-  "name": "Food",
-  "description": "All food related expenses"
-}
-```
-
-## Response Example
-```json
-{
-  "id": "123e4567-e89b-12d3-a456-426614174001",
-  "user_id": "123e4567-e89b-12d3-a456-426614174000",
-  "name": "Food",
-  "description": "All food related expenses",
-  "created_at": "2024-02-20T12:00:00Z",
-  "updated_at": "2024-02-20T12:00:00Z"
-}
-```
-
-## Error Responses
-- 400 Bad Request: If the request body is invalid.
-- 401 Unauthorized: If the user does not have permission to create a category.
-- 500 Internal Server Error: If there's a server-side error.
-
-# Route: Get Categories
-
-## Description
-This route fetches categories from the database. It is accessible to users with admin or moderator roles.
-
-## Endpoint
-`GET /categories`
-
-## Request Parameters
-- None
-
-## Request Headers
-- Authorization: Bearer \<Access Token\>
-
-## Response
-- Status Code: 200 OK
-- Content-Type: application/json
-
-## Response Body Schema
-```json
-[
-  {
-    "id": "string",
-    "user_id": "string",
-    "name": "string",
-    "description": "string",
-    "created_at": "string (timestamp)",
-    "updated_at": "string (timestamp)"
-  }
-]
-
- ### Error Responses
-- 400 Bad Request: If the request body is invalid.
-- 401 Unauthorized: If the user does not have permission to create a category.
-- 500 Internal Server Error: If there's a server-side error.
+- **Route**: `PATCH /categories/:id`
+- **Description**: Updates an existing category.
+- **Request Parameters**:
+  - `id` (string, required): The UUID of the category to update.
+- **Request Body**:
+  - `name` (string, optional): The new name of the category.
+  - `description` (string, optional): The new description of the category.
+- **Authorization**:
+  - Required Role: User
+- **Response**:
+  - Status Code: `200 OK`
+  - Body: The updated category object
+- **Error Responses**:
+  - Status Code: `400 Bad Request`
+    - Description: Returned when the request body is invalid.
+  - Status Code: `404 Not Found`
+    - Description: Returned when the category with the provided ID is not found.
+- **Sample request**:
+    ```json
+    {
+      "name": "New Food Category",
+      "description": "Updated description for food category"
+    }
+    ```
 
 
+### 3. Get Categories
+
+- **Route**: `GET /categories/all`
+- **Description**: Fetches categories from the database.
+- **Authorization**:
+  - Required Role: Admin or Moderator
+- **Response**:
+  - Status Code: `200 OK`
+  - Content-Type: application/json
+  - Body: An array of category objects
+- **Error Responses**:
+  - Status Code: `500 Internal Server Error`
+    - Description: If there's a server-side error.
 
 
+### 4. Delete Category
 
+- **Route**: `DELETE /categories/:id`
+- **Description**: Deletes a category.
+- **Authorization**:
+  - Required Role: User
+- **Request Parameters**:
+  - `id` (string, required): The ID of the category to delete.
+- **Response**:
+  - Status Code: `200 OK`
+  - Content-Type: application/json
+  - Body: 
+    ```json
+    {
+      "message": "Category deleted successfully"
+    }
+    ```
+- **Error Responses**:
+  - Status Code: `400 Bad Request`
+    - Description: If the provided category ID is invalid.
+  - Status Code: `404 Not Found`
+    - Description: If the category with the provided ID is not found.
 
+### 5. Get Categories by User_id ID
 
-
+- **Route**: `GET /categories?user_id=sampleid`
+- **Description**: Retrieves categories filtered by user ID.
+- **Request Parameters**:
+  - `user_id` (string, required): The ID of the user to filter categories by.
+- **Response**:
+  - Status Code: `200 OK`
+  - Body: An array of category objects filtered by the specified user ID.
+- **Error Responses**:
+  - Status Code: `400 Bad Request`
+    - Description: Returned when the user ID is invalid.
+    - Body: 
+      ```json
+      {
+        "error": "Invalid user data" or "User with submitted ID not found"
+      }
+      ```
