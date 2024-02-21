@@ -49,7 +49,7 @@ You can check the database schema [here](./db_schema.dbml) and the table diagram
   - [Request Headers](#request-headers)
   - [Response](#response)
   - [Response Body Schema](#response-body-schema-1)
-  - [Error Responses](#error-responses-1)
+    - [Error Responses](#error-responses-1)
 
 
 # Users API
@@ -787,7 +787,7 @@ This route fetches categories from the database. It is accessible to users with 
   }
 ]
 
-## Error Responses
+ ### Error Responses
 - 400 Bad Request: If the request body is invalid.
 - 401 Unauthorized: If the user does not have permission to create a category.
 - 500 Internal Server Error: If there's a server-side error.
