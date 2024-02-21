@@ -1,13 +1,15 @@
+import 'express-async-errors' ;
 import express, { NextFunction, Request, Response } from 'express';
-import 'express-async-errors';
 import morgan from 'morgan';
 import cors from 'cors';
-import usersRouter from './routes/users';
-import savingsRouter from './routes/savings';
-import contributionsRouter from './routes/contributions';
-import expensesRouter from './routes/expenses';
-import passwordRouter from './routes/resetpasswors';
-import { HttpError } from './types';
+import { HttpError } from './middleware/errorMiddleware';
+import usersRoutes from './routes/users/index';
+import categoriesRoutes from './routes/categories/index';
+import savingsRoutes from './routes/savings/index';
+import expensesRoutes from './routes/expenses/index';
+import contributionsRoutes from './routes/contributions/index';
+import Admin from './routes/admin/index'
+import passwordRoutes from './routes/password/index';
 const app = express();
 
 // Middleware
@@ -17,20 +19,23 @@ app.use(morgan('dev'));
 app.use(cors());
 
 // Routes
-app.use('/users', usersRouter);
-app.use('/savings', savingsRouter);
-app.use('/contributions', contributionsRouter);
-app.use('/expenses', expensesRouter);
-app.use('/', passwordRouter);
+usersRoutes(app);
+savingsRoutes(app);
+expensesRoutes(app);
+contributionsRoutes(app);
+passwordRoutes(app);
+categoriesRoutes(app);
+Admin(app)
 
-// 404 Error handler
+// 404 handler
 app.use(() => {
-  throw new HttpError(404, 'Not found');
+  throw new HttpError(404, 'Route Not found');
 });
 
 // Global error handler
 /* eslint-disable @typescript-eslint/no-unused-vars */
 app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
+  console.error(error); // Log the error
   if (error instanceof HttpError) {
     return res.status(error.statusCode).json({ error: error.message });
   }

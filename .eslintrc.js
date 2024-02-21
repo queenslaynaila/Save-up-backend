@@ -7,6 +7,7 @@ module.exports = {
         "eslint:recommended",
         "plugin:@typescript-eslint/recommended"
     ],
+    "@typescript-eslint/indent": ["error", 2],
     "overrides": [
         {
             "env": {

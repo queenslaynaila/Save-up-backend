@@ -1,7 +1,5 @@
 import twilio from 'twilio';
-
 import { config } from 'dotenv';
-
 config({ path: '.env' });
 
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
@@ -17,7 +15,7 @@ const sendSms = (phone: string, message: string): void => {
       to: phone,
     })
     .then((message) => console.log(message.sid))
-    .catch((error:Error) => console.error(error));
+    .catch((error: Error) => console.error(error));
 };
 
 export default sendSms;
