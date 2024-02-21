@@ -6,7 +6,7 @@ export const idSchema = z.string().uuid();
 export const savingSchema = z.object({
   user_id: z.string().uuid(),
   description: z.string(),
-  category: z.string(),
+  category_id: z.string().uuid(),
   target_amount: z.number(),
   priority: z.string(),
   target_date: z.string(),
@@ -53,8 +53,7 @@ export const updateExpenseSchema = z.object({
 
 // User Schemas
 // ----------------------------------------------
-
-export enum UserRole {
+export const enum UserRole {
   ADMIN = 'admin',
   USER = 'user',
   MODERATOR = 'moderator',
@@ -72,12 +71,17 @@ export const CreateUserSchema = UpdateUserSchema.extend({
   password: z.string(),
 });
 
+export const CreateAdminSchema = CreateUserSchema.extend({
+  role: z.enum(['admin']),
+});
+
 export const UserSchema = CreateUserSchema.extend({
   id: z.string().uuid(),
+  role: z.enum([UserRole.ADMIN, UserRole.USER, UserRole.MODERATOR]),
 });
 
 export const UserLoginSchema = CreateUserSchema.pick({
-  phone_no: true,
+  phone_number: true,
   password: true,
 });
 

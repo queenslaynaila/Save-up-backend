@@ -22,7 +22,7 @@ export default (router: Router) => {
       const result = await pool.query(query, [id, userId]);
 
       if (!result || result.rows.length === 0) {
-        throw new HttpError(400, 'Saving with submitted ID not found');
+        throw new HttpError(400, 'Saving not found');
       }
 
       res.json(result.rows[0]);

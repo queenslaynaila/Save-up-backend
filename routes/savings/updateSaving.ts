@@ -8,7 +8,7 @@ import pool from '../../db';
 export default (router: Router) => {
   router.patch(
     '/:id',
-    authMiddleware({ roles: [UserRole.ADMIN, UserRole.USER] }),
+    authMiddleware({ roles: [UserRole.USER] }),
     async (req, res) => {
       const savingId = req.params.id;
       const validationResult = idSchema.safeParse(savingId);
@@ -43,14 +43,15 @@ export default (router: Router) => {
         values.push(target_date);
       }
       query = query.slice(0, -2);
-      query += ` WHERE user_id = $${userId} AND id = $${values.length + 1} RETURNING *`;
-      values.push(userId);
+      query += ` WHERE user_id = $${values.length + 1} AND id = $${values.length + 2} RETURNING *`;
+      values.push(userId, savingId);
+
 
       const result = await pool.query(query, values);
       const updatedSaving = result.rows[0];
 
       if (!updatedSaving) {
-        throw new HttpError(422, 'Saving with given ID not found');
+        throw new HttpError(422, 'Saving not found');
       }
 
       return res.json(updatedSaving);

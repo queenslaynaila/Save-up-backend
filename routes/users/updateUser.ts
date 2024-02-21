@@ -1,13 +1,13 @@
 import { Router } from 'express';
-import authMiddleware from '../../middleware/auth';
 import { UserRole } from '../../types';
+import authMiddleware from '../../middleware/auth';
 import { UpdateUserSchema, idSchema } from '../../types';
 import { HttpError } from '../../middleware/errorMiddleware';
 import pool from '../../db';
 
 export default (router: Router) => {
   router.patch(
-    '/',
+    '/:id',
     authMiddleware({ roles: [UserRole.ADMIN, UserRole.USER] }),
     async (req, res) => {
       const validationResult = idSchema.safeParse(req.params.id);

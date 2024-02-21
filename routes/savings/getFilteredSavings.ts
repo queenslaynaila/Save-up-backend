@@ -1,7 +1,6 @@
 import authMiddleware from '../../middleware/auth';
 import { UserRole } from '../../types';
 import { Router } from 'express';
-
 import { HttpError } from '../../middleware/errorMiddleware';
 import pool from '../../db';
 
@@ -12,7 +11,8 @@ export default (router: Router) => {
     let query = 'SELECT * FROM savings WHERE user_id = $1';
     const values = [user_id];
     let errorMessage = 'No savings found for the provided user ID';
-
+ console.log(logged_in_user_id)
+ console.log(user_id)
     if (user_id !== logged_in_user_id) {
       throw new HttpError(403, 'Unauthorized access');
     }
