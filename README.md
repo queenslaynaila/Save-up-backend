@@ -36,6 +36,7 @@ You can check the database schema [here](./db_schema.dbml) and the table diagram
     - [6. Get Expenses by Query](#6-get-expenses-by-query)
 - [Categories API](#categories-api)
     - [1. Create Category](#1-create-category)
+    - [1. Get Category By Userid](#1-get-category-by-userid)
     - [2. Update Category](#2-update-category)
     - [3. Get Categories](#3-get-categories)
     - [4. Delete Category](#4-delete-category)
@@ -724,6 +725,17 @@ You can check the database schema [here](./db_schema.dbml) and the table diagram
       "description": "All food related expenses"
     }
     ```
+  ### 1. Get Category By Userid
+
+- **Route**: `POST /categories?user_id=sampleuserid`
+- **Description**: It will bring all categories belonging to logged in user and also bring the systemdefined categories the default ones.
+- **Request Body**:
+  - `user_id` (string,uuid, required): The UUID of the user creating the category.
+- **Response**:
+  - Status Code: `200 OK`
+  - Body: array of categories or []
+  - Header: Token with name X-Auth-Token
+
 
 ### 2. Update Category
 
