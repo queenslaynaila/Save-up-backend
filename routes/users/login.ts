@@ -8,7 +8,7 @@ import bcrypt from 'bcrypt';
 export default (router: Router) => {
   router.post('/signin', async (req, res) => {
     const validationResult = UserLoginSchema.safeParse(req.body);
-   
+
     if (!validationResult.success) {
       throw new HttpError(422, 'Invalid phone number or password');
     }
@@ -23,7 +23,7 @@ export default (router: Router) => {
       throw new HttpError(400, 'Invalid phone number or password combination');
     }
 
-    const token = generateToken(user.id,user.role);
+    const token = generateToken(user.id, user.role);
     res.setHeader('X-Auth-Token', token).json(user);
   });
 };

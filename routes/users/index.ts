@@ -15,6 +15,6 @@ export default (baseRouter: Router) => {
   signOut(router);
   getUserById(router);
   updateUser(router);
- 
+
   baseRouter.use('/users', router);
 };

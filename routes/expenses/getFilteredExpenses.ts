@@ -5,38 +5,34 @@ import { UserRole } from '../../types';
 import pool from '../../db';
 
 export default (router: Router) => {
-  router.get(
-    '/',
-    authMiddleware({ roles: [UserRole.USER] }),
-    async (req, res) => {
-      const { user_id, category_id, month } = req.query;
-      const logged_in_user_id = req.user?.id;
-      let query = 'SELECT * FROM expenses WHERE user_id = $1';
-      const values = [user_id];
-      let errorMessage = 'No expenses found for the provided user ID';
+  router.get('/', authMiddleware({ roles: [UserRole.USER] }), async (req, res) => {
+    const { user_id, category_id, month } = req.query;
+    const logged_in_user_id = req.user?.id;
+    let query = 'SELECT * FROM expenses WHERE user_id = $1';
+    const values = [user_id];
+    let errorMessage = 'No expenses found for the provided user ID';
 
-      if (user_id !== logged_in_user_id) {
-        throw new HttpError(403, 'Unauthorized access');
-      }
-
-      if (category_id) {
-        query += ' AND category = $2';
-        values.push(category_id);
-      }
-
-      if (month) {
-        query += ' AND EXTRACT(MONTH FROM date) = $' + (values.length + 1);
-        values.push(month);
-      }
-
-      errorMessage = 'No expenses found for the given query';
-
-      const result = await pool.query(query, values);
-      if (result.rows.length > 0) {
-        res.json(result.rows);
-      } else {
-        return res.status(404).json({ error: new HttpError(404, errorMessage).message });
-      }
+    if (user_id !== logged_in_user_id) {
+      throw new HttpError(403, 'Unauthorized access');
     }
-  );
+
+    if (category_id) {
+      query += ' AND category = $2';
+      values.push(category_id);
+    }
+
+    if (month) {
+      query += ' AND EXTRACT(MONTH FROM date) = $' + (values.length + 1);
+      values.push(month);
+    }
+
+    errorMessage = 'No expenses found for the given query';
+
+    const result = await pool.query(query, values);
+    if (result.rows.length > 0) {
+      res.json(result.rows);
+    } else {
+      return res.status(404).json({ error: new HttpError(404, errorMessage).message });
+    }
+  });
 };

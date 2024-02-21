@@ -1,4 +1,4 @@
-import 'express-async-errors' ;
+import 'express-async-errors';
 import express, { NextFunction, Request, Response } from 'express';
 import morgan from 'morgan';
 import cors from 'cors';
@@ -8,7 +8,7 @@ import categoriesRoutes from './routes/categories/index';
 import savingsRoutes from './routes/savings/index';
 import expensesRoutes from './routes/expenses/index';
 import contributionsRoutes from './routes/contributions/index';
-import Admin from './routes/admin/index'
+import Admin from './routes/admin/index';
 import passwordRoutes from './routes/password/index';
 const app = express();
 
@@ -25,7 +25,7 @@ expensesRoutes(app);
 contributionsRoutes(app);
 passwordRoutes(app);
 categoriesRoutes(app);
-Admin(app)
+Admin(app);
 
 // 404 handler
 app.use(() => {

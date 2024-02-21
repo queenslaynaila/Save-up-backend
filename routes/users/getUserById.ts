@@ -6,7 +6,8 @@ import pool from '../../db';
 
 export default (router: Router) => {
   router.get(
-    '/:id',authMiddleware(), 
+    '/:id',
+    authMiddleware(),
     //validate(),
     async (req, res) => {
       const validationResult = idSchema.safeParse(req.params.id);
@@ -27,7 +28,6 @@ export default (router: Router) => {
         throw new HttpError(404, 'User with submitted ID not found');
       }
       const user = result.rows[0];
-
 
       res.json(user);
     }

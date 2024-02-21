@@ -6,24 +6,19 @@ import { HttpError } from '../../middleware/errorMiddleware';
 import pool from '../../db';
 
 export default (router: Router) => {
-  router.delete(
-    '/',
-    authMiddleware({ roles: [UserRole.USER] }),
-    async (req, res) => {
-      const validationResult = idSchema.safeParse(req.params.id);
-
-      if (!validationResult.success) {
-        throw new HttpError(403, 'Invalid expense ID');
-      }
-      const id = validationResult.data;
-      const userId = req.user?.id;
-      const query = 'DELETE FROM expenses WHERE id = $1 AND user_id = $2';
-      const result = await pool.query(query, [id, userId]);
-      if (result.rowCount != null && result.rowCount > 0) {
-        return res.json({ message: 'Expense deleted successfully' });
-      } else {
-        throw new HttpError(400, 'Expense with provided ID not found');
-      }
+  router.delete('/', authMiddleware({ roles: [UserRole.USER] }), async (req, res) => {
+    const validationResult = idSchema.safeParse(req.params.id);
+    if (!validationResult.success) {
+      throw new HttpError(403, 'Invalid expense ID');
     }
-  );
+    const id = validationResult.data;
+    const userId = req.user?.id;
+    const query = 'DELETE FROM expenses WHERE id = $1 AND user_id = $2';
+    const result = await pool.query(query, [id, userId]);
+    if (result.rowCount != null && result.rowCount > 0) {
+      return res.json({ message: 'Expense deleted successfully' });
+    } else {
+      throw new HttpError(400, 'Expense with provided ID not found');
+    }
+  });
 };
