@@ -11,8 +11,7 @@ export default (router: Router) => {
     let query = 'SELECT * FROM savings WHERE user_id = $1';
     const values = [user_id];
     let errorMessage = 'No savings found for the provided user ID';
- console.log(logged_in_user_id)
- console.log(user_id)
+   
     if (user_id !== logged_in_user_id) {
       throw new HttpError(403, 'Unauthorized access');
     }
