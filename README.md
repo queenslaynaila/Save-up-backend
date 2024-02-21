@@ -19,6 +19,7 @@ You can check the database schema [here](./db_schema.dbml) and the table diagram
     - [3. Update Saving](#3-update-saving)
     - [4. Delete Saving](#4-delete-saving)
     - [5. Get Savings](#5-get-savings)
+    - [6. Get All Savings](#6-get-all-savings)
 - [Contributions API](#contributions-api)
     - [1. Create Contribution](#1-create-contribution)
     - [2. Get All Contributions](#2-get-all-contributions)
@@ -33,6 +34,22 @@ You can check the database schema [here](./db_schema.dbml) and the table diagram
     - [4. Update Expense](#4-update-expense)
     - [5. Delete Expense](#5-delete-expense)
     - [6. Get Expenses by Query](#6-get-expenses-by-query)
+- [Route: Create Category](#route-create-category)
+  - [Description](#description)
+  - [Endpoint](#endpoint)
+  - [Request Body Schema](#request-body-schema)
+  - [Response Body Schema](#response-body-schema)
+  - [Request Example](#request-example)
+  - [Response Example](#response-example)
+  - [Error Responses](#error-responses)
+- [Route: Get Categories](#route-get-categories)
+  - [Description](#description-1)
+  - [Endpoint](#endpoint-1)
+  - [Request Parameters](#request-parameters)
+  - [Request Headers](#request-headers)
+  - [Response](#response)
+  - [Response Body Schema](#response-body-schema-1)
+  - [Error Responses](#error-responses-1)
 
 
 # Users API
@@ -59,6 +76,15 @@ You can check the database schema [here](./db_schema.dbml) and the table diagram
         "error": "Invalid email, phone number, or password" or "An account with the provided email or phone number already exists"
       }
       ```
+- **Sample request**:
+    ```json
+{
+  "first_name": "Jane",
+  "last_name": "Doe",
+  "phone_no": "+254712345678",
+  "password": "Kenya123"
+}
+
 
 ### 2. User Login
 
@@ -324,7 +350,6 @@ You can check the database schema [here](./db_schema.dbml) and the table diagram
 - **Description**: Retrieves savings data based on the provided filters.
 - **Query Parameters**:
   - `user_id` (string, required): The ID of the user whose savings are to be retrieved.
-  - `category` (string, optional): Filter savings by category.
   - `priority` (string, optional): Filter savings by priority.
   - `status` (string, optional): Filter savings by status.
 - **Request Headers**:
@@ -349,7 +374,22 @@ You can check the database schema [here](./db_schema.dbml) and the table diagram
         "error": "No savings found with the provided filters"
       }
       ```
+### 6. Get All Savings
 
+- **Route**: `GET savings/all` Accesible to only admins or moderators
+- **Description**: Retrieves a list of all users.
+- **Response**:
+  - Status Code: `200 OK`
+  - Body: An array of user objects.
+- **Error Responses**:
+  - Status Code: `404 Not Found`
+    - Description: Returned when no users are found.
+    - Body: 
+      ```json
+      {
+        "error": "No users found"
+      }
+      ```
 # Contributions API
 
 ### 1. Create Contribution
@@ -376,7 +416,7 @@ You can check the database schema [here](./db_schema.dbml) and the table diagram
 
 ### 2. Get All Contributions
 
-- **Route**: `GET /`
+- **Route**: `GET /contributions/all`
 - **Description**: Retrieves a list of all contributions.
 - **Response**:
   - Status Code: `200 OK`
@@ -478,7 +518,7 @@ You can check the database schema [here](./db_schema.dbml) and the table diagram
 
 ### 6. Get Contributions by Saving
 
-- **Route**: `GET /saving/:id`
+- **Route**: `GET /savings?saving_id=samplesavingid & optional queries`
 - **Description**: Retrieves contributions associated with a specific savings.
 - **Request Parameters**:
   - `id` (string, required): The ID of the savings.
@@ -508,11 +548,11 @@ You can check the database schema [here](./db_schema.dbml) and the table diagram
 
 ### 1. Create Expense
 
-- **Route**: `POST /all`
+- **Route**: `POST /expenses`
 - **Description**: Creates a new expense.
 - **Request Body**:
   - `description` (string, required): Description of the expense.
-  - `category` (string, required): Category of the expense.
+  - `category_id` (string,uuid, required): Category of the expense.
   - `amount` (number, required): Amount of the expense.
   - `date` (string, required): Date of the expense.
   - `user_id` (string, required): ID of the user associated with the expense.
@@ -532,7 +572,7 @@ You can check the database schema [here](./db_schema.dbml) and the table diagram
 
 ### 2. Get All Expenses
 
-- **Route**: `GET /`
+- **Route**: `GET /expenses/all`
 - **Description**: Retrieves a list of all expenses.
 - **Response**:
   - Status Code: `200 OK`
@@ -549,7 +589,7 @@ You can check the database schema [here](./db_schema.dbml) and the table diagram
 
 ### 3. Get Expense by ID
 
-- **Route**: `GET /:id`
+- **Route**: `GET expense/:id`
 - **Description**: Retrieves an expense by its ID.
 - **Request Parameters**:
   - `id` (string, required): The ID of the expense to retrieve.
@@ -577,12 +617,11 @@ You can check the database schema [here](./db_schema.dbml) and the table diagram
 
 ### 4. Update Expense
 
-- **Route**: `PATCH /:id`
+- **Route**: `PATCH expense/:id`
 - **Description**: Updates an expense.
 - **Request Parameters**:
   - `id` (string, required): The ID of the expense to update.
-- **Request Body**: Fields to be updated.
-- **Authorization Header**: Token for user authentication.
+- **Request Body**: Fields to be updated siethr  description:string, category_id:stringuuid, amount:number
 - **Response**:
   - Status Code: `200 OK`
   - Body: The updated expense object.
@@ -634,11 +673,11 @@ You can check the database schema [here](./db_schema.dbml) and the table diagram
 
 ### 6. Get Expenses by Query
 
-- **Route**: `GET /`
+- **Route**: `GET /expenses?user_id=sanpleuserid & optional parameters `
 - **Description**: Retrieves expenses based on query parameters.
 - **Query Parameters** (optional):
   - `user_id` (string): ID of the user associated with the expenses.
-  - `category` (string): Category of the expenses.
+  - `category_id` (string): Category of the expenses.
   - `month` (number): Month of the expenses.
 - **Authorization Header**: Token for user authentication.
 - **Response**:
@@ -662,9 +701,96 @@ You can check the database schema [here](./db_schema.dbml) and the table diagram
       }
       ```
 
+# Route: Create Category
 
+## Description
+This route is used to create a new category. It is accessible to standard users only.
 
+## Endpoint
+`POST /categories`
 
+## Request Body Schema
+```typescript
+{
+  user_id: string; // UUID of the user creating the category
+  name?: string; // Name of the category (optional)
+  description?: string; // Description of the category (optional)
+}
+```
+
+## Response Body Schema
+```typescript
+{
+  id: string; // UUID of the created category
+  user_id: string; // UUID of the user who created the category
+  name: string; // Name of the category
+  description: string; // Description of the category
+  created_at: string; // Timestamp of when the category was created
+  updated_at: string; // Timestamp of when the category was last updated
+}
+```
+
+## Request Example
+```json
+{
+  "user_id": "123e4567-e89b-12d3-a456-426614174000",
+  "name": "Food",
+  "description": "All food related expenses"
+}
+```
+
+## Response Example
+```json
+{
+  "id": "123e4567-e89b-12d3-a456-426614174001",
+  "user_id": "123e4567-e89b-12d3-a456-426614174000",
+  "name": "Food",
+  "description": "All food related expenses",
+  "created_at": "2024-02-20T12:00:00Z",
+  "updated_at": "2024-02-20T12:00:00Z"
+}
+```
+
+## Error Responses
+- 400 Bad Request: If the request body is invalid.
+- 401 Unauthorized: If the user does not have permission to create a category.
+- 500 Internal Server Error: If there's a server-side error.
+
+# Route: Get Categories
+
+## Description
+This route fetches categories from the database. It is accessible to users with admin or moderator roles.
+
+## Endpoint
+`GET /categories`
+
+## Request Parameters
+- None
+
+## Request Headers
+- Authorization: Bearer \<Access Token\>
+
+## Response
+- Status Code: 200 OK
+- Content-Type: application/json
+
+## Response Body Schema
+```json
+[
+  {
+    "id": "string",
+    "user_id": "string",
+    "name": "string",
+    "description": "string",
+    "created_at": "string (timestamp)",
+    "updated_at": "string (timestamp)"
+  }
+]
+
+## Error Responses
+- 400 Bad Request: If the request body is invalid.
+- 401 Unauthorized: If the user does not have permission to create a category.
+- 500 Internal Server Error: If there's a server-side error.
 
 
 
