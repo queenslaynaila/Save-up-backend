@@ -26,7 +26,7 @@ export const updateSavingSchema = z.object({
 export const contributionSchema = z.object({
   saving_id: z.string().uuid(),
   amount: z.number(),
-  date: z.date(),
+  date: z.string(),
 });
 
 export const updateContributionSchema = z.object({
@@ -38,17 +38,17 @@ export const updateContributionSchema = z.object({
 // ----------------------------------------------
 export const expenseSchema = z.object({
   user_id: z.string().uuid(),
-  category: z.string(),
+  category_id: z.string().uuid(),
   description: z.string(),
   amount: z.number(),
-  date: z.date(),
+  date: z.string(),
 });
 
 export const updateExpenseSchema = z.object({
-  category: z.string(),
-  description: z.string(),
-  amount: z.number(),
-  date: z.date(),
+  category_id: z.string().uuid().optional(),
+  description: z.string().optional(),
+  amount: z.number().optional(),
+  date: z.string().optional(),
 });
 
 // User Schemas
@@ -90,8 +90,8 @@ export type User = z.infer<typeof UserSchema>;
 // Category Schemas
 // ----------------------------------------------
 export const UpdateCategorySchema = z.object({
-  name: z.string(),
-  description: z.string(),
+  name: z.string().optional(),
+  description: z.string().optional(),
 });
 export const CreateCategorySchema = UpdateCategorySchema.extend({
   user_id: z.string().uuid(),

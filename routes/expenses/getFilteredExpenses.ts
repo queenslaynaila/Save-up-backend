@@ -6,10 +6,10 @@ import pool from '../../db';
 
 export default (router: Router) => {
   router.get(
-    '/:id',
-    authMiddleware({ roles: [UserRole.ADMIN, UserRole.USER] }),
+    '/',
+    authMiddleware({ roles: [UserRole.USER] }),
     async (req, res) => {
-      const { user_id, category, month } = req.query;
+      const { user_id, category_id, month } = req.query;
       const logged_in_user_id = req.user?.id;
       let query = 'SELECT * FROM expenses WHERE user_id = $1';
       const values = [user_id];
@@ -19,9 +19,9 @@ export default (router: Router) => {
         throw new HttpError(403, 'Unauthorized access');
       }
 
-      if (category) {
+      if (category_id) {
         query += ' AND category = $2';
-        values.push(category);
+        values.push(category_id);
       }
 
       if (month) {

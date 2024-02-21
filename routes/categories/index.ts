@@ -10,5 +10,5 @@ export default (baseRouter: express.Router) => {
   deleteCategories(router);
   updateCategories(router);
 
-  baseRouter.use('/contributions', router);
+  baseRouter.use('/categories', router);
 };
