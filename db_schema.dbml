@@ -1,82 +1,76 @@
 Table users {
-    id UUID [primary key, default: `uuid_generate_v4()`]
-    first_name VARCHAR(255) [not null]
-    last_name VARCHAR(255) [not null]
-    email VARCHAR(255) [not null, unique]
-    phone_no VARCHAR(255) [unique]
-    password_hash VARCHAR(255) [not null]
-    total_targeted_amount DECIMAL(10, 2) [default: 0]
-    total_contributions_amount DECIMAL(10, 2) [default: 0]
-    total_expenses_amount DECIMAL(10, 2) [default: 0]
-    created_at TIMESTAMP [default: `NOW()`]
-    updated_at TIMESTAMP [default: `NOW()`]
+  id uuid [primary key, default: `uuid_generate_v4()`]
+  first_name varchar(255) [not null]
+  last_name varchar(255) [not null]
+  phone_number varchar(255) [unique]
+  role role_enum [not null, default: 'user']
+  password varchar(255) [not null]
+  created_at timestamp with time zone [default: `now()`]
+  updated_at timestamp with time zone [default: `now()`]
+  constraint phone_number_format_check check (phone_number ~* '^\+?254[0-9]{9}$')
+}
 
-    constraint email_format_check { check: "email ~* '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$'" }
-    constraint phone_no_format_check { check: "phone_no ~* '^[0-9]{10}$'" }
+Table categories {
+  id uuid [primary key, default: `uuid_generate_v4()`]
+  user_id uuid [null] 
+  name varchar(255) [not null]
+  description varchar(255)
+  created_at timestamp with time zone [default: `now()`]
+  updated_at timestamp with time zone [default: `now()`]
 }
 
 Table savings {
-    id UUID [primary key, default: `uuid_generate_v4()`]
-    user_id UUID [ref: > users.id]
-    description VARCHAR(255) [not null]
-    category VARCHAR(255)
-    target_amount DECIMAL(10, 2) [not null]
-    contributed_amount NUMERIC [default: 0]
-    priority VARCHAR(255)
-    status VARCHAR(255) [default: 'In Progress']
-    target_date DATE
-    start_date DATE [default: `CURRENT_DATE`]
-    created_at TIMESTAMP [default: `NOW()`]
-    updated_at TIMESTAMP [default: `NOW()`]
+  id uuid [primary key, default: `uuid_generate_v4()`]
+  user_id uuid [references: users (id), on delete: cascade]
+  description varchar(255) [not null]
+  category_id uuid [references: categories (id)]
+  target_amount numeric(30, 3) [not null]
+  priority varchar(255)
+  status status_enum [default: 'In Progress']
+  target_date timestamp with time zone
+  start_date timestamp with time zone [default: `now()`]
+  created_at timestamp with time zone [default: `now()`]
+  updated_at timestamp with time zone [default: `now()`]
+  index savings_user_id_idx [user_id]
+  index savings_category_idx [category_id]
+  index savings_priority_idx [priority]
+  index savings_status_idx [status]
+}
 
-    constraint status_check { check: "status IN ('In Progress', 'Complete')" }
+Table security_questions {
+  id uuid [primary key, default: `uuid_generate_v4()`]
+  user_id uuid [null] [references: users (id)]
+  question varchar(255) [not null]
+  created_at timestamp with time zone [default: `now()`]
+}
+
+Table security_answers {
+  id uuid [primary key, default: `uuid_generate_v4()`]
+  question_id uuid [not null] [references: security_questions (id)]
+  user_id uuid [not null] [references: users (id)]
+  answer varchar(255) [not null]
+  created_at timestamp with time zone [default: `now()`]
+  updated_at timestamp with time zone [default: `now()`]
 }
 
 Table contributions {
-    id UUID [primary key, default: `uuid_generate_v4()`]
-    saving_id UUID [not null, ref: > savings.id]
-    amount DECIMAL(10, 2) [not null]
-    date DATE [not null]
-    created_at TIMESTAMP [default: `NOW()`]
-    updated_at TIMESTAMP [default: `NOW()`]
+  id uuid [primary key, default: `uuid_generate_v4()`]
+  saving_id uuid [not null] [references: savings (id), on delete: cascade]
+  amount numeric(30, 3) [not null]
+  date timestamp with time zone
+  created_at timestamp with time zone [default: `now()`]
 }
 
 Table expenses {
-    id UUID [primary key, default: `uuid_generate_v4()`]
-    user_id UUID [ref: > users.id]
-    category VARCHAR(255) [not null]
-    description VARCHAR(255)
-    amount DECIMAL(10, 2) [not null]
-    date DATE [not null]
-    month_extracted INTEGER [generated always as (EXTRACT(MONTH FROM date)) stored]
-    created_at TIMESTAMP [default: `NOW()`]
-    updated_at TIMESTAMP [default: `NOW()`]
-}
-
-Index savings_user_id {
-    savings.user_id
-}
-
-Index savings_category {
-    savings.category
-}
-
-Index savings_priority {
-    savings.priority
-}
-
-Index savings_status {
-    savings.status
-}
-
-Index expenses_user_id {
-    expenses.user_id
-}
-
-Index expenses_category {
-    expenses.category
-}
-
-Index expenses_month {
-    expenses.month_extracted
+  id uuid [primary key, default: `uuid_generate_v4()`]
+  user_id uuid [references: users (id), on delete: cascade]
+  category_id uuid [references: categories (id)]
+  description varchar(255)
+  amount numeric(30, 3) [not null]
+  date timestamp with time zone
+  month integer [generated always as (extract(month from date)) stored]
+  created_at timestamp with time zone [default: `now()`]
+  updated_at timestamp with time zone [default: `now()`]
+  index expenses_user_id_idx [user_id]
+  index expenses_category_idx [category_id]
 }
