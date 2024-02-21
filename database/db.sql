@@ -1,5 +1,3 @@
-BEGIN TRANSACTION;
-
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 CREATE TYPE role_enum AS ENUM ('admin','user','moderator');
@@ -105,12 +103,26 @@ CREATE TABLE IF NOT EXISTS expenses (
   description     VARCHAR(255),
   amount          NUMERIC(30, 3) NOT NULL,
   date            TIMESTAMP WITH TIME ZONE,
+  month           INTEGER,        --value is extracted from date always on update
   created_at      TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at      TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+-- Create the trigger function to update the month column
+CREATE OR REPLACE FUNCTION update_month_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.month = EXTRACT(MONTH FROM NEW.date);
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- call update_month
+CREATE TRIGGER update_month_trigger
+BEFORE INSERT OR UPDATE OF date ON expenses
+FOR EACH ROW
+EXECUTE FUNCTION update_month_column();
+
 CREATE INDEX expenses_user_id_idx ON expenses (user_id);
 CREATE INDEX expenses_category_idx ON expenses (category_id);
--- CREATE INDEX expenses_month_idx ON expenses (month);
-
-COMMIT;
+CREATE INDEX expenses_month_idx ON expenses (month);
