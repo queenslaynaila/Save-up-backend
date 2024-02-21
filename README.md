@@ -10,6 +10,7 @@ You can check the database schema [here](./db_schema.dbml) and the table diagram
     - [4. Get All Users](#4-get-all-users)
     - [5. Get User by ID](#5-get-user-by-id)
     - [6. Update User](#6-update-user)
+    - [6. Update User Phone Number](#6-update-user-phone-number)
 - [Password Reset API](#password-reset-api)
     - [1. Initiate Password Reset](#1-initiate-password-reset)
     - [2. Reset Password](#2-reset-password)
@@ -171,6 +172,38 @@ You can check the database schema [here](./db_schema.dbml) and the table diagram
       ```json
       {
         "error": "You are not authorized to update this user information"
+      }
+      ```
+ 
+### 6. Update User Phone Number
+
+- **Route**: `PATCH /users/update-phone/:id`
+- **Description**: Updates user information.
+- **Request Headers**:
+  - `Authorization`: Token for user authentication.
+- **Request Parameters**:
+  - `id` (string, required): The ID of the user to update.
+- **Request Body**: 
+    - `password` (string, required): The user's current password.
+    - `newPhoneNumber` (string, required): The new phone number to update.
+- **Response**:
+  - Status Code: `200 OK`
+  - Body: A success message indicating that the phone number was updated successfully.
+- **Error Responses**:
+  - Status Code: `400 Bad Request`
+    - Description:  Returned when the request body is invalid.
+    - Body: 
+      ```json
+      {
+        "error": "Invalid phone number"
+      }
+      ```
+  - Status Code: `401 Unauthorized`
+    - Description: Returned when the provided password is incorrect.
+    - Body: 
+      ```json
+      {
+         "error": "Invalid password"
       }
       ```
 

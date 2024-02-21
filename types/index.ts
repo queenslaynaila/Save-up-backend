@@ -72,6 +72,9 @@ export const CreateUserSchema = UpdateUserSchema.extend({
   password: z.string(),
 });
 
+export const UpdatePhoneSchema = CreateUserSchema.pick({
+  phone_number: true,
+});
 export const CreateAdminSchema = CreateUserSchema.extend({
   role: z.enum(['admin']),
 });
