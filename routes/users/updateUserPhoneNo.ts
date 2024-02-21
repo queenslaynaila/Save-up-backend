@@ -10,6 +10,10 @@ export default (router: Router) => {
   authMiddleware(),
   async (req, res) => {
     const userId = req.params.id;
+    const authenticatedUserId = req.user?.id;
+    if (userId !== authenticatedUserId) {
+      throw new HttpError(401, 'Unauthorized');
+    }
     const { password, newPhoneNumber } = req.body;
 
     const validationResult = UpdatePhoneSchema.safeParse(req.body);
