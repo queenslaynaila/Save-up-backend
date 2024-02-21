@@ -10,7 +10,6 @@ You can check the database schema [here](./db_schema.dbml) and the table diagram
     - [4. Get All Users](#4-get-all-users)
     - [5. Get User by ID](#5-get-user-by-id)
     - [6. Update User](#6-update-user)
-    - [7. Delete User](#7-delete-user)
 - [Password Reset API](#password-reset-api)
     - [1. Initiate Password Reset](#1-initiate-password-reset)
     - [2. Reset Password](#2-reset-password)
@@ -40,17 +39,17 @@ You can check the database schema [here](./db_schema.dbml) and the table diagram
 
 ### 1. Create User
 
-- **Route**: `POST /`
+- **Route**: `POST /user`
 - **Description**: Creates a new user account.
 - **Request Body**:
   - `first_name` (string, required): The first name of the user.
   - `last_name` (string, required): The last name of the user.
-  - `email` (string, required): The email address of the user.
-  - `phone_no` (string, required): The phone number of the user.
+  - `phone_no` (string, required): The phone number of the user. Kenyan phone no +254 followed by 9 digits
   - `password` (string, required): The password for the user account.
 - **Response**:
   - Status Code: `200 OK`
-  - Body: The created user object including a JWT token sent over as a cookie called token .
+  - Body: The created user object 
+  - Header: Token with name X-Auth-Token
 - **Error Responses**:
   - Status Code: `400 Bad Request`
     - Description: Returned when the request body is invalid or an account with the provided email or phone number already exists.
@@ -63,38 +62,38 @@ You can check the database schema [here](./db_schema.dbml) and the table diagram
 
 ### 2. User Login
 
-- **Route**: `POST /signin`
+- **Route**: `POST users/signin`
 - **Description**: Authenticates a user and returns a JWT token.
 - **Request Body**:
-  - `email` (string, optional): The email address of the user.
-  - `phone_no` (string, optional): The phone number of the user.
+  - `phone_no` (string, required): The phone number of the user.
   - `password` (string, required): The password for the user account.
 - **Response**:
   - Status Code: `200 OK`
-  - Body: The authenticated user object including a JWT token sent over as a cookie called token .
+  - Body: The authenticated user object  .
+  - Header:  X-Auth-Token', token
 - **Error Responses**:
   - Status Code: `400 Bad Request`
     - Description: Returned when the request body is invalid or the provided credentials are incorrect.
     - Body: 
       ```json
       {
-        "error": "Invalid email, phone number, or password combination"
+        "error": "Invalid phone number, or password " or "Invalid phone number or password combination"
       }
       ```
 
 ### 3. User Logout
 
-- **Route**: `POST /signout`
-- **Description**: Logs out the authenticated user by clearing the authentication token.
+- **Route**: `POST users/signout`
+- **Description**: Logs out the authenticated user by clearing the authentication header.
 - **Request Headers**:
-  - `Authorization`: Token for user authentication.
+  - `X-Auth-Token`: Token for user authentication.
 - **Response**:
   - Status Code: `200 OK`
   - Body: Message indicating successful logout.
 
 ### 4. Get All Users
 
-- **Route**: `GET /`
+- **Route**: `GET /` Accesible to only admins or moderators
 - **Description**: Retrieves a list of all users.
 - **Response**:
   - Status Code: `200 OK`
@@ -124,7 +123,7 @@ You can check the database schema [here](./db_schema.dbml) and the table diagram
     - Body: 
       ```json
       {
-        "error": "Invalid user ID"
+        "error": "Invalid user data" or "User with submitted ID not found"
       }
       ```
 
@@ -139,7 +138,7 @@ You can check the database schema [here](./db_schema.dbml) and the table diagram
 - **Request Body**: Fields to be updated.
 - **Response**:
   - Status Code: `200 OK`
-  - Body: The updated user object.
+  - Body: The updated user object.includeing either first_name or last_name
 - **Error Responses**:
   - Status Code: `400 Bad Request`
     - Description: Returned when the user ID or request body is invalid.
@@ -155,35 +154,6 @@ You can check the database schema [here](./db_schema.dbml) and the table diagram
       ```json
       {
         "error": "You are not authorized to update this user information"
-      }
-      ```
-
-### 7. Delete User
-
-- **Route**: `DELETE /:id`
-- **Description**: Deletes a user account.
-- **Request Headers**:
-  - `Authorization`: Token for user authentication.
-- **Request Parameters**:
-  - `id` (string, required): The ID of the user to delete.
-- **Response**:
-  - Status Code: `204 No Content`
-    - Description: Returned when the user is deleted successfully.
-- **Error Responses**:
-  - Status Code: `400 Bad Request`
-    - Description: Returned when the user ID is invalid or the user with the provided ID is not found.
-    - Body: 
-      ```json
-      {
-        "error": "Invalid user ID" or "User with provided ID not found"
-      }
-      ```
-  - Status Code: `403 Forbidden`
-    - Description: Returned when the user is not authorized to delete the user account.
-    - Body: 
-      ```json
-      {
-        "error": "You are not authorized to delete this user information"
       }
       ```
 
@@ -255,7 +225,7 @@ You can check the database schema [here](./db_schema.dbml) and the table diagram
 - **Request Body**:
   - `user_id` (string, required): The ID of the user associated with the saving.
   - `description` (string, required): Description of the saving.
-  - `category` (string, required): Category of the saving.
+  - `category_id` (uuid, required): Category id of the saving.
   - `target_amount` (number, required): Target amount of the saving.
   - `priority` (string, required): Priority level of the saving.
   - `target_date` (string, required): Target date for achieving the saving.
@@ -274,8 +244,8 @@ You can check the database schema [here](./db_schema.dbml) and the table diagram
 
 ### 2. Get All Savings
 
-- **Route**: `GET /all`
-- **Description**: Retrieves all savings entries.
+- **Route**: `GET savings/all`
+- **Description**: Retrieves all savings entries.Accesible yo only admin and moderators
 - **Response**:
   - Status Code: `200 OK`
   - Body: An array of all savings entries.
@@ -300,7 +270,7 @@ You can check the database schema [here](./db_schema.dbml) and the table diagram
 - **Request Body**: Fields to be updated.
 - **Response**:
   - Status Code: `200 OK`
-  - Body: The updated saving object.
+  - Body: The updated saving object. INCLUDEITING EITHER OF THE FOLLOWING   description:STRINF, target_amount:NUMBER, priority:STRING, target_date:STRING
 - **Error Responses**:
   - Status Code: `400 Bad Request`
     - Description: Returned when the request body or saving ID is invalid.
@@ -350,7 +320,7 @@ You can check the database schema [here](./db_schema.dbml) and the table diagram
 
 ### 5. Get Savings
 
-- **Route**: `GET /`
+- **Route**: `GET /savings`
 - **Description**: Retrieves savings data based on the provided filters.
 - **Query Parameters**:
   - `user_id` (string, required): The ID of the user whose savings are to be retrieved.
