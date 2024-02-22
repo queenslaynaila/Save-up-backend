@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import pool from '../../db';
-import { HttpError } from '../../middleware/errorMiddleware';
+
 import { UserRole } from '../../types';
 import authMiddleware from '../../middleware/auth';
 

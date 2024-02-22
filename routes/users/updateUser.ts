@@ -8,7 +8,7 @@ import pool from '../../db';
 export default (router: Router) => {
   router.patch(
     '/:id',
-    authMiddleware({ roles: [UserRole.ADMIN, UserRole.USER] }),
+    authMiddleware(),
     async (req, res) => {
       const validationResult = idSchema.safeParse(req.params.id);
       if (!validationResult.success) {
