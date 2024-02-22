@@ -395,7 +395,7 @@ You can check the database schema [here](./db_schema.dbml) and the table diagram
 ### 3. Get Categories
 
 - **Route**: `GET /categories/all`
-- **Description**: Fetches categories from the database.
+- **Description**: Fetches categories from the database.accesible to admin snd moderator only
 - **Authorization**:
   - Required Role: Admin or Moderator
 - **Response**:
@@ -433,7 +433,7 @@ You can check the database schema [here](./db_schema.dbml) and the table diagram
 ### 5. Get Categories by User_id ID
 
 - **Route**: `GET /categories?user_id=sampleid`
-- **Description**: Retrieves categories filtered by user ID.
+- **Description**: Retrieves categories filtered by user ID it also includes thesystem defined ones.
 - **Request Parameters**:
   - `user_id` (string, required): The ID of the user to filter categories by.
 - **Response**:

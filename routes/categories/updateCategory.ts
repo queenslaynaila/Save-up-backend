@@ -6,7 +6,7 @@ import { HttpError } from '../../middleware/errorMiddleware';
 import pool from '../../db';
 
 export default (router: Router) => {
-  router.patch('/:id', authMiddleware({ roles: [UserRole.USER] }), async (req, res) => {
+  router.patch('/:id', authMiddleware({ roles: [UserRole.USER,UserRole.ADMIN] }), async (req, res) => {
     const validationResultId = idSchema.safeParse(req.params.id);
     if (!validationResultId.success) {
       return res.status(400).json({ error: new HttpError(400, 'Invalid saving ID').message });
