@@ -3,7 +3,6 @@ import createSaving from './createSaving';
 import deleteSaving from './deleteSaving';
 import getAllSavings from './getAllSavings';
 import getSavingsByUserID from './getSavingsByUserID';
-import getSavingById from './getSavingById';
 import updateSaving from './updateSaving';
 
 export default (baseRouter: express.Router) => {
@@ -12,7 +11,6 @@ export default (baseRouter: express.Router) => {
   deleteSaving(router);
   getAllSavings(router);
   getSavingsByUserID(router);
-  getSavingById(router);
   updateSaving(router);
 
   baseRouter.use('/savings', router);
