@@ -1,7 +1,7 @@
 
 ## Database Schema
 You can check the database schema [here](./db_schema.dbml) and the table diagram [here](./schema.md).ERD diagram is [here](./ERD.png)
-
+Find document explaining databse permissions [here](./permissions.md)
 ## Table of Contents
 - [Users API](#users-api)
     - [1. Create User](#1-create-user)
