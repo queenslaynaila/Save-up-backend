@@ -1,5 +1,4 @@
 import authMiddleware from '../../middleware/auth';
-import { UserRole } from '../../types';
 import { Router } from 'express';
 import { CreateCategorySchema } from '../../types';
 import { HttpError } from '../../middleware/errorMiddleware';
@@ -7,7 +6,7 @@ import pool from '../../db';
 
 // Route for creating a category (accessible to standard users )
 export default (router: Router) => {
-  router.post('/', authMiddleware({ roles: [UserRole.USER] }), async (req, res) => {
+  router.post('/', authMiddleware(), async (req, res) => {
     const validationResult = CreateCategorySchema.safeParse(req.body);
     if (!validationResult.success) {
       throw new HttpError(400, 'Invalid category data');
