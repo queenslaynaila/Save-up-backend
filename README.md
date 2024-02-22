@@ -789,14 +789,14 @@ You can check the database schema [here](./db_schema.dbml) and the table diagram
 
 ### 1. Get Total Target Amount
 
-- **Route**: `GET cumulatives/total-target-amount`
-- **Description**: Returns sum of all targeted amount a user has purpoted to save.
-  - `description` (string, required): Description of the expense.
-  - `category_id` (string,uuid, required): Category of the expense.
-  - `amount` (number, required): Amount of the expense.
-  - `date` (string, required): Date of the expense.
-  - `user_id` (string, required): ID of the user associated with the expense.
-- **Authorization Header**: Token for user authentication.
+- **Route**: `GET /cumulatives/total-target-amount?priority=sample&you can add other query parameteres`
+- **Description**: Retrieves savings data for a user and further filters them based on the provided filters.
+- **Query Parameters**:
+  - `category_id` (string, optional): The ID of the category whos savings we want to find the cumulatives.
+  - `priority` (string, optional): Total for all savings belonging to a particular category.
+  - `status` (string, optional): Get cumulatives for a saving in a particuar status.
+- **Request Headers**:
+- `Authorization`: Token for user authentication.
 - **Response**:
 - **Status Code**: `200 OK`
 - **Succesful Response**: 
