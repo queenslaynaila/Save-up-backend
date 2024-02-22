@@ -49,7 +49,7 @@ export const updateExpenseSchema = z.object({
   category_id: z.string().uuid().optional(),
   description: z.string().optional(),
   amount: z.number().optional(),
-  date: z.string().optional(),
+  date: z.string().optional()
 });
 
 // User Schemas
@@ -57,36 +57,37 @@ export const updateExpenseSchema = z.object({
 export const enum UserRole {
   ADMIN = 'admin',
   USER = 'user',
-  MODERATOR = 'moderator',
+  MODERATOR = 'moderator'
 }
 
 export const UpdateUserSchema = z.object({
   first_name: z.string().optional(),
-  last_name: z.string().optional(),
+  last_name: z.string().optional()
 });
 
 export const CreateUserSchema = UpdateUserSchema.extend({
   phone_number: z
     .string()
     .refine((value) => /^\+254\d{9}$/.test(value), 'Invalid phone number format'),
-  password: z.string(),
+  password: z.string()
 });
 
 export const UpdatePhoneSchema = CreateUserSchema.pick({
   phone_number: true,
+  password: true
 });
 export const CreateAdminSchema = CreateUserSchema.extend({
-  role: z.enum(['admin']),
+  role: z.enum(['admin'])
 });
 
 export const UserSchema = CreateUserSchema.extend({
   id: z.string().uuid(),
-  role: z.enum([UserRole.ADMIN, UserRole.USER, UserRole.MODERATOR]),
+  role: z.enum([UserRole.ADMIN, UserRole.USER, UserRole.MODERATOR])
 });
 
 export const UserLoginSchema = CreateUserSchema.pick({
   phone_number: true,
-  password: true,
+  password: true
 });
 
 export type User = z.infer<typeof UserSchema>;

@@ -8,8 +8,10 @@ import categoriesRoutes from './routes/categories/index';
 import savingsRoutes from './routes/savings/index';
 import expensesRoutes from './routes/expenses/index';
 import contributionsRoutes from './routes/contributions/index';
-import Admin from './routes/admin/index';
+import AdminRoutes from './routes/admin/index';
 import passwordRoutes from './routes/password/index';
+import securityQuestionsRoutes from './routes/securityQuestions';
+import securityAnswerRoutes from './routes/securityAnswer/index'
 const app = express();
 
 // Middleware
@@ -27,7 +29,9 @@ expensesRoutes(app);
 contributionsRoutes(app);
 passwordRoutes(app);
 categoriesRoutes(app);
-Admin(app);
+AdminRoutes(app);
+securityQuestionsRoutes(app);
+securityAnswerRoutes(app);
 
 // 404 handler
 app.use(() => {
@@ -37,7 +41,6 @@ app.use(() => {
 // Global error handler
 /* eslint-disable @typescript-eslint/no-unused-vars */
 app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
-  console.error(error); // Log the error
   if (error instanceof HttpError) {
     return res.status(error.statusCode).json({ error: error.message });
   }
