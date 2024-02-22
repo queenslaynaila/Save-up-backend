@@ -77,14 +77,13 @@ You can check the database schema [here](./db_schema.dbml) and the table diagram
       ```
 - **Sample request**:
     ```json
-{
-  "first_name": "Jane",
-  "last_name": "Doe",
-  "phone_no": "+254712345678",
-  "password": "Kenya123"
-}
-
-
+    {
+      "first_name": "Jane",
+      "last_name": "Doe",
+      "phone_no": "+254712345678",
+      "password": "Kenya123"
+    }
+```
 ### 2. User Login
 
 - **Route**: `POST users/signin`
@@ -215,12 +214,12 @@ You can check the database schema [here](./db_schema.dbml) and the table diagram
       ```
 - **Success Responses**:
   - Status Code: `200`
-    - Body: 
+- Body: 
       ```json
       {
         "message": "Phone number updated successfully. Please log in with your new phone number"
       }
-      ```
+    ```
  
 
 # Security Questions API
@@ -232,10 +231,10 @@ You can check the database schema [here](./db_schema.dbml) and the table diagram
 - **Permissions**:Open to only admin and the standard user
 
 - **Response**:
-  - Status Code: `200 OK`
-  - An array of objects containing  all the questions
+- Status Code: `200 OK`
+- An array of objects containing  all the questions
 - **Error Responses**:
-  - [] An empty array if no data was found 
+- [ ] An empty array if no data was found 
 
 
 # Security Answers API
@@ -589,7 +588,7 @@ You can check the database schema [here](./db_schema.dbml) and the table diagram
 ### 6. Get Savings By SavingID
 
 - **Route**: `GET /savings/:ID`
-- **Description**: Retrieves savings data based on userid.
+- **Description**: Retrieves savings data based on SAVINGid.
 - **Request Headers**:
   - `Authorization`: Token for user authentication.
 - **Response**:
@@ -609,7 +608,7 @@ You can check the database schema [here](./db_schema.dbml) and the table diagram
     - Body: 
       ```json
       {
-        "error": "No savings found with the provided filters"
+        "error": "No savings found "
       }
       ```
       
@@ -757,7 +756,7 @@ You can check the database schema [here](./db_schema.dbml) and the table diagram
 
 ### 6. Get Contributions by Saving
 
-- **Route**: `GET /savings?saving_id=samplesavingid & optional queries`
+- **Route**: `GET /savings?saving_id=samplesavingid`
 - **Description**: Retrieves contributions associated with a specific savings.
 - **Request Parameters**:
   - `id` (string, required): The ID of the savings.
@@ -805,7 +804,9 @@ You can check the database schema [here](./db_schema.dbml) and the table diagram
   "total_target_amount": "60000"
 }
 ```
+
 - If no sum is found it returns 
+  
 ```json
 {
   "total_target_amount": "0"
@@ -823,7 +824,8 @@ You can check the database schema [here](./db_schema.dbml) and the table diagram
   "total_target_amount": "60000"
 }
 ```
--If no sum is found it returns 0 
+
+- If no sum is found it returns 0 
 
 ```json
 {
@@ -965,7 +967,7 @@ You can check the database schema [here](./db_schema.dbml) and the table diagram
 - **Query Parameters** (optional):
   - `user_id` (string): ID of the user associated with the expenses.
   - `category_id` (string): Category of the expenses.
-  - `month` (number): Month of the expenses.
+  - `month` (number): Month of the expenses IN numerics.
 - **Authorization Header**: Token for user authentication.
 - **Response**:
   - Status Code: `200 OK`
