@@ -11,6 +11,8 @@ You can check the database schema [here](./db_schema.dbml) and the table diagram
     - [5. Get User by ID](#5-get-user-by-id)
     - [6. Update User](#6-update-user)
     - [6. Update User Phone Number](#6-update-user-phone-number)
+- [Security Answers API](#security-answers-api)
+    - [1. Create Security Answers](#1-create-security-answers)
 - [Password Reset API](#password-reset-api)
     - [1. Initiate Password Reset](#1-initiate-password-reset)
     - [2. Reset Password](#2-reset-password)
@@ -215,6 +217,28 @@ You can check the database schema [here](./db_schema.dbml) and the table diagram
       }
       ```
  
+# Security Answers API
+ ### 1. Create Security Answers
+
+- **Route**: `POST /security-answers'`
+- **Description**: Creates security answers to a sceurity question chosen by the user from a list of system defined ones.
+- **Request Body**:
+  - `question_id` (string,uuid, required): The id of the chosen question
+  - `user_id` (string, uuid, required): The id the user.
+  - `answer` (string, required): The user defined answer
+
+- **Response**:
+  - Status Code: `200 OK`
+  - { message: 'Security answer created successfully' }
+- **Error Responses**:
+  - Status Code: `400 Bad Request`
+    - Description: Returned when the request body is invalid .
+    - Body: 
+      ```json
+      {
+        "message": "Security answer created successfully"
+      }
+      ```
 
 
 # Password Reset API
