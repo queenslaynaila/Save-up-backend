@@ -40,6 +40,9 @@ You can check the database schema [here](./db_schema.dbml) and the table diagram
     - [4. Update Contribution](#4-update-contribution)
     - [5. Delete Contribution](#5-delete-contribution)
     - [6. Get Contributions by Saving](#6-get-contributions-by-saving)
+- [Cumulatives](#cumulatives)
+    - [1. Get Total Target Amount](#1-get-total-target-amount)
+    - [2. Get Total Contributed Amount](#2-get-total-contributed-amount)
 - [Expense API](#expense-api)
     - [1. Create Expense](#1-create-expense)
     - [2. Get All Expenses](#2-get-all-expenses)
@@ -779,6 +782,54 @@ You can check the database schema [here](./db_schema.dbml) and the table diagram
         "error": "Contribution with given savingID not found"
       }
       ```
+
+
+
+
+# Cumulatives
+
+### 1. Get Total Target Amount
+
+- **Route**: `GET cumulatives/total-target-amount`
+- **Description**: Returns sum of all targeted amount a user has purpoted to save.
+  - `description` (string, required): Description of the expense.
+  - `category_id` (string,uuid, required): Category of the expense.
+  - `amount` (number, required): Amount of the expense.
+  - `date` (string, required): Date of the expense.
+  - `user_id` (string, required): ID of the user associated with the expense.
+- **Authorization Header**: Token for user authentication.
+- **Response**:
+- **Status Code**: `200 OK`
+- **Succesful Response**: 
+  ```json {
+  "total_target_amount": "60000"
+}
+```
+- If no sum is found it returns 
+```json
+{
+  "total_target_amount": "0"
+}
+```
+
+### 2. Get Total Contributed Amount
+
+- **Route**: `GET umulatives/total-contributions`
+- **Description**: Retrieves sum of all a users cotributed amount .
+- **Response**:
+- Status Code: `200 OK`
+- **Succesful Response**: 
+  ```json {
+  "total_target_amount": "60000"
+}
+```
+-If no sum is found it returns 0 
+
+```json
+{
+  "total_target_amount": "0"
+}
+```
 
 # Expense API
 

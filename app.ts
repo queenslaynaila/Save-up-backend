@@ -12,6 +12,7 @@ import AdminRoutes from './routes/admin/index';
 import passwordRoutes from './routes/password/index';
 import securityQuestionsRoutes from './routes/securityQuestions';
 import securityAnswerRoutes from './routes/securityAnswer/index'
+import cumulativesRoutes from './routes/cumulatives/index'
 const app = express();
 
 // Middleware
@@ -32,6 +33,7 @@ categoriesRoutes(app);
 AdminRoutes(app);
 securityQuestionsRoutes(app);
 securityAnswerRoutes(app);
+cumulativesRoutes(app)
 
 // 404 handler
 app.use(() => {
