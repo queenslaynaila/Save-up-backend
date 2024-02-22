@@ -11,6 +11,8 @@ You can check the database schema [here](./db_schema.dbml) and the table diagram
     - [5. Get User by ID](#5-get-user-by-id)
     - [6. Update User](#6-update-user)
     - [6. Update User Phone Number](#6-update-user-phone-number)
+- [Security Questions API](#security-questions-api)
+    - [1. Get All Security Questions](#1-get-all-security-questions)
 - [Security Answers API](#security-answers-api)
     - [1. Create Security Answers](#1-create-security-answers)
 - [Password Reset API](#password-reset-api)
@@ -217,6 +219,21 @@ You can check the database schema [here](./db_schema.dbml) and the table diagram
       }
       ```
  
+
+# Security Questions API
+ ### 1. Get All Security Questions
+
+- **Route**: `Get /security-questions`
+- **Description**: Gets a complete list of all system defined quetsions.
+- **Permissions**:Open to only admin and the standard user
+
+- **Response**:
+  - Status Code: `200 OK`
+  - An array of objects containing  all the questions
+- **Error Responses**:
+  - [] An empty array if no data was found 
+
+
 # Security Answers API
  ### 1. Create Security Answers
 
@@ -239,7 +256,6 @@ You can check the database schema [here](./db_schema.dbml) and the table diagram
         "message": "Security answer created successfully"
       }
       ```
-
 
 # Password Reset API
 
