@@ -95,6 +95,30 @@ CREATE TABLE IF NOT EXISTS contributions (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+CREATE FUNCTION update_saving_status()
+RETURNS TRIGGER AS $$
+DECLARE
+    total_contributions NUMERIC(30, 3);
+BEGIN
+    SELECT COALESCE(SUM(amount), 0) INTO total_contributions
+    FROM contributions
+    WHERE saving_id = NEW.saving_id; 
+
+    IF total_contributions >= (SELECT target_amount FROM savings WHERE id = NEW.saving_id) THEN
+        UPDATE savings
+        SET status = 'Completed'
+        WHERE id = NEW.saving_id;
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER contributions_trigger
+AFTER INSERT ON contributions
+FOR EACH ROW
+EXECUTE FUNCTION update_saving_status();
+
 
 CREATE TABLE IF NOT EXISTS expenses (
   id              uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -108,7 +132,7 @@ CREATE TABLE IF NOT EXISTS expenses (
   updated_at      TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Create the trigger function to update the month column
+-- trigger function to update  month column
 CREATE OR REPLACE FUNCTION update_month_column()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -116,8 +140,6 @@ BEGIN
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
-
--- call update_month
 CREATE TRIGGER update_month_trigger
 BEFORE INSERT OR UPDATE OF date ON expenses
 FOR EACH ROW
@@ -126,3 +148,4 @@ EXECUTE FUNCTION update_month_column();
 CREATE INDEX expenses_user_id_idx ON expenses (user_id);
 CREATE INDEX expenses_category_idx ON expenses (category_id);
 CREATE INDEX expenses_month_idx ON expenses (month);
+
