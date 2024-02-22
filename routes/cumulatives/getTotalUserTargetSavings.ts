@@ -16,10 +16,6 @@ export default (router: Router) => {
         WHERE user_id = $1`;
       const result = await pool.query(query, [userId]);
 
-      if (!result || result.rows.length === 0) {
-        throw new HttpError(404, 'No savings found for the user');
-      }
-
       const totalTargetAmount = result.rows[0].total_target_amount;
       res.json({ total_target_amount: totalTargetAmount });
     }
