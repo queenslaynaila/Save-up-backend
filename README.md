@@ -5,7 +5,7 @@ You can check the database schema [here](./db_schema.dbml) and the table diagram
 ## Table of Contents
 - [Users API](#users-api)
     - [1. Create User](#1-create-user)
-    - [2. User Login](#2-user-login)
+  - [2. User Login](#2-user-login)
     - [3. User Logout](#3-user-logout)
     - [4. Get All Users](#4-get-all-users)
     - [5. Get User by ID](#5-get-user-by-id)
@@ -83,8 +83,8 @@ You can check the database schema [here](./db_schema.dbml) and the table diagram
       "phone_no": "+254712345678",
       "password": "Kenya123"
     }
-```
-### 2. User Login
+      ```
+ ## 2. User Login
 
 - **Route**: `POST users/signin`
 - **Description**: Authenticates a user and returns a JWT token.
@@ -316,10 +316,6 @@ You can check the database schema [here](./db_schema.dbml) and the table diagram
         "error": "Invalid reset token."
       }
       ```
-
-
-
-
 
 # Categories API
 
@@ -782,56 +778,54 @@ You can check the database schema [here](./db_schema.dbml) and the table diagram
       }
       ```
 
-
-
-
 # Cumulatives
 
 ### 1. Get Total Target Amount
 
-- **Route**: `GET /cumulatives/total-target-amount?priority=sample&you can add other query parameteres`
-- **Description**: Retrieves savings data for a user and further filters them based on the provided filters.
+- **Route**: `GET /cumulatives/total-target-amount`
+- **Description**: Retrieves the total target amount for savings based on the provided filters.
 - **Query Parameters**:
-  - `category_id` (string, optional): The ID of the category whos savings we want to find the cumulatives.
-  - `priority` (string, optional): Total for all savings belonging to a particular category.
-  - `status` (string, optional): Get cumulatives for a saving in a particuar status.
+  - `category_id` (string, optional): The ID of the category whose savings' total target amount we want to retrieve.
+  - `priority` (string, optional): Filter by a particular category.
+  - `status` (string, optional): Filter by a particular status of savings.
 - **Request Headers**:
-- `Authorization`: Token for user authentication.
+  - `Authorization`: Token for user authentication.
 - **Response**:
-- **Status Code**: `200 OK`
-- **Succesful Response**: 
-  ```json {
-  "total_target_amount": "60000"
-}
-```
-
-- If no sum is found it returns 
-  
-```json
-{
-  "total_target_amount": "0"
-}
-```
+  - **Status Code**: `200 OK`
+  - **Successful Response**: 
+    ```json
+    {
+      "total_target_amount": "60000"
+    }
+    ```
+  - If no sum is found, it returns 
+    ```json
+    {
+      "total_target_amount": "0"
+    }
+    ```
 
 ### 2. Get Total Contributed Amount
 
-- **Route**: `GET umulatives/total-contributions`
-- **Description**: Retrieves sum of all a users cotributed amount .
+- **Route**: `GET /cumulatives/total-contributions`
+- **Description**: Retrieves the total amount contributed by a user.
+- **Request Headers**:
+  - `Authorization`: Token for user authentication.
 - **Response**:
-- Status Code: `200 OK`
-- **Succesful Response**: 
-  ```json {
-  "total_target_amount": "60000"
-}
-```
+  - **Status Code**: `200 OK`
+  - **Successful Response**: 
+    ```json
+    {
+      "total_contributed_amount": "60000"
+    }
+    ```
+  - If no sum is found, it returns 
+    ```json
+    {
+      "total_contributed_amount": "0"
+    }
+    ```
 
-- If no sum is found it returns 0 
-
-```json
-{
-  "total_target_amount": "0"
-}
-```
 
 # Expense API
 
