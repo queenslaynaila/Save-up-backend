@@ -14,11 +14,12 @@ export default (router: Router) => {
     if (userId !== authenticatedUserId) {
       throw new HttpError(401, 'Unauthorized');
     }
-    const { password, newPhoneNumber } = req.body;
+    const { password, phone_number } = req.body;
 
     const validationResult = UpdatePhoneSchema.safeParse(req.body);
     if (!validationResult.success) {
-      throw new HttpError(400, 'Invalid phone number');
+      console.log(validationResult.error);
+      throw new HttpError(400, 'Invalid data');
     }
 
     const userQuery = 'SELECT * FROM users WHERE id = $1';
@@ -30,7 +31,7 @@ export default (router: Router) => {
     }
 
     const updateQuery = 'UPDATE users SET phone_number = $1 WHERE id = $2';
-    await pool.query(updateQuery, [newPhoneNumber, userId]);
+    await pool.query(updateQuery, [phone_number, userId]);
 
     res.json({ message: 'Phone number updated successfully. Please log in with your new phone number.' });
   });

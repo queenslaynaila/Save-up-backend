@@ -178,14 +178,14 @@ You can check the database schema [here](./db_schema.dbml) and the table diagram
 ### 6. Update User Phone Number
 
 - **Route**: `PATCH /users/update-phone/:id`
-- **Description**: Updates user information.
+- **Description**: Updates users phonee number.
 - **Request Headers**:
   - `Authorization`: Token for user authentication.
 - **Request Parameters**:
   - `id` (string, required): The ID of the user to update.
 - **Request Body**: 
     - `password` (string, required): The user's current password.
-    - `newPhoneNumber` (string, required): The new phone number to update.
+    - `phone_number` (string, required): The new phone number to update.
 - **Response**:
   - Status Code: `200 OK`
   - Body: A success message indicating that the phone number was updated successfully.
@@ -206,7 +206,15 @@ You can check the database schema [here](./db_schema.dbml) and the table diagram
          "error": "Invalid password"
       }
       ```
-
+- **Success Responses**:
+  - Status Code: `200`
+    - Body: 
+      ```json
+      {
+        "message": "Phone number updated successfully. Please log in with your new phone number"
+      }
+      ```
+ 
 
 
 # Password Reset API
