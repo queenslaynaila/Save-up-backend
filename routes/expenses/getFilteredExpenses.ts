@@ -28,11 +28,8 @@ export default (router: Router) => {
 
     errorMessage = 'No expenses found for the given query';
 
-    const result = await pool.query(query, values);
-    if (result.rows.length > 0) {
-      res.json(result.rows);
-    } else {
-      return res.status(404).json({ error: new HttpError(404, errorMessage).message });
-    }
+    const results = await pool.query(query, values);
+    const expenses = results.rows || [];
+    return res.json(expenses)
   });
 };
