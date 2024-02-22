@@ -7,7 +7,7 @@ import jwt, { Secret } from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 
 export default (router: Router) => {
-  router.post('/', authMiddleware({ roles: [UserRole.ADMIN, UserRole.USER] }), async (req, res) => {
+  router.post('/', async (req, res) => {
     const { phoneNo, securityAnswer } = req.body;
     const userQuery = 'SELECT * FROM users WHERE phone_no = $1';
     const userResult = await pool.query(userQuery, [phoneNo]);

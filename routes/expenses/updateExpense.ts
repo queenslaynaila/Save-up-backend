@@ -6,7 +6,7 @@ import { UserRole } from '../../types';
 import pool from '../../db';
 
 export default (router: Router) => {
-  router.patch('/:id', authMiddleware({ roles: [UserRole.USER] }), async (req, res) => {
+  router.patch('/:id', authMiddleware(), async (req, res) => {
     const validationResult = idSchema.safeParse(req.params.id);
     if (!validationResult.success) {
       throw new HttpError(422, 'Invalid expense ID');

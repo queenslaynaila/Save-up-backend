@@ -2,9 +2,9 @@ import { Router } from 'express';
 import { idSchema } from '../../types';
 import { HttpError } from '../../middleware/errorMiddleware';
 import pool from '../../db';
-
+import authMiddleware from '../../middleware/auth'; 
 export default (router: Router) => {
-  router.delete('/:id', async (req, res) => {
+  router.delete('/:id',authMiddleware(), async (req, res) => {
     const validationResult = idSchema.safeParse(req.params.id);
     if (!validationResult.success) {
       throw new HttpError(422, 'Invalid ID');

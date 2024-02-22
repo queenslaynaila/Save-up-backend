@@ -6,7 +6,7 @@ import { UserRole } from '../../types';
 import pool from '../../db';
 
 export default (router: Router) => {
-  router.patch('/:id', authMiddleware({ roles: [UserRole.USER] }), async (req, res) => {
+  router.patch('/:id', authMiddleware(), async (req, res) => {
     const savingId = req.params.id;
     const validationResult = idSchema.safeParse(savingId);
     if (!validationResult.success) {

@@ -5,7 +5,7 @@ import { UserRole } from '../../types';
 import pool from '../../db';
 
 export default (router: Router) => {
-  router.get('/', authMiddleware({ roles: [UserRole.USER] }), async (req, res) => {
+  router.get('/', authMiddleware(), async (req, res) => {
     const { user_id, category_id, month } = req.query;
     const logged_in_user_id = req.user?.id;
     let query = 'SELECT * FROM expenses WHERE user_id = $1';

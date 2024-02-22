@@ -25,7 +25,7 @@ export default (router: Router) => {
       const result = await pool.query(query, [id]);
 
       if (result.rows.length === 0) {
-        throw new HttpError(404, 'User with submitted ID not found');
+        throw new HttpError(404, 'User not found');
       }
       const user = result.rows[0];
 

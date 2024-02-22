@@ -9,7 +9,6 @@ import jwt, { Secret } from 'jsonwebtoken';
 export default (router: Router) => {
   router.post(
     '/reset',
-    authMiddleware({ roles: [UserRole.ADMIN, UserRole.USER] }),
     async (req, res) => {
       const { newPassword, resetToken } = req.body;
       const decodedToken = jwt.verify(resetToken, process.env.JWT_SECRET as Secret) as {

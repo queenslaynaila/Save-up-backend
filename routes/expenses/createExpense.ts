@@ -6,7 +6,7 @@ import { HttpError } from '../../middleware/errorMiddleware';
 import pool from '../../db';
 
 export default (router: Router) => {
-  router.post('/', authMiddleware({ roles: [UserRole.USER] }), async (req, res) => {
+  router.post('/', authMiddleware(), async (req, res) => {
     const validationResult = expenseSchema.safeParse(req.body);
     if (!validationResult.success) {
       throw new HttpError(400, 'Invalid expense data provided');

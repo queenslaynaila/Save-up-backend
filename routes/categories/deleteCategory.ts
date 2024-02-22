@@ -6,7 +6,7 @@ import { HttpError } from '../../middleware/errorMiddleware';
 import pool from '../../db';
 
 export default (router: Router) => {
-  router.delete('/:id', authMiddleware({ roles: [UserRole.USER] }), async (req, res) => {
+  router.delete('/:id', authMiddleware(), async (req, res) => {
     const validationResult = idSchema.safeParse(req.params.id);
     if (!validationResult.success) {
       throw new HttpError(400, 'Invalid category ID');
