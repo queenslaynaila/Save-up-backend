@@ -65,10 +65,10 @@ export const UpdateUserSchema = z.object({
   last_name: z.string().optional()
 });
 
-export const CreateUserSchema = UpdateUserSchema.extend({
-  phone_number: z
-    .string()
-    .refine((value) => /^\+254\d{9}$/.test(value), 'Invalid phone number format'),
+export const CreateUserSchema = z.object({
+  first_name: z.string(),
+  last_name: z.string(),
+  phone_number: z.string().refine((value) => /^\+254\d{9}$/.test(value), 'Invalid phone number format'),
   password: z.string()
 });
 

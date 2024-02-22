@@ -30,8 +30,9 @@ You can check the database schema [here](./db_schema.dbml) and the table diagram
     - [2. Get All Savings](#2-get-all-savings)
     - [3. Update Saving](#3-update-saving)
     - [4. Delete Saving](#4-delete-saving)
-    - [5. Get Savings](#5-get-savings)
-    - [6. Get All Savings](#6-get-all-savings)
+    - [5. Get Savings By Userid](#5-get-savings-by-userid)
+    - [6. Get Savings By SavingID](#6-get-savings-by-savingid)
+    - [7. Get All Savings](#7-get-all-savings)
 - [Contributions API](#contributions-api)
     - [1. Create Contribution](#1-create-contribution)
     - [2. Get All Contributions](#2-get-all-contributions)
@@ -46,7 +47,6 @@ You can check the database schema [here](./db_schema.dbml) and the table diagram
     - [4. Update Expense](#4-update-expense)
     - [5. Delete Expense](#5-delete-expense)
     - [6. Get Expenses by Query](#6-get-expenses-by-query)
-
 
 # Users API
 
@@ -221,6 +221,7 @@ You can check the database schema [here](./db_schema.dbml) and the table diagram
  
 
 # Security Questions API
+
  ### 1. Get All Security Questions
 
 - **Route**: `Get /security-questions`
@@ -262,9 +263,11 @@ You can check the database schema [here](./db_schema.dbml) and the table diagram
 ### 1. Initiate Password Reset
 
 - **Route**: `POST /initiate-password`
-- **Description**: Initiates the password reset process by generating a reset token and sending it to the user's phone number via SMS.
-- **Request Body**:
+- **Description**: .
+- **Request Body**:This endpoint initiates the process for resetting a user's password. It verifies the user's identity through their phone number and a security answer provided by the user.
   - `phoneNo` (string, required): The phone number of the user requesting password reset.
+  - `securityAnswer` (string, required): The security answer provided by the user.
+
 - **Response**:
   - Status Code: `200 OK`
   - Body:
@@ -278,7 +281,7 @@ You can check the database schema [here](./db_schema.dbml) and the table diagram
     - Body:
       ```json
       {
-        "error": "User with provided phone number does not exist"
+          "message": "Incorrect security answer or security answer not found for the user"
       }
       ```
 
@@ -550,10 +553,10 @@ You can check the database schema [here](./db_schema.dbml) and the table diagram
       }
       ```
 
-### 5. Get Savings
+### 5. Get Savings By Userid
 
 - **Route**: `GET /savings?user_id=sample&priority=high&you can add other queries`
-- **Description**: Retrieves savings data based on the provided filters.
+- **Description**: Retrieves savings data for a user and further filters them based on the provided filters.
 - **Query Parameters**:
   - `user_id` (string, required): The ID of the user whose savings are to be retrieved.
   - `priority` (string, optional): Filter savings by priority.
@@ -580,7 +583,34 @@ You can check the database schema [here](./db_schema.dbml) and the table diagram
         "error": "No savings found with the provided filters"
       }
       ```
-### 6. Get All Savings
+### 6. Get Savings By SavingID
+
+- **Route**: `GET /savings/:ID`
+- **Description**: Retrieves savings data based on userid.
+- **Request Headers**:
+  - `Authorization`: Token for user authentication.
+- **Response**:
+  - Status Code: `200 OK`
+  - Body: A saving object.
+- **Error Responses**:
+  - Status Code: `403 Forbidden`
+    - Description: Returned when a user attempts to access savings data that does not belong to them.
+    - Body: 
+      ```json
+      {
+        "error": "Unauthorized access"
+      }
+      ```
+  - Status Code: `404 Not Found`
+    - Description: Returned when no savings data is found for the provided query parameters.
+    - Body: 
+      ```json
+      {
+        "error": "No savings found with the provided filters"
+      }
+      ```
+      
+### 7. Get All Savings
 
 - **Route**: `GET savings/all` Accesible to only admins or moderators
 - **Description**: Retrieves a list of all users.
