@@ -2,13 +2,11 @@ import { Router } from 'express';
 import bcrypt from 'bcrypt';
 import { HttpError } from '../../middleware/errorMiddleware';
 import authMiddleware from '../../middleware/auth';
-import { UpdatePhoneSchema } from '../../types'; 
+import { UpdatePhoneSchema } from '../../types';
 import pool from '../../db';
 
 export default (router: Router) => {
-  router.patch('/update-phone/:id', 
-  authMiddleware(),
-  async (req, res) => {
+  router.patch('/update-phone/:id', authMiddleware(), async (req, res) => {
     const userId = req.params.id;
     const authenticatedUserId = req.user?.id;
     if (userId !== authenticatedUserId) {
@@ -33,6 +31,8 @@ export default (router: Router) => {
     const updateQuery = 'UPDATE users SET phone_number = $1 WHERE id = $2';
     await pool.query(updateQuery, [phone_number, userId]);
 
-    res.json({ message: 'Phone number updated successfully. Please log in with your new phone number.' });
+    res.json({
+      message: 'Phone number updated successfully. Please log in with your new phone number.',
+    });
   });
 };

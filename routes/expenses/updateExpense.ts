@@ -42,7 +42,7 @@ export default (router: Router) => {
       values.push(date);
     }
 
-    query = query.slice(0, -2); 
+    query = query.slice(0, -2);
     query += ` WHERE id = $${values.length + 1} RETURNING *`;
     values.push(expenseId);
 

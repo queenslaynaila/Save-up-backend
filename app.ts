@@ -11,17 +11,19 @@ import contributionsRoutes from './routes/contributions/index';
 import AdminRoutes from './routes/admin/index';
 import passwordRoutes from './routes/password/index';
 import securityQuestionsRoutes from './routes/securityQuestions';
-import securityAnswerRoutes from './routes/securityAnswer/index'
-import cumulativesRoutes from './routes/cumulatives/index'
+import securityAnswerRoutes from './routes/securityAnswer/index';
+import cumulativesRoutes from './routes/cumulatives/index';
 const app = express();
 
 // Middleware
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(morgan('dev'));
-app.use(cors({
-  exposedHeaders: ['Authorization', 'X-Auth-Token']
-}));
+app.use(
+  cors({
+    exposedHeaders: ['Authorization', 'X-Auth-Token'],
+  })
+);
 
 // Routes
 usersRoutes(app);
@@ -33,7 +35,7 @@ categoriesRoutes(app);
 AdminRoutes(app);
 securityQuestionsRoutes(app);
 securityAnswerRoutes(app);
-cumulativesRoutes(app)
+cumulativesRoutes(app);
 
 // 404 handler
 app.use(() => {

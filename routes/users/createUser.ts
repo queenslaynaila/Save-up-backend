@@ -10,7 +10,7 @@ import { generateToken } from '../../middleware/generatetoken';
 export default (router: Router) => {
   router.post(
     '/',
-  
+
     async (req, res) => {
       const validationResult = CreateUserSchema.safeParse(req.body);
       if (!validationResult.success) {

@@ -10,7 +10,7 @@ export default (baseRouter: express.Router) => {
   getAllCategories(router);
   deleteCategories(router);
   updateCategories(router);
-  getCategoriesByUserId(router)
+  getCategoriesByUserId(router);
 
   baseRouter.use('/categories', router);
 };

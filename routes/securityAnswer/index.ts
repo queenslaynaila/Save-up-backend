@@ -3,7 +3,7 @@ import createSecurityAnswer from './createSecurityAnswer';
 export default (baseRouter: Router) => {
   const router = Router();
 
- createSecurityAnswer(router);
+  createSecurityAnswer(router);
 
   baseRouter.use('/security-answers', router);
 };

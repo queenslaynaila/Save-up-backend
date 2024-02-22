@@ -12,22 +12,21 @@ export default (router: Router) => {
     authMiddleware({ roles: [UserRole.ADMIN, UserRole.USER] }),
     async (req, res) => {
       const { newPassword, resetToken } = req.body;
-        const decodedToken = jwt.verify(resetToken, process.env.JWT_SECRET as Secret) as {
-          phone_no: string;
-        };
-        const phoneNo = decodedToken.phone_no;
-        const hashPassword = bcrypt.hashSync(newPassword, 10);
+      const decodedToken = jwt.verify(resetToken, process.env.JWT_SECRET as Secret) as {
+        phone_no: string;
+      };
+      const phoneNo = decodedToken.phone_no;
+      const hashPassword = bcrypt.hashSync(newPassword, 10);
 
-        const result = await pool.query('UPDATE users SET password = $1 WHERE phone_no = $2', [
-          hashPassword,
-          phoneNo,
-        ]);
+      const result = await pool.query('UPDATE users SET password = $1 WHERE phone_no = $2', [
+        hashPassword,
+        phoneNo,
+      ]);
 
-        if (result.rowCount === 0) {
-          return res.status(400).json({ message: 'User does not exist' });
-        }
-        res.json({ message: 'Password updated successfully. Login' });
-      
+      if (result.rowCount === 0) {
+        return res.status(400).json({ message: 'User does not exist' });
+      }
+      res.json({ message: 'Password updated successfully. Login' });
     }
   );
 };
