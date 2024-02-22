@@ -961,7 +961,7 @@ You can check the database schema [here](./db_schema.dbml) and the table diagram
 - **Query Parameters** (optional):
   - `user_id` (string): ID of the user associated with the expenses.
   - `category_id` (string): Category of the expenses.
-  - `month` (number): Month of the expenses IN numerics.
+  - `month` (number): Month of the expenses IN numerics eg 2 for february.
 - **Authorization Header**: Token for user authentication.
 - **Response**:
   - Status Code: `200 OK`
