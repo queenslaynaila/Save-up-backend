@@ -1,76 +1,111 @@
-Table users {
-  id uuid [primary key, default: `uuid_generate_v4()`]
-  first_name varchar(255) [not null]
-  last_name varchar(255) [not null]
-  phone_number varchar(255) [unique]
-  role role_enum [not null, default: 'user']
-  password varchar(255) [not null]
-  created_at timestamp with time zone [default: `now()`]
-  updated_at timestamp with time zone [default: `now()`]
-  constraint phone_number_format_check check (phone_number ~* '^\+?254[0-9]{9}$')
+
+Enum "role_enum" {
+  "admin"
+  "user"
+  "moderator"
 }
 
-Table categories {
-  id uuid [primary key, default: `uuid_generate_v4()`]
-  user_id uuid [null] 
-  name varchar(255) [not null]
-  description varchar(255)
-  created_at timestamp with time zone [default: `now()`]
-  updated_at timestamp with time zone [default: `now()`]
+Enum "status_enum" {
+  "In Progress"
+  "Completed"
+  "Dormant"
 }
 
-Table savings {
-  id uuid [primary key, default: `uuid_generate_v4()`]
-  user_id uuid [references: users (id), on delete: cascade]
-  description varchar(255) [not null]
-  category_id uuid [references: categories (id)]
-  target_amount numeric(30, 3) [not null]
-  priority varchar(255)
-  status status_enum [default: 'In Progress']
-  target_date timestamp with time zone
-  start_date timestamp with time zone [default: `now()`]
-  created_at timestamp with time zone [default: `now()`]
-  updated_at timestamp with time zone [default: `now()`]
-  index savings_user_id_idx [user_id]
-  index savings_category_idx [category_id]
-  index savings_priority_idx [priority]
-  index savings_status_idx [status]
+Table "categories" {
+  "id" uuid [not null, default: `public.uuid_generate_v4()`]
+  "user_id" uuid
+  "name" "character varying(255)" [not null]
+  "description" "character varying(255)"
+  "created_at" timestamp [default: `now()`]
+  "updated_at" timestamp [default: `now()`]
 }
 
-Table security_questions {
-  id uuid [primary key, default: `uuid_generate_v4()`]
-  user_id uuid [null] [references: users (id)]
-  question varchar(255) [not null]
-  created_at timestamp with time zone [default: `now()`]
+Table "contributions" {
+  "id" uuid [not null, default: `public.uuid_generate_v4()`]
+  "saving_id" uuid [not null]
+  "amount" numeric(30,3) [not null]
+  "date" timestamp
+  "created_at" timestamp [default: `now()`]
 }
 
-Table security_answers {
-  id uuid [primary key, default: `uuid_generate_v4()`]
-  question_id uuid [not null] [references: security_questions (id)]
-  user_id uuid [not null] [references: users (id)]
-  answer varchar(255) [not null]
-  created_at timestamp with time zone [default: `now()`]
-  updated_at timestamp with time zone [default: `now()`]
+Table "expenses" {
+  "id" uuid [not null, default: `public.uuid_generate_v4()`]
+  "user_id" uuid
+  "category_id" uuid
+  "description" "character varying(255)"
+  "amount" numeric(30,3) [not null]
+  "date" timestamp
+  "created_at" timestamp [default: `now()`]
+  "updated_at" timestamp [default: `now()`]
+
+Indexes {
+  category_id [type: btree, name: "expenses_category_idx"]
+  user_id [type: btree, name: "expenses_user_id_idx"]
+}
 }
 
-Table contributions {
-  id uuid [primary key, default: `uuid_generate_v4()`]
-  saving_id uuid [not null] [references: savings (id), on delete: cascade]
-  amount numeric(30, 3) [not null]
-  date timestamp with time zone
-  created_at timestamp with time zone [default: `now()`]
+Table "savings" {
+  "id" uuid [not null, default: `public.uuid_generate_v4()`]
+  "user_id" uuid
+  "description" "character varying(255)" [not null]
+  "category_id" uuid
+  "target_amount" numeric(30,3) [not null]
+  "priority" "character varying(255)"
+  "status" status_enum [default: `'In Progress'::public.status_enum`]
+  "target_date" timestamp
+  "start_date" timestamp [default: `now()`]
+  "created_at" timestamp [default: `now()`]
+  "updated_at" timestamp [default: `now()`]
+
+Indexes {
+  category_id [type: btree, name: "savings_category_idx"]
+  priority [type: btree, name: "savings_priority_idx"]
+  status [type: btree, name: "savings_status_idx"]
+  user_id [type: btree, name: "savings_user_id_idx"]
+}
 }
 
-Table expenses {
-  id uuid [primary key, default: `uuid_generate_v4()`]
-  user_id uuid [references: users (id), on delete: cascade]
-  category_id uuid [references: categories (id)]
-  description varchar(255)
-  amount numeric(30, 3) [not null]
-  date timestamp with time zone
-  month integer [generated always as (extract(month from date)) stored]
-  created_at timestamp with time zone [default: `now()`]
-  updated_at timestamp with time zone [default: `now()`]
-  index expenses_user_id_idx [user_id]
-  index expenses_category_idx [category_id]
+Table "security_answers" {
+  "id" uuid [not null, default: `public.uuid_generate_v4()`]
+  "question_id" uuid [not null]
+  "user_id" uuid [not null]
+  "answer" "character varying(255)" [not null]
+  "created_at" timestamp [default: `now()`]
+  "updated_at" timestamp [default: `now()`]
 }
+
+Table "security_questions" {
+  "id" uuid [not null, default: `public.uuid_generate_v4()`]
+  "user_id" uuid
+  "question" "character varying(255)" [not null]
+  "created_at" timestamp [default: `now()`]
+}
+
+Table "users" {
+  "id" uuid [not null, default: `public.uuid_generate_v4()`]
+  "first_name" "character varying(255)" [not null]
+  "last_name" "character varying(255)" [not null]
+  "phone_number" "character varying(255)"
+  "role" role_enum [not null, default: `'user'::public.role_enum`]
+  "password" "character varying(255)" [not null]
+  "created_at" timestamp [default: `now()`]
+  "updated_at" timestamp [default: `now()`]
+}
+
+Ref "categories_user_id_fkey":"users"."id" < "categories"."user_id"
+
+Ref "contributions_saving_id_fkey":"savings"."id" < "contributions"."saving_id" [delete: cascade]
+
+Ref "expenses_category_id_fkey":"categories"."id" < "expenses"."category_id"
+
+Ref "expenses_user_id_fkey":"users"."id" < "expenses"."user_id" [delete: cascade]
+
+Ref "savings_category_id_fkey":"categories"."id" < "savings"."category_id"
+
+Ref "savings_user_id_fkey":"users"."id" < "savings"."user_id" [delete: cascade]
+
+Ref "security_answers_question_id_fkey":"security_questions"."id" < "security_answers"."question_id"
+
+Ref "security_answers_user_id_fkey":"users"."id" < "security_answers"."user_id"
+
+Ref "security_questions_user_id_fkey":"users"."id" < "security_questions"."user_id"
