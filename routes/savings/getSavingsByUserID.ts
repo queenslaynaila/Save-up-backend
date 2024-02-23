@@ -6,7 +6,7 @@ import pool from '../../db';
 
 export default (router: Router) => {
   router.get('/', authMiddleware({ roles: [UserRole.ADMIN, UserRole.USER] }), async (req, res) => {
-    const { user_id, priority, status ,order} = req.query;
+    const { user_id, priority, status, order, page, pageSize } = req.query as { [key: string]: string };
     const logged_in_user_id = req.user?.id;
     let query = 'SELECT * FROM savings WHERE user_id = $1';
     const values = [user_id];
@@ -30,11 +30,17 @@ export default (router: Router) => {
       query += ` ORDER BY created_at ${order.toUpperCase()}`;
     }
 
+    if (page && pageSize) {
+      const offset = (parseInt(page) - 1) * parseInt(pageSize);
+      query += ' LIMIT $' + (values.length + 1) + ' OFFSET $' + (values.length + 2);
+      values.push(parseInt(pageSize).toString(), offset.toString());
+    }
+
     errorMessage = 'No savings found for the given query';
 
     const result = await pool.query(query, values);
     const savings = result.rows || [];
-    return res.json(savings)
-
+    return res.json(savings);
   });
 };
+

@@ -5,7 +5,7 @@ Find document explaining databse permissions [here](./permissions.md)
 ## Table of Contents
 - [Users API](#users-api)
     - [1. Create User](#1-create-user)
-  - [2. User Login](#2-user-login)
+    - [2. User Login](#2-user-login)
     - [3. User Logout](#3-user-logout)
     - [4. Get All Users With Pagination](#4-get-all-users-with-pagination)
     - [5. Get User by ID](#5-get-user-by-id)
@@ -39,7 +39,7 @@ Find document explaining databse permissions [here](./permissions.md)
     - [3. Get Contribution by ID](#3-get-contribution-by-id)
     - [4. Update Contribution](#4-update-contribution)
     - [5. Delete Contribution](#5-delete-contribution)
-    - [6. Get Contributions by Saving](#6-get-contributions-by-saving)
+    - [6. Get Contributions by Saving ID](#6-get-contributions-by-saving-id)
 - [Cumulatives](#cumulatives)
     - [1. Get Total Target Amount](#1-get-total-target-amount)
     - [2. Get Total Contributed Amount](#2-get-total-contributed-amount)
@@ -49,7 +49,7 @@ Find document explaining databse permissions [here](./permissions.md)
     - [3. Get Expense by ID](#3-get-expense-by-id)
     - [4. Update Expense](#4-update-expense)
     - [5. Delete Expense](#5-delete-expense)
-    - [6. Get Expenses by Query](#6-get-expenses-by-query)
+    - [6. Get Expenses by Userid](#6-get-expenses-by-userid)
 
 # Users API
 
@@ -84,7 +84,7 @@ Find document explaining databse permissions [here](./permissions.md)
       "password": "Kenya123"
     }
       ```
- ## 2. User Login
+### 2. User Login
 
 - **Route**: `POST users/signin`
 - **Description**: Authenticates a user and returns a JWT token.
@@ -566,7 +566,9 @@ Find document explaining databse permissions [here](./permissions.md)
   - `user_id` (string, required): The ID of the user whose savings are to be retrieved.
   - `priority` (string, optional): Filter savings by priority.
   - `status` (string, optional): Filter savings by status.
-  - `order`(string,optional): Its value can either be `asc` or `desc`
+  - `order`(string,optional): Its value can either be `asc` or `desc` 
+  - `page`(string,optional):  The page number of the results to retrieve.
+  - `pageSize`(string,optional):he number of savings to include per page.
 - **Request Headers**:
   - `Authorization`: Token for user authentication.
 - **Response**:
@@ -632,6 +634,8 @@ Find document explaining databse permissions [here](./permissions.md)
         "error": "No users found"
       }
       ```
+
+
 # Contributions API
 
 ### 1. Create Contribution
@@ -762,12 +766,14 @@ Find document explaining databse permissions [here](./permissions.md)
       }
       ```
 
-### 6. Get Contributions by Saving
+### 6. Get Contributions by Saving ID
 
 - **Route**: `GET /savings?saving_id=samplesavingid`
 - **Description**: Retrieves contributions associated with a specific savings.
 - **Request Parameters**:
-  - `id` (string, required): The ID of the savings.
+  - `saving_id` (string, required): The ID of the savings.
+  - `page` (string, optional): The page number for pagination..
+  - `pageSize` (string, optional): The number of items per page for pagination..
 - **Authorization Header**: Token for user authentication.
 - **Response**:
   - Status Code: `200 OK`
@@ -969,14 +975,15 @@ Find document explaining databse permissions [here](./permissions.md)
       }
       ```
 
-### 6. Get Expenses by Query
+### 6. Get Expenses by Userid
 
 - **Route**: `GET /expenses?user_id=sanpleuserid & optional parameters `
 - **Description**: Retrieves expenses based on query parameters.
-- **Query Parameters** (optional):
-  - `user_id` (string): ID of the user associated with the expenses.
-  - `category_id` (string): Category of the expenses.
-  - `month` (number): Month of the expenses IN numerics eg 2 for february.
+- **Query Parameters** :
+  - `user_id` (string,required): ID of the user associated with the expenses.
+  - `category_id` (string,optional): Category of the expenses.
+  - `month` (number,optional): Month of the expenses IN numerics eg 2 for february.
+  - `order` (string, optional): Value can either be `asc` or `desc`
 - **Authorization Header**: Token for user authentication.
 - **Response**:
   - Status Code: `200 OK`
