@@ -566,6 +566,7 @@ Find document explaining databse permissions [here](./permissions.md)
   - `user_id` (string, required): The ID of the user whose savings are to be retrieved.
   - `priority` (string, optional): Filter savings by priority.
   - `status` (string, optional): Filter savings by status.
+  - `order`(string,optional): Its value can either be `asc` or `desc`
 - **Request Headers**:
   - `Authorization`: Token for user authentication.
 - **Response**:
