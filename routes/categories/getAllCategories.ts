@@ -7,7 +7,7 @@ export default (router: Router) => {
   router.get(
     '/all',
     authMiddleware({ roles: [UserRole.ADMIN, UserRole.MODERATOR] }),
-    async (req, res) => {
+    async (_, res) => {
       const query = 'SELECT * FROM categories LIMIT 15';
       const result = await pool.query(query);
       const contributions = result.rows || [];
