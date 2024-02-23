@@ -7,7 +7,7 @@ Find document explaining databse permissions [here](./permissions.md)
     - [1. Create User](#1-create-user)
   - [2. User Login](#2-user-login)
     - [3. User Logout](#3-user-logout)
-    - [4. Get All Users](#4-get-all-users)
+    - [4. Get All Users With Pagination](#4-get-all-users-with-pagination)
     - [5. Get User by ID](#5-get-user-by-id)
     - [6. Update User](#6-update-user)
     - [6. Update User Phone Number](#6-update-user-phone-number)
@@ -35,7 +35,7 @@ Find document explaining databse permissions [here](./permissions.md)
     - [7. Get All Savings](#7-get-all-savings)
 - [Contributions API](#contributions-api)
     - [1. Create Contribution](#1-create-contribution)
-    - [2. Get All Contributions](#2-get-all-contributions)
+    - [2. Get All Contributions With Pagination](#2-get-all-contributions-with-pagination)
     - [3. Get Contribution by ID](#3-get-contribution-by-id)
     - [4. Update Contribution](#4-update-contribution)
     - [5. Delete Contribution](#5-delete-contribution)
@@ -45,7 +45,7 @@ Find document explaining databse permissions [here](./permissions.md)
     - [2. Get Total Contributed Amount](#2-get-total-contributed-amount)
 - [Expense API](#expense-api)
     - [1. Create Expense](#1-create-expense)
-    - [2. Get All Expenses](#2-get-all-expenses)
+    - [2. Get All Expenses With Pagination](#2-get-all-expenses-with-pagination)
     - [3. Get Expense by ID](#3-get-expense-by-id)
     - [4. Update Expense](#4-update-expense)
     - [5. Delete Expense](#5-delete-expense)
@@ -115,10 +115,14 @@ Find document explaining databse permissions [here](./permissions.md)
   - Status Code: `200 OK`
   - Body: Message indicating successful logout.
 
-### 4. Get All Users
+### 4. Get All Users With Pagination
 
 - **Route**: `GET /` Accesible to only admins or moderators
 - **Description**: Retrieves a list of all users.
+- **Query Parameters** (optional):
+  - `page` (string) Optional: ID of the user associated with the expenses.
+  - `pageSize` (string) Optional: Category of the expenses.
+- **Authorization Header**: Token for user authentication.
 - **Response**:
   - Status Code: `200 OK`
   - Body: An array of user objects.
@@ -479,6 +483,9 @@ Find document explaining databse permissions [here](./permissions.md)
 
 - **Route**: `GET savings/all`
 - **Description**: Retrieves all savings entries.Accesible yo only admin and moderators
+- **Query Parameters** (optional):
+  - `page` (string) Optional: ID of the user associated with the expenses.
+  - `pageSize` (string) Optional: Category of the expenses.
 - **Response**:
   - Status Code: `200 OK`
   - Body: An array of all savings entries.
@@ -648,10 +655,14 @@ Find document explaining databse permissions [here](./permissions.md)
       }
       ```
 
-### 2. Get All Contributions
+### 2. Get All Contributions With Pagination 
 
 - **Route**: `GET /contributions/all`
 - **Description**: Retrieves a list of all contributions.
+- **Permission**: Admin and Moderators.
+  - **Query Parameters** (optional):
+  - `page` (string) Optional: ID of the user associated with the expenses.
+  - `pageSize` (string) Optional: Category of the expenses.
 - **Response**:
   - Status Code: `200 OK`
   - Body: An array of contribution objects.
@@ -853,10 +864,13 @@ Find document explaining databse permissions [here](./permissions.md)
       }
       ```
 
-### 2. Get All Expenses
+### 2. Get All Expenses With Pagination
 
 - **Route**: `GET /expenses/all`
-- **Description**: Retrieves a list of all expenses.
+- **Description**: Retrieves a list of all expenses.For admin and moderators only
+- **Query Parameters** (optional):
+  - `page` (string) Optional: ID of the user associated with the expenses.
+  - `pageSize` (string) Optional: Category of the expenses.
 - **Response**:
   - Status Code: `200 OK`
   - Body: An array of expense objects.
