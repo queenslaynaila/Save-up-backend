@@ -1,9 +1,7 @@
-import 'express-async-errors';
 import { Router } from 'express';
 import bcrypt from 'bcrypt';
 import { CreateUserSchema } from '../../types';
 import { HttpError } from '../../middleware/errorMiddleware';
-
 import pool from '../../db';
 import { generateToken } from '../../middleware/generatetoken';
 
@@ -22,18 +20,14 @@ export default (router: Router) => {
           VALUES ($1, $2, $3, $4, NOW(), NOW())
           RETURNING *`;
       const userValues = [first_name, last_name, phone_number, password_hash];
-      console.log('before query');
+      
       const userResult = await pool.query(userQuery, userValues);
-      if (userResult.rows.length === 0) {
-        console.error('Error: User not inserted');
-        throw new HttpError(
-          400,
-          'An account with the provided email or phone number already exists'
-        );
-      }
-      console.log('after query');
-      const newUser = userResult.rows[0];
 
+      if (userResult.rows.length === 0) {
+        throw new HttpError(400, 'An account with the provided phone number already exists');
+      }
+
+      const newUser = userResult.rows[0];
       const userDataToSend = {
         id: newUser.id,
         first_name: newUser.first_name,
@@ -48,3 +42,4 @@ export default (router: Router) => {
     }
   );
 };
+
