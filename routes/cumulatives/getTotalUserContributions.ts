@@ -7,7 +7,7 @@ import authMiddleware from '../../middleware/auth';
 export default (router: Router) => {
   router.get(
     '/total-contributions',
-    authMiddleware({ roles: [UserRole.ADMIN, UserRole.USER] }),
+    authMiddleware(),
     async (req, res) => {
       const userId = req.user?.id;
 

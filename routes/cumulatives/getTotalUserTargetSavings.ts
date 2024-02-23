@@ -6,7 +6,7 @@ import authMiddleware from '../../middleware/auth';
 export default (router: Router) => {
   router.get(
     '/total-target-amount',
-    authMiddleware({ roles: [UserRole.ADMIN, UserRole.USER] }),
+    authMiddleware(),
     async (req, res) => {
       const userId = req.user?.id;
       const { priority, status, category_id } = req.query as { priority?: string, status?: string, category_id?: string };
