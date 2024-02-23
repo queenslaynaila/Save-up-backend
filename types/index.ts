@@ -67,10 +67,8 @@ export const UpdateUserSchema = z.object({
 export const CreateUserSchema = z.object({
   first_name: z.string(),
   last_name: z.string(),
-  phone_number: z
-    .string()
-    .refine((value) => /^\+254\d{9}$/.test(value), 'Invalid phone number format'),
-  password: z.string(),
+  phone_number: z.string().refine((value) => /^\+254\d{9}$/.test(value), 'Invalid phone number format'),
+  password: z.string().refine((value) => /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*\W)(?!.*\s).{8,}$/.test(value),'Password must have at least 8 characters, one uppercase, one lowercase, one digit, and one symbol'),
 });
 
 export const UpdatePhoneSchema = CreateUserSchema.pick({
