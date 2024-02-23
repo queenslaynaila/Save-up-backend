@@ -1,21 +1,22 @@
 import authMiddleware from '../../middleware/auth';
-import { UserRole } from '../../types';
+import { hasPermission } from '../../middleware/hasPermission';
 import { Router } from 'express';
 import { HttpError } from '../../middleware/errorMiddleware';
 import pool from '../../db';
 
 export default (router: Router) => {
-  router.get('/', authMiddleware({ roles: [UserRole.ADMIN, UserRole.USER] }), async (req, res) => {
+  router.get('/', authMiddleware(), async (req, res) => {
     const { user_id, priority, status, order, page, pageSize } = req.query as { [key: string]: string };
-    const logged_in_user_id = req.user?.id;
-    let query = 'SELECT * FROM savings WHERE user_id = $1';
-    const values = [user_id];
-    let errorMessage = 'No savings found for the provided user ID';
 
-    if (user_id !== logged_in_user_id) {
+    const logged_in_user_role = req.user!.role; 
+    if (!hasPermission(req, user_id, logged_in_user_role)) {
       throw new HttpError(403, 'Unauthorized access');
     }
 
+    let query = 'SELECT * FROM savings WHERE user_id = $1';
+    const values = [user_id];
+    let errorMessage = 'No savings found for the provided user ID';
+    
     if (priority) {
       query += ' AND priority = $' + (values.length + 1);
       values.push(priority);
@@ -36,8 +37,8 @@ export default (router: Router) => {
       values.push(parseInt(pageSize).toString(), offset.toString());
     }
 
-    errorMessage = 'No savings found for the given query';
 
+    errorMessage = 'No savings found for the given query';
     const result = await pool.query(query, values);
     const savings = result.rows || [];
     return res.json(savings);

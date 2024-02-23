@@ -1,23 +1,31 @@
 import { Router } from 'express';
 import { HttpError } from '../../middleware/errorMiddleware';
 import authMiddleware from '../../middleware/auth';
+import { hasPermission } from '../../middleware/hasPermission';
 import pool from '../../db';
 
 export default (router: Router) => {
   router.get('/', authMiddleware(), async (req, res) => {
-    const { user_id, category_id, month, page, pageSize,order } = req.query;
-    const logged_in_user_id = req.user?.id;
+    const { user_id, category_id, month, page, pageSize, order } = req.query as {
+      user_id: string,
+      category_id: string,
+      month: string,
+      page: string,
+      pageSize: string,
+      order: string
+    };
+      
+    const logged_in_user_role = req.user!.role;
+    if (!hasPermission(req, user_id, logged_in_user_role)) {
+      throw new HttpError(403, 'Unauthorized access');
+    }
+
     const pageInt = parseInt(String(page || '1'));
     const pageSizeInt = parseInt(String(pageSize || '10'));
     const offset = (pageInt - 1) * pageSizeInt;
-
     let query = 'SELECT * FROM expenses WHERE user_id = $1';
     const values = [user_id];
     let errorMessage = 'No expenses found for the provided user ID';
-
-    if (user_id !== logged_in_user_id) {
-      throw new HttpError(403, 'Unauthorized access');
-    }
 
     if (category_id) {
       query += ' AND category_id = $' + (values.length + 1);
