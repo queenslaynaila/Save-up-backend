@@ -12,7 +12,7 @@ export default (router: Router) => {
     async (req, res) => {
       const validationResultId = idSchema.safeParse(req.params.id);
       if (!validationResultId.success) {
-        return res.status(400).json({ error: new HttpError(400, 'Invalid saving ID').message });
+        throw new HttpError(400, 'Invalid category ID');
       }
       const id = validationResultId.data;
       const userId = req.user?.id;
