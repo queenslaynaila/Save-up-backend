@@ -1,7 +1,5 @@
 import { Router } from 'express';
 import pool from '../../db';
-
-import { UserRole } from '../../types';
 import authMiddleware from '../../middleware/auth';
 
 export default (router: Router) => {

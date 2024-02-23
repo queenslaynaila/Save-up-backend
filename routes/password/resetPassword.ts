@@ -1,6 +1,4 @@
 import { Router } from 'express';
-import authMiddleware from '../../middleware/auth';
-import { UserRole } from '../../types';
 import pool from '../../db';
 import bcrypt from 'bcrypt';
 

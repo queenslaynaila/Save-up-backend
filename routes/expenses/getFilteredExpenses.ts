@@ -1,7 +1,6 @@
 import { Router } from 'express';
 import { HttpError } from '../../middleware/errorMiddleware';
 import authMiddleware from '../../middleware/auth';
-import { UserRole } from '../../types';
 import pool from '../../db';
 
 export default (router: Router) => {
