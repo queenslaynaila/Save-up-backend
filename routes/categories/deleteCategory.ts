@@ -1,5 +1,4 @@
 import authMiddleware from '../../middleware/auth';
-import { UserRole } from '../../types';
 import { Router } from 'express';
 import { idSchema } from '../../types';
 import { HttpError } from '../../middleware/errorMiddleware';

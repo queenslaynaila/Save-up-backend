@@ -1,6 +1,5 @@
 import { Router } from 'express';
 import authMiddleware from '../../middleware/auth';
-import { UserRole } from '../../types';
 import { UpdateCategorySchema, idSchema } from '../../types';
 import { HttpError } from '../../middleware/errorMiddleware';
 import pool from '../../db';

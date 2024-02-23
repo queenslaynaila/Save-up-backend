@@ -15,7 +15,6 @@ export default (router: Router) => {
 
     let query = 'SELECT * FROM savings WHERE user_id = $1';
     const values = [user_id];
-    let errorMessage = 'No savings found for the provided user ID';
     
     if (priority) {
       query += ' AND priority = $' + (values.length + 1);
@@ -37,8 +36,6 @@ export default (router: Router) => {
       values.push(parseInt(pageSize).toString(), offset.toString());
     }
 
-
-    errorMessage = 'No savings found for the given query';
     const result = await pool.query(query, values);
     const savings = result.rows || [];
     return res.json(savings);

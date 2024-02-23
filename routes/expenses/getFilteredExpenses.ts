@@ -23,9 +23,9 @@ export default (router: Router) => {
     const pageInt = parseInt(String(page || '1'));
     const pageSizeInt = parseInt(String(pageSize || '10'));
     const offset = (pageInt - 1) * pageSizeInt;
+    
     let query = 'SELECT * FROM expenses WHERE user_id = $1';
     const values = [user_id];
-    let errorMessage = 'No expenses found for the provided user ID';
 
     if (category_id) {
       query += ' AND category_id = $' + (values.length + 1);
@@ -44,8 +44,6 @@ export default (router: Router) => {
 
     query += orderByClause + ' OFFSET $' + (values.length + 1) + ' LIMIT $' + (values.length + 2);
     values.push(offset.toString(), pageSizeInt.toString());
-
-    errorMessage = 'No expenses found for the given query';
 
     const results = await pool.query(query, values);
     const expenses = results.rows || [];
