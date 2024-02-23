@@ -7,9 +7,9 @@ export default (router: Router) => {
   router.get('/', authMiddleware(), async (req, res) => {
     const saving_id = req.query.saving_id;
     const page = parseInt(String(req.query.page || '1'));
-    const pageSize = parseInt(String(req.query.pageSize || '10')) 
+    const pageSize = parseInt(String(req.query.pageSize || '10'));
     const offset = (page - 1) * pageSize;
-    
+
     if (!saving_id) {
       throw new HttpError(400, 'Saving ID is required');
     }

@@ -5,7 +5,7 @@ import pool from '../../db';
 import bcrypt from 'bcrypt';
 import authMiddleware from '../../middleware/auth';
 export default (router: Router) => {
-  router.post('/',authMiddleware(), async (req, res) => {
+  router.post('/', authMiddleware(), async (req, res) => {
     const validationResult = createSecurityAnswerSchema.safeParse(req.body);
     if (!validationResult.success) {
       throw new HttpError(422, 'Invalid data');

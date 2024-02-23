@@ -13,7 +13,7 @@ export default (router: Router) => {
       const offset = (page - 1) * pageSize;
       const query = 'SELECT * FROM expenses ORDER BY created_at DESC OFFSET $1 LIMIT $2';
       const values = [offset, pageSize];
-      const result = await pool.query(query,values);
+      const result = await pool.query(query, values);
       const expenses = result.rows || [];
       return res.json(expenses);
     }

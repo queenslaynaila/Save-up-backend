@@ -6,6 +6,6 @@ export default (router: Router) => {
     const query = 'SELECT * FROM security_questions LIMIT 10';
     const result = await pool.query(query);
     const questions = result.rows || [];
-    res.json(questions)
+    res.json(questions);
   });
 };

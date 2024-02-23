@@ -6,16 +6,18 @@ import pool from '../../db';
 
 export default (router: Router) => {
   router.get('/', authMiddleware(), async (req, res) => {
-    const { user_id, priority, status, order, page, pageSize } = req.query as { [key: string]: string };
+    const { user_id, priority, status, order, page, pageSize } = req.query as {
+      [key: string]: string;
+    };
 
-    const logged_in_user_role = req.user!.role; 
+    const logged_in_user_role = req.user!.role;
     if (!hasPermission(req, user_id, logged_in_user_role)) {
       throw new HttpError(403, 'Unauthorized access');
     }
 
     let query = 'SELECT * FROM savings WHERE user_id = $1';
     const values = [user_id];
-    
+
     if (priority) {
       query += ' AND priority = $' + (values.length + 1);
       values.push(priority);
@@ -41,4 +43,3 @@ export default (router: Router) => {
     return res.json(savings);
   });
 };
-

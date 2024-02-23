@@ -5,46 +5,42 @@ import { HttpError } from '../../middleware/errorMiddleware';
 import pool from '../../db';
 
 export default (router: Router) => {
-  router.patch(
-    '/:id',
-    authMiddleware(),
-    async (req, res) => {
-      const validationResultId = idSchema.safeParse(req.params.id);
-      if (!validationResultId.success) {
-        throw new HttpError(400, 'Invalid category ID');
-      }
-      const id = validationResultId.data;
-      const userId = req.user?.id;
-
-      const validationResultBody = UpdateCategorySchema.safeParse(req.body);
-      if (!validationResultBody.success) {
-        throw new HttpError(422, 'Invalid category data');
-      }
-      const { name, description } = validationResultBody.data;
-
-      let query = 'UPDATE categories SET ';
-      const values = [];
-
-      if (name) {
-        query += `name = $${values.length + 1}, `;
-        values.push(name);
-      }
-      if (description) {
-        query += `description = $${values.length + 1}, `;
-        values.push(description);
-      }
-
-      query += `updated_at = NOW() WHERE id = $${values.length + 1} AND user_id = $${values.length + 2} RETURNING *`;
-      values.push(id);
-      values.push(userId);
-
-      const result = await pool.query(query, values);
-      const updatedCategory = result.rows[0];
-
-      if (!updatedCategory) {
-        throw new HttpError(404, 'Category not found');
-      }
-      res.json(updatedCategory);
+  router.patch('/:id', authMiddleware(), async (req, res) => {
+    const validationResultId = idSchema.safeParse(req.params.id);
+    if (!validationResultId.success) {
+      throw new HttpError(400, 'Invalid category ID');
     }
-  );
+    const id = validationResultId.data;
+    const userId = req.user?.id;
+
+    const validationResultBody = UpdateCategorySchema.safeParse(req.body);
+    if (!validationResultBody.success) {
+      throw new HttpError(422, 'Invalid category data');
+    }
+    const { name, description } = validationResultBody.data;
+
+    let query = 'UPDATE categories SET ';
+    const values = [];
+
+    if (name) {
+      query += `name = $${values.length + 1}, `;
+      values.push(name);
+    }
+    if (description) {
+      query += `description = $${values.length + 1}, `;
+      values.push(description);
+    }
+
+    query += `updated_at = NOW() WHERE id = $${values.length + 1} AND user_id = $${values.length + 2} RETURNING *`;
+    values.push(id);
+    values.push(userId);
+
+    const result = await pool.query(query, values);
+    const updatedCategory = result.rows[0];
+
+    if (!updatedCategory) {
+      throw new HttpError(404, 'Category not found');
+    }
+    res.json(updatedCategory);
+  });
 };

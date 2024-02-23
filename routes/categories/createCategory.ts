@@ -4,7 +4,6 @@ import { CreateCategorySchema } from '../../types';
 import { HttpError } from '../../middleware/errorMiddleware';
 import pool from '../../db';
 
-
 export default (router: Router) => {
   router.post('/', authMiddleware(), async (req, res) => {
     const validationResult = CreateCategorySchema.safeParse(req.body);

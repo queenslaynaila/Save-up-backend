@@ -18,7 +18,7 @@ export default (router: Router) => {
 
       const id = validationResult.data;
       const userId = req.user!.id;
-      const logged_in_user_role = req.user!.role
+      const logged_in_user_role = req.user!.role;
 
       if (!hasPermission(req, userId, logged_in_user_role)) {
         throw new HttpError(403, 'Unauthorized access');

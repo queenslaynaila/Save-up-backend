@@ -7,14 +7,14 @@ import pool from '../../db';
 export default (router: Router) => {
   router.get('/', authMiddleware(), async (req, res) => {
     const { user_id, category_id, month, page, pageSize, order } = req.query as {
-      user_id: string,
-      category_id: string,
-      month: string,
-      page: string,
-      pageSize: string,
-      order: string
+      user_id: string;
+      category_id: string;
+      month: string;
+      page: string;
+      pageSize: string;
+      order: string;
     };
-      
+
     const logged_in_user_role = req.user!.role;
     if (!hasPermission(req, user_id, logged_in_user_role)) {
       throw new HttpError(403, 'Unauthorized access');
@@ -23,7 +23,7 @@ export default (router: Router) => {
     const pageInt = parseInt(String(page || '1'));
     const pageSizeInt = parseInt(String(pageSize || '10'));
     const offset = (pageInt - 1) * pageSizeInt;
-    
+
     let query = 'SELECT * FROM expenses WHERE user_id = $1';
     const values = [user_id];
 
@@ -47,6 +47,6 @@ export default (router: Router) => {
 
     const results = await pool.query(query, values);
     const expenses = results.rows || [];
-    return res.json(expenses)
+    return res.json(expenses);
   });
 };

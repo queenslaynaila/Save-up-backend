@@ -5,7 +5,7 @@ import pool from '../../db';
 import authMiddleware from '../../middleware/auth';
 
 export default (router: Router) => {
-  router.patch('/',authMiddleware(), async (req, res) => {
+  router.patch('/', authMiddleware(), async (req, res) => {
     const validationResult = updateSecurityAnswerSchema.safeParse(req.body);
     if (!validationResult.success) {
       throw new HttpError(422, 'Invalid data');
