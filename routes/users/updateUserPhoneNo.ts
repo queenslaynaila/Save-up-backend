@@ -16,7 +16,6 @@ export default (router: Router) => {
 
     const validationResult = UpdatePhoneSchema.safeParse(req.body);
     if (!validationResult.success) {
-      console.log(validationResult.error);
       throw new HttpError(400, 'Invalid data');
     }
 

@@ -20,7 +20,6 @@ export default (router: Router) => {
         RETURNING *`;
     const userValues = [first_name, last_name, phone_number, password_hash, role];
 
-    console.log('before query');
     const userResult = await pool.query(userQuery, userValues);
 
     if (userResult.rows.length === 0) {
@@ -28,7 +27,6 @@ export default (router: Router) => {
       throw new HttpError(400, 'An account with the provided email or phone number already exists');
     }
 
-    console.log('after query');
     const newUser = userResult.rows[0];
 
     const userDataToSend = {

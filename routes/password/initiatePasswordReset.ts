@@ -28,7 +28,6 @@ export default (router: Router) => {
     const resetToken = jwt.sign({ phoneNo }, process.env.JWT_SECRET as Secret, {
       expiresIn: '10m',
     });
-    console.log('Reset token:', resetToken);
     sendSms(phoneNo, `Here is your reset token ${resetToken}. Do not share this with anyone.`);
     return res.json({ message: 'Reset token generated and sent successfully.' });
   });
