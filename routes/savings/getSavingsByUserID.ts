@@ -3,16 +3,14 @@ import { hasPermission } from '../../middleware/hasPermission';
 import { Router } from 'express';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { sql } from '../../db';
+import { savingInterface } from './index';
 
 export default (router: Router) => {
   router.get('/', authMiddleware(), async (req, res) => {
-    const { user_id, priority, status, order, page, pageSize } = req.query as {
+    const { user_id, priority, status } = req.query as {
       user_id: string;
       priority?: string;
       status?: string;
-      order?: string;
-      page?: string;
-      pageSize?: string;
     };
 
     const logged_in_user_role = req.user!.role;
@@ -33,20 +31,11 @@ export default (router: Router) => {
       values.status = status;
     }
 
-    if (order === 'asc' || order === 'desc') {
-      query += ` ORDER BY created_at ${order.toUpperCase()}`;
-    }
+    query += ' LIMIT 15';
 
-    if (page && pageSize) {
-      const offset = (parseInt(page) - 1) * parseInt(pageSize);
-      query += ' LIMIT :limit OFFSET :offset';
-      values.limit = pageSize;
-      values.offset = offset.toString();
-    }
-
-    const SQL_GET_SAVINGS = sql(query);
-    const result = await SQL_GET_SAVINGS(values).many();
-
+    const SQL_GET_SAVINGS = sql<{ user_id: string; priority?: string; status?: string }, savingInterface[]>(query);
+    const result = await SQL_GET_SAVINGS({ user_id, priority, status }).many();
     return res.json(result);
+   
   });
 };

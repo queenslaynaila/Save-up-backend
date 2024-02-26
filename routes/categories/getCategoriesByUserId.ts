@@ -1,6 +1,6 @@
 import authMiddleware from '../../middleware/auth';
 import { Router } from 'express';
-import pool from '../../db';
+import { sql } from '../../db';
 import { hasPermission } from '../../middleware/hasPermission';
 
 export default (router: Router) => {
@@ -12,7 +12,7 @@ export default (router: Router) => {
     }
 
     let query = 'SELECT * FROM categories';
-    const values: (string | null)[] = []; 
+    const values: (string | null)[] = [];
 
     if (req.query.user_id) {
       const user_id = req.query.user_id;
