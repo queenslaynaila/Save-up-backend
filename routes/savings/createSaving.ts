@@ -1,8 +1,10 @@
 import authMiddleware from '../../middleware/auth';
+import { hasPermission } from '../../middleware/hasPermission';
 import { Router } from 'express';
 import { savingSchema } from '../../types';
 import { HttpError } from '../../middleware/errorMiddleware';
-import pool from '../../db';
+import { sql } from '../../db';
+import { savingInterface } from './index';
 
 export default (router: Router) => {
   router.post('/', authMiddleware(), async (req, res) => {
@@ -10,24 +12,28 @@ export default (router: Router) => {
     if (!validationResult.success) {
       throw new HttpError(400, 'Invalid saving data');
     }
-
-    const loggedInUser = req.user?.id;
-    const { user_id, description, category_id, target_amount, priority, target_date } =
-      validationResult.data;
-    if (loggedInUser !== user_id) {
-      throw new HttpError(401, 'Unauthorized access ');
+    const { user_id, description, category_id, target_amount, priority, target_date } = validationResult.data;
+    const userId = req.user!.id;
+    const loggedInUserRole = req.user!.role;
+    if (!hasPermission(req, userId,  loggedInUserRole)) {
+      throw new HttpError(403, 'Unauthorized access');
     }
 
-    const savingQuery = `
-            INSERT INTO savings (user_id, description, category_id, target_amount, priority, target_date) 
-            VALUES ($1, $2, $3, $4, $5, $6) 
-            RETURNING *`;
-    const savingValues = [user_id, description, category_id, target_amount, priority, target_date];
-    const savingResult = await pool.query(savingQuery, savingValues);
-    if (savingResult.rows.length === 0) {
-      throw new HttpError(400, 'User with provided ID not found');
-    }
+    const query = `
+      INSERT INTO savings (user_id, description, category_id, target_amount, priority, target_date, created_at, updated_at)
+      VALUES (:user_id, :description, :category_id, :target_amount, :priority, :target_date, NOW(), NOW()) 
+      RETURNING *
+    `;
+    const SQL_CREATE_SAVING = sql<{ user_id: string; description: string; category_id: string; target_amount: number; priority: string; target_date: string }, savingInterface>(query);
 
-    res.json(savingResult.rows[0]);
+    const newSaving = await SQL_CREATE_SAVING({
+      user_id,
+      description,
+      category_id,
+      target_amount,
+      priority,
+      target_date,
+    }).one();
+    res.json(newSaving);
   });
 };

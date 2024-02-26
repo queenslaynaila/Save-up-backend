@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { idSchema, updateSavingSchema } from '../../types';
 import authMiddleware from '../../middleware/auth';
-import pool from '../../db';
+import { sql } from '../../db';
 
 export default (router: Router) => {
   router.patch('/:id', authMiddleware(), async (req, res) => {
