@@ -2,14 +2,14 @@ import { Router } from 'express';
 import { HttpError } from '../../middleware/errorMiddleware';
 import authMiddleware from '../../middleware/auth';
 import { hasPermission } from '../../middleware/hasPermission';
-import pool from '../../db';
+import { sql } from '../../db';
 
 export default (router: Router) => {
   router.get('/', authMiddleware(), async (req, res) => {
     const { user_id, category_id, month, page, pageSize, order } = req.query as {
       user_id: string;
-      category_id: string;
-      month: string;
+      category_id?: string;
+      month?: string;
       page: string;
       pageSize: string;
       order: string;
@@ -20,21 +20,21 @@ export default (router: Router) => {
       throw new HttpError(403, 'Unauthorized access');
     }
 
-    const pageInt = parseInt(String(page || '1'));
-    const pageSizeInt = parseInt(String(pageSize || '10'));
+    const pageInt = parseInt(page || '1');
+    const pageSizeInt = parseInt(pageSize || '10');
     const offset = (pageInt - 1) * pageSizeInt;
 
-    let query = 'SELECT * FROM expenses WHERE user_id = $1';
-    const values = [user_id];
+    let query = 'SELECT * FROM expenses WHERE user_id = :user_id';
+    const values: { [key: string]: string | number } = { user_id };
 
     if (category_id) {
-      query += ' AND category_id = $' + (values.length + 1);
-      values.push(category_id);
+      query += ' AND category_id = :category_id';
+      values.category_id = category_id;
     }
 
     if (month) {
-      query += ' AND EXTRACT(MONTH FROM date) = $' + (values.length + 1);
-      values.push(month);
+      query += ' AND EXTRACT(MONTH FROM date) = :month';
+      values.month = parseInt(month);
     }
 
     let orderByClause = ' ORDER BY date';
@@ -42,11 +42,12 @@ export default (router: Router) => {
       orderByClause += ' ' + order.toUpperCase();
     }
 
-    query += orderByClause + ' OFFSET $' + (values.length + 1) + ' LIMIT $' + (values.length + 2);
-    values.push(offset.toString(), pageSizeInt.toString());
+    query += orderByClause + ' OFFSET :offset LIMIT :limit';
+    values.offset = offset;
+    values.limit = pageSizeInt;
 
-    const results = await pool.query(query, values);
-    const expenses = results.rows || [];
-    return res.json(expenses);
+    const SQL_GET_EXPENSES = sql(query);
+    const results = await SQL_GET_EXPENSES(values).many();
+    return res.json(results);
   });
 };
