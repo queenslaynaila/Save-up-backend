@@ -8,11 +8,10 @@ export default (router: Router) => {
   router.get(
     '/all',
     authMiddleware({ roles: [UserRole.ADMIN, UserRole.MODERATOR] }),
-    async (req, res) => {
-      const SQL_GET_ALL = sql<Record<string, never>, savingInterface>(
-        `SELECT * FROM savings ORDER BY created_at `
-      );
-      const savings = await SQL_GET_ALL({}).many();
+    async (_, res) => {
+      const query = `SELECT * FROM savings ORDER BY created_at `;
+      const SQL_GET_EXPENSES = sql<Record<string, never>, savingInterface>(query);
+      const savings = await SQL_GET_EXPENSES({}).many();
       return res.json(savings);
     }
   );

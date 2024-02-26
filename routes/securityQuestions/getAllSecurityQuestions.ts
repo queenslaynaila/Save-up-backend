@@ -1,11 +1,12 @@
 import { Router } from 'express';
-import pool from '../../db';
+import { sql } from '../../db';
+import { SecurityQuestionSchema } from '../../types';
 
 export default (router: Router) => {
   router.get('/', async (_, res) => {
-    const query = 'SELECT * FROM security_questions LIMIT 10';
-    const result = await pool.query(query);
-    const questions = result.rows || [];
-    res.json(questions);
+    const query = `SELECT * FROM security_questions  `;
+    const SQL_GET_EXPENSES = sql<Record<string, never>, SecurityQuestionSchema>(query);
+    const securityQuestions = await SQL_GET_EXPENSES({}).many();
+    return res.json(securityQuestions)
   });
 };

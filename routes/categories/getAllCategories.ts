@@ -1,17 +1,17 @@
 import authMiddleware from '../../middleware/auth';
 import { Router } from 'express';
-import pool from '../../db';
-import { UserRole } from '../../types';
+import { sql } from '../../db';
+import { UserRole ,CategorySchema } from '../../types';
 
 export default (router: Router) => {
   router.get(
     '/all',
     authMiddleware({ roles: [UserRole.ADMIN, UserRole.MODERATOR] }),
     async (_, res) => {
-      const query = 'SELECT * FROM categories LIMIT 15';
-      const result = await pool.query(query);
-      const contributions = result.rows || [];
-      return res.json(contributions);
+      const query = `SELECT * FROM categories LIMIT 15`;
+      const SQL_GET_ALL = sql<Record<string,never>, CategorySchema>(query);
+      const categories = await SQL_GET_ALL({}).many();
+      return res.json(categories);
     }
   );
 };

@@ -1,20 +1,16 @@
 import authMiddleware from '../../middleware/auth';
 import { UserRole } from '../../types';
 import { Router } from 'express';
-import pool from '../../db';
+import { sql } from '../../db';
 
 export default (router: Router) => {
   router.get(
     '/all',
     authMiddleware({ roles: [UserRole.ADMIN, UserRole.MODERATOR] }),
-    async (req, res) => {
-      const page = parseInt(String(req.query.page || '1'));
-      const pageSize = parseInt(String(req.query.pageSize || '10'));
-      const offset = (page - 1) * pageSize;
-      const query = 'SELECT * FROM expenses ORDER BY created_at DESC OFFSET $1 LIMIT $2';
-      const values = [offset, pageSize];
-      const result = await pool.query(query, values);
-      const expenses = result.rows || [];
+    async (_req, res) => {
+      const query = ` SELECT * FROM expenses ORDER BY created_at  `;
+      const SQL_GET_EXPENSES = sql<Record<string, never>, { id: string; created_at: string; updated_at: string; month: string }>(query);
+      const expenses = await SQL_GET_EXPENSES({}).many();
       return res.json(expenses);
     }
   );
