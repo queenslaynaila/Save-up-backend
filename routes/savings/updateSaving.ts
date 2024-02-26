@@ -11,7 +11,7 @@ export default (router: Router) => {
     if (!validationResult.success) {
       return res.status(400).json({ error: new HttpError(400, 'Invalid saving ID').message });
     }
-    const userId = req.user?.id;
+    const userId = req.user!.id;
 
     const validatedSavings = updateSavingSchema.safeParse(req.body);
     if (!validatedSavings.success) {
@@ -22,33 +22,29 @@ export default (router: Router) => {
     let query = 'UPDATE savings SET ';
     const values = [];
     if (description) {
-      query += `description = $${values.length + 1}, `;
+      query += `description = :description, `;
       values.push(description);
     }
 
     if (target_amount) {
-      query += `target_amount = $${values.length + 1}, `;
+      query += `target_amount = :target_amount, `;
       values.push(target_amount);
     }
     if (priority) {
-      query += `priority = $${values.length + 1}, `;
+      query += `priority = :priority, `;
       values.push(priority);
     }
     if (target_date) {
-      query += `target_date = $${values.length + 1}, `;
+      query += `target_date = :target_date, `;
       values.push(target_date);
     }
     query = query.slice(0, -2);
-    query += ` WHERE user_id = $${values.length + 1} AND id = $${values.length + 2} RETURNING *`;
+    query += ' WHERE user_id = :user_id AND id = :saving_id RETURNING *';
     values.push(userId, savingId);
 
-    const result = await pool.query(query, values);
-    const updatedSaving = result.rows[0];
+    const SQL_UPDATE_SAVING = sql<{ description?: string; target_amount?: number; priority?: string; target_date?: string; user_id: string; saving_id: string }, Record<string, never>>(query);
+    const result = await SQL_UPDATE_SAVING({ description, target_amount, priority, target_date, user_id: userId, saving_id: savingId }).one();
 
-    if (!updatedSaving) {
-      throw new HttpError(422, 'Saving not found');
-    }
-
-    return res.json(updatedSaving);
+    return res.json(result);
   });
 };

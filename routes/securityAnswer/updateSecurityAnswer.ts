@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { updateSecurityAnswerSchema } from '../../types';
 import { HttpError } from '../../middleware/errorMiddleware';
-import pool from '../../db';
+import { sql } from '../../db';
 import authMiddleware from '../../middleware/auth';
 
 export default (router: Router) => {
@@ -10,20 +10,17 @@ export default (router: Router) => {
     if (!validationResult.success) {
       throw new HttpError(422, 'Invalid data');
     }
-    const { question_id, answer } = validationResult.data;
 
+    const { question_id, answer } = validationResult.data;
+    const userId = req.user!.id;
     const updateQuery = `
       UPDATE security_answers 
-      SET answer = $1, updated_at = NOW() 
-      WHERE question_id = $2 AND user_id = $3
+      SET answer = :answer, updated_at = NOW() 
+      WHERE question_id = :question_id AND user_id = :user_id
       RETURNING *`;
-    const updateValues = [answer, question_id];
 
-    const updateResult = await pool.query(updateQuery, updateValues);
-    if (updateResult.rows.length === 0) {
-      throw new HttpError(404, 'Security answer not found');
-    }
-    const updatedAnswer = updateResult.rows[0];
-    res.json(updatedAnswer);
+    const SQL_UPDATE_SECURITY_ANSWER = sql<{ question_id: string; answer: string; user_id: string }, Record<string, never>>(updateQuery);
+    const updateResult = await SQL_UPDATE_SECURITY_ANSWER({ question_id, answer, user_id: userId }).one();
+    res.json(updateResult);
   });
 };

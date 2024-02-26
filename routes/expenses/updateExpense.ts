@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { idSchema, updateExpenseSchema } from '../../types';
 import authMiddleware from '../../middleware/auth';
-import pool from '../../db';
+import { sql } from '../../db';
 
 export default (router: Router) => {
   router.patch('/:id', authMiddleware(), async (req, res) => {
@@ -14,44 +14,42 @@ export default (router: Router) => {
 
     const validationResultBody = updateExpenseSchema.safeParse(req.body);
     if (!validationResultBody.success) {
-      throw new HttpError(
-        422,
-        'Invalid expense data. Please provide valid values for all expense fields.'
-      );
+      throw new HttpError(422, validationResultBody.error.errors[0].message);
     }
 
     const { description, category_id, amount, date } = validationResultBody.data;
+
     let query = 'UPDATE expenses SET ';
     const values = [];
 
     if (description) {
-      query += `description = $${values.length + 1}, `;
+      query += `description = :description, `;
       values.push(description);
     }
     if (category_id) {
-      query += `category_id = $${values.length + 1}, `;
+      query += `category_id = :category_id, `;
       values.push(category_id);
     }
     if (amount) {
-      query += `amount = $${values.length + 1}, `;
+      query += `amount = :amount, `;
       values.push(amount);
     }
     if (date) {
-      query += `date = $${values.length + 1}, `;
+      query += `date = :date, `;
       values.push(date);
     }
 
     query = query.slice(0, -2);
-    query += ` WHERE id = $${values.length + 1} RETURNING *`;
+    query += ' WHERE id = :id RETURNING *';
     values.push(expenseId);
 
-    const result = await pool.query(query, values);
-    const updatedExpense = result.rows[0];
+    const SQL_UPDATE_EXPENSE = sql<{ description?: string; category_id?: string; amount?: number; date?: string; id: string }, Record<string, never>>(query);
+    const result = await SQL_UPDATE_EXPENSE({ description, category_id, amount, date, id: expenseId }).one();
 
-    if (!updatedExpense) {
+    if (!result) {
       throw new HttpError(400, 'Expense with given ID not found');
     }
 
-    res.status(200).json(updatedExpense);
+    res.status(200).json(result);
   });
 };
