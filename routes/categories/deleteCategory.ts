@@ -2,7 +2,7 @@ import authMiddleware from '../../middleware/auth';
 import { Router } from 'express';
 import { idSchema } from '../../types';
 import { HttpError } from '../../middleware/errorMiddleware';
-import pool from '../../db';
+import { sql } from '../../db';
 
 export default (router: Router) => {
   router.delete('/:id', authMiddleware(), async (req, res) => {
@@ -11,14 +11,10 @@ export default (router: Router) => {
       throw new HttpError(400, 'Invalid category ID');
     }
     const categoryId = validationResult.data;
-    const userId = req.user?.id;
-    const query = 'DELETE FROM categories WHERE id = $1 AND user_id = $2';
-    const result = await pool.query(query, [categoryId, userId]);
-
-    if (result.rowCount != null && result.rowCount > 0) {
-      return res.json({ message: 'Category deleted successfully' });
-    } else {
-      throw new HttpError(404, 'Category with provided ID not found');
-    }
+    const userId = req.user!.id;
+    const query = 'DELETE FROM categories WHERE id = :categoryId AND user_id = :userId';
+    const SQL_DELETE_SAVING = sql<{ id: string; user_id: string }, Record<string, never>>(query);
+    await SQL_DELETE_SAVING({id:categoryId, user_id: userId }).exec();
+    return res.json({ message: 'Category deleted successfully' });
   });
 };

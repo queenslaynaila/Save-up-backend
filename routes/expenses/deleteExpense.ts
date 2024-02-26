@@ -2,7 +2,7 @@ import authMiddleware from '../../middleware/auth';
 import { Router } from 'express';
 import { idSchema } from '../../types';
 import { HttpError } from '../../middleware/errorMiddleware';
-import pool from '../../db';
+import { sql } from '../../db';
 
 export default (router: Router) => {
   router.delete('/', authMiddleware(), async (req, res) => {
@@ -11,13 +11,10 @@ export default (router: Router) => {
       throw new HttpError(403, 'Invalid expense ID');
     }
     const id = validationResult.data;
-    const userId = req.user?.id;
-    const query = 'DELETE FROM expenses WHERE id = $1 AND user_id = $2';
-    const result = await pool.query(query, [id, userId]);
-    if (result.rowCount != null && result.rowCount > 0) {
-      return res.json({ message: 'Expense deleted successfully' });
-    } else {
-      throw new HttpError(400, 'Expense with provided ID not found');
-    }
+    const userId = req.user!.id;
+    const query = 'DELETE FROM expenses WHERE id = :id AND user_id = :userId';
+    const SQL_DELETE_EXPENSE = sql<{ id: string; user_id: string }, Record<string, never>>(query);
+    await SQL_DELETE_EXPENSE({ id, user_id: userId }).exec();
+    return res.json({ message: 'Expenses deleted successfully' });
   });
 };
