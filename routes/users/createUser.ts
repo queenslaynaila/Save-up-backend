@@ -2,8 +2,9 @@ import { Router } from 'express';
 import bcrypt from 'bcrypt';
 import { CreateUserSchema } from '../../types';
 import { HttpError } from '../../middleware/errorMiddleware';
-import pool from '../../db';
+import { sql } from '../../db';
 import { generateToken } from '../../middleware/generatetoken';
+import { UserSchema } from './index';
 
 export default (router: Router) => {
   router.post('/', async (req, res) => {
@@ -13,19 +14,20 @@ export default (router: Router) => {
     }
     const { first_name, last_name, phone_number, password } = validationResult.data;
     const password_hash = bcrypt.hashSync(password, 10);
-    const userQuery = `
-          INSERT INTO users (first_name, last_name, phone_number, password, created_at, updated_at) 
-          VALUES ($1, $2, $3, $4, NOW(), NOW())
-          RETURNING *`;
-    const userValues = [first_name, last_name, phone_number, password_hash];
 
-    const userResult = await pool.query(userQuery, userValues);
-
-    if (userResult.rows.length === 0) {
+    const SQL_CREATE_USER = sql<{ first_name: string; last_name: string; phone_number: string; password: string }, UserSchema>(
+      `INSERT INTO users (first_name, last_name, phone_number, password, created_at, updated_at)
+       VALUES (:first_name, :last_name, :phone_number, :password, NOW(), NOW())
+       RETURNING *`
+    );
+  
+    const userResult = await SQL_CREATE_USER({ first_name, last_name, phone_number, password: password_hash}).one();
+    
+    if (!userResult) {
       throw new HttpError(400, 'An account with the provided phone number already exists');
     }
 
-    const newUser = userResult.rows[0];
+    const newUser = userResult;
     const userDataToSend = {
       id: newUser.id,
       first_name: newUser.first_name,

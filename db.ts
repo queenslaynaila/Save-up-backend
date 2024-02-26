@@ -1,15 +1,14 @@
-import { Pool } from 'pg';
+import {createBasicSQL} from "@m-pot/sql-query";
 import { config } from 'dotenv';
-
 config({ path: '.env' });
 
-const pool = new Pool({
-  user: process.env.DB_USER,
-  host: process.env.DB_HOST,
-  database: process.env.DB_DATABASE,
-  password: process.env.DB_PASSWORD,
-  port: parseInt(process.env.DB_PORT || '5432'),
-  ssl: Boolean(process.env.SSL) || true,
+export const {sql, shutdown: closeDbConnection} = createBasicSQL({
+  host: process.env.PG_HOST,
+  port: parseInt(process.env.PG_PORT || '5432'),
+  database: process.env.PG_DATABASE,
+  user:  process.env.PG_USER,
+  password:  process.env.PG_PASSWORD,
+  disablePooling:Boolean(process.env.PG_BOUNCER_ENABLED) || true,
+  max: 60,
 });
 
-export default pool;
