@@ -1,10 +1,10 @@
 import express from 'express';
 import createSaving from './createSaving';
-// import deleteSaving from './deleteSaving';
+import deleteSaving from './deleteSaving';
 import getAllSavings from './getAllSavings';
 import getSavingsByUserID from './getSavingsByUserID';
 import getSavingBySavingID from './getSavingBySavingID';
-// import updateSaving from './updateSaving';
+import updateSaving from './updateSaving';
 
 export interface savingInterface {
   id: string;
@@ -23,10 +23,10 @@ export interface savingInterface {
 export default (baseRouter: express.Router) => {
   const router = express.Router();
   createSaving(router);
-  // deleteSaving(router);
+  deleteSaving(router);
   getAllSavings(router);
   getSavingsByUserID(router);
-  //updateSaving(router);
+  updateSaving(router);
   getSavingBySavingID(router);
 
   baseRouter.use('/savings', router);

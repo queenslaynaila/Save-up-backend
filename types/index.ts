@@ -34,6 +34,14 @@ export const updateContributionSchema = contributionSchema.pick({
   date: true,
 });
 
+export interface ContributionSchema {
+  saving_id: z.ZodString;
+  amount: z.ZodNumber;
+  date: z.ZodString;
+  created_at: Date;
+  updated_at: Date;
+}
+
 // Schema for Expense
 // ---------------------------------------------------------------------------------------------------------
 export const expenseSchema = z.object({
@@ -44,6 +52,14 @@ export const expenseSchema = z.object({
   date: z.string(),
 });
 
+export type expenseInterface = z.infer<typeof expenseSchema>;
+
+// Extend the expenseInterface type with additional properties
+export interface ExtendedExpenseInterface extends expenseInterface {
+  created_at: string;
+  updated_at: string;
+  month: string;
+}
 export const updateExpenseSchema = z.object({
   category_id: z.string().uuid().optional(),
   description: z.string().optional(),
@@ -90,7 +106,7 @@ export const UserLoginSchema = CreateUserSchema.pick({
   phone_number: true,
   password: true,
 });
-
+export type Admin = z.infer<typeof UserSchema>;
 export type User = z.infer<typeof UserSchema>;
 
 // Category Schemas
@@ -101,7 +117,26 @@ export const UpdateCategorySchema = z.object({
 });
 export const CreateCategorySchema = UpdateCategorySchema.extend({
   user_id: z.string().uuid(),
+  name: z.string(),
+  description: z.string(),
 });
+
+export interface CategorySchema {
+  id: z.ZodString;
+  description: z.ZodString;
+  name: z.ZodString;
+  user_id: z.ZodString;
+  created_at:Date;
+  updated_at:Date;
+}
+//Security Question Schema
+export interface SecurityQuestionSchema {
+  id: z.ZodString;
+  user_id: z.ZodString;
+  question: z.ZodString;
+  created_at:Date;
+  updated_at:Date;
+}
 
 //Security Answer Schema
 // ---------------------------------------------------------------------------------------------------------
