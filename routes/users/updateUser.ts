@@ -27,31 +27,28 @@ export default (router: Router) => {
     const { first_name, last_name } = validationResultBody.data;
     let query = 'UPDATE users SET ';
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const values: any = {}; 
+    const values: any = {};
 
     if (first_name) {
       query += `first_name = :first_name, `;
-      values.first_name = first_name; 
+      values.first_name = first_name;
     }
     if (last_name) {
       query += `last_name = :last_name, `;
-      values.last_name = last_name; 
+      values.last_name = last_name;
     }
 
     query = query.slice(0, -2);
 
     query += ` WHERE id = :id RETURNING *`;
-    values.id = userId; 
+    values.id = userId;
 
-    const SQL_UPDATE_USER = sql<{ id: string; first_name?: string; last_name?: string }, UserSchema>(
-      query
-    );
-    const updatedUser = await SQL_UPDATE_USER(values).one();
-
-    if (!updatedUser) {
-      throw new HttpError(400, 'User with given ID not found');
-    }
-
+    const SQL_UPDATE_USER = sql<
+    { id: string; first_name?: string; last_name?: string },
+    UserSchema
+    >(query);
+    
+    const updatedUser = await SQL_UPDATE_USER(values).one(new HttpError(400, 'User with given ID not found'));
     res.status(200).json(updatedUser);
   });
 };

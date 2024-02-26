@@ -17,13 +17,18 @@ export default (router: Router) => {
     }
     const { password, phone_number } = req.body;
 
-    const SQL_GET_USER = sql<{ phone_number: string; password: string  },ExtendedUserSchema>(`SELECT * from users where phone_number = :phone_number`);
- 
-    const userResult = await SQL_GET_USER({ phone_number, password}).one();
+    const query = `SELECT id, first_name, last_name, phone_number, role, created_at, updated_at
+                  FROM users
+                  WHERE phone_number = :phone_number`;
 
-    if (!userResult || !(await bcrypt.compare(password, userResult.password))) {
+    const SQL_GET_USER = sql<{ phone_number: string; password: string }, ExtendedUserSchema>( query);
+
+    const userResult = await SQL_GET_USER({ phone_number, password }).one();
+
+    if (!(await bcrypt.compare(password, userResult.password))) {
       throw new HttpError(400, 'Invalid phone number or password combination');
     }
+
     const userDataToSend = {
       id: userResult.id,
       first_name: userResult.first_name,

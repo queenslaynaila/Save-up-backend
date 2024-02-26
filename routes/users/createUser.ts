@@ -15,19 +15,26 @@ export default (router: Router) => {
     const { first_name, last_name, phone_number, password } = validationResult.data;
     const password_hash = bcrypt.hashSync(password, 10);
 
-    const SQL_CREATE_USER = sql<{ first_name: string; last_name: string; phone_number: string; password: string }, UserSchema>(
-      `INSERT INTO users (first_name, last_name, phone_number, password, created_at, updated_at)
-       VALUES (:first_name, :last_name, :phone_number, :password, NOW(), NOW())
-       RETURNING *`
-    );
-  
-    const userResult = await SQL_CREATE_USER({ first_name, last_name, phone_number, password: password_hash}).one();
-    
-    if (!userResult) {
-      throw new HttpError(400, 'An account with the provided phone number already exists');
-    }
+    const query = `INSERT INTO users (first_name, last_name, phone_number, password, created_at, updated_at)
+     VALUES (:first_name, :last_name, :phone_number, :password, NOW(), NOW())
+    RETURNING *`;
 
-    const newUser = userResult;
+    const SQL_CREATE_USER = sql<
+    { first_name: string; last_name: string; phone_number: string; password: string },
+    UserSchema
+    >(query);
+
+    const newUser = await SQL_CREATE_USER({
+      first_name,
+      last_name,
+      phone_number,
+      password: password_hash,
+    })
+      .one()
+      .catch(() => {
+        throw new HttpError(400, 'An account with the provided phone number already exists');
+      });
+
     const userDataToSend = {
       id: newUser.id,
       first_name: newUser.first_name,

@@ -3,7 +3,7 @@ import bcrypt from 'bcrypt';
 import { HttpError } from '../../middleware/errorMiddleware';
 import authMiddleware from '../../middleware/auth';
 import { UpdatePhoneSchema } from '../../types';
-import pool from '../../db';
+import { sql } from '../../db';
 
 export default (router: Router) => {
   router.patch('/update-phone/:id', authMiddleware(), async (req, res) => {
@@ -18,17 +18,25 @@ export default (router: Router) => {
     if (!validationResult.success) {
       throw new HttpError(400, 'Invalid data');
     }
+    const userPasswordQuery = sql<{ userId: string }, { password: string }>(
+      `SELECT password FROM users WHERE id = :userId`
+    );
+    const userPasswordResult = await userPasswordQuery({ userId }).one();
 
-    const userQuery = 'SELECT * FROM users WHERE id = $1';
-    const userResult = await pool.query(userQuery, [userId]);
-    const user = userResult.rows[0];
-
-    if (!user || !(await bcrypt.compare(password, user.password))) {
-      throw new HttpError(401, 'Invalid password');
+    if (!userPasswordResult || !(await bcrypt.compare(password, userPasswordResult.password))) {
+      throw new HttpError(401, 'Invalid password or user not found');
     }
 
-    const updateQuery = 'UPDATE users SET phone_number = $1 WHERE id = $2';
-    await pool.query(updateQuery, [phone_number, userId]);
+    const SQL_UPDATE_PHONE = sql<{ phone_number: string; userId: string }, { updatedRows: number }>(
+      `UPDATE users 
+       SET phone_number = :phone_number 
+       WHERE id = :userId`
+    );
+
+    const result = await SQL_UPDATE_PHONE({ phone_number, userId }).one();
+    if (!result) {
+      throw new HttpError(401, 'Update failed');
+    }
 
     res.json({
       message: 'Phone number updated successfully. Please log in with your new phone number.',

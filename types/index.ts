@@ -67,8 +67,10 @@ export const UpdateUserSchema = z.object({
 export const CreateUserSchema = z.object({
   first_name: z.string(),
   last_name: z.string(),
-  phone_number: z.string().refine((value) => /^\+254\d{9}$/.test(value), 'Invalid phone number format'),
-  password: z.string()
+  phone_number: z
+    .string()
+    .refine((value) => /^\+254\d{9}$/.test(value), 'Invalid phone number format'),
+  password: z.string(),
 });
 
 export const UpdatePhoneSchema = CreateUserSchema.pick({

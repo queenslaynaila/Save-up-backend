@@ -11,12 +11,11 @@ import updateUserPhoneNo from './updateUserPhoneNo';
 export interface UserSchema {
   id: string;
   first_name: string;
-  last_name:string;
-  phone_number:string;
+  last_name: string;
+  phone_number: string;
   role: UserRole;
   created_at: Date;
   updated_at: Date;
-
 }
 export default (baseRouter: Router) => {
   const router = Router();
