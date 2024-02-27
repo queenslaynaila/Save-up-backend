@@ -75,24 +75,20 @@ export const enum UserRole {
   MODERATOR = 'moderator',
 }
 
-export const UpdateUserSchema = z.object({
-  first_name: z.string().optional(),
-  last_name: z.string().optional(),
-});
-
-export const CreateUserSchema = z.object({
+const BaseUserSchema = z.object({
   first_name: z.string(),
   last_name: z.string(),
+});
+
+export const CreateUserSchema = BaseUserSchema.extend({
   phone_number: z
     .string()
     .refine((value) => /^\+254\d{9}$/.test(value), 'Invalid phone number format'),
   password: z.string(),
 });
 
-export const UpdatePhoneSchema = CreateUserSchema.pick({
-  phone_number: true,
-  password: true,
-});
+export const UpdateUserSchema = BaseUserSchema.partial();
+
 export const CreateAdminSchema = CreateUserSchema.extend({
   role: z.enum(['admin']),
 });
@@ -106,6 +102,12 @@ export const UserLoginSchema = CreateUserSchema.pick({
   phone_number: true,
   password: true,
 });
+
+export const UpdatePhoneSchema = CreateUserSchema.pick({
+  phone_number: true,
+  password: true,
+});
+
 export type Admin = z.infer<typeof UserSchema>;
 export type User = z.infer<typeof UserSchema>;
 

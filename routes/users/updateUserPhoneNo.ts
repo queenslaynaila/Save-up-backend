@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import bcrypt from 'bcrypt';
 import { HttpError } from '../../middleware/errorMiddleware';
-import authMiddleware,{hasPermission} from '../../middleware/auth';
+import authMiddleware from '../../middleware/auth';
 import { UpdatePhoneSchema } from '../../types';
 import { sql } from '../../db';
 

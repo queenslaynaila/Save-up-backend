@@ -1,6 +1,5 @@
 import { Router } from 'express';
 import authMiddleware from '../../middleware/auth';
-import { hasPermission } from '../../middleware/hasPermission';
 import { savingSchema } from '../../types';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { sql } from '../../db';
@@ -12,13 +11,13 @@ export default (router: Router) => {
     if (!validationResult.success) {
       throw new HttpError(400, 'Invalid saving data');
     }
-
     const { user_id, description, category_id, target_amount, priority, target_date } = validationResult.data;
+
     const loggedInUserId = req.user!.id;
-    const loggedInUserRole = req.user!.role;
-    
-    if (!hasPermission(req, user_id, loggedInUserRole)) {
-      throw new HttpError(403, 'Unauthorized access');
+    const authenticatedUserId = req.user?.id;
+
+    if (authenticatedUserId !== user_id) {
+      throw new HttpError(403, 'Unauthorized');
     }
 
     const query = `
@@ -36,7 +35,9 @@ export default (router: Router) => {
       target_amount,
       priority,
       target_date,
-    }).one();
+    }).one().catch(() => {
+      throw new HttpError(400, 'Selected category doessnt exist');
+    });
 
     res.json(newSaving);
   });
