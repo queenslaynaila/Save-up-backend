@@ -11,9 +11,12 @@ export default (router: Router) => {
     }
     const securityAnswerId = validationResult.data;
     const userId = req.user!.id;
-    const query = 'DELETE FROM security_answers  WHERE id = :securityAnswerId AND user_id = :userId';
+    const query = 'DELETE FROM security_answers  WHERE id = :securityAnswerId AND user_id = :userId RETURNING id';
     const SQL_DELETE_SAVING = sql<{ id: string; user_id: string }, Record<string, never>>(query);
-    await SQL_DELETE_SAVING({id:securityAnswerId, user_id: userId }).exec();
+    const idDeleted = await SQL_DELETE_SAVING({id:securityAnswerId, user_id: userId }).oneOrNull();
+    if (!idDeleted ) {
+      throw new HttpError(404, 'Answer not found');
+    }
     return res.json({ message: 'Answer deleted successfully' });
   });
 };
