@@ -44,11 +44,7 @@ export default (router: Router) => {
     values.push(expenseId);
 
     const SQL_UPDATE_EXPENSE = sql<{ description?: string; category_id?: string; amount?: number; date?: string; id: string }, Record<string, never>>(query);
-    const result = await SQL_UPDATE_EXPENSE({ description, category_id, amount, date, id: expenseId }).one();
-
-    if (!result) {
-      throw new HttpError(400, 'Expense with given ID not found');
-    }
+    const result = await SQL_UPDATE_EXPENSE({ description, category_id, amount, date, id: expenseId }).one(new HttpError(400, 'Expense with given ID not found'));
 
     res.status(200).json(result);
   });

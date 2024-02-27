@@ -18,14 +18,22 @@ export default (router: Router) => {
       RETURNING id, created_at, updated_at, month
     `;
 
+    const loggedInUserId = req.user!.id;
+    const authenticatedUserId = req.user?.id;
+    if (authenticatedUserId !== user_id) {
+      throw new HttpError(403, 'Unauthorized');
+    }
+
     const SQL_CREATE_EXPENSES = sql<typeof validationResult.data, ExtendedExpenseInterface>(query);
     const expense = await SQL_CREATE_EXPENSES({
       description,
       category_id,
       amount,
       date,
-      user_id,
-    }).one()
+      user_id:loggedInUserId,
+    }).one().catch(() => {
+      throw new HttpError(400, 'Selected category doesnt exist');
+    });
     
     return res.json(expense);
     

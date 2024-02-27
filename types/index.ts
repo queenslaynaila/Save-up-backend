@@ -3,8 +3,7 @@ import { z } from 'zod';
 // ---------------------------------------------------------------------------------------------------------
 export const idSchema = z.string().uuid();
 
-export const savingSchema = z.object({
-  user_id: z.string().uuid(),
+export const baseSavingSchema = z.object({
   description: z.string(),
   category_id: z.string().uuid(),
   target_amount: z.number(),
@@ -12,14 +11,18 @@ export const savingSchema = z.object({
   target_date: z.string(),
 });
 
-export const updateSavingSchema = z.object({
-  description: z.string().optional(),
-  category_id: z.string().uuid().optional(),
-  target_amount: z.number().optional(),
+export const savingSchema = baseSavingSchema.extend({
+  user_id: z.string().uuid(),
+});
+
+export const updateSavingSchema = baseSavingSchema.partial();
+
+export const getSavingsQueryParamsSchema = z.object({
+  user_id: z.string().uuid(),
   priority: z.string().optional(),
-  target_date: z.string().optional(),
   status: z.string().optional(),
 });
+
 
 // Schema for Contribution
 // ---------------------------------------------------------------------------------------------------------
