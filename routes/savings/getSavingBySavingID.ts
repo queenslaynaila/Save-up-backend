@@ -5,28 +5,26 @@ import { savingInterface } from './index';
 import { sql } from '../../db';
 import { idSchema, UserRole } from '../../types';
 
+let savingQuery = `SELECT * FROM savings WHERE id = :id`;
+const SQL_GET_SAVING_BY_ID = sql<{ id: string; userId?: string }, savingInterface>(savingQuery);
+
 export default (router: Router) => {
   router.get('/:id', authMiddleware(), async (req, res) => {
-
-    const validationResult = idSchema.safeParse(req.params.id);
-    if (!validationResult.success) {
+    const idValidationResult = idSchema.safeParse(req.params.id);
+    if (!idValidationResult.success) {
       throw new HttpError(400, 'Invalid saving ID');
     }
 
-    const id = validationResult.data;
-    const userId = req.user!.id;
+    const savingId = idValidationResult.data;
+    const loggedInUserId = req.user!.id;
     const userRole = req.user!.role;
 
-    let query = `SELECT * FROM savings WHERE id = :id `;
-    const values: { id: string; userId?: string } = { id };
-
+    const queryValues: { id: string; userId?: string } = { id: savingId };
     if (userRole !== UserRole.ADMIN) {
-      query += ' AND user_id = :userId';
-      values.userId = userId; 
+      savingQuery += ' AND user_id = :userId';
+      queryValues.userId = loggedInUserId; 
     }
-
-    const SQL_GET_SAVING_BY_ID = sql<{ id: string; userId?: string }, savingInterface>(query);
-    const saving = await SQL_GET_SAVING_BY_ID(values).one(new HttpError(404, 'Saving not found')); 
+    const saving = await SQL_GET_SAVING_BY_ID(queryValues).one(new HttpError(404, 'Saving not found')); 
     return res.json(saving);
   });
 };

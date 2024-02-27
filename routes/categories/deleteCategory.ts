@@ -4,6 +4,10 @@ import { idSchema } from '../../types';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { sql } from '../../db';
 
+const SQL_DELETE_CATEGORY = sql<{ id: string; user_id: string }, Record<string, never>>(`
+  DELETE FROM categories WHERE id = :categoryId AND user_id = :userId RETURNING id
+`);
+
 export default (router: Router) => {
   router.delete('/:id', authMiddleware(), async (req, res) => {
     const validationResult = idSchema.safeParse(req.params.id);
@@ -12,9 +16,7 @@ export default (router: Router) => {
     }
     const categoryId = validationResult.data;
     const userId = req.user!.id;
-    const query = 'DELETE FROM categories WHERE id = :categoryId AND user_id = :userId RETURNING id';
-    const SQL_DELETE_SAVING = sql<{ id: string; user_id: string }, Record<string, never>>(query);
-    const idDeleted = await SQL_DELETE_SAVING({id:categoryId, user_id: userId }).oneOrNull();
+    const idDeleted = await SQL_DELETE_CATEGORY({id:categoryId, user_id: userId }).oneOrNull();
     if (!idDeleted ) {
       throw new HttpError(404, 'Category not found');
     }

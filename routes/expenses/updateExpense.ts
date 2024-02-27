@@ -1,8 +1,13 @@
 import { Router } from 'express';
+import { z } from 'zod';
 import { HttpError } from '../../middleware/errorMiddleware';
-import { idSchema, updateExpenseSchema } from '../../types';
+import { idSchema, updateExpenseSchema,ExtendedExpenseInterface  } from '../../types';
 import authMiddleware from '../../middleware/auth';
 import { sql } from '../../db';
+
+let updateExpenseQuery = 'UPDATE expenses SET ';
+const SQL_UPDATE_EXPENSE = sql<z.infer<typeof updateExpenseSchema> & { id: string }, ExtendedExpenseInterface>(updateExpenseQuery);
+
 
 export default (router: Router) => {
   router.patch('/:id', authMiddleware(), async (req, res) => {
@@ -19,31 +24,29 @@ export default (router: Router) => {
 
     const { description, category_id, amount, date } = validationResultBody.data;
 
-    let query = 'UPDATE expenses SET ';
     const values = [];
 
     if (description) {
-      query += `description = :description, `;
+      updateExpenseQuery += `description = :description, `;
       values.push(description);
     }
     if (category_id) {
-      query += `category_id = :category_id, `;
+      updateExpenseQuery += `category_id = :category_id, `;
       values.push(category_id);
     }
     if (amount) {
-      query += `amount = :amount, `;
+      updateExpenseQuery += `amount = :amount, `;
       values.push(amount);
     }
     if (date) {
-      query += `date = :date, `;
+      updateExpenseQuery += `date = :date, `;
       values.push(date);
     }
 
-    query = query.slice(0, -2);
-    query += ' WHERE id = :id RETURNING *';
+    updateExpenseQuery = updateExpenseQuery.slice(0, -2);
+    updateExpenseQuery += ' WHERE id = :id RETURNING *';
     values.push(expenseId);
 
-    const SQL_UPDATE_EXPENSE = sql<{ description?: string; category_id?: string; amount?: number; date?: string; id: string }, Record<string, never>>(query);
     const result = await SQL_UPDATE_EXPENSE({ description, category_id, amount, date, id: expenseId }).one(new HttpError(400, 'Expense with given ID not found'));
 
     res.status(200).json(result);
