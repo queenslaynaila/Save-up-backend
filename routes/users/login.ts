@@ -22,7 +22,7 @@ export default (router: Router) => {
                    WHERE phone_number = :phone_number`;
 
     const SQL_GET_USER = sql<{ phone_number: string }, ExtendedUserSchema>(query);
-    const userResult = await SQL_GET_USER({ phone_number }).one();
+    const userResult = await SQL_GET_USER({ phone_number }).one(new HttpError(400, 'User not found'));
 
     const isPasswordCorrect = await bcrypt.compare(password, userResult.password);
     if (!isPasswordCorrect) {
