@@ -148,3 +148,22 @@ export const updateSecurityAnswerSchema = z.object({
 export const createSecurityAnswerSchema = updateSecurityAnswerSchema.extend({
   user_id: z.string().uuid(),
 });
+
+export interface SecurityAnswerSchema {
+  id: string;
+  user_id:string;
+  question_id: string;
+  answer: string;
+  created_at:Date;
+  updated_at:Date;
+}
+
+export interface UserSchema {
+  id: string;
+  first_name: string;
+  last_name: string;
+  phone_number: string;
+  role: UserRole;
+  created_at: Date;
+  updated_at: Date;
+}
