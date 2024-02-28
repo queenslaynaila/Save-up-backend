@@ -21,14 +21,13 @@ export default (router: Router) => {
 
     const { user_id, description, category_id, target_amount, priority, target_date } = validationResult.data;
 
-    const loggedInUserId = req.user!.id;
     const authenticatedUserId = req.user!.id;
     if (authenticatedUserId !== user_id) {
       throw new HttpError(403, 'Unauthorized');
     }
 
     const newSaving = await SQL_CREATE_SAVING({
-      user_id: loggedInUserId,
+      user_id: authenticatedUserId,
       description,
       category_id,
       target_amount,

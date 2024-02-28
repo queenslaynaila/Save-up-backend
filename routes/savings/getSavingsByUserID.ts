@@ -18,10 +18,8 @@ export default (router: Router) => {
       throw new HttpError(400, 'Invalid query parameters');
     }
     const { user_id, priority, status } = validationResult.data;
-
-    const loggedInUserId = req.user!.id;
     const userRole = req.user!.role;
-    if (!hasPermission(req, loggedInUserId, userRole)) {
+    if (!hasPermission(req, user_id, userRole)) {
       throw new HttpError(403, 'Unauthorized');
     }
 

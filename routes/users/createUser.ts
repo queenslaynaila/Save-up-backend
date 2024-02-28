@@ -6,8 +6,8 @@ import { sql } from '../../db';
 import { generateToken } from '../../middleware/generatetoken';
 import { CreateUserSchema, UserSchema } from '../../types';
 
-const SQL_CREATE_USER = sql<z.infer<typeof CreateUserSchema>, UserSchema>(
-  `INSERT INTO users (first_name, last_name, phone_number, password, created_at, updated_at)
+const SQL_CREATE_USER = sql<z.infer<typeof CreateUserSchema>, UserSchema>(`
+  INSERT INTO users (first_name, last_name, phone_number, password, created_at, updated_at)
   VALUES (:first_name, :last_name, :phone_number, :password, NOW(), NOW())
   RETURNING id, first_name, last_name, phone_number, created_at, updated_at`
 );
