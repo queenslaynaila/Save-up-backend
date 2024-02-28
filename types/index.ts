@@ -57,7 +57,6 @@ export const expenseSchema = z.object({
 
 export type expenseInterface = z.infer<typeof expenseSchema>;
 
-// Extend the expenseInterface type with additional properties
 export interface ExtendedExpenseInterface extends expenseInterface {
   created_at: string;
   updated_at: string;
