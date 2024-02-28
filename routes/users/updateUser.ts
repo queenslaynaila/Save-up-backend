@@ -12,7 +12,6 @@ const SQL_UPDATE_USER = sql<z.infer<typeof UpdateUserSchema>, UserSchema>(query)
 
 export default (router: Router) => {
   router.patch('/:id', authMiddleware(), async (req, res) => {
-
     const userId = req.params.id;
     const loggedInUserRole = req.user!.role;
     if (!hasPermission(req, userId, loggedInUserRole)) {
@@ -21,10 +20,13 @@ export default (router: Router) => {
 
     const validationResult = UpdateUserSchema.safeParse(req.body);
     if (!validationResult.success) {
-      throw new HttpError(422, 'Invalid user data. Please provide valid values for all user fields.');
+      throw new HttpError(
+        422,
+        'Invalid user data. Please provide valid values for all user fields.'
+      );
     }
     const { first_name, last_name } = validationResult.data;
-    const values: z.infer<typeof UpdateUserSchema> & { id: string } = { id: userId }; 
+    const values: z.infer<typeof UpdateUserSchema> & { id: string } = { id: userId };
     if (first_name) {
       query += `first_name = :first_name, `;
       values.first_name = first_name;
@@ -35,7 +37,7 @@ export default (router: Router) => {
     }
     query = query.slice(0, -2);
     query += ` WHERE id = :id RETURNING *`;
-    values.id = userId; 
+    values.id = userId;
 
     const updatedUser = await SQL_UPDATE_USER(values).one(new HttpError(400, 'User not found'));
     res.status(200).json(updatedUser);

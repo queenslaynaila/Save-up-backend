@@ -1,13 +1,15 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { HttpError } from '../../middleware/errorMiddleware';
-import { idSchema, updateExpenseSchema,ExtendedExpenseInterface  } from '../../types';
+import { idSchema, updateExpenseSchema, ExtendedExpenseInterface } from '../../types';
 import authMiddleware from '../../middleware/auth';
 import { sql } from '../../db';
 
 let updateExpenseQuery = 'UPDATE expenses SET ';
-const SQL_UPDATE_EXPENSE = sql<z.infer<typeof updateExpenseSchema> & { id: string }, ExtendedExpenseInterface>(updateExpenseQuery);
-
+const SQL_UPDATE_EXPENSE = sql<
+  z.infer<typeof updateExpenseSchema> & { id: string },
+  ExtendedExpenseInterface
+>(updateExpenseQuery);
 
 export default (router: Router) => {
   router.patch('/:id', authMiddleware(), async (req, res) => {
@@ -47,7 +49,13 @@ export default (router: Router) => {
     updateExpenseQuery += ' WHERE id = :id RETURNING *';
     values.push(expenseId);
 
-    const result = await SQL_UPDATE_EXPENSE({ description, category_id, amount, date, id: expenseId }).one(new HttpError(400, 'Expense with given ID not found'));
+    const result = await SQL_UPDATE_EXPENSE({
+      description,
+      category_id,
+      amount,
+      date,
+      id: expenseId,
+    }).one(new HttpError(400, 'Expense with given ID not found'));
 
     res.status(200).json(result);
   });

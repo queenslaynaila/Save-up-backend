@@ -26,6 +26,5 @@ export default (router: Router) => {
     const SQL_GET_CATEGORIES = sql<{ user_id?: string }, CategorySchema>(query);
     const result = await SQL_GET_CATEGORIES({ user_id: req.query.user_id as string }).many();
     return res.json(result);
-
   });
 };

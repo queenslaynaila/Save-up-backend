@@ -4,7 +4,12 @@ import { HttpError } from '../../middleware/errorMiddleware';
 import { sql } from '../../db';
 import { ContributionSchema } from '../../types';
 
-const SQL_GET_CONTRIBUTIONS_BY_SAVING = sql<{ saving_id: string; offset: number; limit: number },ContributionSchema>(`SELECT * FROM contributions WHERE saving_id = :saving_id ORDER BY id OFFSET :offset LIMIT :limit`);
+const SQL_GET_CONTRIBUTIONS_BY_SAVING = sql<
+  { saving_id: string; offset: number; limit: number },
+  ContributionSchema
+>(
+  `SELECT * FROM contributions WHERE saving_id = :saving_id ORDER BY id OFFSET :offset LIMIT :limit`
+);
 
 export default (router: Router) => {
   router.get('/', authMiddleware(), async (req, res) => {
@@ -15,7 +20,11 @@ export default (router: Router) => {
     if (!saving_id) {
       throw new HttpError(400, 'Saving ID is required');
     }
-    const result = await SQL_GET_CONTRIBUTIONS_BY_SAVING({saving_id, offset, limit: pageSize }).many();
+    const result = await SQL_GET_CONTRIBUTIONS_BY_SAVING({
+      saving_id,
+      offset,
+      limit: pageSize,
+    }).many();
     return res.json(result);
   });
 };

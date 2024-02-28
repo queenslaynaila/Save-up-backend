@@ -7,7 +7,7 @@ import { savingInterface } from './index';
 import { updateSavingSchema } from '../../types';
 
 let query = 'UPDATE savings SET ';
-const SQL_UPDATE_SAVING = sql<z.infer<typeof updateSavingSchema>,savingInterface>(query);
+const SQL_UPDATE_SAVING = sql<z.infer<typeof updateSavingSchema>, savingInterface>(query);
 
 export default (router: Router) => {
   router.patch('/:id', authMiddleware(), async (req, res) => {
@@ -19,9 +19,13 @@ export default (router: Router) => {
       throw new HttpError(422, 'Invalid saving data');
     }
 
-    const { description, category_id, target_amount, priority, target_date } = validatedSavings.data;
+    const { description, category_id, target_amount, priority, target_date } =
+      validatedSavings.data;
 
-    const values: z.infer<typeof updateSavingSchema>&{ user_id: string; saving_id: string } = { user_id: userId, saving_id: savingId };
+    const values: z.infer<typeof updateSavingSchema> & { user_id: string; saving_id: string } = {
+      user_id: userId,
+      saving_id: savingId,
+    };
 
     if (description) {
       query += `description = :description, `;

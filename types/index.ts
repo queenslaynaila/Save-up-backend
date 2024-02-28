@@ -23,7 +23,6 @@ export const getSavingsQueryParamsSchema = z.object({
   status: z.string().optional(),
 });
 
-
 // Schema for Contribution
 // ---------------------------------------------------------------------------------------------------------
 export const contributionSchema = z.object({
@@ -130,16 +129,16 @@ export interface CategorySchema {
   description: z.ZodString;
   name: z.ZodString;
   user_id: z.ZodString;
-  created_at:Date;
-  updated_at:Date;
+  created_at: Date;
+  updated_at: Date;
 }
 //Security Question Schema
 export interface SecurityQuestionSchema {
   id: z.ZodString;
   user_id: z.ZodString;
   question: z.ZodString;
-  created_at:Date;
-  updated_at:Date;
+  created_at: Date;
+  updated_at: Date;
 }
 
 //Security Answer Schema
@@ -155,11 +154,11 @@ export const createSecurityAnswerSchema = updateSecurityAnswerSchema.extend({
 
 export interface SecurityAnswerSchema {
   id: string;
-  user_id:string;
+  user_id: string;
   question_id: string;
   answer: string;
-  created_at:Date;
-  updated_at:Date;
+  created_at: Date;
+  updated_at: Date;
 }
 
 export interface UserSchema {

@@ -24,5 +24,3 @@ export default (router: Router) => {
     return res.json({ message: 'Savings deleted successfully' });
   });
 };
-
-                                             

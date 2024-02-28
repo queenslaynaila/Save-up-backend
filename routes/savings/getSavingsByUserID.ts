@@ -8,11 +8,12 @@ import { savingInterface } from './index';
 import { getSavingsQueryParamsSchema } from '../../types';
 
 let baseQuery = `SELECT * FROM savings WHERE user_id = :user_id`;
-const SQL_GET_SAVINGS = sql<z.infer<typeof getSavingsQueryParamsSchema>, savingInterface>(baseQuery);
+const SQL_GET_SAVINGS = sql<z.infer<typeof getSavingsQueryParamsSchema>, savingInterface>(
+  baseQuery
+);
 
 export default (router: Router) => {
   router.get('/', authMiddleware(), async (req, res) => {
-
     const validationResult = getSavingsQueryParamsSchema.safeParse(req.query);
     if (!validationResult.success) {
       throw new HttpError(400, 'Invalid query parameters');
@@ -23,8 +24,8 @@ export default (router: Router) => {
       throw new HttpError(403, 'Unauthorized');
     }
 
-    const values: { user_id: string; priority?: string; status?: string } = { user_id: user_id }; 
-      
+    const values: { user_id: string; priority?: string; status?: string } = { user_id: user_id };
+
     if (priority) {
       baseQuery += ' AND priority = :priority';
       values.priority = priority;

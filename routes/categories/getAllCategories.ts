@@ -1,9 +1,11 @@
 import authMiddleware from '../../middleware/auth';
 import { Router } from 'express';
 import { sql } from '../../db';
-import { UserRole ,CategorySchema } from '../../types';
+import { UserRole, CategorySchema } from '../../types';
 
-const SQL_GET_ALL_CATEGORIES = sql<Record<string,never>, CategorySchema>(`SELECT * FROM categories LIMIT 15`);
+const SQL_GET_ALL_CATEGORIES = sql<Record<string, never>, CategorySchema>(
+  `SELECT * FROM categories LIMIT 15`
+);
 export default (router: Router) => {
   router.get(
     '/all',

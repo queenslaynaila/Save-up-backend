@@ -24,7 +24,9 @@ export default (router: Router) => {
     }
 
     const { password, phone_number } = validationResult.data;
-    const userResult = await SQL_GET_USER({ phone_number }).one(new HttpError(400, 'User not found'));
+    const userResult = await SQL_GET_USER({ phone_number }).one(
+      new HttpError(400, 'User not found')
+    );
 
     const isPasswordCorrect = await bcrypt.compare(password, userResult.password);
     if (!isPasswordCorrect) {

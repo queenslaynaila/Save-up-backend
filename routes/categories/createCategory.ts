@@ -1,11 +1,11 @@
 import authMiddleware from '../../middleware/auth';
 import { Router } from 'express';
 import { z } from 'zod';
-import { CreateCategorySchema,CategorySchema } from '../../types';
+import { CreateCategorySchema, CategorySchema } from '../../types';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { sql } from '../../db';
 
-const SQL_CREATE_CATEGORY = sql<z.infer<typeof CreateCategorySchema>,CategorySchema>(`
+const SQL_CREATE_CATEGORY = sql<z.infer<typeof CreateCategorySchema>, CategorySchema>(`
     INSERT INTO categories (user_id, name, description, created_at, updated_at)
     VALUES (:user_id, :name, :description, NOW(), NOW())
     RETURNING *
@@ -17,7 +17,7 @@ export default (router: Router) => {
     if (!validationResult.success) {
       throw new HttpError(400, 'Invalid category data');
     }
-    const { user_id, name, description } = validationResult.data; 
+    const { user_id, name, description } = validationResult.data;
     const categoryResult = await SQL_CREATE_CATEGORY({ user_id, name, description }).one();
     return res.json(categoryResult);
   });

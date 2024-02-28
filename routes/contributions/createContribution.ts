@@ -8,8 +8,7 @@ import { sql } from '../../db';
 const SQL_CREATE_CONTRIBUTION = sql<z.infer<typeof contributionSchema>, ContributionSchema>(`
     INSERT INTO contributions (saving_id, amount, date)
     VALUES (:saving_id, :amount, :date)
-    RETURNING *`
-);
+    RETURNING *`);
 
 export default (router: Router) => {
   router.post('/', authMiddleware(), async (req, res) => {

@@ -5,8 +5,7 @@ import authMiddleware from '../../middleware/auth';
 const SQL_GET_TOTAL_EXPENSES = sql<{ userId: string }, { total_expenses: number }>(`
       SELECT COALESCE(SUM(amount), 0) AS total_expenses
       FROM expenses
-      WHERE user_id = :userId`
-);
+      WHERE user_id = :userId`);
 
 export default (router: Router) => {
   router.get('/total-expenses', authMiddleware(), async (req, res) => {

@@ -19,7 +19,8 @@ export default (router: Router) => {
       throw new HttpError(400, 'Invalid saving data');
     }
 
-    const { user_id, description, category_id, target_amount, priority, target_date } = validationResult.data;
+    const { user_id, description, category_id, target_amount, priority, target_date } =
+      validationResult.data;
 
     const authenticatedUserId = req.user!.id;
     if (authenticatedUserId !== user_id) {
@@ -33,9 +34,11 @@ export default (router: Router) => {
       target_amount,
       priority,
       target_date,
-    }).one().catch(() => {
-      throw new HttpError(400, 'Selected category does not exist');
-    });
+    })
+      .one()
+      .catch(() => {
+        throw new HttpError(400, 'Selected category does not exist');
+      });
 
     return res.json(newSaving);
   });

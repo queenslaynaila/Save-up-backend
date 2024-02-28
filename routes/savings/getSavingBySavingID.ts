@@ -22,9 +22,11 @@ export default (router: Router) => {
     const queryValues: { id: string; userId?: string } = { id: savingId };
     if (userRole !== UserRole.ADMIN) {
       savingQuery += ' AND user_id = :userId';
-      queryValues.userId = loggedInUserId; 
+      queryValues.userId = loggedInUserId;
     }
-    const saving = await SQL_GET_SAVING_BY_ID(queryValues).one(new HttpError(404, 'Saving not found')); 
+    const saving = await SQL_GET_SAVING_BY_ID(queryValues).one(
+      new HttpError(404, 'Saving not found')
+    );
     return res.json(saving);
   });
 };

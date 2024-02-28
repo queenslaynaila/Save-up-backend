@@ -1,7 +1,7 @@
 import authMiddleware from '../../middleware/auth';
 import { Router } from 'express';
 import { HttpError } from '../../middleware/errorMiddleware';
-import { UserRole, idSchema,ExtendedExpenseInterface } from '../../types';
+import { UserRole, idSchema, ExtendedExpenseInterface } from '../../types';
 import { sql } from '../../db';
 
 let query = 'SELECT * FROM expenses WHERE id = :id';

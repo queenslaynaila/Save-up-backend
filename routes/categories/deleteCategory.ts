@@ -16,8 +16,8 @@ export default (router: Router) => {
     }
     const categoryId = validationResult.data;
     const userId = req.user!.id;
-    const idDeleted = await SQL_DELETE_CATEGORY({id:categoryId, user_id: userId }).oneOrNull();
-    if (!idDeleted ) {
+    const idDeleted = await SQL_DELETE_CATEGORY({ id: categoryId, user_id: userId }).oneOrNull();
+    if (!idDeleted) {
       throw new HttpError(404, 'Category not found');
     }
     return res.json({ message: 'Category deleted successfully' });
