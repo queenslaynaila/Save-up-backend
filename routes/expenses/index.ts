@@ -3,7 +3,7 @@ import createExpense from './createExpense';
 import deleteExpense from './deleteExpense';
 import getAllExpenses from './getAllExpenses';
 import getExpenseById from './getExpenseById';
-import getFilteredExpenses from './getFilteredExpenses';
+import getExpensesByUserId from './getExpensesByUserId';
 import updateExpense from './updateExpense';
 
 export default (baseRouter: express.Router) => {
@@ -12,7 +12,7 @@ export default (baseRouter: express.Router) => {
   deleteExpense(router);
   getAllExpenses(router);
   getExpenseById(router);
-  getFilteredExpenses(router);
+  getExpensesByUserId(router);
   updateExpense(router);
 
   baseRouter.use('/expenses', router);
