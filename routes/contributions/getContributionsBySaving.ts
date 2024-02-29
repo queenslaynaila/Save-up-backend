@@ -5,8 +5,8 @@ import { sql } from '../../db';
 import { ContributionSchema } from '../../types';
 
 const SQL_GET_CONTRIBUTIONS_BY_SAVING = sql<
-  { saving_id: string; offset: number; limit: number },
-  ContributionSchema
+{ saving_id: string; offset: number; limit: number },
+ContributionSchema
 >(
   `SELECT * FROM contributions WHERE saving_id = :saving_id ORDER BY id OFFSET :offset LIMIT :limit`
 );
