@@ -10,8 +10,8 @@ export default (router: Router) => {
     const userQuery =
       'SELECT id, first_name, last_name, role, created_at, updated_at FROM users WHERE phone_no = :phoneNo';
     const SQL_GET_USER = sql<
-      { phoneNo: string },
-      Pick<UserSchema, 'id' | 'first_name' | 'last_name' | 'role' | 'created_at' | 'updated_at'>
+    { phoneNo: string },
+    Pick<UserSchema, 'id' | 'first_name' | 'last_name' | 'role' | 'created_at' | 'updated_at'>
     >(userQuery);
     const user = await SQL_GET_USER({ phoneNo }).one();
 
