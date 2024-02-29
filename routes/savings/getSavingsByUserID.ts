@@ -7,10 +7,7 @@ import { sql } from '../../db';
 import { savingInterface } from './index';
 import { getSavingsQueryParamsSchema } from '../../types';
 
-let baseQuery = `SELECT * FROM savings WHERE user_id = :user_id`;
-const SQL_GET_SAVINGS = sql<z.infer<typeof getSavingsQueryParamsSchema>, savingInterface>(
-  baseQuery
-);
+const SQL_GET_SAVINGS = (query: string) => sql<z.infer<typeof getSavingsQueryParamsSchema>, savingInterface>(query);
 
 export default (router: Router) => {
   router.get('/', authMiddleware(), async (req, res) => {
@@ -24,19 +21,21 @@ export default (router: Router) => {
       throw new HttpError(403, 'Unauthorized');
     }
 
-    const values: { user_id: string; priority?: string; status?: string } = { user_id: user_id };
+    let query = `SELECT * FROM savings WHERE user_id = :user_id`;
+    const values: { user_id: string; priority?: string; status?: string } = { user_id };
 
     if (priority) {
-      baseQuery += ' AND priority = :priority';
+      query += ' AND priority = :priority';
       values.priority = priority;
     }
     if (status) {
-      baseQuery += ' AND status = :status';
+      query += ' AND status = :status';
       values.status = status;
     }
 
-    baseQuery += ' LIMIT 15';
-    const savings = await SQL_GET_SAVINGS(values).many();
+    query += ' LIMIT 15';
+
+    const savings = await SQL_GET_SAVINGS(query)(values).many();
     return res.json(savings);
   });
 };

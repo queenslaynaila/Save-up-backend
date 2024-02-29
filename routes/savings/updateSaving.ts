@@ -6,8 +6,7 @@ import { sql } from '../../db';
 import { savingInterface } from './index';
 import { updateSavingSchema } from '../../types';
 
-let query = 'UPDATE savings SET ';
-const SQL_UPDATE_SAVING = sql<z.infer<typeof updateSavingSchema>, savingInterface>(query);
+const SQL_UPDATE_SAVING = (updated: string) => sql<z.infer<typeof updateSavingSchema>, savingInterface>(updated);
 
 export default (router: Router) => {
   router.patch('/:id', authMiddleware(), async (req, res) => {
@@ -26,31 +25,34 @@ export default (router: Router) => {
       user_id: userId,
       saving_id: savingId,
     };
-
+    const query = 'UPDATE savings SET ';
+    let param = ''
     if (description) {
-      query += `description = :description, `;
+      param += `description = :description`;
       values.description = description;
     }
     if (category_id) {
-      query += `category_id = :category_id, `;
+      param += `category_id = :category_id, `;
       values.category_id = category_id;
     }
     if (target_amount) {
-      query += `target_amount = :target_amount, `;
+      param += `target_amount = :target_amount, `;
       values.target_amount = target_amount;
     }
     if (priority) {
-      query += `priority = :priority, `;
+      param += `priority = :priority, `;
       values.priority = priority;
     }
     if (target_date) {
-      query += `target_date = :target_date, `;
+      param += `target_date = :target_date, `;
       values.target_date = target_date;
     }
-
-    query = query.slice(0, -2);
-    query += ' WHERE user_id = :user_id AND id = :saving_id RETURNING *';
-    const result = await SQL_UPDATE_SAVING(values).one();
+    param += ' WHERE user_id = :user_id AND id = :saving_id RETURNING *';
+    const updated = query + param
+   
+    
+    const result = await SQL_UPDATE_SAVING(updated)(values).one();
+   
     return res.json(result);
   });
 };

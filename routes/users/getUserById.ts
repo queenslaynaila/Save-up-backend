@@ -6,7 +6,7 @@ import { idSchema } from '../../types';
 import { sql } from '../../db';
 import { UserSchema } from './index';
 
-const SQL_GET_USER_BY_ID = sql<{ userId: string }, UserSchema>(
+const SQL_GET_USER_BY_ID = sql<{ id: string }, UserSchema>(
   `SELECT id, first_name, last_name, phone_number, role, created_at, updated_at FROM users  WHERE id = :id`
 );
 
@@ -17,13 +17,13 @@ export default (router: Router) => {
       throw new HttpError(400, 'Invalid data');
     }
 
-    const userId = validationResult.data;
+    const id = validationResult.data;
     const loggedInUserRole = req.user!.role;
-    if (!hasPermission(req, userId, loggedInUserRole)) {
+    if (!hasPermission(req, id, loggedInUserRole)) {
       return res.status(403).json({ message: 'Unauthorized access' });
     }
 
-    const user = await SQL_GET_USER_BY_ID({ userId }).one(new HttpError(404, 'User not found'));
+    const user = await SQL_GET_USER_BY_ID({ id }).one(new HttpError(404, 'User not found'));
     res.json(user);
   });
 };
