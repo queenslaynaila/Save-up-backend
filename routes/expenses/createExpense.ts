@@ -5,12 +5,11 @@ import { expenseSchema, ExtendedExpenseInterface } from '../../types';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { sql } from '../../db';
 
-const SQL_CREATE_EXPENSES = sql<
-  z.infer<typeof expenseSchema>,
-  ExtendedExpenseInterface
->(`INSERT INTO expenses (description, category_id, amount, date, user_id)
-VALUES (:description, :category_id, :amount, :date, :user_id)
-RETURNING *`);
+const SQL_CREATE_EXPENSES = sql<z.infer<typeof expenseSchema>,  ExtendedExpenseInterface>(
+  `INSERT INTO expenses (description, category_id, amount, date, user_id)
+  VALUES (:description, :category_id, :amount, :date, :user_id)
+  RETURNING *`
+);
 
 export default (router: Router) => {
   router.post('/', authMiddleware(), async (req, res) => {
