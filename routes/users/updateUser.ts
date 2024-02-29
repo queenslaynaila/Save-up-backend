@@ -40,9 +40,6 @@ export default (router: Router) => {
     query = query.slice(0, -2);
     query += ` WHERE id = :id RETURNING *`;
 
-    console.log(query);
-
-    
     const updatedUser = await SQL_UPDATE_USER(query)(values).one(new HttpError(400, 'User not found'));
 
     res.status(200).json(updatedUser);
