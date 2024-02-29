@@ -27,9 +27,9 @@ export default (router: Router) => {
       password: passwordHash,
     })
       .one()
-      // .catch(() => {
-      //   throw new HttpError(400, 'An account with the provided phone number already exists');
-      // });
+      .catch(() => {
+        throw new HttpError(400, 'An account with the provided phone number already exists');
+      });
 
     const token = generateToken(newUser.id, newUser.role);
     res.setHeader('X-Auth-Token', token).json(newUser);
