@@ -25,10 +25,12 @@ export default (router: Router) => {
       user_id: userId,
       saving_id: savingId,
     };
+
     const query = 'UPDATE savings SET ';
-    let param = ''
+    let param = '';
+    
     if (description) {
-      param += `description = :description`;
+      param += `description = :description, `;
       values.description = description;
     }
     if (category_id) {
@@ -47,9 +49,11 @@ export default (router: Router) => {
       param += `target_date = :target_date, `;
       values.target_date = target_date;
     }
-    param += ' WHERE user_id = :user_id AND id = :saving_id RETURNING *';
-    const updated = query + param
    
+    param = param.slice(0, -2);
+    
+
+    const updated = `${query}${param} WHERE user_id = :user_id AND id = :saving_id RETURNING *`;
     
     const result = await SQL_UPDATE_SAVING(updated)(values).one();
    
