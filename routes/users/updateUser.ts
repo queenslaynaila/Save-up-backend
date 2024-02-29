@@ -7,8 +7,7 @@ import { UserSchema } from './index';
 import { sql } from '../../db';
 import { hasPermission } from '../../middleware/hasPermission';
 
-let query = 'UPDATE users SET ';
-const SQL_UPDATE_USER = sql<z.infer<typeof UpdateUserSchema>, UserSchema>(query);
+const SQL_UPDATE_USER = (query: string) => sql<z.infer<typeof UpdateUserSchema>, UserSchema>(query);
 
 export default (router: Router) => {
   router.patch('/:id', authMiddleware(), async (req, res) => {
@@ -25,8 +24,11 @@ export default (router: Router) => {
         'Invalid user data. Please provide valid values for all user fields.'
       );
     }
+
     const { first_name, last_name } = validationResult.data;
     const values: z.infer<typeof UpdateUserSchema> & { id: string } = { id: userId };
+
+    let query = 'UPDATE users SET ';
     if (first_name) {
       query += `first_name = :first_name, `;
       values.first_name = first_name;
@@ -37,9 +39,13 @@ export default (router: Router) => {
     }
     query = query.slice(0, -2);
     query += ` WHERE id = :id RETURNING *`;
-    values.id = userId;
 
-    const updatedUser = await SQL_UPDATE_USER(values).one(new HttpError(400, 'User not found'));
+    console.log(query);
+
+    
+    const updatedUser = await SQL_UPDATE_USER(query)(values).one(new HttpError(400, 'User not found'));
+
     res.status(200).json(updatedUser);
   });
 };
+
