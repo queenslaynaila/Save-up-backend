@@ -108,24 +108,33 @@ CREATE FUNCTION update_saving_status()
 RETURNS TRIGGER AS $$
 DECLARE
     total_contributions NUMERIC(30, 3);
+    saving_target_date TIMESTAMP WITH TIME ZONE; 
 BEGIN
     SELECT COALESCE(SUM(amount), 0) INTO total_contributions
     FROM contributions
     WHERE saving_id = NEW.saving_id; 
 
+    SELECT target_date INTO saving_target_date
+    FROM savings
+    WHERE id = NEW.saving_id;
+
     IF total_contributions >= (SELECT target_amount FROM savings WHERE id = NEW.saving_id) THEN
         UPDATE savings
-        SET status = 'Completed'
+        SET status = 'Completed',
+            completed_date = CURRENT_DATE
         WHERE id = NEW.saving_id;
     ELSE
-       IF CURRENT_DATE > (NEW.target_date + INTERVAL '90 days') THEN
-            NEW.status = 'Dormant';
+        IF CURRENT_DATE > (saving_target_date + INTERVAL '90 days') THEN
+            UPDATE savings
+            SET status = 'Dormant'
+            WHERE id = NEW.saving_id;
         END IF;
     END IF;
 
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
+
 
 CREATE TRIGGER contributions_trigger
 AFTER INSERT ON contributions
