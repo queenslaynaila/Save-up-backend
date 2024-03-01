@@ -3,12 +3,13 @@ import { sql } from '../../db';
 import authMiddleware from '../../middleware/auth';
 import { HttpError } from '../../middleware/errorMiddleware';
 
-const calculateTotalSavingsByCustomTimeframe = sql<{ userId: string, startDate: string, endDate: string }, { totalExpense: number }>(`
-    SELECT COALESCE(SUM(amount), 0) AS totalExpense
-    FROM savings
+const calculateTotalSavingsByCustomTimeframe = sql<{ userId: string, startDate: string, endDate: string }, { totalTargetAmount: number }>(`
+    SELECT COALESCE(SUM(target_amount), 0) AS totalTargetAmount
+    FROM savings 
     WHERE user_id = :userId
-    AND date >= :startDate
-    AND date <= :endDate`);
+    AND start_date >= :startDate
+    AND start_date <= :endDate
+`);
 
 export default (router: Router) => {
   router.get('/total-savings-by-time', authMiddleware(), async (req, res) => {
@@ -22,7 +23,7 @@ export default (router: Router) => {
     startDate = new Date(startDate as string).toISOString(); 
     endDate = new Date(endDate as string).toISOString(); 
     const result = await calculateTotalSavingsByCustomTimeframe ({ userId, startDate, endDate }).one();
-    const totalExpense = result.totalExpense;
-    res.json({ totalExpense });
+    
+    res.json(result);
   });
 };

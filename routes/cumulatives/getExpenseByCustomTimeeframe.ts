@@ -22,7 +22,6 @@ export default (router: Router) => {
     startDate = new Date(startDate as string).toISOString(); 
     endDate = new Date(endDate as string).toISOString(); 
     const result = await calculateTotalExpenseByCustomTimeframe({ userId, startDate, endDate }).one();
-    const totalExpense = result.totalExpense;
-    res.json({ totalExpense });
+    res.json(result);
   });
 };
