@@ -6,7 +6,7 @@ import { HttpError } from '../../middleware/errorMiddleware';
 const SQL_GET_CUMULATIVES = (query: string) => sql<{ operator: string;tableName: string }, { totals: number }>(query);
 
 export default (router: Router) => {
-  router.get('/cumulatives', authMiddleware(), async (req, res) => {
+  router.get('/aggregates', authMiddleware(), async (req, res) => {
     let operator = req.query.operator as string;
     const tableName = req.query.tableName as string;
 
