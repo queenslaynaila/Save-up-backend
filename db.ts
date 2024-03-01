@@ -10,5 +10,6 @@ export const {sql, shutdown: closeDbConnection} = createBasicSQL({
   password:  process.env.PG_PASSWORD,
   disablePooling:Boolean(process.env.PG_BOUNCER_ENABLED) || true,
   max: 60,
+  ssl: Boolean(process.env.SSL) || true
 });
 
