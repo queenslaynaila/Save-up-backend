@@ -54,6 +54,15 @@ CREATE TABLE IF NOT EXISTS savings (
   updated_at    TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+ALTER TABLE savings
+ADD COLUMN completed_date DATE;
+UPDATE savings
+SET completed_date = CASE
+                   WHEN status = 'Completed' THEN CURRENT_DATE  
+                   ELSE NULL 
+END;
+
+
 CREATE  INDEX savings_user_id_idx  ON savings (user_id);
 CREATE  INDEX savings_category_idx ON savings (category_id);
 CREATE  INDEX savings_priority_idx ON savings (priority);
@@ -108,6 +117,10 @@ BEGIN
         UPDATE savings
         SET status = 'Completed'
         WHERE id = NEW.saving_id;
+    ELSE
+       IF CURRENT_DATE > (NEW.target_date + INTERVAL '90 days') THEN
+            NEW.status = 'Dormant';
+        END IF;
     END IF;
 
     RETURN NEW;

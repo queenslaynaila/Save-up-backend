@@ -1,11 +1,13 @@
 import { Router } from 'express';
 import createAdmin from './createAdmin';
-import cumulatives from './cumulatives';
+import getTableAgregates from './getTableAgregates';
+import getCompletedSavings from './getCompletedSavings';
 
 export default (baseRouter: Router) => {
   const router = Router();
   createAdmin(router);
-  cumulatives(router);
+  getTableAgregates(router);
+  getCompletedSavings(router);
 
   baseRouter.use('/admin', router);
 };
