@@ -2,7 +2,6 @@ import { Router } from 'express';
 import { UserRole } from '../../types/index';
 import createUser from './createUser';
 import getAllUsers from './getAllUsers';
-import getUserById from './getUserById';
 import login from './login';
 import signOut from './signOut';
 import updateUser from './updateUser';
@@ -22,7 +21,6 @@ export default (baseRouter: Router) => {
 
   getAllUsers(router);
   createUser(router);
-  getUserById(router);
   updateUser(router);
   login(router);
   signOut(router);
