@@ -18,6 +18,7 @@
     "@m-pot/sql-query": "^2.0.11",
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.2",
+    "bull": "^4.12.2",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "dotenv": "^16.4.4",
@@ -32,6 +33,7 @@
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
     "@types/body-parser": "^1.19.5",
+    "@types/bull": "^4.10.0",
     "@types/cookie-parser": "^1.4.6",
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
