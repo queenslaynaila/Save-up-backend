@@ -62,6 +62,9 @@ SET completed_date = CASE
                    ELSE NULL 
 END;
 
+ALTER TABLE savings
+RENAME target_amount to amount
+
 
 CREATE  INDEX savings_user_id_idx  ON savings (user_id);
 CREATE  INDEX savings_category_idx ON savings (category_id);
@@ -103,6 +106,23 @@ CREATE TABLE IF NOT EXISTS contributions (
   date       TIMESTAMP WITH TIME ZONE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
+
+ALTER TABLE contributions
+ADD COLUMN month integer;
+
+CREATE OR REPLACE FUNCTION update_contribution_month_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.month := EXTRACT(MONTH FROM NEW.date);
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER update_contribution_month_column
+BEFORE INSERT ON contributions
+FOR EACH ROW
+EXECUTE FUNCTION update_contribution_month_column();
+
 
 CREATE FUNCTION update_saving_status()
 RETURNS TRIGGER AS $$
@@ -155,17 +175,19 @@ CREATE TABLE IF NOT EXISTS expenses (
 );
 
 -- trigger function to update  month column
-CREATE OR REPLACE FUNCTION update_month_column()
+CREATE OR REPLACE FUNCTION update_expense_month_column()
 RETURNS TRIGGER AS $$
 BEGIN
-    NEW.month = EXTRACT(MONTH FROM NEW.date);
+    NEW.month := EXTRACT(MONTH FROM NEW.date);
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
+
 CREATE TRIGGER update_month_trigger
 BEFORE INSERT OR UPDATE OF date ON expenses
 FOR EACH ROW
-EXECUTE FUNCTION update_month_column();
+EXECUTE FUNCTION update_expense_month_column();
+
 
 CREATE INDEX expenses_user_id_idx ON expenses (user_id);
 CREATE INDEX expenses_category_idx ON expenses (category_id);

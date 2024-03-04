@@ -2,7 +2,8 @@ import { Router, Request, Response } from 'express';
 import { ExtendedExpenseInterface } from '../../types';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/auth';
-
+import { UserRole } from '../../types';
+import { HttpError } from '../../middleware/errorMiddleware';
 
 const baseQuery = `SELECT * FROM expenses `;
 const SQL_GET_EXPENSES = (baseQuery: string) => sql<Record<string, string>, ExtendedExpenseInterface>(baseQuery);
@@ -17,9 +18,10 @@ export default (router: Router) => {
       const loggedInUserId = req.user!.id;
       queryParams.userId = loggedInUserId;
       filters.push(`user_id = '${loggedInUserId}'`);
-    } else if (expenseIdentifier !== 'all' ) {
-      filters.push(`user_id = :userId`);
+    } else if (expenseIdentifier == 'all' && req.user!.role === UserRole.ADMIN ) {
       queryParams.userId = expenseIdentifier; 
+    } else {
+      throw new HttpError(403, 'Unauthorized');
     }
     if (req.query.category_id) {
       queryParams.category_id = req.query.category_id as string;

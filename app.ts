@@ -13,8 +13,9 @@ import passwordRoutes from './routes/password/index';
 import securityQuestionsRoutes from './routes/securityQuestions';
 import securityAnswerRoutes from './routes/securityAnswer/index';
 import cumulativesRoutes from './routes/cumulatives/index';
+//import { updateSavingStatus } from './cronT'
 const app = express();
-
+//updateSavingStatus();
 // Middleware
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
