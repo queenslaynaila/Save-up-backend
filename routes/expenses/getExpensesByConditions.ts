@@ -22,7 +22,7 @@ export default (router: Router) => {
       queryParams.user_id = loggedInUserId;
       filters.push(`user_id = '${loggedInUserId}'`);
     } else if (expenseIdentifier === 'all') {
-      if (!isStandardUser) {
+      if (isStandardUser) {
         throw new HttpError(403, 'Unauthorized');
       }
     } else if (UUIDSchema.parse(expenseIdentifier)) {
