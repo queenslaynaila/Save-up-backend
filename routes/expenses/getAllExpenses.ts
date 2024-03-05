@@ -14,7 +14,7 @@ export default (router: Router) => {
     const queryParams: { userId?: string; month?: string; category_id?: string } = {};
     const filters: string[] = [];
     const loggedInUserId = req.user!.id;
-    const isStandardUser = req.user?.role === 'user';
+    const isStandardUser = req.user?.role === 'User';
 
     switch (expenseIdentifier) {
       case 'me':

@@ -18,7 +18,7 @@ export default (router: Router) => {
 
     const convertedStatus = status ? convertToTitleCase(status) : undefined;
     const convertedPriority = priority ? convertToTitleCase(priority) : undefined;
-    const isStandardUser = req.user?.role === 'user';
+    const isStandardUser = req.user?.role === 'User';
 
     switch (savingsIdentifier) {
       case 'me':

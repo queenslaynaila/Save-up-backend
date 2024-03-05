@@ -11,7 +11,7 @@ export default (router: Router) => {
     const { contributionsIdentifier } = req.params; 
     const { category_id, month, saving_id,user_id } = req.query as { category_id?: string; month?: string; saving_id?: string ;user_id?: string; };
     const loggedInUserId = req.user!.id;
-    const isStandardUser = req.user?.role === 'user';
+    const isStandardUser = req.user?.role === 'User';
     const queryParams: { user_id?: string; saving_id?: string; month?: string; category_id?: string } = {};
     const filters: string[] = [];
 
