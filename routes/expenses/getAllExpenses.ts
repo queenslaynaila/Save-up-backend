@@ -2,7 +2,6 @@ import { Router, Request, Response } from 'express';
 import { ExtendedExpenseInterface } from '../../types';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/auth';
-import { UserRole } from '../../types';
 import { HttpError } from '../../middleware/errorMiddleware';
 
 
@@ -15,6 +14,7 @@ export default (router: Router) => {
     const queryParams: { userId?: string; month?: string; category_id?: string } = {};
     const filters: string[] = [];
     const loggedInUserId = req.user!.id;
+    const isStandardUser = req.user?.role === 'user';
 
     switch (expenseIdentifier) {
       case 'me':
@@ -22,7 +22,7 @@ export default (router: Router) => {
         filters.push(`user_id = '${loggedInUserId}'`);
         break;
       case 'all':
-        if (req.user!.role === UserRole.ADMIN) {
+        if (!isStandardUser) {
           null
         } else {
           throw new HttpError(403, 'Unauthorized');
