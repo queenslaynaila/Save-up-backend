@@ -39,7 +39,9 @@ export default (router: Router) => {
     if (category_id) filters.push(`category_id = '${category_id}'`);
     if (convertedPriority && isValidValue(convertedPriority, ACCEPTED_PRIORITY_VALUES)) filters.push(`priority = '${convertedPriority}'`);
     if (convertedStatus && isValidValue(convertedStatus, ACCEPTED_STATUS_VALUES)) filters.push(`status = '${convertedStatus}'`);
-    const expenses = await SQL_GET_SAVINGS(queryParams).extend(` WHERE ${filters.join(' AND ')}` ,queryParams).many();
+
+    const queryString = filters.length > 0 ? ` WHERE ${filters.join(' AND ')}` : '';
+    const expenses = await SQL_GET_SAVINGS(queryParams).extend(queryString ,queryParams).many();
     res.json(expenses);
   });
 };
