@@ -1,8 +1,7 @@
 import express from 'express';
 import createSaving from './createSaving';
 import deleteSaving from './deleteSaving';
-import getAllSavings from './getAllSavings';
-import getSavingsByUserID from './getSavingsByUserID';
+import getSavingsByConditions from './getSavingsByConditions';
 import getSavingBySavingID from './getSavingBySavingID';
 import updateSaving from './updateSaving';
 
@@ -24,8 +23,7 @@ export default (baseRouter: express.Router) => {
   const router = express.Router();
   createSaving(router);
   deleteSaving(router);
-  getAllSavings(router);
-  getSavingsByUserID(router);
+  getSavingsByConditions(router);
   updateSaving(router);
   getSavingBySavingID(router);
 

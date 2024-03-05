@@ -5,41 +5,43 @@ import authMiddleware from '../../middleware/auth';
 import { UserRole } from '../../types';
 import { HttpError } from '../../middleware/errorMiddleware';
 
-const baseQuery = `SELECT * FROM expenses `;
-const SQL_GET_EXPENSES = (baseQuery: string) => sql<Record<string, string>, ExtendedExpenseInterface>(baseQuery);
+
+const SQL_GET_EXPENSES = sql<Record<string, string>, ExtendedExpenseInterface>(`SELECT * FROM expenses`);
 
 export default (router: Router) => {
   router.get('/:expenseIdentifier', authMiddleware(), async (req: Request, res: Response) => {
     const { expenseIdentifier } = req.params; 
+    const { category_id, month } = req.query as { category_id?: string; month?: string; };
     const queryParams: { userId?: string; month?: string; category_id?: string } = {};
     const filters: string[] = [];
+    const loggedInUserId = req.user!.id;
 
-    if (expenseIdentifier === 'me') {
-      const loggedInUserId = req.user!.id;
-      queryParams.userId = loggedInUserId;
-      filters.push(`user_id = '${loggedInUserId}'`);
-    } else if (expenseIdentifier == 'all' && req.user!.role === UserRole.ADMIN ) {
-      queryParams.userId = expenseIdentifier; 
-    } else {
-      throw new HttpError(403, 'Unauthorized');
+    switch (expenseIdentifier) {
+      case 'me':
+        queryParams.userId = loggedInUserId;
+        filters.push(`user_id = '${loggedInUserId}'`);
+        break;
+      case 'all':
+        if (req.user!.role === UserRole.ADMIN) {
+          null
+        } else {
+          throw new HttpError(403, 'Unauthorized');
+        }
+        break;
+      default:
+        throw new HttpError(400, 'Bad request');
     }
-    if (req.query.category_id) {
-      queryParams.category_id = req.query.category_id as string;
-      filters.push(`category_id = '${queryParams.category_id}'`);
+  
+    if (category_id) {
+      queryParams.category_id = category_id; 
+      filters.push(`category_id = '${category_id}'`);
     }
-    if (req.query.month) {
-      queryParams.month = req.query.month as string;
-      filters.push(`month = '${queryParams.month}'`);
+    if (month) {
+      queryParams.month = month; 
+      filters.push(`month = '${month}'`);
     }
-    let whereClause = '';
-    if (filters.length > 0) {
-      whereClause = ` WHERE ${filters.join(' AND ')}`;
-    }
-
-    const modifiedQuery = `${baseQuery}${whereClause}`;
-    console.log(modifiedQuery);
-    console.log(queryParams);
-    const expenses = await SQL_GET_EXPENSES(modifiedQuery)(queryParams).many();
+    const queryString = filters.length > 0 ? ` WHERE ${filters.join(' AND ')}` : '';
+    const expenses = await SQL_GET_EXPENSES(queryParams).extend(queryString, queryParams).many();
     res.json(expenses);
   });
 };

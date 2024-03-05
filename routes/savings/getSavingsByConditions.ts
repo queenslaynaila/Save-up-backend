@@ -20,17 +20,20 @@ export default (router: Router) => {
     const convertedPriority = priority ? convertToTitleCase(priority) : undefined;
     const isStandardUser = req.user?.role === 'user';
 
-    if (savingsIdentifier === 'me') {
-      queryParams.user_id = req.user!.id;
-      filters.push(`user_id = '${queryParams.user_id}'`)
-    } else if(savingsIdentifier === 'all' && !isStandardUser) {
-      //if its all and user is admin or moderator basequery stays the same so nothing
-      null
-    } else if (savingsIdentifier === 'all' && isStandardUser) {
-      throw new HttpError(400, 'Unauthorized');
-    } else {
-      throw new HttpError(400, 'Invalid ');
+    switch (savingsIdentifier) {
+      case 'me':
+        queryParams.user_id = req.user!.id;
+        filters.push(`user_id = '${queryParams.user_id}'`);
+        break;
+      case 'all':
+        if (isStandardUser) {
+          throw new HttpError(401, 'Unauthorized');
+        }
+        break;
+      default:
+        throw new HttpError(400, 'Bad request');
     }
+    
 
     if (user_id) filters.push(`user_id = '${user_id}'`);
     if (category_id) filters.push(`category_id = '${category_id}'`);

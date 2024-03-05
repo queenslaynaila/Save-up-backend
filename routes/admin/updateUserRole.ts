@@ -5,18 +5,20 @@ import { UserSchema } from '../../routes/users/index';
 import authMiddleware from '../../middleware/auth';
 import { UserRole } from '../../types';
 
-const VALID_ROLES = ['admin', 'user','moderator'];
+const VALID_ROLES = ['admin', 'user', 'moderator'];
 
-const SQL_UPDATE_ROLE = sql<{ userId: string, roleToUpdate: string }, UserSchema>(`UPDATE users SET role =:roleToUpdate WHERE id = :userId`);
+const SQL_UPDATE_ROLE = sql<{ roleToUpdate: string, id: string }, UserSchema>(`UPDATE users SET role = :roleToUpdate WHERE id = :id`);
 
 export default (router: Router) => {
-  router.patch('/:roleToUpdate',authMiddleware({roles: [UserRole.ADMIN]}), async (req, res) => {
-    const { roleToUpdate } = req.params;
-    const { userId } = req.body;
-    if (!VALID_ROLES.includes(roleToUpdate.toLowerCase() )) {
+  router.patch('/:roleToUpdate/:id', authMiddleware({ roles: [UserRole.ADMIN] }), async (req, res) => {
+    let { roleToUpdate } = req.params;
+    const { id } = req.params;
+    roleToUpdate = roleToUpdate.toLowerCase();
+    if (!VALID_ROLES.includes(roleToUpdate)) {
       throw new HttpError(400, 'Invalid role.');
     }
-    const result = await SQL_UPDATE_ROLE({userId,roleToUpdate}).one();
+    console.log(SQL_UPDATE_ROLE({ id, roleToUpdate }));
+    const result = await SQL_UPDATE_ROLE({  roleToUpdate ,id}).one();
     res.json(result);
   });
 };
