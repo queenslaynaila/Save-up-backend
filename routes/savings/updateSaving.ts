@@ -18,7 +18,7 @@ export default (router: Router) => {
       throw new HttpError(422, 'Invalid saving data');
     }
 
-    const { description, category_id, target_amount, priority, target_date } =
+    const { description, category_id, amount, priority, target_date } =
       validatedSavings.data;
 
     const values: z.infer<typeof updateSavingSchema> & { user_id: string; saving_id: string } = {
@@ -37,9 +37,9 @@ export default (router: Router) => {
       param += `category_id = :category_id, `;
       values.category_id = category_id;
     }
-    if (target_amount) {
-      param += `target_amount = :target_amount, `;
-      values.target_amount = target_amount;
+    if (amount) {
+      param += `amount = :amount, `;
+      values.amount = amount;
     }
     if (priority) {
       param += `priority = :priority, `;

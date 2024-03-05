@@ -3,11 +3,16 @@ import { z } from 'zod';
 // ---------------------------------------------------------------------------------------------------------
 export const idSchema = z.string().uuid();
 
+export const enum priority {
+  HIGH = 'High',
+  INTERMEDIATE = 'Intermediate',
+  LOW = 'Low',
+}
 export const baseSavingSchema = z.object({
   description: z.string(),
   category_id: z.string().uuid(),
-  target_amount: z.number(),
-  priority: z.string(),
+  amount: z.number(),
+  priority: z.enum([priority.HIGH, priority.INTERMEDIATE, priority.LOW]),
   target_date: z.string(),
 });
 
@@ -71,9 +76,9 @@ export const updateExpenseSchema = z.object({
 // User Schemas
 // ---------------------------------------------------------------------------------------------------------
 export const enum UserRole {
-  ADMIN = 'admin',
-  USER = 'user',
-  MODERATOR = 'moderator',
+  ADMIN = 'Admin',
+  USER = 'User',
+  MODERATOR = 'Moderator',
 }
 
 const BaseUserSchema = z.object({
@@ -91,7 +96,7 @@ export const CreateUserSchema = BaseUserSchema.extend({
 export const UpdateUserSchema = BaseUserSchema.partial();
 
 export const CreateAdminSchema = CreateUserSchema.extend({
-  role: z.enum(['admin']),
+  role: z.enum(['Admin']),
 });
 
 export const UserSchema = CreateUserSchema.extend({

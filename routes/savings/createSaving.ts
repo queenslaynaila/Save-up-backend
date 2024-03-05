@@ -7,8 +7,8 @@ import { sql } from '../../db';
 import { savingInterface } from './index';
 
 const SQL_CREATE_SAVING = sql<z.infer<typeof savingSchema>, savingInterface>(`
-  INSERT INTO savings (user_id, description, category_id, target_amount, priority, target_date, created_at, updated_at)
-  VALUES (:user_id, :description, :category_id, :target_amount, :priority, :target_date, NOW(), NOW()) 
+  INSERT INTO savings (user_id, description, category_id, amount, priority, target_date, created_at, updated_at)
+  VALUES (:user_id, :description, :category_id, :amount, :priority, :target_date, NOW(), NOW()) 
   RETURNING *
 `);
 
@@ -19,7 +19,7 @@ export default (router: Router) => {
       throw new HttpError(400, 'Invalid saving data');
     }
 
-    const { user_id, description, category_id, target_amount, priority, target_date } =
+    const { user_id, description, category_id, amount, priority, target_date } =
       validationResult.data;
 
     const authenticatedUserId = req.user!.id;
@@ -31,7 +31,7 @@ export default (router: Router) => {
       user_id: authenticatedUserId,
       description,
       category_id,
-      target_amount,
+      amount,
       priority,
       target_date,
     })

@@ -1,13 +1,13 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
-CREATE TYPE role_enum AS ENUM ('admin','user','moderator');
+CREATE TYPE role_enum AS ENUM ('Admin','User','Moderator');
 
 CREATE TABLE IF NOT EXISTS users (
   id            uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
   first_name    VARCHAR(255) NOT NULL,
   last_name     VARCHAR(255) NOT NULL,
   phone_number  VARCHAR(255) UNIQUE,
-  role          role_enum NOT NULL DEFAULT 'user',
+  role          role_enum NOT NULL DEFAULT 'User',
   password      VARCHAR(255) NOT NULL,
   created_at    TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at    TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -40,13 +40,15 @@ VALUES (NULL, 'Food', 'All food related expenses'),
 
 CREATE TYPE status_enum AS ENUM ('In Progress', 'Completed', 'Dormant');
 
+CREATE TYPE priority_enum AS ENUM ('High', 'Intermediate', 'Low');
+
 CREATE TABLE IF NOT EXISTS savings (
   id            uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id       uuid REFERENCES users (id) ON DELETE CASCADE,
   description   VARCHAR(255) NOT NULL,
   category_id   uuid REFERENCES categories (id),
   target_amount NUMERIC(30, 3) NOT NULL,
-  priority      VARCHAR(255),
+  priority      priority_enum,
   status        status_enum DEFAULT 'In Progress',
   target_date   TIMESTAMP WITH TIME ZONE,
   start_date    TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
