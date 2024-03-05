@@ -1,0 +1,56 @@
+import { Router, Request, Response } from 'express';
+import { z } from 'zod';
+import { sql } from '../../db';
+import { ContributionSchema } from '../../types';
+import authMiddleware from '../../middleware/auth';
+import { HttpError } from '../../middleware/errorMiddleware';
+
+const UUIDSchema = z.string().uuid();
+const SQL_GET_CONTRIBUTIONS = sql<{ user_id?: string; month?: string; }, ContributionSchema>(`SELECT * FROM contributions `);
+
+export default (router: Router) => {
+  router.get('/:contributionsIdentifier', authMiddleware(), async (req: Request, res: Response) => {
+    const { contributionsIdentifier } = req.params; 
+    const { category_id, month, saving_id} = req.query as { category_id?: string; month?: string; saving_id?: string};
+    const loggedInUserId = req.user!.id;
+    const isStandardUser = req.user?.role === 'User';
+    const queryParams: { user_id?: string; saving_id?: string; month?: string; category_id?: string } = {};
+    const filters: string[] = [];
+
+    if (contributionsIdentifier === 'me') {
+      filters.push(`saving_id IN (SELECT id FROM savings WHERE user_id = '${loggedInUserId}')`);
+      queryParams.user_id = loggedInUserId;
+    } else if (contributionsIdentifier === 'all') {
+      if (!isStandardUser) {
+        null
+      } else {
+        throw new HttpError(401, 'Unauthorised');
+      }
+    } else if (UUIDSchema.parse(contributionsIdentifier)) {
+      if (isStandardUser) {
+        throw new HttpError(401, 'Unauthorized');
+      }
+      queryParams.user_id = contributionsIdentifier;
+      filters.push(`saving_id IN (SELECT id FROM savings WHERE user_id ='${contributionsIdentifier}')`);
+    } else {
+      throw new HttpError(400, 'Bad request');
+    }
+    
+    if (saving_id) {
+      queryParams.saving_id = saving_id;
+      filters.push(`saving_id = '${saving_id}'`);
+    }
+    if (category_id){
+      queryParams.category_id = category_id;
+      filters.push(`saving_id IN (SELECT id FROM savings WHERE category_id = '${category_id}')`);
+    }
+    if (month){
+      queryParams.month = month;
+      filters.push(`month = '${month}'`);
+    } 
+    
+    const queryString = filters.length > 0 ? ` WHERE ${filters.join(' AND ')}` : '';
+    const contributions = await SQL_GET_CONTRIBUTIONS(queryParams).extend(queryString, queryParams).many();
+    res.json(contributions);
+  });
+};

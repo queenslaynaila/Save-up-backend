@@ -20,14 +20,14 @@ function authMiddleware(options: AuthMiddlewareOptions = {}) {
     const token = req.headers['authorization'];
 
     if (!token) {
-      return res.status(401).json({ message: 'Token does not exist. Login first' });
+      throw new HttpError(401, 'Token does not exist. Login first');
     }
 
     const tokenValue = token.split(' ')[1];
 
     jwt.verify(tokenValue, process.env.JWT_SECRET as Secret, (err, decoded) => {
       if (err) {
-        return res.status(401).json({ message: 'Invalid token, please log in again' });
+        throw new HttpError(401, 'Invalid token, please log in again');
       }
 
       const user = decoded as User;

@@ -9,7 +9,7 @@ let savingQuery = `SELECT * FROM savings WHERE id = :id`;
 const SQL_GET_SAVING_BY_ID = sql<{ id: string; userId?: string }, savingInterface>(savingQuery);
 
 export default (router: Router) => {
-  router.get('/:id', authMiddleware(), async (req, res) => {
+  router.get('/savi/:id', authMiddleware(), async (req, res) => {
     const idValidationResult = idSchema.safeParse(req.params.id);
     if (!idValidationResult.success) {
       throw new HttpError(400, 'Invalid saving ID');
