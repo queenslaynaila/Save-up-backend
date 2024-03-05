@@ -1,45 +1,43 @@
 import { Router, Request, Response } from 'express';
 import { sql } from '../../db';
-import {ContributionSchema } from '../../types';
+import { ContributionSchema } from '../../types';
 import authMiddleware from '../../middleware/auth';
-import { UserRole } from '../../types'; 
+import { HttpError } from '../../middleware/errorMiddleware';
 
-const baseQuery = `SELECT * FROM contributions `;
-const SQL_GET_CONTRIBUTIONS = (modifiedQuery: string) => sql<{ userId?: string; month?: string; }, ContributionSchema>(modifiedQuery);
+const SQL_GET_CONTRIBUTIONS = sql<{ userId?: string; month?: string; }, ContributionSchema>(`SELECT * FROM contributions `);
 
 export default (router: Router) => {
   router.get('/:contributionsIdentifier', authMiddleware(), async (req: Request, res: Response) => {
     const { contributionsIdentifier } = req.params; 
-    const queryParams: { userId?: string; saving_id?: string; month: string } = { month: '' };
-    const filters: string[] = [];
+    const { category_id, month, saving_id,user_id } = req.query as { category_id?: string; month?: string; saving_id?: string ;user_id?: string; };
     const loggedInUserId = req.user!.id;
-    const isAdmin = req.user!.role === UserRole.ADMIN;
+    const isStandardUser = req.user?.role === 'user';
+    const queryParams: { userId?: string; saving_id?: string; month?: string; category_id?: string } = {};
+    const filters: string[] = [];
 
-    if (contributionsIdentifier === 'me') {
-      filters.push(` saving_id IN (SELECT id FROM savings WHERE user_id = '${loggedInUserId}') `);
-      queryParams.userId = loggedInUserId;
-    } else if (contributionsIdentifier === 'all' && isAdmin) {
-      queryParams.userId = contributionsIdentifier; 
-    }
-    if (req.query.saving_id) {
-      if (!isAdmin) {
+    switch (contributionsIdentifier) {
+      case 'me':
         filters.push(`saving_id IN (SELECT id FROM savings WHERE user_id = '${loggedInUserId}')`);
-      }
-      queryParams.saving_id = req.query.saving_id as string;
-      filters.push(`saving_id = '${queryParams.saving_id}'`);
-    }
-    if (req.query.month) {
-      queryParams.month = req.query.month as string;
-      filters.push(`month = '${queryParams.month}'`);
-    }
-
-    let whereClause = '';
-    if (filters.length > 0) {
-      whereClause = ` WHERE ${filters.join(' AND ')}`;
+        queryParams.userId = loggedInUserId;
+        break;
+      case 'all':
+        if (isStandardUser) {
+          throw new HttpError(401, 'Unauthorised');
+        }
+        break;
+      default:
+        throw new HttpError(400, 'Bad request');
     }
 
-    const modifiedQuery = `${baseQuery}${whereClause}`;
-    const contributions = await SQL_GET_CONTRIBUTIONS(modifiedQuery)(queryParams).many();
+    if (user_id && !isStandardUser) filters.push(`user_id IN (SELECT user_id FROM savings WHERE user_id = '${user_id}')`);
+    if (saving_id) filters.push(`saving_id = '${saving_id}'`);
+    if (category_id) filters.push(`saving_id IN (SELECT id FROM savings WHERE category_id = '${category_id}')`);
+    if (month) filters.push(`month = '${month}'`);
+    
+    let queryString = ''; 
+    filters.length > 0? queryString = ` WHERE ${filters.join(' AND ')}` : queryString;
+  
+    const contributions = await SQL_GET_CONTRIBUTIONS(queryParams).extend(queryString, queryParams).many();
     res.json(contributions);
   });
 };
