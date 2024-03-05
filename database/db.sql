@@ -140,7 +140,7 @@ BEGIN
     FROM savings
     WHERE id = NEW.saving_id;
 
-    IF total_contributions >= (SELECT target_amount FROM savings WHERE id = NEW.saving_id) THEN
+    IF total_contributions >= (SELECT amount FROM savings WHERE id = NEW.saving_id) THEN
         UPDATE savings
         SET status = 'Completed',
             completed_date = CURRENT_DATE
