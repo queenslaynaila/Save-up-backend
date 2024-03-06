@@ -53,7 +53,7 @@ export default (router: Router) => {
     }
 
     const queryString = filters.length > 0 ? ` WHERE ${filters.join(' AND ')}` : '';
-    const expenses = await SQL_GET_SAVINGS(queryParams).extend(queryString, queryParams).many();
-    res.json(expenses);
+    const savings = await SQL_GET_SAVINGS(queryParams).extend(queryString, queryParams).many();
+    res.json(savings);
   });
 };

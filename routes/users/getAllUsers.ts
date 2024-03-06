@@ -1,24 +1,36 @@
 import { Router, Request, Response } from 'express';
 import { sql } from '../../db';
+import { z } from 'zod';
 import authMiddleware from '../../middleware/auth';
 import { UserSchema } from './index';
+import { HttpError } from '../../middleware/errorMiddleware';
 
-const baseQuery = `SELECT id, first_name, last_name, phone_number, role, created_at, updated_at FROM users `;
-const SQL_GET_SAVINGS = (modifiedQuery: string) => sql<{ userId?: string; role?: string }, UserSchema>(modifiedQuery);
+const UUIDSCHEMA = z.string().uuid();
+const SQL_GET_SAVINGS =  sql<{ userId?: string; role?: string }, UserSchema>('SELECT id, first_name, last_name, phone_number, role, created_at, updated_at FROM users ');
 
 export default (router: Router) => {
-  router.get('/:datarange', authMiddleware(), async (req: Request, res: Response) => {
-    const userId = req.params.userId; 
+  router.get('/:userIdentifier', authMiddleware(), async (req: Request, res: Response) => {
+    const { userIdentifier } = req.params;
     const queryParams: { userId?: string; role?: string; } = {};
     const filters: string[] = [];
+    const isStandardUser = req.user?.role === 'User';
 
-    if (userId === 'me') {
+    if (userIdentifier === 'me') {
       const loggedInUserId = req.user!.id; 
       queryParams.userId = loggedInUserId;
       filters.push(`user_id = '${loggedInUserId}'`);
-    } else if (userId !== 'all') {
-      filters.push(`user_id = :userId`);
-      queryParams.userId = userId;
+    } else if (userIdentifier !== 'all') {
+      if (isStandardUser) {
+        throw new HttpError(401, 'Unauthorized');
+      }else if (UUIDSCHEMA.parse(userIdentifier)) {
+        if (isStandardUser) {
+          throw new HttpError(401, 'Unauthorized');
+        }
+        queryParams.userId = userIdentifier;
+        filters.push(`user_id = '${userIdentifier}'`);
+      } else {
+        throw new HttpError(400, 'Bad request');
+      }
     }
 
     if (req.query.role) {
@@ -26,14 +38,8 @@ export default (router: Router) => {
       filters.push(`role = '${queryParams.role}'`);
     }
   
-    // Construct the WHERE and And clause 
-    let whereClause = '';
-    if (filters.length > 0) {
-      whereClause = ` WHERE ${filters.join(' AND ')}`;
-    }
-    const modifiedQuery = `${baseQuery}${whereClause}`;
-    console.log(modifiedQuery);
-    const savings = await SQL_GET_SAVINGS(modifiedQuery)(queryParams).many(); 
-    res.json(savings);
+    const queryString = filters.length > 0 ? ` WHERE ${filters.join(' AND ')}` : '';
+    const users = await SQL_GET_SAVINGS(queryParams).extend(queryString, queryParams).many(); 
+    res.json(users);
   });
 };
