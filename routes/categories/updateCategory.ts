@@ -40,9 +40,6 @@ export default (router: Router) => {
     param = param.slice(0, -2);
 
     const updatedQuery = `${query}${param} WHERE user_id = :user_id AND id = :category_id RETURNING *`;
-    console.log(updatedQuery)
-    console.log(values)
-
     const result = await SQL_UPDATE_CATEGORY(updatedQuery)(values).one(new HttpError (400, 'Category not found'));
 
     return res.json(result);
