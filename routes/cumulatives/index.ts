@@ -5,7 +5,7 @@ import getTotalUserExpenses from './getTotalUserExpenses';
 import getTotalSavingsByCustomTimeFrame from './getTotalSavingsByCustomTimeFrame';
 import getTotalContributionsByTime from './getTotalContributionsByTime';
 import getExpenseByCustomTimeeframe from './getExpenseByCustomTimeeframe';
-import getExpenseComparisonByCategory from './getExpenseComparisonByCategory';
+import getTopExpenseCategories from './getTopExpenseCategories';
 export default (baseRouter: express.Router) => {
   const router = express.Router();
   getTotalUserTargetSavings(router);
@@ -14,7 +14,7 @@ export default (baseRouter: express.Router) => {
   getExpenseByCustomTimeeframe(router);
   getTotalSavingsByCustomTimeFrame(router);
   getTotalContributionsByTime(router);
-  getExpenseComparisonByCategory(router);
+  getTopExpenseCategories(router);
 
   baseRouter.use('/cumulatives', router);
 };
