@@ -6,7 +6,7 @@ import authMiddleware from '../../middleware/auth';
 import { HttpError } from '../../middleware/errorMiddleware';
 
 
-const UUIDSchema = z.string().uuid();
+const UUIDSCHEMA = z.string().uuid();
 const SQL_GET_EXPENSES = sql<Record<string, string>, ExtendedExpenseInterface>(`SELECT * FROM expenses`);
 
 export default (router: Router) => {
@@ -25,7 +25,7 @@ export default (router: Router) => {
       if (isStandardUser) {
         throw new HttpError(403, 'Unauthorized');
       }
-    } else if (UUIDSchema.parse(expenseIdentifier)) {
+    } else if (UUIDSCHEMA.parse(expenseIdentifier)) {
       if (isStandardUser) {
         throw new HttpError(401, 'Unauthorized');
       }

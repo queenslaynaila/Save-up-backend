@@ -5,7 +5,7 @@ import { ContributionSchema } from '../../types';
 import authMiddleware from '../../middleware/auth';
 import { HttpError } from '../../middleware/errorMiddleware';
 
-const UUIDSchema = z.string().uuid();
+const UUIDSCHEMA = z.string().uuid();
 const SQL_GET_CONTRIBUTIONS = sql<{ user_id?: string; month?: string; }, ContributionSchema>(`SELECT * FROM contributions `);
 
 export default (router: Router) => {
@@ -26,7 +26,7 @@ export default (router: Router) => {
       } else {
         throw new HttpError(401, 'Unauthorised');
       }
-    } else if (UUIDSchema.parse(contributionsIdentifier)) {
+    } else if (UUIDSCHEMA.parse(contributionsIdentifier)) {
       if (isStandardUser) {
         throw new HttpError(401, 'Unauthorized');
       }

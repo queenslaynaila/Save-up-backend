@@ -6,7 +6,7 @@ import authMiddleware from '../../middleware/auth';
 import { convertToTitleCase, isValidValue } from '../../middleware/caseNormalization';
 import { HttpError } from '../../middleware/errorMiddleware';
 
-const UUIDSchema = z.string().uuid();
+const UUIDSCHEMA = z.string().uuid();
 const ACCEPTED_STATUS_VALUES = ['In Progress', 'Dormant', 'Completed'];
 const ACCEPTED_PRIORITY_VALUES = ['High', 'Intermediate', 'Low'];
 const SQL_GET_SAVINGS = sql<{ userId?: string; priority?: string; status?: string; category_id?: string }, savingInterface>(`SELECT * FROM savings`);
@@ -29,7 +29,7 @@ export default (router: Router) => {
       if (isStandardUser) {
         throw new HttpError(401, 'Unauthorized');
       }
-    } else if (UUIDSchema.parse(savingsIdentifier)) {
+    } else if (UUIDSCHEMA.parse(savingsIdentifier)) {
       if (isStandardUser) {
         throw new HttpError(401, 'Unauthorized');
       }
