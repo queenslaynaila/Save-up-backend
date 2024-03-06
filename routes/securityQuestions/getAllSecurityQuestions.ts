@@ -3,7 +3,7 @@ import { sql } from '../../db';
 import { SecurityQuestionSchema } from '../../types';
 
 const SQL_GET_SECURITY_QUESTIONS = sql<Record<string, never>, SecurityQuestionSchema>(
-  `SELECT * FROM security_questions`
+  `SELECT id, question FROM security_questions`
 );
 
 export default (router: Router) => {

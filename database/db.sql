@@ -101,6 +101,30 @@ CREATE TABLE IF NOT EXISTS security_answers (
   updated_at        TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+CREATE OR REPLACE FUNCTION check_security_answer_limit()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF (
+        SELECT COUNT(*)
+        FROM security_answers
+        WHERE user_id = NEW.user_id
+    ) >= 5 THEN
+        RAISE EXCEPTION 'Maximum limit of security answers reached';
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER before_insert_security_answers
+BEFORE INSERT ON security_answers
+FOR EACH ROW
+EXECUTE FUNCTION check_security_answer_limit();
+
+ALTER TABLE security_answers
+ADD CONSTRAINT unique_user_question_answer
+UNIQUE (user_id, question_id);
+
+
 CREATE TABLE IF NOT EXISTS contributions (
   id         uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
   saving_id  uuid NOT NULL REFERENCES savings (id) ON DELETE CASCADE,
