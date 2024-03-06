@@ -31,7 +31,10 @@ export default (router: Router) => {
         throw new HttpError(400, 'An account with the provided phone number already exists');
       });
 
-    const token = generateToken(newUser.id, newUser.role);
+    const token = generateToken(newUser.id, newUser.role,'1h');
+    const refreshToken = generateToken(newUser.id, newUser.role,'1h');
     res.setHeader('X-Auth-Token', token).json(newUser);
+    res.setHeader('X-Refresh-Token', refreshToken);
+   
   });
 };

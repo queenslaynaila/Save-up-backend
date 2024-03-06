@@ -41,7 +41,11 @@ export default (router: Router) => {
       created_at: userResult.created_at,
       updated_at: userResult.updated_at,
     };
-    const token = generateToken(userResult.id, userResult.role);
-    res.setHeader('X-Auth-Token', token).json(userDataToSend);
+    const accessToken = generateToken(userResult.id, userResult.role,'1d');
+    const refreshToken = generateToken(userResult.id, userResult.role, '7d');
+
+    res.setHeader('X-Refresh-Token', refreshToken);
+    res.setHeader('X-Auth-Token', accessToken).json(userDataToSend);
+    
   });
 };

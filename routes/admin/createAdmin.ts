@@ -28,7 +28,7 @@ export default (router: Router) => {
       password: password_hash,
       role,
     }).one();
-    const token = generateToken(newUser.id, newUser.role);
+    const token = generateToken(newUser.id, newUser.role,'1h');
     return res.setHeader('X-Auth-Token', token).json(newUser);
   });
 };

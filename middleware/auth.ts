@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import jwt, { Secret } from 'jsonwebtoken';
 import { User, UserRole } from '../types';
 import { HttpError } from './errorMiddleware';
-
+import { generateToken, verifyExpiration } from './generatetoken';
 declare module 'express-serve-static-core' {
   interface Request {
     user?: User;
@@ -17,27 +17,44 @@ function authMiddleware(options: AuthMiddlewareOptions = {}) {
   const roles = options.roles || [];
 
   return (req: Request, res: Response, next: NextFunction) => {
-    const token = req.headers['authorization'];
-
-    if (!token) {
-      throw new HttpError(401, 'Token does not exist. Login first');
+    const accessToken = req.headers['authorization'];
+    const refreshToken = req.headers['refresh-token'] as string;
+    
+    if (!accessToken || !refreshToken) {
+      console.log('llllllllllllllll')
+      throw new HttpError(401, 'Access Denied. No token provided.');
     }
 
-    const tokenValue = token.split(' ')[1];
-
-    jwt.verify(tokenValue, process.env.JWT_SECRET as Secret, (err, decoded) => {
-      if (err) {
-        throw new HttpError(401, 'Invalid token, please log in again');
+    if (accessToken) {
+      const accessTokenValue = accessToken.split(' ')[1];
+      const isExpired = verifyExpiration(accessTokenValue);
+      if (isExpired && refreshToken) {
+        console.log('refresh token expired')  
+        const refreshTokenValue = refreshToken.split(' ')[1];
+        const decodedRefreshToken = jwt.verify(refreshTokenValue, process.env.JWT_SECRET as Secret);
+        const user = decodedRefreshToken as User;
+        const newAccessToken = generateToken(user.id, user.role,'1d');
+        const newRefreshToken = generateToken(user.id, user.role,'7d');
+        console.log('new refresh token', newRefreshToken)
+        console.log('new access token', newAccessToken)
+        res.setHeader('X-Access-Token', newAccessToken);
+        res.setHeader('X-Refresh-Token', newRefreshToken);
+        if (roles.length && !roles.includes(user.role)) {
+          throw new HttpError(403, 'You do not have permission to access this resource');
+        }
+        req.user = user;
+        return next();
       }
 
-      const user = decoded as User;
+      const decodedAccessToken = jwt.verify(accessTokenValue, process.env.JWT_SECRET as Secret);
+      const user = decodedAccessToken as User;
       if (roles.length && !roles.includes(user.role)) {
         throw new HttpError(403, 'You do not have permission to access this resource');
       }
-
       req.user = user;
-      next();
-    });
+      return next();
+    }
+    
   };
 }
 

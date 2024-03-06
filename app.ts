@@ -26,7 +26,7 @@ app.use((_, res, next) => {
 });
 app.use(
   cors({
-    exposedHeaders: ['Authorization', 'X-Auth-Token'],
+    exposedHeaders: ['Authorization', 'X-Auth-Token', 'X-Refresh-Token']
   })
 );
 
