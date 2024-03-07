@@ -1,7 +1,7 @@
 import { Request } from 'express';
 import { UserRole } from '../types';
 
-export function hasPermission(req: Request, userId: string, userRole: UserRole): boolean {
+export function hasPermission(req: Request, userId: string): boolean {
   if (userRole === UserRole.ADMIN || userRole === UserRole.MODERATOR) {
     return true;
   } else {
