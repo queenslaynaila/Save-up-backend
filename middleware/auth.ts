@@ -3,6 +3,7 @@ import jwt, { Secret } from 'jsonwebtoken';
 import { User, UserRole } from '../types';
 import { HttpError } from './errorMiddleware';
 import { generateToken, verifyExpiration } from './generatetoken';
+
 declare module 'express-serve-static-core' {
   interface Request {
     user?: User;

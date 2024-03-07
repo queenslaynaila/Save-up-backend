@@ -1,5 +1,5 @@
-import 'express-async-errors';
 import express, { NextFunction, Request, Response } from 'express';
+import 'express-async-errors';
 import morgan from 'morgan';
 import cors from 'cors';
 import { HttpError } from './middleware/errorMiddleware';
@@ -14,9 +14,10 @@ import securityQuestionsRoutes from './routes/securityQuestions';
 import securityAnswerRoutes from './routes/securityAnswer/index';
 import cumulativesRoutes from './routes/cumulatives/index';
 //import { updateSavingStatus } from './cronT'
-const app = express();
 //updateSavingStatus();
+
 // Middleware
+const app = express();
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(morgan('dev'));

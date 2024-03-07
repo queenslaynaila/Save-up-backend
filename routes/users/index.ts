@@ -26,5 +26,6 @@ export default (baseRouter: Router) => {
   signOut(router);
   updateUser(router);
   updateUserPhoneNo(router);
+  
   baseRouter.use('/users', router);
 };

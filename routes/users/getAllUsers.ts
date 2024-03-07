@@ -1,9 +1,9 @@
-import { Router, Request, Response } from 'express';
-import { sql } from '../../db';
+import { Request, Response, Router } from 'express';
 import { z } from 'zod';
+import { HttpError } from '../../middleware/errorMiddleware';
+import { sql } from '../../db';
 import authMiddleware from '../../middleware/auth';
 import { UserSchema } from './index';
-import { HttpError } from '../../middleware/errorMiddleware';
 
 const UUIDSCHEMA = z.string().uuid();
 const SQL_GET_SAVINGS =  sql<{ userId?: string; role?: string }, UserSchema>('SELECT id, first_name, last_name, phone_number, role, created_at, updated_at FROM users ');

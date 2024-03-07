@@ -1,23 +1,24 @@
 import { Router } from 'express';
-import jwt, { Secret } from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
+import jwt, { Secret } from 'jsonwebtoken';
+import { HttpError } from '../../middleware/errorMiddleware';
 import { SecurityQuestionSchema, UserSchema } from '../../types';
 import { sql } from '../../db';
 import sendSms from '../../services/twilio';
-import { HttpError } from '../../middleware/errorMiddleware';
 
 
-const SQL_GET_SECURITY_ANSWERS = sql<{ user_id: string; }, {question_id: string, answer: string}>(
-  `SELECT question_id, answer FROM security_answers WHERE user_id = :userId`
+const SQL_GET_SECURITY_ANSWERS = sql<{ user_id: string; },{question_id: string, answer: string}>(
+  `SELECT question_id, answer FROM security_answers WHERE user_id = :user_id`
 ); 
 
-const SQL_GET_SECURITY_QUESTIONS = sql<{  user_id: string; }, SecurityQuestionSchema>(
-  `SELECT id, question FROM security_questions  WHERE user_id = :userId`
+const SQL_GET_SECURITY_QUESTIONS = sql<{  user_id: string; },SecurityQuestionSchema>(
+  `SELECT id, question FROM security_questions  WHERE user_id = :user_id`
 );
 
-const SQL_GET_USER = sql<{ phone_number: string }, Pick<UserSchema, 'id' | 'first_name' | 'last_name' | 'role' | 'created_at' | 'updated_at'>>(
+const SQL_GET_USER = sql<{ phone_number: string },Pick<UserSchema, 'id' | 'first_name' | 'last_name' | 'role' | 'created_at' | 'updated_at'>>(
   `SELECT id, first_name, last_name, role, created_at, updated_at FROM users WHERE phone_number = :phone_number`
 );
+const SQL_RESET_PASSWORD = sql<{ password: string; phone_number: string },{ phone_number: string }>(`UPDATE users SET password = $1 WHERE phone_number = :phone_number `);
 
 
 export const initiatePasswordReset = (router: Router) => {
@@ -73,8 +74,6 @@ export const resetPassword = (router: Router) => {
   router.post('/reset', async (req, res) => {
     const { new_password, phone_number } = req.body;
     const hashPassword = bcrypt.hashSync(new_password, 10);
-    const query = `UPDATE users SET password = $1 WHERE phone_number = :phoneNo`;
-    const SQL_RESET_PASSWORD = sql<{ password: string; phone_number: string }, { phone_number: string }>(query);
     await SQL_RESET_PASSWORD({ phone_number: phone_number, password: hashPassword }).exec();
     res.json({ message: 'Password updated successfully. Login' });
   });

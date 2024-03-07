@@ -1,11 +1,11 @@
 import { Router } from 'express';
 import { z } from 'zod';
-import authMiddleware from '../../middleware/auth';
-import { UpdateUserSchema } from '../../types';
 import { HttpError } from '../../middleware/errorMiddleware';
-import { UserSchema } from './index';
 import { sql } from '../../db';
+import authMiddleware from '../../middleware/auth';
 import { hasPermission } from '../../middleware/hasPermission';
+import { UpdateUserSchema } from '../../types';
+import { UserSchema } from './index';
 
 const SQL_UPDATE_USER = (query: string) => sql<z.infer<typeof UpdateUserSchema>, UserSchema>(query);
 

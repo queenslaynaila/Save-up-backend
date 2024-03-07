@@ -1,9 +1,9 @@
 import { Router } from 'express';
 import bcrypt from 'bcrypt';
-import { generateToken } from '../../middleware/generatetoken';
-import { UserLoginSchema } from '../../types';
 import { HttpError } from '../../middleware/errorMiddleware';
+import { generateToken } from '../../middleware/generatetoken';
 import { sql } from '../../db';
+import { UserLoginSchema } from '../../types';
 import { UserSchema } from './index';
 
 interface ExtendedUserSchema extends UserSchema {
