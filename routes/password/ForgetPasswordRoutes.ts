@@ -19,7 +19,7 @@ const SQL_GET_SECURITY_QUESTIONS = sql<{  user_id: string; },{ question: string,
 const SQL_GET_USER = sql<{ phone_number: string },Pick<UserSchema, 'id' | 'first_name' | 'last_name' | 'role' | 'created_at' | 'updated_at'>>(
   `SELECT id, first_name, last_name, role, created_at, updated_at FROM users WHERE phone_number = :phone_number`
 );
-const SQL_RESET_PASSWORD = sql<{ password: string; phone_number: string },{ phone_number: string }>(`UPDATE users SET password = $1 WHERE phone_number = :phone_number `);
+const SQL_RESET_PASSWORD = sql<{ password: string; user_id : string },{ phone_number: string }>(`UPDATE users SET password = $1 WHERE user_id  = :user_id  `);
 
 
 export const initiatePasswordReset = (router: Router) => {
@@ -53,19 +53,16 @@ export const verifyPasswordResetToken = (router: Router) => {
 }
 
 
+
+
 export const verifySecurityAnswers = (router: Router) => {
   router.post('/verify-security-answers', async (req, res) => {
-    const { answers,phone_number } = req.body;
-    const user = await SQL_GET_USER({ phone_number }).one(new HttpError(404, 'User not found.'));
-    const userId = user.id;
-    if (!userId) {
-      throw new HttpError(404, 'User not found for the provided phone number.');
-    }
-    const userSecurityAnswers = await SQL_GET_SECURITY_ANSWERS({ user_id: userId }).many();
+    const { answers, user_id } = req.body;
+    const userSecurityAnswers = await SQL_GET_SECURITY_ANSWERS({ user_id }).many();
     const incorrectAnswers: string[] = [];
     answers.forEach(({ question_id, answer }: { question_id: string, answer: string }) => {
       const storedAnswer = userSecurityAnswers.find((a: { question_id: string, answer: string }) => a.question_id === question_id);
-      if (!storedAnswer || !bcrypt.compareSync(answer, storedAnswer.answer)) {
+      if (!storedAnswer || !bcrypt.compare(answer, storedAnswer.answer)) {
         incorrectAnswers.push(question_id);
       }
     });
@@ -74,14 +71,15 @@ export const verifySecurityAnswers = (router: Router) => {
     }
     res.json({ message: 'Security questions answered successfully. You can now reset your password.' });
   });
-}
+};
+
 
 
 export const resetPassword = (router: Router) => {
   router.post('/reset', async (req, res) => {
-    const { new_password, phone_number } = req.body;
+    const { new_password, user_id  } = req.body;
     const hashPassword = bcrypt.hashSync(new_password, 10);
-    await SQL_RESET_PASSWORD({ phone_number: phone_number, password: hashPassword }).exec();
+    await SQL_RESET_PASSWORD({ user_id :user_id , password: hashPassword }).exec();
     res.json({ message: 'Password updated successfully. Login' });
   });
 }
