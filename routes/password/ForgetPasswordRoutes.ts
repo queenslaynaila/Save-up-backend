@@ -2,7 +2,7 @@ import { Router } from 'express';
 import bcrypt from 'bcrypt';
 import jwt, { Secret } from 'jsonwebtoken';
 import { HttpError } from '../../middleware/errorMiddleware';
-import { SecurityQuestionSchema, UserSchema } from '../../types';
+import {  UserSchema } from '../../types';
 import { sql } from '../../db';
 import sendSms from '../../services/twilio';
 
@@ -11,9 +11,10 @@ const SQL_GET_SECURITY_ANSWERS = sql<{ user_id: string; },{question_id: string, 
   `SELECT question_id, answer FROM security_answers WHERE user_id = :user_id`
 ); 
 
-const SQL_GET_SECURITY_QUESTIONS = sql<{  user_id: string; },SecurityQuestionSchema>(
-  `SELECT id, question FROM security_questions  WHERE user_id = :user_id`
+const SQL_GET_SECURITY_QUESTIONS = sql<{  user_id: string; },{ question: string, question_id: string }>(
+  `SELECT sq.id AS question_id, sq.question FROM security_answers sa INNER JOIN security_questions sq ON sa.question_id = sq.id WHERE sa.user_id = :user_id`
 );
+
 
 const SQL_GET_USER = sql<{ phone_number: string },Pick<UserSchema, 'id' | 'first_name' | 'last_name' | 'role' | 'created_at' | 'updated_at'>>(
   `SELECT id, first_name, last_name, role, created_at, updated_at FROM users WHERE phone_number = :phone_number`
@@ -28,8 +29,8 @@ export const initiatePasswordReset = (router: Router) => {
     const resetToken = jwt.sign({ phone_number , user_id: user.id }, process.env.JWT_SECRET as Secret, {
       expiresIn: '10m',
     });
-  
     sendSms(phone_number, `Your password reset token is: ${resetToken}. It expires in 10 minutes. Do not share with anyone.`);
+    console.log(`its ${resetToken}`);
     res.json({ message: 'Password reset token generated and sent successfully.' });
   });
 }
@@ -37,14 +38,20 @@ export const initiatePasswordReset = (router: Router) => {
 export const verifyPasswordResetToken = (router: Router) => {
   router.post('/verify-token', async (req, res) => {
     const { resetToken } = req.body;
-    const decodedToken = jwt.verify(resetToken, process.env.JWT_SECRET as Secret) as { phone_number: string ,userId:string};
-    const userId= decodedToken.userId;
-    const securityQuestions = await SQL_GET_SECURITY_QUESTIONS({ user_id: userId }).many().catch(() => {
-      throw new HttpError(404, 'No security questions found for the user.');
-    });
-    res.json(securityQuestions);
+    let decodedToken;
+    try {
+      decodedToken = jwt.verify(resetToken, process.env.JWT_SECRET as Secret) as { phone_number: string, user_id: string };
+    } catch (error) {
+      throw new HttpError(401, 'Invalid token');
+    }
+    const user_id = decodedToken.user_id;
+    const securityQuestions = await SQL_GET_SECURITY_QUESTIONS({ user_id }).many().catch(() => {
+      throw new HttpError(404, 'No security questions found for you. Contact Support for assistance');
+    })
+    res.json( securityQuestions );
   });
 }
+
 
 export const verifySecurityAnswers = (router: Router) => {
   router.post('/verify-security-answers', async (req, res) => {
