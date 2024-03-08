@@ -12,13 +12,16 @@ const SQL_CREATE_CATEGORY = sql<z.infer<typeof CreateCategorySchema>, CategorySc
 `);
 
 export default (router: Router) => {
-  router.post('/', authMiddleware(), async (req, res) => {
-    const validationResult = CreateCategorySchema.safeParse(req.body);
-    if (!validationResult.success) {
-      throw new HttpError(400, 'Invalid category data');
-    }
-    const { user_id, name, description } = validationResult.data;
-    const categoryResult = await SQL_CREATE_CATEGORY({ user_id, name, description }).one();
-    return res.json(categoryResult);
-  });
+  router.post<Record<string, never>,CategorySchema,typeof CreateCategorySchema,Record<string, never>,Record<string, never>>(
+    '/', 
+    authMiddleware(), 
+    async (req, res) => {
+      const validationResult = CreateCategorySchema.safeParse(req.body);
+      if (!validationResult.success) {
+        throw new HttpError(400, 'Invalid category data');
+      }
+      const { user_id, name, description } = validationResult.data;
+      const categoryResult = await SQL_CREATE_CATEGORY({ user_id, name, description }).one();
+      return res.json(categoryResult);
+    });
 };

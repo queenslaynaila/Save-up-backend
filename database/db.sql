@@ -23,6 +23,9 @@ CREATE TABLE IF NOT EXISTS categories (
   created_at  TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at  TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
+ALTER TABLE categories
+ADD COLUMN deleted_at TIMESTAMP WITH TIME ZONE;
+
 
 INSERT INTO categories (user_id, name, description)
 VALUES (NULL, 'Food', 'All food related expenses'),

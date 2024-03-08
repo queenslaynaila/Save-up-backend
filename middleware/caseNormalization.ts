@@ -1,4 +1,4 @@
-export const convertToTitleCase = (str: string | undefined): string => {
+export const convertToTitleCase = (str: string): string => {
   return str ? str.toLowerCase().replace(/\b\w/g, c => c.toUpperCase()) : '';
 };
 

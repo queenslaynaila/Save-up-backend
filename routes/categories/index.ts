@@ -1,16 +1,16 @@
 import express from 'express';
 import createCategory from './createCategory';
 import deleteCategories from './deleteCategory';
-import getAllCategories from './getAllCategories';
 import updateCategory from './updateCategory';
-import getCategoriesByUserId from './getCategoriesByUserId';
+import getCategoriesByConditons from './getCategoriesByConditons';
+
 export default (baseRouter: express.Router) => {
   const router = express.Router();
   createCategory(router);
-  getAllCategories(router);
   deleteCategories(router);
   updateCategory(router);
-  getCategoriesByUserId(router);
+  getCategoriesByConditons(router);
+ 
 
   baseRouter.use('/categories', router);
 };

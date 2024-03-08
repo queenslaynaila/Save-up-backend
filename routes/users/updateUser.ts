@@ -7,13 +7,14 @@ import { hasPermission } from '../../middleware/hasPermission';
 import { UpdateUserSchema } from '../../types';
 import { UserSchema } from './index';
 
-const SQL_UPDATE_USER = (query: string) => sql<z.infer<typeof UpdateUserSchema>, UserSchema>(query);
+const SQL_UPDATE_USER = sql<z.infer<typeof UpdateUserSchema>, UserSchema>(
+  `UPDATE users SET `
+);
 
 export default (router: Router) => {
   router.patch('/:id', authMiddleware(), async (req, res) => {
     const userId = req.params.id;
-    const loggedInUserRole = req.user!.role;
-    if (!hasPermission(req, userId, loggedInUserRole)) {
+    if (!hasPermission(req, userId)) {
       return res.status(403).json({ message: 'Unauthorized access' });
     }
 
@@ -26,23 +27,22 @@ export default (router: Router) => {
     }
 
     const { first_name, last_name } = validationResult.data;
-    const values: z.infer<typeof UpdateUserSchema> & { id: string } = { id: userId };
+    const values: { id: string; first_name?: string; last_name?: string } = { id: userId };
+    const  updateClauses: string[] = [];
 
-    let query = 'UPDATE users SET ';
     if (first_name) {
-      query += `first_name = :first_name, `;
+      updateClauses.push(`first_name = :first_name`);
       values.first_name = first_name;
     }
     if (last_name) {
-      query += `last_name = :last_name, `;
+      updateClauses.push(`last_name = :last_name`);
       values.last_name = last_name;
     }
-    query = query.slice(0, -2);
-    query += ` WHERE id = :id RETURNING *`;
 
-    const updatedUser = await SQL_UPDATE_USER(query)(values).one(new HttpError(400, 'User not found'));
-
-    res.status(200).json(updatedUser);
+    const query = SQL_UPDATE_USER({});
+    const setClause =  updateClauses.join(', ');
+    const extendedQuery = query.extend(`${setClause} WHERE id = :id RETURNING *`, values);
+    const updatedUser = await extendedQuery.one(new HttpError(400, 'User not found'));
+    res.json(updatedUser);
   });
 };
-

@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { UserRole } from '../../types/index';
 import createUser from './createUser';
-import getAllUsers from './getAllUsers';
+import getUsersByConditions from './getUsersByConditions';
 import login from './login';
 import signOut from './signOut';
 import updateUser from './updateUser';
@@ -19,7 +19,7 @@ export interface UserSchema {
 export default (baseRouter: Router) => {
   const router = Router();
 
-  getAllUsers(router);
+  getUsersByConditions(router);
   createUser(router);
   updateUser(router);
   login(router);

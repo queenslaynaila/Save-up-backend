@@ -5,7 +5,7 @@ import {HttpError} from "../../middleware/errorMiddleware";
 import {sql} from "../../db";
 
 interface CategorySchema {
-  // id: string;
+  id: string;
   user_id: string;
   name: string;
   description: string;
@@ -18,8 +18,7 @@ const SQL_DELETE_CATEGORY =
   sql<Pick<CategorySchema, "id" | "user_id">, Pick<CategorySchema, "id">>(
     `UPDATE categories
      SET deleted_at = NOW()
-     WHERE id = :id
-       AND user_id = :user_id
+     WHERE id = :id AND user_id = :user_id
      RETURNING id`
   );
 
@@ -31,7 +30,6 @@ export default (router: Router) => {
     }
     const id = validationResult.data;
     const userId = req.user!.id;
-
     const idDeleted = await SQL_DELETE_CATEGORY({id, user_id: userId}).oneOrNull();
     if (!idDeleted) {
       throw new HttpError(404, "Categories  not found");

@@ -1,11 +1,11 @@
 import { Request } from 'express';
 import { UserRole } from '../types';
 
-export function hasPermission(req: Request, userId: string): boolean {
-  if (userRole === UserRole.ADMIN || userRole === UserRole.MODERATOR) {
+export function hasPermission(req: Request, targetUserId:string): boolean {
+  if (req.user!.role === UserRole.ADMIN || req.user!.role === UserRole.MODERATOR) {
     return true;
   } else {
-    const authenticatedUserId = req.user?.id;
-    return authenticatedUserId === userId;
+    const loggedInUserId = req.user?.id;
+    return loggedInUserId === targetUserId;
   }
 }

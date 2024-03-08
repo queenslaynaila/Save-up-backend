@@ -13,33 +13,33 @@ const SQL_CREATE_SAVING = sql<z.infer<typeof savingSchema>, savingInterface>(`
 `);
 
 export default (router: Router) => {
-  router.post('/', authMiddleware(), async (req, res) => {
-    const validationResult = savingSchema.safeParse(req.body);
-    if (!validationResult.success) {
-      throw new HttpError(400, 'Invalid saving data');
-    }
-
-    const { user_id, description, category_id, amount, priority, target_date } =
+  router.post<Record<string, never>,savingInterface,typeof savingSchema,Record<string, never>,Record<string, never>>(
+    '/', 
+    authMiddleware(), 
+    async (req, res) => {
+      const validationResult = savingSchema.safeParse(req.body);
+      if (!validationResult.success) {
+        throw new HttpError(400, 'Invalid saving data');
+      }
+      const { user_id, description, category_id, amount, priority, target_date } =
       validationResult.data;
+      const authenticatedUserId = req.user!.id;
+      if (authenticatedUserId !== user_id) {
+        throw new HttpError(403, 'Unauthorized');
+      }
+      const newSaving = await SQL_CREATE_SAVING({
+        user_id: authenticatedUserId,
+        description,
+        category_id,
+        amount,
+        priority,
+        target_date,
+      })
+        .one()
+        .catch(() => {
+          throw new HttpError(400, 'Selected category does not exist');
+        });
 
-    const authenticatedUserId = req.user!.id;
-    if (authenticatedUserId !== user_id) {
-      throw new HttpError(403, 'Unauthorized');
-    }
-
-    const newSaving = await SQL_CREATE_SAVING({
-      user_id: authenticatedUserId,
-      description,
-      category_id,
-      amount,
-      priority,
-      target_date,
-    })
-      .one()
-      .catch(() => {
-        throw new HttpError(400, 'Selected category does not exist');
-      });
-
-    return res.json(newSaving);
-  });
+      return res.json(newSaving);
+    });
 };

@@ -11,13 +11,16 @@ const SQL_CREATE_CONTRIBUTION = sql<z.infer<typeof contributionSchema>, Contribu
     RETURNING *`);
 
 export default (router: Router) => {
-  router.post('/', authMiddleware(), async (req, res) => {
-    const validationResult = contributionSchema.safeParse(req.body);
-    if (!validationResult.success) {
-      throw new HttpError(400, 'Invalid saving id, amount, or date');
-    }
-    const { saving_id, amount, date } = validationResult.data;
-    const contributionResult = await SQL_CREATE_CONTRIBUTION({ saving_id, amount, date }).one();
-    return res.json(contributionResult);
-  });
+  router.post<Record<string, never>,ContributionSchema,typeof contributionSchema,Record<string, never>,Record<string, never>>(
+    '/', 
+    authMiddleware(), 
+    async (req, res) => {
+      const validationResult = contributionSchema.safeParse(req.body);
+      if (!validationResult.success) {
+        throw new HttpError(400, 'Invalid saving id, amount, or date');
+      }
+      const { saving_id, amount, date } = validationResult.data;
+      const contributionResult = await SQL_CREATE_CONTRIBUTION({ saving_id, amount, date }).one();
+      return res.json(contributionResult);
+    });
 };

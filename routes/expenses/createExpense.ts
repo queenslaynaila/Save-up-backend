@@ -12,30 +12,31 @@ const SQL_CREATE_EXPENSES = sql<z.infer<typeof expenseSchema>,  ExtendedExpenseI
 );
 
 export default (router: Router) => {
-  router.post('/', authMiddleware(), async (req, res) => {
-    const validationResult = expenseSchema.safeParse(req.body);
-    if (!validationResult.success) {
-      throw new HttpError(400, 'Invalid expense data provided');
-    }
-
-    const { description, category_id, amount, date, user_id } = validationResult.data;
-    const loggedInUserId = req.user!.id;
-    const authenticatedUserId = req.user?.id;
-    if (authenticatedUserId !== user_id) {
-      throw new HttpError(403, 'Unauthorized');
-    }
-
-    const expense = await SQL_CREATE_EXPENSES({
-      description,
-      category_id,
-      amount,
-      date,
-      user_id: loggedInUserId,
-    })
-      .one()
-      .catch(() => {
-        throw new HttpError(400, 'Selected category does not exist');
-      });
-    return res.json(expense);
-  });
+  router.post<Record<string, never>,ExtendedExpenseInterface,typeof expenseSchema,Record<string, never>,Record<string, never>>(
+    '/', 
+    authMiddleware(), 
+    async (req, res) => {
+      const validationResult = expenseSchema.safeParse(req.body);
+      if (!validationResult.success) {
+        throw new HttpError(400, 'Invalid expense data provided');
+      }
+      const { description, category_id, amount, date, user_id } = validationResult.data;
+      const loggedInUserId = req.user!.id;
+      const authenticatedUserId = req.user?.id;
+      if (authenticatedUserId !== user_id) {
+        throw new HttpError(403, 'Unauthorized');
+      }
+      const expense = await SQL_CREATE_EXPENSES({
+        description,
+        category_id,
+        amount,
+        date,
+        user_id: loggedInUserId,
+      })
+        .one()
+        .catch(() => {
+          throw new HttpError(400, 'Selected category does not exist');
+        });
+      return res.json(expense);
+    });
 };
