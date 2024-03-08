@@ -222,3 +222,36 @@ CREATE INDEX expenses_user_id_idx ON expenses (user_id);
 CREATE INDEX expenses_category_idx ON expenses (category_id);
 CREATE INDEX expenses_month_idx ON expenses (month);
 
+CREATE TABLE IF NOT EXISTS reset_tokens (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID REFERENCES users(id),
+    token INTEGER NOT NULL CHECK (token BETWEEN 1000 AND 9999),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    used BOOLEAN DEFAULT FALSE,
+    used_at TIMESTAMP WITH TIME ZONE,
+    expiry_time TIMESTAMP WITH TIME ZONE DEFAULT (CURRENT_TIMESTAMP + INTERVAL '15 minutes')
+);
+
+CREATE OR REPLACE FUNCTION check_user_token_limit()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF EXISTS (
+        SELECT 1
+        FROM reset_tokens
+        WHERE user_id = NEW.user_id
+          AND DATE_TRUNC('day', created_at) = DATE_TRUNC('day', CURRENT_TIMESTAMP)
+        HAVING COUNT(*) >= 10
+    ) THEN
+        RAISE EXCEPTION 'User has reached the maximum token limit for the day';
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER enforce_user_token_limit
+BEFORE INSERT ON reset_tokens
+FOR EACH ROW
+EXECUTE FUNCTION check_user_token_limit();
+
+ALTER TABLE reset_tokens
+ADD CONSTRAINT token_expiry CHECK (expiry_time > created_at + INTERVAL '15 minutes');
