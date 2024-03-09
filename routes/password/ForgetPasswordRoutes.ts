@@ -44,14 +44,6 @@ interface SecurityAnswersRequest {
   answers: { question_id: string; answer: string }[];
 }
 
-interface SecurityQuestion {
-  question_id: string;
-  question: string;
-}
-
-// interface SecurityQuestionsResponse {
-//   securityQuestions: SecurityQuestion[];
-// }
 
 export const initiatePasswordReset = (router: Router) => {
   router.post<string, Record<string, never>, { message: string }, { phone_number: string }, Record<string, never>>(
