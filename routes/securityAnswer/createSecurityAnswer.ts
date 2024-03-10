@@ -6,7 +6,10 @@ import { createSecurityAnswerSchema } from '../../types';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/auth';
 
-const SQL_CREATE_ANSWER = sql<z.infer<typeof createSecurityAnswerSchema>,Record<string, never>>(`INSERT INTO security_answers (question_id, user_id, answer, created_at, updated_at) 
+const SQL_CREATE_ANSWER = sql<
+z.infer<typeof createSecurityAnswerSchema>,
+Record<string, never>
+>(`INSERT INTO security_answers (question_id, user_id, answer, created_at, updated_at) 
 VALUES (:question_id, :user_id, :answer, NOW(), NOW())`);
 
 export default (router: Router) => {

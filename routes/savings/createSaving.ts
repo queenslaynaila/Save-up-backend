@@ -16,7 +16,7 @@ export default (router: Router) => {
   router.post<
   Record<string, never>,
   savingInterface,
-  typeof savingSchema,
+    typeof savingSchema,
   Record<string, never>,
   Record<string, never>
   >('/', authMiddleware(), async (req, res) => {

@@ -12,37 +12,39 @@ interface CreateUserSchema {
   password: string;
 }
 
-const SQL_CREATE_USER = sql< CreateUserSchema, UserSchema>(`
+const SQL_CREATE_USER = sql<CreateUserSchema, UserSchema>(`
   INSERT INTO users (first_name, last_name, phone_number, password, created_at, updated_at)
   VALUES (:first_name, :last_name, :phone_number, :password, NOW(), NOW())
   RETURNING id, first_name, last_name, phone_number,role, created_at, updated_at`);
 
 export default (router: Router) => {
-  router.post<Record<string, never>,UserSchema,CreateUserSchema,Record<string, never>,Record<string, never>>(
-    '/', 
-    async (req, res) => {
+  router.post<
+  Record<string, never>,
+  UserSchema,
+  CreateUserSchema,
+  Record<string, never>,
+  Record<string, never>
+  >('/', async (req, res) => {
+    const validationResult = CreateUserSchema.safeParse(req.body);
+    if (!validationResult.success) {
+      throw new HttpError(422, 'Invalid phone number or password');
+    }
 
-      const validationResult = CreateUserSchema.safeParse(req.body);
-      if (!validationResult.success) {
-        throw new HttpError(422, 'Invalid phone number or password');
-      }
+    const { first_name, last_name, phone_number, password } = validationResult.data;
+    const passwordHash = bcrypt.hashSync(password, 10);
+    const newUser = await SQL_CREATE_USER({
+      first_name,
+      last_name,
+      phone_number,
+      password: passwordHash,
+    })
+      .one()
+      .catch(() => {
+        throw new HttpError(400, 'An account with the provided phone number already exists');
+      });
 
-      const { first_name, last_name, phone_number, password } = validationResult.data;
-      const passwordHash = bcrypt.hashSync(password, 10);
-      const newUser = await SQL_CREATE_USER({
-        first_name,
-        last_name,
-        phone_number,
-        password: passwordHash,
-      })
-        .one()
-        .catch(() => {
-          throw new HttpError(400, 'An account with the provided phone number already exists');
-        });
-
-      const token = generateToken(newUser.id, newUser.role,'1h');
-      const refreshToken = generateToken(newUser.id, newUser.role,'1h');
-      res.setHeader('X-Refresh-Token', refreshToken).setHeader('X-Auth-Token', token).json(newUser);
-            
-    });
+    const token = generateToken(newUser.id, newUser.role, '1h');
+    const refreshToken = generateToken(newUser.id, newUser.role, '1h');
+    res.setHeader('X-Refresh-Token', refreshToken).setHeader('X-Auth-Token', token).json(newUser);
+  });
 };

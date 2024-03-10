@@ -15,7 +15,7 @@ export default (router: Router) => {
   router.post<
   Record<string, never>,
   ExtendedExpenseInterface,
-    typeof expenseSchema,
+  typeof expenseSchema,
   Record<string, never>,
   Record<string, never>
   >('/', authMiddleware(), async (req, res) => {

@@ -14,23 +14,27 @@ const SQL_CREATE_ADMIN = sql<z.infer<typeof CreateAdminSchema>, Admin>(`
 `);
 
 export default (router: Router) => {
-  router.post<Record<string, never>,Admin,typeof CreateAdminSchema ,Record<string, never>,Record<string, never>>(
-    '/', 
-    async (req, res) => {
-      const validationResult = CreateAdminSchema.safeParse(req.body);
-      if (!validationResult.success) {
-        throw new HttpError(422, 'Invalid phone number or password');
-      }
-      const { first_name, last_name, phone_number, password, role } = validationResult.data;
-      const password_hash = bcrypt.hashSync(password, 10);
-      const newUser = await SQL_CREATE_ADMIN({
-        first_name,
-        last_name,
-        phone_number,
-        password: password_hash,
-        role,
-      }).one();
-      const token = generateToken(newUser.id, newUser.role,'1h');
-      return res.setHeader('X-Auth-Token', token).json(newUser);
-    });
+  router.post<
+  Record<string, never>,
+  Admin,
+  typeof CreateAdminSchema,
+  Record<string, never>,
+  Record<string, never>
+  >('/', async (req, res) => {
+    const validationResult = CreateAdminSchema.safeParse(req.body);
+    if (!validationResult.success) {
+      throw new HttpError(422, 'Invalid phone number or password');
+    }
+    const { first_name, last_name, phone_number, password, role } = validationResult.data;
+    const password_hash = bcrypt.hashSync(password, 10);
+    const newUser = await SQL_CREATE_ADMIN({
+      first_name,
+      last_name,
+      phone_number,
+      password: password_hash,
+      role,
+    }).one();
+    const token = generateToken(newUser.id, newUser.role, '1h');
+    return res.setHeader('X-Auth-Token', token).json(newUser);
+  });
 };
