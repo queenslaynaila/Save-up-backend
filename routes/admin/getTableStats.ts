@@ -5,51 +5,56 @@ import authMiddleware from '../../middleware/auth';
 import { convertToTitleCase } from '../../middleware/caseNormalization';
 import { UserRole } from '../../types';
 
-const SQL_GET_CUMULATIVES = (query: string) => sql<{ operator: string; resource: string }, { totals: number }>(query);
+const SQL_GET_CUMULATIVES = (query: string) =>
+  sql<{ operator: string; resource: string }, { totals: number }>(query);
 const VALID_OPERATORS = ['SUM', 'MAX', 'MIN', 'AVG', 'COUNT'];
 const VALID_RESOURCES = ['contributions', 'savings', 'expenses'];
 const VALID_STATUS = ['Completed', 'Dormant', 'In Progress'];
 
 export default (router: Router) => {
-  router.get('/stats/:resource/:operator',authMiddleware({ roles: [UserRole.ADMIN]}), async (req, res) => {
-    req.params.resource = req.params.resource.toLowerCase();
-    req.params.operator = req.params.operator.toUpperCase();
-    const { resource, operator } = req.params;
-    const { user_id, priority, status, category_id, start_date, end_date } = req.query as {
-      user_id?: string;
-      priority?: string;
-      status?: string;
-      category_id?: string;
-      start_date?: string;
-      end_date?: string;
-    };
-    const formattedStatus = status ? convertToTitleCase(status) : '';
-    
-    if (!VALID_RESOURCES.includes(resource)) {
-      throw new HttpError(400, 'Invalid resource');
-    }
+  router.get(
+    '/stats/:resource/:operator',
+    authMiddleware({ roles: [UserRole.ADMIN] }),
+    async (req, res) => {
+      req.params.resource = req.params.resource.toLowerCase();
+      req.params.operator = req.params.operator.toUpperCase();
+      const { resource, operator } = req.params;
+      const { user_id, priority, status, category_id, start_date, end_date } = req.query as {
+        user_id?: string;
+        priority?: string;
+        status?: string;
+        category_id?: string;
+        start_date?: string;
+        end_date?: string;
+      };
+      const formattedStatus = status ? convertToTitleCase(status) : '';
 
-    if (!VALID_OPERATORS.includes(operator)) {
-      throw new HttpError(400, 'Invalid operator');
-    }
-    if (status && !VALID_STATUS.includes(formattedStatus)) {
-      throw new HttpError(400, 'Invalid status');
-    }
-    let query = `SELECT COALESCE(${operator}(amount), 0) AS ${operator} FROM ${resource} WHERE 1=1`;
+      if (!VALID_RESOURCES.includes(resource)) {
+        throw new HttpError(400, 'Invalid resource');
+      }
 
-    if (['savings', 'expenses'].includes(resource)) {
-      if (user_id) query += ` AND user_id = '${user_id}'`;
-      if (category_id) query += ` AND category_id = '${category_id}'`;
-      if (priority) query += ` AND priority = '${priority}'`;
-      if (start_date) query += ` AND completed_date >= '${start_date}'`;
-      if (end_date) query += ` AND completed_date <= '${end_date}'`;
-    }
-    if (resource === 'savings' && status) {
-      query += ` AND status = '${formattedStatus}'`;
-    }
+      if (!VALID_OPERATORS.includes(operator)) {
+        throw new HttpError(400, 'Invalid operator');
+      }
+      if (status && !VALID_STATUS.includes(formattedStatus)) {
+        throw new HttpError(400, 'Invalid status');
+      }
+      let query = `SELECT COALESCE(${operator}(amount), 0) AS ${operator} FROM ${resource} WHERE 1=1`;
 
-    const values: { operator: string; resource: string } = { operator, resource };
-    const result = await SQL_GET_CUMULATIVES(query)(values).one();
-    res.json(result);
-  });
+      if (['savings', 'expenses'].includes(resource)) {
+        if (user_id) query += ` AND user_id = '${user_id}'`;
+        if (category_id) query += ` AND category_id = '${category_id}'`;
+        if (priority) query += ` AND priority = '${priority}'`;
+        if (start_date) query += ` AND completed_date >= '${start_date}'`;
+        if (end_date) query += ` AND completed_date <= '${end_date}'`;
+      }
+      if (resource === 'savings' && status) {
+        query += ` AND status = '${formattedStatus}'`;
+      }
+
+      const values: { operator: string; resource: string } = { operator, resource };
+      const result = await SQL_GET_CUMULATIVES(query)(values).one();
+      res.json(result);
+    }
+  );
 };

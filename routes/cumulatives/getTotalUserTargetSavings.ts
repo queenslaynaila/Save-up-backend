@@ -3,7 +3,10 @@ import { sql } from '../../db';
 import authMiddleware from '../../middleware/auth';
 
 let condition = 'user_id = :userId';
-const SQL_GET_TOTAL_TARGET_AMOUNT = sql<{ [key: string]: string },{ total_target_amount: number }>(`
+const SQL_GET_TOTAL_TARGET_AMOUNT = sql<
+{ [key: string]: string },
+{ total_target_amount: number }
+>(`
     SELECT COALESCE(SUM(target_amount), 0) AS total_target_amount
     FROM savings
     WHERE ${condition}

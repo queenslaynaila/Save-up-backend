@@ -4,7 +4,8 @@ import { HttpError } from '../../middleware/errorMiddleware';
 import { idSchema, ContributionSchema, UserRole } from '../../types';
 import { sql } from '../../db';
 
-const SQL_GET_CONTRIBUTION_BY_ID = (query: string) => sql<{ id: string }, ContributionSchema>(query);
+const SQL_GET_CONTRIBUTION_BY_ID = (query: string) =>
+  sql<{ id: string }, ContributionSchema>(query);
 
 export default (router: Router) => {
   router.get('/records/:contributionsId', authMiddleware(), async (req, res) => {
@@ -29,4 +30,3 @@ export default (router: Router) => {
     return res.json(result);
   });
 };
-

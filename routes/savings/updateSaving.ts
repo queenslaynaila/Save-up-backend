@@ -6,7 +6,8 @@ import { sql } from '../../db';
 import { savingInterface } from './index';
 import { updateSavingSchema } from '../../types';
 
-const SQL_UPDATE_SAVING = (updated: string) => sql<z.infer<typeof updateSavingSchema>, savingInterface>(updated);
+const SQL_UPDATE_SAVING = (updated: string) =>
+  sql<z.infer<typeof updateSavingSchema>, savingInterface>(updated);
 
 export default (router: Router) => {
   router.patch('/:id', authMiddleware(), async (req, res) => {
@@ -18,8 +19,7 @@ export default (router: Router) => {
       throw new HttpError(422, 'Invalid saving data');
     }
 
-    const { description, category_id, amount, priority, target_date } =
-      validatedSavings.data;
+    const { description, category_id, amount, priority, target_date } = validatedSavings.data;
 
     const values: z.infer<typeof updateSavingSchema> & { user_id: string; saving_id: string } = {
       user_id: userId,
@@ -28,7 +28,7 @@ export default (router: Router) => {
 
     const query = 'UPDATE savings SET ';
     let param = '';
-    
+
     if (description) {
       param += `description = :description, `;
       values.description = description;
@@ -49,14 +49,13 @@ export default (router: Router) => {
       param += `target_date = :target_date, `;
       values.target_date = target_date;
     }
-   
+
     param = param.slice(0, -2);
-    
 
     const updated = `${query}${param} WHERE user_id = :user_id AND id = :saving_id RETURNING *`;
-    
+
     const result = await SQL_UPDATE_SAVING(updated)(values).one();
-   
+
     return res.json(result);
   });
 };

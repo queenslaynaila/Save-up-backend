@@ -15,9 +15,13 @@ const SQL_GET_TOP_EXPENDITURE_CATEGORIES = sql<{ userId: string }, TopExpenditur
 `);
 
 export default (router: Router) => {
-  router.get('/top-expenditure-categories', authMiddleware(), async (req: Request, res: Response) => {
-    const userId = req.user!.id;
-    const result = await SQL_GET_TOP_EXPENDITURE_CATEGORIES({ userId }).many();
-    res.json(result);
-  });
+  router.get(
+    '/top-expenditure-categories',
+    authMiddleware(),
+    async (req: Request, res: Response) => {
+      const userId = req.user!.id;
+      const result = await SQL_GET_TOP_EXPENDITURE_CATEGORIES({ userId }).many();
+      res.json(result);
+    }
+  );
 };

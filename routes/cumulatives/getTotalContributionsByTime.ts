@@ -3,7 +3,10 @@ import { sql } from '../../db';
 import authMiddleware from '../../middleware/auth';
 import { HttpError } from '../../middleware/errorMiddleware';
 
-const CALCULATE_TOTAL_CONTRIBUTIONS_BY_CUSTOM_TIME = sql<{ userId: string, startDate: string, endDate: string }, { totalContributionAmount: number }>(`
+const CALCULATE_TOTAL_CONTRIBUTIONS_BY_CUSTOM_TIME = sql<
+{ userId: string; startDate: string; endDate: string },
+{ totalContributionAmount: number }
+>(`
     SELECT COALESCE(SUM(c.amount), 0) AS totalContributionAmount
     FROM contributions c
     JOIN savings s ON c.saving_id = s.id
@@ -21,9 +24,13 @@ export default (router: Router) => {
       throw new HttpError(400, 'Both start date and end date are required.');
     }
 
-    startDate = new Date(startDate as string).toISOString(); 
-    endDate = new Date(endDate as string).toISOString(); 
-    const result = await CALCULATE_TOTAL_CONTRIBUTIONS_BY_CUSTOM_TIME ({ userId, startDate, endDate }).one();
+    startDate = new Date(startDate as string).toISOString();
+    endDate = new Date(endDate as string).toISOString();
+    const result = await CALCULATE_TOTAL_CONTRIBUTIONS_BY_CUSTOM_TIME({
+      userId,
+      startDate,
+      endDate,
+    }).one();
     res.json(result);
   });
 };

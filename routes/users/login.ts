@@ -17,8 +17,8 @@ const SQL_GET_USER = sql<{ phone_number: string }, ExtendedUserSchema>(`
 `);
 
 export default (router: Router) => {
-  router.post<Record<string, never>,UserSchema,{ phone_number: string },Record<string, never>>(
-    '/signin', 
+  router.post<Record<string, never>, UserSchema, { phone_number: string }, Record<string, never>>(
+    '/signin',
     async (req, res) => {
       const validationResult = UserLoginSchema.safeParse(req.body);
       if (!validationResult.success) {
@@ -44,8 +44,12 @@ export default (router: Router) => {
         updated_at: userResult.updated_at,
       };
 
-      const accessToken = generateToken(userResult.id, userResult.role,'1d');
+      const accessToken = generateToken(userResult.id, userResult.role, '1d');
       const refreshToken = generateToken(userResult.id, userResult.role, '7d');
-      res.setHeader('X-Refresh-Token', refreshToken).setHeader('X-Auth-Token', accessToken).json(userDataToSend);
-    });
+      res
+        .setHeader('X-Refresh-Token', refreshToken)
+        .setHeader('X-Auth-Token', accessToken)
+        .json(userDataToSend);
+    }
+  );
 };

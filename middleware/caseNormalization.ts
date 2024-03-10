@@ -1,5 +1,5 @@
 export const convertToTitleCase = (str: string): string => {
-  return str ? str.toLowerCase().replace(/\b\w/g, c => c.toUpperCase()) : '';
+  return str ? str.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase()) : '';
 };
 
 export const isValidValue = (value: string | undefined, acceptedValues: string[]): boolean => {

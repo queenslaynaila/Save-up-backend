@@ -5,7 +5,11 @@ import { UpdateCategorySchema } from '../../types';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { sql } from '../../db';
 
-const SQL_UPDATE_CATEGORY = (updatedQuery: string) =>sql<z.infer<typeof UpdateCategorySchema> & { id: string; user_id: string }, Record<string, never>>(updatedQuery);
+const SQL_UPDATE_CATEGORY = (updatedQuery: string) =>
+  sql<
+  z.infer<typeof UpdateCategorySchema> & { id: string; user_id: string },
+  Record<string, never>
+  >(updatedQuery);
 
 export default (router: Router) => {
   router.patch('/:id', authMiddleware(), async (req, res) => {
@@ -19,10 +23,14 @@ export default (router: Router) => {
 
     const { name, description } = validatedCategory.data;
 
-    const values: z.infer<typeof UpdateCategorySchema> & { user_id: string; category_id: string; id: string  } = {
+    const values: z.infer<typeof UpdateCategorySchema> & {
+      user_id: string;
+      category_id: string;
+      id: string;
+    } = {
       user_id: userId,
       category_id: categoryId,
-      id:categoryId
+      id: categoryId,
     };
 
     const query = 'UPDATE categories SET ';
@@ -40,7 +48,9 @@ export default (router: Router) => {
     param = param.slice(0, -2);
 
     const updatedQuery = `${query}${param} WHERE user_id = :user_id AND id = :category_id RETURNING *`;
-    const result = await SQL_UPDATE_CATEGORY(updatedQuery)(values).one(new HttpError (400, 'Category not found'));
+    const result = await SQL_UPDATE_CATEGORY(updatedQuery)(values).one(
+      new HttpError(400, 'Category not found')
+    );
 
     return res.json(result);
   });

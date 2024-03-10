@@ -10,7 +10,6 @@ export default (baseRouter: express.Router) => {
   deleteCategories(router);
   updateCategory(router);
   getCategoriesByConditons(router);
- 
 
   baseRouter.use('/categories', router);
 };

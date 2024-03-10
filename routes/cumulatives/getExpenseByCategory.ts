@@ -2,7 +2,10 @@ import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/auth';
 
-const SQL_CALCULATE_TOTAL_EXPENSES_BY_CATEGORY = sql<{ userId: string, categoryId: string }, { totalExpensesByCategory: number }>(`
+const SQL_CALCULATE_TOTAL_EXPENSES_BY_CATEGORY = sql<
+{ userId: string; categoryId: string },
+{ totalExpensesByCategory: number }
+>(`
     SELECT COALESCE(SUM(amount), 0) AS totalExpenses
     FROM expenses
     WHERE user_id = :userId

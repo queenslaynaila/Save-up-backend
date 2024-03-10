@@ -7,9 +7,7 @@ import { hasPermission } from '../../middleware/hasPermission';
 import { UpdateUserSchema } from '../../types';
 import { UserSchema } from './index';
 
-const SQL_UPDATE_USER = sql<z.infer<typeof UpdateUserSchema>, UserSchema>(
-  `UPDATE users SET `
-);
+const SQL_UPDATE_USER = sql<z.infer<typeof UpdateUserSchema>, UserSchema>(`UPDATE users SET `);
 
 export default (router: Router) => {
   router.patch('/:id', authMiddleware(), async (req, res) => {
@@ -28,7 +26,7 @@ export default (router: Router) => {
 
     const { first_name, last_name } = validationResult.data;
     const values: { id: string; first_name?: string; last_name?: string } = { id: userId };
-    const  updateClauses: string[] = [];
+    const updateClauses: string[] = [];
 
     if (first_name) {
       updateClauses.push(`first_name = :first_name`);
@@ -40,7 +38,7 @@ export default (router: Router) => {
     }
 
     const query = SQL_UPDATE_USER({});
-    const setClause =  updateClauses.join(', ');
+    const setClause = updateClauses.join(', ');
     const extendedQuery = query.extend(`${setClause} WHERE id = :id RETURNING *`, values);
     const updatedUser = await extendedQuery.one(new HttpError(400, 'User not found'));
     res.json(updatedUser);
