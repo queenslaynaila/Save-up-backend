@@ -13,8 +13,21 @@ export default (router: Router) => {
     authMiddleware(), 
     async (req, res) => {
       const userId = req.user!.id;
-      const result = await SQL_GET_TOTAL_EXPENSES({ userId }).one();
-      const totalExpenses = result.total_expenses;
-      res.json({ total_expenses: totalExpenses });
+      const { startDate, endDate } = req.query;
+      const filters: string[] = [];
+      const filterArgs: Record<string, string> = {};
+      if (startDate) {
+        filterArgs.startDate = startDate;
+        filters.push(`date >= :startDate`);
+      }
+      if (endDate) {
+        filterArgs.endDate = endDate;
+        filters.push(`date <= :endDate`);
+      }
+      const query = SQL_GET_TOTAL_EXPENSES({userId });
+      if (filters.length > 0) query.extend(`AND ${filters.join(' AND ')}`, filterArgs);
+      query.extend('LIMIT 15', {});
+      res.json(await query.one());
+
     });
 };
