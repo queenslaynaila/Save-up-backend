@@ -45,7 +45,7 @@ interface SecurityAnswersRequest {
 }
 
 export const initiatePasswordReset = (router: Router) => {
-  router.post<string,Record<string, never>,{ message: string },{ phone_number: string },Record<string, never>>(
+  router.post<string,Record<string, never>,{ message: string,userId:string },{ phone_number: string },Record<string, never>>(
     '/forget-password-request', 
     async (req, res) => {
       const { phone_number } = req.body;
@@ -59,7 +59,7 @@ export const initiatePasswordReset = (router: Router) => {
         phone_number,
         `Your password reset token is: ${actualToken}. It expires in 10 minutes. Do not share with anyone.`
       );
-      res.json({ message: 'Password reset token generated and sent successfully.' });
+      res.json({ message: 'Password reset token generated and sent successfully.', userId: user.id });
     });
 };
 interface securityQuestions{
@@ -74,6 +74,7 @@ export const verifyPasswordResetToken = (router: Router) => {
       if (!tokenExists) {
         throw new HttpError(401, 'Invalid token');
       }
+      console.log(tokenExists)
       const tokenInfo = await SQL_GET_TOKEN_INFO({ user_id, reset_token }).one();
       if (tokenInfo.used) {
         throw new HttpError(401, 'Token has already been used');
