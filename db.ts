@@ -9,6 +9,7 @@ export const {sql, shutdown: closeDbConnection} = createBasicSQL({
   user:  process.env.PG_USER,
   password:  process.env.PG_PASSWORD,
   disablePooling:Boolean(process.env.PG_BOUNCER_ENABLED) || true,
+  ssl: Boolean(process.env.SSL) || true,
   max: 60,
 });
 
