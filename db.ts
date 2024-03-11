@@ -3,12 +3,12 @@ import { config } from 'dotenv';
 config({ path: '.env' });
 
 export const {sql, shutdown: closeDbConnection} = createBasicSQL({
-  host: process.env.PG_HOST,
-  port: parseInt(process.env.PG_PORT || '5432'),
-  database: process.env.PG_DATABASE,
-  user:  process.env.PG_USER,
-  password:  process.env.PG_PASSWORD,
-  disablePooling:Boolean(process.env.PG_BOUNCER_ENABLED) || true,
+  host: process.env.DB_HOST,
+  port: parseInt(process.env.DB_PORT || '5432'),
+  database: process.env.DB_DATABASE,
+  user:  process.env.DB_USER,
+  password:  process.env.DB_PASSWORD,
+  disablePooling:Boolean(process.env.DB_BOUNCER_ENABLED) || true,
   ssl: Boolean(process.env.SSL) || true,
   max: 60,
 });
