@@ -9,7 +9,7 @@ const SQL_GET_CONTRIBUTION_BY_ID = (query: string) =>
 
 export default (router: Router) => {
   router.get<{ id: string }, ContributionSchema, Record<string, never>, Record<string, never>>(
-    '/records/:contributionsId', 
+    '/records/:id', 
     authMiddleware(), 
     async (req, res) => {
       const validationResult = idSchema.safeParse(req.params.id);
