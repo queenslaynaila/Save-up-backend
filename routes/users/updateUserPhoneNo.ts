@@ -35,7 +35,7 @@ export default (router: Router) => {
       const userPasswordResult = await SQL_GET_USER_PASSWORD({ userId }).one(
         new HttpError(404, 'User not found')
       );
-      if (await bcrypt.compare(password, userPasswordResult.password)) {
+      if (!await bcrypt.compare(password, userPasswordResult.password)) {
         throw new HttpError(401, 'Invalid password or user not found');
       }
 
