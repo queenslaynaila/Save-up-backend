@@ -36,9 +36,7 @@ export default (router: Router) => {
         password: passwordHash,
       })
         .one()
-        .catch(() => {
-          throw new HttpError(400, 'An account with the provided phone number already exists');
-        });
+       
 
       const token = generateToken(newUser.id, newUser.role, '1h');
       const refreshToken = generateToken(newUser.id, newUser.role, '1h');
