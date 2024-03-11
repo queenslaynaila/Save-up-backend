@@ -14,6 +14,7 @@ export default (router: Router) => {
     async (req, res) => {
       const validationResult = idSchema.safeParse(req.params.id);
       if (!validationResult.success) {
+        console.log('Validation error:', validationResult.error);
         throw new HttpError(400, 'Invalid contributions ID');
       }
       const contributionsId = validationResult.data;
@@ -26,6 +27,7 @@ export default (router: Router) => {
         query += `AND saving_id IN (SELECT id FROM savings WHERE user_id = :userId)`;
         values.userId = userId;
       }
+  
 
       const result = await SQL_GET_CONTRIBUTION_BY_ID(query)(values).one(
         new HttpError(404, 'Contribution not found')
