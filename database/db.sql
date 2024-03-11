@@ -185,6 +185,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 
+
 CREATE TRIGGER contributions_trigger
 AFTER INSERT ON contributions
 FOR EACH ROW

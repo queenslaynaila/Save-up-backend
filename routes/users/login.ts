@@ -17,7 +17,7 @@ const SQL_GET_USER = sql<{ phone_number: string }, ExtendedUserSchema>(`
 `);
 
 export default (router: Router) => {
-  router.post<Record<string, never>, UserSchema, { phone_number: string }, Record<string, never>>(
+  router.post<Record<string, never>, UserSchema, { phone_number: string; password: string }, Record<string, never>>(
     '/signin',
     async (req, res) => {
       const validationResult = UserLoginSchema.safeParse(req.body);

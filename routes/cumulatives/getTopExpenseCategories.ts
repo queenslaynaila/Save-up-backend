@@ -6,7 +6,7 @@ interface TopExpenditureCategory {
   total_expense: number;
 }
 
-const SQL_GET_TOP_EXPENDITURE_CATEGORIES = sql<{ userId: string }, TopExpenditureCategory>(`
+const SQL_GET_TOP_EXPENDITURE_CATEGORIES = sql<{ userId: string }, TopExpenditureCategory[]>(`
     SELECT category_id, COALESCE(SUM(amount), 0) AS total_expense
     FROM expenses
     WHERE user_id = :userId
@@ -15,7 +15,7 @@ const SQL_GET_TOP_EXPENDITURE_CATEGORIES = sql<{ userId: string }, TopExpenditur
 `);
 
 export default (router: Router) => {
-  router.get(
+  router.get<Record<string, never>, TopExpenditureCategory[], Record<string, never>, Record<string, never>>(
     '/top-expenditure-categories',
     authMiddleware(),
     async (req: Request, res: Response) => {

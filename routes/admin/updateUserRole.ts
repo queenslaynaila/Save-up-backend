@@ -7,20 +7,27 @@ import { convertToTitleCase } from '../../middleware/caseNormalization';
 import { UserRole } from '../../types';
 
 const VALID_ROLES = ['Admin', 'User', 'Moderator'];
+
 const SQL_UPDATE_ROLE = sql<{ roleToUpdate: string; id: string }, UserSchema>(`
-UPDATE users SET role = :roleToUpdate WHERE id = :id RETURNING id, first_name, last_name, role, created_at, updated_at`);
+  UPDATE users 
+  SET role = :roleToUpdate 
+  WHERE id = :id 
+  RETURNING id, first_name, last_name, role, created_at, updated_at
+`);
 
 export default (router: Router) => {
-  router.patch(
+  router.patch<{ roleToUpdate: string; id: string }, UserSchema, Record<string, never>, Record<string, never>>(
     '/:roleToUpdate/:id',
     authMiddleware({ roles: [UserRole.ADMIN] }),
     async (req, res) => {
       let { roleToUpdate } = req.params;
       const { id } = req.params;
       roleToUpdate = convertToTitleCase(roleToUpdate);
+      
       if (!VALID_ROLES.includes(roleToUpdate)) {
         throw new HttpError(400, 'Invalid role.');
       }
+
       const result = await SQL_UPDATE_ROLE({ roleToUpdate, id }).one();
       res.json(result);
     }

@@ -8,10 +8,13 @@ const SQL_GET_TOTAL_EXPENSES = sql<{ userId: string }, { total_expenses: number 
       WHERE user_id = :userId`);
 
 export default (router: Router) => {
-  router.get('/total-expenses', authMiddleware(), async (req, res) => {
-    const userId = req.user!.id;
-    const result = await SQL_GET_TOTAL_EXPENSES({ userId }).one();
-    const totalExpenses = result.total_expenses;
-    res.json({ total_expenses: totalExpenses });
-  });
+  router.get<Record<string, never>, { total_expenses: number }, Record<string, never>, Record<string, never>>(
+    '/total-expenses', 
+    authMiddleware(), 
+    async (req, res) => {
+      const userId = req.user!.id;
+      const result = await SQL_GET_TOTAL_EXPENSES({ userId }).one();
+      const totalExpenses = result.total_expenses;
+      res.json({ total_expenses: totalExpenses });
+    });
 };

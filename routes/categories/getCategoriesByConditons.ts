@@ -1,7 +1,7 @@
 import authMiddleware from '../../middleware/auth';
 import { z } from 'zod';
 import { HttpError } from '../../middleware/errorMiddleware';
-import { Router, Response } from 'express';
+import { Router, Request, Response } from 'express';
 import { sql } from '../../db';
 import { CategorySchema } from '../../types';
 
@@ -14,10 +14,10 @@ export default (router: Router) => {
   router.get<
   string,
   { categoryIdentifier: string },
-  CategorySchema,
+  CategorySchema[],
   Record<string, never>,
   Record<string, never>
-  >('/:categoryIdentifier', authMiddleware(), async (req, res: Response) => {
+  >('/:categoryIdentifier', authMiddleware(), async (req: Request, res: Response) => {
     const { categoryIdentifier } = req.params;
     const isStandardUser = req.user?.role === 'User';
     const loggedInUserId = req.user!.id;

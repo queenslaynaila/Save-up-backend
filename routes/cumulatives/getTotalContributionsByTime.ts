@@ -16,21 +16,20 @@ const CALCULATE_TOTAL_CONTRIBUTIONS_BY_CUSTOM_TIME = sql<
 `);
 
 export default (router: Router) => {
-  router.get('/total-contributions-by-time', authMiddleware(), async (req, res) => {
-    const userId = req.user!.id;
-    let { startDate, endDate } = req.query;
-
-    if (!startDate || !endDate) {
-      throw new HttpError(400, 'Both start date and end date are required.');
-    }
-
-    startDate = new Date(startDate as string).toISOString();
-    endDate = new Date(endDate as string).toISOString();
-    const result = await CALCULATE_TOTAL_CONTRIBUTIONS_BY_CUSTOM_TIME({
-      userId,
-      startDate,
-      endDate,
-    }).one();
-    res.json(result);
-  });
+  router.get<Record<string, never>, {totalContributionAmount: number }, Record<string, never>, { startDate: string; endDate: string }>(
+    '/total-contributions-by-time', 
+    authMiddleware(), 
+    async (req, res) => {
+      const userId = req.user!.id;
+      const { startDate, endDate } = req.query;
+      if (!startDate || !endDate) {
+        throw new HttpError(400, 'Both start date and end date are required.');
+      }
+      const result = await CALCULATE_TOTAL_CONTRIBUTIONS_BY_CUSTOM_TIME({
+        userId,
+        startDate,
+        endDate,
+      }).one();
+      res.json(result);
+    });
 };

@@ -10,10 +10,13 @@ const SQL_GET_TOTAL_CONTRIBUTIONS = sql<{ userId: string }, { total_contributed_
 `);
 
 export default (router: Router) => {
-  router.get('/total-contributions', authMiddleware(), async (req, res) => {
-    const userId = req.user!.id;
-    const result = await SQL_GET_TOTAL_CONTRIBUTIONS({ userId }).one();
-    const totalContributedAmount = result.total_contributed_amount;
-    res.json({ total_contributed_amount: totalContributedAmount });
-  });
+  router.get<Record<string, never>, { total_contributed_amount: number }, Record<string, never>, Record<string, never>>(
+    '/total-contributions', 
+    authMiddleware(), 
+    async (req, res) => {
+      const userId = req.user!.id;
+      const result = await SQL_GET_TOTAL_CONTRIBUTIONS({ userId }).one();
+      const totalContributedAmount = result.total_contributed_amount;
+      res.json({ total_contributed_amount: totalContributedAmount });
+    });
 };

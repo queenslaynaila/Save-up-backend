@@ -4,15 +4,12 @@ import { HttpError } from '../../middleware/errorMiddleware';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/auth';
 
-const SQL_UPDATE_SECURITY_ANSWER = sql<
-  { question_id: string; answer: string; user_id: string },
-  Record<string, never>
->(
-  `UPDATE security_answers 
+const SQL_UPDATE_SECURITY_ANSWER = sql<{ question_id: string; answer: string; user_id: string },Record<string, never>>(`
+  UPDATE security_answers 
   SET answer = :answer, updated_at = NOW() 
   WHERE question_id = :question_id AND user_id = :user_id
-  RETURNING *`
-);
+  RETURNING *
+`);
 
 export default (router: Router) => {
   router.patch('/', authMiddleware(), async (req, res) => {
@@ -20,10 +17,8 @@ export default (router: Router) => {
     if (!validationResult.success) {
       throw new HttpError(422, 'Invalid data');
     }
-
     const { question_id, answer } = validationResult.data;
     const userId = req.user!.id;
-
     const updateResult = await SQL_UPDATE_SECURITY_ANSWER({
       question_id,
       answer,

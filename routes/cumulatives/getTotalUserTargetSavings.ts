@@ -2,40 +2,40 @@ import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/auth';
 
-let condition = 'user_id = :userId';
-const SQL_GET_TOTAL_TARGET_AMOUNT = sql<
-{ [key: string]: string },
-{ total_target_amount: number }
->(`
+
+const SQL_GET_TOTAL_TARGET_AMOUNT = sql<{ [key: string]: string },{ total_target_amount: number }>(`
     SELECT COALESCE(SUM(target_amount), 0) AS total_target_amount
     FROM savings
-    WHERE ${condition}
 `);
 
 export default (router: Router) => {
-  router.get('/total-target-amount', authMiddleware(), async (req, res) => {
-    const userId = req.user!.id;
-    const { priority, status, category_id } = req.query as {
-      priority?: string;
-      status?: string;
-      category_id?: string;
-    };
-    const values: { [key: string]: string } = { userId };
-
-    if (priority) {
-      condition += ' AND priority = :priority';
-      values.priority = priority;
+  router.get<Record<string, string>, { total_target_amount: number }, Record<string, string>, {priority?: string;status?: string;category_id?: string;}>(
+    '/total-target-amount', 
+    authMiddleware(), 
+    async (req, res) => {
+      const userId = req.user!.id;
+      const filters: string[] = [];
+      const filterArgs: Record<string, string> = {};
+      const { priority, status, category_id } = req.query 
+      const values: Record<string, string> = { userId };
+  
+      if (priority) {
+        filterArgs.priority = priority;
+        filters.push('priority = :priority');
+      }
+      if (status) {
+        filterArgs.status = status;
+        filters.push ('status = :status');
+      }
+      if (category_id) {
+        filterArgs.category_id = category_id;
+        filters.push ('category_id = :category_id')
+      }
+      const query = SQL_GET_TOTAL_TARGET_AMOUNT({});
+      if (filters.length > 0) query.extend(`WHERE ${filters.join(' AND ')}`, filterArgs);
+      query.extend('WHERE user_id = :userId', values);
+      res.json(await query.one());
     }
-    if (status) {
-      condition += ' AND status = :status';
-      values.status = status;
-    }
-    if (category_id) {
-      condition += ' AND category_id = :category_id';
-      values.category_id = category_id;
-    }
-    const result = await SQL_GET_TOTAL_TARGET_AMOUNT(values).one();
-    const totalTargetAmount = result.total_target_amount;
-    res.json({ total_target_amount: totalTargetAmount });
-  });
+  );
+  
 };
