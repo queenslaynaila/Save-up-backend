@@ -18,8 +18,8 @@ const SQL_GET_USER = sql<{ phone_number: string },Pick<UserSchema, 'id' | 'first
   SELECT id, first_name, last_name, role, created_at, updated_at FROM users WHERE phone_number = :phone_number
 `);
 
-const SQL_RESET_PASSWORD = sql<{ password: string; user_id: string }, { phone_number: string }>(`
-  UPDATE users SET password = $1 WHERE  id = :user_id
+const SQL_RESET_PASSWORD = sql<{ password: string; id: string }, { phone_number: string }>(`
+  UPDATE users SET password = $1 WHERE  id = :id
 `);
 
 const SQL_SAVE_TOKEN = sql<{ user_id: string; token: string }, { token: string }>(`
@@ -118,12 +118,12 @@ export const verifySecurityAnswers = (router: Router) => {
 };
 
 export const resetPassword = (router: Router) => {
-  router.post<string,Record<string, never>,{ message: string },{ new_password: string; user_id: string },Record<string, never>>(
+  router.post<string,Record<string, never>,{ message: string },{ new_password: string; id: string },Record<string, never>>(
     '/reset', 
     async (req, res) => {
-      const { new_password, user_id } = req.body;
+      const { new_password, id } = req.body;
       const hashPassword = bcrypt.hashSync(new_password, 10);
-      await SQL_RESET_PASSWORD({ user_id: user_id, password: hashPassword }).exec();
+      await SQL_RESET_PASSWORD({ id: id, password: hashPassword }).exec();
       res.json({ message: 'Password updated successfully. Login' });
     });
 };
