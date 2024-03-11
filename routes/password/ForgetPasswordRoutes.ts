@@ -19,7 +19,7 @@ const SQL_GET_USER = sql<{ phone_number: string },Pick<UserSchema, 'id' | 'first
 `);
 
 const SQL_RESET_PASSWORD = sql<{ password: string; user_id: string }, { phone_number: string }>(`
-  UPDATE users SET password = $1 WHERE user_id = :user_id
+  UPDATE users SET password = $1 WHERE  id = :user_id
 `);
 
 const SQL_SAVE_TOKEN = sql<{ user_id: string; token: string }, { token: string }>(`
@@ -70,6 +70,7 @@ export const verifyPasswordResetToken = (router: Router) => {
     '/verify-token', 
     async (req, res) => {
       const { user_id, reset_token } = req.body;
+
       const tokenExists = await SQL_CHECK_TOKEN_EXISTS({ user_id, reset_token }).one();
       if (!tokenExists) {
         throw new HttpError(401, 'Invalid token');
