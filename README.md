@@ -1204,7 +1204,7 @@ URL: https://save-up-3w7t.onrender.com/admin/stats/{resource}/{operator}
 - `status` (string optional): The status of the resource. Valid statuses are 'Completed', 'Dormant', or 'In Progress'.
 - `category_id` (string optional): The ID of the category for which statistics are requested.
 - `start_date` (string optional): The start date for the time period of interest.
-- `end_date` (string): The end date for the time period of interest.
+- `end_date` (string optional): The end date for the time period of interest.
 
 ***Response:***
 - `totals` (number): The cumulative result of the specified operation on the requested resource.
