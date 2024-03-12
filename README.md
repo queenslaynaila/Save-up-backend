@@ -1,1008 +1,1005 @@
+# Users
+- [Users](#users)
+  - [Endpoints](#endpoints)
+    - [1. updateUserPhoneNo](#1-updateuserphoneno)
+    - [2. getUserByScope](#2-getuserbyscope)
+    - [3. Signout](#3-signout)
+    - [4. UpdateUser](#4-updateuser)
+    - [5. createUser](#5-createuser)
+    - [6. Login](#6-login)
+- [Savings](#savings)
+  - [Endpoints](#endpoints-1)
+    - [1. getSavingsByConditions](#1-getsavingsbyconditions)
+    - [2. deleteSaving](#2-deletesaving)
+    - [3. updateSaving](#3-updatesaving)
+    - [4. getSavingbySavingId](#4-getsavingbysavingid)
+    - [5. createSaving](#5-createsaving)
+    - [6. getAllSavings](#6-getallsavings)
+- [Contributions](#contributions)
+  - [Endpoints](#endpoints-2)
+    - [1. getContributionsByConditions](#1-getcontributionsbyconditions)
+    - [2. getContributionById](#2-getcontributionbyid)
+    - [3. createContribution](#3-createcontribution)
+- [expenses](#expenses)
+  - [Endpoints](#endpoints-3)
+    - [1. getExpenseByConditions](#1-getexpensebyconditions)
+    - [2. updateExpense](#2-updateexpense)
+    - [3. DeleteExpense](#3-deleteexpense)
+    - [4. createExpense](#4-createexpense)
+- [Categories](#categories)
+  - [Endpoints](#endpoints-4)
+    - [1. updateCategories](#1-updatecategories)
+    - [2. getCategoriesByConditions](#2-getcategoriesbyconditions)
+    - [3. deleteCategory](#3-deletecategory)
+    - [4. createCategories](#4-createcategories)
+- [SecurityQuestions](#securityquestions)
+  - [Endpoints](#endpoints-5)
+    - [1. getAllSecurityQuestions](#1-getallsecurityquestions)
+- [Answers](#answers)
+  - [Endpoints](#endpoints-6)
+    - [1. createSecurityAnsswer](#1-createsecurityansswer)
+- [Password](#password)
+  - [Endpoints](#endpoints-7)
+    - [1. updatePassword](#1-updatepassword)
+    - [2. Forgetpassword request](#2-forgetpassword-request)
+    - [3 verifyPasswordResetToken](#3-verifypasswordresettoken)
+    - [3. verifySecurityAnser](#3-verifysecurityanser)
+    - [4. resetPassword](#4-resetpassword)
 
-## Database Schema
-You can check the database schema [here](./db_schema.dbml) and the table diagram [here](./schema.md).ERD diagram is [here](./ERD.png)
-Find document explaining databse permissions [here](./permissions.md)
-## Table of Contents
-- [Users API](#users-api)
-    - [1. Create User](#1-create-user)
-    - [2. User Login](#2-user-login)
-    - [3. User Logout](#3-user-logout)
-    - [4. Get All Users With Pagination](#4-get-all-users-with-pagination)
-    - [5. Get User by ID](#5-get-user-by-id)
-    - [6. Update User](#6-update-user)
-    - [6. Update User Phone Number](#6-update-user-phone-number)
-- [Security Questions API](#security-questions-api)
-    - [1. Get All Security Questions](#1-get-all-security-questions)
-- [Security Answers API](#security-answers-api)
-    - [1. Create Security Answers](#1-create-security-answers)
-- [Password Reset API](#password-reset-api)
-    - [1. Initiate Password Reset](#1-initiate-password-reset)
-    - [2. Reset Password](#2-reset-password)
-- [Categories API](#categories-api)
-    - [1. Create Category](#1-create-category)
-    - [1. Get Category By Userid](#1-get-category-by-userid)
-    - [2. Update Category](#2-update-category)
-    - [3. Get Categories](#3-get-categories)
-    - [4. Delete Category](#4-delete-category)
-    - [5. Get Categories by User\_id ID](#5-get-categories-by-user_id-id)
-- [Savings API](#savings-api)
-    - [1. Create Saving](#1-create-saving)
-    - [2. Get All Savings](#2-get-all-savings)
-    - [3. Update Saving](#3-update-saving)
-    - [4. Delete Saving](#4-delete-saving)
-    - [5. Get Savings By Userid](#5-get-savings-by-userid)
-    - [6. Get Savings By SavingID](#6-get-savings-by-savingid)
-    - [7. Get All Savings](#7-get-all-savings)
-- [Contributions API](#contributions-api)
-    - [1. Create Contribution](#1-create-contribution)
-    - [2. Get All Contributions With Pagination](#2-get-all-contributions-with-pagination)
-    - [3. Get Contribution by ID](#3-get-contribution-by-id)
-    - [4. Update Contribution](#4-update-contribution)
-    - [5. Delete Contribution](#5-delete-contribution)
-    - [6. Get Contributions by Saving ID](#6-get-contributions-by-saving-id)
-- [Cumulatives](#cumulatives)
-    - [1. Get Total Target Amount](#1-get-total-target-amount)
-    - [2. Get Total Contributed Amount](#2-get-total-contributed-amount)
-- [Expense API](#expense-api)
-    - [1. Create Expense](#1-create-expense)
-    - [2. Get All Expenses With Pagination](#2-get-all-expenses-with-pagination)
-    - [3. Get Expense by ID](#3-get-expense-by-id)
-    - [4. Update Expense](#4-update-expense)
-    - [5. Delete Expense](#5-delete-expense)
-    - [6. Get Expenses by Userid](#6-get-expenses-by-userid)
+## Endpoints
+### 1. updateUserPhoneNo
+***Endpoint:***
 
-# Users API
+```bash
+Method: PATCH
+Type: RAW
+URL: https://save-up-3w7t.onrender.com/users/update-phone/e3a818c6-2d3f-49b5-a716-a97b8fd4c009
+```
+***Headers:***
 
-### 1. Create User
+| Key | Value | Description |
+| --- | ------|-------------|
+| authorization | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTQ4MjU1LCJleHAiOjE3MTAyMzQ2NTV9.gVtpGJNoQYu2GfMHgB1B_ixlDlA2htXpNG_hSXEf0nY |  |
+| refresh-token | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTQ4MjU1LCJleHAiOjE3MTA3NTMwNTV9.Obl2XR1gyRWyjhTha8de4rqMSprTwgYR2U2yJrSgLW0 |  |
 
-- **Route**: `POST /user`
-- **Description**: Creates a new user account.
-- **Request Body**:
-  - `first_name` (string, required): The first name of the user.
-  - `last_name` (string, required): The last name of the user.
-  - `phone_no` (string, required): The phone number of the user. Kenyan phone no +254 followed by 9 digits
-  - `password` (string, required): The password for the user account.
-- **Response**:
-  - Status Code: `200 OK`
-  - Body: The created user object 
-  - Header: Token with name X-Auth-Token
-- **Error Responses**:
-  - Status Code: `400 Bad Request`
-    - Description: Returned when the request body is invalid or an account with the provided email or phone number already exists.
-    - Body: 
-      ```json
-      {
-        "error": "Invalid email, phone number, or password" or "An account with the provided email or phone number already exists"
-      }
-      ```
-- **Sample request**:
-    ```json
+***Body:*** The new phone number along with password
+```js        
+{
+  "phone_number": "+254722830838",
+  "password": "Jemanaila@2000"
+}
+```
+***Success Response:***
+The new phone number 
+```js        
+{
+  "phone_number": "+254722830838",
+}
+```
+
+### 2. getUserByScope
+***Endpoint:***
+
+```bash
+Method: GET
+Type: 
+URL: https://save-up-3w7t.onrender.com/users/{scope}
+
+```
+***Request Parameters***
+Scope:A string parameter indicating the user's identifier. It can be:
+- `me`: Retrieves information about the currently logged-in user.Can be used by all users
+- `all`: Retrieves information about all users (requires Admin or Moderator role).
+- `UserID`: Retrieves information about a specific user based on their ID(requires Admin or Moderator role).
+
+***Query Parameters***:
+- `role` (optional): Filter users by their role. Acceptable values are `User`, `Admin`, or `Moderator`.
+
+***Headers:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| authorization | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTQ4MjU1LCJleHAiOjE3MTAyMzQ2NTV9.gVtpGJNoQYu2GfMHgB1B_ixlDlA2htXpNG_hSXEf0nY |  |
+| refresh-Token | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTQ4MjU1LCJleHAiOjE3MTA3NTMwNTV9.Obl2XR1gyRWyjhTha8de4rqMSprTwgYR2U2yJrSgLW0 |  |
+
+***SampleResponse:*** when all is used.With me its just an array of one object rep the logged in user,sane with userid one obje rep the user searched
+```json
+[
+  {
+    "id": "e3a818c6-2d3f-49b5-a716-a97b8fd4c009",
+    "first_name": "Queenslay",
+    "last_name": "Jema",
+    "phone_number": "+254713518356",
+    "role": "User",
+    "created_at": "2024-03-11T08:55:49.193Z",
+    "updated_at": "2024-03-11T08:55:49.193Z"
+  },
+  {
+    "id": "a97b8fd4c009-e3a818c6-2d3f-49b5-a716",
+    "first_name": "John",
+    "last_name": "Doe",
+    "phone_number": "+1234567890",
+    "role": "Admin",
+    "created_at": "2024-03-11T08:55:49.193Z",
+    "updated_at": "2024-03-11T08:55:49.193Z"
+  }
+]
+```
+
+### 3. Signout
+***Endpoint:***
+
+```bash
+Method: POST
+Type: 
+URL: https://save-up-3w7t.onrender.com/users/signout
+```
+***Headers:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| authorization | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTQ4MjU1LCJleHAiOjE3MTAyMzQ2NTV9.gVtpGJNoQYu2GfMHgB1B_ixlDlA2htXpNG_hSXEf0nY |  |
+| refresh-Token | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTQ4MjU1LCJleHAiOjE3MTA3NTMwNTV9.Obl2XR1gyRWyjhTha8de4rqMSprTwgYR2U2yJrSgLW0 |  |
+
+***Sample Success Response:***
+```json
+{
+  "message": "Logout successful"
+}
+```
+
+### 4. UpdateUser
+***Endpoint:***
+
+```bash
+Method: PATCH
+Type: RAW
+URL: https://save-up-3w7t.onrender.com/users/e3a818c6-2d3f-49b5-a716-a97b8fd4c009
+```
+***Headers:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| authorization | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTQ4MjU1LCJleHAiOjE3MTAyMzQ2NTV9.gVtpGJNoQYu2GfMHgB1B_ixlDlA2htXpNG_hSXEf0nY |  |
+| refresh-token | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTQ4MjU1LCJleHAiOjE3MTA3NTMwNTV9.Obl2XR1gyRWyjhTha8de4rqMSprTwgYR2U2yJrSgLW0 |  |
+
+***Body:***
+The first_name and last_name fields are optional. You can provide either or both of them in the request body.
+
+```js        
+{
+
+    "last_name": "string"
+    "first_name":"string"
+}
+```
+
+***Success:***
+
+```js        
+{
+  "id": "e3a818c6-2d3f-49b5-a716-a97b8fd4c009",
+  "first_name": "Queenslay",
+  "last_name": "Tembo",
+  "phone_number": "+254713518356",
+  "role": "User",
+  "password": "e3a818c6-2d3f-49b5-a716-a97b8fd4c009",
+  "created_at": "2024-03-11T08:55:49.193Z",
+  "updated_at": "2024-03-11T08:55:49.193Z"
+}
+```
+
+### 5. createUser
+***Endpoint:***
+
+```bash
+Method: POST
+Type: RAW
+URL: https://save-up-3w7t.onrender.com/users/
+```
+***Body:***
+
+```js        
+{
+  "first_name": "Queenslay",
+  "last_name": "Jema",
+  "phone_number": "+254713518356",
+  "password": "sampleePassword"
+}
+
+```
+***Sucess Response:***
+```js        
+{
+  "id": "ddba4643-fa09-42d0-9480-90a5d5a48cc8",
+  "first_name": "Queenslay",
+  "last_name": "Jema",
+  "phone_number": "+254713518354",
+  "role": "User",
+  "created_at": "2024-03-11T13:23:33.149Z",
+  "updated_at": "2024-03-11T13:23:33.149Z"
+}
+
+```
+***Error Response:***
+```js        
+{
+  "error": "An account with the provided phone number already exists" or "Internal server error"
+}
+```
+
+
+### 6. Login
+***Endpoint:***
+
+```bash
+Method: POST
+Type: RAW
+URL: https://save-up-3w7t.onrender.com/users/signin
+```
+***Body:***
+
+```js        
+{
+ "phone_number": "+254713518356",
+  "password": "Jemanaila@2000"
+}
+
+```
+---
+
+# Savings
+## Endpoints
+### 1. getSavingsByConditions
+***Endpoint:***
+
+```bash
+Method: GET
+Type: 
+URL: https://save-up-3w7t.onrender.com/savings/{scope}
+```
+
+***Request Parameters***
+Scope: A string parameter indicating the savings identifier. It can be::
+- `me`: Retrieves information about the currently logged-in user's savings.Can be used by all users
+- `all`: Retrieves information about all savings (requires Admin or Moderator role)..
+- `SavingsId`: Retrieves information about savings based on their ID.
+
+***Query Parameters***:
+- `category_id` (optional): Filter savings by category ID.
+- `priority` (optional): Filter savings by priority. Acceptable values are High, Intermediate, or Low.
+- `status` (optional): Filter savings by status. Acceptable values are In Progress, Dormant, or Completed.
+  
+***Headers:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| Authorization | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTAyMzY1MDJ9.2Amq0FHnXndZJXi2FZBFdkDnBI-ztx5HvHG_CUviAK0 |  |
+| refresh-token | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTA3NTQ5MDJ9.mMS61QjvEuq1Abk7LKOR761v2WFvKDQr21c50S38qfs |  |
+
+  
+***Sample Response:***  
+```json
+[
+  {
+    "id": "1",
+    "user_id": "e3a818c6-2d3f-49b5-a716-a97b8fd4c009",
+    "category_id": "2",
+    "amount": 5000,
+    "priority": "High",
+    "status": "In Progress",
+    "created_at": "2024-03-11T08:55:49.193Z",
+    "updated_at": "2024-03-11T08:55:49.193Z"
+  },
+  {
+    "id": "2",
+    "user_id": "e3a818c6-2d3f-49b5-a716-a97b8fd4c009",
+    "category_id": "1",
+    "amount": 3000,
+    "priority": "Low",
+    "status": "Completed",
+    "created_at": "2024-03-11T08:55:49.193Z",
+    "updated_at": "2024-03-11T08:55:49.193Z"
+  }
+]
+```
+
+### 2. deleteSaving
+***Endpoint:***
+
+```bash
+Method: DELETE
+Type: 
+URL: https://save-up-3w7t.onrender.com/savings/473d3361-d5d0-4794-bce7-10950e14d992
+```
+***Headers:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| authorization | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTAyMzY1MDJ9.2Amq0FHnXndZJXi2FZBFdkDnBI-ztx5HvHG_CUviAK0 |  |
+| refresh-token | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTA3NTQ5MDJ9.mMS61QjvEuq1Abk7LKOR761v2WFvKDQr21c50S38qfs |  |
+
+**Success Response:**
+```json
+{
+  "message": "Savings deleted successfully"
+}
+```
+**Error Response:**
+```json
+{
+  "error": "Savings not found" or "Invalid Saving id" 
+}
+```
+
+### 3. updateSaving
+***Endpoint:***
+
+```bash
+Method: PATCH
+Type: RAW
+URL: https://save-up-3w7t.onrender.com/savings/05799423-5268-4173-bb4a-d6c659b72d0c
+```
+***Headers:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| authorization | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTAyMzY1MDJ9.2Amq0FHnXndZJXi2FZBFdkDnBI-ztx5HvHG_CUviAK0 |  |
+| refresh-token | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTA3NTQ5MDJ9.mMS61QjvEuq1Abk7LKOR761v2WFvKDQr21c50S38qfs |  |
+
+***Body:***
+- description (optional): A string representing the updated description of the saving.
+- category_id (optional): A string representing the updated category ID of the saving.
+- amount (optional): A number representing the updated amount of the saving.
+- priority (optional): A string representing the updated priority of the saving.
+- target_date (optional): A string representing the updated target date of the saving.
+
+```js        
+{
+  "priority":"High"
+}
+```
+
+**Success Response:**
+```json
+{
+  "id": "saving_id",
+  "description": "Updated description",
+  "category_id": "Updated category ID",
+  "amount": 1000,
+  "priority": "Updated priority",
+  "target_date": "Updated target date"
+}
+```
+### 4. getSavingbySavingId
+***Endpoint:***
+
+```bash
+Method: GET
+Type: 
+URL: https://save-up-3w7t.onrender.com/savings/records/05799423-5268-4173-bb4a-d6c659b72d0c
+```
+***Headers:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| Authorization | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTAyMzY1MDJ9.2Amq0FHnXndZJXi2FZBFdkDnBI-ztx5HvHG_CUviAK0 |  |
+| refresh-token | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTA3NTQ5MDJ9.mMS61QjvEuq1Abk7LKOR761v2WFvKDQr21c50S38qfs |  |
+
+
+
+### 5. createSaving
+***Endpoint:***
+
+```bash
+Method: POST
+Type: RAW
+URL: https://save-up-3w7t.onrender.com/savings/
+```
+***Headers:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| authorization | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTAyMzY1MDJ9.2Amq0FHnXndZJXi2FZBFdkDnBI-ztx5HvHG_CUviAK0 |  |
+| refresh-token | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTA3NTQ5MDJ9.mMS61QjvEuq1Abk7LKOR761v2WFvKDQr21c50S38qfs |  |
+
+***Request Body:***
+- user_id: The ID of the user associated with the saving.
+- description: The description of the saving.
+- category_id: The ID of the category associated with the saving.
+- amount: The amount of the saving.
+- priority: The priority of the saving.
+- target_date: The target date for achieving the saving.
+
+***Success Response:***
+```json
+{
+  "id": "saving_id",
+  "user_id": "user_id",
+  "description": "Saving description",
+  "category_id": "Category ID",
+  "amount": 1000,
+  "priority": "Priority",
+  "target_date": "Target date",
+  "created_at": "Timestamp",
+  "updated_at": "Timestamp"
+}
+```
+### 6. getAllSavings
+***Endpoint:***
+
+```bash
+Method: GET
+Type: 
+URL: http://localhost:3001/contributions/me
+```
+***Headers:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| Authorization | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVjZWUwMGUyLWZhOGYtNDJmOS1iMzAxLTUwNmJjOWIxZmUyNCIsInJvbGUiOiJtb2RlcmF0b3IiLCJpYXQiOjE3MDk2MDYwMzUsImV4cCI6MTcwOTY5MjQzNX0.HHb0uA0aFm4Q53Q6aLv8HIV3BTwLyn0NG-fHU6BytPc |  |
+
+---
+
+# Contributions
+1. [getContributionsByConditions](#1-getcontributionsbyconditions)
+2. [getContributionById](#2-getcontributionbyid)
+3. [createContribution](#3-createcontribution)
+
+## Endpoints
+### 1. getContributionsByConditions
+***Endpoint:***
+
+```bash
+Method: GET
+Type: 
+URL: https://save-up-3w7t.onrender.com/contributions/{scope}
+```
+
+***Request Parameters***
+Scope: A string parameter indicating the contributions identifier. It can be::
+- `me`: Retrieves information about the currently logged-in user's contrubution.Can be used by all users
+- `all`: Retrieves information about all contributions (requires Admin or Moderator role)..
+- `ContributionId`: Retrieves information about contributions based on their ID.
+
+***Query Parameters***:
+- `saving_id` (optional): Filter contributions by saving ID.
+- `category_id` (optional): Filter contributions by category. 
+- `month` (optional): Filter contributions by month.
+
+***Headers:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| authorization | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTAyMzY1MDJ9.2Amq0FHnXndZJXi2FZBFdkDnBI-ztx5HvHG_CUviAK0 |  |
+| refresh-token | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTA3NTQ5MDJ9.mMS61QjvEuq1Abk7LKOR761v2WFvKDQr21c50S38qfs |  |
+
+### 2. getContributionById
+***Endpoint:***
+
+```bash
+Method: GET
+Type: 
+URL: https://save-up-3w7t.onrender.com/contributions/records/b3bba124-a70f-4fb8-9506-a9e5d3e712b9
+```
+***Headers:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| authorization | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTAyMzY1MDJ9.2Amq0FHnXndZJXi2FZBFdkDnBI-ztx5HvHG_CUviAK0 |  |
+| refresh-token | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTA3NTQ5MDJ9.mMS61QjvEuq1Abk7LKOR761v2WFvKDQr21c50S38qfs |  |
+
+***Success Response:***
+```json
+{
+  "id": "contribution_id",
+  "saving_id": "saving_id",
+  "amount": 1000,
+  "date": "Contribution date",
+  "created_at": "Timestamp",
+  "updated_at": "Timestamp"
+}
+```
+
+### 3. createContribution
+***Endpoint:***
+
+```bash
+Method: POST
+Type: RAW
+URL: https://save-up-3w7t.onrender.com/contributions
+```
+***Headers:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| authorization | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTAyMzY1MDJ9.2Amq0FHnXndZJXi2FZBFdkDnBI-ztx5HvHG_CUviAK0 |  |
+| refresh-token | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTA3NTQ5MDJ9.mMS61QjvEuq1Abk7LKOR761v2WFvKDQr21c50S38qfs |  |
+
+***Body:***
+
+```js        
+{
+  "saving_id":"05799423-5268-4173-bb4a-d6c659b72d0c",
+  "amount": 200,
+  "date":"2024-03-29T18:52:23.369Z"
+}
+```
+**Success Response:**
+```json
+{
+  "id": "contribution_id",
+  "saving_id": "saving_id",
+  "amount": 1000,
+  "date": "Contribution date",
+  "created_at": "Timestamp",
+  "updated_at": "Timestamp"
+}
+```
+# expenses
+1. [getExpenseByConditions](#1-getexpensebyconditions)
+2. [updateExpense](#2-updateexpense)
+3. [DeleteExpense](#3-deleteexpense)
+4. [createExpense](#4-createexpense)
+
+## Endpoints
+--------
+### 1. getExpenseByConditions
+***Endpoint:***
+
+```bash
+Method: GET
+Type: 
+URL: https://save-up-3w7t.onrender.com/expenses/{scope}
+```
+
+***Request Parameters***
+Scope: A string parameter indicating the expense identifier. It can be::
+- `me`: Retrieves information about the currently logged-in user's expense.Can be used by all users
+- `all`: Retrieves information about all expenses (requires Admin or Moderator role)..
+- `userid`: Retrieves all expenses belonging to a user.(requires Admin or Moderator role)
+
+***Query Parameters***:
+- `category_id` (optional): Filter expensess by category. 
+- `month` (optional): Filter expenses by month.
+
+***Headers:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| authorization | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTAyMzY1MDJ9.2Amq0FHnXndZJXi2FZBFdkDnBI-ztx5HvHG_CUviAK0 |  |
+| refresh-token | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTA3NTQ5MDJ9.mMS61QjvEuq1Abk7LKOR761v2WFvKDQr21c50S38qfs |  |
+
+### 2. updateExpense
+***Endpoint:***
+
+```bash
+Method: PATCH
+Type: RAW
+URL: https://save-up-3w7t.onrender.com/expenses/995687d9-3120-4ecc-9f13-de2f587987a1
+```
+***Headers:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| authorization | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTAyMzY1MDJ9.2Amq0FHnXndZJXi2FZBFdkDnBI-ztx5HvHG_CUviAK0 |  |
+| refresh-token | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTA3NTQ5MDJ9.mMS61QjvEuq1Abk7LKOR761v2WFvKDQr21c50S38qfs |  |
+***Body:***
+
+```js        
+{
+  "description":"Sample update trial"
+}
+```
+
+### 3. DeleteExpense
+***Endpoint:***
+
+```bash
+Method: DELETE
+Type: 
+URL: https://save-up-3w7t.onrender.com/expenses/7c7403eb-84d6-4d9d-9b0f-640114bd52da
+```
+
+***Headers:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| authorization | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTAyMzY1MDJ9.2Amq0FHnXndZJXi2FZBFdkDnBI-ztx5HvHG_CUviAK0 |  |
+| refresh-token | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTA3NTQ5MDJ9.mMS61QjvEuq1Abk7LKOR761v2WFvKDQr21c50S38qfs |  |
+
+### 4. createExpense
+***Endpoint:***
+
+```bash
+Method: POST
+Type: RAW
+URL: https://save-up-3w7t.onrender.com/expenses
+```
+***Headers:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| authorization | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTAyMzY1MDJ9.2Amq0FHnXndZJXi2FZBFdkDnBI-ztx5HvHG_CUviAK0 |  |
+| refresh-token | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTA3NTQ5MDJ9.mMS61QjvEuq1Abk7LKOR761v2WFvKDQr21c50S38qfs |  |
+
+***Body:***
+
+```js        
+{
+  "description": "Payment of rent",
+  "category_id":"49d5064c-ddff-4952-9039-c7b84dddcc58" ,
+  "amount":25000.50,
+  "date": "2024-03-29T00:00:00Z",
+  "user_id": "e3a818c6-2d3f-49b5-a716-a97b8fd4c009"
+}
+```
+**Success Response:**
+```json
+{
+  "id": "expense_id",
+  "description": "Expense description",
+  "category_id": "category_id",
+  "amount": 100.50,
+  "date": "2024-03-09",
+  "user_id": "user_id",
+  "created_at": "Timestamp",
+  "updated_at": "Timestamp"
+}
+```
+
+# Categories
+1. [updateCategories](#1-updatecategories)
+2. [getCategoriesByConditions](#2-getcategoriesbyconditions)
+3. [deleteCategory](#3-deletecategory)
+4. [createCategories](#4-createcategories)
+## Endpoints
+--------
+### 1. updateCategories
+***Endpoint:***
+
+```bash
+Method: PATCH
+Type: RAW
+URL: https://save-up-3w7t.onrender.com/categories/dcc01ca2-7f55-40ca-8f89-be91cbdf82fa
+```
+***Headers:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| authorization | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTAyMzY1MDJ9.2Amq0FHnXndZJXi2FZBFdkDnBI-ztx5HvHG_CUviAK0 |  |
+| refresh-token | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTA3NTQ5MDJ9.mMS61QjvEuq1Abk7LKOR761v2WFvKDQr21c50S38qfs |  |
+
+***Body:***
+
+```js        
+{
+  "name":"this is a trial update jjsss",
+  "description":"another trial"
+}
+```
+
+### 2. getCategoriesByConditions
+***Endpoint:***
+
+```bash
+Method: GET
+Type: 
+URL: https://save-up-3w7t.onrender.com/categories/{scope}
+```
+***Request Parameters***
+Scope: A string parameter indicating the category identifier. It can be::
+- `me`: Retrieves information about the currently logged-in user's categoriwaplus system defined.Can be used by all users.If the user has none it just shows system
+- `all`: Retrieves information about all categories (requires Admin or Moderator role)..
+- `system`: Retrieves information about only system defined categories (requires Admin or Moderator role)..
+- `userid`: Retrieves all categories belonging to a user.(requires Admin or Moderator role)
+
+***Headers:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| authorization | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTAyMzY1MDJ9.2Amq0FHnXndZJXi2FZBFdkDnBI-ztx5HvHG_CUviAK0 |  |
+| refresh-token | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTA3NTQ5MDJ9.mMS61QjvEuq1Abk7LKOR761v2WFvKDQr21c50S38qfs |  |
+
+### 3. deleteCategory
+
+***Endpoint:***
+
+```bash
+Method: DELETE
+Type: 
+URL: https://save-up-3w7t.onrender.com/categories/{categoryid}
+```
+***Headers:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| authorization | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTAyMzY1MDJ9.2Amq0FHnXndZJXi2FZBFdkDnBI-ztx5HvHG_CUviAK0 |  |
+| refresh-token | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTA3NTQ5MDJ9.mMS61QjvEuq1Abk7LKOR761v2WFvKDQr21c50S38qfs |  |
+
+### 4. createCategories
+
+***Endpoint:***
+
+```bash
+Method: POST
+Type: RAW
+URL: https://save-up-3w7t.onrender.com/categories
+```
+***Headers:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| authorization | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTAyMzY1MDJ9.2Amq0FHnXndZJXi2FZBFdkDnBI-ztx5HvHG_CUviAK0 |  |
+| refresh-token | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTA3NTQ5MDJ9.mMS61QjvEuq1Abk7LKOR761v2WFvKDQr21c50S38qfs |  |
+
+***Body:***
+
+```js        
+{
+  "user_id":"e3a818c6-2d3f-49b5-a716-a97b8fd4c009",
+  "description":"Purchasing my new reading collection",
+  "name":"Reading"
+}
+```
+***Success Response:***
+```json
+{
+  "id": "category_id",
+  "user_id": "user_id",
+  "name": "Category name",
+  "description": "Category description",
+  "created_at": "Timestamp",
+  "updated_at": "Timestamp"
+}
+```
+
+# SecurityQuestions
+1. [getAllSecurityQuestions](#1-getallsecurityquestions)
+## Endpoints
+
+### 1. getAllSecurityQuestions
+***Endpoint:***
+
+```bash
+Method: GET
+Type: 
+URL: https://save-up-3w7t.onrender.com/security-questions
+```
+***Headers:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| authorization | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTAyMzY1MDJ9.2Amq0FHnXndZJXi2FZBFdkDnBI-ztx5HvHG_CUviAK0 |  |
+| refresh-token | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTA3NTQ5MDJ9.mMS61QjvEuq1Abk7LKOR761v2WFvKDQr21c50S38qfs |  |
+
+**Success Response:**
+```json
+[
+  {
+    "id": "question_id_1",
+    "question": "Security question 1"
+  },
+  {
+    "id": "question_id_2",
+    "question": "Security question 2"
+  },
+]
+```
+
+# Answers
+1. [createSecurityAnsswer](#1-createsecurityansswer)
+## Endpoints
+### 1. createSecurityAnsswer
+***Endpoint:***
+
+```bash
+Method: POST
+Type: RAW
+URL: https://save-up-3w7t.onrender.com/security-answers
+```
+***Headers:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| authorization | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTAyMzY1MDJ9.2Amq0FHnXndZJXi2FZBFdkDnBI-ztx5HvHG_CUviAK0 |  |
+| refresh-token | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTA3NTQ5MDJ9.mMS61QjvEuq1Abk7LKOR761v2WFvKDQr21c50S38qfs |  |
+
+***Body:***
+
+```js        
+{
+  "question_id":"29c1406f-ca4e-401f-aa59-2633ea67e652",
+  "user_id": "e3a818c6-2d3f-49b5-a716-a97b8fd4c009",
+  "answer": "Di Ziyuan"
+}
+
+```
+***Success Response:***
+
+```json
+{
+  "message": "Security answer created successfully"
+}
+```
+---
+# Password
+1. [updatePassword](#1-updatepassword)
+2. [resetPassword](#2-resetpassword)
+3. [verifySecurityAnser](#3-verifysecurityanser)
+4. [verifyPasswordResetToken](#4-verifypasswordresettoken)
+5. [Forgetpassword request](#5-forgetpassword-request)
+
+## Endpoints
+
+### 1. updatePassword
+***Endpoint:***
+
+```bash
+Method: GET
+Type: 
+URL: https://save-up-3w7t.onrender.com/password/update-password
+```
+ ***Headers:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| authorization | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTAyMzY1MDJ9.2Amq0FHnXndZJXi2FZBFdkDnBI-ztx5HvHG_CUviAK0 |  |
+| refresh-token | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTA3NTQ5MDJ9.mMS61QjvEuq1Abk7LKOR761v2WFvKDQr21c50S38qfs |  |
+
+***Body:***
+- `oldPassword`: String (required) - The old password.
+- `newPassword`: String (required) - The new password.
+  
+**Success Response:**
+- Status Code: 200 OK
+```json
+{
+  "message": "Password updated successfully."
+}
+```
+
+### 2. Forgetpassword request
+***Endpoint:***
+
+```bash
+Method: POST
+Type: RAW
+URL: https://save-up-3w7t.onrender.com/password/forget-password-request
+```
+***Body:***
+- `phone_number`: String (required) - The phone number associated with the user's account.
+```js        
+{
+  "phone_number":"+254713518356"
+}
+```
+
+**Success Response:**
+- Status Code: 200 OK
+```json
+{
+  "message": "Password reset token generated and sent successfully.",
+  "userId": "user_id"
+}
+```
+
+
+### 3 verifyPasswordResetToken
+***Endpoint:***
+
+```bash
+Method: POST
+Type: RAW
+URL: https://save-up-3w7t.onrender.com/password/verify-token
+```
+***Body:***
+
+```js        
+{
+   "reset_token":"8752",
+   "user_id":"e3a818c6-2d3f-49b5-a716-a97b8fd4c009"
+}
+```
+***Success Response:***
+- Status Code: 200 OK
+```json
+{
+  "securityQuestions": [
     {
-      "first_name": "Jane",
-      "last_name": "Doe",
-      "phone_no": "+254712345678",
-      "password": "Kenya123"
-    }
-      ```
-### 2. User Login
-
-- **Route**: `POST users/signin`
-- **Description**: Authenticates a user and returns a JWT token.
-- **Request Body**:
-  - `phone_no` (string, required): The phone number of the user.
-  - `password` (string, required): The password for the user account.
-- **Response**:
-  - Status Code: `200 OK`
-  - Body: The authenticated user object  .
-  - Header:  X-Auth-Token', token
-- **Error Responses**:
-  - Status Code: `400 Bad Request`
-    - Description: Returned when the request body is invalid or the provided credentials are incorrect.
-    - Body: 
-      ```json
-      {
-        "error": "Invalid phone number, or password " or "Invalid phone number or password combination"
-      }
-      ```
-
-### 3. User Logout
-
-- **Route**: `POST users/signout`
-- **Description**: Logs out the authenticated user by clearing the authentication header.
-- **Request Headers**:
-  - `X-Auth-Token`: Token for user authentication.
-- **Response**:
-  - Status Code: `200 OK`
-  - Body: Message indicating successful logout.
-
-### 4. Get All Users With Pagination
-
-- **Route**: `GET /` Accesible to only admins or moderators
-- **Description**: Retrieves a list of all users.
-- **Query Parameters** (optional):
-  - `page` (string) Optional: ID of the user associated with the expenses.
-  - `pageSize` (string) Optional: Category of the expenses.
-- **Authorization Header**: Token for user authentication.
-- **Response**:
-  - Status Code: `200 OK`
-  - Body: An array of user objects.
-- **Error Responses**:
-  - Status Code: `404 Not Found`
-    - Description: Returned when no users are found.
-    - Body: 
-      ```json
-      {
-        "error": "No users found"
-      }
-      ```
-
-### 5. Get User by ID
-
-- **Route**: `GET /:id`
-- **Description**: Retrieves a user by their ID.
-- **Request Parameters**:
-  - `id` (string, required): The ID of the user to retrieve.
-- **Response**:
-  - Status Code: `200 OK`
-  - Body: The user object with the specified ID.
-- **Error Responses**:
-  - Status Code: `400 Bad Request`
-    - Description: Returned when the user ID is invalid.
-    - Body: 
-      ```json
-      {
-        "error": "Invalid user data" or "User with submitted ID not found"
-      }
-      ```
-
-### 6. Update User
-
-- **Route**: `PATCH /:id`
-- **Description**: Updates user information.
-- **Request Headers**:
-  - `Authorization`: Token for user authentication.
-- **Request Parameters**:
-  - `id` (string, required): The ID of the user to update.
-- **Request Body**: Fields to be updated.CAN BE either first_name or last_name
-- **Response**:
-  - Status Code: `200 OK`
-  - Body: The updated user object.includeing either first_name or last_name
-- **Error Responses**:
-  - Status Code: `400 Bad Request`
-    - Description: Returned when the user ID or request body is invalid.
-    - Body: 
-      ```json
-      {
-        "error": "Invalid user ID" or "Invalid user data. Please provide valid values for all user fields."
-      }
-      ```
-  - Status Code: `403 Forbidden`
-    - Description: Returned when the user is not authorized to update the user information.
-    - Body: 
-      ```json
-      {
-        "error": "You are not authorized to update this user information"
-      }
-      ```
- 
-### 6. Update User Phone Number
-
-- **Route**: `PATCH /users/update-phone/:id`
-- **Description**: Updates users phonee number.
-- **Request Headers**:
-  - `Authorization`: Token for user authentication.
-- **Request Parameters**:
-  - `id` (string, required): The ID of the user to update.
-- **Request Body**: 
-    - `password` (string, required): The user's current password.
-    - `phone_number` (string, required): The new phone number to update.
-- **Response**:
-  - Status Code: `200 OK`
-  - Body: A success message indicating that the phone number was updated successfully.
-- **Error Responses**:
-  - Status Code: `400 Bad Request`
-    - Description:  Returned when the request body is invalid.
-    - Body: 
-      ```json
-      {
-        "error": "Invalid phone number"
-      }
-      ```
-  - Status Code: `401 Unauthorized`
-    - Description: Returned when the provided password is incorrect.
-    - Body: 
-      ```json
-      {
-         "error": "Invalid password"
-      }
-      ```
-- **Success Responses**:
-  - Status Code: `200`
-- Body: 
-      ```json
-      {
-        "message": "Phone number updated successfully. Please log in with your new phone number"
-      }
-    ```
- 
-
-# Security Questions API
-
- ### 1. Get All Security Questions
-
-- **Route**: `Get /security-questions`
-- **Description**: Gets a complete list of all system defined quetsions.
-- **Permissions**:Open to only admin and the standard user
-
-- **Response**:
-- Status Code: `200 OK`
-- An array of objects containing  all the questions
-- **Error Responses**:
-- [ ] An empty array if no data was found 
-
-
-# Security Answers API
- ### 1. Create Security Answers
-
-- **Route**: `POST /security-answers'`
-- **Description**: Creates security answers to a sceurity question chosen by the user from a list of system defined ones.
-- **Request Body**:
-  - `question_id` (string,uuid, required): The id of the chosen question
-  - `user_id` (string, uuid, required): The id the user.
-  - `answer` (string, required): The user defined answer
-
-- **Response**:
-  - Status Code: `200 OK`
-  - { message: 'Security answer created successfully' }
-- **Error Responses**:
-  - Status Code: `400 Bad Request`
-    - Description: Returned when the request body is invalid .
-    - Body: 
-      ```json
-      {
-        "message": "Security answer created successfully"
-      }
-      ```
-
-# Password Reset API
-
-### 1. Initiate Password Reset
-
-- **Route**: `POST /initiate-password`
-- **Description**: .
-- **Request Body**:This endpoint initiates the process for resetting a user's password. It verifies the user's identity through their phone number and a security answer provided by the user.
-  - `phoneNo` (string, required): The phone number of the user requesting password reset.
-  - `securityAnswer` (string, required): The security answer provided by the user.
-
-- **Response**:
-  - Status Code: `200 OK`
-  - Body:
-    ```json
+      "id": "question_id",
+      "question": "security_question"
+    },
     {
-      "message": "Reset token generated and sent successfully."
-    }
-    ```
-- **Error Responses**:
-  - Status Code: `400 Bad Request`
-    - Body:
-      ```json
-      {
-          "message": "Incorrect security answer or security answer not found for the user"
-      }
-      ```
+      "id": "question_id",
+      "question": "security_question"
+    },
+  ]
+}
+```
 
-### 2. Reset Password
+### 3. verifySecurityAnser
+***Endpoint:***
 
-- **Route**: `POST /reset-password`
-- **Description**: Resets the password of the user using a valid reset token.
-- **Request Body**:
-  - `newPassword` (string, required): The new password for the user account.
-  - `resetToken` (string, required): The reset token received by the user via SMS.
-- **Response**:
-  - Status Code: `200 OK`
-  - Body:
-    ```json
+```bash
+Method: POST
+Type: RAW
+URL: https://save-up-3w7t.onrender.com/password/verify-security-answers
+```
+***Body:***
+- `user_id`: String (required) - The ID of the user.
+- `answers`: Array (required) - Array of security question IDs and corresponding answers provided by the user.
+  - `question_id`: String - The ID of the security question.
+  - `answer`: String - The answer to the security question
+
+```js        
+{
+  "answers": [
     {
-      "message": "Password updated successfully. Login"
-    }
-    ```
-- **Error Responses**:
-  - Status Code: `400 Bad Request`
-    - Body (Token Expired):
-      ```json
-      {
-        "error": "The reset token has expired. Please generate a new one."
-      }
-      ```
-    - Body (Invalid Token):
-      ```json
-      {
-        "error": "Invalid reset token."
-      }
-      ```
-
-# Categories API
-
-### 1. Create Category
-
-- **Route**: `POST /categories`
-- **Description**: Creates a new category.
-- **Request Body**:
-  - `user_id` (string,uuid, required): The UUID of the user creating the category.
-  - `name` (string, required): The name of the category.
-  - `description` (string, optional): The description of the category.
-- **Response**:
-  - Status Code: `200 OK`
-  - Body: The created category object
-  - Header: Token with name X-Auth-Token
-- **Error Responses**:
-  - Status Code: `400 Bad Request`
-    - Description: Returned when the request body is invalid.
-    - Body:
-      ```json
-      {
-        "error": "Invalid category data"
-      }
-      ```
-  - Status Code: `500 Internal Server Error`
-    - Description: Returned when there's a server-side error.
-- **Sample request**:
-    ```json
+      "question_id": "0d251871-9f84-491f-a4fa-5bb834674731",
+      "answer": "Okothe"
+    },
     {
-      "user_id": "123e4567-e89b-12d3-a456-426614174000",
-      "name": "Food",
-      "description": "All food related expenses"
-    }
-    ```
-  ### 1. Get Category By Userid
-
-- **Route**: `POST /categories?user_id=sampleuserid`
-- **Description**: It will bring all categories belonging to logged in user and also bring the systemdefined categories the default ones.
-- **Request Body**:
-  - `user_id` (string,uuid, required): The UUID of the user creating the category.
-- **Response**:
-  - Status Code: `200 OK`
-  - Body: array of categories or []
-  - Header: Token with name X-Auth-Token
-
-
-### 2. Update Category
-
-- **Route**: `PATCH /categories/:id`
-- **Description**: Updates an existing category.
-- **Request Parameters**:
-  - `id` (string, required): The UUID of the category to update.
-- **Request Body**:
-  - `name` (string, optional): The new name of the category.
-  - `description` (string, optional): The new description of the category.
-- **Authorization**:
-  - Required Role: User
-- **Response**:
-  - Status Code: `200 OK`
-  - Body: The updated category object
-- **Error Responses**:
-  - Status Code: `400 Bad Request`
-    - Description: Returned when the request body is invalid.
-  - Status Code: `404 Not Found`
-    - Description: Returned when the category with the provided ID is not found.
-- **Sample request**:
-    ```json
+      "question_id": "0f4bc545-122c-4733-80e7-bf67fa7b738d",
+      "answer": "Lilac"
+    },
     {
-      "name": "New Food Category",
-      "description": "Updated description for food category"
+      "question_id": "29c1406f-ca4e-401f-aa59-2633ea67e652",
+      "answer": "Di Ziyuan"
     }
-    ```
+  ],
+  "user_id": "e3a818c6-2d3f-49b5-a716-a97b8fd4c009"
+}
 
+```
+**Success Response:**
+- Status Code: 200 OK
+```json
+{
+  "message": "Security questions answered successfully. You can now reset your password."
+}
 
-### 3. Get Categories
+```
 
-- **Route**: `GET /categories/all`
-- **Description**: Fetches categories from the database.accesible to admin snd moderator only
-- **Authorization**:
-  - Required Role: Admin or Moderator
-- **Response**:
-  - Status Code: `200 OK`
-  - Content-Type: application/json
-  - Body: An array of category objects
-- **Error Responses**:
-  - Status Code: `500 Internal Server Error`
-    - Description: If there's a server-side error.
+***Error Response:***
+- Status Code: 200 OK
+```json
+{
+  "error": "Incorrect answers. Contact customer service for help."
+}
 
+```
 
-### 4. Delete Category
+### 4. resetPassword
 
-- **Route**: `DELETE /categories/:id`
-- **Description**: Deletes a category.
-- **Authorization**:
-  - Required Role: User
-- **Request Parameters**:
-  - `id` (string, required): The ID of the category to delete.
-- **Response**:
-  - Status Code: `200 OK`
-  - Content-Type: application/json
-  - Body: 
-    ```json
-    {
-      "message": "Category deleted successfully"
-    }
-    ```
-- **Error Responses**:
-  - Status Code: `400 Bad Request`
-    - Description: If the provided category ID is invalid.
-  - Status Code: `404 Not Found`
-    - Description: If the category with the provided ID is not found.
+***Endpoint:***
 
-### 5. Get Categories by User_id ID
+```bash
+Method: POST
+Type: RAW
+URL: https://save-up-3w7t.onrender.com/password/reset
+```
 
-- **Route**: `GET /categories?user_id=sampleid`
-- **Description**: Retrieves categories filtered by user ID it also includes thesystem defined ones.
-- **Request Parameters**:
-  - `user_id` (string, required): The ID of the user to filter categories by.
-- **Response**:
-  - Status Code: `200 OK`
-  - Body: An array of category objects filtered by the specified user ID.
-- **Error Responses**:
-  - Status Code: `400 Bad Request`
-    - Description: Returned when the user ID is invalid.
-    - Body: 
-      ```json
-      {
-        "error": "Invalid user data" or "User with submitted ID not found"
-      }
-      ```
+***Body:***
+- `id`: String (required) - The ID of the user.
+- `new_password`: String (required) - The new password for the user.
 
-# Savings API
+***Success Response:***
+- Status Code: 200 OK
+```json
+{
+  "message": "Password updated successfully. Login"
+}
+```
 
-### 1. Create Saving
+---
+[Back to top](#answers)
+[Back to top](#password)
+[Back to top](#securityquestions)
+[Back to top](#categories)
+[Back to top](#expenses)
+[Back to top](#contributions)
+[Back to savings](#savings)
+[Back to users](#users)
 
-- **Route**: `POST /`
-- **Request Headers**:
-  - `Authorization`: Token for user authentication.
-- **Description**: Creates a new saving entry.
-- **Request Body**:
-  - `user_id` (string, required): The ID of the user associated with the saving.
-  - `description` (string, required): Description of the saving.
-  - `category_id` (uuid, required): Category id of the saving.
-  - `target_amount` (number, required): Target amount of the saving.
-  - `priority` (string, required): Priority level of the saving.
-  - `target_date` (string, required): Target date for achieving the saving.
-- **Response**:
-  - Status Code: `201 Created`
-  - Body: The created saving object.
-- **Error Responses**:
-  - Status Code: `400 Bad Request`
-    - Description: Returned when the request body is invalid.
-    - Body: 
-      ```json
-      {
-        "error": "Invalid saving data"
-      }
-      ```
-
-### 2. Get All Savings
-
-- **Route**: `GET savings/all`
-- **Description**: Retrieves all savings entries.Accesible yo only admin and moderators
-- **Query Parameters** (optional):
-  - `page` (string) Optional: ID of the user associated with the expenses.
-  - `pageSize` (string) Optional: Category of the expenses.
-- **Response**:
-  - Status Code: `200 OK`
-  - Body: An array of all savings entries.
-- **Error Responses**:
-  - Status Code: `404 Not Found`
-    - Description: Returned when no savings are found.
-    - Body: 
-      ```json
-      {
-        "error": "No savings found"
-      }
-      ```
-
-### 3. Update Saving
-
-- **Route**: `PATCH /:id`
-- **Description**: Updates an existing saving entry.
-- - **Request Headers**:
-  - `Authorization`: Token for user authentication.
-- **Request Parameters**:
-  - `id` (string, required): The ID of the saving to update.
-- **Request Body**: Fields to be updated.
-- **Response**:
-  - Status Code: `200 OK`
-  - Body: The updated saving object. INCLUDEITING EITHER OF THE FOLLOWING   description:STRINF, target_amount:NUMBER, priority:STRING, target_date:STRING
-- **Error Responses**:
-  - Status Code: `400 Bad Request`
-    - Description: Returned when the request body or saving ID is invalid.
-    - Body: 
-      ```json
-      {
-        "error": "Invalid saving data" or "Saving with given ID not found"
-      }
-      ```
-  - Status Code: `403 Forbidden`
-    - Description: Returned when the user is not authorized to update the saving.
-    - Body: 
-      ```json
-      {
-        "error": "You are not authorized to update this saving"
-      }
-      ```
-
-### 4. Delete Saving
-
-- **Route**: `DELETE /:id`
-- **Description**: Deletes an existing saving entry.
-- - **Request Headers**:
-  - `Authorization`: Token for user authentication.
-- **Request Parameters**:
-  - `id` (string, required): The ID of the saving to delete.
-- **Response**:
-  - Status Code: `204 No Content`
-    - Description: Returned when the saving is deleted successfully.
-  - Status Code: `400 Bad Request`
-    - Description: Returned when the saving with the provided ID is not found.
-    - Body: 
-      ```json
-      {
-        "error": "Saving with provided ID not found"
-      }
-      ```
-- **Error Responses**:
-  - Status Code: `403 Forbidden`
-    - Description: Returned when the user is not authorized to delete the saving.
-    - Body: 
-      ```json
-      {
-        "error": "You are not authorized to update this saving"
-      }
-      ```
-
-### 5. Get Savings By Userid
-
-- **Route**: `GET /savings?user_id=sample&priority=high&you can add other queries`
-- **Description**: Retrieves savings data for a user and further filters them based on the provided filters.
-- **Query Parameters**:
-  - `user_id` (string, required): The ID of the user whose savings are to be retrieved.
-  - `priority` (string, optional): Filter savings by priority.
-  - `status` (string, optional): Filter savings by status.
-  - `order`(string,optional): Its value can either be `asc` or `desc` 
-  - `page`(string,optional):  The page number of the results to retrieve.
-  - `pageSize`(string,optional):he number of savings to include per page.
-- **Request Headers**:
-  - `Authorization`: Token for user authentication.
-- **Response**:
-  - Status Code: `200 OK`
-  - Body: An array of savings objects matching the provided filters.
-- **Error Responses**:
-  - Status Code: `403 Forbidden`
-    - Description: Returned when a user attempts to access savings data that does not belong to them.
-    - Body: 
-      ```json
-      {
-        "error": "Unauthorized access"
-      }
-      ```
-  - Status Code: `404 Not Found`
-    - Description: Returned when no savings data is found for the provided query parameters.
-    - Body: 
-      ```json
-      {
-        "error": "No savings found with the provided filters"
-      }
-      ```
-### 6. Get Savings By SavingID
-
-- **Route**: `GET /savings/:ID`
-- **Description**: Retrieves savings data based on SAVINGid.
-- **Request Headers**:
-  - `Authorization`: Token for user authentication.
-- **Response**:
-  - Status Code: `200 OK`
-  - Body: A saving object.
-- **Error Responses**:
-  - Status Code: `403 Forbidden`
-    - Description: Returned when a user attempts to access savings data that does not belong to them.
-    - Body: 
-      ```json
-      {
-        "error": "Unauthorized access"
-      }
-      ```
-  - Status Code: `404 Not Found`
-    - Description: Returned when no savings data is found for the provided query parameters.
-    - Body: 
-      ```json
-      {
-        "error": "No savings found "
-      }
-      ```
-      
-### 7. Get All Savings
-
-- **Route**: `GET savings/all` Accesible to only admins or moderators
-- **Description**: Retrieves a list of all users.
-- **Response**:
-  - Status Code: `200 OK`
-  - Body: An array of user objects.
-- **Error Responses**:
-  - Status Code: `404 Not Found`
-    - Description: Returned when no users are found.
-    - Body: 
-      ```json
-      {
-        "error": "No users found"
-      }
-      ```
-
-
-# Contributions API
-
-### 1. Create Contribution
-
-- **Route**: `POST /`
-- **Description**: Creates a new contribution.
-- **Request Body**:
-  - `saving_id` (string, required): The ID of the savings associated with the contribution.
-  - `amount` (number, required): The amount of the contribution.
-  - `date` (string, required): The date of the contribution.
-- **Authorization Header**: Token for user authentication.
-- **Response**:
-  - Status Code: `201 Created`
-  - Body: The created contribution object.
-- **Error Responses**:
-  - Status Code: `400 Bad Request`
-    - Description: Returned when the request body is invalid or the saving ID is invalid.
-    - Body: 
-      ```json
-      {
-        "error": "Invalid saving id, amount, or date"
-      }
-      ```
-
-### 2. Get All Contributions With Pagination 
-
-- **Route**: `GET /contributions/all`
-- **Description**: Retrieves a list of all contributions.
-- **Permission**: Admin and Moderators.
-  - **Query Parameters** (optional):
-  - `page` (string) Optional: ID of the user associated with the expenses.
-  - `pageSize` (string) Optional: Category of the expenses.
-- **Response**:
-  - Status Code: `200 OK`
-  - Body: An array of contribution objects.
-- **Error Responses**:
-  - Status Code: `404 Not Found`
-    - Description: Returned when no contributions are found.
-    - Body: 
-      ```json
-      {
-        "error": "No contributions found"
-      }
-      ```
-
-### 3. Get Contribution by ID
-
-- **Route**: `GET /:id`
-- **Description**: Retrieves a contribution by its ID.
-- **Request Parameters**:
-  - `id` (string, required): The ID of the contribution to retrieve.
-- **Authorization Header**: Token for user authentication.
-- **Response**:
-  - Status Code: `200 OK`
-  - Body: The contribution object with the specified ID.
-- **Error Responses**:
-  - Status Code: `400 Bad Request`
-    - Description: Returned when the contribution ID is invalid.
-    - Body: 
-      ```json
-      {
-        "error": "Invalid contributions ID"
-      }
-      ```
-  - Status Code: `404 Not Found`
-    - Description: Returned when the contribution with the provided ID is not found.
-    - Body: 
-      ```json
-      {
-        "error": "Contribution with provided ID not found"
-      }
-      ```
-
-### 4. Update Contribution
-
-- **Route**: `PATCH /:id`
-- **Description**: Updates a contribution.
-- **Request Parameters**:
-  - `id` (string, required): The ID of the contribution to update.
-- **Request Body**: Fields to be updated.
-- **Authorization Header**: Token for user authentication.
-- **Response**:
-  - Status Code: `200 OK`
-  - Body: The updated contribution object.
-- **Error Responses**:
-  - Status Code: `400 Bad Request`
-    - Description: Returned when the contribution ID or request body is invalid.
-    - Body: 
-      ```json
-      {
-        "error": "Invalid contributions data. Please provide valid values for all user fields."
-      }
-      ```
-  - Status Code: `403 Forbidden`
-    - Description: Returned when the user is not authorized to update the contribution.
-    - Body: 
-      ```json
-      {
-        "error": "Unauthorized to update contribution for this user"
-      }
-      ```
-
-### 5. Delete Contribution
-
-- **Route**: `DELETE /:id`
-- **Description**: Deletes a contribution.
-- **Request Parameters**:
-  - `id` (string, required): The ID of the contribution to delete.
-- **Authorization Header**: Token for user authentication.
-- **Response**:
-  - Status Code: `204 No Content`
-    - Description: Returned when the contribution is deleted successfully.
-- **Error Responses**:
-  - Status Code: `400 Bad Request`
-    - Description: Returned when the contribution ID is invalid.
-    - Body: 
-      ```json
-      {
-        "error": "Invalid user ID"
-      }
-      ```
-  - Status Code: `404 Not Found`
-    - Description: Returned when the contribution with the provided ID is not found.
-    - Body: 
-      ```json
-      {
-        "error": "Contribution with given ID not found"
-      }
-      ```
-
-### 6. Get Contributions by Saving ID
-
-- **Route**: `GET /savings?saving_id=samplesavingid`
-- **Description**: Retrieves contributions associated with a specific savings.
-- **Request Parameters**:
-  - `saving_id` (string, required): The ID of the savings.
-  - `page` (string, optional): The page number for pagination..
-  - `pageSize` (string, optional): The number of items per page for pagination..
-- **Authorization Header**: Token for user authentication.
-- **Response**:
-  - Status Code: `200 OK`
-  - Body: An array of contribution objects.
-- **Error Responses**:
-  - Status Code: `400 Bad Request`
-    - Description: Returned when the saving ID is invalid.
-    - Body: 
-      ```json
-      {
-        "error": "Invalid saving ID"
-      }
-      ```
-  - Status Code: `404 Not Found`
-    - Description: Returned when no contributions are found for the specified saving ID.
-    - Body: 
-      ```json
-      {
-        "error": "Contribution with given savingID not found"
-      }
-      ```
-
-# Cumulatives
-
-### 1. Get Total Target Amount
-
-- **Route**: `GET /cumulatives/total-target-amount`
-- **Description**: Retrieves the total target amount for savings based on the provided filters.
-- **Query Parameters**:
-  - `category_id` (string, optional): The ID of the category whose savings' total target amount we want to retrieve.
-  - `priority` (string, optional): Filter by a particular category.
-  - `status` (string, optional): Filter by a particular status of savings.
-- **Request Headers**:
-  - `Authorization`: Token for user authentication.
-- **Response**:
-  - **Status Code**: `200 OK`
-  - **Successful Response**: 
-    ```json
-    {
-      "total_target_amount": "60000"
-    }
-    ```
-  - If no sum is found, it returns 
-    ```json
-    {
-      "total_target_amount": "0"
-    }
-    ```
-
-### 2. Get Total Contributed Amount
-
-- **Route**: `GET /cumulatives/total-contributions`
-- **Description**: Retrieves the total amount contributed by a user.
-- **Request Headers**:
-  - `Authorization`: Token for user authentication.
-- **Response**:
-  - **Status Code**: `200 OK`
-  - **Successful Response**: 
-    ```json
-    {
-      "total_contributed_amount": "60000"
-    }
-    ```
-  - If no sum is found, it returns 
-    ```json
-    {
-      "total_contributed_amount": "0"
-    }
-    ```
-
-
-# Expense API
-
-### 1. Create Expense
-
-- **Route**: `POST /expenses`
-- **Description**: Creates a new expense.
-- **Request Body**:
-  - `description` (string, required): Description of the expense.
-  - `category_id` (string,uuid, required): Category of the expense.
-  - `amount` (number, required): Amount of the expense.
-  - `date` (string, required): Date of the expense.
-  - `user_id` (string, required): ID of the user associated with the expense.
-- **Authorization Header**: Token for user authentication.
-- **Response**:
-  - Status Code: `201 Created`
-  - Body: The created expense object.
-- **Error Responses**:
-  - Status Code: `400 Bad Request`
-    - Description: Returned when the request body is invalid.
-    - Body: 
-      ```json
-      {
-        "error": "Invalid expense data provided"
-      }
-      ```
-
-### 2. Get All Expenses With Pagination
-
-- **Route**: `GET /expenses/all`
-- **Description**: Retrieves a list of all expenses.For admin and moderators only
-- **Query Parameters** (optional):
-  - `page` (string) Optional: ID of the user associated with the expenses.
-  - `pageSize` (string) Optional: Category of the expenses.
-- **Response**:
-  - Status Code: `200 OK`
-  - Body: An array of expense objects.
-- **Error Responses**:
-  - Status Code: `404 Not Found`
-    - Description: Returned when no expenses are found.
-    - Body: 
-      ```json
-      {
-        "error": "No expenses found"
-      }
-      ```
-
-### 3. Get Expense by ID
-
-- **Route**: `GET expense/:id`
-- **Description**: Retrieves an expense by its ID.
-- **Request Parameters**:
-  - `id` (string, required): The ID of the expense to retrieve.
-- **Authorization Header**: Token for user authentication.
-- **Response**:
-  - Status Code: `200 OK`
-  - Body: The expense object with the specified ID.
-- **Error Responses**:
-  - Status Code: `400 Bad Request`
-    - Description: Returned when the expense ID is invalid.
-    - Body: 
-      ```json
-      {
-        "error": "Invalid expense ID"
-      }
-      ```
-  - Status Code: `404 Not Found`
-    - Description: Returned when the expense with the provided ID is not found.
-    - Body: 
-      ```json
-      {
-        "error": "Expense with submitted ID not found"
-      }
-      ```
-
-### 4. Update Expense
-
-- **Route**: `PATCH expense/:id`
-- **Description**: Updates an expense.
-- **Request Parameters**:
-  - `id` (string, required): The ID of the expense to update.
-- **Request Body**: Fields to be updated siethr  description:string, category_id:stringuuid, amount:number
-- **Response**:
-  - Status Code: `200 OK`
-  - Body: The updated expense object.
-- **Error Responses**:
-  - Status Code: `400 Bad Request`
-    - Description: Returned when the expense ID or request body is invalid.
-    - Body: 
-      ```json
-      {
-        "error": "Invalid data"
-      }
-      ```
-  - Status Code: `403 Forbidden`
-    - Description: Returned when the user is not authorized to update the expense.
-    - Body: 
-      ```json
-      {
-        "error": "You are not authorized to update this expense"
-      }
-      ```
-
-### 5. Delete Expense
-
-- **Route**: `DELETE /:id`
-- **Description**: Deletes an expense.
-- **Request Parameters**:
-  - `id` (string, required): The ID of the expense to delete.
-- **Authorization Header**: Token for user authentication.
-- **Response**:
-  - Status Code: `204 No Content`
-    - Description: Returned when the expense is deleted successfully.
-- **Error Responses**:
-  - Status Code: `400 Bad Request`
-    - Description: Returned when the expense ID is invalid.
-    - Body: 
-      ```json
-      {
-        "error": "Invalid expense ID"
-      }
-      ```
-  - Status Code: `403 Forbidden`
-    - Description: Returned when the user is not authorized to delete the expense.
-    - Body: 
-      ```json
-      {
-        "error": "You are not authorized to delete this expense"
-      }
-      ```
-
-### 6. Get Expenses by Userid
-
-- **Route**: `GET /expenses?user_id=sanpleuserid & optional parameters `
-- **Description**: Retrieves expenses based on query parameters.
-- **Query Parameters** :
-  - `user_id` (string,required): ID of the user associated with the expenses.
-  - `category_id` (string,optional): Category of the expenses.
-  - `month` (number,optional): Month of the expenses IN numerics eg 2 for february.
-  - `order` (string, optional): Value can either be `asc` or `desc`
-- **Authorization Header**: Token for user authentication.
-- **Response**:
-  - Status Code: `200 OK`
-  - Body: An array of expense objects.
-- **Error Responses**:
-  - Status Code: `400 Bad Request`
-    - Description: Returned when the query parameters are invalid.
-    - Body: 
-      ```json
-      {
-        "error": "Invalid query parameters"
-      }
-      ```
-  - Status Code: `404 Not Found`
-    - Description: Returned when no expenses match the query parameters.
-    - Body: 
-      ```json
-      {
-        "error": "No savings found for the provided user ID/category/date"
-      }
-      ```
-
+>Generated at 2024-03-11 12:32:40 by [docgen](https://github.com/thedevsaddam/docgen)
