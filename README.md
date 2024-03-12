@@ -45,6 +45,12 @@
     - [3 verifyPasswordResetToken](#3-verifypasswordresettoken)
     - [3. verifySecurityAnser](#3-verifysecurityanser)
     - [4. resetPassword](#4-resetpassword)
+- [Cumulatives](#cumulatives)
+  - [Endpoints](#endpoints-8)
+    - [1. getTopExpenseCategories](#1-gettopexpensecategories)
+    - [2. getTotalUserSavings](#2-gettotalusersavings)
+    - [3. getTotalUserContributions](#3-gettotalusercontributions)
+    - [4. getTotalUserExpense](#4-gettotaluserexpense)
 
 ## Endpoints
 ### 1. updateUserPhoneNo
@@ -1007,3 +1013,96 @@ URL: https://save-up-3w7t.onrender.com/password/reset
 [Back to users](#users)
 
 >Generated at 2024-03-11 12:32:40 by [docgen](https://github.com/thedevsaddam/docgen)
+
+
+# Cumulatives
+1. [getTopExpenseCategories](#1-gettopexpensecategories)
+2. [getTotalUserSavings](#2-gettotalusersavings)
+3. [getTotalUserContributions](#3-gettotalusercontributions)
+4. [getTotalUserExpense](#4-gettotaluserexpense)
+5. 
+## Endpoints
+### 1. getTopExpenseCategories
+
+***Endpoint:***
+
+```bash
+Method: GET
+Type: 
+URL: https://save-up-3w7t.onrender.com/cumulatives/top-expenditure-categories
+```
+
+***Headers:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| authorization | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImE5YjI0ZTQ3LWY0NDUtNDVmMS1iZTg1LTkyYjE2ZjcwYjM0OCIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTk1OTA4LCJleHAiOjE3MTAyODIzMDh9.6aEVfweLk_fz0atNEbU1oo1nuzh4cvKRezPgqXHUHwY |  |
+| refresh-token | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImE5YjI0ZTQ3LWY0NDUtNDVmMS1iZTg1LTkyYjE2ZjcwYjM0OCIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTk1OTA4LCJleHAiOjE3MTA4MDA3MDh9.dS-vSuJUgfukdC8pHIcaBFWa6Jh4xHCUDdyd6R2g6Mg |  |
+
+### 2. getTotalUserSavings
+***Endpoint:***
+
+```bash
+Method: GET
+Type: 
+URL: https://save-up-3w7t.onrender.com/cumulatives/total-target-amount
+```
+
+***Headers:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| authorization | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImE5YjI0ZTQ3LWY0NDUtNDVmMS1iZTg1LTkyYjE2ZjcwYjM0OCIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTk1OTA4LCJleHAiOjE3MTAyODIzMDh9.6aEVfweLk_fz0atNEbU1oo1nuzh4cvKRezPgqXHUHwY |  |
+| refresh-token | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImE5YjI0ZTQ3LWY0NDUtNDVmMS1iZTg1LTkyYjE2ZjcwYjM0OCIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTk1OTA4LCJleHAiOjE3MTA4MDA3MDh9.dS-vSuJUgfukdC8pHIcaBFWa6Jh4xHCUDdyd6R2g6Mg |  |
+
+### 3. getTotalUserContributions
+***Endpoint:***
+
+```bash
+Method: GET
+Type: 
+URL: https://save-up-3w7t.onrender.com/cumulatives//total-contributions
+```
+***Headers:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| authorization | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImE5YjI0ZTQ3LWY0NDUtNDVmMS1iZTg1LTkyYjE2ZjcwYjM0OCIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTk1OTA4LCJleHAiOjE3MTAyODIzMDh9.6aEVfweLk_fz0atNEbU1oo1nuzh4cvKRezPgqXHUHwY |  |
+| refresh-token | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImE5YjI0ZTQ3LWY0NDUtNDVmMS1iZTg1LTkyYjE2ZjcwYjM0OCIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTk1OTA4LCJleHAiOjE3MTA4MDA3MDh9.dS-vSuJUgfukdC8pHIcaBFWa6Jh4xHCUDdyd6R2g6Mg |  |
+
+***Query params:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| startDate | 2023-01-11 |  |
+| endDate |  2024-01-11 |  |
+
+
+
+### 4. getTotalUserExpense
+
+***Endpoint:***
+
+```bash
+Method: GET
+Type: 
+URL: https://save-up-3w7t.onrender.com/cumulatives/total-expenses
+```
+
+
+***Headers:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| authorization | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImE5YjI0ZTQ3LWY0NDUtNDVmMS1iZTg1LTkyYjE2ZjcwYjM0OCIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTk1OTA4LCJleHAiOjE3MTAyODIzMDh9.6aEVfweLk_fz0atNEbU1oo1nuzh4cvKRezPgqXHUHwY |  |
+| refresh-token | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImE5YjI0ZTQ3LWY0NDUtNDVmMS1iZTg1LTkyYjE2ZjcwYjM0OCIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTk1OTA4LCJleHAiOjE3MTA4MDA3MDh9.dS-vSuJUgfukdC8pHIcaBFWa6Jh4xHCUDdyd6R2g6Mg |  |
+
+***Query params:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| categoryId | 52575644-c176-4937-b76e-61fd70a003fd |  |
+| startDate | 2023-01-11 |  |
+| endDate |  2024-01-11 |  |
+
+
