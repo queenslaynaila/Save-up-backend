@@ -4,7 +4,7 @@ import authMiddleware from '../../middleware/auth';
 
 
 const SQL_GET_TOTAL_TARGET_AMOUNT = sql<{ [key: string]: string },{ total_target_amount: number }>(`
-    SELECT COALESCE(SUM(target_amount), 0) AS total_target_amount
+    SELECT COALESCE(SUM(amount), 0) AS total_target_amount
     FROM savings
 `);
 
