@@ -27,7 +27,7 @@ export default (router: Router) => {
       }
       if (categoryId){
         filterArgs.categoryId = categoryId;
-        filters.push(`category_id = :category_id`);
+        filters.push(`category_id = :categoryId`);
       }
 
       const query = SQL_GET_TOTAL_EXPENSES({userId });
