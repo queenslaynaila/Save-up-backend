@@ -65,8 +65,8 @@ URL: https://save-up-3w7t.onrender.com/users/update-phone/e3a818c6-2d3f-49b5-a71
 
 | Key | Value | Description |
 | --- | ------|-------------|
-| authorization | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTQ4MjU1LCJleHAiOjE3MTAyMzQ2NTV9.gVtpGJNoQYu2GfMHgB1B_ixlDlA2htXpNG_hSXEf0nY |  |
-| refresh-token | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTQ4MjU1LCJleHAiOjE3MTA3NTMwNTV9.Obl2XR1gyRWyjhTha8de4rqMSprTwgYR2U2yJrSgLW0 |  |
+| authorization | Bearer <access_token>  |  |
+| refresh-token | Bearer <access_token>  |  |
 
 ***Body:*** The new phone number along with password
 ```js        
@@ -105,8 +105,8 @@ Scope:A string parameter indicating the user's identifier. It can be:
 
 | Key | Value | Description |
 | --- | ------|-------------|
-| authorization | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTQ4MjU1LCJleHAiOjE3MTAyMzQ2NTV9.gVtpGJNoQYu2GfMHgB1B_ixlDlA2htXpNG_hSXEf0nY |  |
-| refresh-Token | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTQ4MjU1LCJleHAiOjE3MTA3NTMwNTV9.Obl2XR1gyRWyjhTha8de4rqMSprTwgYR2U2yJrSgLW0 |  |
+| authorization | Bearer <access_token>  |  |
+| refresh-token | Bearer <access_token>  |  |
 
 ***SampleResponse:*** when all is used.With me its just an array of one object rep the logged in user,sane with userid one obje rep the user searched
 ```json
@@ -144,8 +144,8 @@ URL: https://save-up-3w7t.onrender.com/users/signout
 
 | Key | Value | Description |
 | --- | ------|-------------|
-| authorization | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTQ4MjU1LCJleHAiOjE3MTAyMzQ2NTV9.gVtpGJNoQYu2GfMHgB1B_ixlDlA2htXpNG_hSXEf0nY |  |
-| refresh-Token | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTQ4MjU1LCJleHAiOjE3MTA3NTMwNTV9.Obl2XR1gyRWyjhTha8de4rqMSprTwgYR2U2yJrSgLW0 |  |
+| authorization | Bearer <access_token>  |  |
+| refresh-token | Bearer <access_token>  |  |
 
 ***Sample Success Response:***
 ```json
@@ -163,11 +163,10 @@ Type: RAW
 URL: https://save-up-3w7t.onrender.com/users/e3a818c6-2d3f-49b5-a716-a97b8fd4c009
 ```
 ***Headers:***
-
 | Key | Value | Description |
 | --- | ------|-------------|
-| authorization | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTQ4MjU1LCJleHAiOjE3MTAyMzQ2NTV9.gVtpGJNoQYu2GfMHgB1B_ixlDlA2htXpNG_hSXEf0nY |  |
-| refresh-token | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTQ4MjU1LCJleHAiOjE3MTA3NTMwNTV9.Obl2XR1gyRWyjhTha8de4rqMSprTwgYR2U2yJrSgLW0 |  |
+| authorization | Bearer <access_token>  |  |
+| refresh-token | Bearer <access_token>  |  |
 
 ***Body:***
 The first_name and last_name fields are optional. You can provide either or both of them in the request body.
@@ -280,9 +279,8 @@ Scope: A string parameter indicating the savings identifier. It can be::
 
 | Key | Value | Description |
 | --- | ------|-------------|
-| Authorization | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTAyMzY1MDJ9.2Amq0FHnXndZJXi2FZBFdkDnBI-ztx5HvHG_CUviAK0 |  |
-| refresh-token | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTA3NTQ5MDJ9.mMS61QjvEuq1Abk7LKOR761v2WFvKDQr21c50S38qfs |  |
-
+| authorization | Bearer <access_token>  |  |
+| refresh-token | Bearer <access_token>  |  |
   
 ***Sample Response:***  
 ```json
@@ -322,8 +320,8 @@ URL: https://save-up-3w7t.onrender.com/savings/473d3361-d5d0-4794-bce7-10950e14d
 
 | Key | Value | Description |
 | --- | ------|-------------|
-| authorization | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTAyMzY1MDJ9.2Amq0FHnXndZJXi2FZBFdkDnBI-ztx5HvHG_CUviAK0 |  |
-| refresh-token | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTA3NTQ5MDJ9.mMS61QjvEuq1Abk7LKOR761v2WFvKDQr21c50S38qfs |  |
+| authorization | Bearer <access_token>  |  |
+| refresh-token | Bearer <access_token>  |  |
 
 **Success Response:**
 ```json
@@ -350,8 +348,8 @@ URL: https://save-up-3w7t.onrender.com/savings/05799423-5268-4173-bb4a-d6c659b72
 
 | Key | Value | Description |
 | --- | ------|-------------|
-| authorization | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTAyMzY1MDJ9.2Amq0FHnXndZJXi2FZBFdkDnBI-ztx5HvHG_CUviAK0 |  |
-| refresh-token | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTA3NTQ5MDJ9.mMS61QjvEuq1Abk7LKOR761v2WFvKDQr21c50S38qfs |  |
+| authorization | Bearer <access_token>  |  |
+| refresh-token | Bearer <access_token>  |  |
 
 ***Body:***
 - description (optional): A string representing the updated description of the saving.
@@ -389,8 +387,8 @@ URL: https://save-up-3w7t.onrender.com/savings/records/05799423-5268-4173-bb4a-d
 
 | Key | Value | Description |
 | --- | ------|-------------|
-| Authorization | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTAyMzY1MDJ9.2Amq0FHnXndZJXi2FZBFdkDnBI-ztx5HvHG_CUviAK0 |  |
-| refresh-token | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTA3NTQ5MDJ9.mMS61QjvEuq1Abk7LKOR761v2WFvKDQr21c50S38qfs |  |
+| authorization | Bearer <access_token>  |  |
+| refresh-token | Bearer <access_token>  |  |
 
 
 
@@ -406,8 +404,8 @@ URL: https://save-up-3w7t.onrender.com/savings/
 
 | Key | Value | Description |
 | --- | ------|-------------|
-| authorization | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTAyMzY1MDJ9.2Amq0FHnXndZJXi2FZBFdkDnBI-ztx5HvHG_CUviAK0 |  |
-| refresh-token | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTA3NTQ5MDJ9.mMS61QjvEuq1Abk7LKOR761v2WFvKDQr21c50S38qfs |  |
+| authorization | Bearer <access_token>  |  |
+| refresh-token | Bearer <access_token>  |  |
 
 ***Request Body:***
 - user_id: The ID of the user associated with the saving.
@@ -443,7 +441,8 @@ URL: http://localhost:3001/contributions/me
 
 | Key | Value | Description |
 | --- | ------|-------------|
-| Authorization | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVjZWUwMGUyLWZhOGYtNDJmOS1iMzAxLTUwNmJjOWIxZmUyNCIsInJvbGUiOiJtb2RlcmF0b3IiLCJpYXQiOjE3MDk2MDYwMzUsImV4cCI6MTcwOTY5MjQzNX0.HHb0uA0aFm4Q53Q6aLv8HIV3BTwLyn0NG-fHU6BytPc |  |
+| authorization | Bearer <access_token>  |  |
+| refresh-token | Bearer <access_token>  |  |
 
 ---
 
@@ -477,8 +476,8 @@ Scope: A string parameter indicating the contributions identifier. It can be::
 
 | Key | Value | Description |
 | --- | ------|-------------|
-| authorization | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTAyMzY1MDJ9.2Amq0FHnXndZJXi2FZBFdkDnBI-ztx5HvHG_CUviAK0 |  |
-| refresh-token | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTA3NTQ5MDJ9.mMS61QjvEuq1Abk7LKOR761v2WFvKDQr21c50S38qfs |  |
+| authorization | Bearer <access_token>  |  |
+| refresh-token | Bearer <access_token>  |  |
 
 ### 2. getContributionById
 ***Endpoint:***
@@ -492,8 +491,8 @@ URL: https://save-up-3w7t.onrender.com/contributions/records/b3bba124-a70f-4fb8-
 
 | Key | Value | Description |
 | --- | ------|-------------|
-| authorization | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTAyMzY1MDJ9.2Amq0FHnXndZJXi2FZBFdkDnBI-ztx5HvHG_CUviAK0 |  |
-| refresh-token | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTA3NTQ5MDJ9.mMS61QjvEuq1Abk7LKOR761v2WFvKDQr21c50S38qfs |  |
+| authorization | Bearer <access_token> |  |
+| refresh-token | Bearer <access_token>  |  |
 
 ***Success Response:***
 ```json
@@ -519,8 +518,8 @@ URL: https://save-up-3w7t.onrender.com/contributions
 
 | Key | Value | Description |
 | --- | ------|-------------|
-| authorization | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTAyMzY1MDJ9.2Amq0FHnXndZJXi2FZBFdkDnBI-ztx5HvHG_CUviAK0 |  |
-| refresh-token | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTA3NTQ5MDJ9.mMS61QjvEuq1Abk7LKOR761v2WFvKDQr21c50S38qfs |  |
+| authorization | Bearer <access_token>  |  |
+| refresh-token | Bearer <access_token>  |  |
 
 ***Body:***
 
@@ -575,8 +574,8 @@ Scope: A string parameter indicating the expense identifier. It can be::
 
 | Key | Value | Description |
 | --- | ------|-------------|
-| authorization | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTAyMzY1MDJ9.2Amq0FHnXndZJXi2FZBFdkDnBI-ztx5HvHG_CUviAK0 |  |
-| refresh-token | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTA3NTQ5MDJ9.mMS61QjvEuq1Abk7LKOR761v2WFvKDQr21c50S38qfs |  |
+| authorization | Bearer <access_token>  |  |
+| refresh-token | Bearer <access_token> |  |
 
 ### 2. updateExpense
 ***Endpoint:***
@@ -590,8 +589,8 @@ URL: https://save-up-3w7t.onrender.com/expenses/995687d9-3120-4ecc-9f13-de2f5879
 
 | Key | Value | Description |
 | --- | ------|-------------|
-| authorization | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTAyMzY1MDJ9.2Amq0FHnXndZJXi2FZBFdkDnBI-ztx5HvHG_CUviAK0 |  |
-| refresh-token | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTA3NTQ5MDJ9.mMS61QjvEuq1Abk7LKOR761v2WFvKDQr21c50S38qfs |  |
+| authorization | Bearer <access_token>  |  |
+| refresh-token | Bearer <access_token>  |  |
 ***Body:***
 
 ```js        
@@ -613,8 +612,8 @@ URL: https://save-up-3w7t.onrender.com/expenses/7c7403eb-84d6-4d9d-9b0f-640114bd
 
 | Key | Value | Description |
 | --- | ------|-------------|
-| authorization | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTAyMzY1MDJ9.2Amq0FHnXndZJXi2FZBFdkDnBI-ztx5HvHG_CUviAK0 |  |
-| refresh-token | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTA3NTQ5MDJ9.mMS61QjvEuq1Abk7LKOR761v2WFvKDQr21c50S38qfs |  |
+| authorization | Bearer <access_token>  |  |
+| refresh-token | Bearer <access_token>  |  |
 
 ### 4. createExpense
 ***Endpoint:***
@@ -628,8 +627,8 @@ URL: https://save-up-3w7t.onrender.com/expenses
 
 | Key | Value | Description |
 | --- | ------|-------------|
-| authorization | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTAyMzY1MDJ9.2Amq0FHnXndZJXi2FZBFdkDnBI-ztx5HvHG_CUviAK0 |  |
-| refresh-token | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTA3NTQ5MDJ9.mMS61QjvEuq1Abk7LKOR761v2WFvKDQr21c50S38qfs |  |
+| authorization | Bearer <access_token>  |  |
+| refresh-token | Bearer <access_token>  |  |
 
 ***Body:***
 
@@ -675,8 +674,8 @@ URL: https://save-up-3w7t.onrender.com/categories/dcc01ca2-7f55-40ca-8f89-be91cb
 
 | Key | Value | Description |
 | --- | ------|-------------|
-| authorization | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTAyMzY1MDJ9.2Amq0FHnXndZJXi2FZBFdkDnBI-ztx5HvHG_CUviAK0 |  |
-| refresh-token | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTA3NTQ5MDJ9.mMS61QjvEuq1Abk7LKOR761v2WFvKDQr21c50S38qfs |  |
+| authorization | Bearer <access_token>  |  |
+| refresh-token | Bearer <access_token>  |  |
 
 ***Body:***
 
@@ -706,8 +705,8 @@ Scope: A string parameter indicating the category identifier. It can be::
 
 | Key | Value | Description |
 | --- | ------|-------------|
-| authorization | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTAyMzY1MDJ9.2Amq0FHnXndZJXi2FZBFdkDnBI-ztx5HvHG_CUviAK0 |  |
-| refresh-token | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTA3NTQ5MDJ9.mMS61QjvEuq1Abk7LKOR761v2WFvKDQr21c50S38qfs |  |
+| authorization | Bearer <access_token>  |  |
+| refresh-token | Bearer <access_token>  |  |
 
 ### 3. deleteCategory
 
@@ -722,8 +721,8 @@ URL: https://save-up-3w7t.onrender.com/categories/{categoryid}
 
 | Key | Value | Description |
 | --- | ------|-------------|
-| authorization | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTAyMzY1MDJ9.2Amq0FHnXndZJXi2FZBFdkDnBI-ztx5HvHG_CUviAK0 |  |
-| refresh-token | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTA3NTQ5MDJ9.mMS61QjvEuq1Abk7LKOR761v2WFvKDQr21c50S38qfs |  |
+| authorization | Bearer <access_token>  |  |
+| refresh-token | Bearer <access_token>  |  |
 
 ### 4. createCategories
 
@@ -738,8 +737,8 @@ URL: https://save-up-3w7t.onrender.com/categories
 
 | Key | Value | Description |
 | --- | ------|-------------|
-| authorization | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTAyMzY1MDJ9.2Amq0FHnXndZJXi2FZBFdkDnBI-ztx5HvHG_CUviAK0 |  |
-| refresh-token | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTA3NTQ5MDJ9.mMS61QjvEuq1Abk7LKOR761v2WFvKDQr21c50S38qfs |  |
+| authorization | Bearer <access_token>  |  |
+| refresh-token | Bearer <access_token>  |  |
 
 ***Body:***
 
@@ -778,8 +777,8 @@ URL: https://save-up-3w7t.onrender.com/security-questions
 
 | Key | Value | Description |
 | --- | ------|-------------|
-| authorization | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTAyMzY1MDJ9.2Amq0FHnXndZJXi2FZBFdkDnBI-ztx5HvHG_CUviAK0 |  |
-| refresh-token | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTA3NTQ5MDJ9.mMS61QjvEuq1Abk7LKOR761v2WFvKDQr21c50S38qfs |  |
+| authorization | Bearer <access_token>  |  |
+| refresh-token | Bearer <access_token>  |  |
 
 **Success Response:**
 ```json
@@ -810,8 +809,8 @@ URL: https://save-up-3w7t.onrender.com/security-answers
 
 | Key | Value | Description |
 | --- | ------|-------------|
-| authorization | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTAyMzY1MDJ9.2Amq0FHnXndZJXi2FZBFdkDnBI-ztx5HvHG_CUviAK0 |  |
-| refresh-token | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTA3NTQ5MDJ9.mMS61QjvEuq1Abk7LKOR761v2WFvKDQr21c50S38qfs |  |
+| authorization | Bearer <access_token> |  |
+| refresh-token | Bearer <access_token>  |  |
 
 ***Body:***
 
@@ -854,8 +853,8 @@ URL: https://save-up-3w7t.onrender.com/password/update-password
 
 | Key | Value | Description |
 | --- | ------|-------------|
-| authorization | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTAyMzY1MDJ9.2Amq0FHnXndZJXi2FZBFdkDnBI-ztx5HvHG_CUviAK0 |  |
-| refresh-token | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUzYTgxOGM2LTJkM2YtNDliNS1hNzE2LWE5N2I4ZmQ0YzAwOSIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTUwMTAyLCJleHAiOjE3MTA3NTQ5MDJ9.mMS61QjvEuq1Abk7LKOR761v2WFvKDQr21c50S38qfs |  |
+| authorization | Bearer <access_token>  |  |
+| refresh-token | Bearer <access_token>  |  |
 
 ***Body:***
 - `oldPassword`: String (required) - The old password.
@@ -1020,9 +1019,10 @@ URL: https://save-up-3w7t.onrender.com/password/reset
 2. [getTotalUserSavings](#2-gettotalusersavings)
 3. [getTotalUserContributions](#3-gettotalusercontributions)
 4. [getTotalUserExpense](#4-gettotaluserexpense)
-5. 
+  
 ## Endpoints
 ### 1. getTopExpenseCategories
+Retrieves the top expenditure categories for a user.
 
 ***Endpoint:***
 
@@ -1036,10 +1036,37 @@ URL: https://save-up-3w7t.onrender.com/cumulatives/top-expenditure-categories
 
 | Key | Value | Description |
 | --- | ------|-------------|
-| authorization | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImE5YjI0ZTQ3LWY0NDUtNDVmMS1iZTg1LTkyYjE2ZjcwYjM0OCIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTk1OTA4LCJleHAiOjE3MTAyODIzMDh9.6aEVfweLk_fz0atNEbU1oo1nuzh4cvKRezPgqXHUHwY |  |
-| refresh-token | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImE5YjI0ZTQ3LWY0NDUtNDVmMS1iZTg1LTkyYjE2ZjcwYjM0OCIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTk1OTA4LCJleHAiOjE3MTA4MDA3MDh9.dS-vSuJUgfukdC8pHIcaBFWa6Jh4xHCUDdyd6R2g6Mg |  |
+| authorization | Bearer <access_token>  |  |
+| refresh-token | Bearer <access_token>  |  |
+
+***Request Parameters:***
+None
+
+***Sample Response:*** 
+An array of objects rep the users most spent categories in ordeer
+```json
+[
+  {
+    "total_expense": 30000,
+    "category_id": "52575644-c176-4937-b76e-61fd70a003fd",
+    "category_name": "Food"
+  },
+  {
+    "total_expense": 25000.5,
+    "category_id": "49d5064c-ddff-4952-9039-c7b84dddcc58",
+    "category_name": "Transportation"
+  },
+  {
+    "total_expense": 2000.5,
+    "category_id": "9da14229-a194-4b90-b95f-3bf095cf96df",
+    "category_name": "Entertainment"
+  }
+]
+```
 
 ### 2. getTotalUserSavings
+Retrieves the logged in users total saving amount
+
 ***Endpoint:***
 
 ```bash
@@ -1052,10 +1079,27 @@ URL: https://save-up-3w7t.onrender.com/cumulatives/total-target-amount
 
 | Key | Value | Description |
 | --- | ------|-------------|
-| authorization | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImE5YjI0ZTQ3LWY0NDUtNDVmMS1iZTg1LTkyYjE2ZjcwYjM0OCIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTk1OTA4LCJleHAiOjE3MTAyODIzMDh9.6aEVfweLk_fz0atNEbU1oo1nuzh4cvKRezPgqXHUHwY |  |
-| refresh-token | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImE5YjI0ZTQ3LWY0NDUtNDVmMS1iZTg1LTkyYjE2ZjcwYjM0OCIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTk1OTA4LCJleHAiOjE3MTA4MDA3MDh9.dS-vSuJUgfukdC8pHIcaBFWa6Jh4xHCUDdyd6R2g6Mg |  |
+| authorization | Bearer <access_token> |  |
+| refresh-token | Bearer <access_token>  |  |
+Bearer <access_token>
+***Request Parameters:***
+None
+
+***Query Parameters:***
+- `priority` (optional): Filter savings totals by priority.Acceptable values are High, Intermediate, or Low.
+- `category_id` (optional): Filter savings totals by categoryid. 
+- `status` (optional): Filter savings totals by status. Acceptable values are In Progress, Dormant, or Completed.
+
+***Response Body:***
+```json
+{
+  "total_target_amount": 0
+}
+```
+
 
 ### 3. getTotalUserContributions
+Retrieves the total amount contributed towards savings within a specified date range.
 ***Endpoint:***
 
 ```bash
@@ -1067,15 +1111,15 @@ URL: https://save-up-3w7t.onrender.com/cumulatives//total-contributions
 
 | Key | Value | Description |
 | --- | ------|-------------|
-| authorization | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImE5YjI0ZTQ3LWY0NDUtNDVmMS1iZTg1LTkyYjE2ZjcwYjM0OCIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTk1OTA4LCJleHAiOjE3MTAyODIzMDh9.6aEVfweLk_fz0atNEbU1oo1nuzh4cvKRezPgqXHUHwY |  |
-| refresh-token | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImE5YjI0ZTQ3LWY0NDUtNDVmMS1iZTg1LTkyYjE2ZjcwYjM0OCIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTk1OTA4LCJleHAiOjE3MTA4MDA3MDh9.dS-vSuJUgfukdC8pHIcaBFWa6Jh4xHCUDdyd6R2g6Mg |  |
+| authorization | Bearer <access_token>  |  |
+| refresh-token | Bearer <access_token>  |  |
 
 ***Query params:***
 
 | Key | Value | Description |
 | --- | ------|-------------|
-| startDate | 2023-01-11 |  |
-| endDate |  2024-01-11 |  |
+| startDate | 2023-01-11 | Start date of the date range (format: YYYY-MM-DD) |
+| endDate |  2024-01-11 | End date of the date range (format: YYYY-MM-DD) |
 
 
 
@@ -1094,8 +1138,8 @@ URL: https://save-up-3w7t.onrender.com/cumulatives/total-expenses
 
 | Key | Value | Description |
 | --- | ------|-------------|
-| authorization | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImE5YjI0ZTQ3LWY0NDUtNDVmMS1iZTg1LTkyYjE2ZjcwYjM0OCIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTk1OTA4LCJleHAiOjE3MTAyODIzMDh9.6aEVfweLk_fz0atNEbU1oo1nuzh4cvKRezPgqXHUHwY |  |
-| refresh-token | Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImE5YjI0ZTQ3LWY0NDUtNDVmMS1iZTg1LTkyYjE2ZjcwYjM0OCIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzEwMTk1OTA4LCJleHAiOjE3MTA4MDA3MDh9.dS-vSuJUgfukdC8pHIcaBFWa6Jh4xHCUDdyd6R2g6Mg |  |
+| authorization | Bearer <access_token> |  |
+| refresh-token | Bearer <access_token>  |  |
 
 ***Query params:***
 
