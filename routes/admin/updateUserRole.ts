@@ -20,15 +20,12 @@ export default (router: Router) => {
     '/:roleToUpdate/:id',
     authMiddleware({ roles: [UserRole.ADMIN] }),
     async (req, res) => {
-      let { roleToUpdate } = req.params;
-      const { id } = req.params;
-      roleToUpdate = convertToTitleCase(roleToUpdate);
-      
+      const  roleToUpdate  =  convertToTitleCase(req.params.roleToUpdate);
+      const  id  = req.params.id;
       if (!VALID_ROLES.includes(roleToUpdate)) {
         throw new HttpError(400, 'Invalid role.');
       }
-
-      const result = await SQL_UPDATE_ROLE({ roleToUpdate, id }).one();
+      const result = await SQL_UPDATE_ROLE({ roleToUpdate, id }).one(new HttpError (404, 'User with given ID not found.'));
       res.json(result);
     }
   );
