@@ -15,8 +15,21 @@ export default (router: Router) => {
     authMiddleware(), 
     async (req, res) => {
       const userId = req.user!.id;
-      const result = await SQL_GET_TOTAL_CONTRIBUTIONS({ userId }).one();
-      const totalContributedAmount = result.total_contributed_amount;
-      res.json({ total_contributed_amount: totalContributedAmount });
+      const { startDate, endDate } = req.query;
+      const filters: string[] = [];
+      const filterArgs: Record<string, string> = {};
+      if (startDate) {
+        filterArgs.startDate = startDate;
+        filters.push(`date >= :startDate`);
+      }
+      if (endDate) {
+        filterArgs.endDate = endDate;
+        filters.push(`date <= :endDate`);
+      }
+      const query = SQL_GET_TOTAL_CONTRIBUTIONS({userId });
+      if (filters.length > 0) query.extend(`AND ${filters.join(' AND ')}`, filterArgs);
+      console.log(query)
+      query.extend('LIMIT 15', {});
+      res.json(await query.one());
     });
 };
