@@ -1001,19 +1001,6 @@ URL: https://save-up-3w7t.onrender.com/password/reset
 }
 ```
 
----
-[Back to top](#answers)
-[Back to top](#password)
-[Back to top](#securityquestions)
-[Back to top](#categories)
-[Back to top](#expenses)
-[Back to top](#contributions)
-[Back to savings](#savings)
-[Back to users](#users)
-
->Generated at 2024-03-11 12:32:40 by [docgen](https://github.com/thedevsaddam/docgen)
-
-
 # Cumulatives
 1. [getTopExpenseCategories](#1-gettopexpensecategories)
 2. [getTotalUserSavings](#2-gettotalusersavings)
@@ -1118,8 +1105,8 @@ URL: https://save-up-3w7t.onrender.com/cumulatives//total-contributions
 
 | Key | Value | Description |
 | --- | ------|-------------|
-| startDate | 2023-01-11 | Start date of the date range (format: YYYY-MM-DD) |
-| endDate |  2024-01-11 | End date of the date range (format: YYYY-MM-DD) |
+| startDate | 2023-01-11 | Start date of the date range (format: YYYY-MM-DD) optional  |
+| endDate |  2024-01-11 | End date of the date range (format: YYYY-MM-DD) optional  |
 
 
 
@@ -1145,8 +1132,18 @@ URL: https://save-up-3w7t.onrender.com/cumulatives/total-expenses
 
 | Key | Value | Description |
 | --- | ------|-------------|
-| categoryId | 52575644-c176-4937-b76e-61fd70a003fd |  |
-| startDate | 2023-01-11 |  |
-| endDate |  2024-01-11 |  |
+| categoryId | 52575644-c176-4937-b76e-61fd70a003fd |optional  |
+| startDate | 2023-01-11 | optional |
+| endDate |  2024-01-11 | optional |
 
+
+---
+[Back to top](#answers)
+[Back to top](#password)
+[Back to top](#securityquestions)
+[Back to top](#categories)
+[Back to top](#expenses)
+[Back to top](#contributions)
+[Back to savings](#savings)
+[Back to users](#users)
 
