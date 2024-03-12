@@ -230,8 +230,21 @@ CREATE TABLE IF NOT EXISTS reset_tokens (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     used BOOLEAN DEFAULT FALSE,
     used_at TIMESTAMP WITH TIME ZONE,
-    expiry_time TIMESTAMP WITH TIME ZONE DEFAULT (CURRENT_TIMESTAMP + INTERVAL '15 minutes')
+    expiry_time TIMESTAMP WITH TIME ZONE DEFAULT (created_at + INTERVAL '15 minutes')
 );
+
+CREATE OR REPLACE FUNCTION set_expiry_time_default()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.expiry_time := NEW.created_at + INTERVAL '15 minutes';
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+CREATE TRIGGER set_expiry_time_default_trigger
+BEFORE INSERT ON reset_tokens
+FOR EACH ROW
+EXECUTE FUNCTION set_expiry_time_default();
+
 
 CREATE OR REPLACE FUNCTION check_user_token_limit()
 RETURNS TRIGGER AS $$

@@ -20,7 +20,7 @@
     - [1. getContributionsByConditions](#1-getcontributionsbyconditions)
     - [2. getContributionById](#2-getcontributionbyid)
     - [3. createContribution](#3-createcontribution)
-- [expenses](#expenses)
+- [Expenses](#expenses)
   - [Endpoints](#endpoints-3)
     - [1. getExpenseByConditions](#1-getexpensebyconditions)
     - [2. updateExpense](#2-updateexpense)
@@ -536,7 +536,9 @@ URL: https://save-up-3w7t.onrender.com/contributions
   "updated_at": "Timestamp"
 }
 ```
-# expenses
+
+
+# Expenses
 1. [getExpenseByConditions](#1-getexpensebyconditions)
 2. [updateExpense](#2-updateexpense)
 3. [DeleteExpense](#3-deleteexpense)
@@ -823,6 +825,8 @@ URL: https://save-up-3w7t.onrender.com/security-answers
 }
 ```
 ---
+
+
 # Password
 1. [updatePassword](#1-updatepassword)
 2. [resetPassword](#2-resetpassword)
