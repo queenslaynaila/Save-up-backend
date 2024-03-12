@@ -8,12 +8,12 @@ const SQL_GET_TOTAL_EXPENSES = sql<{ userId: string }, { total_expenses: number 
       WHERE user_id = :userId`);
 
 export default (router: Router) => {
-  router.get<Record<string, never>, { total_expenses: number }, Record<string, never>,{startDate?:string;endDate?:string}>(
+  router.get<Record<string, never>, { total_expenses: number }, Record<string, never>,{startDate?:string;endDate?:string;categoryId:string}>(
     '/total-expenses', 
     authMiddleware(), 
     async (req, res) => {
       const userId = req.user!.id;
-      const { startDate, endDate } = req.query;
+      const { startDate, endDate, categoryId } = req.query;
       console.log(req.query)
       const filters: string[] = [];
       const filterArgs: Record<string, string> = {};
@@ -25,6 +25,11 @@ export default (router: Router) => {
         filterArgs.endDate = endDate;
         filters.push(`date <= :endDate`);
       }
+      if (categoryId){
+        filterArgs.categoryId = categoryId;
+        filters.push(`category_id = :category_id`);
+      }
+
       const query = SQL_GET_TOTAL_EXPENSES({userId });
       if (filters.length > 0) query.extend(`AND ${filters.join(' AND ')}`, filterArgs);
       console.log(query)
