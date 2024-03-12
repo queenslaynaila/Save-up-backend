@@ -7,11 +7,12 @@ interface TopExpenditureCategory {
 }
 
 const SQL_GET_TOP_EXPENDITURE_CATEGORIES = sql<{ userId: string }, TopExpenditureCategory[]>(`
-    SELECT category_id, COALESCE(SUM(amount), 0) AS total_expense
-    FROM expenses
-    WHERE user_id = :userId
-    GROUP BY category_id
-    ORDER BY total_expense DESC
+  SELECT e.category_id,c.name AS category_name,
+  COALESCE(SUM(e.amount), 0) AS total_expense FROM expenses e
+  JOIN categories c ON e.category_id = c.id
+  WHERE  e.user_id = :userId
+  GROUP BY e.category_id, c.name
+  ORDER BY total_expense DESC
 `);
 
 export default (router: Router) => {
