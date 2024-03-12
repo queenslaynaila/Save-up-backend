@@ -1,5 +1,5 @@
-# Users
-- [Users](#users)
+# Routes
+- [Routes](#routes)
   - [Endpoints](#endpoints)
     - [1. updateUserPhoneNo](#1-updateuserphoneno)
     - [2. getUserByScope](#2-getuserbyscope)
@@ -51,6 +51,11 @@
     - [2. getTotalUserSavings](#2-gettotalusersavings)
     - [3. getTotalUserContributions](#3-gettotalusercontributions)
     - [4. getTotalUserExpense](#4-gettotaluserexpense)
+- [AdminOnlyRoutes](#adminonlyroutes)
+  - [Endpoints](#endpoints-9)
+    - [1. UpdateUserRole](#1-updateuserrole)
+    - [2. getTableStatistics](#2-gettablestatistics)
+    - [3. CreateAdmin](#3-createadmin)
 
 ## Endpoints
 ### 1. updateUserPhoneNo
@@ -1109,7 +1114,6 @@ URL: https://save-up-3w7t.onrender.com/cumulatives//total-contributions
 | endDate |  2024-01-11 | End date of the date range (format: YYYY-MM-DD) optional  |
 
 
-
 ### 4. getTotalUserExpense
 
 ***Endpoint:***
@@ -1119,7 +1123,6 @@ Method: GET
 Type: 
 URL: https://save-up-3w7t.onrender.com/cumulatives/total-expenses
 ```
-
 
 ***Headers:***
 
@@ -1136,14 +1139,93 @@ URL: https://save-up-3w7t.onrender.com/cumulatives/total-expenses
 | startDate | 2023-01-11 | optional |
 | endDate |  2024-01-11 | optional |
 
+# AdminOnlyRoutes
+1. [UpdateUserRole](#1-updateuserrole)
+2. [getTableStatistics](#2-gettablestatistics)
+3. [CreateAdmin](#3-createadmin)
 
----
-[Back to top](#answers)
-[Back to top](#password)
-[Back to top](#securityquestions)
-[Back to top](#categories)
-[Back to top](#expenses)
-[Back to top](#contributions)
-[Back to savings](#savings)
-[Back to users](#users)
+## Endpoints
 
+### 1. UpdateUserRole
+This endpoint allows an admin user to update the role of another user.It may be an upgrade ie user to admin or user to a moderator OR even a downgrade modeerator to user.
+
+***Endpoint:*** 
+```bash
+Method: PATCH
+Type: 
+URL: https://save-up-3w7t.onrender.com/admin/{roleToUpdate}/{id}
+```
+
+***Request Parameters:***
+- `roleToUpdate` (string,required): The new role to assign to the user. Valid roles are 'Admin', 'User', or 'Moderator'.
+- `id` (string,required): The ID of the user whose role needs to be updated.
+
+***Headers:***
+| Key | Value | Description |
+| --- | ------|-------------|
+| authorization | Bearer <Access Token>|  |
+| refresh-token | Bearer <Access Token>|  |
+
+***Request Body:***
+This endpoint does not expect any request body.
+
+***Succesful Response:***
+the endpoint returns a JSON object with the following properties:
+- `id` (string): The ID of the user whose role was updated.
+- `first_name` (string): The first name of the user.
+- `last_name` (string): The last name of the user.
+- `role` (string): The updated role of the user.
+- `created_at` (Date): The timestamp when the user account was created.
+- `updated_at` (Date): The timestamp when the user account was last updated.
+
+
+### 2. getTableStatistics
+***Endpoint:***
+```bash
+Method: GET
+Type: 
+URL: https://save-up-3w7t.onrender.com/admin/stats/{resource}/{operator}
+```
+
+***Request Paraameters:***
+- `resource` (string): The resource for which statistics are requested. Valid resources are 'contributions', 'savings', or 'expenses'.
+- `operator` (string): The operation to perform on the resource data. Valid operators are 'SUM', 'MAX', 'MIN', 'AVG', or 'COUNT'.
+
+***Headers:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| authorization | Bearer <Access Token>|  |
+| refresh-token | Bearer <Access Token>|  |
+
+***Request Query Parameters:***
+- `user_id` (string optional): The ID of the user for whom statistics are requested.
+- `priority` (string optional): The priority of the resource  whom statistics are requested.
+- `status` (string optional): The status of the resource. Valid statuses are 'Completed', 'Dormant', or 'In Progress'.
+- `category_id` (string optional): The ID of the category for which statistics are requested.
+- `start_date` (string optional): The start date for the time period of interest.
+- `end_date` (string): The end date for the time period of interest.
+
+***Response:***
+- `totals` (number): The cumulative result of the specified operation on the requested resource.
+
+### 3. CreateAdmin
+***Endpoint:***
+
+```bash
+Method: POST
+Type: RAW
+URL: https://save-up-3w7t.onrender.com/admin
+```
+
+***Body:***
+
+```js        
+{
+  "first_name": "John",
+  "last_name": "Doe",
+  "phone_number": "+254712517354",
+  "password": "password_here",
+  "role": "Admin"
+}
+```
