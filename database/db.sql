@@ -21,10 +21,10 @@ CREATE TABLE IF NOT EXISTS categories (
   name        VARCHAR(255) NOT NULL,
   description VARCHAR(255),
   created_at  TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at  TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+  updated_at  TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  deleted_at TIMESTAMP WITH TIME ZONE
 );
-ALTER TABLE categories
-ADD COLUMN deleted_at TIMESTAMP WITH TIME ZONE;
+
 
 
 INSERT INTO categories (user_id, name, description)
@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS savings (
   user_id       uuid REFERENCES users (id) ON DELETE CASCADE,
   description   VARCHAR(255) NOT NULL,
   category_id   uuid REFERENCES categories (id),
-  target_amount NUMERIC(30, 3) NOT NULL,
+  amount NUMERIC(30, 3) NOT NULL,
   priority      priority_enum,
   status        status_enum DEFAULT 'In Progress',
   target_date   TIMESTAMP WITH TIME ZONE,
@@ -63,12 +63,10 @@ ALTER TABLE savings
 ADD COLUMN completed_date DATE;
 UPDATE savings
 SET completed_date = CASE
-                   WHEN status = 'Completed' THEN CURRENT_DATE  
-                   ELSE NULL 
+                   WHEN status = 'Completed' THEN CURRENT_DATE
+                   ELSE NULL
 END;
 
-ALTER TABLE savings
-RENAME target_amount to amount
 
 
 CREATE  INDEX savings_user_id_idx  ON savings (user_id);
@@ -78,12 +76,12 @@ CREATE  INDEX savings_status_idx   ON savings (status);
 
 CREATE TABLE IF NOT EXISTS security_questions (
   id          uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
-  user_id     uuid  NULL REFERENCES users (id), 
+  user_id     uuid  NULL REFERENCES users (id),
   question    VARCHAR(255) NOT NULL,
   created_at  TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-INSERT INTO security_questions (user_id, question) 
+INSERT INTO security_questions (user_id, question)
 VALUES (NULL, 'What is the name of your first pet?'),
        (NULL, 'What city were you born in?'),
        (NULL, 'What is your mother\s maiden name?'),
@@ -157,17 +155,17 @@ CREATE FUNCTION update_saving_status()
 RETURNS TRIGGER AS $$
 DECLARE
     total_contributions NUMERIC(30, 3);
-    saving_target_date TIMESTAMP WITH TIME ZONE; 
+    saving_target_date TIMESTAMP WITH TIME ZONE;
 BEGIN
     SELECT COALESCE(SUM(amount), 0) INTO total_contributions
     FROM contributions
-    WHERE saving_id = NEW.saving_id; 
+    WHERE saving_id = NEW.saving_id;
 
-    SELECT target_date INTO saving_target_date
+    SELECT target_date, amount INTO saving_target_date, _amount
     FROM savings
     WHERE id = NEW.saving_id;
 
-    IF total_contributions >= (SELECT amount FROM savings WHERE id = NEW.saving_id) THEN
+    IF total_contributions >= _amount THEN
         UPDATE savings
         SET status = 'Completed',
             completed_date = CURRENT_DATE

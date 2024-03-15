@@ -33,24 +33,20 @@ export default (router: Router) => {
       id: categoryId,
     };
 
-    const query = 'UPDATE categories SET ';
-    let param = '';
+    const SQL_UPDATE_CATEGORY = sql<>(`
+      UPDATE categories
+      SET name = coalesce(:name?, categories.name), 
+          description = coalesce(:description?, categories.description)
+      WHERE user_id = :user_id AND id = :category_id
+      RETURNING *
+    `);
 
-    if (name) {
-      param += `name = :name, `;
-      values.name = name;
-    }
-    if (description) {
-      param += `description = :description, `;
-      values.description = description;
-    }
-
-    param = param.slice(0, -2);
-
-    const updatedQuery = `${query}${param} WHERE user_id = :user_id AND id = :category_id RETURNING *`;
-    const result = await SQL_UPDATE_CATEGORY(updatedQuery)(values).one(
-      new HttpError(400, 'Category not found')
-    );
+    const result = SQL_UPDATE_CATEGORY({
+      user_id: userId,
+      category_id: categoryId,
+      name: name || undefined,
+      description: description || undefined,
+    }).one(new HttpError(400, 'Category not found'));
 
     return res.json(result);
   });

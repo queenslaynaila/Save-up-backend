@@ -11,15 +11,15 @@ interface CreateCategory{
 }
 
 const SQL_CREATE_CATEGORY = sql<CreateCategory, CategorySchema>(`
-    INSERT INTO categories (user_id, name, description, created_at, updated_at)
-    VALUES (:user_id, :name, :description, NOW(), NOW())
+    INSERT INTO categories (user_id, name, description)
+    VALUES (:user_id, :name, :description)
     RETURNING *
 `);
 
 export default (router: Router) => {
   router.post<Record<string, never>,CategorySchema,CreateCategory,Record<string, never>,Record<string, never>>(
-    '/', 
-    authMiddleware(), 
+    '/',
+    authMiddleware(),
     async (req, res) => {
       const validationResult = CreateCategorySchema.safeParse(req.body);
       if (!validationResult.success) {

@@ -1,8 +1,8 @@
-import authMiddleware from '../../middleware/auth';
-import { Router, Request, Response } from 'express';
-import { idSchema } from '../../types';
-import { HttpError } from '../../middleware/errorMiddleware';
-import { sql } from '../../db';
+import authMiddleware from "../../middleware/auth";
+import {Request, Response, Router} from "express";
+import {idSchema} from "../../types";
+import {HttpError} from "../../middleware/errorMiddleware";
+import {sql} from "../../db";
 
 interface CategorySchema {
   id: string;
@@ -14,29 +14,29 @@ interface CategorySchema {
   deleted_at?: Date;
 }
 
-const SQL_DELETE_CATEGORY = sql<Pick<CategorySchema, 'id' | 'user_id'>, Pick<CategorySchema, 'id'>>(`
-   UPDATE categories
-   SET deleted_at = NOW()
-   WHERE id = :id AND user_id = :user_id
-   RETURNING id
+const SQL_DELETE_CATEGORY = sql<Pick<CategorySchema, "id" | "user_id">, {}>(`
+  UPDATE categories
+  SET deleted_at = NOW()
+  WHERE id = :id
+    AND user_id = :user_id
 `);
 
 export default (router: Router) => {
   router.delete<{ id: string }, { message: string }, Record<string, never>, Record<string, never>>(
-    '/:id',
+    "/:id",
     authMiddleware(),
     async (req: Request, res: Response) => {
       const validationResult = idSchema.safeParse(req.params.id);
       if (!validationResult.success) {
-        throw new HttpError(400, 'Invalid category ID');
+        throw new HttpError(400, "Invalid category ID");
       }
-      const id = validationResult.data;
-      const userId = req.user!.id;
-      const idDeleted = await SQL_DELETE_CATEGORY({ id, user_id: userId }).oneOrNull();
-      if (!idDeleted) {
-        throw new HttpError(404, 'Categories not found');
-      }
-      return res.json({ message: 'Categories deleted successfully' });
+
+      await SQL_DELETE_CATEGORY({
+        id: validationResult.data,
+        user_id: req.user!.id
+      }).exec();
+
+      return res.json({message: "Categories deleted successfully"});
     }
   );
 };

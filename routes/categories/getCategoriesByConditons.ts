@@ -12,21 +12,20 @@ const SQL_GET_ALL_CATEGORIES = sql<Record<string, never>, CategorySchema>(
 
 export default (router: Router) => {
   router.get<
-  string,
-  { categoryIdentifier: string },
+  { user_id: string },
   CategorySchema[],
   Record<string, never>,
   Record<string, never>
-  >('/:categoryIdentifier', authMiddleware(), async (req: Request, res: Response) => {
-    const { categoryIdentifier } = req.params;
+  >('/:user_id', authMiddleware(), async (req, res) => {
+    const { user_id: categoryIdentifier } = req.params;
     const isStandardUser = req.user?.role === 'User';
     const loggedInUserId = req.user!.id;
-    const filterArgs: Record<string, string> = {};
-    const filters: string[] = [];
+
+
+    const query = SQL_GET_ALL_CATEGORIES({});
 
     if (categoryIdentifier === 'me') {
-      filterArgs.loggedInUserId = loggedInUserId;
-      filters.push(`user_id = :loggedInUserId OR user_id IS NULL`);
+      query.extend(`WHERE user_id = :loggedInUserId OR user_id IS NULL`, { loggedInUserId });
     } else if (categoryIdentifier === 'all') {
       if (isStandardUser) {
         throw new HttpError(401, 'Unauthorized');
@@ -46,7 +45,6 @@ export default (router: Router) => {
       throw new HttpError(400, 'Bad request');
     }
 
-    const query = SQL_GET_ALL_CATEGORIES({});
     if (filters.length > 0) query.extend(`WHERE ${filters.join(' AND ')}`, filterArgs);
     query.extend('LIMIT 15', {});
     const categories = await query.many();
