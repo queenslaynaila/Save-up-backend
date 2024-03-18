@@ -56,7 +56,7 @@ export const expenseSchema = z.object({
   category_id: z.string().uuid(),
   description: z.string(),
   amount: z.number(),
-  date: z.string(),
+  expense_date: z.string(),
 });
 
 export type expenseInterface = z.infer<typeof expenseSchema>;
@@ -70,7 +70,7 @@ export const updateExpenseSchema = z.object({
   category_id: z.string().uuid().optional(),
   description: z.string().optional(),
   amount: z.number().optional(),
-  date: z.string().optional(),
+  expense_date: z.string().optional(),
 });
 
 // User Schemas

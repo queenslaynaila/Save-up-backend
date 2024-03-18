@@ -1,7 +1,7 @@
 import authMiddleware from '../../middleware/auth';
 import { z } from 'zod';
 import { HttpError } from '../../middleware/errorMiddleware';
-import { Router, Request, Response } from 'express';
+import { Router } from 'express';
 import { sql } from '../../db';
 import { CategorySchema } from '../../types';
 
@@ -20,8 +20,6 @@ export default (router: Router) => {
     const { user_id: categoryIdentifier } = req.params;
     const isStandardUser = req.user?.role === 'User';
     const loggedInUserId = req.user!.id;
-
-
     const query = SQL_GET_ALL_CATEGORIES({});
 
     if (categoryIdentifier === 'me') {
@@ -34,18 +32,16 @@ export default (router: Router) => {
       if (isStandardUser) {
         throw new HttpError(401, 'Unauthorized');
       }
-      filters.push(`user_id IS NULL`);
+      query.extend(`WHERE user_id IS NULL`, { });
     } else if (UUIDSCHEMA.parse(categoryIdentifier)) {
       if (isStandardUser) {
         throw new HttpError(401, 'Unauthorized');
       }
-      filterArgs.categoryIdentifier = categoryIdentifier;
-      filters.push(`user_id = :categoryIdentifier`);
+      query.extend(`WHERE user_id = :categoryIdentifier`, {categoryIdentifier});
     } else {
       throw new HttpError(400, 'Bad request');
     }
 
-    if (filters.length > 0) query.extend(`WHERE ${filters.join(' AND ')}`, filterArgs);
     query.extend('LIMIT 15', {});
     const categories = await query.many();
     res.json(categories);

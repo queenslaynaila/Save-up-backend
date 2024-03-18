@@ -19,14 +19,10 @@ export default (router: Router) => {
       }
       const securityAnswerId = validationResult.data;
       const loggedInUserId = req.user!.id;
-      const deletedAnswerId = await SQL_DELETE_SECURITY_ANSWER({
+      await SQL_DELETE_SECURITY_ANSWER({
         id: securityAnswerId,
         user_id: loggedInUserId,
-      }).oneOrNull();
-      if (!deletedAnswerId) {
-        throw new HttpError(404, 'Answer not found');
-      }
-
+      }).exec();
       return res.json({ message: 'Answer deleted successfully' });
     });
 };

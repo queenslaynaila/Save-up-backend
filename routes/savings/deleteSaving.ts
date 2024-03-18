@@ -20,10 +20,7 @@ export default (router: Router) => {
       const id = validationResult.data;
       const userId = req.user!.id;
 
-      const idDeleted = await SQL_DELETE_SAVING({ id, user_id: userId }).oneOrNull();
-      if (!idDeleted) {
-        throw new HttpError(404, 'Saving not found');
-      }
+      await SQL_DELETE_SAVING({ id, user_id: userId }).exec();
       return res.json({ message: 'Savings deleted successfully' });
     });
 };
