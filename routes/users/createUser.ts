@@ -14,7 +14,7 @@ interface CreateUserSchema {
 
 const SQL_CREATE_USER = sql<CreateUserSchema, UserSchema>(`
   INSERT INTO users (first_name, last_name, phone_number, password)
-  VALUES (:first_name, :last_name, :phone_number, :password
+  VALUES (:first_name, :last_name, :phone_number, :password)
   RETURNING id, first_name, last_name, phone_number,role, created_at
 `);
 
