@@ -22,7 +22,7 @@ export default (router: Router) => {
     async (req, res) => {
       const userId = req.params.id;
       if (!hasPermission(req, userId)) {
-        throw new HttpError(403, 'User not found');
+        throw new HttpError(403, 'Unauthorized');
       }
 
       const validationResult = UpdateUserSchema.safeParse(req.body);
