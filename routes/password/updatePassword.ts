@@ -4,7 +4,7 @@ import { sql } from '../../db';
 import authMiddleware from '../../middleware/auth';
 
 const SQL_UPDATE_PASSWORD = sql<{ password: string; phone_number: string },{ phone_number: string }>(`
-  UPDATE users SET password = $1 WHERE  phone_number  = :phone_number 
+  UPDATE users SET password =:password WHERE  phone_number= :phone_number 
 `);
 
 export default (router: Router) => {

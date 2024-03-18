@@ -7,7 +7,13 @@ import { UpdateUserSchema } from '../../types';
 import { UserSchema } from './index';
 import { HttpError } from '../../middleware/errorMiddleware';
 
-const SQL_UPDATE_USER = sql<z.infer<typeof UpdateUserSchema>, UserSchema>(`UPDATE users SET `);
+const SQL_UPDATE_USER = sql<z.infer<typeof UpdateUserSchema>& { id: string }, UserSchema>(`
+  UPDATE users
+  SET first_name = coalesce(:first_name,  users.first_name)
+      last_name = coalesce(:last_name ,  users.last_name )
+  WHERE id = :id
+  RETURNING *
+`);
 
 export default (router: Router) => {
   router.patch<{ id: string },UserSchema,z.infer<typeof UpdateUserSchema>,Record<string, never>>(
@@ -26,24 +32,14 @@ export default (router: Router) => {
           'Invalid user data. Please provide valid values for all user fields.'
         );
       }
-
       const { first_name, last_name } = validationResult.data;
-      const values: { id: string; first_name?: string; last_name?: string } = { id: userId };
-      const updateClauses: string[] = [];
 
-      if (first_name) {
-        updateClauses.push(`first_name = :first_name`);
-        values.first_name = first_name;
-      }
-      if (last_name) {
-        updateClauses.push(`last_name = :last_name`);
-        values.last_name = last_name;
-      }
-
-      const query = SQL_UPDATE_USER({});
-      const setClause = updateClauses.join(', ');
-      const extendedQuery = query.extend(`${setClause} WHERE id = :id RETURNING *`, values);
-      const updatedUser = await extendedQuery.one(new HttpError(400, 'User not found'));
-      res.json(updatedUser);
+      const result = await SQL_UPDATE_USER({
+        id: userId ,
+        first_name: first_name,
+        last_name : last_name  
+      }).one();
+      
+      res.json(result);
     });
 };
