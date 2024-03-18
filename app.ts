@@ -52,9 +52,9 @@ app.use(() => {
 /* eslint-disable @typescript-eslint/no-unused-vars */
 app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
   console.log(error);
-  // if (error instanceof HttpError) {
-  //   return res.status(error.statusCode).json({ error: error.message });
-  // }
+  if (error instanceof HttpError) {
+    return res.status(error.statusCode).json({ error: error.message });
+  }
   return res.status(500).json({ error: 'Internal Server Error' });
 });
 
