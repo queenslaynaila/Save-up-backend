@@ -24,6 +24,7 @@ export default (router: Router) => {
       if (!hasPermission(req, userId)) {
         throw new HttpError(403, 'Unauthorized');
       }
+      console.log(req.user)
 
       const validationResult = UpdateUserSchema.safeParse(req.body);
       if (!validationResult.success) {
