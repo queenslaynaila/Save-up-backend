@@ -23,6 +23,7 @@ export default (router: Router) => {
       }
       const { user_id, description, category_id, amount, priority, target_date } =validationResult.data;
       const authenticatedUserId = req.user!.id;
+      console.log(authenticatedUserId,user_id)
       if (authenticatedUserId !== user_id) {
         throw new HttpError(403, 'Unauthorized');
       }

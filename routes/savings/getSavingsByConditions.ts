@@ -6,7 +6,7 @@ import authMiddleware from '../../middleware/auth';
 import { convertToTitleCase, isValidValue } from '../../middleware/caseNormalization';
 import { HttpError } from '../../middleware/errorMiddleware';
 
-const UUIDSCHEMA = z.string().uuid();
+const UUIDSCHEMA = z.string();
 const ACCEPTED_STATUS_VALUES = ['In Progress', 'Dormant', 'Completed'];
 const ACCEPTED_PRIORITY_VALUES = ['High', 'Intermediate', 'Low'];
 const SQL_GET_SAVINGS = sql<Record<string, never>, savingInterface>(`SELECT *FROM savings`);

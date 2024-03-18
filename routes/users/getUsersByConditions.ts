@@ -6,7 +6,7 @@ import { convertToTitleCase, isValidValue } from '../../middleware/caseNormaliza
 import authMiddleware from '../../middleware/auth';
 import { UserSchema } from './index';
 
-const UUID_SCHEMA = z.string().uuid();
+const UUID_SCHEMA = z.string();
 const SQL_GET_ALL_USERS = sql<Record<string, never>, UserSchema>(`
   SELECT id, first_name, last_name, phone_number, role, created_at, updated_at FROM users
 `);
