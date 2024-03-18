@@ -5,7 +5,7 @@ import { sql } from '../../db';
 import authMiddleware from '../../middleware/auth';
 
 const SQL_DELETE_SECURITY_ANSWER = sql<{ id: string; user_id: string }, Record<string, never>>(`
-  DELETE FROM security_answers WHERE id = :securityAnswerId AND user_id = :userId RETURNING id
+  DELETE FROM security_answers WHERE id = :securityAnswerId AND user_id = :userId 
 `);
 
 export default (router: Router) => {

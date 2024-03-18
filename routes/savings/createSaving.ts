@@ -7,8 +7,8 @@ import { sql } from '../../db';
 import { savingInterface } from './index';
 
 const SQL_CREATE_SAVING = sql<z.infer<typeof savingSchema>, savingInterface>(`
-  INSERT INTO savings (user_id, description, category_id, amount, priority, target_date, created_at, updated_at)
-  VALUES (:user_id, :description, :category_id, :amount, :priority, :target_date, NOW(), NOW()) 
+  INSERT INTO savings (user_id, description, category_id, amount, priority, target_date)
+  VALUES (:user_id, :description, :category_id, :amount, :priority, :target_date) 
   RETURNING *
 `);
 

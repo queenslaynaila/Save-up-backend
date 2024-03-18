@@ -32,7 +32,7 @@ export default (router: Router) => {
           throw new HttpError(401, 'Unauthorized');
         }
       } else if (UUID_SCHEMA.safeParse(userIdentifier).success) {
-        if (isStandardUser) {
+        if (isStandardUser  && filterArgs.loggedInUserId !== userIdentifier) {
           throw new HttpError(401, 'Unauthorized');
         }
         filterArgs.userIdentifier = userIdentifier;

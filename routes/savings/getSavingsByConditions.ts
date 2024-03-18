@@ -37,7 +37,7 @@ export default (router: Router) => {
         throw new HttpError(401, 'Unauthorized');
       }
     } else if (UUIDSCHEMA.parse(savingsIdentifier)) {
-      if (isStandardUser) {
+      if (isStandardUser && filterArgs.loggedInUserId !== savingsIdentifier) {
         throw new HttpError(401, 'Unauthorized');
       }
       filterArgs.savingsIdentifier = savingsIdentifier;

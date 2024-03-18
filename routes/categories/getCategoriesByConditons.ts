@@ -23,7 +23,7 @@ export default (router: Router) => {
     const query = SQL_GET_ALL_CATEGORIES({});
 
     if (categoryIdentifier === 'me') {
-      query.extend(`WHERE user_id = :loggedInUserId OR user_id IS NULL`, { loggedInUserId });
+      query.extend(`WHERE user_id = :loggedInUserId OR user_id = 1`, { loggedInUserId });
     } else if (categoryIdentifier === 'all') {
       if (isStandardUser) {
         throw new HttpError(401, 'Unauthorized');
@@ -32,9 +32,9 @@ export default (router: Router) => {
       if (isStandardUser) {
         throw new HttpError(401, 'Unauthorized');
       }
-      query.extend(`WHERE user_id IS NULL`, { });
+      query.extend(`WHERE user_id = 1`, { });
     } else if (UUIDSCHEMA.parse(categoryIdentifier)) {
-      if (isStandardUser) {
+      if (isStandardUser && loggedInUserId !== categoryIdentifier) {
         throw new HttpError(401, 'Unauthorized');
       }
       query.extend(`WHERE user_id = :categoryIdentifier`, {categoryIdentifier});

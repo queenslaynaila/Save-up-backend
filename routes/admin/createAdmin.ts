@@ -8,9 +8,9 @@ import { sql } from '../../db';
 import { generateToken } from '../../middleware/generatetoken';
 
 const SQL_CREATE_ADMIN = sql<z.infer<typeof CreateAdminSchema>, Admin>(`
-    INSERT INTO users (first_name, last_name, phone_number, password, role, created_at, updated_at) 
-    VALUES (:first_name, :last_name, :phone_number, :password, :role, NOW(), NOW())
-    RETURNING id, first_name, last_name, phone_number, role, created_at, updated_at
+    INSERT INTO users (first_name, last_name, phone_number, password, role) 
+    VALUES (:first_name, :last_name, :phone_number, :password, :role)
+    RETURNING id, first_name, last_name, phone_number, role, created_at
 `);
 
 export default (router: Router) => {

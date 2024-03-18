@@ -5,7 +5,7 @@ import { HttpError } from '../../middleware/errorMiddleware';
 import { sql } from '../../db';
 
 const SQL_DELETE_EXPENSE = sql<{ id: string; user_id: string }, Record<string, never>>(`
-  DELETE FROM expenses WHERE id = :id AND user_id = :user_id RETURNING id
+  DELETE FROM expenses WHERE id = :id AND user_id = :user_id 
 `);
 
 export default (router: Router) => {

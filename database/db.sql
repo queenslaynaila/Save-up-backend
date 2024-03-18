@@ -1,5 +1,5 @@
 CREATE TYPE role_enum AS ENUM ('Admin','User','Moderator');
-CREATE TYPE status_enum AS ENUM ('In Progress', 'Completed', 'Dormant');
+CREATE TYPE status_enum AS ENUM ('In Progress', 'Completed');
 CREATE TYPE priority_enum AS ENUM ('High', 'Intermediate', 'Low');
 
 CREATE TABLE IF NOT EXISTS users (
@@ -13,16 +13,33 @@ CREATE TABLE IF NOT EXISTS users (
   CONSTRAINT    phone_number_format_check CHECK (phone_number ~* '^\+?254[0-9]{9}$')
 );
 
+INSERT INTO users (first_name, last_name, phone_number, role, password)
+VALUES ('System', 'Categories', '+254000000000', 'Admin', 'Jemanaila@2000');
+
+
 CREATE TABLE IF NOT EXISTS categories (
   id          SERIAL,
   user_id     INT NOT NULL REFERENCES users (id),
   name        VARCHAR(100) NOT NULL,
   description VARCHAR(255),
   created_at  TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-  updated_at  TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   deleted_at  TIMESTAMP WITH TIME ZONE,
   PRIMARY KEY (user_id, id)
 )
+
+INSERT INTO categories (user_id, name, description) 
+VALUES (1, 'Food', 'All food related expenses'),
+       (1, 'Transport', 'All transport related expenses'),
+       (1, 'Housing', 'Expenses/Savings related to rent/mortgage, utilities, and home maintenance'),
+       (1, 'Entertainment', 'Costs for leisure activities such as movies, concerts, and hobbies'),
+       (1, 'Healthcare', 'Medical expenses/Savings including doctor visits, prescriptions, and insurance'),
+       (1, 'Education', 'Expenses for tuition, books, and other educational materials'),
+       (1, 'Clothing', 'Costs for clothing and accessories for personal use'),
+       (1, 'Utilities', 'Bills for electricity, water, gas, and other essential services'),
+       (1, 'Savings', 'Funds set aside for future investments or emergencies'),
+       (1, 'Debt Repayment', 'Payments towards loans, credit cards, and other debts'),
+       (1, 'Travel', 'Expenses or Savings related to trips, vacations, and travel activities');
+
 
 CREATE TABLE IF NOT EXISTS savings (
   id            SERIAL PRIMARY KEY,
@@ -44,6 +61,38 @@ CREATE  INDEX savings_user_id_idx  ON savings (user_id);
 CREATE  INDEX savings_category_idx ON savings (category_id);
 CREATE  INDEX savings_priority_idx ON savings (priority);
 CREATE  INDEX savings_status_idx   ON savings (status);
+
+CREATE TABLE IF NOT EXISTS contributions (
+  id         SERIAL PRIMARY KEY,
+  saving_id  INTEGER NOT NULL REFERENCES savings (id) ON DELETE CASCADE NOT NULL,
+  amount     NUMERIC(30, 3) NOT NULL,
+  date       TIMESTAMP WITH TIME ZONE NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE OR REPLACE FUNCTION update_savings_status()
+RETURNS TRIGGER AS $$
+DECLARE
+    total_contributions NUMERIC(30, 3);
+BEGIN
+    SELECT COALESCE(SUM(amount), 0) INTO total_contributions
+    FROM contributions
+    WHERE saving_id = NEW.saving_id ;
+
+    UPDATE savings
+    SET status = CASE
+                    WHEN total_contributions >= (SELECT amount FROM savings WHERE id = NEW.saving_id) THEN 'Complete'
+                    ELSE 'In Progress'
+                 END
+    WHERE id = NEW.saving_id;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER contributions_trigger
+AFTER INSERT ON contributions
+FOR EACH ROW
+EXECUTE FUNCTION update_savings_status();
 
 CREATE TABLE IF NOT EXISTS security_questions (
   id          SERIAL, 
@@ -81,14 +130,6 @@ CREATE TRIGGER before_insert_security_answers
 BEFORE INSERT ON security_answers
 FOR EACH ROW
 EXECUTE FUNCTION check_security_answer_limit();
-
-CREATE TABLE IF NOT EXISTS contributions (
-  id         SERIAL PRIMARY KEY,
-  saving_id  INTEGER NOT NULL REFERENCES savings (id) ON DELETE CASCADE NOT NULL,
-  amount     NUMERIC(30, 3) NOT NULL,
-  date       TIMESTAMP WITH TIME ZONE NOT NULL,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
 
 CREATE TABLE IF NOT EXISTS expenses (
   id              SERIAL,
