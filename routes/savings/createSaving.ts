@@ -21,14 +21,13 @@ export default (router: Router) => {
       if (!validationResult.success) {
         throw new HttpError(400, 'Invalid saving data');
       }
-      const { user_id, description, category_id, amount, priority, target_date } =
-      validationResult.data;
+      const { user_id, description, category_id, amount, priority, target_date } =validationResult.data;
       const authenticatedUserId = req.user!.id;
       if (authenticatedUserId !== user_id) {
         throw new HttpError(403, 'Unauthorized');
       }
       const newSaving = await SQL_CREATE_SAVING({
-        user_id: authenticatedUserId,
+        user_id: user_id,
         description,
         category_id,
         amount,
