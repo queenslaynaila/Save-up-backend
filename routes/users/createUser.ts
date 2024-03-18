@@ -2,7 +2,6 @@ import { Router } from 'express';
 import bcrypt from 'bcrypt';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { sql } from '../../db';
-import { generateToken } from '../../middleware/generatetoken';
 import { CreateUserSchema, UserSchema } from '../../types';
 
 interface CreateUserSchema {
@@ -36,9 +35,6 @@ export default (router: Router) => {
         password: passwordHash,
       })
         .one(new HttpError(400, 'An account with the provided phone number already exists'))
-        
-      const token = generateToken(newUser.id, newUser.role, '1h');
-      const refreshToken = generateToken(newUser.id, newUser.role, '1h');
-      res.setHeader('X-Refresh-Token', refreshToken).setHeader('X-Auth-Token', token).json(newUser);
+      res.json(newUser);
     });
 };
