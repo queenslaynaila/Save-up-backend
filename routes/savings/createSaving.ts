@@ -34,12 +34,7 @@ export default (router: Router) => {
         amount,
         priority,
         target_date,
-      })
-        .one()
-        .catch(() => {
-          throw new HttpError(400, 'Selected category does not exist');
-        });
-
+      }).one(new HttpError(400, 'Selected category does not exist'))
       return res.json(newSaving);
     });
 };
