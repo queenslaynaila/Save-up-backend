@@ -1,7 +1,7 @@
 import { z } from 'zod';
 // Schemas for Saving
 // ---------------------------------------------------------------------------------------------------------
-export const idSchema = z.string().uuid();
+export const idSchema = z.string();
 
 export const enum priority {
   HIGH = 'High',
@@ -10,20 +10,20 @@ export const enum priority {
 }
 export const baseSavingSchema = z.object({
   description: z.string(),
-  category_id: z.string().uuid(),
+  category_id: z.string(),
   amount: z.number(),
   priority: z.enum([priority.HIGH, priority.INTERMEDIATE, priority.LOW]),
   target_date: z.string(),
 });
 
 export const savingSchema = baseSavingSchema.extend({
-  user_id: z.string().uuid(),
+  user_id: z.string(),
 });
 
 export const updateSavingSchema = baseSavingSchema.partial();
 
 export const getSavingsQueryParamsSchema = z.object({
-  user_id: z.string().uuid(),
+  user_id: z.string(),
   priority: z.string().optional(),
   status: z.string().optional(),
 });
@@ -31,7 +31,7 @@ export const getSavingsQueryParamsSchema = z.object({
 // Schema for Contribution
 // ---------------------------------------------------------------------------------------------------------
 export const contributionSchema = z.object({
-  saving_id: z.string().uuid(),
+  saving_id: z.string(),
   amount: z.number(),
   date: z.string(),
 });
@@ -52,8 +52,8 @@ export interface ContributionSchema {
 // Schema for Expense
 // ---------------------------------------------------------------------------------------------------------
 export const expenseSchema = z.object({
-  user_id: z.string().uuid(),
-  category_id: z.string().uuid(),
+  user_id: z.string(),
+  category_id: z.string(),
   description: z.string(),
   amount: z.number(),
   expense_date: z.string(),
@@ -67,7 +67,7 @@ export interface ExtendedExpenseInterface extends expenseInterface {
   month: string;
 }
 export const updateExpenseSchema = z.object({
-  category_id: z.string().uuid().optional(),
+  category_id: z.string().optional(),
   description: z.string().optional(),
   amount: z.number().optional(),
   expense_date: z.string().optional(),
@@ -100,7 +100,7 @@ export const CreateAdminSchema = CreateUserSchema.extend({
 });
 
 export const UserSchema = CreateUserSchema.extend({
-  id: z.string().uuid(),
+  id: z.string(),
   role: z.enum([UserRole.ADMIN, UserRole.USER, UserRole.MODERATOR]),
 });
 
@@ -124,7 +124,7 @@ export const UpdateCategorySchema = z.object({
   description: z.string().optional(),
 });
 export const CreateCategorySchema = UpdateCategorySchema.extend({
-  user_id: z.string().uuid(),
+  user_id: z.string(),
   name: z.string(),
   description: z.string(),
 });
@@ -149,12 +149,12 @@ export interface SecurityQuestionSchema {
 //Security Answer Schema
 // ---------------------------------------------------------------------------------------------------------
 export const updateSecurityAnswerSchema = z.object({
-  question_id: z.string().uuid(),
+  question_id: z.string(),
   answer: z.string(),
 });
 
 export const createSecurityAnswerSchema = updateSecurityAnswerSchema.extend({
-  user_id: z.string().uuid(),
+  user_id: z.string(),
 });
 
 export interface SecurityAnswerSchema {
