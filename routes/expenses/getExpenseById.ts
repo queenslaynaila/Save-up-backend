@@ -5,7 +5,7 @@ import { UserRole, idSchema, ExtendedExpenseInterface } from '../../types';
 import { sql } from '../../db';
 
 const SQL_GET_EXPENSE_BY_ID = (query: string) =>
-  sql<{ id: string; userId?: string }, ExtendedExpenseInterface>(query);
+  sql<{ id:number; userId?:number }, ExtendedExpenseInterface>(query);
 
 export default (router: Router) => {
   router.get<{ id: string }, ExtendedExpenseInterface, Record<string, never>, Record<string, never>>(
@@ -22,7 +22,7 @@ export default (router: Router) => {
       const userRole = req.user!.role;
 
       let query = 'SELECT * FROM expenses WHERE id = :id';
-      const values: { id: string; userId?: string } = { id: expenseId };
+      const values: { id:number; userId?:number } = { id: expenseId };
       if (userRole !== UserRole.ADMIN) {
         query += ' AND user_id = :userId';
         values.userId = userId;
