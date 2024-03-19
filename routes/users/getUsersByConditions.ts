@@ -6,9 +6,9 @@ import { convertToTitleCase, isValidValue } from '../../middleware/caseNormaliza
 import authMiddleware from '../../middleware/auth';
 import { UserSchema } from './index';
 
-const UUID_SCHEMA = z.string();
+const ID_SCHEMA = z.number();
 const SQL_GET_ALL_USERS = sql<Record<string, never>, UserSchema>(`
-  SELECT id, first_name, last_name, phone_number, role, created_at, updated_at FROM users
+  SELECT id, first_name, last_name, phone_number, role, created_at FROM users
 `);
 const ACCEPTED_ROLES = ['User', 'Admin', 'Moderator'];
 
@@ -20,19 +20,19 @@ export default (router: Router) => {
       const { userIdentifier } = req.params;
       const { role } = req.query;
       const filters: string[] = [];
-      const filterArgs: Record<string, string> = {};
+      const filterArgs: Record<string, string | number> = {};
       const isStandardUser = req.user?.role === 'User';
       const convertedRole = role ? convertToTitleCase(role) : '';
 
       if (userIdentifier === 'me') {
-        filterArgs.loggedInUserId = req.user!.id.toString();
+        filterArgs.loggedInUserId = req.user!.id;
         filters.push(`id = :loggedInUserId`);
       } else if (userIdentifier === 'all') {
         if (isStandardUser) {
           throw new HttpError(401, 'Unauthorized');
         }
-      } else if (UUID_SCHEMA.safeParse(userIdentifier).success) {
-        if (isStandardUser  && filterArgs.loggedInUserId !== userIdentifier) {
+      } else if (ID_SCHEMA.safeParse(parseInt(userIdentifier)).success) {
+        if (isStandardUser  && req.user!.id != parseInt(userIdentifier)) {
           throw new HttpError(401, 'Unauthorized');
         }
         filterArgs.userIdentifier = userIdentifier;

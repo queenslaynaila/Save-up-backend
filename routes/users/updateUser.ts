@@ -7,10 +7,10 @@ import { UpdateUserSchema } from '../../types';
 import { UserSchema } from './index';
 import { HttpError } from '../../middleware/errorMiddleware';
 
-const SQL_UPDATE_USER = sql<z.infer<typeof UpdateUserSchema>& { id: string }, UserSchema>(`
+const SQL_UPDATE_USER = sql<z.infer<typeof UpdateUserSchema>& { id:number }, UserSchema>(`
   UPDATE users
-  SET first_name = coalesce(:first_name,  users.first_name)
-      last_name = coalesce(:last_name ,  users.last_name )
+  SET first_name = COALESCE(:first_name, users.first_name),
+      last_name = COALESCE(:last_name, users.last_name)
   WHERE id = :id
   RETURNING *
 `);
@@ -20,7 +20,7 @@ export default (router: Router) => {
     '/:id', 
     authMiddleware(), 
     async (req, res) => {
-      const userId = req.params.id;
+      const userId = parseInt(req.params.id);
       if (!hasPermission(req, userId)) {
         throw new HttpError(403, 'Unauthorized');
       }

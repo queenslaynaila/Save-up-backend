@@ -7,7 +7,7 @@ import { sql } from '../../db';
 
 const SQL_CREATE_EXPENSES = sql<z.infer<typeof expenseSchema>, ExtendedExpenseInterface>(`
   INSERT INTO expenses (description, category_id, amount,expense_date, user_id)
-  VALUES (:description, :category_id, :amount, : expense_date, :user_id)
+  VALUES (:description, :category_id, :amount, :expense_date, :user_id)
   RETURNING *
 `);
 
@@ -18,6 +18,7 @@ export default (router: Router) => {
     async (req, res) => {
       const validationResult = expenseSchema.safeParse(req.body);
       if (!validationResult.success) {
+        console.error('Validation errors:', validationResult.error);
         throw new HttpError(400, 'Invalid expense data provided');
       }
       const { description, category_id, amount, expense_date, user_id } = validationResult.data;

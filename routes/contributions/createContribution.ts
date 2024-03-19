@@ -5,7 +5,7 @@ import { HttpError } from '../../middleware/errorMiddleware';
 import { sql } from '../../db';
 
 interface ContributionCreation {
-  saving_id: string;
+  saving_id:number;
   amount: number;
   date: string;
 }

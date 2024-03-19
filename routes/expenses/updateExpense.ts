@@ -1,28 +1,24 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { HttpError } from '../../middleware/errorMiddleware';
-import { idSchema, updateExpenseSchema, ExtendedExpenseInterface } from '../../types';
+import { updateExpenseSchema, ExtendedExpenseInterface } from '../../types';
 import authMiddleware from '../../middleware/auth';
 import { sql } from '../../db';
 
-const SQL_UPDATE_EXPENSE= sql<z.infer<typeof updateExpenseSchema> & { id: string;user_id:string;},ExtendedExpenseInterface>(`
-  UPDATE expenses
-  SET description = coalesce(:description,  expenses.description)
-      category_id = coalesce(:category_id,  expenses.category_id)
-      amount = coalesce(:amount,  expenses.amount)
-      expense_date = coalesce(:date,  expenses.expense_date )
-  WHERE user_id = :user_id AND id = :expense_id
-  RETURNING *
+const SQL_UPDATE_EXPENSE= sql<z.infer<typeof updateExpenseSchema> & { id:number;user_id:number;},ExtendedExpenseInterface>(`
+UPDATE expenses
+SET description = COALESCE(:description, expenses.description),
+    category_id = COALESCE(:category_id, expenses.category_id),
+    amount = COALESCE(:amount, expenses.amount),
+    expense_date = COALESCE(:expense_date, expenses.expense_date)
+WHERE user_id = :user_id AND id = :id
+RETURNING *
 `);
 
 export default (router: Router) => {
   router.patch('/:id', authMiddleware(), async (req, res) => {
     const userId = req.user!.id;
-    const validationResult = idSchema.safeParse(req.params.id);
-    if (!validationResult.success) {
-      throw new HttpError(422, 'Invalid expense ID');
-    }
-    const expenseId = validationResult.data;
+    const expenseId = parseInt(req.params.id);
 
     const validationResultBody = updateExpenseSchema.safeParse(req.body);
     if (!validationResultBody.success) {

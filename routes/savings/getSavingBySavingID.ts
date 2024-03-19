@@ -13,7 +13,7 @@ export default (router: Router) => {
     '/records/:savingId', 
     authMiddleware(), 
     async (req, res) => {
-      const idValidationResult = idSchema.safeParse(req.params.savingId);
+      const idValidationResult = idSchema.safeParse(parseInt(req.params.savingId));
       if (!idValidationResult.success) {
         throw new HttpError(400, 'Invalid saving ID');
       }

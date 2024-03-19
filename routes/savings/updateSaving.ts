@@ -7,16 +7,17 @@ import { savingInterface } from './index';
 import { updateSavingSchema } from '../../types';
 
 
-const SQL_UPDATE_SAVING =  sql<z.infer<typeof updateSavingSchema>& { user_id:number; id: number }, savingInterface>(`
+const SQL_UPDATE_SAVING = sql<z.infer<typeof updateSavingSchema>& { user_id:number; id: number }, savingInterface>(`
   UPDATE savings
-  SET description = coalesce(:description,  savings.description)
-      category_id = coalesce(:category_id,  savings.category_id)
-      amount = coalesce(:amount,  savings.amount)
-      priority = coalesce(:priority,  savings.priority )
+  SET description = coalesce(:description,  savings.description),
+      category_id = coalesce(:category_id,  savings.category_id),
+      amount = coalesce(:amount,  savings.amount),
+      priority = coalesce(:priority,  savings.priority ),
       target_date = coalesce(:target_date,  savings.target_date )
-  WHERE user_id = :user_id AND id = :saving_id
+  WHERE user_id = :user_id AND id = :id
   RETURNING *
 `);
+
 
 export default (router: Router) => {
   router.patch('/:id', authMiddleware(), async (req, res) => {
