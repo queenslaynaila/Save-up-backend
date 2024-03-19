@@ -4,7 +4,7 @@ import { HttpError } from '../../middleware/errorMiddleware';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/auth';
 
-const SQL_DELETE_SECURITY_ANSWER = sql<{ id: string; user_id: string }, Record<string, never>>(`
+const SQL_DELETE_SECURITY_ANSWER = sql<{ id:number; user_id:number }, Record<string, never>>(`
   DELETE FROM security_answers WHERE id = :securityAnswerId AND user_id = :userId 
 `);
 
@@ -13,7 +13,7 @@ export default (router: Router) => {
     '/:id', 
     authMiddleware(), 
     async (req, res) => {
-      const validationResult = idSchema.safeParse(req.params.id);
+      const validationResult = idSchema.safeParse(parseInt(req.params.id));
       if (!validationResult.success) {
         throw new HttpError(422, 'Invalid ID');
       }
