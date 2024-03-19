@@ -34,7 +34,7 @@ export default (router: Router) => {
       }
       query.extend(`WHERE user_id = 1`, { });
     } else if (UUIDSCHEMA.parse(categoryIdentifier)) {
-      if (isStandardUser && loggedInUserId !== categoryIdentifier) {
+      if (isStandardUser && loggedInUserId.toString() !== categoryIdentifier.toString()) {
         throw new HttpError(401, 'Unauthorized');
       }
       query.extend(`WHERE user_id = :categoryIdentifier`, {categoryIdentifier});

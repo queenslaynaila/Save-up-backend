@@ -6,10 +6,10 @@ import getSavingBySavingID from './getSavingBySavingID';
 import updateSaving from './updateSaving';
 
 export interface savingInterface {
-  id: string;
-  user_id: string;
+  id: number;
+  user_id: number;
   description: string;
-  category_id: string;
+  category_id: number;
   priority: string;
   status: string;
   target_amount: number;

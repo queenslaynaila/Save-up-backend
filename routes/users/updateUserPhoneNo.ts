@@ -23,7 +23,7 @@ export default (router: Router) => {
       const userId = req.params.id;
       const authenticatedUserId = req.user!.id;
 
-      if (userId !== authenticatedUserId) {
+      if (userId.toString() !== authenticatedUserId.toString()) {
         throw new HttpError(401, 'Unauthorized');
       }
 

@@ -1,7 +1,7 @@
 import { z } from 'zod';
 // Schemas for Saving
 // ---------------------------------------------------------------------------------------------------------
-export const idSchema = z.string();
+export const idSchema = z.number();
 
 export const enum priority {
   HIGH = 'High',
@@ -10,20 +10,20 @@ export const enum priority {
 }
 export const baseSavingSchema = z.object({
   description: z.string(),
-  category_id: z.string(),
+  category_id: z.number(),
   amount: z.number(),
   priority: z.enum([priority.HIGH, priority.INTERMEDIATE, priority.LOW]),
   target_date: z.string(),
 });
 
 export const savingSchema = baseSavingSchema.extend({
-  user_id: z.string(),
+  user_id: z.number(),
 });
 
 export const updateSavingSchema = baseSavingSchema.partial();
 
 export const getSavingsQueryParamsSchema = z.object({
-  user_id: z.string(),
+  user_id: z.number(),
   priority: z.string().optional(),
   status: z.string().optional(),
 });
@@ -31,7 +31,7 @@ export const getSavingsQueryParamsSchema = z.object({
 // Schema for Contribution
 // ---------------------------------------------------------------------------------------------------------
 export const contributionSchema = z.object({
-  saving_id: z.string(),
+  saving_id: z.number(),
   amount: z.number(),
   date: z.string(),
 });
@@ -42,7 +42,7 @@ export const updateContributionSchema = contributionSchema.pick({
 });
 
 export interface ContributionSchema {
-  saving_id: z.ZodString;
+  saving_id: z.ZodNumber;
   amount: z.ZodNumber;
   date: z.ZodString;
   created_at: Date;
@@ -52,8 +52,8 @@ export interface ContributionSchema {
 // Schema for Expense
 // ---------------------------------------------------------------------------------------------------------
 export const expenseSchema = z.object({
-  user_id: z.string(),
-  category_id: z.string(),
+  user_id: z.number(),
+  category_id: z.number(),
   description: z.string(),
   amount: z.number(),
   expense_date: z.string(),
@@ -67,7 +67,7 @@ export interface ExtendedExpenseInterface extends expenseInterface {
   month: string;
 }
 export const updateExpenseSchema = z.object({
-  category_id: z.string().optional(),
+  category_id: z.number().optional(),
   description: z.string().optional(),
   amount: z.number().optional(),
   expense_date: z.string().optional(),
@@ -100,7 +100,7 @@ export const CreateAdminSchema = CreateUserSchema.extend({
 });
 
 export const UserSchema = CreateUserSchema.extend({
-  id: z.string(),
+  id: z.number(),
   role: z.enum([UserRole.ADMIN, UserRole.USER, UserRole.MODERATOR]),
 });
 
@@ -124,13 +124,13 @@ export const UpdateCategorySchema = z.object({
   description: z.string().optional(),
 });
 export const CreateCategorySchema = UpdateCategorySchema.extend({
-  user_id: z.string(),
+  user_id: z.number(),
   name: z.string(),
   description: z.string(),
 });
 
 export interface CategorySchema {
-  id: z.ZodString;
+  id: z.ZodNumber;
   description: z.ZodString;
   name: z.ZodString;
   user_id: z.ZodString;
@@ -139,8 +139,8 @@ export interface CategorySchema {
 }
 //Security Question Schema
 export interface SecurityQuestionSchema {
-  id: z.ZodString;
-  user_id: z.ZodString;
+  id: z.ZodNumber;
+  user_id: z.ZodNumber;
   question: z.ZodString;
   created_at: Date;
   updated_at: Date;
@@ -149,17 +149,17 @@ export interface SecurityQuestionSchema {
 //Security Answer Schema
 // ---------------------------------------------------------------------------------------------------------
 export const updateSecurityAnswerSchema = z.object({
-  question_id: z.string(),
+  question_id: z.number(),
   answer: z.string(),
 });
 
 export const createSecurityAnswerSchema = updateSecurityAnswerSchema.extend({
-  user_id: z.string(),
+  user_id: z.number(),
 });
 
 export interface SecurityAnswerSchema {
   id: string;
-  user_id: string;
+  user_id: number;
   question_id: string;
   answer: string;
   created_at: Date;
@@ -167,7 +167,7 @@ export interface SecurityAnswerSchema {
 }
 
 export interface UserSchema {
-  id: string;
+  id: number;
   first_name: string;
   last_name: string;
   phone_number: string;

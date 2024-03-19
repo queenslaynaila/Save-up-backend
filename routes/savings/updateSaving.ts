@@ -7,7 +7,7 @@ import { savingInterface } from './index';
 import { updateSavingSchema } from '../../types';
 
 
-const SQL_UPDATE_SAVING =  sql<z.infer<typeof updateSavingSchema>& { user_id: string; id: string }, savingInterface>(`
+const SQL_UPDATE_SAVING =  sql<z.infer<typeof updateSavingSchema>& { user_id:number; id: number }, savingInterface>(`
   UPDATE savings
   SET description = coalesce(:description,  savings.description)
       category_id = coalesce(:category_id,  savings.category_id)
@@ -20,7 +20,7 @@ const SQL_UPDATE_SAVING =  sql<z.infer<typeof updateSavingSchema>& { user_id: st
 
 export default (router: Router) => {
   router.patch('/:id', authMiddleware(), async (req, res) => {
-    const savingId = req.params.id;
+    const savingId = parseInt(req.params.id);
     const userId = req.user!.id;
 
     const validatedSavings = updateSavingSchema.safeParse(req.body);

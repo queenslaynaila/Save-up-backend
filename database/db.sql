@@ -77,14 +77,15 @@ DECLARE
 BEGIN
     SELECT COALESCE(SUM(amount), 0) INTO total_contributions
     FROM contributions
-    WHERE saving_id = NEW.saving_id ;
+    WHERE saving_id = NEW.saving_id;
 
-    UPDATE savings
-    SET status = CASE
-                    WHEN total_contributions >= (SELECT amount FROM savings WHERE id = NEW.saving_id) THEN 'Complete'
-                    ELSE 'In Progress'
-                 END
-    WHERE id = NEW.saving_id;
+    IF total_contributions >= (SELECT amount FROM savings WHERE id = NEW.saving_id) THEN
+        UPDATE savings
+        SET status = 'Completed',
+            completed_date = CURRENT_DATE
+        WHERE id = NEW.saving_id;
+    END IF;
+
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
@@ -156,17 +157,17 @@ CREATE TABLE IF NOT EXISTS reset_tokens (
     expired_at  TIMESTAMP WITH TIME ZONE DEFAULT (CURRENT_TIMESTAMP + INTERVAL '15 minutes')
 );
 
-CREATE OR REPLACE FUNCTION set_expiry_time_default()
-RETURNS TRIGGER AS $$
-BEGIN
-    NEW.expiry_time := NEW.created_at + INTERVAL '15 minutes';
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-CREATE TRIGGER set_expiry_time_default_trigger
-BEFORE INSERT ON reset_tokens
-FOR EACH ROW
-EXECUTE FUNCTION set_expiry_time_default();
+-- CREATE OR REPLACE FUNCTION set_expiry_time_default()
+-- RETURNS TRIGGER AS $$
+-- BEGIN
+--     NEW.expiry_time := NEW.created_at + INTERVAL '15 minutes';
+--     RETURN NEW;
+-- END;
+-- $$ LANGUAGE plpgsql;
+-- CREATE TRIGGER set_expiry_time_default_trigger
+-- BEFORE INSERT ON reset_tokens
+-- FOR EACH ROW
+-- EXECUTE FUNCTION set_expiry_time_default();
 
 
 CREATE OR REPLACE FUNCTION check_user_token_limit()
@@ -189,6 +190,3 @@ CREATE TRIGGER enforce_user_token_limit
 BEFORE INSERT ON reset_tokens
 FOR EACH ROW
 EXECUTE FUNCTION check_user_token_limit();
-
-ALTER TABLE reset_tokens
-ADD CONSTRAINT token_expiry CHECK (expiry_time > created_at + INTERVAL '15 minutes');

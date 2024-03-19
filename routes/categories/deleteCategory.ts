@@ -5,8 +5,8 @@ import {HttpError} from "../../middleware/errorMiddleware";
 import {sql} from "../../db";
 
 interface CategorySchema {
-  id: string;
-  user_id: string;
+  id: number;
+  user_id: number;
   name: string;
   description: string;
   created_at: Date;

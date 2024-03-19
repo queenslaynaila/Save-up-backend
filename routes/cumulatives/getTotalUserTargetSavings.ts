@@ -17,7 +17,7 @@ export default (router: Router) => {
       const filters: string[] = [];
       const filterArgs: Record<string, string> = {};
       const { priority, status, category_id } = req.query 
-      const values: Record<string, string> = { userId };
+      const values: Record<string, number> = { userId };
   
       if (priority) {
         filterArgs.priority = priority;

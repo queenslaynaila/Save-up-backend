@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/auth';
 
-const SQL_GET_TOTAL_CONTRIBUTIONS = sql<{ userId: string }, { total_contributed_amount: number }>(`
+const SQL_GET_TOTAL_CONTRIBUTIONS = sql<{ userId: number }, { total_contributed_amount: number }>(`
     SELECT COALESCE(SUM(c.amount), 0) AS total_contributed_amount
     FROM contributions c
     JOIN savings s ON c.saving_id = s.id

@@ -4,7 +4,7 @@ import { idSchema } from '../../types';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { sql } from '../../db';
 
-const SQL_DELETE_SAVING = sql<{ id: string; user_id: string }, Record<string, never>>(`
+const SQL_DELETE_SAVING = sql<{ id: number; user_id:number }, Record<string, never>>(`
   DELETE FROM savings WHERE id = :id AND user_id = :user_id
 `);
 

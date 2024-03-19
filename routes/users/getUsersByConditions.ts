@@ -25,7 +25,7 @@ export default (router: Router) => {
       const convertedRole = role ? convertToTitleCase(role) : '';
 
       if (userIdentifier === 'me') {
-        filterArgs.loggedInUserId = req.user!.id;
+        filterArgs.loggedInUserId = req.user!.id.toString();
         filters.push(`id = :loggedInUserId`);
       } else if (userIdentifier === 'all') {
         if (isStandardUser) {

@@ -5,7 +5,7 @@ import { UpdateCategorySchema,CategorySchema } from '../../types';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { sql } from '../../db';
 
-const SQL_UPDATE_CATEGORY = sql<z.infer<typeof UpdateCategorySchema> & { id: string; user_id: string },CategorySchema>(`
+const SQL_UPDATE_CATEGORY = sql<z.infer<typeof UpdateCategorySchema> & { id: number; user_id:number },CategorySchema>(`
   UPDATE categories
   SET name = coalesce(:name, categories.name), 
       description = coalesce(:description, categories.description)
@@ -26,7 +26,7 @@ export default (router: Router) => {
     const { name, description } = validatedCategory.data;
     const result = SQL_UPDATE_CATEGORY({
       user_id: userId,
-      id: categoryId,
+      id: parseInt(categoryId),
       name: name, 
       description: description ,
     }).one(new HttpError(400, 'Category not found'));

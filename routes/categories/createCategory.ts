@@ -5,7 +5,7 @@ import { HttpError } from '../../middleware/errorMiddleware';
 import { sql } from '../../db';
 
 interface CreateCategory{
-  user_id: string
+  user_id: number
   name: string
   description: string
 }

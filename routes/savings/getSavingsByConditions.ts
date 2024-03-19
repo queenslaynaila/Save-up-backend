@@ -30,7 +30,7 @@ export default (router: Router) => {
     const isStandardUser = req.user?.role === 'User';
 
     if (savingsIdentifier === 'me') {
-      filterArgs.loggedInUserId = loggedInUserId;
+      filterArgs.loggedInUserId= loggedInUserId.toString() ;
       filters.push(`user_id = :loggedInUserId`);
     } else if (savingsIdentifier === 'all') {
       if (isStandardUser) {

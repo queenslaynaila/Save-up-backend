@@ -6,7 +6,7 @@ interface TopExpenditureCategory {
   total_expense: number;
 }
 
-const SQL_GET_TOP_EXPENDITURE_CATEGORIES = sql<{ userId: string }, TopExpenditureCategory[]>(`
+const SQL_GET_TOP_EXPENDITURE_CATEGORIES = sql<{ userId:number }, TopExpenditureCategory[]>(`
   SELECT e.category_id,c.name AS category_name,
   COALESCE(SUM(e.amount), 0) AS total_expense FROM expenses e
   JOIN categories c ON e.category_id = c.id

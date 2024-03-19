@@ -8,7 +8,7 @@ import updateUser from './updateUser';
 import updateUserPhoneNo from './updateUserPhoneNo';
 
 export interface UserSchema {
-  id: string;
+  id:number;
   first_name: string;
   last_name: string;
   phone_number: string;

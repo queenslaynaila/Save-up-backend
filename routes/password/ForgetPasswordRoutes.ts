@@ -10,7 +10,7 @@ import { sql } from '../../db';
 
 declare module 'express-serve-static-core' {
   interface Request {
-    userId?: string;
+    userId?:number;
     isTokenGenerated: boolean;
   }
 }
@@ -19,23 +19,23 @@ const SQL_GET_USER = sql<{ phone_number: string }, Pick<UserSchema, 'id' | 'firs
   `SELECT id, first_name, last_name, role, created_at, updated_at FROM users WHERE phone_number = :phone_number`
 );
 
-const SQL_SAVE_TOKEN = sql<{ user_id: string; token: string }, { token: string }>(
+const SQL_SAVE_TOKEN = sql<{ user_id:number; token: string }, { token: string }>(
   `INSERT INTO reset_tokens (user_id, token) VALUES (:user_id, :token) RETURNING token`
 );
 
-const SQL_UPDATE_TOKEN_USAGE = sql<{ user_id: string; reset_token: string }, Record<string, never>>(
+const SQL_UPDATE_TOKEN_USAGE = sql<{ user_id:number; reset_token: string }, Record<string, never>>(
   `UPDATE reset_tokens SET used = TRUE, used_at = CURRENT_TIMESTAMP WHERE user_id = :user_id AND token = :reset_token`
 );
 
-const SQL_RESET_PASSWORD = sql<{ password: string; id: string }, { phone_number: string }>(
+const SQL_RESET_PASSWORD = sql<{ password: string; id:number }, { phone_number: string }>(
   `UPDATE users SET password = $1 WHERE  id = :id`
 );
 
-const SQL_GET_SECURITY_ANSWERS = sql<{ user_id: string }, { question_id: string; answer: string }>(
+const SQL_GET_SECURITY_ANSWERS = sql<{ user_id:number }, { question_id:number; answer: string }>(
   `SELECT question_id, answer FROM security_answers WHERE user_id = :user_id`
 );
 
-const SQL_GET_SECURITY_QUESTIONS = sql<{ user_id: string }, { question: string; question_id: string }>(
+const SQL_GET_SECURITY_QUESTIONS = sql<{ user_id: number }, { question: string; question_id:number }>(
   `SELECT sq.id AS question_id, sq.question FROM security_answers sa INNER JOIN security_questions sq ON sa.question_id = sq.id WHERE sa.user_id = :user_id`
 );
 
@@ -49,7 +49,7 @@ const verifyResetToken = (req: Request, res: Response, next: NextFunction) => {
     if (err) {
       return next(err);
     } else {
-      const { userId } = decoded as { userId: string };
+      const { userId } = decoded as { userId: number };
       req.userId = userId;
       next();
     }
@@ -77,11 +77,11 @@ export const initiatePasswordReset = (router: Router) => {
 };
 
 interface securityQuestions{
-  securityQuestions: { question_id: string; question: string }[]
+  securityQuestions: { question_id:number; question: string }[]
 }
 
 export const verifyPasswordResetToken = (router: Router) => {
-  router.post<Record<string, never>, securityQuestions, { user_id: string; reset_token: string }, Record<string, never>, Record<string, never>>(
+  router.post<Record<string, never>, securityQuestions, { user_id:number; reset_token: string }, Record<string, never>, Record<string, never>>(
     '/verify-token',
     verifyResetToken,
     async (req, res) => {
@@ -95,8 +95,8 @@ export const verifyPasswordResetToken = (router: Router) => {
 
 interface SecurityAnswersRequest {
   message: string;
-  user_id: string;
-  answers: { question_id: string; answer: string }[];
+  user_id:number;
+  answers: { question_id:number; answer: string }[];
 }
 
 export const verifySecurityAnswers = (router: Router) => {
@@ -107,10 +107,10 @@ export const verifySecurityAnswers = (router: Router) => {
       const { answers } = req.body;
       const user_id = req.userId!;
       const userSecurityAnswers = await SQL_GET_SECURITY_ANSWERS({ user_id }).many();
-      const incorrectAnswers: string[] = [];
-      answers.forEach(({ question_id, answer }: { question_id: string; answer: string }) => {
+      const incorrectAnswers: number[] = [];
+      answers.forEach(({ question_id, answer }: { question_id:number; answer: string }) => {
         const storedAnswer = userSecurityAnswers.find(
-          (a: { question_id: string; answer: string }) => a.question_id === question_id
+          (a: { question_id:number; answer: string }) => a.question_id === question_id
         );
         if (!storedAnswer || !bcrypt.compare(answer, storedAnswer.answer)) {
           incorrectAnswers.push(question_id);
@@ -126,7 +126,7 @@ export const verifySecurityAnswers = (router: Router) => {
 };
 
 export const resetPassword = (router: Router) => {
-  router.post<string, Record<string, never>, { message: string }, { new_password: string; id: string }, Record<string, never>>(
+  router.post<string, Record<string, never>, { message: string }, { new_password: string; id:number }, Record<string, never>>(
     '/reset',
     verifyResetToken,
     async (req, res) => {

@@ -6,7 +6,7 @@ export function hasPermission(req: Request, targetUserId: string): boolean {
     return true;
   } else {
     const loggedInUserId = req.user?.id;
-    console.log( loggedInUserId === targetUserId)
-    return loggedInUserId === targetUserId;
+    console.log( loggedInUserId!.toString() === targetUserId.toString())
+    return loggedInUserId!.toString() === targetUserId.toString();
   }
 }
