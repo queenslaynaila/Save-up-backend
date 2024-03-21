@@ -1,36 +1,49 @@
-import 'express-async-errors';
 import { Router } from 'express';
 import bcrypt from 'bcrypt';
-import { z } from 'zod';
-import { CreateAdminSchema, Admin } from '../../types';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { sql } from '../../db';
-import { generateToken } from '../../middleware/generatetoken';
+import { CreateUserSchema, UserSchema } from '../../types';
 
-const SQL_CREATE_ADMIN = sql<z.infer<typeof CreateAdminSchema>, Admin>(`
-    INSERT INTO users (first_name, last_name, phone_number, password, role) 
-    VALUES (:first_name, :last_name, :phone_number, :password, :role)
-    RETURNING id, first_name, last_name, phone_number, role, created_at
+interface CreateUserSchema {
+  first_name: string;
+  last_name: string;
+  password: string;
+  phone_number: string;
+}
+
+interface CreateUserWithIdSchema extends Omit<CreateUserSchema, 'phone_number'> {
+  id: number;
+}
+
+const SQL_CREATE_USER_PHONE = sql<Pick<CreateUserSchema, 'phone_number'>, { id: number }>(`
+  INSERT INTO users_phone (phone_number)
+  VALUES (:phone_number)
+  RETURNING id
+`);
+
+const SQL_CREATE_USER = sql<CreateUserWithIdSchema, UserSchema>(`
+  INSERT INTO users (id, first_name, last_name, password, role)
+  VALUES (:id, :first_name, :last_name, :password, 'Admin')
+  RETURNING id, first_name, last_name, role, created_at
 `);
 
 export default (router: Router) => {
-  router.post<Record<string, never>,Admin,typeof CreateAdminSchema,Record<string, never>,Record<string, never>>(
-    '/', 
+  router.post<Record<string, never>, UserSchema, CreateUserSchema, Record<string, never>, Record<string, never>>(
+    '/',
     async (req, res) => {
-      const validationResult = CreateAdminSchema.safeParse(req.body);
+      const validationResult = CreateUserSchema.safeParse(req.body);
       if (!validationResult.success) {
-        throw new HttpError(422, 'Invalid phone number or password');
+        throw new HttpError(422, 'Invalid input');
       }
-      const { first_name, last_name, phone_number, password, role } = validationResult.data;
-      const password_hash = bcrypt.hashSync(password, 10);
-      const newUser = await SQL_CREATE_ADMIN({
+      const { first_name, last_name, password, phone_number } = validationResult.data;
+      const user = await SQL_CREATE_USER_PHONE({ phone_number }).one(new HttpError(400, 'Account with this Phone number already exists'));
+      const passwordHash = bcrypt.hashSync(password, 10);
+      const newUser = await SQL_CREATE_USER({
+        id: user.id,
         first_name,
         last_name,
-        phone_number,
-        password: password_hash,
-        role,
+        password: passwordHash,
       }).one();
-      const token = generateToken(newUser.id, newUser.role, '1h');
-      return res.setHeader('X-Auth-Token', token).json(newUser);
+      res.json(newUser);
     });
 };

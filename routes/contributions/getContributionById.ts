@@ -14,7 +14,6 @@ export default (router: Router) => {
     async (req, res) => {
       const validationResult = ID_SCHEMA.safeParse(parseInt(req.params.id));
       if (!validationResult.success) {
-        console.log('Validation error:', validationResult.error);
         throw new HttpError(400, 'Invalid contributions ID');
       }
       const contributionsId = validationResult.data;

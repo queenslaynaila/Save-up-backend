@@ -28,7 +28,6 @@ export default (router: Router) => {
       }
       const query = SQL_GET_TOTAL_CONTRIBUTIONS({userId });
       if (filters.length > 0) query.extend(`AND ${filters.join(' AND ')}`, filterArgs);
-      console.log(query)
       query.extend('LIMIT 15', {});
       res.json(await query.one());
     });

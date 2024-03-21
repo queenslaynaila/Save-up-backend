@@ -12,7 +12,7 @@ export default (router: Router) => {
     '/records/:expenseId', 
     authMiddleware(), 
     async (req, res) => {
-      const validationResult = idSchema.safeParse(req.params.id);
+      const validationResult = ID_SCHEMA.safeParse(req.params.id);
       if (!validationResult.success) {
         throw new HttpError(400, 'Invalid expense ID');
       }

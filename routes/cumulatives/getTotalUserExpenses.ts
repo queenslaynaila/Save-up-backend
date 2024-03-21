@@ -14,7 +14,6 @@ export default (router: Router) => {
     async (req, res) => {
       const userId = req.user!.id;
       const { startDate, endDate, categoryId } = req.query;
-      console.log(req.query)
       const filters: string[] = [];
       const filterArgs: Record<string, string> = {};
       if (startDate) {
@@ -32,7 +31,6 @@ export default (router: Router) => {
 
       const query = SQL_GET_TOTAL_EXPENSES({userId });
       if (filters.length > 0) query.extend(`AND ${filters.join(' AND ')}`, filterArgs);
-      console.log(query)
       query.extend('LIMIT 15', {});
       res.json(await query.one());
 

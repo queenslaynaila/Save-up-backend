@@ -15,8 +15,8 @@ declare module 'express-serve-static-core' {
   }
 }
 
-const SQL_GET_USER = sql<{ phone_number: string }, Pick<UserSchema, 'id' | 'first_name' | 'last_name' | 'role' | 'created_at' | 'updated_at'>>(
-  `SELECT id, first_name, last_name, role, created_at, updated_at FROM users WHERE phone_number = :phone_number`
+const SQL_GET_USER = sql<{ phone_number: string }, Pick<UserSchema, 'id'>>(
+  `SELECT id FROM users_phone WHERE phone_number = :phone_number`
 );
 
 const SQL_SAVE_TOKEN = sql<{ user_id:number; token: string }, { token: string }>(
@@ -24,7 +24,7 @@ const SQL_SAVE_TOKEN = sql<{ user_id:number; token: string }, { token: string }>
 );
 
 const SQL_UPDATE_TOKEN_USAGE = sql<{ user_id:number; reset_token: string }, Record<string, never>>(
-  `UPDATE reset_tokens SET used = TRUE, used_at = CURRENT_TIMESTAMP WHERE user_id = :user_id AND token = :reset_token`
+  `UPDATE reset_tokens SET used_at = CURRENT_TIMESTAMP WHERE user_id = :user_id AND token = :reset_token`
 );
 
 const SQL_RESET_PASSWORD = sql<{ password: string; id:number }, { phone_number: string }>(
@@ -40,9 +40,9 @@ const SQL_GET_SECURITY_QUESTIONS = sql<{ user_id: number }, { question: string; 
 );
 
 const verifyResetToken = (req: Request, res: Response, next: NextFunction) => {
-  const token = req.headers['X-Reset-Token'] as string;
+  const token = req.headers['reset-token'] as string;
   if (!token) {
-    return res.status(403).json({ message: 'Access denied' });
+    throw new HttpError(403, 'Access denied');
   }
   const resetTokenValue = token.split(' ')[1];
   jwt.verify(resetTokenValue, process.env.JWT_SECRET as Secret, (err, decoded) => {
@@ -57,7 +57,7 @@ const verifyResetToken = (req: Request, res: Response, next: NextFunction) => {
 };
 
 export const initiatePasswordReset = (router: Router) => {
-  router.post<string, Record<string, never>, { message: string }, { phone_number: string }, Record<string, never>>(
+  router.post<Record<string, never>, { message: string }, { phone_number: string }, Record<string, never>>(
     '/forget-password-request',
     async (req, res) => {
       const { phone_number } = req.body;
@@ -67,7 +67,7 @@ export const initiatePasswordReset = (router: Router) => {
         new HttpError(500, 'Error saving token')
       );
       const actualToken = token.token;
-      const accessToken = jwt.sign({ userId: user.id }, 'process.env.JWT_SECRET as Secret', { expiresIn: "15m" });
+      const accessToken = jwt.sign({ userId: user.id },'process.env.JWT_SECRET as Secret', { expiresIn: "15m" });
       sendSms(
         phone_number,
         `Your password reset token is: ${actualToken}. It expires in 10 minutes. Do not share with anyone.`

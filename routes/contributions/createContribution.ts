@@ -21,10 +21,8 @@ export default (router: Router) => {
       if (!validationResult.success) {
         throw new HttpError(400, 'Invalid saving id, amount, or date');
       }
-      console.log(`this is logged in ${req.user!.id}` )
       const user_id= req.user!.id
       const { saving_id, amount, date } = validationResult.data;
-      console.log(user_id,saving_id, amount, date)
       const contributionResult = await SQL_CREATE_CONTRIBUTION({ user_id,saving_id, amount, date }).one();
       return res.json(contributionResult);
     });

@@ -114,6 +114,18 @@ CREATE TABLE IF NOT EXISTS security_questions (
 );
 SELECT create_reference_table('security_questions');
 
+INSERT INTO security_questions (question)
+VALUES ('What is the name of your first pet?'),
+       ('What city were you born in?'),
+       ('What is your mother\s maiden name?'),
+       ('What is the name of your favorite teacher?'),
+       ('In what city did you meet your spouse/significant other?'),
+       ('What is the name of your favorite childhood friend?'),
+       ('What was the make and model of your first car?'),
+       ('What is your favorite color?'),
+       ( 'What street did you grow up on?'),
+       ( 'What is the name of your favorite book?');
+
 ----------------------------------------------------------------------------------------------------
 
 CREATE TABLE IF NOT EXISTS security_answers (
