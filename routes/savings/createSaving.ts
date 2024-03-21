@@ -5,6 +5,7 @@ import { savingSchema } from '../../types';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { sql } from '../../db';
 import { savingInterface } from './index';
+import { hasPermission } from '../../middleware/hasPermission';
 
 const SQL_CREATE_SAVING = sql<z.infer<typeof savingSchema>, savingInterface>(`
   INSERT INTO savings (user_id, description, category_id, amount, priority, target_date)
@@ -22,9 +23,7 @@ export default (router: Router) => {
         throw new HttpError(400, 'Invalid saving data');
       }
       const { user_id, description, category_id, amount, priority, target_date } =validationResult.data;
-      const authenticatedUserId = req.user!.id;
-      console.log(authenticatedUserId,user_id)
-      if (authenticatedUserId !== user_id) {
+      if (!hasPermission(req, user_id)) {
         throw new HttpError(403, 'Unauthorized');
       }
       const newSaving = await SQL_CREATE_SAVING({

@@ -41,10 +41,11 @@ export const updateContributionSchema = contributionSchema.pick({
   date: true,
 });
 
-export interface ContributionSchema {
-  saving_id: z.ZodNumber;
-  amount: z.ZodNumber;
-  date: z.ZodString;
+export type ContributionSchema = {
+  user_id:number,
+  saving_id:number,
+  amount: number,
+  date: string;
   created_at: Date;
   updated_at: Date;
 }

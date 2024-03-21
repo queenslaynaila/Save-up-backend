@@ -1,6 +1,7 @@
 import { HttpError } from '../../middleware/errorMiddleware';
 import  authMiddleware  from '../../middleware/auth';
 import { convertToTitleCase, isValidValue } from '../../middleware/caseNormalization';
+import { hasPermission } from '../../middleware/hasPermission';
 import { sql } from '../../db';
 import { Router, Response } from 'express';
 import { UserSchema } from './index';
@@ -31,8 +32,8 @@ export default (router: Router) => {
           throw new HttpError(401, 'Unauthorized');
         }
       } else if (ID_SCHEMA.safeParse(parseInt(userId)).success) {
-        if (isStandardUser && req.user!.id != parseInt(userId)) {
-          throw new HttpError(401, 'Unauthorized');
+        if (!hasPermission(req, parseInt(userId))) {
+          throw new HttpError(403, 'Unauthorized');
         }
         filterArgs.userId = userId;
         filters.push(`id = :userId`);

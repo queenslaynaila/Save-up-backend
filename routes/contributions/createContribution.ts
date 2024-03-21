@@ -4,15 +4,11 @@ import { contributionSchema, ContributionSchema } from '../../types';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { sql } from '../../db';
 
-interface ContributionCreation {
-  saving_id:number;
-  amount: number;
-  date: string;
-}
+type ContributionCreation = Omit<ContributionSchema, 'created_at' | 'updated_at'>
 
 const SQL_CREATE_CONTRIBUTION = sql<ContributionCreation, ContributionSchema>(`
-    INSERT INTO contributions (saving_id, amount, date)
-    VALUES (:saving_id, :amount, :date)
+    INSERT INTO contributions (user_id,saving_id, amount, date)
+    VALUES (:user_id,:saving_id,:amount, :date)
     RETURNING *
 `);
 
@@ -25,8 +21,11 @@ export default (router: Router) => {
       if (!validationResult.success) {
         throw new HttpError(400, 'Invalid saving id, amount, or date');
       }
+      console.log(`this is logged in ${req.user!.id}` )
+      const user_id= req.user!.id
       const { saving_id, amount, date } = validationResult.data;
-      const contributionResult = await SQL_CREATE_CONTRIBUTION({ saving_id, amount, date }).one();
+      console.log(user_id,saving_id, amount, date)
+      const contributionResult = await SQL_CREATE_CONTRIBUTION({ user_id,saving_id, amount, date }).one();
       return res.json(contributionResult);
     });
 };

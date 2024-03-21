@@ -1,63 +1,55 @@
 import { Router, Response } from 'express';
-import { z } from 'zod';
 import { sql } from '../../db';
-import { ContributionSchema } from '../../types';
+import { ContributionSchema, ID_SCHEMA } from '../../types';
 import authMiddleware from '../../middleware/auth';
 import { HttpError } from '../../middleware/errorMiddleware';
 
-const UUIDSCHEMA = z.string().uuid();
 const SQL_GET_CONTRIBUTIONS = sql<{ user_id?:number; }, ContributionSchema>(
   `SELECT * FROM contributions `
 );
 
 export default (router: Router) => {
-  router.get<
-  string,
-  { contributionsIdentifier: string },
-  ContributionSchema,
-  Record<string, never>,
-  { category_id?:string; saving_id?:string}
-  >('/:contributionsIdentifier', authMiddleware(), async (req, res: Response) => {
-    const { contributionsIdentifier } = req.params;
-    const { category_id,saving_id } = req.query;
-    const filterArgs: Record<string, string> = {};
-    const filters: string[] = [];
-    const loggedInUserId = req.user!.id;
-    const isStandardUser = req.user?.role === 'User';
+  router.get<string,{ contributionId: string },ContributionSchema,Record<string, never>,{ category_id?: string; saving_id?: string }
+  >('/:contributionId', 
+    authMiddleware(), 
+    async (req, res: Response) => {
+      const { contributionId } = req.params;
+      const { category_id, saving_id } = req.query;
+      const filterArgs: Record<string, string> = {};
+      const filters: string[] = [];
+      const loggedInUserId = req.user!.id;
+      const isStandardUser = req.user?.role === 'User';
 
-    if (contributionsIdentifier === 'me') {
-      filterArgs.loggedInUserId = loggedInUserId.toString();
-      filters.push(`saving_id IN (SELECT id FROM savings WHERE user_id = :loggedInUserId)`);
-    } else if (contributionsIdentifier === 'all') {
-      if (isStandardUser) {
-        throw new HttpError(403, 'Unauthorized');
+      if (contributionId === 'me') {
+        filterArgs.loggedInUserId = loggedInUserId.toString();
+        filters.push(`user_id = :loggedInUserId`);
+      } else if (contributionId === 'all') {
+        if (isStandardUser) {
+          throw new HttpError(403, 'Unauthorized');
+        }
+      } else if(ID_SCHEMA.parse(parseInt(contributionId))) {
+        if (isStandardUser && req.user!.id !== parseInt(contributionId)) {
+          throw new HttpError(401, 'Unauthorized');
+        }
+        filterArgs.contributionId = contributionId;
+        filters.push(`user_id = :contributionId`);
+      } else {
+        throw new HttpError(400, 'Bad request');
       }
-    } else if (UUIDSCHEMA.parse(contributionsIdentifier)) {
-      if (isStandardUser) {
-        throw new HttpError(401, 'Unauthorized');
+
+      if (saving_id) {
+        filterArgs.saving_id = saving_id.toString();
+        filters.push(`saving_id = :saving_id`);
       }
-      filterArgs.contributionsIdentifier = contributionsIdentifier;
-      filters.push(
-        `saving_id IN (SELECT id FROM savings WHERE user_id = :contributionsIdentifier)`
-      );
-    } else {
-      throw new HttpError(400, 'Bad request');
-    }
+      if (category_id) {
+        filterArgs.category_id = category_id.toString()
+        filters.push(`saving_id IN (SELECT id FROM savings WHERE category_id = :category_id)`);
+      }
 
-    if (saving_id) {
-      filterArgs.saving_id = saving_id.toString();
-      filters.push(`saving_id = :saving_id`);
-    }
-    if (category_id) {
-      filterArgs.category_id = category_id.toString()
-      filters.push(`saving_id IN (SELECT id FROM savings WHERE category_id = :category_id)`);
-    }
- 
-
-    const query = SQL_GET_CONTRIBUTIONS({});
-    if (filters.length > 0) query.extend(`WHERE ${filters.join(' AND ')}`, filterArgs);
-    query.extend('LIMIT 15', {});
-    const contributions = await query.many();
-    res.json(contributions);
-  });
+      const query = SQL_GET_CONTRIBUTIONS({});
+      if (filters.length > 0) query.extend(`WHERE ${filters.join(' AND ')}`, filterArgs);
+      query.extend('LIMIT 15', {});
+      const contributions = await query.many();
+      res.json(contributions);
+    });
 };
