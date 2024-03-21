@@ -32,7 +32,6 @@ export default (router: Router) => {
     async (req, res) => {
       const validationResult = CreateUserSchema.safeParse(req.body);
       if (!validationResult.success) {
-        console.log(validationResult.error)
         throw new HttpError(422, 'Invalid input');
       }
       const { first_name, last_name, password, phone_number } = validationResult.data;

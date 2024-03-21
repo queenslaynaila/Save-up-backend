@@ -3,7 +3,7 @@ import { Router } from 'express';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { savingInterface } from './index';
 import { sql } from '../../db';
-import { idSchema, UserRole } from '../../types';
+import { ID_SCHEMA,UserRole } from '../../types';
 
 let savingQuery = `SELECT * FROM savings WHERE id = :id`;
 const SQL_GET_SAVING_BY_ID = sql<{ id: number; userId?: number }, savingInterface>(savingQuery);
@@ -13,7 +13,7 @@ export default (router: Router) => {
     '/records/:savingId', 
     authMiddleware(), 
     async (req, res) => {
-      const idValidationResult = idSchema.safeParse(parseInt(req.params.savingId));
+      const idValidationResult = ID_SCHEMA.safeParse(parseInt(req.params.savingId));
       if (!idValidationResult.success) {
         throw new HttpError(400, 'Invalid saving ID');
       }

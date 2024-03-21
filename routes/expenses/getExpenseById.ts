@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import authMiddleware from '../../middleware/auth';
 import { HttpError } from '../../middleware/errorMiddleware';
-import { UserRole, idSchema, ExtendedExpenseInterface } from '../../types';
+import { UserRole, ID_SCHEMA,ExtendedExpenseInterface } from '../../types';
 import { sql } from '../../db';
 
 const SQL_GET_EXPENSE_BY_ID = (query: string) =>

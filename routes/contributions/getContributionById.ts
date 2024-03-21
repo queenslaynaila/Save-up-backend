@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import authMiddleware from '../../middleware/auth';
 import { HttpError } from '../../middleware/errorMiddleware';
-import { idSchema, ContributionSchema, UserRole } from '../../types';
+import { ID_SCHEMA, ContributionSchema, UserRole } from '../../types';
 import { sql } from '../../db';
 
 const SQL_GET_CONTRIBUTION_BY_ID = (query: string) =>
@@ -12,7 +12,7 @@ export default (router: Router) => {
     '/records/:id', 
     authMiddleware(), 
     async (req, res) => {
-      const validationResult = idSchema.safeParse(parseInt(req.params.id));
+      const validationResult = ID_SCHEMA.safeParse(parseInt(req.params.id));
       if (!validationResult.success) {
         console.log('Validation error:', validationResult.error);
         throw new HttpError(400, 'Invalid contributions ID');
@@ -27,8 +27,6 @@ export default (router: Router) => {
         query += `AND saving_id IN (SELECT id FROM savings WHERE user_id = :userId)`;
         values.userId = userId;
       }
-  
-
       const result = await SQL_GET_CONTRIBUTION_BY_ID(query)(values).one(
         new HttpError(404, 'Contribution not found')
       );

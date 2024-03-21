@@ -1,8 +1,8 @@
 import { z } from 'zod';
 // Schemas for Saving
 // ---------------------------------------------------------------------------------------------------------
-export const idSchema = z.number();
 
+export const ID_SCHEMA = z.number();
 export const enum priority {
   HIGH = 'High',
   INTERMEDIATE = 'Intermediate',

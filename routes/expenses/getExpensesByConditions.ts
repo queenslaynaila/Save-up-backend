@@ -1,11 +1,11 @@
 import { Router, Response } from 'express';
-import { z } from 'zod';
 import { ExtendedExpenseInterface } from '../../types';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/auth';
 import { HttpError } from '../../middleware/errorMiddleware';
+import {ID_SCHEMA}  from '../../types/index';
 
-const ID_SCHEMA = z.number();
+
 const SQL_GET_EXPENSES = sql<Record<string, string>, ExtendedExpenseInterface>(
   `SELECT * FROM expenses`
 );

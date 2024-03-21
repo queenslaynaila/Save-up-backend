@@ -1,42 +1,41 @@
-import { Response, Router } from 'express';
-import { z } from 'zod';
 import { HttpError } from '../../middleware/errorMiddleware';
-import { sql } from '../../db';
+import  authMiddleware  from '../../middleware/auth';
 import { convertToTitleCase, isValidValue } from '../../middleware/caseNormalization';
-import authMiddleware from '../../middleware/auth';
+import { sql } from '../../db';
+import { Router, Response } from 'express';
 import { UserSchema } from './index';
+import {ID_SCHEMA}  from '../../types/index';
 
-const ID_SCHEMA = z.number();
 const SQL_GET_ALL_USERS = sql<Record<string, never>, UserSchema>(`
-  SELECT id, first_name, last_name, phone_number, role, created_at FROM users
+  SELECT id, first_name, last_name, role, created_at FROM users
 `);
 const ACCEPTED_ROLES = ['User', 'Admin', 'Moderator'];
 
 export default (router: Router) => {
-  router.get<string,{ userIdentifier: string },UserSchema,Record<string, never>,{ role?: string }>(
-    '/:userIdentifier', 
+  router.get<string, { userId: string }, UserSchema, Record<string, never>, { role?: string }>(
+    '/:userId', 
     authMiddleware(), 
     async (req, res: Response) => {
-      const { userIdentifier } = req.params;
+      const { userId } = req.params;
       const { role } = req.query;
       const filters: string[] = [];
       const filterArgs: Record<string, string | number> = {};
       const isStandardUser = req.user?.role === 'User';
       const convertedRole = role ? convertToTitleCase(role) : '';
 
-      if (userIdentifier === 'me') {
+      if (userId === 'me') {
         filterArgs.loggedInUserId = req.user!.id;
         filters.push(`id = :loggedInUserId`);
-      } else if (userIdentifier === 'all') {
+      } else if (userId === 'all') {
         if (isStandardUser) {
           throw new HttpError(401, 'Unauthorized');
         }
-      } else if (ID_SCHEMA.safeParse(parseInt(userIdentifier)).success) {
-        if (isStandardUser  && req.user!.id != parseInt(userIdentifier)) {
+      } else if (ID_SCHEMA.safeParse(parseInt(userId)).success) {
+        if (isStandardUser && req.user!.id != parseInt(userId)) {
           throw new HttpError(401, 'Unauthorized');
         }
-        filterArgs.userIdentifier = userIdentifier;
-        filters.push(`id = :userIdentifier`);
+        filterArgs.userId = userId;
+        filters.push(`id = :userId`);
       } else {
         throw new HttpError(400, 'Bad request');
       }

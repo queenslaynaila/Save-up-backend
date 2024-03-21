@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { idSchema } from '../../types';
+import { ID_SCHEMA} from '../../types';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/auth';

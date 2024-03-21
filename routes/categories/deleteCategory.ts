@@ -1,6 +1,6 @@
 import authMiddleware from "../../middleware/auth";
 import {Router} from "express";
-import {idSchema} from "../../types";
+import {ID_SCHEMA} from "../../types";
 import {HttpError} from "../../middleware/errorMiddleware";
 import {sql} from "../../db";
 
@@ -29,7 +29,7 @@ export default (router: Router) => {
     "/:id",
     authMiddleware(),
     async (req, res) => {
-      const validationResult = idSchema.safeParse(req.params.id);
+      const validationResult = ID_SCHEMA.safeParse(req.params.id);
       if (!validationResult.success) {
         throw new HttpError(400, "Invalid category ID");
       }
