@@ -10,10 +10,16 @@ interface ExtendedUserSchema extends UserSchema {
   password: string;
 }
 
-const SQL_GET_USER = sql<{ phone_number: string }, ExtendedUserSchema>(`
+const SQL_GET_USER_PHONE = sql<{ phone_number: string }, { id: number }>(`
+  SELECT id
+  FROM users_phone
+  WHERE phone_number = :phone_number
+`);
+
+const SQL_GET_USER = sql<{ id: number }, ExtendedUserSchema>(`
   SELECT *
   FROM users
-  WHERE phone_number = :phone_number
+  WHERE id = :id
 `);
 
 export default (router: Router) => {
@@ -26,10 +32,10 @@ export default (router: Router) => {
       }
 
       const { password, phone_number } = validationResult.data;
-      const userResult = await SQL_GET_USER({ phone_number }).one(
+      const user = await SQL_GET_USER_PHONE({ phone_number }).one(
         new HttpError(400, 'User not found')
       );
-
+      const userResult = await SQL_GET_USER({ id: user.id }).one();
       const isPasswordCorrect = await bcrypt.compare(password, userResult.password);
       if (!isPasswordCorrect) {
         throw new HttpError(400, 'Invalid phone number or password combination');

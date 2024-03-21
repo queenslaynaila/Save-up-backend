@@ -21,7 +21,7 @@ function authMiddleware(options: AuthMiddlewareOptions = {}) {
     const accessToken = req.headers['authorization'];
     const refreshToken = req.headers['refresh-token'] as string;
     if (!accessToken || !refreshToken) {
-      throw new HttpError(401, 'Access Denied. No token provided.');
+      throw new HttpError(401, 'Access Denied.Log in.');
     }
 
     if (accessToken) {

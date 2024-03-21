@@ -1,5 +1,4 @@
 import { Router } from 'express';
-import { z } from 'zod';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/auth';
 import { hasPermission } from '../../middleware/hasPermission';
@@ -7,7 +6,13 @@ import { UpdateUserSchema } from '../../types';
 import { UserSchema } from './index';
 import { HttpError } from '../../middleware/errorMiddleware';
 
-const SQL_UPDATE_USER = sql<z.infer<typeof UpdateUserSchema>& { id:number }, UserSchema>(`
+interface UpdateUserSchema {
+  first_name: string | undefined;
+  last_name: string | undefined;
+  id:number;
+}
+
+const SQL_UPDATE_USER = sql<UpdateUserSchema, UserSchema>(`
   UPDATE users
   SET first_name = COALESCE(:first_name, users.first_name),
       last_name = COALESCE(:last_name, users.last_name)
@@ -16,7 +21,7 @@ const SQL_UPDATE_USER = sql<z.infer<typeof UpdateUserSchema>& { id:number }, Use
 `);
 
 export default (router: Router) => {
-  router.patch<{ id: string },UserSchema,z.infer<typeof UpdateUserSchema>,Record<string, never>>(
+  router.patch<{ id: string },UserSchema,UpdateUserSchema,Record<string, never>>(
     '/:id', 
     authMiddleware(), 
     async (req, res) => {
@@ -24,8 +29,6 @@ export default (router: Router) => {
       if (!hasPermission(req, userId)) {
         throw new HttpError(403, 'Unauthorized');
       }
-      console.log(req.user)
-
       const validationResult = UpdateUserSchema.safeParse(req.body);
       if (!validationResult.success) {
         throw new HttpError(
