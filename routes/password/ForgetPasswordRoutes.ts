@@ -7,6 +7,7 @@ import { generateRandomToken } from '../../middleware/generateRandomToken';
 import sendSms from '../../services/twilio';
 import { UserSchema } from '../../types';
 import { sql } from '../../db';
+import {resetPasswordLimiter } from '../../services/rateLimit'
 
 declare module 'express-serve-static-core' {
   interface Request {
@@ -20,7 +21,7 @@ const SQL_GET_USER = sql<{ phone_number: string }, Pick<UserSchema, 'id'>>(
 );
 
 const SQL_SAVE_TOKEN = sql<{ user_id:number; token: string }, { token: string }>(`
-  INSERT INTO reset_tokens (user_id, token)
+  INSERT INTO reset_tokens (id,user_id, token)
   SELECT COALESCE((SELECT MAX(id) FROM reset_tokens WHERE user_id = :user_id), 0) + 1,:user_id, :token
   RETURNING token
 `);
@@ -61,13 +62,12 @@ const verifyResetToken = (req: Request, res: Response, next: NextFunction) => {
 export const initiatePasswordReset = (router: Router) => {
   router.post<Record<string, never>, { message: string }, { phone_number: string }, Record<string, never>>(
     '/forget-password-request',
+    resetPasswordLimiter,
     async (req, res) => {
       const { phone_number } = req.body;
       const user = await SQL_GET_USER({ phone_number }).one(new HttpError(404, 'User not found.'));
       const resetToken = generateRandomToken();
-      const token = await SQL_SAVE_TOKEN({ user_id: user.id, token: resetToken }).one(
-        new HttpError(500, 'Error saving token')
-      );
+      const token = await SQL_SAVE_TOKEN({ user_id: user.id, token: resetToken }).one();
       const actualToken = token.token;
       const accessToken = jwt.sign({ userId: user.id },'process.env.JWT_SECRET as Secret', { expiresIn: "15m" });
       sendSms(

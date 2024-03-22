@@ -72,6 +72,9 @@ CREATE  INDEX savings_user_id_idx  ON savings (user_id);
 CREATE  INDEX savings_category_idx ON savings (category_id);
 CREATE  INDEX savings_priority_idx ON savings (priority);
 CREATE  INDEX savings_status_idx   ON savings (status);
+CREATE INDEX idx_savings_start_at ON savings (start_at);
+CREATE INDEX idx_savings_completed_at ON savings (completed_at);
+
 SELECT create_distributed_table('savings',   'user_id');
 
 ----------------------------------------------------------------------------------------------------
@@ -108,6 +111,8 @@ CREATE TABLE IF NOT EXISTS expenses (
 
 CREATE INDEX expenses_user_id_idx ON expenses (user_id);
 CREATE INDEX expenses_category_idx ON expenses (category_id);
+CREATE INDEX idx_savings_expense_spent_at ON savings (expense_spent_at);
+
 SELECT create_distributed_table('expenses',   'user_id');
 
 ----------------------------------------------------------------------------------------------------
@@ -182,3 +187,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE TRIGGER enforce_update_saving_status
+BEFORE INSERT ON contributions
+FOR EACH ROW
+EXECUTE FUNCTION update_savings_status();
