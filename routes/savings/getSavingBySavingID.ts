@@ -5,8 +5,10 @@ import { savingInterface } from './index';
 import { sql } from '../../db';
 import { ID_SCHEMA,UserRole } from '../../types';
 
-let savingQuery = `SELECT * FROM savings WHERE id = :id`;
-const SQL_GET_SAVING_BY_ID = sql<{ id: number; userId?: number }, savingInterface>(savingQuery);
+
+const SQL_GET_SAVING_BY_ID = sql<{ id: number; userId?: number }, savingInterface>(`
+    SELECT * FROM savings WHERE id = :id
+`);
 
 export default (router: Router) => {
   router.get<{ savingId: string }, savingInterface, Record<string, never>, Record<string, never>>(
@@ -22,14 +24,11 @@ export default (router: Router) => {
       const loggedInUserId = req.user!.id;
       const userRole = req.user!.role;
 
-      const queryValues: { id: number; userId?: number } = { id: savingId };
+      const query = SQL_GET_SAVING_BY_ID({ id: savingId });
       if (userRole !== UserRole.ADMIN) {
-        savingQuery += ' AND user_id = :userId';
-        queryValues.userId = loggedInUserId;
+        query.extend('AND user_id = :userId', { userId: loggedInUserId });
       }
-      const saving = await SQL_GET_SAVING_BY_ID(queryValues).one(
-        new HttpError(404, 'Saving not found')
-      );
+      const saving = await query.one(new HttpError(404, 'Saving not found'));
       return res.json(saving);
     });
 };

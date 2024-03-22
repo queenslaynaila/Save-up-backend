@@ -14,12 +14,16 @@ const SQL_GET_SAVINGS = sql<Record<string, never>, savingInterface>(
 );
 
 export default (router: Router) => {
-  router.get<string,{ savingsIdentifier: string },savingInterface,Record<string, never>,{ category_id?: string; priority?: string; status?: string }
+  router.get<string,
+  { savingsIdentifier: string },
+  savingInterface,
+  Record<string, never>,
+  { category_id?: string; priority?: string; status?: string; start_at?: string; completed_at?: string }
   >('/:savingsIdentifier', 
     authMiddleware(), 
     async (req, res: Response) => {
       const { savingsIdentifier } = req.params;
-      const { category_id, priority, status } = req.query;
+      const { category_id, priority, status,start_at, completed_at  } = req.query;
 
       const filters: string[] = [];
       const filterArgs: Record<string, string> = {};
@@ -50,6 +54,16 @@ export default (router: Router) => {
         filters.push(`category_id = :category_id`);
       }
 
+      if (start_at) {
+        filterArgs.start_at = start_at;
+        filters.push(`start_at = :start_at`);
+      }
+
+      if (completed_at) {
+        filterArgs.completed_at = completed_at;
+        filters.push(`completed_at = :completed_at`);
+      }
+       
       if (convertedPriority && isValidValue(convertedPriority, ACCEPTED_PRIORITY_VALUES)) {
         filterArgs.priority = convertedPriority;
         filters.push(`priority = :priority`);

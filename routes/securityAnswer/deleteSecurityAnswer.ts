@@ -13,9 +13,9 @@ export default (router: Router) => {
     '/:id', 
     authMiddleware(), 
     async (req, res) => {
-      const validationResult = idSchema.safeParse(parseInt(req.params.id));
+      const validationResult =ID_SCHEMA.safeParse(parseInt(req.params.id));
       if (!validationResult.success) {
-        throw new HttpError(422, 'Invalid ID');
+        throw new HttpError(422, 'Invalid data');
       }
       const securityAnswerId = validationResult.data;
       const loggedInUserId = req.user!.id;
