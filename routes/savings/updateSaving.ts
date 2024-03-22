@@ -9,11 +9,11 @@ import { updateSavingSchema } from '../../types';
 
 const SQL_UPDATE_SAVING = sql<z.infer<typeof updateSavingSchema>& { user_id:number; id: number }, savingInterface>(`
   UPDATE savings
-  SET description = coalesce(:description,  savings.description),
-      category_id = coalesce(:category_id,  savings.category_id),
-      amount = coalesce(:amount,  savings.amount),
-      priority = coalesce(:priority,  savings.priority ),
-      target_date = coalesce(:target_date,  savings.target_date )
+  SET description = COALESCE(:description,  savings.description),
+      category_id = COALESCE(:category_id,  savings.category_id),
+      amount = COALESCE(:amount,  savings.amount),
+      priority = COALESCE(:priority,  savings.priority ),
+      target_at = COALESCE(:target_at,  savings.target_at )
   WHERE user_id = :user_id AND id = :id
   RETURNING *
 `);
@@ -29,7 +29,7 @@ export default (router: Router) => {
       throw new HttpError(422, 'Invalid saving data');
     }
 
-    const { description, category_id, amount, priority, target_date } = validatedSavings.data;
+    const { description, category_id, amount, priority, target_at } = validatedSavings.data;
 
     const result = await SQL_UPDATE_SAVING({
       user_id: userId,
@@ -38,7 +38,7 @@ export default (router: Router) => {
       category_id: category_id ,
       amount: amount ,
       priority:priority,
-      target_date:target_date,
+      target_at:target_at,
     })
       .one(new HttpError(400, 'Savings with given ID not found'));
 

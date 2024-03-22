@@ -7,10 +7,10 @@ import { sql } from '../../db';
 
 const SQL_UPDATE_CATEGORY = sql<z.infer<typeof UpdateCategorySchema> & { id: number; user_id:number },CategorySchema>(`
   UPDATE categories
-  SET name = coalesce(:name, categories.name), 
-      description = coalesce(:description, categories.description)
+  SET name = COALESCE(:name, categories.name), 
+      description = COALESCE(:description, categories.description)
   WHERE user_id = :user_id AND id = :category_id
-  RETURNING *
+  RETURNING id, user_id, name, description, created_at;
 `);
 
 export default (router: Router) => {

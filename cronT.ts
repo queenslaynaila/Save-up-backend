@@ -18,21 +18,21 @@ export async function updateSavingStatus() {
     const { saving_id, total_contributions } = contribution;
 
     const targetAmountQuery = `
-                SELECT target_amount, target_date
+                SELECT target_amount, target_at
                 FROM savings
                 WHERE id = :savingId;
             `;
     const savingInfo = await sql<
     { savingId: string },
-    { target_amount: number; target_date: Date }
+    { target_amount: number; target_at: Date }
     >(targetAmountQuery)({ savingId: saving_id }).one();
-    const { target_amount, target_date } = savingInfo;
+    const { target_amount, target_at } = savingInfo;
 
     if (total_contributions >= target_amount) {
       await sql(
         `UPDATE savings SET status = 'Completed', completed_date = CURRENT_DATE WHERE id = :savingId`
       )({ savingId: saving_id }).exec();
-    } else if (new Date() > new Date(target_date.getTime() + 90 * 24 * 60 * 60 * 1000)) {
+    } else if (new Date() > new Date(target_at.getTime() + 90 * 24 * 60 * 60 * 1000)) {
       await sql(`UPDATE savings SET status = 'Dormant' WHERE id = :savingId`)({
         savingId: saving_id,
       }).exec();

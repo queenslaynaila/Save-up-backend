@@ -13,7 +13,7 @@ export const baseSavingSchema = z.object({
   category_id: z.number(),
   amount: z.number(),
   priority: z.enum([priority.HIGH, priority.INTERMEDIATE, priority.LOW]),
-  target_date: z.string(),
+  target_at: z.string(),
 });
 
 export const savingSchema = baseSavingSchema.extend({
@@ -31,23 +31,18 @@ export const getSavingsQueryParamsSchema = z.object({
 // Schema for Contribution
 // ---------------------------------------------------------------------------------------------------------
 export const contributionSchema = z.object({
+  user_id: z.number(),
   saving_id: z.number(),
   amount: z.number(),
   date: z.string(),
-});
-
-export const updateContributionSchema = contributionSchema.pick({
-  amount: true,
-  date: true,
 });
 
 export type ContributionSchema = {
   user_id:number,
   saving_id:number,
   amount: number,
-  date: string;
-  created_at: Date;
-  updated_at: Date;
+  date: string,
+  created_at: Date
 }
 
 // Schema for Expense
@@ -64,8 +59,7 @@ export type expenseInterface = z.infer<typeof expenseSchema>;
 
 export interface ExtendedExpenseInterface extends expenseInterface {
   created_at: string;
-  updated_at: string;
-  month: string;
+  deleted_at: string;
 }
 export const updateExpenseSchema = z.object({
   category_id: z.number().optional(),
@@ -130,21 +124,19 @@ export const CreateCategorySchema = UpdateCategorySchema.extend({
   description: z.string(),
 });
 
-export interface CategorySchema {
-  id: z.ZodNumber;
-  description: z.ZodString;
-  name: z.ZodString;
+export type CategorySchema ={
   user_id: z.ZodString;
+  id: z.ZodNumber;
+  name: z.ZodString;
+  description: z.ZodString;
   created_at: Date;
-  updated_at: Date;
+  deleted_at: Date;
 }
 //Security Question Schema
 export interface SecurityQuestionSchema {
   id: z.ZodNumber;
-  user_id: z.ZodNumber;
   question: z.ZodString;
   created_at: Date;
-  updated_at: Date;
 }
 
 //Security Answer Schema
@@ -164,15 +156,12 @@ export interface SecurityAnswerSchema {
   question_id: string;
   answer: string;
   created_at: Date;
-  updated_at: Date;
 }
 
 export interface UserSchema {
   id: number;
   first_name: string;
   last_name: string;
-  phone_number: string;
   role: UserRole;
   created_at: Date;
-  updated_at: Date;
 }

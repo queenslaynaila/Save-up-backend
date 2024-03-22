@@ -465,7 +465,7 @@ Find document explaining databse permissions [here](./permissions.md)
   - `category_id` (uuid, required): Category id of the saving.
   - `target_amount` (number, required): Target amount of the saving.
   - `priority` (string, required): Priority level of the saving.
-  - `target_date` (string, required): Target date for achieving the saving.
+  - `target_at` (string, required): Target date for achieving the saving.
 - **Response**:
   - Status Code: `201 Created`
   - Body: The created saving object.
@@ -510,7 +510,7 @@ Find document explaining databse permissions [here](./permissions.md)
 - **Request Body**: Fields to be updated.
 - **Response**:
   - Status Code: `200 OK`
-  - Body: The updated saving object. INCLUDEITING EITHER OF THE FOLLOWING   description:STRINF, target_amount:NUMBER, priority:STRING, target_date:STRING
+  - Body: The updated saving object. INCLUDEITING EITHER OF THE FOLLOWING   description:STRINF, target_amount:NUMBER, priority:STRING, target_at:STRING
 - **Error Responses**:
   - Status Code: `400 Bad Request`
     - Description: Returned when the request body or saving ID is invalid.

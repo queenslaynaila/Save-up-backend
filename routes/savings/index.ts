@@ -5,7 +5,7 @@ import getSavingsByConditions from './getSavingsByConditions';
 import getSavingBySavingID from './getSavingBySavingID';
 import updateSaving from './updateSaving';
 
-export interface savingInterface {
+export type savingInterface = {
   id: number;
   user_id: number;
   description: string;
@@ -13,10 +13,12 @@ export interface savingInterface {
   priority: string;
   status: string;
   target_amount: number;
-  target_date: string;
-  start_date: Date;
+  target_at: string;
+  start_at: Date;
   created_at: Date;
   updated_at: Date;
+  completed_at:Date;
+  deleted_at:Date;
 }
 
 export default (baseRouter: express.Router) => {

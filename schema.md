@@ -26,7 +26,7 @@
 | contributed_amount   | NUMERIC       |                                                        | 0               |
 | priority             | VARCHAR(255)  |                                                        |                 |
 | status               | VARCHAR(255)  | DEFAULT 'In Progress', FORMAT CHECK: /^(In Progress|Complete)$/ |           |
-| target_date          | DATE          |                                                        |                 |
+| target_at          | DATE          |                                                        |                 |
 | start_date           | DATE          | DEFAULT CURRENT_DATE                                   |                 |
 | created_at           | TIMESTAMP     |                                                        | NOW()           |
 | updated_at           | TIMESTAMP     |                                                        | NOW()           |

@@ -361,7 +361,7 @@ URL: https://save-up-3w7t.onrender.com/savings/05799423-5268-4173-bb4a-d6c659b72
 - category_id (optional): A string representing the updated category ID of the saving.
 - amount (optional): A number representing the updated amount of the saving.
 - priority (optional): A string representing the updated priority of the saving.
-- target_date (optional): A string representing the updated target date of the saving.
+- target_at (optional): A string representing the updated target date of the saving.
 
 ```js        
 {
@@ -377,7 +377,7 @@ URL: https://save-up-3w7t.onrender.com/savings/05799423-5268-4173-bb4a-d6c659b72
   "category_id": "Updated category ID",
   "amount": 1000,
   "priority": "Updated priority",
-  "target_date": "Updated target date"
+  "target_at": "Updated target date"
 }
 ```
 ### 4. getSavingbySavingId
@@ -418,7 +418,7 @@ URL: https://save-up-3w7t.onrender.com/savings/
 - category_id: The ID of the category associated with the saving.
 - amount: The amount of the saving.
 - priority: The priority of the saving.
-- target_date: The target date for achieving the saving.
+- target_at: The target date for achieving the saving.
 
 ***Success Response:***
 ```json
@@ -429,7 +429,7 @@ URL: https://save-up-3w7t.onrender.com/savings/
   "category_id": "Category ID",
   "amount": 1000,
   "priority": "Priority",
-  "target_date": "Target date",
+  "target_at": "Target date",
   "created_at": "Timestamp",
   "updated_at": "Timestamp"
 }

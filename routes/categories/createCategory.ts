@@ -4,16 +4,17 @@ import { CreateCategorySchema, CategorySchema } from '../../types';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { sql } from '../../db';
 
-interface CreateCategory{
+type CreateCategory ={
   user_id: number
   name: string
   description: string
 }
 
 const SQL_CREATE_CATEGORY = sql<CreateCategory, CategorySchema>(`
-    INSERT INTO categories (user_id, name, description)
-    VALUES (:user_id, :name, :description)
-    RETURNING *
+  INSERT INTO categories (id, user_id, name, description)
+  SELECT COALESCE((SELECT MAX(id) FROM categories WHERE user_id = :user_id), 0) + 1,
+        :user_id, :name, :description
+  RETURNING id, user_id, name, description, created_at;
 `);
 
 export default (router: Router) => {

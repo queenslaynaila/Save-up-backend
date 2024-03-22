@@ -6,9 +6,10 @@ import { HttpError } from '../../middleware/errorMiddleware';
 import { sql } from '../../db';
 
 const SQL_CREATE_EXPENSES = sql<z.infer<typeof expenseSchema>, ExtendedExpenseInterface>(`
-  INSERT INTO expenses (description, category_id, amount,expense_date, user_id)
-  VALUES (:description, :category_id, :amount, :expense_date, :user_id)
-  RETURNING *
+  INSERT INTO expenses (id,user_id,category_id,description, amount,expense_spent_at)
+  SELECT COALESCE((SELECT MAX(id) FROM expenses WHERE user_id = :user_id), 0) + 1,
+  :description, :category_id, :amount, :expense_date, :user_id)
+  RETURNING user_id,id,category_id,description,amount,expense_spent_at,created_at
 `);
 
 export default (router: Router) => {
@@ -18,7 +19,6 @@ export default (router: Router) => {
     async (req, res) => {
       const validationResult = expenseSchema.safeParse(req.body);
       if (!validationResult.success) {
-        console.error('Validation errors:', validationResult.error);
         throw new HttpError(400, 'Invalid expense data provided');
       }
       const { description, category_id, amount, expense_date, user_id } = validationResult.data;

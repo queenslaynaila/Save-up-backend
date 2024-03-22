@@ -19,9 +19,11 @@ const SQL_GET_USER = sql<{ phone_number: string }, Pick<UserSchema, 'id'>>(
   `SELECT id FROM users_phone WHERE phone_number = :phone_number`
 );
 
-const SQL_SAVE_TOKEN = sql<{ user_id:number; token: string }, { token: string }>(
-  `INSERT INTO reset_tokens (user_id, token) VALUES (:user_id, :token) RETURNING token`
-);
+const SQL_SAVE_TOKEN = sql<{ user_id:number; token: string }, { token: string }>(`
+  INSERT INTO reset_tokens (user_id, token)
+  SELECT COALESCE((SELECT MAX(id) FROM reset_tokens WHERE user_id = :user_id), 0) + 1,:user_id, :token
+  RETURNING token
+`);
 
 const SQL_UPDATE_TOKEN_USAGE = sql<{ user_id:number; reset_token: string }, Record<string, never>>(
   `UPDATE reset_tokens SET used_at = CURRENT_TIMESTAMP WHERE user_id = :user_id AND token = :reset_token`

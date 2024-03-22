@@ -3,12 +3,6 @@ CREATE TYPE status_enum AS ENUM ('In Progress', 'Completed');
 CREATE TYPE priority_enum AS ENUM ('High', 'Intermediate', 'Low');
 ------------------------------------------------------------------------------------------------
 
-CREATE SEQUENCE categories_seq START WITH 1 INCREMENT BY 1;
-CREATE SEQUENCE savings_seq START WITH 1 INCREMENT BY 1;
-CREATE SEQUENCE contributions_seq START WITH 1 INCREMENT BY 1;
-CREATE SEQUENCE expenses_seq START WITH 1 INCREMENT BY 1;
-------------------------------------------------------------------------------------------------
-
 CREATE TABLE IF NOT EXISTS users_phone (
   id            SERIAL PRIMARY KEY,
   phone_number  VARCHAR(15) UNIQUE NOT NULL,
@@ -27,16 +21,20 @@ CREATE TABLE IF NOT EXISTS users (
 SELECT create_distributed_table('users', 'id');
 
 --------------------------------------------------------------------------------------------------
+
 CREATE TABLE IF NOT EXISTS categories (
   user_id     INT NOT NULL,
-  id          INT DEFAULT nextval('categories_seq'),
+  id          INT NOT NULL,
   name        VARCHAR(100) NOT NULL,
   description VARCHAR(255),
   created_at  TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   deleted_at  TIMESTAMP WITH TIME ZONE,
   PRIMARY KEY (user_id, id)
 )
+
+CREATE INDEX ON categories (user_id);
 SELECT create_distributed_table('categories',   'user_id');
+
 INSERT INTO categories (user_id, name, description) 
 VALUES (1, 'Food', 'All food related expenses'),
        (1, 'Transport', 'All transport related expenses'),
@@ -49,24 +47,27 @@ VALUES (1, 'Food', 'All food related expenses'),
        (1, 'Savings', 'Funds set aside for future investments or emergencies'),
        (1, 'Debt Repayment', 'Payments towards loans, credit cards, and other debts'),
        (1, 'Travel', 'Expenses or Savings related to trips, vacations, and travel activities');
+
 -----------------------------------------------------------------------------------------------------
 
 CREATE TABLE IF NOT EXISTS savings (
   user_id       INT NOT NULL,
-  id             INT  DEFAULT nextval('savings_seq'),
+  id             INT NOT NULL,
   category_id   INT NOT NULL,
   description   VARCHAR(255) NOT NULL,
   amount        NUMERIC(30, 3) NOT NULL,
   priority      priority_enum NOT NULL,
   status        status_enum NOT NULL DEFAULT 'In Progress',
-  target_date   TIMESTAMP WITH TIME ZONE NOT NULL,
-  start_date    TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-  completed_at  TIMESTAMP WITH TIME ZONE, 
+  target_at   TIMESTAMP WITH TIME ZONE NOT NULL,
+  start_at      TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   created_at    TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   updated_at    TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  completed_at  TIMESTAMP WITH TIME ZONE, 
+  deleted_at  TIMESTAMP WITH TIME ZONE,
   PRIMARY KEY (user_id, id), 
   FOREIGN KEY   (user_id,category_id) REFERENCES categories( user_id,id) 
 );
+
 CREATE  INDEX savings_user_id_idx  ON savings (user_id);
 CREATE  INDEX savings_category_idx ON savings (category_id);
 CREATE  INDEX savings_priority_idx ON savings (priority);
@@ -77,7 +78,7 @@ SELECT create_distributed_table('savings',   'user_id');
 
 CREATE TABLE IF NOT EXISTS contributions (
   user_id     INT NOT NULL ,
-  id          INT DEFAULT nextval('contributions_seq'),
+  id          INT NOT NULL,
   saving_id   INTEGER NOT NULL,
   amount      NUMERIC(30, 3) NOT NULL,
   date        TIMESTAMP WITH TIME ZONE NOT NULL,
@@ -85,24 +86,29 @@ CREATE TABLE IF NOT EXISTS contributions (
   PRIMARY KEY (user_id, id),  
   FOREIGN KEY (user_id, saving_id) REFERENCES savings (user_id, id)
 );
+
+CREATE INDEX contributions_user_id_idx ON contributions (user_id);
+CREATE INDEX contributions_saving_id_idx ON contributions (saving_id);
 SELECT create_distributed_table('contributions', 'user_id');
 
 ----------------------------------------------------------------------------------------------------
 
 CREATE TABLE IF NOT EXISTS expenses (
-  user_id         INT NOT NULL,
-  id              INT DEFAULT nextval('expenses_seq'),
-  category_id     INT NOT NULL,
-  description     VARCHAR(255),
-  amount          NUMERIC(30, 3) NOT NULL,
-  expense_date    TIMESTAMP WITH TIME ZONE, 
-  created_at      TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  PRIMARY KEY     (user_id, id),
-  FOREIGN KEY     (user_id, category_id) REFERENCES categories (user_id, id)
+  user_id          INT NOT NULL,
+  id               INT NOT NULL,
+  category_id      INT NOT NULL,
+  description      VARCHAR(255),
+  amount           NUMERIC(30, 3) NOT NULL,
+  expense_spent_at TIMESTAMP WITH TIME ZONE, 
+  created_at       TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  deleted_at       TIMESTAMP WITH TIME ZONE,
+  PRIMARY KEY      (user_id, id),
+  FOREIGN KEY      (user_id, category_id) REFERENCES categories (user_id, id)
 );
-SELECT create_distributed_table('expenses',   'user_id');
+
 CREATE INDEX expenses_user_id_idx ON expenses (user_id);
 CREATE INDEX expenses_category_idx ON expenses (category_id);
+SELECT create_distributed_table('expenses',   'user_id');
 
 ----------------------------------------------------------------------------------------------------
 
@@ -114,7 +120,7 @@ CREATE TABLE IF NOT EXISTS security_questions (
 );
 SELECT create_reference_table('security_questions');
 
-INSERT INTO security_questions (question)
+INSERT INTO security_questions ( question)
 VALUES ('What is the name of your first pet?'),
        ('What city were you born in?'),
        ('What is your mother\s maiden name?'),
@@ -129,17 +135,21 @@ VALUES ('What is the name of your first pet?'),
 ----------------------------------------------------------------------------------------------------
 
 CREATE TABLE IF NOT EXISTS security_answers (
+  id                INT NOT NULL,
   user_id           INT NOT NULL REFERENCES users(id),
   question_id       INT NOT NULL REFERENCES security_questions (id), 
   answer            VARCHAR(255) NOT NULL,
   created_at        TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   PRIMARY KEY      (user_id,question_id)
 );
+
+CREATE INDEX ON  security_answers (user_id);
 SELECT create_distributed_table('security_answers','user_id');
 
 ----------------------------------------------------------------------------------------------------
+
 CREATE TABLE IF NOT EXISTS reset_tokens (
-    id          SERIAL,
+    id          INT NOT NULL,
     user_id     INT REFERENCES users(id),
     token       INTEGER NOT NULL CHECK (token BETWEEN 1000 AND 9999),
     created_at  TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
@@ -147,6 +157,8 @@ CREATE TABLE IF NOT EXISTS reset_tokens (
     expired_at  TIMESTAMP WITH TIME ZONE DEFAULT (CURRENT_TIMESTAMP + INTERVAL '15 minutes'),
     PRIMARY KEY      (user_id,id)
 );
+
+CREATE INDEX ON reset_tokens (user_id);
 SELECT create_distributed_table('reset_tokens','user_id');
 
 ----------------------------------------------------------------------------------------------------

@@ -7,8 +7,9 @@ import { sql } from '../../db';
 type ContributionCreation = Omit<ContributionSchema, 'created_at' | 'updated_at'>
 
 const SQL_CREATE_CONTRIBUTION = sql<ContributionCreation, ContributionSchema>(`
-    INSERT INTO contributions (user_id,saving_id, amount, date)
-    VALUES (:user_id,:saving_id,:amount, :date)
+    INSERT INTO contributions (id,user_id,saving_id, amount, date)
+    SELECT COALESCE((SELECT MAX(id) FROM contributions WHERE user_id = :user_id), 0) + 1,
+    :user_id,:saving_id,:amount, :date
     RETURNING *
 `);
 

@@ -8,8 +8,9 @@ import { savingInterface } from './index';
 import { hasPermission } from '../../middleware/hasPermission';
 
 const SQL_CREATE_SAVING = sql<z.infer<typeof savingSchema>, savingInterface>(`
-  INSERT INTO savings (user_id, description, category_id, amount, priority, target_date)
-  VALUES (:user_id, :description, :category_id, :amount, :priority, :target_date) 
+  INSERT INTO savings (id, user_id, description, category_id, amount, priority, target_at)
+  SELECT COALESCE((SELECT MAX(id) FROM savings WHERE user_id = :user_id), 0) + 1,
+  :user_id, :description, :category_id, :amount, :priority, :target_at
   RETURNING *
 `);
 
@@ -22,7 +23,7 @@ export default (router: Router) => {
       if (!validationResult.success) {
         throw new HttpError(400, 'Invalid saving data');
       }
-      const { user_id, description, category_id, amount, priority, target_date } =validationResult.data;
+      const { user_id, description, category_id, amount, priority, target_at } =validationResult.data;
       if (!hasPermission(req, user_id)) {
         throw new HttpError(403, 'Unauthorized');
       }
@@ -32,7 +33,7 @@ export default (router: Router) => {
         category_id,
         amount,
         priority,
-        target_date,
+        target_at,
       }).one(new HttpError(400, 'Selected category does not exist'))
       return res.json(newSaving);
     });

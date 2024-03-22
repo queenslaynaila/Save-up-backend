@@ -52,7 +52,7 @@ Table "savings" {
   "target_amount" numeric(30,3) [not null]
   "priority" "character varying(255)"
   "status" status_enum [default: `'In Progress'::public.status_enum`]
-  "target_date" timestamp
+  "target_at" timestamp
   "start_date" timestamp [default: `now()`]
   "created_at" timestamp [default: `now()`]
   "updated_at" timestamp [default: `now()`]

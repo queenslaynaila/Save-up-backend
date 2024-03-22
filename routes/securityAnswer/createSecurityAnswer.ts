@@ -7,8 +7,8 @@ import { sql } from '../../db';
 import authMiddleware from '../../middleware/auth';
 
 const SQL_CREATE_ANSWER = sql<z.infer<typeof createSecurityAnswerSchema>,Record<string, never>>(`
-  INSERT INTO security_answers (question_id, user_id, answer) 
-  VALUES (:question_id, :user_id, :answer)
+  INSERT INTO security_answers (id,question_id, user_id, answer) 
+  SELECT COALESCE((SELECT MAX(id) FROM security_answers WHERE user_id = :user_id), 0) + 1,:question_id, :user_id, :answer
 `);
 
 export default (router: Router) => {

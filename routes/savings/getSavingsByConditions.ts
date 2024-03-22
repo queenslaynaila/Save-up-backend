@@ -8,7 +8,10 @@ import {ID_SCHEMA}  from '../../types/index';
 
 const ACCEPTED_STATUS_VALUES = ['In Progress', 'Dormant', 'Completed'];
 const ACCEPTED_PRIORITY_VALUES = ['High', 'Intermediate', 'Low'];
-const SQL_GET_SAVINGS = sql<Record<string, never>, savingInterface>(`SELECT *FROM savings`);
+
+const SQL_GET_SAVINGS = sql<Record<string, never>, savingInterface>(
+  `SELECT *FROM savings WHERE deleted_at IS NULL`
+);
 
 export default (router: Router) => {
   router.get<string,{ savingsIdentifier: string },savingInterface,Record<string, never>,{ category_id?: string; priority?: string; status?: string }
@@ -58,7 +61,7 @@ export default (router: Router) => {
       }
 
       const query = SQL_GET_SAVINGS({});
-      if (filters.length > 0) query.extend(`WHERE ${filters.join(' AND ')}`, filterArgs);
+      if (filters.length > 0) query.extend(`AND ${filters.join(' AND ')}`, filterArgs);
       query.extend('LIMIT 15', {});
       res.json(await query.many());
     });

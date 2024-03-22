@@ -22,10 +22,7 @@ const SQL_DELETE_CATEGORY = sql<Pick<CategorySchema, "id" | "user_id">,  Record<
 `);
 
 export default (router: Router) => {
-  router.delete<{ id: string }, 
-  { message: string }, 
-  Record<string, never>, 
-  Record<string, never>>(
+  router.delete<{ id: string }, { message: string }, Record<string, never>, Record<string, never>>(
     "/:id",
     authMiddleware(),
     async (req, res) => {

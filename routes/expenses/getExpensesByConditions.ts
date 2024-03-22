@@ -7,16 +7,16 @@ import {ID_SCHEMA}  from '../../types/index';
 
 
 const SQL_GET_EXPENSES = sql<Record<string, string>, ExtendedExpenseInterface>(
-  `SELECT * FROM expenses`
+  `SELECT * FROM expenses WHERE deleted_at IS NULL`
 );
 
 export default (router: Router) => {
-  router.get<string,{ expenseIdentifier: string },ExtendedExpenseInterface,Record<string, never>,{ category_id?: string; }>(
+  router.get<string,{ expenseIdentifier: string },ExtendedExpenseInterface,Record<string, never>,{ category_id?: string; start_date?: string; end_date?: string }>(
     '/:expenseIdentifier', 
     authMiddleware(), 
     async (req, res: Response) => {
       const { expenseIdentifier } = req.params;
-      const { category_id } = req.query;
+      const { category_id, start_date, end_date } = req.query;
       const filterArgs: Record<string, string> = {};
       const filters: string[] = [];
       const loggedInUserId = req.user!.id;
@@ -29,7 +29,7 @@ export default (router: Router) => {
         if (isStandardUser) {
           throw new HttpError(403, 'Unauthorized');
         }
-      } else if ( ID_SCHEMA.parse(parseInt(expenseIdentifier))) {
+      } else if (ID_SCHEMA.parse(parseInt(expenseIdentifier))) { //get user specific expenses
         if (isStandardUser)  {
           throw new HttpError(401, 'Unauthorized');
         }
@@ -39,12 +39,17 @@ export default (router: Router) => {
         throw new HttpError(400, 'Bad request');
       }
 
+      if (start_date && end_date) {
+        filterArgs.start_date = start_date;
+        filterArgs.end_date = end_date;
+        filters.push(`expense_spent_at BETWEEN :start_date AND :end_date`);
+      }
       if (category_id) {
         filterArgs.category_id = category_id;
         filters.push(`category_id = :category_id`);
       }
       const query = SQL_GET_EXPENSES({});
-      if (filters.length > 0) query.extend(`WHERE ${filters.join(' AND ')}`, filterArgs);
+      if (filters.length > 0) query.extend(`AND ${filters.join(' AND ')}`, filterArgs);
       query.extend('LIMIT 15', {});
       const expenses = await query.many();
       res.json(expenses);
