@@ -26,11 +26,6 @@ const SQL_CREATE_USER = sql<CreateUserWithIdSchema, UserSchema>(`
   RETURNING id, first_name, last_name, role, created_at
 `);
 
-const SQL_GET_USER_PHONE_NUMBER = sql<{ userId: number }, { phone_number: string }>(`
-  SELECT phone_number FROM users_phone WHERE id = :userId
-`);
-
-
 export default (router: Router) => { 
   router.post<Record<string, never>,UserSchema,CreateUserSchema,Record<string, never>,Record<string, never>>(
     '/',
@@ -42,11 +37,6 @@ export default (router: Router) => {
       const { first_name, last_name, password, phone_number } = validationResult.data;
       const user = await SQL_CREATE_USER_PHONE({ phone_number }).one(new HttpError(400, 'Account with this Phone number already exists'));
       const passwordHash = bcrypt.hashSync(password, 10);
-      const phoneResult = await SQL_GET_USER_PHONE_NUMBER({ userId: user_id }).one();
-      const phoneNumber = await bcrypt.hash(phoneResult.phone_number, 10) 
-      if (passwordHash === phoneNumber) {
-        throw new HttpError(400, 'Please avoid using your phone number as your password.');
-      }
       const newUser = await SQL_CREATE_USER({
         id: user.id,
         first_name,
