@@ -67,7 +67,8 @@ export const initiatePasswordReset = (router: Router) => {
       const { phone_number } = req.body;
       const user = await SQL_GET_USER({ phone_number }).one(new HttpError(404, 'User not found.'));
       const resetToken = generateRandomToken();
-      const token = await SQL_SAVE_TOKEN({ user_id: user.id, token: resetToken }).one();
+      const hashedResetToken = await bcrypt.hash(resetToken, 10);
+      const token = await SQL_SAVE_TOKEN({ user_id: user.id, token:hashedResetToken }).one();
       const actualToken = token.token;
       const accessToken = jwt.sign({ userId: user.id },'process.env.JWT_SECRET as Secret', { expiresIn: "15m" });
       sendSms(
