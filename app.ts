@@ -16,7 +16,7 @@ import cumulativesRoutes from './routes/cumulatives/index';
 
 // Middleware
 const app = express();
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: false, limit: '10mb' }));
 app.use(express.json());
 app.use(morgan('dev'));
 app.use((_, res, next) => {
