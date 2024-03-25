@@ -23,15 +23,15 @@ export default (router: Router) => {
     async (req, res) => {
       const userId = req.params.id;
       if (!hasPermission(req, parseInt(userId))) {
-        throw new HttpError(403, 'Unauthorized');
+        throw new HttpError(403, 'Forbidden');
       }
       const validationResult = UpdatePhoneSchema.safeParse(req.body);
       if (!validationResult.success) {
-        throw new HttpError(400, 'Invalid data');
+        throw new HttpError(422, 'Unprocessable Entity');
       }
       const { password, phone_number } = validationResult.data;
       const userPassword = await SQL_GET_USER_PASSWORD({ userId }).one(
-        new HttpError(404, 'User not found')
+        new HttpError(404, 'Not found')
       );
       if (!await bcrypt.compare(password, userPassword.password)) {
         throw new HttpError(401, 'Invalid password');

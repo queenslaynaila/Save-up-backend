@@ -27,13 +27,13 @@ export default (router: Router) => {
     async (req, res) => {
       const userId = parseInt(req.params.id);
       if (!hasPermission(req, userId)) {
-        throw new HttpError(403, 'Unauthorized');
+        throw new HttpError(403, 'Forbidden');
       }
       const validationResult = UpdateUserSchema.safeParse(req.body);
       if (!validationResult.success) {
         throw new HttpError(
-          422,
-          'Invalid user data. Please provide valid values for all user fields.'
+          403,
+          'Unprocessable Entity'
         );
       }
       const { first_name, last_name } = validationResult.data;

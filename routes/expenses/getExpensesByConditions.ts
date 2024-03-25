@@ -27,11 +27,11 @@ export default (router: Router) => {
         filters.push(`user_id = :loggedInUserId`);
       } else if (expenseIdentifier === 'all') {
         if (isStandardUser) {
-          throw new HttpError(403, 'Unauthorized');
+          throw new HttpError(403, 'Forbidden');
         }
-      } else if (ID_SCHEMA.parse(parseInt(expenseIdentifier))) { //get user specific expenses
+      } else if (ID_SCHEMA.parse(parseInt(expenseIdentifier))) { 
         if (isStandardUser)  {
-          throw new HttpError(401, 'Unauthorized');
+          throw new HttpError(403, 'Forbidden');
         }
         filterArgs.user_id = expenseIdentifier;
         filters.push(`user_id = :expenseIdentifier`);

@@ -24,7 +24,7 @@ export default (router: Router) => {
     async (req, res) => {
       const validationResult = CreateCategorySchema.safeParse(req.body);
       if (!validationResult.success) {
-        throw new HttpError(400, 'Invalid category data');
+        throw new HttpError(422, 'Unprocessable Entity');
       }
       const { user_id, name, description } = validationResult.data;
       const categoryResult = await SQL_CREATE_CATEGORY({ user_id, name, description }).one();

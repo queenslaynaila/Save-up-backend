@@ -30,7 +30,7 @@ export default (router: Router) => {
     async (req, res) => {
       const validationResult = createSecurityAnswerSchema.safeParse(req.body);
       if (!validationResult.success) {
-        throw new HttpError(422, 'Invalid request');
+        throw new HttpError(422, 'Unprocessable Entity');
       }
       const { question_id, user_id, answer } = validationResult.data;
       const normalizedAnswer = answer.toLowerCase();  

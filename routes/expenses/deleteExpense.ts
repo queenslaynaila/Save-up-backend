@@ -18,7 +18,7 @@ export default (router: Router) => {
     async (req, res) => {
       const validationResult = ID_SCHEMA.safeParse(parseInt(req.params.id));
       if (!validationResult.success) {
-        throw new HttpError(403, 'Invalid expense ID');
+        throw new HttpError(422, "Unprocessable Entity");
       }
       const expenseId = validationResult.data;
       const userId = req.user!.id;

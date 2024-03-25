@@ -19,13 +19,13 @@ export default (router: Router) => {
     async (req, res) => {
       const validationResult = expenseSchema.safeParse(req.body);
       if (!validationResult.success) {
-        throw new HttpError(400, 'Invalid expense data provided');
+        throw new HttpError(422, "Unprocessable Entity");
       }
       const { description, category_id, amount, expense_date, user_id } = validationResult.data;
       const loggedInUserId = req.user!.id;
       const authenticatedUserId = req.user?.id;
       if (authenticatedUserId !== user_id) {
-        throw new HttpError(403, 'Unauthorized');
+        throw new HttpError(403, 'Forbidden');
       }
       const expense = await SQL_CREATE_EXPENSES({
         description,
@@ -34,7 +34,7 @@ export default (router: Router) => {
         expense_date,
         user_id: loggedInUserId,
       })
-        .one(new HttpError(400, 'Selected category does not exist'))
+        .one()
       return res.json(expense);
     });
 };

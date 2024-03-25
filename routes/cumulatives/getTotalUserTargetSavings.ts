@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/auth';
-
+import { HttpError } from '../../middleware/errorMiddleware';
 
 const SQL_GET_TOTAL_TARGET_AMOUNT = sql<{ [key: string]: string },{ total_target_amount: number }>(`
     SELECT COALESCE(SUM(amount), 0) AS total_target_amount
@@ -34,7 +34,7 @@ export default (router: Router) => {
       const query = SQL_GET_TOTAL_TARGET_AMOUNT({});
       if (filters.length > 0) query.extend(`WHERE ${filters.join(' AND ')}`, filterArgs);
       query.extend('WHERE user_id = :userId', values);
-      res.json(await query.one());
+      res.json(await query.one( new HttpError(500, 'An error occurred while processing your request. Please try again later.')));
     }
   );
   

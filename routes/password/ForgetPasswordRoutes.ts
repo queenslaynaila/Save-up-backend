@@ -62,7 +62,7 @@ const verifyResetToken = (req: Request, res: Response, next: NextFunction) => {
 export const initiatePasswordReset = (router: Router) => {
   router.post<Record<string, never>, { message: string }, { phone_number: string }, Record<string, never>>(
     '/forget-password-request',
-    resetPasswordLimiter,
+   
     async (req, res) => {
       const { phone_number } = req.body;
       const user = await SQL_GET_USER({ phone_number }).one(new HttpError(404, 'User not found.'));

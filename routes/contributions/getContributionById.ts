@@ -14,7 +14,7 @@ export default (router: Router) => {
     async (req, res) => {
       const validationResult = ID_SCHEMA.safeParse(parseInt(req.params.id));
       if (!validationResult.success) {
-        throw new HttpError(400, 'Invalid contributions ID');
+        throw new HttpError(422, 'Unprocessable Entity');
       }
       const contributionsId = validationResult.data;
       const userId = req.user!.id;
@@ -27,7 +27,7 @@ export default (router: Router) => {
         values.userId = userId;
       }
       const result = await SQL_GET_CONTRIBUTION_BY_ID(query)(values).one(
-        new HttpError(404, 'Contribution not found')
+        new HttpError(404, 'Unable to complete the request')
       );
       return res.json(result);
     });

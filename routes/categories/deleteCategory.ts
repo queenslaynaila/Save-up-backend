@@ -28,7 +28,7 @@ export default (router: Router) => {
     async (req, res) => {
       const validationResult = ID_SCHEMA.safeParse(req.params.id);
       if (!validationResult.success) {
-        throw new HttpError(400, "Invalid category ID");
+        throw new HttpError(422, "Unprocessable Entity");
       }
       await SQL_DELETE_CATEGORY({
         id: validationResult.data,

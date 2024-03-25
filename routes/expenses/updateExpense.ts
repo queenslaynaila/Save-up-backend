@@ -22,7 +22,7 @@ export default (router: Router) => {
 
     const validationResultBody = updateExpenseSchema.safeParse(req.body);
     if (!validationResultBody.success) {
-      throw new HttpError(422, 'Invalid data');
+      throw new HttpError(422, "Unprocessable Entity");
     }
 
     const { description, category_id, amount,expense_date } = validationResultBody.data;
@@ -34,7 +34,7 @@ export default (router: Router) => {
       category_id: category_id ,
       amount: amount ,
       expense_date:expense_date ,
-    }).one(new HttpError(400, 'Expense not found'));
+    }).one(new HttpError(404, 'Not found'));
     res.json(result);
   });
 };

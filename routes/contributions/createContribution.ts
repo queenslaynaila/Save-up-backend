@@ -20,11 +20,11 @@ export default (router: Router) => {
     async (req, res) => {
       const validationResult = contributionSchema.safeParse(req.body);
       if (!validationResult.success) {
-        throw new HttpError(400, 'Invalid saving id, amount, or date');
+        throw new HttpError(422, 'Unprocessable Entity');
       }
       const user_id= req.user!.id
       const { saving_id, amount, date } = validationResult.data;
-      const contributionResult = await SQL_CREATE_CONTRIBUTION({ user_id,saving_id, amount, date }).one();
+      const contributionResult = await SQL_CREATE_CONTRIBUTION({ user_id,saving_id, amount, date }).one(new HttpError(404, 'Unable to complete the request'));
       return res.json(contributionResult);
     });
 };

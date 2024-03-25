@@ -17,7 +17,7 @@ export default (router: Router) => {
     async (req, res) => {
       const idValidationResult = ID_SCHEMA.safeParse(parseInt(req.params.savingId));
       if (!idValidationResult.success) {
-        throw new HttpError(400, 'Invalid request');
+        throw new HttpError(422, 'Unprocessable Entity');
       }
 
       const savingId = idValidationResult.data;
@@ -28,7 +28,7 @@ export default (router: Router) => {
       if (userRole !== UserRole.ADMIN) {
         query.extend('AND user_id = :userId', { userId: loggedInUserId });
       }
-      const saving = await query.one(new HttpError(404, 'Saving not found'));
+      const saving = await query.one(new HttpError(404, 'Not found'));
       return res.json(saving);
     });
 };

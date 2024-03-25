@@ -25,11 +25,11 @@ export default (router: Router) => {
         filters.push(`user_id = :loggedInUserId`);
       } else if (contributionId === 'all') {
         if (isStandardUser) {
-          throw new HttpError(403, 'Unauthorized');
+          throw new HttpError(403, 'Forbidden');
         }
       } else if(ID_SCHEMA.parse(parseInt(contributionId))) {
         if (isStandardUser && req.user!.id !== parseInt(contributionId)) {
-          throw new HttpError(401, 'Unauthorized');
+          throw new HttpError(403, 'Forbidden');
         }
         filterArgs.contributionId = contributionId;
         filters.push(`user_id = :contributionId`);

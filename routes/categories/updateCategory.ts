@@ -20,7 +20,7 @@ export default (router: Router) => {
 
     const validatedCategory = UpdateCategorySchema.safeParse(req.body);
     if (!validatedCategory.success) {
-      throw new HttpError(422, 'Invalid category data');
+      throw new HttpError(422, "Unprocessable Entity");
     }
     
     const { name, description } = validatedCategory.data;
@@ -29,7 +29,7 @@ export default (router: Router) => {
       id: parseInt(categoryId),
       name: name, 
       description: description ,
-    }).one(new HttpError(400, 'Category not found'));
+    }).one(new HttpError(404, 'Unable to complete the request'));
 
     return res.json(result);
   });

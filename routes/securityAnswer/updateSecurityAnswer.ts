@@ -15,7 +15,7 @@ export default (router: Router) => {
   router.patch('/', authMiddleware(), async (req, res) => {
     const validationResult = updateSecurityAnswerSchema.safeParse(req.body);
     if (!validationResult.success) {
-      throw new HttpError(422, 'Invalid data');
+      throw new HttpError(422, 'Unprocessable Entity');
     }
     const { question_id, answer } = validationResult.data;
     const userId = req.user!.id;
@@ -23,7 +23,7 @@ export default (router: Router) => {
       question_id,
       answer,
       user_id: userId,
-    }).one();
+    }).one(new HttpError(404, 'Not found'));
     res.json(updateResult);
   });
 };

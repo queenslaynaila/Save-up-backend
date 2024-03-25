@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/auth';
+import { HttpError } from '../../middleware/errorMiddleware';
 
 const SQL_GET_TOTAL_CONTRIBUTIONS = sql<{ userId: number }, { total_contributed_amount: number }>(`
     SELECT COALESCE(SUM(c.amount), 0) AS total_contributed_amount
@@ -29,6 +30,6 @@ export default (router: Router) => {
       const query = SQL_GET_TOTAL_CONTRIBUTIONS({userId });
       if (filters.length > 0) query.extend(`AND ${filters.join(' AND ')}`, filterArgs);
       query.extend('LIMIT 15', {});
-      res.json(await query.one());
+      res.json(await query.one(new HttpError(404, 'Unable to complete the request')));
     });
 };

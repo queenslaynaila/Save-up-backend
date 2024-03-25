@@ -24,16 +24,16 @@ export default (router: Router) => {
         query.extend(`AND user_id = :loggedInUserId `, { loggedInUserId });
       } else if (categoryIdentifier === 'all') {
         if (isStandardUser) {
-          throw new HttpError(401, 'Unauthorized');
+          throw new HttpError(403, 'Forbidden');
         }
       } else if (categoryIdentifier === 'system') {
         if (isStandardUser) {
-          throw new HttpError(401, 'Unauthorized');
+          throw new HttpError(403, 'Forbidden');
         }
         query.extend(`AND user_id = 1`, {});
-      } else if (UUIDSCHEMA.parse(categoryIdentifier)) { //get categories for a specific user
+      } else if (UUIDSCHEMA.parse(categoryIdentifier)) { 
         if (isStandardUser && loggedInUserId.toString() !== categoryIdentifier.toString()) {
-          throw new HttpError(401, 'Unauthorized');
+          throw new HttpError(403, 'Forbidden');
         }
         query.extend(`AND user_id = :categoryIdentifier`, { categoryIdentifier });
       } else {

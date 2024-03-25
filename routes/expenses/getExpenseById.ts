@@ -15,7 +15,7 @@ export default (router: Router) => {
     async (req, res) => {
       const validationResult = ID_SCHEMA.safeParse(parseInt(req.params.id));
       if (!validationResult.success) {
-        throw new HttpError(400, 'Invalid expense ID');
+        throw new HttpError(422, "Unprocessable Entity");
       }
 
       const expenseId = validationResult.data;
@@ -25,7 +25,7 @@ export default (router: Router) => {
       if (userRole !== UserRole.ADMIN) {
         query.extend('AND user_id = :userId', { userId });
       }
-      const result = await query.one(new HttpError(404, 'Expense not found'));
+      const result = await query.one(new HttpError(404, 'Not found'));
       return res.json(result);
     });
 };

@@ -26,7 +26,7 @@ export default (router: Router) => {
 
     const validatedSavings = updateSavingSchema.safeParse(req.body);
     if (!validatedSavings.success) {
-      throw new HttpError(422, 'Invalid saving data');
+      throw new HttpError(422, 'Unprocessable Entity');
     }
 
     const { description, category_id, amount, priority, target_at } = validatedSavings.data;
@@ -40,7 +40,7 @@ export default (router: Router) => {
       priority:priority,
       target_at:target_at,
     })
-      .one(new HttpError(400, 'Savings with given ID not found'));
+      .one(new HttpError(404, 'Not found'));
 
     return res.json(result);
   });
