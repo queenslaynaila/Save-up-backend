@@ -21,7 +21,7 @@ export default (router: Router) => {
     async (req, res) => {
       const validationResult = savingSchema.safeParse(req.body);
       if (!validationResult.success) {
-        throw new HttpError(400, 'Invalid saving data');
+        throw new HttpError(400, 'Invalid request');
       }
       const { user_id, description, category_id, amount, priority, target_at } =validationResult.data;
       if (!hasPermission(req, user_id)) {
@@ -34,7 +34,7 @@ export default (router: Router) => {
         amount,
         priority,
         target_at,
-      }).one(new HttpError(400, 'Selected category does not exist'))
+      }).one(new HttpError(400, 'Failed to create saving. Please try again later'))
       return res.json(newSaving);
     });
 };

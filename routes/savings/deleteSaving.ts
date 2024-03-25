@@ -18,7 +18,7 @@ export default (router: Router) => {
     async (req, res) => {
       const validationResult = ID_SCHEMA.safeParse(parseInt(req.params.id));
       if (!validationResult.success) {
-        throw new HttpError(400, 'Invalid saving ID');
+        throw new HttpError(400, 'Invalid data');
       }
       const id = validationResult.data;
       const userId = req.user!.id;
