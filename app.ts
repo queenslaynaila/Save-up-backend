@@ -13,6 +13,11 @@ import passwordRoutes from './routes/password/index';
 import securityQuestionsRoutes from './routes/securityQuestions';
 import securityAnswerRoutes from './routes/securityAnswer/index';
 import cumulativesRoutes from './routes/cumulatives/index';
+import cron from 'node-cron';
+import { sendSecurityReminderSMS } from './cronjob';
+
+//Cron job
+cron.schedule('0 3 1 */6 *', sendSecurityReminderSMS);
 
 // Middleware
 const app = express();
