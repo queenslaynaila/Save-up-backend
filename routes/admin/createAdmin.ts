@@ -33,7 +33,7 @@ export default (router: Router) => {
     async (req, res) => {
       const validationResult = CreateUserSchema.safeParse(req.body);
       if (!validationResult.success) {
-        throw new HttpError(422, 'Invalid input');
+        throw new HttpError(422, 'Unprocessable Entity');
       }
       const { first_name, last_name, password, phone_number } = validationResult.data;
       const user = await SQL_CREATE_USER_PHONE({ phone_number }).one(new HttpError(400, 'Account with this Phone number already exists'));
