@@ -114,7 +114,7 @@ export const verifySecurityAnswers = (router: Router) => {
         const storedAnswer = userSecurityAnswers.find(
           (a: { question_id:number; answer: string }) => a.question_id === question_id
         );
-        if (!storedAnswer || !bcrypt.compare(answer, storedAnswer.answer)) {
+        if (!storedAnswer || !bcrypt.compare(answer.toLowerCase(), storedAnswer.answer)) {
           incorrectAnswers.push(question_id);
         }
       });
