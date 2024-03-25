@@ -112,6 +112,7 @@ CREATE TABLE IF NOT EXISTS expenses (
 CREATE INDEX expenses_user_id_idx ON expenses (user_id);
 CREATE INDEX expenses_category_idx ON expenses (category_id);
 CREATE INDEX idx_savings_expense_spent_at ON savings (expense_spent_at);
+CREATE INDEX idx_expenses_user_amount ON expenses (user_id, amount);
 
 SELECT create_distributed_table('expenses',   'user_id');
 
@@ -129,13 +130,13 @@ INSERT INTO security_questions ( question)
 VALUES ('What is the name of your first pet?'),
        ('What city were you born in?'),
        ('What is your mother\s maiden name?'),
-       ('What is the name of your favorite teacher?'),
+       ('What is the name of your favorite teacher in highschool?'),
        ('In what city did you meet your spouse/significant other?'),
        ('What is the name of your favorite childhood friend?'),
-       ('What was the make and model of your first car?'),
-       ('What is your favorite color?'),
-       ( 'What street did you grow up on?'),
-       ( 'What is the name of your favorite book?');
+       ('What was your maths teacher suname in your final year?'),
+       ('What was the destination of your most memorable field trip?'),
+       ( 'What was the name of the first school you remember attending?'),
+       ( 'What is the name of the college you applied to but didnt attend?');
 
 ----------------------------------------------------------------------------------------------------
 
