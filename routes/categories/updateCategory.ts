@@ -4,6 +4,7 @@ import authMiddleware from '../../middleware/auth';
 import { UpdateCategorySchema,CategorySchema } from '../../types';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { sql } from '../../db';
+import  { validateRequest } from '../../middleware/validationMiddleware';
 
 const SQL_UPDATE_CATEGORY = sql<z.infer<typeof UpdateCategorySchema> & { id: number; user_id:number },CategorySchema>(`
   UPDATE categories
@@ -14,23 +15,20 @@ const SQL_UPDATE_CATEGORY = sql<z.infer<typeof UpdateCategorySchema> & { id: num
 `);
 
 export default (router: Router) => {
-  router.patch('/:id', authMiddleware(), async (req, res) => {
-    const categoryId = req.params.id;
-    const userId = req.user!.id;
+  router.patch('/:id', 
+    authMiddleware(), 
+    validateRequest(UpdateCategorySchema),
+    async (req, res) => {
+      const categoryId = req.params.id;
+      const userId = req.user!.id;
+      const { name, description } = req.body;
+      const result = SQL_UPDATE_CATEGORY({
+        user_id: userId,
+        id: parseInt(categoryId),
+        name: name, 
+        description: description ,
+      }).one(new HttpError(404, 'Unable to complete the request'));
 
-    const validatedCategory = UpdateCategorySchema.safeParse(req.body);
-    if (!validatedCategory.success) {
-      throw new HttpError(422, "Unprocessable Entity");
-    }
-    
-    const { name, description } = validatedCategory.data;
-    const result = SQL_UPDATE_CATEGORY({
-      user_id: userId,
-      id: parseInt(categoryId),
-      name: name, 
-      description: description ,
-    }).one(new HttpError(404, 'Unable to complete the request'));
-
-    return res.json(result);
-  });
+      return res.json(result);
+    });
 };

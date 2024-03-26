@@ -5,6 +5,7 @@ import authMiddleware from '../../middleware/auth';
 import { HttpError } from '../../middleware/errorMiddleware';
 import {resetPasswordLimiter } from '../../services/rateLimit'
 
+
 const SQL_UPDATE_PASSWORD = sql<{ password: string; phone_number: string },{ phone_number: string }>(`
   UPDATE users SET password =:password WHERE  phone_number= :phone_number 
 `);

@@ -1,7 +1,7 @@
 import authMiddleware from '../../middleware/auth';
 import { Router } from 'express';
 import { CreateCategorySchema, CategorySchema } from '../../types';
-import { HttpError } from '../../middleware/errorMiddleware';
+import  { validateRequest } from '../../middleware/validationMiddleware';
 import { sql } from '../../db';
 
 type CreateCategory ={
@@ -21,12 +21,9 @@ export default (router: Router) => {
   router.post<Record<string, never>,CategorySchema,CreateCategory,Record<string, never>,Record<string, never>>(
     '/',
     authMiddleware(),
+    validateRequest(CreateCategorySchema),
     async (req, res) => {
-      const validationResult = CreateCategorySchema.safeParse(req.body);
-      if (!validationResult.success) {
-        throw new HttpError(422, 'Unprocessable Entity');
-      }
-      const { user_id, name, description } = validationResult.data;
+      const { user_id, name, description } = req.body;
       const categoryResult = await SQL_CREATE_CATEGORY({ user_id, name, description }).one();
       return res.json(categoryResult);
     });

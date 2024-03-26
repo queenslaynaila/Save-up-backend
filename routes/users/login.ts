@@ -5,6 +5,7 @@ import { generateToken } from '../../middleware/generatetoken';
 import { sql } from '../../db';
 import { UserLoginSchema } from '../../types';
 import { UserSchema } from './index';
+import  { validateRequest } from '../../middleware/validationMiddleware';
 
 interface ExtendedUserSchema extends UserSchema {
   password: string;
@@ -25,13 +26,9 @@ const SQL_GET_USER = sql<{ id: number }, ExtendedUserSchema>(`
 export default (router: Router) => {
   router.post<Record<string, never>, UserSchema, { phone_number: string; password: string }, Record<string, never>>(
     '/signin',
+    validateRequest(UserLoginSchema),
     async (req, res) => {
-      const validationResult = UserLoginSchema.safeParse(req.body);
-      if (!validationResult.success) {
-        throw new HttpError(422, 'Invalid phone number or password');
-      }
-
-      const { password, phone_number } = validationResult.data;
+      const { password, phone_number } = req.body;
       const user = await SQL_GET_USER_PHONE({ phone_number }).one(
         new HttpError(404, 'Not found')
       );

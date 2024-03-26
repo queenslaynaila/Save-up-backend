@@ -4,7 +4,7 @@ import { HttpError } from '../../middleware/errorMiddleware';
 import { savingInterface } from './index';
 import { sql } from '../../db';
 import { ID_SCHEMA,UserRole } from '../../types';
-
+import  { validateRequest } from '../../middleware/validationMiddleware';
 
 const SQL_GET_SAVING_BY_ID = sql<{ id: number; userId?: number }, savingInterface>(`
     SELECT * FROM savings WHERE id = :id
@@ -14,13 +14,9 @@ export default (router: Router) => {
   router.get<{ savingId: string }, savingInterface, Record<string, never>, Record<string, never>>(
     '/records/:savingId', 
     authMiddleware(), 
+    validateRequest(ID_SCHEMA),
     async (req, res) => {
-      const idValidationResult = ID_SCHEMA.safeParse(parseInt(req.params.savingId));
-      if (!idValidationResult.success) {
-        throw new HttpError(422, 'Unprocessable Entity');
-      }
-
-      const savingId = idValidationResult.data;
+      const savingId = (parseInt(req.params.savingId));
       const loggedInUserId = req.user!.id;
       const userRole = req.user!.role;
 

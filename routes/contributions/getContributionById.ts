@@ -3,6 +3,8 @@ import authMiddleware from '../../middleware/auth';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { ID_SCHEMA, ContributionSchema, UserRole } from '../../types';
 import { sql } from '../../db';
+import  { validateRequest } from '../../middleware/validationMiddleware';
+
 
 const SQL_GET_CONTRIBUTION_BY_ID = (query: string) =>
   sql<{ id: number }, ContributionSchema>(query);
@@ -11,12 +13,9 @@ export default (router: Router) => {
   router.get<{ id: string }, ContributionSchema, Record<string, never>, Record<string, never>>(
     '/records/:id', 
     authMiddleware(), 
+    validateRequest(ID_SCHEMA),
     async (req, res) => {
-      const validationResult = ID_SCHEMA.safeParse(parseInt(req.params.id));
-      if (!validationResult.success) {
-        throw new HttpError(422, 'Unprocessable Entity');
-      }
-      const contributionsId = validationResult.data;
+      const contributionsId = parseInt(req.params.id);
       const userId = req.user!.id;
       const userRole = req.user!.role;
 

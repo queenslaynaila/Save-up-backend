@@ -5,6 +5,7 @@ import { hasPermission } from '../../middleware/hasPermission';
 import { UpdateUserSchema } from '../../types';
 import { UserSchema } from './index';
 import { HttpError } from '../../middleware/errorMiddleware';
+import  { validateRequest } from '../../middleware/validationMiddleware';
 
 interface UpdateUserSchema {
   first_name: string | undefined;
@@ -24,20 +25,13 @@ export default (router: Router) => {
   router.patch<{ id: string },UserSchema,UpdateUserSchema,Record<string, never>>(
     '/:id', 
     authMiddleware(), 
+    validateRequest(UpdateUserSchema),
     async (req, res) => {
       const userId = parseInt(req.params.id);
       if (!hasPermission(req, userId)) {
         throw new HttpError(403, 'Forbidden');
       }
-      const validationResult = UpdateUserSchema.safeParse(req.body);
-      if (!validationResult.success) {
-        throw new HttpError(
-          403,
-          'Unprocessable Entity'
-        );
-      }
-      const { first_name, last_name } = validationResult.data;
-
+      const { first_name, last_name } = req.body;
       const result = await SQL_UPDATE_USER({
         id: userId ,
         first_name: first_name,
