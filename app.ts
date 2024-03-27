@@ -1,7 +1,10 @@
-import express, { NextFunction, Request, Response } from 'express';
+
 import 'express-async-errors';
-import morgan from 'morgan';
-import cors from 'cors';
+import cron from 'node-cron';
+import Fastify from 'fastify';
+import fastifyHelmet from '@fastify/helmet';
+import fastifyCors from '@fastify/cors';
+import { sendSecurityReminderSMS } from './cronjob';
 import { HttpError } from './middleware/errorMiddleware';
 import usersRoutes from './routes/users/index';
 import categoriesRoutes from './routes/categories/index';
@@ -13,52 +16,35 @@ import passwordRoutes from './routes/password/index';
 import securityQuestionsRoutes from './routes/securityQuestions';
 import securityAnswerRoutes from './routes/securityAnswer/index';
 import cumulativesRoutes from './routes/cumulatives/index';
-import cron from 'node-cron';
-import { sendSecurityReminderSMS } from './cronjob';
 
-//Cron job
 cron.schedule('0 3 1 */6 *', sendSecurityReminderSMS);
 
-// Middleware
-const app = express();
-app.use(express.urlencoded({ extended: false, limit: '10mb' }));
-app.use(express.json());
-app.use(morgan('dev'));
-app.use((_, res, next) => {
-  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
-  next();
+const app = Fastify({ logger: true});
+app.register(fastifyCors, {
+  exposedHeaders: ['Authorization', 'X-Auth-Token', 'X-Refresh-Token', 'X-Reset-Token'],
 });
-app.use(
-  cors({
-    exposedHeaders: ['Authorization', 'X-Auth-Token', 'X-Refresh-Token','X-Reset-Token'],
-  })
-);
+app.register(fastifyHelmet, { global: true });
+app.register(usersRoutes,{ prefix:'/users' })
+app.register(savingsRoutes,{ prefix:'/savings' })
+app.register(expensesRoutes,{ prefix:'/expenses' })
+app.register(contributionsRoutes,{prefix: '/contributions' })
+app.register(passwordRoutes,{ prefix: '/password' })
+app.register(categoriesRoutes,{ prefix: '/categories' })
+app.register(AdminRoutes,{ prefix: '/admin' })
+app.register(securityQuestionsRoutes,{ prefix: '/security-questions' })
+app.register(securityAnswerRoutes,{ prefix: '/security-answers' })
+app.register(cumulativesRoutes,{ prefix: '/cumulatives' })
 
-// Routes
-usersRoutes(app);
-savingsRoutes(app);
-expensesRoutes(app);
-contributionsRoutes(app);
-passwordRoutes(app);
-categoriesRoutes(app);
-AdminRoutes(app);
-securityQuestionsRoutes(app);
-securityAnswerRoutes(app);
-cumulativesRoutes(app);
-
-// 404 handler
-app.use(() => {
+app.setNotFoundHandler(() => {
   throw new HttpError(404, 'Route Not found');
 });
 
-// Global error handler
-/* eslint-disable @typescript-eslint/no-unused-vars */
-app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
-  console.log(error);
-  if (error instanceof HttpError) {
-    return res.status(error.statusCode).json({ error: error.message });
+app.setErrorHandler((error, request, reply) => {
+  if (error instanceof HttpError) { 
+    return reply.status(error.statusCode).send({ error:error.message});
   }
-  return res.status(500).json({ error: 'Internal Server Error' });
+  return reply.code(500).send({ error:'Internal Server Error' });
 });
+
 
 export default app;

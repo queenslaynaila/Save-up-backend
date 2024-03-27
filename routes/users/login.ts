@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import bcrypt from 'bcrypt';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { generateToken } from '../../middleware/generatetoken';
@@ -23,11 +23,12 @@ const SQL_GET_USER = sql<{ id: number }, ExtendedUserSchema>(`
   WHERE id = :id
 `);
 
-export default (router: Router) => {
-  router.post<Record<string, never>, UserSchema, { phone_number: string; password: string }, Record<string, never>>(
+
+export default (fastify: FastifyInstance) => {
+  fastify.post<{ Body: { phone_number: string;password:string } }>(
     '/signin',
-    validateRequest(UserLoginSchema),
-    async (req, res) => {
+    { preHandler:[validateRequest(UserLoginSchema)]},
+    async (req:FastifyRequest<{ Body: { phone_number: string;password:string } }>, res:FastifyReply) => {
       const { password, phone_number } = req.body;
       const user = await SQL_GET_USER_PHONE({ phone_number }).one(
         new HttpError(404, 'Not found')
@@ -50,9 +51,9 @@ export default (router: Router) => {
       const accessToken = generateToken(userResult.id, userResult.role, '1d');
       const refreshToken = generateToken(userResult.id, userResult.role, '7d');
       res
-        .setHeader('X-Refresh-Token', refreshToken)
-        .setHeader('X-Auth-Token', accessToken)
-        .json(userDataToSend);
+        .header('X-Refresh-Token', refreshToken)
+        .header('X-Auth-Token', accessToken)
+        .send(userDataToSend);
     }
   );
 };

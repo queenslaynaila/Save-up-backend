@@ -1,4 +1,4 @@
-import { Response, Router } from 'express';
+import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { sql } from '../../db';
 import { savingInterface } from './index';
 import authMiddleware from '../../middleware/auth';
@@ -13,34 +13,31 @@ const SQL_GET_SAVINGS = sql<Record<string, never>, savingInterface>(
   `SELECT *FROM savings WHERE deleted_at IS NULL`
 );
 
-export default (router: Router) => {
-  router.get<string,
-  { savingsIdentifier: string },
-  savingInterface,
-  Record<string, never>,
-  { category_id?: string; priority?: string; status?: string; start_at?: string; completed_at?: string }
-  >('/:savingsIdentifier', 
-    authMiddleware(), 
-    async (req, res: Response) => {
-      const { savingsIdentifier } = req.params;
-      const { category_id, priority, status,start_at, completed_at  } = req.query;
+
+export default (fastify: FastifyInstance) => {
+  fastify.get<{ Params: { savingsIdentifier: string }, Querystring: { category_id?: string; priority?: string; status?: string; start_at?: string; completed_at?: string  } }>(
+    '/:savingsIdentifier',
+    { preHandler: authMiddleware() },
+    async (request: FastifyRequest<{ Params: { savingsIdentifier: string }, Querystring: { category_id?: string; priority?: string; status?: string; start_at?: string; completed_at?: string  } }>, reply: FastifyReply) => {
+      const { savingsIdentifier } = request.params;
+      const { category_id, priority, status, start_at, completed_at } = request.query;
 
       const filters: string[] = [];
       const filterArgs: Record<string, string> = {};
-      const loggedInUserId = req.user!.id;
+      const loggedInUserId = request.user!.id;
       const convertedStatus = status ? convertToTitleCase(status) : undefined;
       const convertedPriority = priority ? convertToTitleCase(priority) : undefined;
-      const isStandardUser = req.user?.role === 'User';
+      const isStandardUser = request.user?.role === 'User';
 
       if (savingsIdentifier === 'me') {
-        filterArgs.loggedInUserId= loggedInUserId.toString() ;
+        filterArgs.loggedInUserId = loggedInUserId.toString();
         filters.push(`user_id = :loggedInUserId`);
       } else if (savingsIdentifier === 'all') {
         if (isStandardUser) {
           throw new HttpError(403, 'Forbidden');
         }
-      } else if (ID_SCHEMA.parse(parseInt(savingsIdentifier))) {
-        if (isStandardUser && req.user!.id !== parseInt(savingsIdentifier)) {
+      } else if (ID_SCHEMA.safeParse(parseInt(savingsIdentifier)).success) {
+        if (isStandardUser && request.user!.id !== parseInt(savingsIdentifier)) {
           throw new HttpError(403, 'Forbidden');
         }
         filterArgs.savingsIdentifier = savingsIdentifier;
@@ -63,7 +60,7 @@ export default (router: Router) => {
         filterArgs.completed_at = completed_at;
         filters.push(`completed_at = :completed_at`);
       }
-       
+
       if (convertedPriority && isValidValue(convertedPriority, ACCEPTED_PRIORITY_VALUES)) {
         filterArgs.priority = convertedPriority;
         filters.push(`priority = :priority`);
@@ -77,6 +74,8 @@ export default (router: Router) => {
       const query = SQL_GET_SAVINGS({});
       if (filters.length > 0) query.extend(`AND ${filters.join(' AND ')}`, filterArgs);
       query.extend('LIMIT 15', {});
-      res.json(await query.many());
-    });
+      const savings = await query.many();
+      reply.send(savings);
+    }
+  );
 };

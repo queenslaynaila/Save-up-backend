@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { FastifyRequest, FastifyReply,FastifyInstance } from 'fastify';
 import bcrypt from 'bcrypt';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { sql } from '../../db';
@@ -27,21 +27,23 @@ const SQL_CREATE_USER = sql<CreateUserWithIdSchema, UserSchema>(`
   RETURNING id, first_name, last_name, role, created_at
 `);
 
-export default (router: Router) => { 
-  router.post<Record<string, never>,UserSchema,CreateUserSchema,Record<string, never>,Record<string, never>>(
+
+export default async (fastify: FastifyInstance) => {
+  fastify.post<{ Body:CreateUserSchema }>(
     '/',
-    validateRequest(CreateUserSchema),
-    async (req, res) => {
+    { preHandler:validateRequest(CreateUserSchema)}, 
+    async (req: FastifyRequest<{ Body: CreateUserSchema }>, reply: FastifyReply) => {
       const { first_name, last_name, password, phone_number } = req.body;
-      const user = await SQL_CREATE_USER_PHONE({ phone_number }).one(new HttpError(400, 'Account with this Phone number already exists'));
+      const user = await SQL_CREATE_USER_PHONE({ phone_number })
+        .one(new HttpError(400, 'Account with this Phone number already exists'));
       const passwordHash = bcrypt.hashSync(password, 10);
       const newUser = await SQL_CREATE_USER({
         id: user.id,
         first_name,
         last_name,
         password: passwordHash,
-      })
-        .one()
-      res.json(newUser);
-    });
+      }).one()
+      reply.send(newUser);
+    }
+  );
 };

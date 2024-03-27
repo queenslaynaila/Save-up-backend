@@ -1,7 +1,7 @@
+import { FastifyRequest, FastifyReply,FastifyInstance } from 'fastify';
 import authMiddleware from '../../middleware/auth';
 import { z } from 'zod';
 import { HttpError } from '../../middleware/errorMiddleware';
-import { Router } from 'express';
 import { sql } from '../../db';
 import { CategorySchema } from '../../types';
 
@@ -10,11 +10,11 @@ const SQL_GET_ALL_CATEGORIES = sql<Record<string, never>, CategorySchema>(
   `SELECT * FROM categories WHERE deleted_at IS NULL`
 );
 
-export default (router: Router) => {
-  router.get<{ user_id: string }, CategorySchema[], Record<string, never>, Record<string, never>>(
+export default async (fastify: FastifyInstance) => {
+  fastify.post<{ Params:{ user_id: string }}>(
     '/:user_id',
-    authMiddleware(),
-    async (req, res) => {
+    { preHandler:authMiddleware()}, 
+    async (req:FastifyRequest<{ Params: { user_id: string } }>,reply: FastifyReply) => {
       const { user_id: categoryIdentifier } = req.params;
       const isStandardUser = req.user?.role === 'User';
       const loggedInUserId = req.user!.id;
@@ -42,6 +42,7 @@ export default (router: Router) => {
 
       query.extend('LIMIT 15', {});
       const categories = await query.many();
-      res.json(categories);
-    });
+      reply.send(categories);
+    }
+  );
 };

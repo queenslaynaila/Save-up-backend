@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { FastifyRequest, FastifyReply,FastifyInstance } from 'fastify';
 import authMiddleware from '../../middleware/auth';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { ID_SCHEMA, ContributionSchema, UserRole } from '../../types';
@@ -6,15 +6,13 @@ import { sql } from '../../db';
 import  { validateRequest } from '../../middleware/validationMiddleware';
 
 
-const SQL_GET_CONTRIBUTION_BY_ID = (query: string) =>
-  sql<{ id: number }, ContributionSchema>(query);
+const SQL_GET_CONTRIBUTION_BY_ID = (query: string) =>sql<{ id: number }, ContributionSchema>(query);
 
-export default (router: Router) => {
-  router.get<{ id: string }, ContributionSchema, Record<string, never>, Record<string, never>>(
-    '/records/:id', 
-    authMiddleware(), 
-    validateRequest(ID_SCHEMA),
-    async (req, res) => {
+export default async (fastify: FastifyInstance) => {
+  fastify.post<{ Params:{ id: string }}>(
+    '/:user_id',
+    { preHandler:[authMiddleware(),validateRequest(ID_SCHEMA)]}, 
+    async (req:FastifyRequest<{ Params: { id: string } }>,reply: FastifyReply) => {
       const contributionsId = parseInt(req.params.id);
       const userId = req.user!.id;
       const userRole = req.user!.role;
@@ -28,6 +26,7 @@ export default (router: Router) => {
       const result = await SQL_GET_CONTRIBUTION_BY_ID(query)(values).one(
         new HttpError(404, 'Unable to complete the request')
       );
-      return res.json(result);
-    });
+      return reply.send(result);
+    }
+  );
 };

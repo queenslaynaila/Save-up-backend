@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import authMiddleware from '../../middleware/auth';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { UserRole, ID_SCHEMA,ExtendedExpenseInterface } from '../../types';
@@ -9,20 +9,20 @@ const SQL_GET_EXPENSE_BY_ID = sql<{ id:number; userId?:number }, ExtendedExpense
   SELECT * FROM savings WHERE id = :id
 `);
 
-export default (router: Router) => {
-  router.get<{ id: string }, ExtendedExpenseInterface, Record<string, never>, Record<string, never>>(
-    '/records/:expenseId', 
-    authMiddleware(), 
-    validateRequest(ID_SCHEMA),
-    async (req, res) => {
-      const expenseId = parseInt(req.params.id);
-      const userId = req.user!.id;
-      const userRole = req.user!.role;
+export default async (fastify: FastifyInstance) => {
+  fastify.get<{ Params: { expenseId: string } }>(
+    '/records/:expenseId',
+    { preHandler: [authMiddleware(), validateRequest(ID_SCHEMA)] },
+    async (request: FastifyRequest<{ Params: { expenseId: string } }>, reply: FastifyReply) => {
+      const expenseId = parseInt(request.params.expenseId);
+      const userId = request.user!.id;
+      const userRole = request.user!.role;
       const query = SQL_GET_EXPENSE_BY_ID({ id: expenseId });
       if (userRole !== UserRole.ADMIN) {
         query.extend('AND user_id = :userId', { userId });
       }
       const result = await query.one(new HttpError(404, 'Not found'));
-      return res.json(result);
-    });
-};
+      return reply.send(result);
+    }
+  );
+}

@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { FastifyRequest, FastifyReply,FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import authMiddleware from '../../middleware/auth';
 import { HttpError } from '../../middleware/errorMiddleware';
@@ -18,30 +18,29 @@ const SQL_UPDATE_SAVING = sql<z.infer<typeof updateSavingSchema>& { user_id:numb
   RETURNING *
 `);
 
-
-export default (router: Router) => {
-  router.patch('/:id', authMiddleware(), async (req, res) => {
-    const savingId = parseInt(req.params.id);
-    const userId = req.user!.id;
-
-    const validatedSavings = updateSavingSchema.safeParse(req.body);
-    if (!validatedSavings.success) {
-      throw new HttpError(422, 'Unprocessable Entity');
+export default async (fastify: FastifyInstance) => {
+  fastify.patch<{ Params: { id: string }, Body:z.infer<typeof updateSavingSchema>}, savingInterface>(
+    '/:id',
+    {
+      preHandler: [authMiddleware()], 
+      schema: {
+        body: updateSavingSchema,
+      },
+    },
+    async (request: FastifyRequest<{ Params: { id: string },Body:z.infer<typeof updateSavingSchema> }>, reply: FastifyReply) => {
+      const savingId = parseInt(request.params.id);
+      const userId = request.user!.id; 
+      const { description, category_id, amount, priority, target_at } = request.body;
+      const result = await SQL_UPDATE_SAVING({
+        user_id: userId,
+        id: savingId,
+        description,
+        category_id,
+        amount,
+        priority,
+        target_at,
+      }).one(new HttpError(404, 'Not found'));
+      reply.code(200).send(result);
     }
-
-    const { description, category_id, amount, priority, target_at } = validatedSavings.data;
-
-    const result = await SQL_UPDATE_SAVING({
-      user_id: userId,
-      id: savingId ,
-      description: description ,
-      category_id: category_id ,
-      amount: amount ,
-      priority:priority,
-      target_at:target_at,
-    })
-      .one(new HttpError(404, 'Not found'));
-
-    return res.json(result);
-  });
+  );
 };

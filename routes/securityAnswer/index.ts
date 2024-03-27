@@ -1,9 +1,7 @@
-import { Router } from 'express';
+import { FastifyInstance } from 'fastify';
 import createSecurityAnswer from './createSecurityAnswer';
-export default (baseRouter: Router) => {
-  const router = Router();
 
-  createSecurityAnswer(router);
+export default (fastify: FastifyInstance) => {
 
-  baseRouter.use('/security-answers', router);
+  createSecurityAnswer(fastify);
 };

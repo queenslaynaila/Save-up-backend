@@ -1,38 +1,30 @@
-import authMiddleware from "../../middleware/auth";
-import {Router} from "express";
-import {ID_SCHEMA} from "../../types";
-import {sql} from "../../db";
-import  { validateRequest } from '../../middleware/validationMiddleware';
+import { FastifyInstance, FastifyRequest,FastifyReply } from 'fastify';
+import { ID_SCHEMA } from '../../types'; 
+import { sql } from '../../db';
+import authMiddleware from '../../middleware/auth'; 
 
-interface CategorySchema {
-  id: number;
-  user_id: number;
-  name: string;
-  description: string;
-  created_at: Date;
-  updated_at: Date;
-  deleted_at?: Date;
-}
-
-const SQL_DELETE_CATEGORY = sql<Pick<CategorySchema, "id" | "user_id">,  Record<string, never>>(`
-  UPDATE categories
-  SET deleted_at = NOW()
-  WHERE id = :id
-  AND user_id = :user_id
+const SQL_DELETE_CATEGORY = sql<{ id: number; user_id: number }, Record<string, never>>(`
+  DELETE FROM categories
+  WHERE id = :id AND user_id = :user_id
 `);
 
-export default (router: Router) => {
-  router.delete<{ id: string }, { message: string }, Record<string, never>, Record<string, never>>(
-    "/:id",
-    authMiddleware(),
-    validateRequest(ID_SCHEMA),
-    async (req, res) => {
-      const id = parseInt(req.params.id)
-      await SQL_DELETE_CATEGORY({
-        id: id,
-        user_id: req.user!.id
-      }).exec();
-      return res.json({message: "Categories deleted successfully"});
+export default  async (fastify: FastifyInstance) => {
+  fastify.delete<{ Params: { id: string } }, { message: string }>(
+    '/:id',
+    {
+      preHandler: [authMiddleware()],
+      schema: {
+        params: {
+          id: ID_SCHEMA,
+        },
+      },
+    },
+    async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
+      const id = parseInt(request.params.id);
+      const userId = request.user!.id; 
+      await SQL_DELETE_CATEGORY({ id, user_id: userId }).exec();
+      reply.code(204).send(); 
     }
   );
 };
+

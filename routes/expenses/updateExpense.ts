@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { z } from 'zod';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { updateExpenseSchema, ExtendedExpenseInterface } from '../../types';
@@ -17,29 +17,23 @@ const SQL_UPDATE_EXPENSE= sql<z.infer<typeof updateExpenseSchema> & { id:number;
   RETURNING *
 `);
 
-export default (router: Router) => {
-  router.patch('/:id', 
-    authMiddleware(), 
-    validateRequest(updateExpenseSchema),
-    async (req, res) => {
-      const userId = req.user!.id;
-      const expenseId = parseInt(req.params.id);
-
-      const validationResultBody = updateExpenseSchema.safeParse(req.body);
-      if (!validationResultBody.success) {
-        throw new HttpError(422, "Unprocessable Entity");
-      }
-
-      const { description, category_id, amount,expense_date } = validationResultBody.data;
-
+export default async (fastify: FastifyInstance) => {
+  fastify.patch<{ Params: { id: string }; Body: z.infer<typeof updateExpenseSchema> }>(
+    '/:id',
+    { preHandler: [authMiddleware(), validateRequest(updateExpenseSchema)] },
+    async (request: FastifyRequest<{ Params: { id: string };Body:z.infer<typeof updateExpenseSchema> }>, reply: FastifyReply) => {
+      const userId = request.user!.id;
+      const expenseId = parseInt(request.params.id);
+      const { description, category_id, amount, expense_date } = request.body;
       const result = await SQL_UPDATE_EXPENSE({
         user_id: userId,
         id: expenseId,
-        description: description ,
-        category_id: category_id ,
-        amount: amount ,
-        expense_date:expense_date ,
+        description: description,
+        category_id: category_id,
+        amount: amount,
+        expense_date: expense_date,
       }).one(new HttpError(404, 'Not found'));
-      res.json(result);
-    });
+      reply.send(result);
+    }
+  );
 };

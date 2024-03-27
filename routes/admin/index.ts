@@ -1,12 +1,9 @@
-import { Router } from 'express';
+import  { FastifyInstance } from 'fastify';
 import createAdmin from './createAdmin';
-import getTableStats from './getTableStats';
 import updateUserRole from './updateUserRole';
-export default (baseRouter: Router) => {
-  const router = Router();
-  createAdmin(router);
-  getTableStats(router);
-  updateUserRole(router);
 
-  baseRouter.use('/admin', router);
-};
+export default async function adminRoutes (fastify: FastifyInstance) {
+  createAdmin(fastify);
+  updateUserRole(fastify);
+}
+

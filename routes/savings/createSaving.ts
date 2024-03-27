@@ -1,11 +1,12 @@
-import { Router } from 'express';
-import { z } from 'zod';
+import { FastifyRequest, FastifyReply,FastifyInstance } from 'fastify';
 import authMiddleware from '../../middleware/auth';
 import { savingSchema } from '../../types';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { sql } from '../../db';
 import { savingInterface } from './index';
+import { z } from 'zod';
 import { hasPermission } from '../../middleware/hasPermission';
+import  { validateRequest } from '../../middleware/validationMiddleware';
 
 const SQL_CREATE_SAVING = sql<z.infer<typeof savingSchema>, savingInterface>(`
   INSERT INTO savings (id, user_id, description, category_id, amount, priority, target_at)
@@ -14,16 +15,12 @@ const SQL_CREATE_SAVING = sql<z.infer<typeof savingSchema>, savingInterface>(`
   RETURNING *
 `);
 
-export default (router: Router) => {
-  router.post<Record<string, never>,savingInterface,typeof savingSchema,Record<string, never>,Record<string, never>>(
-    '/', 
-    authMiddleware(), 
-    async (req, res) => {
-      const validationResult = savingSchema.safeParse(req.body);
-      if (!validationResult.success) {
-        throw new HttpError(422, 'Unprocessable Entity');
-      }
-      const { user_id, description, category_id, amount, priority, target_at } =validationResult.data;
+export default async (fastify: FastifyInstance) => {
+  fastify.post<{ Body: z.infer<typeof savingSchema> }>(
+    '/',
+    { preHandler:[ authMiddleware(),validateRequest(savingSchema) ]}, 
+    async (req: FastifyRequest<{ Body: z.infer<typeof savingSchema> }>, reply: FastifyReply) => {
+      const { user_id, description, category_id, amount, priority, target_at } = req.body;
       if (!hasPermission(req, user_id)) {
         throw new HttpError(403, 'Forbidden')
       }
@@ -35,6 +32,7 @@ export default (router: Router) => {
         priority,
         target_at,
       }).one();
-      return res.json(newSaving);
-    });
+      return reply.send(newSaving);
+    }
+  );
 };

@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/auth';
 import { hasPermission } from '../../middleware/hasPermission';
@@ -21,23 +21,22 @@ const SQL_UPDATE_USER = sql<UpdateUserSchema, UserSchema>(`
   RETURNING *
 `);
 
-export default (router: Router) => {
-  router.patch<{ id: string },UserSchema,UpdateUserSchema,Record<string, never>>(
+export default (fastify: FastifyInstance) => {
+  fastify.patch<{ Params: { id: string }, Body: UpdateUserSchema }>(
     '/:id', 
-    authMiddleware(), 
-    validateRequest(UpdateUserSchema),
-    async (req, res) => {
+    { preHandler: [authMiddleware(), validateRequest(UpdateUserSchema)] },
+    async (req: FastifyRequest<{ Params: { id: string }, Body: UpdateUserSchema }>, reply: FastifyReply) => {
       const userId = parseInt(req.params.id);
       if (!hasPermission(req, userId)) {
         throw new HttpError(403, 'Forbidden');
       }
       const { first_name, last_name } = req.body;
       const result = await SQL_UPDATE_USER({
-        id: userId ,
+        id: userId,
         first_name: first_name,
-        last_name : last_name  
+        last_name: last_name
       }).one();
       
-      res.json(result);
+      reply.send(result);
     });
 };

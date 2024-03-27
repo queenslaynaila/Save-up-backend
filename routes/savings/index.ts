@@ -1,4 +1,4 @@
-import express from 'express';
+import { FastifyInstance } from 'fastify';
 import createSaving from './createSaving';
 import deleteSaving from './deleteSaving';
 import getSavingsByConditions from './getSavingsByConditions';
@@ -21,13 +21,12 @@ export type savingInterface = {
   deleted_at:Date;
 }
 
-export default (baseRouter: express.Router) => {
-  const router = express.Router();
-  createSaving(router);
-  deleteSaving(router);
-  getSavingsByConditions(router);
-  updateSaving(router);
-  getSavingBySavingID(router);
+export default (fastify: FastifyInstance) => {
 
-  baseRouter.use('/savings', router);
+  createSaving(fastify);
+  deleteSaving(fastify);
+  getSavingsByConditions(fastify);
+  updateSaving(fastify);
+  getSavingBySavingID(fastify);
+
 };

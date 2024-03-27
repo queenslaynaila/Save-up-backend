@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { FastifyInstance } from 'fastify';
 import { UserRole } from '../../types/index';
 import createUser from './createUser';
 import getUsersByConditions from './getUsersByConditions';
@@ -16,16 +16,14 @@ export interface UserSchema {
   created_at: Date;
   updated_at: Date;
 }
-export default (baseRouter: Router) => {
-  const router = Router();
 
-  getUsersByConditions(router);
-  createUser(router);
-  updateUser(router);
-  login(router);
-  signOut(router);
-  updateUser(router);
-  updateUserPhoneNo(router);
+export default (fastify: FastifyInstance) => {
 
-  baseRouter.use('/users', router);
+  getUsersByConditions(fastify);
+  createUser(fastify);
+  updateUser(fastify);
+  login(fastify);
+  signOut(fastify);
+  updateUserPhoneNo(fastify);
+
 };

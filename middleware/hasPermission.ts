@@ -1,7 +1,7 @@
-import { Request } from 'express';
+import { FastifyRequest } from 'fastify';
 import { UserRole } from '../types';
 
-export function hasPermission(req: Request, targetUserId:number): boolean {
+export function hasPermission(req: FastifyRequest, targetUserId:number): boolean {
   if (req.user!.role === UserRole.ADMIN || req.user!.role === UserRole.MODERATOR) {
     return true;
   } else {

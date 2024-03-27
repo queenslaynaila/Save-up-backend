@@ -1,13 +1,13 @@
 import { HttpError } from '../middleware/errorMiddleware';
-import { NextFunction, Request, Response } from 'express';
+import { FastifyRequest, FastifyReply } from 'fastify';
 import { ZodSchema  } from 'zod';
 
-export function validateRequest  (schema:ZodSchema)  {
-  return (req: Request, res: Response, next: NextFunction) => {
-    const validationResult = schema.safeParse(req.body);
+export function validateRequest(schema: ZodSchema) {
+  return async (request: FastifyRequest, reply: FastifyReply, next: () => void) => {
+    const validationResult = schema.safeParse(request.body);
     if (!validationResult.success) {
-      throw new HttpError(422, 'Unprocessable Entity');
+      throw new HttpError(422, 'Unprocessable Entity'); 
     }
-    next(); 
+    next();
   };
 }

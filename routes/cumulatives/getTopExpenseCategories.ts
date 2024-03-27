@@ -1,4 +1,4 @@
-import { Router, Request, Response } from 'express';
+import { FastifyRequest, FastifyReply,FastifyInstance } from 'fastify';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/auth';
 
@@ -15,14 +15,14 @@ const SQL_GET_TOP_EXPENDITURE_CATEGORIES = sql<{ userId:number }, TopExpenditure
   ORDER BY total_expense DESC
 `);
 
-export default (router: Router) => {
-  router.get<Record<string, never>, TopExpenditureCategory[], Record<string, never>, Record<string, never>>(
+export default async function (fastify: FastifyInstance) {
+  fastify.get(
     '/top-expenditure-categories',
-    authMiddleware(),
-    async (req: Request, res: Response) => {
+    { preHandler: authMiddleware() },
+    async (req: FastifyRequest, reply: FastifyReply) => {
       const userId = req.user!.id;
       const result = await SQL_GET_TOP_EXPENDITURE_CATEGORIES({ userId }).many();
-      res.json(result);
+      reply.send(result);
     }
   );
-};
+}

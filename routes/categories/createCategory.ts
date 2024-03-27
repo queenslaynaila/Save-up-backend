@@ -1,5 +1,5 @@
+import { FastifyRequest, FastifyReply,FastifyInstance } from 'fastify';
 import authMiddleware from '../../middleware/auth';
-import { Router } from 'express';
 import { CreateCategorySchema, CategorySchema } from '../../types';
 import  { validateRequest } from '../../middleware/validationMiddleware';
 import { sql } from '../../db';
@@ -17,14 +17,15 @@ const SQL_CREATE_CATEGORY = sql<CreateCategory, CategorySchema>(`
   RETURNING id, user_id, name, description, created_at;
 `);
 
-export default (router: Router) => {
-  router.post<Record<string, never>,CategorySchema,CreateCategory,Record<string, never>,Record<string, never>>(
+
+export default async (fastify: FastifyInstance) => {
+  fastify.post<{ Body:CreateCategory }>(
     '/',
-    authMiddleware(),
-    validateRequest(CreateCategorySchema),
-    async (req, res) => {
+    { preHandler:[ validateRequest(CreateCategorySchema),authMiddleware() ]}, 
+    async (req: FastifyRequest<{ Body: CreateCategory }>, reply: FastifyReply) => {
       const { user_id, name, description } = req.body;
       const categoryResult = await SQL_CREATE_CATEGORY({ user_id, name, description }).one();
-      return res.json(categoryResult);
-    });
+      return reply.send(categoryResult);
+    }
+  );
 };

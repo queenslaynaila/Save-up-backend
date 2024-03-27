@@ -1,12 +1,12 @@
-import { NextFunction, Request, Response } from 'express';
+import { FastifyRequest, FastifyReply } from 'fastify';
 import jwt, { Secret } from 'jsonwebtoken';
 import { User, UserRole } from '../types';
 import { HttpError } from './errorMiddleware';
 import { generateToken, verifyExpiration } from './generatetoken';
 
-declare module 'express-serve-static-core' {
-  interface Request {
-    user?: User;
+declare module 'fastify' {
+  interface FastifyRequest {
+    user: User;
   }
 }
 
@@ -17,7 +17,7 @@ interface AuthMiddlewareOptions {
 function authMiddleware(options: AuthMiddlewareOptions = {}) {
   const roles = options.roles || [];
 
-  return (req: Request, res: Response, next: NextFunction) => {
+  return (req: FastifyRequest, reply:FastifyReply) => {
     const accessToken = req.headers['authorization'];
     const refreshToken = req.headers['refresh-token'] as string;
     if (!accessToken || !refreshToken) {
@@ -33,13 +33,13 @@ function authMiddleware(options: AuthMiddlewareOptions = {}) {
         const user = decodedRefreshToken as User;
         const newAccessToken = generateToken(user.id, user.role, '1d');
         const newRefreshToken = generateToken(user.id, user.role, '7d');
-        res.setHeader('X-Access-Token', newAccessToken);
-        res.setHeader('X-Refresh-Token', newRefreshToken);
+        reply.header('X-Access-Token', newAccessToken);
+        reply.header('X-Refresh-Token', newRefreshToken);
         if (roles.length && !roles.includes(user.role)) {
           throw new HttpError(403, 'You do not have permission to access this resource');
         }
         req.user = user;
-        return next();
+        return;
       }
 
       const decodedAccessToken = jwt.verify(accessTokenValue, process.env.JWT_SECRET as Secret);
@@ -48,7 +48,7 @@ function authMiddleware(options: AuthMiddlewareOptions = {}) {
         throw new HttpError(403, 'You do not have permission to access this resource');
       }
       req.user = user;
-      return next();
+      return;
     }
   };
 }

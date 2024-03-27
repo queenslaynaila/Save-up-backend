@@ -1,17 +1,17 @@
-import express from 'express';
+import { FastifyInstance } from 'fastify';
 import createExpense from './createExpense';
 import deleteExpense from './deleteExpense';
 import getExpensesById from './getExpenseById' ;
 import getExpensesByConditions from './getExpensesByConditions';
 import updateExpense from './updateExpense';
 
-export default (baseRouter: express.Router) => {
-  const router = express.Router();
-  createExpense(router);
-  deleteExpense(router);
-  getExpensesById(router);
-  getExpensesByConditions(router);
-  updateExpense(router);
+export default (fastify: FastifyInstance) => {
 
-  baseRouter.use('/expenses', router);
+  createExpense(fastify);
+  deleteExpense(fastify);
+  getExpensesById(fastify);
+  getExpensesByConditions(fastify);
+  updateExpense(fastify);
+
+
 };

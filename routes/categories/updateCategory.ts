@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { FastifyRequest, FastifyReply,FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import authMiddleware from '../../middleware/auth';
 import { UpdateCategorySchema,CategorySchema } from '../../types';
@@ -14,11 +14,19 @@ const SQL_UPDATE_CATEGORY = sql<z.infer<typeof UpdateCategorySchema> & { id: num
   RETURNING id, user_id, name, description, created_at;
 `);
 
-export default (router: Router) => {
-  router.patch('/:id', 
-    authMiddleware(), 
-    validateRequest(UpdateCategorySchema),
-    async (req, res) => {
+
+export default async (fastify: FastifyInstance) => {
+  fastify.patch<
+  { Params: { id: string }; Body:{ name: string; description: string} }, 
+  CategorySchema, 
+  Record<string, never>
+  >(
+    '/:roleToUpdate/:id',
+    {
+      preHandler: [authMiddleware(),validateRequest(UpdateCategorySchema),],
+    },
+    async (req: FastifyRequest<{ Params: { id: string };Body:{ name: string; description: string}  }>, 
+      reply:FastifyReply) => {
       const categoryId = req.params.id;
       const userId = req.user!.id;
       const { name, description } = req.body;
@@ -28,7 +36,6 @@ export default (router: Router) => {
         name: name, 
         description: description ,
       }).one(new HttpError(404, 'Unable to complete the request'));
-
-      return res.json(result);
-    });
-};
+      return reply.send(result);
+    } 
+  )};

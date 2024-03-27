@@ -30,13 +30,12 @@ export const getSavingsQueryParamsSchema = z.object({
 
 // Schema for Contribution
 // ---------------------------------------------------------------------------------------------------------
-export const contributionSchema = z.object({
-  user_id: z.number(),
+export const contributionSchem = z.object({
   saving_id: z.number(),
   amount: z.number(),
   date: z.string(),
 });
-
+export type contributionSchema = z.infer<typeof contributionSchem>;
 export type ContributionSchema = {
   user_id:number,
   saving_id:number,

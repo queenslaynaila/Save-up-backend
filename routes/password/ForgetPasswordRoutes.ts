@@ -1,5 +1,4 @@
-import { Router } from 'express';
-import { NextFunction, Request, Response } from 'express';
+import { FastifyRequest, FastifyReply,FastifyInstance } from 'fastify';
 import jwt, { Secret } from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import { HttpError } from '../../middleware/errorMiddleware';
@@ -7,7 +6,7 @@ import { generateRandomToken } from '../../middleware/generateRandomToken';
 import sendSms from '../../services/twilio';
 import { UserSchema } from '../../types';
 import { sql } from '../../db';
-import {resetPasswordLimiter } from '../../services/rateLimit'
+
 
 declare module 'express-serve-static-core' {
   interface Request {
@@ -59,40 +58,42 @@ const verifyResetToken = (req: Request, res: Response, next: NextFunction) => {
   });
 };
 
-export const initiatePasswordReset = (router: Router) => {
-  router.post<Record<string, never>, { message: string }, { phone_number: string }, Record<string, never>>(
+
+
+export const initiatePasswordReset= (fastify: FastifyInstance) =>{
+  fastify.post<{ Body: { phone_number: string } }>(
     '/forget-password-request',
-    resetPasswordLimiter ,
-    async (req, res) => {
-      const { phone_number } = req.body;
+    { preHandler: app.rateLimit()}, 
+    async (request: FastifyRequest<{ Body: { phone_number: string } }>, reply: FastifyReply) => {
+      const { phone_number } = request.body;
       const user = await SQL_GET_USER({ phone_number }).one(new HttpError(404, 'User not found.'));
       const resetToken = generateRandomToken();
       const hashedResetToken = await bcrypt.hash(resetToken, 10);
-      const token = await SQL_SAVE_TOKEN({ user_id: user.id, token:hashedResetToken }).one();
-      const actualToken = token.token;
-      const accessToken = jwt.sign({ userId: user.id },'process.env.JWT_SECRET as Secret', { expiresIn: "15m" });
+      const token = await SQL_SAVE_TOKEN({ user_id: user.id, token: hashedResetToken }).one();
+      const accessToken = jwt.sign({ userId: user.id }, process.env.JWT_SECRET as string, { expiresIn: '15m' });
       sendSms(
         phone_number,
-        `Your password reset token is: ${actualToken}. It expires in 10 minutes. Do not share with anyone.`
+        `Your password reset token is: ${token.token}. It expires in 10 minutes. Do not share with anyone.`
       );
-      res.setHeader('X-Reset-Token', accessToken).json({ message: 'Password reset token generated and sent successfully.' });
+      reply.header('X-Reset-Token', accessToken).send({ message: 'Password reset token generated and sent successfully.' });
+   
     });
-};
+}
+
 
 interface securityQuestions{
   securityQuestions: { question_id:number; question: string }[]
 }
 
-export const verifyPasswordResetToken = (router: Router) => {
-  router.post<Record<string, never>, securityQuestions, { user_id:number; reset_token: string }, Record<string, never>, Record<string, never>>(
+export const verifyPasswordResetToken = (fastify: FastifyInstance) => {
+  fastify.post<{ Body: { user_id:number; reset_token: string } }>(
     '/verify-token',
-    verifyResetToken,
-    async (req, res) => {
+    async (req: FastifyRequest<{ Body: { user_id:number; reset_token: string } }>, reply: FastifyReply) => {
       const { reset_token } = req.body;
       const user_id = req.userId!;
       await SQL_UPDATE_TOKEN_USAGE({ user_id, reset_token }).exec();
       const securityQuestions = await SQL_GET_SECURITY_QUESTIONS({ user_id }).many()
-      res.json({ securityQuestions });
+      reply.send({ securityQuestions });
     });
 };
 
@@ -102,11 +103,10 @@ interface SecurityAnswersRequest {
   answers: { question_id:number; answer: string }[];
 }
 
-export const verifySecurityAnswers = (router: Router) => {
-  router.post<string, Record<string, never>, { message: string }, SecurityAnswersRequest, Record<string, never>>(
+export const verifySecurityAnswers = (fastify: FastifyInstance) => {
+  fastify.post<{ Body: { answers: { question_id:number; answer: string }[] } }>(
     '/verify-security-answers',
-    verifyResetToken,
-    async (req, res) => {
+    async (req: FastifyRequest<{ Body: { answers: { question_id:number; answer: string }[] } }>, res: FastifyReply) => {
       const { answers } = req.body;
       const user_id = req.userId!;
       const userSecurityAnswers = await SQL_GET_SECURITY_ANSWERS({ user_id }).many();
@@ -122,21 +122,20 @@ export const verifySecurityAnswers = (router: Router) => {
       if (incorrectAnswers.length > 0) {
         throw new HttpError(401, `Incorrect answers. Contact customer service for help.`);
       }
-      res.json({
+      res.send({
         message: 'Security questions answered successfully. You can now reset your password.',
       });
     });
 };
 
-export const resetPassword = (router: Router) => {
-  router.post<string, Record<string, never>, { message: string }, { new_password: string; id:number }, Record<string, never>>(
+export const resetPassword = (fastify: FastifyInstance) => {
+  fastify.post<{ Body: { new_password: string; } }>(
     '/reset',
-    verifyResetToken,
-    async (req, res) => {
+    async (req: FastifyRequest<{ Body: { new_password: string;} }>, res: FastifyReply) => {
       const { new_password } = req.body;
       const user_id = req.userId!;
       const hashPassword = bcrypt.hashSync(new_password, 10);
       await SQL_RESET_PASSWORD({ id: user_id, password: hashPassword }).exec();
-      res.json({ message: 'Password updated successfully. Login' });
+      res.send({ message: 'Password updated successfully. Login' });
     });
 };

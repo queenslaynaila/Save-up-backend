@@ -1,10 +1,10 @@
-import rateLimit from 'express-rate-limit';
+//import fastifyRateLimit from "@fastify/rate-limit";
 
-const resetRequestsLimit = {
-  windowMs: 24 * 60 * 60 * 1000, 
+export const resetRequestsLimit = {
+  timeWindow: '1 day', 
   max: 10,
   message: 'Too many requests',
 };
   
-export const resetPasswordLimiter = rateLimit(resetRequestsLimit);
+
 

@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { FastifyRequest, FastifyReply,FastifyInstance } from 'fastify';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/auth';
 import { HttpError } from '../../middleware/errorMiddleware';
@@ -10,11 +10,11 @@ const SQL_GET_TOTAL_CONTRIBUTIONS = sql<{ userId: number }, { total_contributed_
     WHERE s.user_id = :userId
 `);
 
-export default (router: Router) => {
-  router.get<Record<string, never>, { total_contributed_amount: number }, Record<string, never>, Record<string, never>>(
-    '/total-contributions', 
-    authMiddleware(), 
-    async (req, res) => {
+export default async function (fastify: FastifyInstance) {
+  fastify.get<{ Querystring: { startDate?: string; endDate?: string } }>(
+    '/total-contributions',
+    { preHandler: authMiddleware() },
+    async (req: FastifyRequest<{ Querystring: { startDate?: string; endDate?: string } }>, reply: FastifyReply) => {
       const userId = req.user!.id;
       const { startDate, endDate } = req.query;
       const filters: string[] = [];
@@ -27,9 +27,11 @@ export default (router: Router) => {
         filterArgs.endDate = endDate;
         filters.push(`date <= :endDate`);
       }
-      const query = SQL_GET_TOTAL_CONTRIBUTIONS({userId });
+      const query = SQL_GET_TOTAL_CONTRIBUTIONS({ userId });
       if (filters.length > 0) query.extend(`AND ${filters.join(' AND ')}`, filterArgs);
       query.extend('LIMIT 15', {});
-      res.json(await query.one(new HttpError(404, 'Unable to complete the request')));
-    });
-};
+      const result = await query.one(new HttpError(404, 'Unable to complete the request'));
+      reply.send(result);
+    }
+  );
+}

@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { FastifyRequest, FastifyReply,FastifyInstance } from 'fastify';
 import { sql } from '../../db';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { UserSchema } from '../../routes/users/index';
@@ -15,18 +15,24 @@ const SQL_UPDATE_ROLE = sql<{ roleToUpdate: string; id: string }, UserSchema>(`
   RETURNING id, first_name, last_name, role, created_at
 `);
 
-export default (router: Router) => {
-  router.patch<{ roleToUpdate: string; id: string }, UserSchema, Record<string, never>, Record<string, never>>(
+export default async (fastify: FastifyInstance) => {
+  fastify.patch<
+  { Params: { roleToUpdate: string; id: string }; Body: never }, 
+  UserSchema, 
+  Record<string, never>
+  >(
     '/:roleToUpdate/:id',
-    authMiddleware({ roles: [UserRole.ADMIN] }),
-    async (req, res) => {
-      const  roleToUpdate  =  convertToTitleCase(req.params.roleToUpdate);
-      const  id  = req.params.id;
-      if (!VALID_ROLES.includes(roleToUpdate)) {
+    {
+      preHandler: [authMiddleware({ roles: [UserRole.ADMIN] })],
+    },
+    async (req: FastifyRequest<{ Params: { roleToUpdate: string; id: string } }>, reply:FastifyReply) => {
+      const { roleToUpdate, id } = req.params;
+      const formattedRole = convertToTitleCase(roleToUpdate);
+      if (!VALID_ROLES.includes(formattedRole)) {
         throw new HttpError(400, 'Invalid role.');
       }
-      const result = await SQL_UPDATE_ROLE({ roleToUpdate, id }).one(new HttpError (404, 'User with given ID not found.'));
-      res.json(result);
-    }
-  );
-};
+      const result = await SQL_UPDATE_ROLE({ roleToUpdate: formattedRole, id })
+        .one(new HttpError(404, 'User with given ID not found.'));
+      reply.send(result);
+    } 
+  )};

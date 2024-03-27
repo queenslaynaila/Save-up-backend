@@ -1,7 +1,17 @@
-import { Router } from 'express';
+import { FastifyRequest, FastifyReply,FastifyInstance } from 'fastify';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/auth';
 import { HttpError } from '../../middleware/errorMiddleware';
+
+interface TotalExpensesQuery {
+  startDate?: string;
+  endDate?: string;
+  categoryId?: string;
+}
+
+interface TotalExpensesResponse {
+  total_expenses: number;
+}
 
 
 const SQL_GET_TOTAL_EXPENSES = sql<{ userId: number }, { total_expenses: number }>(`
@@ -9,11 +19,11 @@ const SQL_GET_TOTAL_EXPENSES = sql<{ userId: number }, { total_expenses: number 
       FROM expenses
       WHERE user_id = :userId`);
 
-export default (router: Router) => {
-  router.get<Record<string, never>, { total_expenses: number }, Record<string, never>,{startDate?:string;endDate?:string;categoryId?:string}>(
+export default (fastify: FastifyInstance) => {
+  fastify.get<{ Querystring: TotalExpensesQuery }, TotalExpensesResponse>(
     '/total-expenses', 
-    authMiddleware(), 
-    async (req, res) => {
+    { preHandler: authMiddleware() },
+    async (req:FastifyRequest<{ Querystring: TotalExpensesQuery }>, reply:FastifyReply) => {
       const userId = req.user!.id;
       const { startDate, endDate, categoryId } = req.query;
       const filters: string[] = [];
@@ -34,7 +44,7 @@ export default (router: Router) => {
       const query = SQL_GET_TOTAL_EXPENSES({userId });
       if (filters.length > 0) query.extend(`AND ${filters.join(' AND ')}`, filterArgs);
       query.extend('LIMIT 15', {});
-      res.json(await query.one( new HttpError(500, 'An error occurred while processing your request. Please try again later.')));
+      reply.send(await query.one( new HttpError(500, 'An error occurred while processing your request. Please try again later.')));
 
     });
 };

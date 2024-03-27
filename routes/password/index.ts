@@ -1,4 +1,4 @@
-import express from 'express';
+import { FastifyInstance } from 'fastify';
 import updatePassword from './updatePassword';
 import {
   initiatePasswordReset,
@@ -7,14 +7,12 @@ import {
   resetPassword,
 } from './ForgetPasswordRoutes';
 
-export default (baseRouter: express.Router) => {
-  const router = express.Router();
+export default (fastify: FastifyInstance) => {
 
-  updatePassword(router);
-  initiatePasswordReset(router);
-  verifyPasswordResetToken(router);
-  verifySecurityAnswers(router);
-  resetPassword(router);
+  updatePassword(fastify);
+  initiatePasswordReset(fastify);
+  verifyPasswordResetToken(fastify);
+  verifySecurityAnswers(fastify);
+  resetPassword(fastify);
 
-  baseRouter.use('/password', router);
 };
