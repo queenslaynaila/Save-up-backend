@@ -82,7 +82,7 @@ SELECT create_distributed_table('savings',   'user_id');
 CREATE TABLE IF NOT EXISTS contributions (
   user_id     INT NOT NULL ,
   id          INT NOT NULL,
-  saving_id   INTEGER NOT NULL,
+  saving_id   INT NOT NULL,
   amount      NUMERIC(30, 3) NOT NULL,
   date        TIMESTAMP WITH TIME ZONE NOT NULL,
   created_at  TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -157,7 +157,7 @@ SELECT create_distributed_table('security_answers','user_id');
 CREATE TABLE IF NOT EXISTS reset_tokens (
     id          INT NOT NULL,
     user_id     INT REFERENCES users(id),
-    token       INTEGER NOT NULL CHECK (token BETWEEN 1000 AND 9999),
+    token       INT NOT NULL CHECK (token BETWEEN 1000 AND 9999),
     created_at  TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     used_at     TIMESTAMP WITH TIME ZONE,
     expired_at  TIMESTAMP WITH TIME ZONE DEFAULT (CURRENT_TIMESTAMP + INTERVAL '15 minutes'),
