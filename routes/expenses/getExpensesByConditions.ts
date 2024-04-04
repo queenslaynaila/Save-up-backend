@@ -42,7 +42,7 @@ export default (router: Router) => {
       if (start_date && end_date) {
         filterArgs.start_date = start_date;
         filterArgs.end_date = end_date;
-        filters.push(`expense_spent_at BETWEEN :start_date AND :end_date`);
+        filters.push(`spent_at BETWEEN :start_date AND :end_date`);
       }
       if (category_id) {
         filterArgs.category_id = category_id;
