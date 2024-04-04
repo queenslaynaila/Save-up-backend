@@ -13,6 +13,9 @@ import passwordRoutes from './routes/password/index';
 import securityQuestionsRoutes from './routes/securityQuestions';
 import securityAnswerRoutes from './routes/securityAnswer/index';
 import cumulativesRoutes from './routes/cumulatives/index';
+import electionRoutes from './routes/elections/index';
+import groupRoutes from './routes/groups/index';
+import inviteRoutes from './routes/invitations/index';
 import cron from 'node-cron';
 import { sendSecurityReminderSMS } from './cronjob';
 
@@ -45,6 +48,9 @@ AdminRoutes(app);
 securityQuestionsRoutes(app);
 securityAnswerRoutes(app);
 cumulativesRoutes(app);
+electionRoutes (app);
+groupRoutes(app);
+inviteRoutes(app);
 
 // 404 handler
 app.use(() => {
