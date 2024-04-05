@@ -1,40 +1,27 @@
-import { Router } from 'express';
-import { z } from 'zod';
 import authMiddleware from '../../middleware/auth';
-import { savingSchema } from '../../types';
+import { Router } from 'express';
+import { contributionSchema, ContributionSchema } from '../../types';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { sql } from '../../db';
-import { savingInterface } from './index';
-import { hasPermission } from '../../middleware/hasPermission';
+import  { validateRequest } from '../../middleware/validationMiddleware';
+type ContributionCreation = Omit<ContributionSchema, 'created_at' | 'updated_at'>
 
-const SQL_CREATE_SAVING = sql<z.infer<typeof savingSchema>, savingInterface>(`
-  INSERT INTO savings (id, user_id, description, category_id, amount, priority, target_at)
-  SELECT COALESCE((SELECT MAX(id) FROM savings WHERE user_id = :user_id), 0) + 1,
-  :user_id, :description, :category_id, :amount, :priority, :target_at
-  RETURNING *
+const SQL_CREATE_SAVING = sql<ContributionCreation, ContributionSchema>(`
+    INSERT INTO savings (id,user_id,saving_id, amount, date)
+    SELECT COALESCE((SELECT MAX(id) FROM savings WHERE user_id = :user_id), 0) + 1,
+    :user_id,:saving_id,:amount, :date
+    RETURNING *
 `);
 
 export default (router: Router) => {
-  router.post<Record<string, never>,savingInterface,typeof savingSchema,Record<string, never>,Record<string, never>>(
+  router.post<Record<string, never>,ContributionSchema,ContributionCreation,Record<string, never>,Record<string, never>>(
     '/', 
     authMiddleware(), 
+    validateRequest(contributionSchema),
     async (req, res) => {
-      const validationResult = savingSchema.safeParse(req.body);
-      if (!validationResult.success) {
-        throw new HttpError(422, 'Unprocessable Entity');
-      }
-      const { user_id, description, category_id, amount, priority, target_at } =validationResult.data;
-      if (!hasPermission(req, user_id)) {
-        throw new HttpError(403, 'Forbidden')
-      }
-      const newSaving = await SQL_CREATE_SAVING({
-        user_id: user_id,
-        description,
-        category_id,
-        amount,
-        priority,
-        target_at,
-      }).one();
-      return res.json(newSaving);
+      const user_id= req.user!.id
+      const { saving_id, amount, date } = req.body;
+      const contributionResult = await SQL_CREATE_SAVING({ user_id,saving_id, amount, date }).one(new HttpError(404, 'Unable to complete the request'));
+      return res.json(contributionResult);
     });
 };

@@ -8,12 +8,12 @@ import { updateSavingSchema } from '../../types';
 
 
 const SQL_UPDATE_SAVING = sql<z.infer<typeof updateSavingSchema>& { user_id:number; id: number }, savingInterface>(`
-  UPDATE savings
-  SET description = COALESCE(:description,  savings.description),
-      category_id = COALESCE(:category_id,  savings.category_id),
-      amount = COALESCE(:amount,  savings.amount),
-      priority = COALESCE(:priority,  savings.priority ),
-      target_at = COALESCE(:target_at,  savings.target_at )
+  UPDATE goals
+  SET description = COALESCE(:description,  goals.description),
+      category_id = COALESCE(:category_id,  goals.category_id),
+      amount = COALESCE(:amount,  goals.amount),
+      priority = COALESCE(:priority,  goals.priority ),
+      target_at = COALESCE(:target_at,  goals.target_at )
   WHERE user_id = :user_id AND id = :id
   RETURNING *
 `);

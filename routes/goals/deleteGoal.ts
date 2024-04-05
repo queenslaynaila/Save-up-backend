@@ -5,7 +5,7 @@ import { sql } from '../../db';
 import  { validateRequest } from '../../middleware/validationMiddleware';
 
 const SQL_DELETE_SAVING = sql<{ id: number; user_id:number }, Record<string, never>>(`
-  UPDATE savings
+  UPDATE goals
   SET deleted_at = NOW()
   WHERE id = :id
   AND user_id = :user_id
@@ -21,6 +21,6 @@ export default (router: Router) => {
       const userId = req.user!.id;
 
       await SQL_DELETE_SAVING({ id, user_id: userId }).exec();
-      return res.json({ message: 'Savings deleted successfully' });
+      return res.json({ message: 'Goal deleted successfully' });
     });
 };

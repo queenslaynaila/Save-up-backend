@@ -7,7 +7,7 @@ import { ID_SCHEMA,UserRole } from '../../types';
 import  { validateRequest } from '../../middleware/validationMiddleware';
 
 const SQL_GET_SAVING_BY_ID = sql<{ id: number; userId?: number }, savingInterface>(`
-    SELECT * FROM savings WHERE id = :id
+    SELECT * FROM goals WHERE id = :id
 `);
 
 export default (router: Router) => {

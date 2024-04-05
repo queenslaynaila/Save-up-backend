@@ -1,82 +1,55 @@
-import { Response, Router } from 'express';
+import { Router, Response } from 'express';
 import { sql } from '../../db';
-import { savingInterface } from './index';
+import { ContributionSchema, ID_SCHEMA } from '../../types';
 import authMiddleware from '../../middleware/auth';
-import { convertToTitleCase, isValidValue } from '../../middleware/caseNormalization';
 import { HttpError } from '../../middleware/errorMiddleware';
-import {ID_SCHEMA}  from '../../types/index';
 
-const ACCEPTED_STATUS_VALUES = ['In Progress', 'Dormant', 'Completed'];
-const ACCEPTED_PRIORITY_VALUES = ['High', 'Intermediate', 'Low'];
-
-const SQL_GET_SAVINGS = sql<Record<string, never>, savingInterface>(
-  `SELECT *FROM savings WHERE deleted_at IS NULL`
+const SQL_GET_CONTRIBUTIONS = sql<{ user_id?:number; }, ContributionSchema>(
+  `SELECT * FROM savings `
 );
 
 export default (router: Router) => {
-  router.get<string,
-  { savingsIdentifier: string },
-  savingInterface,
-  Record<string, never>,
-  { category_id?: string; priority?: string; status?: string; start_at?: string; completed_at?: string }
-  >('/:savingsIdentifier', 
+  router.get<string,{ contributionId: string },ContributionSchema,Record<string, never>,{ category_id?: string; saving_id?: string }
+  >('/:contributionId', 
     authMiddleware(), 
     async (req, res: Response) => {
-      const { savingsIdentifier } = req.params;
-      const { category_id, priority, status,start_at, completed_at  } = req.query;
-
-      const filters: string[] = [];
+      const { contributionId } = req.params;
+      const { category_id, saving_id } = req.query;
       const filterArgs: Record<string, string> = {};
+      const filters: string[] = [];
       const loggedInUserId = req.user!.id;
-      const convertedStatus = status ? convertToTitleCase(status) : undefined;
-      const convertedPriority = priority ? convertToTitleCase(priority) : undefined;
       const isStandardUser = req.user?.role === 'User';
 
-      if (savingsIdentifier === 'me') {
-        filterArgs.loggedInUserId= loggedInUserId.toString() ;
+      if (contributionId === 'me') {
+        filterArgs.loggedInUserId = loggedInUserId.toString();
         filters.push(`user_id = :loggedInUserId`);
-      } else if (savingsIdentifier === 'all') {
+      } else if (contributionId === 'all') {
         if (isStandardUser) {
           throw new HttpError(403, 'Forbidden');
         }
-      } else if (ID_SCHEMA.parse(parseInt(savingsIdentifier))) {
-        if (isStandardUser && req.user!.id !== parseInt(savingsIdentifier)) {
+      } else if(ID_SCHEMA.parse(parseInt(contributionId))) {
+        if (isStandardUser && req.user!.id !== parseInt(contributionId)) {
           throw new HttpError(403, 'Forbidden');
         }
-        filterArgs.savingsIdentifier = savingsIdentifier;
-        filters.push(`user_id = :savingsIdentifier`);
+        filterArgs.contributionId = contributionId;
+        filters.push(`user_id = :contributionId`);
       } else {
         throw new HttpError(400, 'Bad request');
       }
 
+      if (saving_id) {
+        filterArgs.saving_id = saving_id.toString();
+        filters.push(`saving_id = :saving_id`);
+      }
       if (category_id) {
-        filterArgs.category_id = category_id;
-        filters.push(`category_id = :category_id`);
+        filterArgs.category_id = category_id.toString()
+        filters.push(`saving_id IN (SELECT id FROM savings WHERE category_id = :category_id)`);
       }
 
-      if (start_at) {
-        filterArgs.start_at = start_at;
-        filters.push(`start_at = :start_at`);
-      }
-
-      if (completed_at) {
-        filterArgs.completed_at = completed_at;
-        filters.push(`completed_at = :completed_at`);
-      }
-       
-      if (convertedPriority && isValidValue(convertedPriority, ACCEPTED_PRIORITY_VALUES)) {
-        filterArgs.priority = convertedPriority;
-        filters.push(`priority = :priority`);
-      }
-
-      if (convertedStatus && isValidValue(convertedStatus, ACCEPTED_STATUS_VALUES)) {
-        filterArgs.status = convertedStatus;
-        filters.push(`status = :status`);
-      }
-
-      const query = SQL_GET_SAVINGS({});
-      if (filters.length > 0) query.extend(`AND ${filters.join(' AND ')}`, filterArgs);
+      const query = SQL_GET_CONTRIBUTIONS({});
+      if (filters.length > 0) query.extend(`WHERE ${filters.join(' AND ')}`, filterArgs);
       query.extend('LIMIT 15', {});
-      res.json(await query.many());
+      const savings = await query.many();
+      res.json(savings);
     });
 };
