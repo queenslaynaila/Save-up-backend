@@ -24,6 +24,7 @@ cron.schedule('0 3 1 */6 *', sendSecurityReminderSMS);
 
 // Middleware
 const app = express();
+
 app.use(express.urlencoded({ extended: false, limit: '10mb' }));
 app.use(express.json());
 app.use(morgan('dev'));
