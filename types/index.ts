@@ -1,5 +1,33 @@
 import { z } from 'zod';
 
+// Category Schemas
+
+export const CreateCategorySchema = z.object({
+  name: z.string(),
+  description: z.string(),
+});
+
+export type CreateCategoryInterface = z.infer<typeof CreateCategorySchema>;
+
+export const UpdateCategorySchema = CreateCategorySchema.extend({
+  id: z.number(),
+})
+
+export type UpdateCategoryInterface = z.infer<typeof UpdateCategorySchema>;
+
+export const CategorySchema = UpdateCategorySchema.extend({
+  created_at: z.date()
+})
+
+export type CategoryInterface = z.infer<typeof CategorySchema>;
+
+//Security Question Schema
+export interface SecurityQuestionSchema {
+  id: z.ZodNumber;
+  question: z.ZodString;
+  created_at: Date;
+}
+
 //User Types & Interfaces
 export const enum UserRole {
   ADMIN = 'Admin',
@@ -63,6 +91,33 @@ export const UpdateUserPhoneSchema = BaseUserSchema.pick({
 })
 
 export type UpdatePhoneInterface = z.infer<typeof UpdateUserPhoneSchema>;
+
+// NEXT OF KIN SCHEMA
+
+export const CreateNextOfKinSchema = z.object({
+  user_id:z.number(),
+  full_name: z.string(),
+  relationship: z.string(),
+  email: z.string().email(),
+  phone_number: z
+    .string()
+    .refine((value) => /^\+254\d{9}$/.test(value)),
+});
+
+export type CreateNextOfKinInterface = z.infer<typeof CreateNextOfKinSchema>;
+
+export const NextOfKinSchema= CreateNextOfKinSchema
+  .omit({ user_id: true })
+  .extend({
+    created_at: z.string(),
+    updated_at: z.string()
+  })
+
+export type NextOfKinInterface = z.infer<typeof NextOfKinSchema>;
+
+export const UpdateNextOfKinSchema = CreateNextOfKinSchema.partial();
+
+export type UpdateNextOfKinInterface = z.infer<typeof UpdateNextOfKinSchema>;
 
 // Schemas for Saving
 // ---------------------------------------------------------------------------------------------------------
@@ -134,32 +189,7 @@ export const updateExpenseSchema = z.object({
 });
 
 
-// Category Schemas
-// ----------------------------------------------------------------------------------------------------------
-export const UpdateCategorySchema = z.object({
-  name: z.string().optional(),
-  description: z.string().optional(),
-});
-export const CreateCategorySchema = UpdateCategorySchema.extend({
-  user_id: z.number(),
-  name: z.string(),
-  description: z.string(),
-});
 
-export type CategorySchema ={
-  user_id: z.ZodString;
-  id: z.ZodNumber;
-  name: z.ZodString;
-  description: z.ZodString;
-  created_at: Date;
-  deleted_at: Date;
-}
-//Security Question Schema
-export interface SecurityQuestionSchema {
-  id: z.ZodNumber;
-  question: z.ZodString;
-  created_at: Date;
-}
 
 //Security Answer Schema
 // ---------------------------------------------------------------------------------------------------------
@@ -188,19 +218,7 @@ export interface UserSchema {
   created_at: Date;
 }
 
-// NEXT OF KIN SCHEMA
-// ---------------------------------------------------------------------------------------------------------
-export const NextOfKinSchema = z.object({
-  user_id:z.number(),
-  full_name: z.string(),
-  relationship: z.string(),
-  email: z.string().email()
-});
 
-export const ExtendedNextOfKinSchema= NextOfKinSchema.extend({
-  created_at: z.string(),
-  updated_at: z.string()
-})
 
 // GROUPS SCHEMA
 // ---------------------------------------------------------------------------------------------------------

@@ -1,15 +1,14 @@
-import authMiddleware from '../../middleware/auth';
-import { z } from 'zod';
 import { Router } from 'express';
-import { NextOfKinSchema , ExtendedNextOfKinSchema} from '../../types';
 import { sql } from '../../db';
+import authMiddleware from '../../middleware/auth';
+import { NextOfKinInterface } from '../../types';
 
-const SQL_GET_KIN = sql<{user_id?: number },z.infer<typeof ExtendedNextOfKinSchema>>(`
-    SELECT * FROM savings WHERE user_id = user_:id
+const SQL_GET_KIN = sql<{user_id: number }, NextOfKinInterface>(`
+    SELECT full_name,relationship,email,phone_number,created_at,updated_at FROM next_of_kins WHERE user_id = user_:id
 `);
 
 export default (router: Router) => {
-  router.post<Record<string, never>,z.infer<typeof ExtendedNextOfKinSchema>,z.infer<typeof NextOfKinSchema>,Record<string, never>,Record<string, never> >(
+  router.post<Record<string, never>,NextOfKinInterface,{ user_id: number },Record<string, never>,Record<string, never>>(
     '/records', 
     authMiddleware(), 
     async (req, res) => { 

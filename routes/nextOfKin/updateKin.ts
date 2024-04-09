@@ -1,29 +1,26 @@
 import authMiddleware from '../../middleware/auth';
-import { z } from 'zod';
 import { Router } from 'express';
 import { sql } from '../../db';
 import { hasPermission } from '../../middleware/hasPermission';
-import { ExtendedNextOfKinSchema} from '../../types';
+import { UpdateNextOfKinInterface , NextOfKinInterface ,UpdateNextOfKinSchema } from '../../types'; 
 import { HttpError } from '../../middleware/errorMiddleware';
+import { validateRequest } from '../../middleware/validationMiddleware';
 
-interface UpdateKinSchema {
-  full_name: string | undefined;
-  relationship: string | undefined;
-  user_id:number;
-}
-  
-
-const SQL_UPDATE_KIN = sql<UpdateKinSchema, z.infer<typeof ExtendedNextOfKinSchema>>(`
-    UPDATE next_of_kin
-    SET full_name = COALESCE(:full_name,next_of_kin.full_name_),
-        relationship = COALESCE(:relationship,next_of_kin.relationship)
-    WHERE user_id = user_:id
-    RETURNING *
+const SQL_UPDATE_KIN = sql<UpdateNextOfKinInterface,NextOfKinInterface>(`
+  UPDATE next_of_kin
+  SET full_name = COALESCE(:full_name,next_of_kin.full_name_),
+      relationship = COALESCE(:relationship,next_of_kin.relationship)
+      email = COALESCE(:email,next_of_kin.email)
+      phone_number = COALESCE(:phone_number,next_of_kin.phone_number)
+  WHERE user_id = user_:id
+  RETURNING full_name,relationship,email,phone_number,created_at,updated_at
 `);
+
 export default (router: Router) => {
-  router.delete<Record<string, never>, { user_id: number },UpdateKinSchema, { message: string }, Record<string, never>>(
+  router.delete<Record<string, never>, NextOfKinInterface , UpdateNextOfKinInterface ,Record<string, never>, Record<string, never>>(
     '/update', 
     authMiddleware(), 
+    validateRequest(UpdateNextOfKinSchema),
     async (req, res) => {
       const user_id = req.user!.id;
       if (!hasPermission(req, user_id)) {
