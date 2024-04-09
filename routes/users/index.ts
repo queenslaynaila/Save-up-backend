@@ -7,12 +7,10 @@ import getUsersByConditions from './getUsersByConditions';
 
 export default (baseRouter: Router) => {
   const router = Router();
-
   createUser(router);
   login(router);
   getUsersByConditions(router);
   updateUserPhoneNo(router);
   signOut(router);
-
   baseRouter.use('/users', router);
 };

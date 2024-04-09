@@ -9,6 +9,7 @@ import {UpdatePhoneInterface,  UpdateUserPhoneSchema} from '../../types';
 const SQL_GET_USER_PIN = sql<{ userId: string },{ pin: string }>(`
   SELECT pin FROM users WHERE id = :userId
 `);
+
 const SQL_UPDATE_PHONE = sql<{ phone_number: string; userId: string }, { phone_number: string }>(`
    UPDATE users_contacts
    SET phone_number = :phone_number 

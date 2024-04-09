@@ -9,15 +9,11 @@ import { UpdateUserPhoneSchema,GetUserInterface,UpdatePhoneInterface } from '../
 type ExtendedUserInterface = GetUserInterface & { pin: string };
 
 const SQL_GET_USER_ENTITY_ID = sql<{ phone_number: string }, { id: number }>(`
-  SELECT id
-  FROM user_contacts
-  WHERE phone_number = :phone_number
+  SELECT id FROM user_contacts WHERE phone_number = :phone_number
 `);
 
 const SQL_GET_USER = sql<{ id: number },ExtendedUserInterface>(`
-  SELECT *
-  FROM users
-  WHERE id = :id
+  SELECT * FROM users WHERE id = :id
 `);
 
 export default (router: Router) => {
@@ -30,6 +26,7 @@ export default (router: Router) => {
         new HttpError(404, 'Not found')
       );
       const user = await SQL_GET_USER({ id: entity_id.id }).one();
+
       const isPasswordCorrect = await bcrypt.compare(pin, user.pin);
       if (!isPasswordCorrect) {
         throw new HttpError(400, 'Invalid phone number or password combination');
@@ -41,6 +38,7 @@ export default (router: Router) => {
         role: user.role,
         created_at: user.created_at,
       };
+
       const accessToken = generateToken(user.id, user.role, '1d');
       const refreshToken = generateToken(user.id, user.role, '7d');
       res
