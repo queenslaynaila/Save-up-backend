@@ -1,45 +1,37 @@
 import authMiddleware from '../../middleware/auth';
-import { z } from 'zod';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { Router } from 'express';
 import { sql } from '../../db';
-import { CategorySchema } from '../../types';
+import { CategoryInterface,ID_SCHEMA} from '../../types';
 
-const UUIDSCHEMA = z.string().uuid();
-const SQL_GET_ALL_CATEGORIES = sql<Record<string, never>, CategorySchema>(
+const SQL_GET_ALL_CATEGORIES = sql<Record<string, never>, CategoryInterface>(
   `SELECT * FROM categories WHERE deleted_at IS NULL`
 );
 
 export default (router: Router) => {
-  router.get<{ user_id: string }, CategorySchema[], Record<string, never>, Record<string, never>>(
-    '/:user_id',
+  router.get<{  targetCategory: string }, CategoryInterface[], Record<string, never>, Record<string, never>>(
+    '/:targetCategory',
     authMiddleware(),
     async (req, res) => {
-      const { user_id: categoryIdentifier } = req.params;
+      const { targetCategory} = req.params;
       const isStandardUser = req.user?.role === 'User';
       const loggedInUserId = req.user!.id;
       const query = SQL_GET_ALL_CATEGORIES({});
 
-      if (categoryIdentifier === 'me') {
+      if (targetCategory === 'me') {
         query.extend(`AND user_id = :loggedInUserId `, { loggedInUserId });
-      } else if (categoryIdentifier === 'all') {
+      } else if (targetCategory === 'all') {
         if (isStandardUser) {
           throw new HttpError(403, 'Forbidden');
         }
-      } else if (categoryIdentifier === 'system') {
-        if (isStandardUser) {
+      } else if (ID_SCHEMA.safeParse(parseInt(targetCategory)).success) {
+        if (isStandardUser && loggedInUserId.toString() !== targetCategory.toString()) {
           throw new HttpError(403, 'Forbidden');
         }
-        query.extend(`AND user_id = 1`, {});
-      } else if (UUIDSCHEMA.parse(categoryIdentifier)) { 
-        if (isStandardUser && loggedInUserId.toString() !== categoryIdentifier.toString()) {
-          throw new HttpError(403, 'Forbidden');
-        }
-        query.extend(`AND user_id = :categoryIdentifier`, { categoryIdentifier });
+        query.extend(`AND user_id = :categoryIdentifier`, { targetCategory });
       } else {
         throw new HttpError(400, 'Bad request');
       }
-
       query.extend('LIMIT 15', {});
       const categories = await query.many();
       res.json(categories);

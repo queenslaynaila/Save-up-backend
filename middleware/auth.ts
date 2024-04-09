@@ -1,9 +1,13 @@
 import { NextFunction, Request, Response } from 'express';
 import jwt, { Secret } from 'jsonwebtoken';
-import { User, UserRole } from '../types';
+import { UserRole } from '../types';
 import { HttpError } from './errorMiddleware';
 import { generateToken, verifyExpiration } from './generatetoken';
 
+type User = {
+  id: number;
+  role: UserRole;
+}
 declare module 'express-serve-static-core' {
   interface Request {
     user?: User;
