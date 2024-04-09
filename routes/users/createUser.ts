@@ -1,47 +1,38 @@
 import { Router } from 'express';
 import bcrypt from 'bcrypt';
-import { HttpError } from '../../middleware/errorMiddleware';
 import { sql } from '../../db';
-import { CreateUserSchema, UserSchema } from '../../types';
-import  { validateRequest } from '../../middleware/validationMiddleware';
+import { HttpError } from '../../middleware/errorMiddleware';
+import { validateRequest } from '../../middleware/validationMiddleware';
+import { BaseUserSchema, CreateUserContactInterface, CreateUserInterface, UserInterface } from '../../types';
 
-interface CreateUserSchema {
-  first_name: string;
-  last_name: string;
-  password: string;
-  phone_number:string;
-}
-interface CreateUserWithIdSchema extends Omit<CreateUserSchema, 'phone_number'> {
-  id: number;
-}
-
-const SQL_CREATE_USER_PHONE = sql<Pick<CreateUserSchema,'phone_number'>, { id: number }>(`
-  INSERT INTO users_phone (phone_number)
-  VALUES (:phone_number)
+const SQL_CREATE_USER_ENTITY = sql<{entity_type: string }, { id:number }>(`
+  INSERT INTO entities (entity_type)
+  VALUES (:entity_type)
   RETURNING id
 `);
 
-const SQL_CREATE_USER = sql<CreateUserWithIdSchema, UserSchema>(`
-  INSERT INTO users (id, first_name, last_name, password)
-  VALUES (:id, :first_name, :last_name, :password)
-  RETURNING id, first_name, last_name, role, created_at
+const SQL_CREATE_USER_CONTACTS = sql<CreateUserContactInterface, Record<string, never>>(`
+  INSERT INTO users_contacts (entity_id,phone_number,national_id )
+  VALUES (:entity_id,:phone_number,:national_id)
+`);
+
+const SQL_CREATE_USER = sql<CreateUserInterface, Record<string, never>>(`
+  INSERT INTO users (id,full_name,gender,pin)
+  VALUES (:id, :full_name, :gender, :pin)
 `);
 
 export default (router: Router) => { 
-  router.post<Record<string, never>,UserSchema,CreateUserSchema,Record<string, never>,Record<string, never>>(
+  router.post<Record<string, never> ,{ message:string }, UserInterface, Record<string, never>, Record<string, never>>(
     '/',
-    validateRequest(CreateUserSchema),
+    validateRequest( BaseUserSchema),
     async (req, res) => {
-      const { first_name, last_name, password, phone_number } = req.body;
-      const user = await SQL_CREATE_USER_PHONE({ phone_number }).one(new HttpError(400, 'Account with this Phone number already exists'));
-      const passwordHash = bcrypt.hashSync(password, 10);
-      const newUser = await SQL_CREATE_USER({
-        id: user.id,
-        first_name,
-        last_name,
-        password: passwordHash,
-      })
-        .one()
-      res.json(newUser);
+      const { full_name, gender, national_id, phone_number, pin } = req.body;
+      const entity = await SQL_CREATE_USER_ENTITY({ entity_type: 'User' }).one();
+      await SQL_CREATE_USER_CONTACTS({ entity_id:entity.id,phone_number ,national_id })
+        .one(new HttpError(400, 'Account with this Phone number already exists'));
+      const pinHash = bcrypt.hashSync(pin, 12);
+      await SQL_CREATE_USER({ id:entity.id, full_name, gender, pin: pinHash })
+        .one(new HttpError(400, 'Unexpected error occurred, please try again later.'));
+      res.json({message:"Account created Succesfully.Procced to login"});
     });
 };
