@@ -1,7 +1,6 @@
 import { z } from 'zod';
 
-// Category Schemas
-
+// CATEGORY SCHEMAS
 export const CreateCategorySchema = z.object({
   name: z.string(),
   description: z.string(),
@@ -21,14 +20,14 @@ export const CategorySchema = UpdateCategorySchema.extend({
 
 export type CategoryInterface = z.infer<typeof CategorySchema>;
 
-//Security Question Schema
+// SECURITY QUESTIONS SCHEMA
 export interface SecurityQuestionSchema {
   id: z.ZodNumber;
   question: z.ZodString;
   created_at: Date;
 }
 
-//User Types & Interfaces
+// USER  SCHEMA
 export const enum UserRole {
   ADMIN = 'Admin',
   USER = 'User',
@@ -92,8 +91,7 @@ export const UpdateUserPhoneSchema = BaseUserSchema.pick({
 
 export type UpdatePhoneInterface = z.infer<typeof UpdateUserPhoneSchema>;
 
-// NEXT OF KIN SCHEMA
-
+// NEXT OF KIN SCHEMAS
 export const CreateNextOfKinSchema = z.object({
   user_id:z.number(),
   full_name: z.string(),
@@ -119,8 +117,24 @@ export const UpdateNextOfKinSchema = CreateNextOfKinSchema.partial();
 
 export type UpdateNextOfKinInterface = z.infer<typeof UpdateNextOfKinSchema>;
 
-// Schemas for Saving
-// ---------------------------------------------------------------------------------------------------------
+// SECURITY ANSWER SCHEMAS
+
+export const createSecurityAnswerSchema = z.object({
+  user_id: z.number(),
+  question_id: z.number(),
+  answer: z.string()
+});
+
+export type CreateSecurityAnswerInterface = z.infer<typeof createSecurityAnswerSchema>;
+
+export const SecurityAnswerSchema = createSecurityAnswerSchema.extend({
+  id: z.number(),
+  created_at: z.date()
+})
+
+export type SecurityAnswerInterface = z.infer<typeof SecurityAnswerSchema>;
+
+// SAVING SCHEMAS
 
 export const ID_SCHEMA = z.number();
 export const enum priority {
@@ -191,32 +205,6 @@ export const updateExpenseSchema = z.object({
 
 
 
-//Security Answer Schema
-// ---------------------------------------------------------------------------------------------------------
-export const updateSecurityAnswerSchema = z.object({
-  question_id: z.number(),
-  answer: z.string(),
-});
-
-export const createSecurityAnswerSchema = updateSecurityAnswerSchema.extend({
-  user_id: z.number(),
-});
-
-export interface SecurityAnswerSchema {
-  id: string;
-  user_id: number;
-  question_id: string;
-  answer: string;
-  created_at: Date;
-}
-
-export interface UserSchema {
-  id: number;
-  first_name: string;
-  last_name: string;
-  role: UserRole;
-  created_at: Date;
-}
 
 
 
