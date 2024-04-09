@@ -1,4 +1,5 @@
 # Routes
+<string, { targetUser: string }, GetUserInterface, Record<string, never>, { role?: string }>
 - [Routes](#routes)
   - [Endpoints](#endpoints)
     - [1. updateUserPhoneNo](#1-updateuserphoneno)

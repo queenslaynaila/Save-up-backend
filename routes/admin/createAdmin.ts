@@ -17,7 +17,7 @@ interface CreateUserWithIdSchema extends Omit<CreateUserSchema, 'phone_number'> 
 }
 
 const SQL_CREATE_USER_PHONE = sql<Pick<CreateUserSchema, 'phone_number'>, { id: number }>(`
-  INSERT INTO users_phone (phone_number)
+  INSERT INTO user_contacts(phone_number)
   VALUES (:phone_number)
   RETURNING id
 `);

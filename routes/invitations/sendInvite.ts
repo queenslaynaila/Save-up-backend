@@ -6,7 +6,7 @@ import { validateRequest } from '../../middleware/validationMiddleware';
 import {SendInviteInterface , SendInviteSchema} from '../../types';
 
 const SQL_FIND_USER_BY_PHONE = sql<{ phone_number: string }, { receiver_id: number }>(`
-    SELECT user_id FROM users_phone WHERE phone_number = :phone_number
+    SELECT user_id FROM user_contactsWHERE phone_number = :phone_number
 `);
 
 const SQL_SEND_INVITATION = sql<SendInviteInterface, {message:string}>(`

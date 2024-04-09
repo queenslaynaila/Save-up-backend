@@ -5,6 +5,7 @@ CREATE TYPE enum_priorities AS ENUM ('High', 'Intermediate', 'Low');
 CREATE TYPE enum_invites AS ENUM ('Pending', 'Accepted', 'Rejected');
 CREATE TYPE enum_relationships AS ENUM ('Parent', 'Spouse', 'Sibling', 'Child', 'Relative', 'Lawyer', 'Friend');
 CREATE TYPE enum_genders AS ENUM ('Male', 'Female', 'Prefer not to say');
+CREATE TYPE enum_entities AS ENUM ('User','Groups');
 
 --- General Purpose Tables
 CREATE TABLE IF NOT EXISTS security_questions (
@@ -50,20 +51,29 @@ VALUES ('Food', 'All food related expenses'),
 
 SELECT create_reference_table('categories');
 
+--Entity
+CREATE TABLE IF NOT EXISTS entities (
+  id              SERIAL PRIMARY KEY,
+  entity_type     enum_entities NOT NULL
+);
+
+SELECT create_reference_table('entities');
+
 --- User & User Management
 CREATE TABLE IF NOT EXISTS user_contacts (
-  id              SERIAL PRIMARY KEY,
+  entity_id       INT NOT NULL PRIMARY KEY,
   phone_number    TEXT UNIQUE NOT NULL,
-  national_id     TEXT UNIQUE NOT NULL,
+  national_id     CHAR(8) NOT NULL UNIQUE,
+  FOREIGN KEY     (entity_id) REFERENCES entities(id),
   CONSTRAINT      phone_number_format_check CHECK (phone_number ~* '^\+?254[0-9]{9}$')
 );
 
 CREATE TABLE IF NOT EXISTS users (
-  id              INT NOT NULL PRIMARY KEY,  
+  id              INT NOT NULL PRIMARY KEY,
   full_name       TEXT NOT NULL,
   role            enum_roles NOT NULL DEFAULT 'User',
   gender          enum_genders NOT NULL,
-  pin             TEXT NOT NULL,
+  pin             CHAR(4) NOT NULL,
   created_at      TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );
 
@@ -72,18 +82,19 @@ CREATE INDEX idx_users_by_gender ON users(gender);
 CREATE INDEX idx_users_by_created_at ON users(created_at);
 SELECT create_distributed_table('users', 'id');
 
-CREATE TABLE IF NOT EXISTS next_of_kin (
+CREATE TABLE IF NOT EXISTS next_of_kins (
   user_id         INT PRIMARY KEY,
   full_name       TEXT NOT NULL,
   relationship    enum_relationships NOT NULL,
   email           TEXT NOT NULL,
+  phone_number    TEXT NOT NULL,
   created_at      TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   updated_at      TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   deleted_at      TIMESTAMP WITH TIME ZONE,
   FOREIGN KEY     (user_id) REFERENCES users(id) 
 );
 
-SELECT create_distributed_table('next_of_kin', 'user_id');
+SELECT create_distributed_table('next_of_kins', 'user_id');
 
 CREATE TABLE IF NOT EXISTS security_answers (
   user_id       INT NOT NULL,
@@ -118,98 +129,59 @@ CREATE TABLE IF NOT EXISTS groups (
   created_by    INT NOT NULL,
   updated_at    TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   created_at    TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-  deleted_at    TIMESTAMP WITH TIME ZONE,
-  FOREIGN KEY   (created_by) REFERENCES users(id)
+  deleted_at    TIMESTAMP WITH TIME ZONE
 );
 
+SELECT create_distributed_table('groups', 'id');
+
 CREATE TABLE IF NOT EXISTS user_groups (
-  user_id       INT NOT NULL ,
   group_id      INT NOT NULL,
+  user_id       INT NOT NULL ,
   joined_at     TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-  PRIMARY KEY   (user_id, group_id),
-  FOREIGN KEY   (user_id) REFERENCES users(id),
+  PRIMARY KEY   (group_id,user_id)
+  FOREIGN KEY   (user_id) REFERENCES entities(id),
   FOREIGN KEY   (group_id) REFERENCES groups(id)
 );
 
-CREATE TABLE IF NOT EXISTS messages (
-  sender_id       INT NOT NULL,
-  group_id      INT NOT NULL,
-  id            INT NOT NULL,
-  message       TEXT NOT NULL,
-  sent_at       TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-  PRIMARY KEY   (sender_id, group_id, id), 
-  FOREIGN KEY   (sender_id,group_id) REFERENCES user_groups(user_id, group_id)
-);
+SELECT create_distributed_table('user_groups', 'group_id');
+CREATE INDEX idx_user_groups_by_group_id ON user_groups(group_id);
 
-CREATE INDEX idx_user_groups_by_user_id ON user_groups(user_id);
-SELECT create_distributed_table('user_groups', 'user_id');
 
 CREATE TABLE IF NOT EXISTS group_administrators (
-  user_id       INT NOT NULL,
   group_id      INT NOT NULL,
+  user_id       INT NOT NULL,
   created_at    TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-  PRIMARY KEY   (user_id, group_id),
-  FOREIGN KEY   (user_id, group_id) REFERENCES user_groups(user_id, group_id)
+  PRIMARY KEY   (group_id,user_id),
+  FOREIGN KEY   (group_id,user_id) REFERENCES user_groups(group_id,user_id)
 );
 
+SELECT create_distributed_table('group_administrators', 'group_id');
 CREATE INDEX idx_group_admins_by_group_id ON group_administrators(group_id);
 CREATE INDEX idx_group_admins_by_user_id ON group_administrators(user_id);
 
-
-CREATE TABLE IF NOT EXISTS invitations (         
+CREATE TABLE IF NOT EXISTS invitations (   
+  group_id      INT NOT NULL,      
   sender_id     INT NOT NULL,
   receiver_id   INT NOT NULL,
-  group_id      INT NOT NULL,
   status        enum_invites NOT NULL DEFAULT 'Pending',
   created_at    TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-  PRIMARY KEY   (receiver_id, group_id),
-  FOREIGN KEY   (sender_id, group_id) REFERENCES group_administrators(user_id, group_id),
-  FOREIGN KEY   (receiver_id, group_id) REFERENCES user_groups(user_id, group_id)
+  PRIMARY KEY   (group_id,receiver_id),
+  FOREIGN KEY   (group_id,sender_id) REFERENCES group_administrators(group_id,user_id),
+  FOREIGN KEY   (receiver_id) REFERENCES entities(id)
 );
 
-CREATE INDEX idx_invitations_by_receiver_id ON invitations(receiver_id);
-SELECT create_distributed_table('invitations', 'receiver_id');
+CREATE INDEX idx_invitations_by_group_id ON invitations(group_id);
+SELECT create_distributed_table('invitations', 'group_id');
 
---- Elections & Election Management
-CREATE TABLE IF NOT EXISTS elections (
-  group_id      INT NOT NULL,
-  id            INT NOT NULL,
-  caller_id     INT NOT NULL,
-  election_name TEXT NOT NULL,
-  start_at      TIMESTAMP WITH TIME ZONE NOT NULL,
-  end_at        TIMESTAMP WITH TIME ZONE NOT NULL,
-  created_at    TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-  CONSTRAINT    check_start_end_time CHECK (start_at < end_at),
-  PRIMARY KEY   (group_id, id),
-  FOREIGN KEY   (group_id) REFERENCES groups(id),
-	FOREIGN KEY   (caller_id, group_id) REFERENCES group_administrators(user_id, group_id)
-);
+--- Group Admin Approval
 
-CREATE TABLE IF NOT EXISTS election_candidates (
-  group_id      INT NOT NULL,
-  election_id   INT NOT NULL,
-  candidate_id  INT NOT NULL,
-  created_at    TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-  PRIMARY KEY   (group_id, election_id, candidate_id),
-  FOREIGN KEY   (group_id, election_id) REFERENCES elections (group_id,id),
-  FOREIGN KEY   (candidate_id, group_id) REFERENCES user_groups(user_id, group_id)
-);
 
-CREATE TABLE IF NOT EXISTS votes (
-  group_id      INT NOT NULL,
-  election_id   INT NOT NULL,
-  candidate_id  INT NOT NULL,
-  voter_id      INT NOT NULL,
-  created_at    TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-  PRIMARY KEY   (group_id,election_id,candidate_id,voter_id),
-  FOREIGN KEY   (voter_id) REFERENCES users(id),
-  FOREIGN KEY   (group_id, election_id, candidate_id) REFERENCES election_candidates(group_id,election_id, candidate_id)
-);
 
---Financial management 
+---Financial management 
 
 CREATE TABLE IF NOT EXISTS goals (
-  id             INT NOT NULL PRIMARY KEY,
+  entity_id      INT NOT NULL,
+  id             INT NOT NULL,
   category_id    INT NOT NULL,
   description    TEXT NOT NULL,
   amount         NUMERIC(30, 3) NOT NULL,
@@ -221,31 +193,11 @@ CREATE TABLE IF NOT EXISTS goals (
   updated_at     TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   completed_at   TIMESTAMP WITH TIME ZONE, 
   deleted_at     TIMESTAMP WITH TIME ZONE,
+  PRIMARY KEY    (entity_id,id),
+  FOREIGN KEY    (entity_id) REFERENCES entities(id),
   FOREIGN KEY    (category_id) REFERENCES categories(id)
 );
 SELECT create_distributed_table('goals', 'id');
-
-CREATE TABLE user_goals (
-    user_id         INT NOT NULL,
-    goal_id         INT NOT NULL,
-    PRIMARY KEY     (goal_id, user_id),
-    FOREIGN KEY     (user_id) REFERENCES users(id),
-    FOREIGN KEY     (goal_id) REFERENCES goals(id)
-);
-
-SELECT create_distributed_table('user_goals', 'group_id');
-CREATE INDEX idx_user_goals_by_user_id ON user_goals(user_id);
-
-CREATE TABLE group_goals (
-    group_id        INT NOT NULL,
-    goal_id         INT NOT NULL,
-    PRIMARY KEY     (group_id, goal_id),
-    FOREIGN KEY     (group_id) REFERENCES groups(id),
-    FOREIGN KEY     (goal_id) REFERENCES goals(id)
-);
-
-CREATE INDEX idx_group_goals_by_group_id ON group_goals(group_id);
-SELECT create_distributed_table('group_goals', 'goal_id');
 
 CREATE TABLE IF NOT EXISTS savings (
   user_id     INT NOT NULL,
@@ -258,11 +210,12 @@ CREATE TABLE IF NOT EXISTS savings (
   FOREIGN KEY (goal_id) REFERENCES goals(id) 
 );
 
+SELECT create_distributed_table('savings', 'goal_id');
 CREATE INDEX idx_savings_by_user_and_goal ON savings(user_id, goal_id);
-SELECT create_distributed_table('savings', 'user_id');
+
 
 CREATE TABLE IF NOT EXISTS expenses (
-  user_id      INT NOT NULL,
+  entity_id      INT NOT NULL,
   id           INT NOT NULL,
   category_id  INT NOT NULL,
   description  TEXT,
@@ -270,14 +223,14 @@ CREATE TABLE IF NOT EXISTS expenses (
   date_spent   TIMESTAMP WITH TIME ZONE, 
   created_at   TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   deleted_at   TIMESTAMP WITH TIME ZONE,
-  PRIMARY KEY  (user_id, id),
-  FOREIGN KEY  (user_id) REFERENCES users(id),
+  PRIMARY KEY  (entity_id, id),
+  FOREIGN KEY    (entity_id) REFERENCES entities(id),
   FOREIGN KEY  (category_id) REFERENCES categories(id)
 );
 
 CREATE INDEX idx_expenses_by_user_and_category ON expenses(user_id, category_id);
 CREATE INDEX idx_expenses_by_date_spent ON expenses(date_spent);
-SELECT create_distributed_table('expenses', 'user_id');
+SELECT create_distributed_table('expenses', ' id');
 
 --TRiggers
 

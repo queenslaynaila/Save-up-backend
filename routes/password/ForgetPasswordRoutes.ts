@@ -17,7 +17,7 @@ declare module 'express-serve-static-core' {
 }
 
 const SQL_GET_USER = sql<{ phone_number: string }, Pick<UserSchema, 'id'>>(
-  `SELECT id FROM users_phone WHERE phone_number = :phone_number`
+  `SELECT id FROM user_contactsWHERE phone_number = :phone_number`
 );
 
 const SQL_SAVE_TOKEN = sql<{ user_id:number; token: string }, { token: string }>(`
