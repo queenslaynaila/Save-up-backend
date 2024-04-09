@@ -41,7 +41,6 @@ export default (router: Router) => {
         role: user.role,
         created_at: user.created_at,
       };
-
       const accessToken = generateToken(user.id, user.role, '1d');
       const refreshToken = generateToken(user.id, user.role, '7d');
       res
