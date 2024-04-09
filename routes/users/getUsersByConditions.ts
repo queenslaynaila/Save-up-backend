@@ -1,41 +1,41 @@
-import { HttpError } from '../../middleware/errorMiddleware';
-import  authMiddleware  from '../../middleware/auth';
-import { convertToTitleCase, isValidValue } from '../../middleware/caseNormalization';
-import { hasPermission } from '../../middleware/hasPermission';
-import { sql } from '../../db';
 import { Router, Response } from 'express';
-import { UserSchema } from './index';
-import {ID_SCHEMA}  from '../../types/index';
+import { sql } from '../../db';
+import { HttpError } from '../../middleware/errorMiddleware';
+import { hasPermission } from '../../middleware/hasPermission';
+import { convertToTitleCase, isValidValue } from '../../middleware/caseNormalization';
+import authMiddleware from '../../middleware/auth';
+import { GetUserInterface,ID_SCHEMA } from '../../types/index';
 
-const SQL_GET_ALL_USERS = sql<Record<string, never>, UserSchema>(`
-  SELECT id, first_name, last_name, role, created_at FROM users
+const SQL_GET_ALL_USERS = sql<Record<string, never>,  GetUserInterface>(`
+  SELECT id, full_name, role, gender, created_at FROM users
 `);
+
 const ACCEPTED_ROLES = ['User', 'Admin', 'Moderator'];
 
 export default (router: Router) => {
-  router.get<string, { userId: string }, UserSchema, Record<string, never>, { role?: string }>(
-    '/:userId', 
+  router.get<string, { targetUser: string }, GetUserInterface, Record<string, never>, { role?: string }>(
+    '/:targetUser', 
     authMiddleware(), 
     async (req, res: Response) => {
-      const { userId } = req.params;
+      const { targetUser } = req.params;
       const { role } = req.query;
       const filters: string[] = [];
       const filterArgs: Record<string, string | number> = {};
-      const isStandardUser = req.user?.role === 'User';
+      const isStandardUser = req.user!.role === 'User';
       const convertedRole = role ? convertToTitleCase(role) : '';
 
-      if (userId === 'me') {
+      if (targetUser === 'me') {
         filterArgs.loggedInUserId = req.user!.id;
         filters.push(`id = :loggedInUserId`);
-      } else if (userId === 'all') {
+      } else if (targetUser === 'all') {
         if (isStandardUser) {
           throw new HttpError(403, 'Forbidden');
         }
-      } else if (ID_SCHEMA.safeParse(parseInt(userId)).success) {
-        if (!hasPermission(req, parseInt(userId))) {
+      } else if (ID_SCHEMA.safeParse(parseInt(targetUser)).success) {
+        if (!hasPermission(req, parseInt(targetUser))) {
           throw new HttpError(403, 'Forbidden');
         }
-        filterArgs.userId = userId;
+        filterArgs.userId = targetUser;
         filters.push(`id = :userId`);
       } else {
         throw new HttpError(400, 'Bad request');
