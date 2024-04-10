@@ -134,6 +134,49 @@ export const SecurityAnswerSchema = createSecurityAnswerSchema.extend({
 
 export type SecurityAnswerInterface = z.infer<typeof SecurityAnswerSchema>;
 
+// GROUPS SCHEMA
+
+export const CreateGroupSchema = z.object({
+  id: z.number(),
+  group_name: z.string(),
+  description: z.string(), 
+  created_by:z.number(),
+});
+export type CreateGroupInterface = z.infer<typeof CreateGroupSchema>;
+
+export const CreateGroupResponse = CreateGroupSchema.extend({
+  created_at:z.date(),
+  updated_at:z.date()
+}) 
+export type CreateGroupResponseInterface = z.infer<typeof CreateGroupResponse>;
+
+export const ExitGroupSchema = z.object({
+  user_id: z.number(),
+  group_id: z.number()
+})
+export type ExitGroupInterface = z.infer<typeof ExitGroupSchema>;
+
+export const UpdateGroupSchema = ExitGroupSchema.pick({
+  group_id: true,
+}).extend({
+  group_name: z.string().optional(),
+  description: z.string().optional()
+})
+export type UpdateGroupInterface = z.infer<typeof UpdateGroupSchema>;
+
+export const UpdateGroupResponseSchema = CreateGroupSchema.pick({
+  group_name: true,
+  description: true
+})
+export type UpdateGroupResponseInterface = z.infer<typeof UpdateGroupResponseSchema>;
+
+export const GetGroupMembers = z.object({
+  user_id: z.number(),
+  full_name: z.string(),
+  joined_at: z.date()
+})
+export type GetGroupMembersInterface = z.infer<typeof GetGroupMembers>;
+
 // SAVING SCHEMAS
 
 export const ID_SCHEMA = z.number();
@@ -208,83 +251,6 @@ export const updateExpenseSchema = z.object({
 
 
 
-// GROUPS SCHEMA
-// ---------------------------------------------------------------------------------------------------------
-
-export const CreateGroupSchema = z.object({
-  name: z.string(),
-  description: z.string(), 
-  created_by:z.number(),
-});
-export type CreateGroupInterface = z.infer<typeof CreateGroupSchema>;
-
-export const CreateGroupResponse = z.object({
-  id:z.number(),
-  name: z.string(),
-  description: z.string(), 
-  created_by:z.string(),
-  created_at:z.string(),
-  updated_at:z.string()
-});
-
-export type CreateGroupResponseInterface = z.infer<typeof CreateGroupResponse>;
-
-
-export const CreateGroupGoalSchema = z.object({
-  group_id: z.string(),
-  category_id:z.number(),
-  description: z.string(), 
-  target_amount:z.number(),
-  priority: z.string(),
-  target_at:z.date(),
-});
-
-export type CreateGroupGoalInterface = z.infer<typeof CreateGroupGoalSchema>;
-
-export const CreateGroupGoalResponse = z.object({
-  id:z.number(),
-  name: z.string(),
-  description: z.string(), 
-  created_by:z.string(),
-  created_at:z.string(),
-  updated_at:z.string()
-});
-
-export type CreateGroupGoalResponseInterface = z.infer<typeof CreateGroupGoalResponse>;
-
-export const  GetGroupGoalsSchema = CreateGroupGoalSchema.pick({
-  group_id: true,
-});
-
-export const GetGroupGoalsResponse = z.object({
-  id: z.number(),
-  owner_id: z.number(),
-  category_id: z.number(),
-  description: z.string(),
-  target_amount: z.number(),
-  priority: z.string(),
-  target_at: z.string(),
-});
-
-export type GetGroupGoalsResponseInterface = z.infer<typeof GetGroupGoalsResponse>;
-
-export type GetGroupGoalsInterface = z.infer<typeof GetGroupGoalsSchema>;
-
-export const ExitGroupSchema = z.object({
-  group_id: z.number(),
-  user_id: z.number(),
-});
-
-export type ExitGroupInterface = z.infer<typeof ExitGroupSchema>;
-
-
-export const UpdateGroupSchema = z.object({
-  group_id: z.number(),
-  name: z.string().optional(),
-  description: z.string().optional(),
-});
-
-export type UpdateGroupInterface = z.infer<typeof UpdateGroupSchema>;
 
 // INVITE SCHEMA
 // ---------------------------------------------------------------------------------------------------------
