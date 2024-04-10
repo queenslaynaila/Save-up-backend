@@ -136,6 +136,21 @@ CREATE TABLE IF NOT EXISTS groups (
 
 SELECT create_distributed_table('groups', 'id');
 
+CREATE TABLE IF NOT EXISTS invitations (   
+  group_id      INT NOT NULL,      
+  sender_id     INT NOT NULL,
+  receiver_id   INT NOT NULL,
+  status        enum_invites NOT NULL DEFAULT 'Pending',
+  created_at    TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  PRIMARY KEY   (group_id,receiver_id),
+  FOREIGN KEY   (group_id,sender_id) REFERENCES group_administrators(group_id,user_id),
+  FOREIGN KEY   (receiver_id) REFERENCES entities(id)
+);
+
+CREATE INDEX idx_invitations_by_group_id ON invitations(group_id);
+SELECT create_distributed_table('invitations', 'group_id');
+
+
 CREATE TABLE IF NOT EXISTS user_groups (
   group_id      INT NOT NULL,
   user_id       INT NOT NULL ,
@@ -162,21 +177,27 @@ SELECT create_distributed_table('group_administrators', 'group_id');
 CREATE INDEX idx_group_admins_by_group_id ON group_administrators(group_id);
 CREATE INDEX idx_group_admins_by_user_id ON group_administrators(user_id);
 
-CREATE TABLE IF NOT EXISTS invitations (   
-  group_id      INT NOT NULL,      
-  sender_id     INT NOT NULL,
-  receiver_id   INT NOT NULL,
-  status        enum_invites NOT NULL DEFAULT 'Pending',
-  created_at    TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-  PRIMARY KEY   (group_id,receiver_id),
-  FOREIGN KEY   (group_id,sender_id) REFERENCES group_administrators(group_id,user_id),
-  FOREIGN KEY   (receiver_id) REFERENCES entities(id)
+CREATE TABLE IF NOT EXISTS nominated_administrators (
+  group_id         INT NOT NULL,
+  user_id          INT NOT NULL,
+  created_at       TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  PRIMARY KEY      (group_id, user_id),
+  FOREIGN KEY      (group_id, user_id) REFERENCES user_groups(group_id, user_id)
 );
 
-CREATE INDEX idx_invitations_by_group_id ON invitations(group_id);
-SELECT create_distributed_table('invitations', 'group_id');
+SELECT create_distributed_table('nominated_administrators', 'group_id');
 
---- Group Admin Approval
+CREATE TABLE IF NOT EXISTS administrator_votes (
+  group_id          INT NOT NULL,
+  voter_user_id     INT NOT NULL,
+  candidate_user_id INT NOT NULL,
+  vote              BOOLEAN NOT NULL, -- True for approval, False for disapproval
+  PRIMARY KEY       (group_id, voter_user_id, candidate_user_id),
+  FOREIGN KEY       (group_id, voter_user_id) REFERENCES user_groups(group_id, user_id),
+  FOREIGN KEY       (group_id, candidate_user_id) REFERENCES nominated_administrators(group_id, user_id)
+);
+
+SELECT create_distributed_table('administrator_votes', 'group_id');
 
 ---Financial management 
 
@@ -197,6 +218,7 @@ CREATE TABLE IF NOT EXISTS goals (
   FOREIGN KEY    (entity_id) REFERENCES entities(id),
   FOREIGN KEY    (category_id) REFERENCES categories(id)
 );
+
 SELECT create_distributed_table('goals', 'id');
 
 CREATE TABLE IF NOT EXISTS savings (
@@ -213,9 +235,8 @@ CREATE TABLE IF NOT EXISTS savings (
 SELECT create_distributed_table('savings', 'goal_id');
 CREATE INDEX idx_savings_by_user_and_goal ON savings(user_id, goal_id);
 
-
 CREATE TABLE IF NOT EXISTS expenses (
-  entity_id      INT NOT NULL,
+  entity_id    INT NOT NULL,
   id           INT NOT NULL,
   category_id  INT NOT NULL,
   description  TEXT,
@@ -232,7 +253,7 @@ CREATE INDEX idx_expenses_by_user_and_category ON expenses(user_id, category_id)
 CREATE INDEX idx_expenses_by_date_spent ON expenses(date_spent);
 SELECT create_distributed_table('expenses', 'id');
 
---TRiggers
+--Triggers
 
 CREATE OR REPLACE FUNCTION update_goals_status()
 RETURNS TRIGGER AS $$
@@ -317,8 +338,6 @@ BEFORE INSERT ON invitations
 FOR EACH ROW
 EXECUTE FUNCTION check_existing_invitation();
 
-
-------------------------------------------------------------------------------------------------
 --Trigger to add user to a group if on reponse to an invite status is accepeted
 
 CREATE OR REPLACE FUNCTION update_user_groups_after_invite()
