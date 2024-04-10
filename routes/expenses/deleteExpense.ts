@@ -12,8 +12,8 @@ const SQL_DELETE_EXPENSE = sql<{ id: number; user_id: number }, Record<string, n
 `);
 
 export default (router: Router) => {
-  router.delete<{ id: string },{ message: string }, Record<string, never>, Record<string, never>>(
-    '/:id', 
+  router.patch<{ id: string },{ message: string }, Record<string, never>, Record<string, never>>(
+    'records/:id', 
     authMiddleware(), 
     validateRequest(ID_SCHEMA),
     async (req, res) => {

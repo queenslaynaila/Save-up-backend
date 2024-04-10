@@ -10,8 +10,8 @@ const SQL_DELETE_KIN = sql<{ user_id: number, id: number },Record<string, never>
 `);
 
 export default (router: Router) => {   
-  router.delete<{ id: string },{message:string}, Record<string, never>, Record<string, never>>(
-    '/:id', 
+  router.patch<{ id: string },{message:string}, Record<string, never>, Record<string, never>>(
+    'record/:id', 
     authMiddleware(), 
     async (req, res) => {
       const user_id = req.user!.id;

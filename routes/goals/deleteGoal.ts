@@ -12,8 +12,8 @@ const SQL_DELETE_GOAL = sql<{ id: number; entity_id:number }, Record<string, nev
 `);
 
 export default (router: Router) => {
-  router.delete<{ id: string },{message:string}, Record<string, never>, Record<string, never>>(
-    '/:id', 
+  router.patch<{ id: string },{message:string}, Record<string, never>, Record<string, never>>(
+    'record/:id', 
     authMiddleware(), 
     validateRequest(ID_SCHEMA),
     async (req, res) => {
