@@ -205,30 +205,38 @@ export type InviteResponseInterface = z.infer<typeof InviteResponseSchema>;
 // SAVING SCHEMAS
 
 export const ID_SCHEMA = z.number();
+
 export const enum priority {
   HIGH = 'High',
   INTERMEDIATE = 'Intermediate',
   LOW = 'Low',
 }
-export const baseSavingSchema = z.object({
-  description: z.string(),
+
+export const BaseGoalSchema = z.object({
+  entity_id: z.number(),
   category_id: z.number(),
+  description: z.string(),  
   amount: z.number(),
   priority: z.enum([priority.HIGH, priority.INTERMEDIATE, priority.LOW]),
   target_at: z.string(),
 });
 
-export const savingSchema = baseSavingSchema.extend({
-  user_id: z.number(),
-});
 
-export const updateSavingSchema = baseSavingSchema.partial();
+export type CreateGoalInterface = z.infer<typeof BaseGoalSchema>;
 
-export const getSavingsQueryParamsSchema = z.object({
-  user_id: z.number(),
-  priority: z.string().optional(),
-  status: z.string().optional(),
-});
+export const GoalSchema =  BaseGoalSchema.extend({
+  id: z.number(),
+  created_at: z.date(),
+  target_at: z.date(),
+  updated_at: z.date(),
+  completed_at: z.date(),
+})
+
+export type GoalInterface = z.infer<typeof GoalSchema>;
+
+export const UpdateGoalSchema = BaseGoalSchema.omit({ entity_id: true }).partial().extend({id: z.number()});
+
+export type UpdateGoalInterface = z.infer<typeof UpdateGoalSchema>;
 
 // Schema for Contribution
 // ---------------------------------------------------------------------------------------------------------

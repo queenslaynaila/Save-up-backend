@@ -4,11 +4,11 @@ import { ID_SCHEMA} from '../../types';
 import { sql } from '../../db';
 import  { validateRequest } from '../../middleware/validationMiddleware';
 
-const SQL_DELETE_SAVING = sql<{ id: number; user_id:number }, Record<string, never>>(`
+const SQL_DELETE_GOAL = sql<{ id: number; entity_id:number }, Record<string, never>>(`
   UPDATE goals
   SET deleted_at = NOW()
   WHERE id = :id
-  AND user_id = :user_id
+  AND entity_id = :entity_id
 `);
 
 export default (router: Router) => {
@@ -19,8 +19,7 @@ export default (router: Router) => {
     async (req, res) => {
       const id = parseInt(req.params.id);
       const userId = req.user!.id;
-
-      await SQL_DELETE_SAVING({ id, user_id: userId }).exec();
+      await SQL_DELETE_GOAL({ id, entity_id: userId }).exec();
       return res.json({ message: 'Goal deleted successfully' });
     });
 };
