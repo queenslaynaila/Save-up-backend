@@ -54,7 +54,7 @@ SELECT create_reference_table('categories');
 --Entity
 CREATE TABLE IF NOT EXISTS entities (
   id              SERIAL PRIMARY KEY,
-  entity_type     enum_entities NOT NULL
+  entity_type     enum_entities NOT NULL 
 );
 
 SELECT create_reference_table('entities');

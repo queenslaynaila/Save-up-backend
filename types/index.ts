@@ -65,6 +65,7 @@ export const CreateUserSchema = BaseUserSchema.pick({
 
 export type CreateUserInterface = z.infer<typeof CreateUserSchema>;
 
+
 export const GetUserSchema = CreateUserSchema.pick({
   id: true,
   full_name: true,
@@ -76,9 +77,15 @@ export const GetUserSchema = CreateUserSchema.pick({
 
 export type GetUserInterface = z.infer<typeof GetUserSchema>;
 
-export const CreateAdminSchema = BaseUserSchema.extend({
+export const CreateAdminSchema = BaseUserSchema.omit({
+  phone_number: true,
+  national_id: true
+}).extend({
+  id: z.number(),
   role: z.enum(['Admin'])
 });
+
+export type CreateAdminInterface = z.infer<typeof CreateAdminSchema>;
 
 export const UserSchema = BaseUserSchema.extend({
   role: z.enum([UserRole.ADMIN, UserRole.USER, UserRole.MODERATOR])
