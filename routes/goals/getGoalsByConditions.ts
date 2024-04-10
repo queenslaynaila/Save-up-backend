@@ -1,24 +1,19 @@
 import { Response, Router } from 'express';
 import { sql } from '../../db';
-import { savingInterface } from './index';
 import authMiddleware from '../../middleware/auth';
 import { convertToTitleCase, isValidValue } from '../../middleware/caseNormalization';
 import { HttpError } from '../../middleware/errorMiddleware';
-import {ID_SCHEMA}  from '../../types/index';
+import { ID_SCHEMA ,GoalInterface }  from '../../types/index';
 
 const ACCEPTED_STATUS_VALUES = ['In Progress', 'Dormant', 'Completed'];
 const ACCEPTED_PRIORITY_VALUES = ['High', 'Intermediate', 'Low'];
 
-const SQL_GET_SAVINGS = sql<Record<string, never>, savingInterface>(
+const SQL_GET_SAVINGS = sql<Record<string, never>,GoalInterface>(
   `SELECT *FROM goals WHERE deleted_at IS NULL`
 );
 
 export default (router: Router) => {
-  router.get<string,
-  { savingsIdentifier: string },
-  savingInterface,
-  Record<string, never>,
-  { category_id?: string; priority?: string; status?: string; start_at?: string; completed_at?: string }
+  router.get<string,{ goalsIdentifier: string },savingInterface,Record<string, never>,{ category_id?: string; priority?: string; status?: string; start_at?: string; completed_at?: string }
   >('/:goalsIdentifier', 
     authMiddleware(), 
     async (req, res: Response) => {

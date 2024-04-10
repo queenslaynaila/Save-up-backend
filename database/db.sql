@@ -178,8 +178,6 @@ SELECT create_distributed_table('invitations', 'group_id');
 
 --- Group Admin Approval
 
-
-
 ---Financial management 
 
 CREATE TABLE IF NOT EXISTS goals (
@@ -191,7 +189,6 @@ CREATE TABLE IF NOT EXISTS goals (
   priority       enum_priorities NOT NULL,
   status         enum_statuses NOT NULL DEFAULT 'In Progress',
   target_at      TIMESTAMP WITH TIME ZONE NOT NULL,
-  start_at       TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   created_at     TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   updated_at     TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   completed_at   TIMESTAMP WITH TIME ZONE, 
@@ -233,7 +230,7 @@ CREATE TABLE IF NOT EXISTS expenses (
 
 CREATE INDEX idx_expenses_by_user_and_category ON expenses(user_id, category_id);
 CREATE INDEX idx_expenses_by_date_spent ON expenses(date_spent);
-SELECT create_distributed_table('expenses', ' id');
+SELECT create_distributed_table('expenses', 'id');
 
 --TRiggers
 
