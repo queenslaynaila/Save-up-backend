@@ -83,7 +83,8 @@ CREATE INDEX idx_users_by_created_at ON users(created_at);
 SELECT create_distributed_table('users', 'id');
 
 CREATE TABLE IF NOT EXISTS next_of_kins (
-  user_id         INT PRIMARY KEY,
+  user_id         INT NOT NULL,
+  id              SERIAL INT NOT NULL,
   full_name       TEXT NOT NULL,
   relationship    enum_relationships NOT NULL,
   email           TEXT NOT NULL,
@@ -91,6 +92,7 @@ CREATE TABLE IF NOT EXISTS next_of_kins (
   created_at      TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   updated_at      TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   deleted_at      TIMESTAMP WITH TIME ZONE,
+  PRIMARY KEY     (user_id,id),
   FOREIGN KEY     (user_id) REFERENCES users(id) 
 );
 
