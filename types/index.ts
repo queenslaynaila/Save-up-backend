@@ -177,6 +177,28 @@ export const GetGroupMembers = z.object({
 })
 export type GetGroupMembersInterface = z.infer<typeof GetGroupMembers>;
 
+//INVITE SCHEMA
+
+export const SendInviteSchema = z.object({
+  receiver_id:z.number(),
+  sender_id:z.number(),
+  group_id:z.number(),
+});
+
+export type SendInviteInterface = z.infer<typeof SendInviteSchema>;
+
+export const InviteSchema = z.object({
+  group_id:z.number(),
+  sender_id:z.number(),
+  receiver_id:z.number(),
+});
+
+export const InviteResponseSchema = InviteSchema.extend({
+  status:z.string()
+}).omit({sender_id: true});
+
+export type InviteResponseInterface = z.infer<typeof InviteResponseSchema>;
+
 // SAVING SCHEMAS
 
 export const ID_SCHEMA = z.number();
@@ -252,28 +274,8 @@ export const updateExpenseSchema = z.object({
 
 
 
-// INVITE SCHEMA
-// ---------------------------------------------------------------------------------------------------------
 
-export const SendInviteSchema = z.object({
-  receiver_id:z.number(),
-  sender_id:z.number(),
-  group_id:z.number(),
-});
 
-export type SendInviteInterface = z.infer<typeof SendInviteSchema>;
-
-export const InviteSchema = z.object({
-  group_id:z.number(),
-  sender_id:z.number(),
-  receiver_id:z.number(),
-});
-
-export const InviteResponseSchema = InviteSchema.extend({
-  status:z.string()
-}).omit({sender_id: true});
-
-export type InviteResponseInterface = z.infer<typeof InviteResponseSchema>;
 
 export const ElectionSchema = z.object({
   group_id:z.number(),
