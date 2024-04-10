@@ -251,8 +251,8 @@ export const UpdateGoalSchema = BaseGoalSchema.omit({ entity_id: true }).partial
 
 export type UpdateGoalInterface = z.infer<typeof UpdateGoalSchema>;
 
-// Schema for Contribution
-// ---------------------------------------------------------------------------------------------------------
+// SAVING SCHEMAS
+
 export const contributionSchema = z.object({
   user_id: z.number(),
   saving_id: z.number(),
@@ -268,82 +268,25 @@ export type ContributionSchema = {
   created_at: Date
 }
 
-// Schema for Expense
-// ---------------------------------------------------------------------------------------------------------
-export const expenseSchema = z.object({
-  user_id: z.number(),
+// EXPENSES SCHEMAS
+
+export const BaseExpenseSchema = z.object({
+  entity_id: z.number(),
   category_id: z.number(),
   description: z.string(),
-  amount: z.number(),
-  expense_date: z.string(),
+  amount_spent: z.number(),
+  date_spent: z.date(),
 });
 
-export type expenseInterface = z.infer<typeof expenseSchema>;
+export type CreateExpenseInterface = z.infer<typeof BaseExpenseSchema>;
 
-export interface ExtendedExpenseInterface extends expenseInterface {
-  created_at: string;
-  deleted_at: string;
-}
-export const updateExpenseSchema = z.object({
-  category_id: z.number().optional(),
-  description: z.string().optional(),
-  amount: z.number().optional(),
-  expense_date: z.string().optional(),
-});
+export const ExpenseSchema = BaseExpenseSchema.extend({
+  id: z.number(),
+  created_at: z.date()
+})
 
+export type ExpenseInterface = z.infer<typeof ExpenseSchema>;
 
+export const UpdateExpenseSchema = BaseExpenseSchema.partial().extend({id: z.number()});
 
-
-
-
-
-
-
-
-
-export const ElectionSchema = z.object({
-  group_id:z.number(),
-  caller_id:z.number(),
-  election_name:z.string(),
-  start_at:z.date(),
-  end_at:z.date()
-});
-
-export type ElectionInterface = z.infer<typeof ElectionSchema>;
-
-export interface ElectionResponse {
-  id: number;
-  group_id: number;
-  election_name: string;
-  caller_id: number;
-  start_at: Date;
-  end_at: Date;
-  created_at: Date;
-}
-
-
-export const ElectionVoteSchema = z.object({
-  election_id: z.number(), 
-  candidate_id: z.number(), 
-  voter_id: z.number(),
-  group_id: z.number(), 
-});
-
-export type ElectionVoteInterface = z.infer<typeof ElectionVoteSchema>;
-
-export interface ElectionCandidateSchema {
-  election_id: number;
-  candidate_id: number;
-}
-
-export const  ElectionCandidateSchema = z.object({
-  election_id: z.number(),
-  candidate_id: z.number()
-});
-
-export interface ElectionCandidateResponse {
-  election_id: number;
-  candidate_id: number;
-  votes: number;
-  created_at: Date;
-}
+export type UpdateExpenseInterface = z.infer<typeof UpdateExpenseSchema>;

@@ -1,17 +1,19 @@
 import { Router, Response } from 'express';
-import { ExtendedExpenseInterface } from '../../types';
+import { ExpenseInterface } from '../../types';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/auth';
 import { HttpError } from '../../middleware/errorMiddleware';
 import {ID_SCHEMA}  from '../../types/index';
 
 
-const SQL_GET_EXPENSES = sql<Record<string, string>, ExtendedExpenseInterface>(
-  `SELECT * FROM expenses WHERE deleted_at IS NULL`
+const SQL_GET_EXPENSES = sql<Record<string, string>, ExpenseInterface>(`
+  SELECT entity_id,id,category_id,description,amount_spent,date_spent
+  FROM expenses 
+  WHERE deleted_at IS NULL`
 );
 
 export default (router: Router) => {
-  router.get<string,{ expenseIdentifier: string },ExtendedExpenseInterface,Record<string, never>,{ category_id?: string; start_date?: string; end_date?: string }>(
+  router.get<string,{ expenseIdentifier: string },ExpenseInterface,Record<string, never>,{ category_id?: string; start_date?: string; end_date?: string }>(
     '/:expenseIdentifier', 
     authMiddleware(), 
     async (req, res: Response) => {
@@ -24,7 +26,7 @@ export default (router: Router) => {
 
       if (expenseIdentifier === 'me') {
         filterArgs.loggedInUserId = loggedInUserId.toString()
-        filters.push(`user_id = :loggedInUserId`);
+        filters.push(`entity_id = :loggedInUserId`);
       } else if (expenseIdentifier === 'all') {
         if (isStandardUser) {
           throw new HttpError(403, 'Forbidden');
@@ -34,7 +36,7 @@ export default (router: Router) => {
           throw new HttpError(403, 'Forbidden');
         }
         filterArgs.user_id = expenseIdentifier;
-        filters.push(`user_id = :expenseIdentifier`);
+        filters.push(`entity_id = :expenseIdentifier`);
       } else {
         throw new HttpError(400, 'Bad request');
       }

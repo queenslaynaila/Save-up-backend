@@ -3,21 +3,24 @@ import { sql } from '../../db';
 import authMiddleware from '../../middleware/auth';
 import { convertToTitleCase, isValidValue } from '../../middleware/caseNormalization';
 import { HttpError } from '../../middleware/errorMiddleware';
-import { ID_SCHEMA ,GoalInterface }  from '../../types/index';
+import { GoalInterface }  from '../../types/index';
 
 const ACCEPTED_STATUS_VALUES = ['In Progress', 'Dormant', 'Completed'];
 const ACCEPTED_PRIORITY_VALUES = ['High', 'Intermediate', 'Low'];
 
-const SQL_GET_SAVINGS = sql<Record<string, never>,GoalInterface>(
-  `SELECT *FROM goals WHERE deleted_at IS NULL`
-);
+const SQL_GET_SAVINGS = sql<Record<string, never>,GoalInterface>(`
+  SELECT id, entity_id, description, category_id, amount, priority, target_at ,created_at,completed_at FROM goals 
+  WHERE deleted_at IS NULL
+`);
 
 export default (router: Router) => {
-  router.get<string,{ goalsIdentifier: string },savingInterface,Record<string, never>,{ category_id?: string; priority?: string; status?: string; start_at?: string; completed_at?: string }
+  router.get<string,{ goalsIdentifier: string },GoalInterface[],
+  Record<string, never>,
+  { category_id?: string; priority?: string; status?: string; start_at?: string; completed_at?: string }
   >('/:goalsIdentifier', 
     authMiddleware(), 
     async (req, res: Response) => {
-      const { savingsIdentifier } = req.params;
+      const { goalsIdentifier } = req.params;
       const { category_id, priority, status,start_at, completed_at  } = req.query;
 
       const filters: string[] = [];
@@ -27,19 +30,13 @@ export default (router: Router) => {
       const convertedPriority = priority ? convertToTitleCase(priority) : undefined;
       const isStandardUser = req.user?.role === 'User';
 
-      if (savingsIdentifier === 'me') {
+      if (goalsIdentifier === 'me') {
         filterArgs.loggedInUserId= loggedInUserId.toString() ;
-        filters.push(`user_id = :loggedInUserId`);
-      } else if (savingsIdentifier === 'all') {
+        filters.push(`entity_id = :loggedInUserId`);
+      } else if (goalsIdentifier === 'all') {
         if (isStandardUser) {
           throw new HttpError(403, 'Forbidden');
         }
-      } else if (ID_SCHEMA.parse(parseInt(savingsIdentifier))) {
-        if (isStandardUser && req.user!.id !== parseInt(savingsIdentifier)) {
-          throw new HttpError(403, 'Forbidden');
-        }
-        filterArgs.savingsIdentifier = savingsIdentifier;
-        filters.push(`user_id = :savingsIdentifier`);
       } else {
         throw new HttpError(400, 'Bad request');
       }
