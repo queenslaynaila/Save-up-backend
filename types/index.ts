@@ -87,6 +87,12 @@ export const CreateAdminSchema = BaseUserSchema.omit({
 
 export type CreateAdminInterface = z.infer<typeof CreateAdminSchema>;
 
+export const UpdatedUserRoleSchema = CreateAdminSchema.omit({
+  pin: true
+})
+
+export type UpdatedUserRoleInterface = z.infer<typeof UpdatedUserRoleSchema>;
+
 export const UserSchema = BaseUserSchema.extend({
   role: z.enum([UserRole.ADMIN, UserRole.USER, UserRole.MODERATOR])
 });
