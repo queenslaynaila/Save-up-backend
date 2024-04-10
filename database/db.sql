@@ -123,12 +123,12 @@ SELECT create_distributed_table('reset_tokens', 'user_id');
 
 --- Groups & Group Management
 CREATE TABLE IF NOT EXISTS groups (
-  id            INT PRIMARY KEY,
+  id            SERIAL PRIMARY KEY,
   group_name    TEXT NOT NULL,
   description   TEXT,
   created_by    INT NOT NULL,
-  updated_at    TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   created_at    TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  updated_at    TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   deleted_at    TIMESTAMP WITH TIME ZONE
 );
 
@@ -138,6 +138,7 @@ CREATE TABLE IF NOT EXISTS user_groups (
   group_id      INT NOT NULL,
   user_id       INT NOT NULL ,
   joined_at     TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  left_at       TIMESTAMP WITH TIME ZONE,
   PRIMARY KEY   (group_id,user_id)
   FOREIGN KEY   (user_id) REFERENCES entities(id),
   FOREIGN KEY   (group_id) REFERENCES groups(id)
