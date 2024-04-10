@@ -107,13 +107,16 @@ export type CreateNextOfKinInterface = z.infer<typeof CreateNextOfKinSchema>;
 export const NextOfKinSchema= CreateNextOfKinSchema
   .omit({ user_id: true })
   .extend({
+    id: z.number(),
     created_at: z.string(),
     updated_at: z.string()
   })
 
 export type NextOfKinInterface = z.infer<typeof NextOfKinSchema>;
 
-export const UpdateNextOfKinSchema = CreateNextOfKinSchema.partial();
+export const UpdateNextOfKinSchema = CreateNextOfKinSchema.partial().extend({
+  id: z.number()
+});
 
 export type UpdateNextOfKinInterface = z.infer<typeof UpdateNextOfKinSchema>;
 

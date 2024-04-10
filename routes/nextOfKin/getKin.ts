@@ -4,11 +4,13 @@ import authMiddleware from '../../middleware/auth';
 import { NextOfKinInterface } from '../../types';
 
 const SQL_GET_KIN = sql<{user_id: number }, NextOfKinInterface>(`
-    SELECT full_name,relationship,email,phone_number,created_at,updated_at FROM next_of_kins WHERE user_id = user_:id
+    SELECT id,full_name,relationship,email,phone_number,created_at,updated_at FROM next_of_kins 
+    WHERE user_id = user_:id
+    AND deleted_at is null
 `);
 
 export default (router: Router) => {
-  router.post<Record<string, never>,NextOfKinInterface,{ user_id: number },Record<string, never>,Record<string, never>>(
+  router.get<Record<string, never>,NextOfKinInterface,{ user_id: number },Record<string, never>,Record<string, never>>(
     '/records', 
     authMiddleware(), 
     async (req, res) => { 

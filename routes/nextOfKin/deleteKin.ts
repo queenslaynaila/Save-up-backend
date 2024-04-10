@@ -2,17 +2,21 @@ import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/auth';
 
-const SQL_DELETE_KIN = sql<{ user_id: number },{ message:string }>(`
-    DELETE FROM next_of_kin WHERE user_id = :user_id
+const SQL_DELETE_KIN = sql<{ user_id: number, id: number },Record<string, never>>(`
+    UPDATE next_of_kin  SET deleted_at = NOW()
+    WHERE user_id = :user_id
+    AND id = :id
+    SET deleted_at = NOW()
 `);
 
 export default (router: Router) => {   
   router.delete<{ id: string },{message:string}, Record<string, never>, Record<string, never>>(
-    '/deletekin', 
+    '/:id', 
     authMiddleware(), 
     async (req, res) => {
       const user_id = req.user!.id;
-      await SQL_DELETE_KIN({user_id }).exec();
+      const id = parseInt(req.params.id);
+      await SQL_DELETE_KIN({user_id, id }).exec();
       return res.json({ message: 'Kin deleted successfully' });
     }
   );
