@@ -4,7 +4,7 @@ import authMiddleware from '../../middleware/auth';
 import { CategoryInterface } from '../../types';
 
 const SQL_GET_ALL_CATEGORIES = sql<Record<string, never>, CategoryInterface>(
-  `SELECT id,name,description,created_at FROM categories WHERE deleted_at IS NULL`
+  `SELECT id, name, description, created_at FROM categories WHERE deleted_at IS NULL`
 );
 
 export default (router: Router) => {
