@@ -1,27 +1,28 @@
 import authMiddleware from '../../middleware/auth';
 import { Router } from 'express';
-import { contributionSchema, ContributionSchema } from '../../types';
+import { CreateSavingInterface,SavingInterface,BaseSavingSchema } from '../../types';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { sql } from '../../db';
 import  { validateRequest } from '../../middleware/validationMiddleware';
-type ContributionCreation = Omit<ContributionSchema, 'created_at' | 'updated_at'>
 
-const SQL_CREATE_SAVING = sql<ContributionCreation, ContributionSchema>(`
-    INSERT INTO savings (id,user_id,saving_id, amount, date)
+const SQL_CREATE_SAVING = sql<CreateSavingInterface, SavingInterface>(`
+    INSERT INTO savings (id,user_id,goal_id, amount)
     SELECT COALESCE((SELECT MAX(id) FROM savings WHERE user_id = :user_id), 0) + 1,
-    :user_id,:saving_id,:amount, :date
+    :user_id,:goal_id,:amount
     RETURNING *
 `);
 
 export default (router: Router) => {
-  router.post<Record<string, never>,ContributionSchema,ContributionCreation,Record<string, never>,Record<string, never>>(
+  router.post<Record<string, never>,SavingInterface,CreateSavingInterface,
+  Record<string, never>,Record<string, never>>(
     '/', 
     authMiddleware(), 
-    validateRequest(contributionSchema),
+    validateRequest(BaseSavingSchema),
     async (req, res) => {
       const user_id= req.user!.id
-      const { saving_id, amount, date } = req.body;
-      const contributionResult = await SQL_CREATE_SAVING({ user_id,saving_id, amount, date }).one(new HttpError(404, 'Unable to complete the request'));
+      const { goal_id, amount} = req.body;
+      const contributionResult = await SQL_CREATE_SAVING({ user_id,goal_id, amount })
+        .one(new HttpError(404, 'Unable to complete the request'));
       return res.json(contributionResult);
     });
 };

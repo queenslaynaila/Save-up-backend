@@ -1,45 +1,45 @@
 import { Router, Response } from 'express';
 import { sql } from '../../db';
-import { ContributionSchema, ID_SCHEMA } from '../../types';
+import { SavingInterface, ID_SCHEMA } from '../../types';
 import authMiddleware from '../../middleware/auth';
 import { HttpError } from '../../middleware/errorMiddleware';
 
-const SQL_GET_CONTRIBUTIONS = sql<{ user_id?:number; }, ContributionSchema>(
+const SQL_GET_CONTRIBUTIONS = sql<Record<string, never>, SavingInterface>(
   `SELECT * FROM savings `
 );
 
 export default (router: Router) => {
-  router.get<string,{ contributionId: string },ContributionSchema,Record<string, never>,{ category_id?: string; saving_id?: string }
-  >('/:contributionId', 
+  router.get<string,{ savingId: string },SavingInterface,Record<string, never>,{ category_id?: string; goal_id?: string }
+  >('/:savingId', 
     authMiddleware(), 
     async (req, res: Response) => {
-      const { contributionId } = req.params;
-      const { category_id, saving_id } = req.query;
+      const { savingId } = req.params;
+      const { category_id, goal_id } = req.query;
       const filterArgs: Record<string, string> = {};
       const filters: string[] = [];
       const loggedInUserId = req.user!.id;
       const isStandardUser = req.user?.role === 'User';
 
-      if (contributionId === 'me') {
+      if (savingId === 'me') {
         filterArgs.loggedInUserId = loggedInUserId.toString();
         filters.push(`user_id = :loggedInUserId`);
-      } else if (contributionId === 'all') {
+      } else if (savingId === 'all') {
         if (isStandardUser) {
           throw new HttpError(403, 'Forbidden');
         }
-      } else if(ID_SCHEMA.parse(parseInt(contributionId))) {
-        if (isStandardUser && req.user!.id !== parseInt(contributionId)) {
+      } else if(ID_SCHEMA.parse(parseInt(savingId))) {
+        if (isStandardUser && req.user!.id !== parseInt(savingId)) {
           throw new HttpError(403, 'Forbidden');
         }
-        filterArgs.contributionId = contributionId;
-        filters.push(`user_id = :contributionId`);
+        filterArgs.savingId = savingId;
+        filters.push(`user_id = :savingId`);
       } else {
         throw new HttpError(400, 'Bad request');
       }
 
-      if (saving_id) {
-        filterArgs.saving_id = saving_id.toString();
-        filters.push(`saving_id = :saving_id`);
+      if (goal_id) {
+        filterArgs.goal_id = goal_id.toString();
+        filters.push(`goal_id = :goal_id`);
       }
       if (category_id) {
         filterArgs.category_id = category_id.toString()

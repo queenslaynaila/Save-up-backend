@@ -215,7 +215,7 @@ export const InviteResponseSchema = InviteSchema.extend({
 
 export type InviteResponseInterface = z.infer<typeof InviteResponseSchema>;
 
-// SAVING SCHEMAS
+// GOAL SCHEMAS
 
 export const ID_SCHEMA = z.number();
 
@@ -253,20 +253,20 @@ export type UpdateGoalInterface = z.infer<typeof UpdateGoalSchema>;
 
 // SAVING SCHEMAS
 
-export const contributionSchema = z.object({
+export const BaseSavingSchema = z.object({
   user_id: z.number(),
-  saving_id: z.number(),
+  goal_id: z.number(),
   amount: z.number(),
-  date: z.string(),
 });
 
-export type ContributionSchema = {
-  user_id:number,
-  saving_id:number,
-  amount: number,
-  date: string,
-  created_at: Date
-}
+export type CreateSavingInterface = z.infer<typeof BaseSavingSchema>;
+
+export const SavingSchema = BaseSavingSchema.extend({
+  id: z.number(),
+  created_at: z.date(),
+})
+
+export type SavingInterface = z.infer<typeof SavingSchema>;
 
 // EXPENSES SCHEMAS
 
