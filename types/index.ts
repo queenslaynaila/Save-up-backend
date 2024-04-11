@@ -21,11 +21,14 @@ export const CategorySchema = UpdateCategorySchema.extend({
 export type CategoryInterface = z.infer<typeof CategorySchema>;
 
 // SECURITY QUESTIONS SCHEMA
-export interface SecurityQuestionSchema {
-  id: z.ZodNumber;
-  question: z.ZodString;
-  created_at: Date;
-}
+
+export const SecurityQuestionSchema = z.object({
+  id: z.number(),
+  question: z.string(),
+  created_at: z.date()
+})
+
+export type SecurityQuestionInterface = z.infer<typeof SecurityQuestionSchema>;
 
 // USER  SCHEMA
 export const enum UserRole {
