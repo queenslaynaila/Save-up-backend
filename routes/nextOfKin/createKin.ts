@@ -1,9 +1,9 @@
-import authMiddleware from '../../middleware/auth';
 import { Router } from 'express';
-import { CreateNextOfKinInterface , NextOfKinInterface , CreateNextOfKinSchema  } from '../../types'; 
 import { sql } from '../../db';
+import authMiddleware from '../../middleware/auth';
 import { validateRequest } from '../../middleware/validationMiddleware';
- 
+import { CreateNextOfKinInterface , NextOfKinInterface , CreateNextOfKinSchema  } from '../../types'; 
+
 const SQL_CREATE_KIN = sql<CreateNextOfKinInterface ,  NextOfKinInterface>(`
   INSERT INTO next_of_kins (id,user_id, full_name, relationship, email)
   SELECT COALESCE((SELECT MAX(id) FROM next_of_kins WHERE user_id = :user_id), 0) + 1,

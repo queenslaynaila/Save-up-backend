@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/auth';
 import { HttpError } from '../../middleware/errorMiddleware';
-import {SendInviteInterface } from '../../types';
+import { SendInviteInterface } from '../../types';
 
 const SQL_FIND_USER_BY_PHONE = sql<{ phone_number: string }, { receiver_id: number }>(`
     SELECT user_id FROM user_contacts WHERE phone_number = :phone_number

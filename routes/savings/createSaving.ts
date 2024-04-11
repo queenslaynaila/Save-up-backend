@@ -1,9 +1,9 @@
-import authMiddleware from '../../middleware/auth';
 import { Router } from 'express';
-import { CreateSavingInterface,SavingInterface,BaseSavingSchema } from '../../types';
-import { HttpError } from '../../middleware/errorMiddleware';
 import { sql } from '../../db';
-import  { validateRequest } from '../../middleware/validationMiddleware';
+import authMiddleware from '../../middleware/auth';
+import { HttpError } from '../../middleware/errorMiddleware';
+import { validateRequest } from '../../middleware/validationMiddleware';
+import { CreateSavingInterface, SavingInterface, BaseSavingSchema } from '../../types';
 
 const SQL_CREATE_SAVING = sql<CreateSavingInterface, SavingInterface>(`
     INSERT INTO savings (id,user_id,goal_id, amount)

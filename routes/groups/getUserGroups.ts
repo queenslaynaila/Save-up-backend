@@ -1,7 +1,7 @@
-import { sql } from '../../db';
 import { Router } from 'express';
+import { sql } from '../../db';
 import authMiddleware from '../../middleware/auth';
-import { CreateGroupResponseInterface} from '../../types';
+import { CreateGroupResponseInterface } from '../../types';
 
 const SQL_FETCH_USER_GROUPS = sql<{ user_id: number },  CreateGroupResponseInterface>(`
   SELECT g.id, g.group_name, g.description, g.created_by, g.created_at

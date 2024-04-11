@@ -1,13 +1,11 @@
-import { Router } from 'express';
-import { NextFunction, Request, Response } from 'express';
+import { Router, NextFunction, Request, Response } from 'express';
 import jwt, { Secret } from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
+import sendSms from '../../services/twilio';
+import { resetPasswordLimiter } from '../../services/rateLimit';
+import { sql } from '../../db';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { generateRandomToken } from '../../middleware/generateRandomToken';
-import sendSms from '../../services/twilio';
-import { UserSchema } from '../../types';
-import { sql } from '../../db';
-import {resetPasswordLimiter } from '../../services/rateLimit'
 
 declare module 'express-serve-static-core' {
   interface Request {

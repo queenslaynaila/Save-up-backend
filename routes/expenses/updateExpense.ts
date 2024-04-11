@@ -1,10 +1,9 @@
 import { Router } from 'express';
-import { HttpError } from '../../middleware/errorMiddleware';
-import { UpdateExpenseInterface ,ExpenseInterface  ,UpdateExpenseSchema } from '../../types';
-import authMiddleware from '../../middleware/auth';
 import { sql } from '../../db';
-import  { validateRequest } from '../../middleware/validationMiddleware';
-
+import { HttpError } from '../../middleware/errorMiddleware';
+import authMiddleware from '../../middleware/auth';
+import { validateRequest } from '../../middleware/validationMiddleware';
+import { UpdateExpenseInterface, ExpenseInterface, UpdateExpenseSchema } from '../../types';
 
 const SQL_UPDATE_EXPENSE= sql<UpdateExpenseInterface,ExpenseInterface>(`
   UPDATE expenses

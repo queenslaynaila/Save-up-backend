@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import authMiddleware from '../../middleware/auth';
-import {  CreateGoalInterface ,GoalInterface ,BaseGoalSchema} from '../../types';
 import { sql } from '../../db';
+import authMiddleware from '../../middleware/auth';
 import { validateRequest } from '../../middleware/validationMiddleware';
+import { CreateGoalInterface, GoalInterface, BaseGoalSchema } from '../../types';
 
 const SQL_CREATE_GOAL = sql< CreateGoalInterface, GoalInterface >(`
   INSERT INTO goals (id, entity_id, description, category_id, amount, priority, target_at)

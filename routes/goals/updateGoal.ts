@@ -2,9 +2,8 @@ import { Router } from 'express';
 import authMiddleware from '../../middleware/auth';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { sql } from '../../db';
-import {UpdateGoalInterface ,  GoalInterface ,UpdateGoalSchema} from '../../types';
+import { UpdateGoalInterface, GoalInterface, UpdateGoalSchema } from '../../types';
 import { validateRequest } from '../../middleware/validationMiddleware';
-
 
 const SQL_UPDATE_SAVING = sql<UpdateGoalInterface, GoalInterface>(`
   UPDATE goals

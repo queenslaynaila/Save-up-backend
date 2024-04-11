@@ -1,8 +1,8 @@
-import authMiddleware from "../../middleware/auth";
-import {Router} from "express";
-import {ID_SCHEMA} from "../../types";
-import {sql} from "../../db";
-import  { validateRequest } from '../../middleware/validationMiddleware';
+import { Router } from 'express';
+import { sql } from '../../db';
+import authMiddleware from '../../middleware/auth';
+import { ID_SCHEMA } from '../../types';
+import { validateRequest } from '../../middleware/validationMiddleware';
 
 const SQL_DELETE_CATEGORY = sql<{ id: number;}, Record<string, never>>(`
   UPDATE categories

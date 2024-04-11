@@ -1,8 +1,8 @@
 import { Router } from 'express';
+import { sql } from '../../db';
 import authMiddleware from '../../middleware/auth';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { SavingInterface } from '../../types';
-import { sql } from '../../db';
 
 const  SQL_GET_SAVING_BY_ID = sql<{ id: number}, SavingInterface>(
   `SELECT * FROM savings WHERE id = :id `

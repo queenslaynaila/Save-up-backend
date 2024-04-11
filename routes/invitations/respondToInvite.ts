@@ -1,10 +1,10 @@
-import { sql } from '../../db';
 import { Router } from 'express';
+import { sql } from '../../db';
 import authMiddleware from '../../middleware/auth';
 import { validateRequest } from '../../middleware/validationMiddleware';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { convertToTitleCase } from '../../middleware/caseNormalization';
-import {InviteResponseInterface, InviteResponseSchema} from '../../types';
+import { InviteResponseInterface, InviteResponseSchema } from '../../types';
 
 const SQL_RESPOND_TO_INVITE = sql<InviteResponseInterface, { message:string }>(`
   UPDATE invitations

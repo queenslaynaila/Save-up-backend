@@ -1,9 +1,9 @@
-import authMiddleware from '../../middleware/auth';
 import { Router } from 'express';
-import { HttpError } from '../../middleware/errorMiddleware';
 import { sql } from '../../db';
-import { ID_SCHEMA,GoalInterface} from '../../types';
-import  { validateRequest } from '../../middleware/validationMiddleware';
+import authMiddleware from '../../middleware/auth';
+import { validateRequest } from '../../middleware/validationMiddleware';
+import { HttpError } from '../../middleware/errorMiddleware';
+import { ID_SCHEMA, GoalInterface } from '../../types';
 
 const SQL_GET_SAVING_BY_ID = sql<{ id: number;}, GoalInterface>(`
     SELECT id, entity_id, description, category_id, amount, priority, target_at ,created_at,completed_at FROM goals

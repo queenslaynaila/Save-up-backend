@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/auth';
 import { validateRequest } from '../../middleware/validationMiddleware';
-import { ExitGroupInterface , ExitGroupSchema} from '../../types';
+import { ExitGroupInterface, ExitGroupSchema } from '../../types';
 
 const SQL_EXIT_GROUP = sql< ExitGroupInterface, Record<string, never>>(`
   UPDATE user_groups

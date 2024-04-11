@@ -1,8 +1,8 @@
-import authMiddleware from '../../middleware/auth';
 import { Router } from 'express';
 import { sql } from '../../db';
-import { UpdateNextOfKinInterface , NextOfKinInterface ,UpdateNextOfKinSchema } from '../../types'; 
+import authMiddleware from '../../middleware/auth';
 import { validateRequest } from '../../middleware/validationMiddleware';
+import { UpdateNextOfKinInterface , NextOfKinInterface ,UpdateNextOfKinSchema } from '../../types'; 
 
 const SQL_UPDATE_KIN = sql<UpdateNextOfKinInterface,NextOfKinInterface>(`
   UPDATE next_of_kin

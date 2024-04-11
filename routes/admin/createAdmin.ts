@@ -3,7 +3,8 @@ import bcrypt from 'bcrypt';
 import { sql } from '../../db';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { validateRequest } from '../../middleware/validationMiddleware';
-import { CreateUserContactInterface, CreateAdminInterface, UserInterface,CreateAdminSchema } from '../../types';
+import { CreateUserContactInterface, CreateAdminInterface, UserInterface, CreateAdminSchema } from '../../types';
+
 
 const SQL_CREATE_USER_ENTITY = sql<{entity_type: string }, { id:number }>(`
   INSERT INTO entities (entity_type)

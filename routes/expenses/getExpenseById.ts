@@ -1,9 +1,9 @@
 import { Router } from 'express';
-import authMiddleware from '../../middleware/auth';
-import { HttpError } from '../../middleware/errorMiddleware';
-import { ExpenseInterface, ID_SCHEMA } from '../../types';
 import { sql } from '../../db';
-import  { validateRequest } from '../../middleware/validationMiddleware';
+import { HttpError } from '../../middleware/errorMiddleware';
+import authMiddleware from '../../middleware/auth';
+import { validateRequest } from '../../middleware/validationMiddleware';
+import { ExpenseInterface, ID_SCHEMA } from '../../types';
 
 const SQL_GET_EXPENSE_BY_ID = sql<{ id:number; userId?:number },  ExpenseInterface>(`
   SELECT entity_id,id,category_id,description,amount_spent,date_spent

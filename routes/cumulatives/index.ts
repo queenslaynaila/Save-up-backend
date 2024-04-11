@@ -3,6 +3,7 @@ import getTotalUserTargetSavings from './getTotalUserTargetSavings';
 import getTotalUserContributions from './getTotalUserContributions';
 import getTotalUserExpenses from './getTotalUserExpenses';
 import getTopExpenseCategories from './getTopExpenseCategories';
+
 export default (baseRouter: express.Router) => {
   const router = express.Router();
   getTotalUserTargetSavings(router);

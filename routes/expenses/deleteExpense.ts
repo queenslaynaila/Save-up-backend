@@ -1,8 +1,8 @@
-import authMiddleware from '../../middleware/auth';
 import { Router } from 'express';
-import { ID_SCHEMA} from '../../types';
 import { sql } from '../../db';
-import  { validateRequest } from '../../middleware/validationMiddleware';
+import authMiddleware from '../../middleware/auth';
+import { validateRequest } from '../../middleware/validationMiddleware';
+import { ID_SCHEMA } from '../../types';
 
 const SQL_DELETE_EXPENSE = sql<{ id: number; entity_id: number }, Record<string, never>>(`
   UPDATE expenses

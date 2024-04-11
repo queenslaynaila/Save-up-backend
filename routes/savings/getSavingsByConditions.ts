@@ -1,8 +1,8 @@
 import { Router, Response } from 'express';
 import { sql } from '../../db';
-import { SavingInterface, ID_SCHEMA } from '../../types';
 import authMiddleware from '../../middleware/auth';
 import { HttpError } from '../../middleware/errorMiddleware';
+import { SavingInterface, ID_SCHEMA } from '../../types';
 
 const SQL_GET_CONTRIBUTIONS = sql<Record<string, never>, SavingInterface>(
   `SELECT * FROM savings `
