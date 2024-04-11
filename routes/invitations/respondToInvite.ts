@@ -16,7 +16,7 @@ const VALID_RESOURCES = ['Pending', 'Accepted', 'Rejected'];
 
 export default (router: Router) => {
   router.patch<Record<string, never>,{ message:string },InviteResponseInterface, Record<string,never>, Record<string, never>>(
-    '/update-invite',
+    '/',
     authMiddleware(),
     validateRequest(InviteResponseSchema),
     async (req, res) => {

@@ -21,11 +21,14 @@ export default (router: Router) => {
       const user_id = req.user!.id;
       const { groupId } = req.params; 
       const { phone_number } = req.body;
-      const receiver_id = await SQL_FIND_USER_BY_PHONE({ phone_number })
-        .one(new HttpError(404, 'Sorry, we couldn\'t find a user with this phone number.You can invite them to join the app and connect with you!'));
-      await SQL_SEND_INVITATION({ group_id: groupId, receiver_id: receiver_id.receiver_id, sender_id: user_id })
-        .one(new HttpError(404, 'User already has a pending invitation for this group'));
-      return res.json({ message: 'Invite sent successfully' });
+      const receiver_id = await SQL_FIND_USER_BY_PHONE({ phone_number }).oneOrNull();
+      if (!receiver_id ) {
+        throw new HttpError(404, 'User with this phone number not found. You can invite them to join the app and connect with you');
+      } else {
+        await SQL_SEND_INVITATION({ group_id: groupId, receiver_id: receiver_id.receiver_id, sender_id: user_id })
+          .one(new HttpError(404, 'User already has a pending invitation for this group'));
+        return res.json({ message: 'Invite sent successfully' });
+      }
     }
   );
 };
