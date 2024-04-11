@@ -4,8 +4,8 @@ import { sql } from '../../db';
 import authMiddleware from '../../middleware/auth';
 import  { validateRequest } from '../../middleware/validationMiddleware';
 
-const SQL_DELETE_SECURITY_ANSWER = sql<{ id:number; user_id:number }, Record<string, never>>(`
-  DELETE FROM security_answers WHERE id = :securityAnswerId AND user_id = :userId 
+const SQL_DELETE_SECURITY_ANSWER = sql<{ question_id:number; user_id:number }, Record<string, never>>(`
+  DELETE FROM security_answers WHERE question_id = :question_id AND user_id = :user_id
 `);
 
 export default (router: Router) => {
@@ -14,10 +14,10 @@ export default (router: Router) => {
     authMiddleware(), 
     validateRequest(ID_SCHEMA),
     async (req, res) => {
-      const securityAnswerId = parseInt(req.params.id);
+      const securityQuestionId = parseInt(req.params.id);
       const loggedInUserId = req.user!.id;
       await SQL_DELETE_SECURITY_ANSWER({
-        id: securityAnswerId,
+        question_id: securityQuestionId,
         user_id: loggedInUserId,
       }).exec();
       return res.json({ message: 'Answer deleted successfully' });
