@@ -13,7 +13,7 @@ const SQL_CREATE_GROUP_ENTITY = sql<{entity_type: string }, { id:number }>(`
 const SQL_CREATE_GROUP = sql<CreateGroupInterface, CreateGroupResponseInterface>(`
   INSERT INTO groups (id,group_name,description,created_by)
   VALUES (:id,:group_name,:description,:created_by)
-  RETURNING *
+  RETURNING * 
 `);
 
 export default (router: Router) => {

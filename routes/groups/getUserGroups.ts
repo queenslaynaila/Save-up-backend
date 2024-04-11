@@ -8,6 +8,7 @@ const SQL_FETCH_USER_GROUPS = sql<{ user_id: number },  CreateGroupResponseInter
   FROM groups g
   INNER JOIN user_groups ug ON g.id = ug.group_id
   WHERE ug.user_id = :user_id
+  AND ug.left_at IS NULL
 `);
 
 export default (router: Router) => {
