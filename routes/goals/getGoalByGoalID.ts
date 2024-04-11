@@ -11,12 +11,12 @@ const SQL_GET_SAVING_BY_ID = sql<{ id: number;}, GoalInterface>(`
 `);
 
 export default (router: Router) => {
-  router.get<{ savingId: string }, GoalInterface, Record<string, never>, Record<string, never>>(
-    '/records/:savingId', 
+  router.get<{ goalId: string }, GoalInterface, Record<string, never>, Record<string, never>>(
+    '/records/:goalId', 
     authMiddleware(), 
     validateRequest(ID_SCHEMA),
     async (req, res) => {
-      const savingId = (parseInt(req.params.savingId));
+      const savingId = (parseInt(req.params.goalId));
       const query = SQL_GET_SAVING_BY_ID({ id: savingId });
       const saving = await query.one(new HttpError(404, 'Not found'));
       return res.json(saving);

@@ -23,7 +23,7 @@ export default (router: Router) => {
     async (req, res) => {
       const { phone_number , pin } = req.body;
       const entity_id = await SQL_GET_USER_ENTITY_ID({ phone_number }).one(
-        new HttpError(404, 'Not found')
+        new HttpError(404, 'User Not found')
       );
       const user = await SQL_GET_USER({ id: entity_id.id }).one();
 

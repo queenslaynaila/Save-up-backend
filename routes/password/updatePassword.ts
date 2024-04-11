@@ -10,7 +10,7 @@ const SQL_UPDATE_PASSWORD = sql<{ pin: string; phone_number: string },{ phone_nu
 `);
 
 export default (router: Router) => {
-  router.post<Record<string, never>, { message:string }, { oldPassword: string; newPassword: string }, Record<string, never>>(
+  router.patch<Record<string, never>, { message:string }, { oldPassword: string; newPassword: string }, Record<string, never>>(
     '/update-pin', 
     authMiddleware(), 
     resetPasswordLimiter,

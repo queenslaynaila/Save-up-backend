@@ -3,13 +3,15 @@ import 'express-async-errors';
 import morgan from 'morgan';
 import cors from 'cors';
 import { HttpError } from './middleware/errorMiddleware';
+import swaggerUI from "swagger-ui-express";
+import swaggerJsDoc from "swagger-jsdoc";
 import usersRoutes from './routes/users/index';
 import categoriesRoutes from './routes/categories/index';
 import savingsRoutes from './routes/goals/index';
 import expensesRoutes from './routes/expenses/index';
 import contributionsRoutes from './routes/savings/index';
 import AdminRoutes from './routes/admin/index';
-import passwordRoutes from './routes/password/index';
+//import passwordRoutes from './routes/password/index';
 import securityQuestionsRoutes from './routes/securityQuestions';
 import securityAnswerRoutes from './routes/securityAnswer/index';
 import cumulativesRoutes from './routes/cumulatives/index';
@@ -22,9 +24,28 @@ import { sendSecurityReminderSMS } from './cronjob';
 //Cron job
 cron.schedule('0 3 1 */6 *', sendSecurityReminderSMS);
 
+const options = {
+  definition: {
+    openapi: "3.0.0",
+    info: {
+      title: "Saveup API",
+      version: "1.0.0",
+      description: "API DOC FOR SAVEUP",
+    },
+    servers: [
+      {
+        url: "http://localhost:3001",
+      },
+    ],
+  },
+  apis: ["./routes/**/*.ts"],
+};
+
+const specs = swaggerJsDoc(options);
+
 // Middleware
 const app = express();
-
+app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(specs));
 app.use(express.urlencoded({ extended: false, limit: '10mb' }));
 app.use(express.json());
 app.use(morgan('dev'));
@@ -43,7 +64,7 @@ usersRoutes(app);
 savingsRoutes(app);
 expensesRoutes(app);
 contributionsRoutes(app);
-passwordRoutes(app);
+//passwordRoutes(app);
 categoriesRoutes(app);
 AdminRoutes(app);
 securityQuestionsRoutes(app);
