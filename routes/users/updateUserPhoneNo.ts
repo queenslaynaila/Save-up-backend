@@ -10,15 +10,14 @@ const SQL_GET_USER_PIN = sql<{ userId: string },{ pin: string }>(`
   SELECT pin FROM users WHERE id = :userId
 `);
 
-const SQL_UPDATE_PHONE = sql<{ phone_number: string; userId: string }, { phone_number: string }>(`
+const SQL_UPDATE_PHONE = sql<{ phone_number: string; userId: string }, Record<string,never>>(`
    UPDATE users_contacts
    SET phone_number = :phone_number 
    WHERE id = :userId
-   RETURNING phone_number`
-);
+`);
 
 export default (router: Router) => {
-  router.patch<{ id: string },{ phone_number: string }, UpdatePhoneInterface , Record<string, never>>(
+  router.patch<{ id: string },{ message: string }, UpdatePhoneInterface , Record<string, never>>(
     '/update-phone/:id', 
     authMiddleware(), 
     validateRequest(UpdateUserPhoneSchema),
@@ -31,7 +30,7 @@ export default (router: Router) => {
       if (!await bcrypt.compare(pin, userPassword.pin)) {
         throw new HttpError(401, 'Invalid password');
       }
-      const updateResult = await SQL_UPDATE_PHONE({ phone_number, userId }).one();
-      res.json(updateResult);
+      await SQL_UPDATE_PHONE({ phone_number, userId }).exec();
+      res.json({ message: 'Phone number updated. For continued security, please log in again with your new phone number.' });
     });
 };

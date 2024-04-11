@@ -61,10 +61,10 @@ SELECT create_reference_table('entities');
 
 --- User & User Management
 CREATE TABLE IF NOT EXISTS user_contacts (
-  entity_id       INT NOT NULL PRIMARY KEY,
+  id       INT NOT NULL PRIMARY KEY,
   phone_number    TEXT UNIQUE NOT NULL,
   national_id     CHAR(8) NOT NULL UNIQUE,
-  FOREIGN KEY     (entity_id) REFERENCES entities(id),
+  FOREIGN KEY     (id) REFERENCES entities(id),
   CONSTRAINT      phone_number_format_check CHECK (phone_number ~* '^\+?254[0-9]{9}$')
 );
 

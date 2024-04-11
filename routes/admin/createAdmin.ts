@@ -5,7 +5,6 @@ import { HttpError } from '../../middleware/errorMiddleware';
 import { validateRequest } from '../../middleware/validationMiddleware';
 import { CreateUserContactInterface, CreateAdminInterface, UserInterface, CreateAdminSchema } from '../../types';
 
-
 const SQL_CREATE_USER_ENTITY = sql<{entity_type: string }, { id:number }>(`
   INSERT INTO entities (entity_type)
   VALUES (:entity_type)

@@ -46,6 +46,12 @@ export const BaseUserSchema = z.object({
 
 export type UserInterface = z.infer<typeof BaseUserSchema>;
 
+export const UserWithRoleSchema = BaseUserSchema.extend({
+  role: z.enum(['Admin']).optional(),
+})
+
+export type UserWithRoleInterface = z.infer< typeof UserWithRoleSchema>
+
 export const CreateUserContactSchema = BaseUserSchema.pick({
   national_id: true,
   phone_number: true
