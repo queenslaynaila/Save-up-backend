@@ -18,9 +18,9 @@ export default (router: Router) => {
     authMiddleware(),
     validateRequest(UpdateGroupSchema),
     async (req, res) => {
-      const { groupId } = req.params; 
+      const groupId = parseInt(req.params.groupId);
       const { group_name, description } = req.body;
-      const updatedGroup = await SQL_UPDATE_GROUP({ group_id: parseInt(groupId), group_name, description }).one();
+      const updatedGroup = await SQL_UPDATE_GROUP({ group_id: groupId, group_name, description }).one();
       res.json(updatedGroup);
     }
   );

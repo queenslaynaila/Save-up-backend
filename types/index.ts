@@ -169,6 +169,10 @@ export const CreateGroupSchema = z.object({
 });
 export type CreateGroupInterface = z.infer<typeof CreateGroupSchema>;
 
+export const CommonGroupSchema = CreateGroupSchema.omit({ created_by: true })
+
+export type CommonGroupInterface = z.infer<typeof CommonGroupSchema>;
+
 export const CreateGroupResponse = CreateGroupSchema.extend({
   created_at:z.date(),
   updated_at:z.date()

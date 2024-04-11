@@ -153,7 +153,6 @@ CREATE TABLE IF NOT EXISTS invitations (
 CREATE INDEX idx_invitations_by_group_id ON invitations(group_id);
 SELECT create_distributed_table('invitations', 'group_id');
 
-
 CREATE TABLE IF NOT EXISTS user_groups (
   group_id      INT NOT NULL,
   user_id       INT NOT NULL ,
@@ -166,7 +165,6 @@ CREATE TABLE IF NOT EXISTS user_groups (
 
 SELECT create_distributed_table('user_groups', 'group_id');
 CREATE INDEX idx_user_groups_by_group_id ON user_groups(group_id);
-
 
 CREATE TABLE IF NOT EXISTS group_administrators (
   group_id      INT NOT NULL,
