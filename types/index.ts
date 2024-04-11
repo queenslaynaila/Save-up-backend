@@ -8,11 +8,11 @@ export const CreateCategorySchema = z.object({
 
 export type CreateCategoryInterface = z.infer<typeof CreateCategorySchema>;
 
-export const UpdateCategorySchema = CreateCategorySchema.extend({
+export const UpdateCategorySchema = CreateCategorySchema.partial().extend({
   id: z.number(),
 })
 
-export type UpdateCategoryInterface = z.infer<typeof UpdateCategorySchema>;
+export type UpdatedCategoryInterface = z.infer<typeof UpdateCategorySchema>;
 
 export const CategorySchema = UpdateCategorySchema.extend({
   created_at: z.date()

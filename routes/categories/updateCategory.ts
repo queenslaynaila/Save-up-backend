@@ -3,9 +3,9 @@ import { sql } from '../../db';
 import { HttpError } from '../../middleware/errorMiddleware';
 import authMiddleware from '../../middleware/auth';
 import { validateRequest } from '../../middleware/validationMiddleware';
-import { CreateCategoryInterface, CategoryInterface,UpdateCategoryInterface, CreateCategorySchema } from '../../types';
+import { CategoryInterface,UpdatedCategoryInterface, CreateCategorySchema } from '../../types';
 
-const SQL_UPDATE_CATEGORY = sql<UpdateCategoryInterface,CategoryInterface>(`
+const SQL_UPDATE_CATEGORY = sql<UpdatedCategoryInterface,CategoryInterface>(`
   UPDATE categories
   SET name = COALESCE(:name, categories.name), 
       description = COALESCE(:description, categories.description)
@@ -14,7 +14,7 @@ const SQL_UPDATE_CATEGORY = sql<UpdateCategoryInterface,CategoryInterface>(`
 `);
 
 export default (router: Router) => {
-  router.patch<{  id: string }, CategoryInterface,CreateCategoryInterface, Record<string, never>>(
+  router.patch<{  id: string }, CategoryInterface,UpdatedCategoryInterface, Record<string, never>>(
     '/:id', 
     authMiddleware(), 
     validateRequest(CreateCategorySchema),
