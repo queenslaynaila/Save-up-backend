@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/auth';
+import { HttpError } from '../../middleware/errorMiddleware';
 import { validateRequest } from '../../middleware/validationMiddleware';
 import { CreateNextOfKinInterface , NextOfKinInterface , CreateNextOfKinSchema  } from '../../types'; 
 
@@ -25,7 +26,7 @@ export default (router: Router) => {
         relationship,
         email,
         phone_number
-      }).one()
+      }).one(new HttpError(400, 'You already have an existing next of kin. Please update it'));
       return res.json(nextOfKin);
     });
 };
