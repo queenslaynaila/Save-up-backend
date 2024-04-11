@@ -181,21 +181,21 @@ CREATE INDEX idx_group_admins_by_user_id ON group_administrators(user_id);
 CREATE TABLE IF NOT EXISTS nominated_administrators (
   group_id         INT NOT NULL,
   user_id          INT NOT NULL,
-  created_at       TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  nominated_at       TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   PRIMARY KEY      (group_id, user_id),
   FOREIGN KEY      (group_id, user_id) REFERENCES user_groups(group_id, user_id)
 );
 
 SELECT create_distributed_table('nominated_administrators', 'group_id');
 
-CREATE TABLE IF NOT EXISTS administrator_votes (
-  group_id          INT NOT NULL,
-  voter_user_id     INT NOT NULL,
-  candidate_user_id INT NOT NULL,
-  vote              BOOLEAN NOT NULL, -- True for approval, False for disapproval
-  PRIMARY KEY       (group_id, voter_user_id, candidate_user_id),
-  FOREIGN KEY       (group_id, voter_user_id) REFERENCES user_groups(group_id, user_id),
-  FOREIGN KEY       (group_id, candidate_user_id) REFERENCES nominated_administrators(group_id, user_id)
+CREATE TABLE IF NOT EXISTS nomination_approvals (
+  group_id            INT NOT NULL,
+  voter_member_id     INT NOT NULL,
+  nominated_member_id   INT NOT NULL,
+  vote                BOOLEAN NOT NULL, -- True for approval, False for disapproval
+  PRIMARY KEY         (group_id, voter_member_id, nominated_member_id),
+  FOREIGN KEY         (group_id, voter_member_id) REFERENCES user_groups(group_id, user_id),
+  FOREIGN KEY         (group_id, nominated_member_id) REFERENCES nominated_administrators(group_id, user_id)
 );
 
 SELECT create_distributed_table('administrator_votes', 'group_id');

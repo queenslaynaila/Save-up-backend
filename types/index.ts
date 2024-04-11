@@ -204,7 +204,15 @@ export const GetGroupMembers = z.object({
   full_name: z.string(),
   joined_at: z.date()
 })
+
 export type GetGroupMembersInterface = z.infer<typeof GetGroupMembers>;
+
+export const NominatedAdminSchema = ExitGroupSchema.extend({
+  full_name: z.string(),
+  nominated_at: z.date()
+})
+
+export type NominatedAdminInterface = z.infer<typeof NominatedAdminSchema>;
 
 //INVITE SCHEMA
 
