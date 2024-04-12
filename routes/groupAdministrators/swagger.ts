@@ -1,47 +1,26 @@
 /**
  * @swagger
- * components:
- *   schemas:
- *     GroupAdmin:
- *       type: object
- *       required:
- *         - group_id
- *         - user_id
- *         - created_at
- *       properties:
- *         group_id:
- *           type: integer
- *           description: The ID of the group.
- *         user_id:
- *           type: integer
- *           description: The ID of the user who is a group administrator.
- *         created_at:
- *            type: string
- *            description: The date and time when the group administrator was created.
- *       example:
- *         group_id: 1
- *         user_id: 2
- */
-
-/**
- * @swagger
- * tags:
- *   name: Group Admin
- *   description: Group administrators management API endpoints
-*/
-
-/**
- * @swagger
- * /group-admin:
+ * /group-admin/{group_id}:
  *   post:
  *     summary: Make a user a group administrator
  *     tags: [Group Admin]
+ *     parameters:
+ *       - in: path
+ *         name: group_id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The ID of the group to make a user an administrator for.
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/GroupAdmin'
+ *             type: object
+ *             properties:
+ *               user_id:
+ *                 type: integer
+ *                 description: The ID of the user to make an administrator.
  *     responses:
  *       200:
  *         description: User made a group administrator successfully.
@@ -64,7 +43,7 @@
  *       - in: path
  *         name: group_id
  *         schema:
- *           type: integer
+ *           type: string
  *         required: true
  *         description: The ID of the group to nominate an administrator for.
  *     requestBody:
@@ -79,7 +58,7 @@
  *                 description: The ID of the user to nominate as an administrator.
  *     responses:
  *       200:
- *         description: User nominated as a group administrator successfully.
+ *         description: Member nominated as admin.
  *       400:
  *         description: Error occurred during group administrator nomination.
  *         content:
@@ -90,7 +69,37 @@
  *                 message:
  *                   type: string
  *                   description: Error message indicating the reason for failure.
- * 
+ */
+
+
+/**
+ * @swagger
+ * /group-admin/nominate/{group_id}/{nominated_member_id}:
+ *   post:
+ *     summary: Approve the nomination of a member as a group administrator
+ *     tags: [Group Admin]
+ *     parameters:
+ *       - in: path
+ *         name: group_id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The ID of the group.
+ *       - in: path
+ *         name: nominated_member_id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The ID of the member nominated as an administrator.
+ *     responses:
+ *       200:
+ *         description: Nomination recorded successfully.
+ *       500:
+ *         description: Internal server error.
+ */
+
+/**
+ * @swagger
  * /group-admin/{group_id}:
  *   get:
  *     summary: Get nominated administrators for a group
@@ -99,7 +108,7 @@
  *       - in: path
  *         name: group_id
  *         schema:
- *           type: integer
+ *           type: string
  *         required: true
  *         description: The ID of the group to get nominated administrators for.
  *     responses:
@@ -110,5 +119,17 @@
  *             schema:
  *               type: array
  *               items:
- *                 $ref: '#/components/schemas/GroupAdmin'
+ *                 type: object
+ *                 properties:
+ *                   group_id:
+ *                     type: integer
+ *                   user_id:
+ *                     type: integer
+ *                   full_name:
+ *                     type: string
+ *                   nominated_at:
+ *                     type: string
+ *                     format: date-time
+ *       500:
+ *         description: Internal server error.
  */

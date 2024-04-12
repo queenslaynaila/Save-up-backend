@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/auth';
 import { validateRequest } from '../../middleware/validationMiddleware';
-import { UpdateGroupInterface,  UpdateGroupResponseInterface ,UpdateGroupSchema} from '../../types';
+import { UpdateGroupInterface,  UpdateGroupResponseInterface ,BaseGroupSchema } from '../../types';
 
 const SQL_UPDATE_GROUP = sql<UpdateGroupInterface, UpdateGroupResponseInterface>(`
   UPDATE groups
@@ -16,7 +16,7 @@ export default (router: Router) => {
   router.patch<{ groupId: string }, UpdateGroupResponseInterface, UpdateGroupInterface, Record<string, never>, Record<string, never>>(
     '/:groupId',
     authMiddleware(),
-    validateRequest(UpdateGroupSchema),
+    validateRequest(BaseGroupSchema ),
     async (req, res) => {
       const groupId = parseInt(req.params.groupId);
       const { group_name, description } = req.body;

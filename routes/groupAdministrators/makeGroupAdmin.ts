@@ -9,12 +9,12 @@ const SQL_CREATE_GROUP_ADMIN = sql<{ user_id: number; group_id: number }, Record
 `);
 
 export default (router: Router) => {
-  router.post<Record<string, never>, { message: string }, { user_id: number; group_id: number }, Record<string, never>, Record<string, never>>(
+  router.post<{ group_id: string }, { message: string }, { user_id: number; }, Record<string, never>, Record<string, never>>(
     '/:group_id',
     authMiddleware(),
     async (req, res) => {
       const { user_id } = req.body;
-      const { group_id } = req.params;
+      const group_id  = parseInt(req.params.group_id);
       await SQL_CREATE_GROUP_ADMIN({ user_id, group_id }).exec();
       res.json({ message: 'Group admin created successfully' });
     }

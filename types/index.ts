@@ -160,12 +160,16 @@ export type SecurityAnswerInterface = z.infer<typeof SecurityAnswerSchema>;
 
 // GROUPS SCHEMA
 
-export const CreateGroupSchema = z.object({
-  id: z.number(),
+export const BaseGroupSchema = z.object({
   group_name: z.string(),
   description: z.string(), 
-  created_by:z.number(),
-});
+})
+
+export const CreateGroupSchema = BaseGroupSchema.extend({
+  id: z.number(),
+  created_by:z.number()
+})
+
 export type CreateGroupInterface = z.infer<typeof CreateGroupSchema>;
 
 export const CommonGroupSchema = CreateGroupSchema.omit({ created_by: true })

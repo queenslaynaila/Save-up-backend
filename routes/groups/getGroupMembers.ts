@@ -24,9 +24,8 @@ export default (router: Router) => {
     '/:group_id',
     authMiddleware(),
     async (req, res) => {
-      const { group_id } = req.params; 
-      const id = parseInt(group_id)
-      const groups = await SQL_GET_GROUP_MEMBERS({ group_id:id }).many();
+      const  group_id  = parseInt(req.params.group_id); 
+      const groups = await SQL_GET_GROUP_MEMBERS({ group_id}).many();
       return res.json(groups);
     }
   );

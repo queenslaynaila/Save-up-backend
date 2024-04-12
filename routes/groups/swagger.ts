@@ -46,7 +46,6 @@
  *   name: Groups
  *   description: Group management API endpoints
 */
-
 /**
  * @swagger
  * /groups:
@@ -58,12 +57,44 @@
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/CreateGroupRequest'
+ *             type: object
+ *             properties:
+ *               group_name:
+ *                 type: string
+ *                 description: The name of the group.
+ *               description:
+ *                 type: string
+ *                 description: The description of the group.
  *     responses:
  *       200:
  *         description: Group created successfully.
- *       400:
- *         description: Error occurred during group creation.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: number
+ *                   description: The unique identifier of the group.
+ *                 group_name:
+ *                   type: string
+ *                   description: The name of the group.
+ *                 description:
+ *                   type: string
+ *                   description: The description of the group.
+ *                 created_by:
+ *                   type: number
+ *                   description: The ID of the user who created the group.
+ *                 created_at:
+ *                   type: string
+ *                   format: date-time
+ *                   description: The timestamp when the group was created.
+ *                 updated_at:
+ *                   type: string
+ *                   format: date-time
+ *                   description: The timestamp when the group was last updated.
+ *       500:
+ *         description: Internal Server Error.
  *         content:
  *           application/json:
  *             schema:
@@ -73,6 +104,7 @@
  *                   type: string
  *                   description: Error message indicating the reason for failure.
  */
+
 
 /**
  * @swagger
@@ -106,7 +138,7 @@
  * @swagger
  * /groups/common-groups/{user_id}:
  *   get:
- *     summary: Get common groups for a user
+ *     summary: Get common groups a user has with a specific group member
  *     tags: [Groups]
  *     parameters:
  *       - in: path
@@ -114,7 +146,7 @@
  *         schema:
  *           type: integer
  *         required: true
- *         description: The ID of the user.
+ *         description: The ID of the group member the logged in User is trying to get common groups for.
  *     responses:
  *       200:
  *         description: List of common groups.
@@ -123,8 +155,16 @@
  *             schema:
  *               type: array
  *               items:
- *                 $ref: '#/components/schemas/Group'
+ *                 type: object
+ *                 properties:
+ *                   group_name:
+ *                     type: string
+ *                   description:
+ *                     type: string
+ *                   id:
+ *                     type: integer
  */
+
 
 /**
  * @swagger
@@ -149,15 +189,16 @@
  *               items:
  *                 type: object
  *                 properties:
- *                   id:
+ *                   user_id:
  *                     type: integer
- *                   name:
- *                     type: string
- *                   role:
+ *                   full_name:
  *                     type: string
  *                   joined_at:
  *                     type: string
+ *       500:
+ *         description: Internal server error.
  */
+
 
 /**
  * @swagger
@@ -174,7 +215,10 @@
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/Group'
+ *       500:
+ *         description: Internal server error.
  */
+
 
 /**
  * @swagger
@@ -194,10 +238,28 @@
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/UpdateGroupRequest'
+ *             type: object
+ *             properties:
+ *               group_name:
+ *                 type: string
+ *                 description: The updated name of the group.
+ *               description:
+ *                 type: string
+ *                 description: The updated description of the group.
  *     responses:
  *       200:
  *         description: Group updated successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 group_name:
+ *                   type: string
+ *                   description: The updated name of the group.
+ *                 description:
+ *                   type: string
+ *                   description: The updated description of the group.
  *       400:
  *         description: Error occurred while updating the group.
  *         content:
@@ -208,4 +270,6 @@
  *                 message:
  *                   type: string
  *                   description: Error message indicating the reason for failure.
+ *       500:
+ *         description: Internal server error.
  */
