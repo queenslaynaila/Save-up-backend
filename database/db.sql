@@ -61,11 +61,12 @@ SELECT create_reference_table('entities');
 
 --- User & User Management
 CREATE TABLE IF NOT EXISTS user_contacts (
-  id       INT NOT NULL PRIMARY KEY,
+  id              INT PRIMARY KEY,
   phone_number    TEXT UNIQUE NOT NULL,
-  national_id     CHAR(8) NOT NULL UNIQUE,
+  national_id     INTEGER NOT NULL UNIQUE,
   FOREIGN KEY     (id) REFERENCES entities(id),
-  CONSTRAINT      phone_number_format_check CHECK (phone_number ~* '^\+?254[0-9]{9}$')
+  CONSTRAINT      phone_number_format_check CHECK (phone_number ~* '^\+?254[0-9]{9}$'),
+  CONSTRAINT      national_id_length_check CHECK (national_id >= 10000000 AND national_id <= 99999999)
 );
 
 CREATE TABLE IF NOT EXISTS users (
@@ -73,7 +74,7 @@ CREATE TABLE IF NOT EXISTS users (
   full_name       TEXT NOT NULL,
   role            enum_roles NOT NULL DEFAULT 'User',
   gender          enum_genders NOT NULL,
-  pin             CHAR(4) NOT NULL,
+  pin             TEXT NOT NULL,
   created_at      TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );
 

@@ -67,14 +67,17 @@
  *                 type: string
  *                 enum: [Male, Female, Prefer not to say]
  *               national_id:
- *                 type: number
- *                 description: National ID with 8 digits.
+ *                 type: integer
+ *                 minimum: 10000000
+ *                 maximum: 99999999   
+ *                 description: The national ID of the user, an 8-digit integer.
  *               phone_number:
  *                 type: string
  *                 pattern: '^\+254\d{9}$'
  *                 description: Phone number with the format +254XXXXXXXXX (12 digits).
  *               pin:
  *                 type: string
+ *                 pattern: '^\d{4}$'
  *     responses:
  *       200:
  *         description: Account created successfully. Proceed to login.
@@ -120,11 +123,17 @@
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *                  - phone_number
+ *                  - pin
  *             properties:
  *               phone_number:
  *                 type: string
+ *                 pattern: '^\+254\d{9}$'
+ *                 description: Phone number with the format +254XXXXXXXXX (12 digits).
  *               pin:
  *                 type: string
+ *                 pattern: '^\d{4}$'
  *     responses:
  *       200:
  *         content:
