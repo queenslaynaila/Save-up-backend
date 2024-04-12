@@ -233,7 +233,12 @@ export const InviteResponseSchema = InviteSchema.extend({
   status:z.string()
 }).omit({sender_id: true});
 
+
 export type InviteResponseInterface = z.infer<typeof InviteResponseSchema>;
+
+export const InviteRequestSchema = InviteResponseSchema.omit({sender_id: true, receiver_id: true});
+
+export type InviteRequestInterface = z.infer<typeof InviteRequestSchema>;
 
 // GOAL SCHEMAS
 
