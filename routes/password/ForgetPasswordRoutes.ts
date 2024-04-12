@@ -41,7 +41,7 @@ const SQL_GET_SECURITY_QUESTIONS = sql<{ user_id: number }, { question: string; 
 );
 
 const verifyResetToken = (req: Request, res: Response, next: NextFunction) => {
-  const token = req.headers['reset-token'] as string;
+  const token = req.headers['X-Reset-Token'] as string;
   if (!token) {
     throw new HttpError(403, 'Access denied');
   }
@@ -59,7 +59,7 @@ const verifyResetToken = (req: Request, res: Response, next: NextFunction) => {
 
 export const initiatePasswordReset = (router: Router) => {
   router.post<Record<string, never>, { message: string }, { phone_number: string }, Record<string, never>>(
-    '/forget-password-request',
+    '/forget-password',
     resetPasswordLimiter ,
     async (req, res) => {
       const { phone_number } = req.body;
@@ -83,7 +83,7 @@ interface securityQuestions{
 
 export const verifyPasswordResetToken = (router: Router) => {
   router.post<Record<string, never>, securityQuestions, { user_id:number; reset_token: string }, Record<string, never>, Record<string, never>>(
-    '/verify-token',
+    '/verify-reset-token',
     verifyResetToken,
     async (req, res) => {
       const { reset_token } = req.body;

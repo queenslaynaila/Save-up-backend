@@ -75,58 +75,55 @@
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Goal'
+ *             type: object
+ *             properties:
+ *               description:
+ *                 type: string
+ *               category_id:
+ *                 type: number
+ *               amount:
+ *                 type: number
+ *               priority:
+ *                 type: string
+ *               target_at:
+ *                 type: string
+ *                 format: date-time
  *     responses:
  *       200:
  *         description: Goal created successfully.
- *       400:
- *         description: Error occurred during goal creation.
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 message:
+ *                 id:
+ *                   type: number
+ *                 entity_id:
+ *                   type: number
+ *                 category_id:
+ *                   type: number
+ *                 description:
  *                   type: string
- *                   description: Error message indicating the reason for failure.
- * 
- * /goals/delete/{id}:
- *   patch:
- *     summary: Soft delete a goal
- *     tags: [Goals]
- *     parameters:
- *       - in: path
- *         name: id
- *         schema:
- *           type: integer
- *         required: true
- *         description: The ID of the goal to soft delete.
- *     responses:
- *       200:
- *         description: Goal soft deleted successfully.
- *       404:
- *         description: Goal not found.
- * 
- * /goals/records/{goalId}:
- *   get:
- *     summary: Get a goal by ID
- *     tags: [Goals]
- *     parameters:
- *       - in: path
- *         name: goalId
- *         schema:
- *           type: integer
- *         required: true
- *         description: The ID of the goal to retrieve.
- *     responses:
- *       200:
- *         description: Goal retrieved successfully.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Goal'
- *       404:
- *         description: Goal not found.
+ *                 created_at:
+ *                   type: string
+ *                   format: date-time
+ *                 amount:
+ *                   type: number
+ *                 priority:
+ *                   type: string
+ *                 target_at:
+ *                   type: string
+ *                   format: date-time
+ *                 updated_at:
+ *                   type: string
+ *                   format: date-time
+ *                 completed_at:
+ *                   type: string
+ *                   format: date-time
+ *       401:
+ *         description: Access Denied. Log in.
+ *       500:
+ *         description: Internal server error.
  * 
  * /goals/{id}:
  *   patch:
@@ -136,24 +133,142 @@
  *       - in: path
  *         name: id
  *         schema:
- *           type: integer
+ *           type: string
  *         required: true
  *         description: The ID of the goal to update.
  *     requestBody:
- *       required: true
+ *       required: false
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Goal'
+ *             type: object
+ *             properties:
+ *               description:
+ *                 type: string
+ *               category_id:
+ *                 type: number
+ *               amount:
+ *                 type: number
+ *               priority:
+ *                 type: string
+ *                 enum:
+ *                   - "High"
+ *                   - "Low"
+ *                   - "Intermediate"
+ *               target_at:
+ *                 type: string
+ *                 format: date-time
  *     responses:
  *       200:
  *         description: Goal updated successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 entity_id:
+ *                   type: number
+ *                 category_id:
+ *                   type: number
+ *                 description:
+ *                   type: string
+ *                 amount:
+ *                   type: number
+ *                 priority:
+ *                   type: string
+ *                 target_at:
+ *                   type: string
+ *                   format: date-time
+ *                 id:
+ *                   type: number
+ *                 created_at:
+ *                   type: string
+ *                   format: date-time
+ *                 updated_at:
+ *                   type: string
+ *                   format: date-time
+ *                 completed_at:
+ *                   type: string
+ *                   format: date-time
  *       404:
  *         description: Goal not found.
- * 
+ 
+ * /goals/records/{goalId}:
+ *   get:
+ *     summary: Get a goal by ID
+ *     tags: [Goals]
+ *     parameters:
+ *       - in: path
+ *         name: goalId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The ID of the goal to retrieve.
+ *     responses:
+ *       200:
+ *         description: Goal retrieved successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 entity_id:
+ *                   type: number
+ *                 category_id:
+ *                   type: number
+ *                 description:
+ *                   type: string
+ *                 amount:
+ *                   type: number
+ *                 priority:
+ *                   type: string
+ *                 target_at:
+ *                   type: string
+ *                   format: date-time
+ *                 id:
+ *                   type: number
+ *                 created_at:
+ *                   type: string
+ *                   format: date-time
+ *                 updated_at:
+ *                   type: string
+ *                   format: date-time
+ *                 completed_at:
+ *                   type: string
+ *                   format: date-time
+ *       404:
+ *         description: Not found.
+ *       500:
+ *         description: Internal server error.
+
+ * /goals/delete/{id}:
+ *   patch:
+ *     summary: Soft delete a goal
+ *     tags: [Goals]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The ID of the goal to soft delete.
+ *     responses:
+ *       200:
+ *         description: Goal deleted successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Success message indicating the goal was deleted.
+ *       500:
+ *         description: Internal server error.
+ 
  * /goals/{goalsIdentifier}:
  *   get:
- *     summary: Get a goal based on provided conditions
+ *     summary: Get goals based on provided conditions
  *     tags: [Goals]
  *     parameters:
  *       - in: path
@@ -161,14 +276,53 @@
  *         schema:
  *           type: string
  *         required: true
- *         description: The identifier for the conditions to retrieve the goal.
+ *         description: |
+ *           The identifier for the conditions to retrieve the goals. It can be one of the following:
+ *           - "me": Retrieves all goals for the currently logged-in user.
+ *           - "all": Retrieves all goals on the app (accessible only to admins).
+ *           - A positive integer: Retrieves goals for a specific user based on their ID (requires admin role).
  *     responses:
  *       200:
- *         description: Goal retrieved successfully.
+ *         description: Goals retrieved successfully.
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Goal'
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   entity_id:
+ *                     type: number
+ *                   category_id:
+ *                     type: number
+ *                   description:
+ *                     type: string
+ *                   amount:
+ *                     type: number
+ *                   priority:
+ *                     type: string
+ *                   target_at:
+ *                     type: string
+ *                     format: date-time
+ *                   id:
+ *                     type: number
+ *                   created_at:
+ *                     type: string
+ *                     format: date-time
+ *                   updated_at:
+ *                     type: string
+ *                     format: date-time
+ *                   completed_at:
+ *                     type: string
+ *                     format: date-time
+ *       400:
+ *         description: Bad request. (Invalid parameters provided.)
+ *       403:
+ *         description: Forbidden. (Access restricted to admins for 'all' and specific user IDs).
+ *       500:
+ *         description: Internal server error.
  *       404:
- *         description: Goal not found.
+ *         description: Goals not found.
+
+
  */

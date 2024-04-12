@@ -16,20 +16,20 @@ const SQL_UPDATE_EXPENSE= sql<UpdateExpenseInterface,ExpenseInterface>(`
 `);
 
 export default (router: Router) => {
-  router.patch('/:id', 
+  router.patch<{ id: string },ExpenseInterface, UpdateExpenseInterface, Record<string, never>>('/:id', 
     authMiddleware(), 
     validateRequest(UpdateExpenseSchema),
     async (req, res) => {
       const userId = req.user!.id;
       const expenseId = parseInt(req.params.id);
-      const { description, category_id, amount,expense_date } = req.body;
+      const { description, category_id, amount_spent,date_spent} = req.body;
       const result = await SQL_UPDATE_EXPENSE({
         entity_id: userId,
         id: expenseId,
-        description: description ,
-        category_id: category_id ,
-        amount_spent: amount ,
-        date_spent:expense_date ,
+        description,
+        category_id,
+        amount_spent,
+        date_spent,
       }).one(new HttpError(404, 'Not found'));
       res.json(result);
     });
