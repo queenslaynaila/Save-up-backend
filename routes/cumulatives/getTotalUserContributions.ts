@@ -30,6 +30,6 @@ export default (router: Router) => {
       const query = SQL_GET_TOTAL_CONTRIBUTIONS({userId });
       if (filters.length > 0) query.extend(`AND ${filters.join(' AND ')}`, filterArgs);
       query.extend('LIMIT 15', {});
-      res.json(await query.one(new HttpError(404, 'Unable to complete the request')));
+      res.json(await query.one(new HttpError(500, 'Unable to complete the request')));
     });
 };

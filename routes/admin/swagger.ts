@@ -1,4 +1,3 @@
-
 /**
  * @swagger
  * tags:
@@ -12,12 +11,35 @@
  *   post:
  *     summary: Create a new admin
  *     tags: [Admin]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               full_name:
+ *                 type: string
+ *               gender:
+ *                 type: string
+ *                 enum: [Male, Female, Prefer not to say]
+ *               national_id:
+ *                 type: integer
+ *               phone_number:
+ *                 type: string
+ *               pin:
+ *                 type: string
  *     responses:
  *       200:
- *         description: Admin created successfully.
- *       401:
- *         description: Unauthorized access. Only admins can create new admins.
- * 
+ *         description: Account created successfully. Proceed to login.
+ *       400:
+ *         description: Account with this Phone number already exists or Unexpected error occurred, please try again later.
+ *       500:
+ *         description: Internal server error.
+ */
+
+/**
+ * @swagger
  * /admin/stats/{resource}/{operator}:
  *   get:
  *     summary: Get table statistics
@@ -38,9 +60,19 @@
  *     responses:
  *       200:
  *         description: Table statistics retrieved successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *                   type: object
+ *                   properties:
+ *                     total:
+ *                       type: number
  *       401:
  *         description: Unauthorized access. Only admins can access this endpoint.
- * 
+ */
+
+/**
+ * @swagger
  * /admin/{roleToUpdate}/{id}:
  *   patch:
  *     summary: Update user role
@@ -51,16 +83,32 @@
  *         schema:
  *           type: string
  *         required: true
- *         description: The role to update (User, Admin, Moderator).
+ *         description: The role to update (Admin, User, Moderator).
  *       - in: path
  *         name: id
  *         schema:
- *           type: integer
+ *           type: string
  *         required: true
  *         description: The ID of the user whose role to update.
  *     responses:
  *       200:
  *         description: User role updated successfully.
- *       401:
- *         description: Unauthorized access. Only admins can update user roles.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 full_name:
+ *                   type: string
+ *                 gender:
+ *                   type: string
+ *                   enum: [Male, Female, Prefer not to say]
+ *                 id:
+ *                   type: number
+ *                 role:
+ *                   type: string
+ *       400:
+ *         description: INVALID ROLE ERROR MSG.
+ *       404:
+ *         description: User not found.
  */
