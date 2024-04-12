@@ -24,8 +24,7 @@ export type CategoryInterface = z.infer<typeof CategorySchema>;
 
 export const SecurityQuestionSchema = z.object({
   id: z.number(),
-  question: z.string(),
-  created_at: z.date()
+  question: z.string()
 })
 
 export type SecurityQuestionInterface = z.infer<typeof SecurityQuestionSchema>;

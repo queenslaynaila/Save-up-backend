@@ -1,0 +1,56 @@
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     SecurityQuestion:
+ *       type: object
+ *       required:
+ *         - id
+ *         - question
+ *         - created_at
+ *       properties:
+ *         id:
+ *           type: number
+ *           description: The unique identifier of the security question.
+ *         question:
+ *           type: string
+ *           description: The text of the security question.
+ *       example:
+ *         id: 1
+ *         question: What is your mother's maiden name?
+ */
+
+/**
+ * @swagger
+ * tags:
+ *   name: Security Questions
+ *   description: The security questions API endpoints
+ */
+
+/**
+ * @swagger
+ * /security-questions:
+ *   get:
+ *     summary: Get all security questions
+ *     tags: [Security Questions]
+ *     responses:
+ *       200:
+ *         description: List of security questions
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: number
+ *                     description: The unique identifier of the security question.
+ *                   question:
+ *                     type: string
+ *                     description: The text of the security question.
+ *       401:
+ *         description: Access denied. Log in.
+ *       500:
+ *         description: Internal server error.
+ */
