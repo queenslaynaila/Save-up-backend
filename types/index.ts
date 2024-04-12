@@ -39,11 +39,11 @@ export const enum UserRole {
 export const BaseUserSchema = z.object({
   full_name: z.string(),
   gender: z.enum(['Male', 'Female', 'Prefer not to say']),
-  national_id: z.number(),
+  national_id: z.number().int().min(10000000).max(99999999),
   phone_number: z
     .string()
     .refine((value) => /^\+254\d{9}$/.test(value)),
-  pin:z.string()
+  pin: z.string().refine((value) => /^\d{4}$/.test(value)),
 });
 
 export type UserInterface = z.infer<typeof BaseUserSchema>;
