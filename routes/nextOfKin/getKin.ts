@@ -12,7 +12,7 @@ const SQL_GET_KIN = sql<{user_id: number }, NextOfKinInterface>(`
 
 export default (router: Router) => {
   router.get<Record<string, never>,NextOfKinInterface,{ user_id: number },Record<string, never>,Record<string, never>>(
-    '/records', 
+    '/', 
     authMiddleware(), 
     async (req, res) => { 
       const user_id = req.user!.id

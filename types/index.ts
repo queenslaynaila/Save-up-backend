@@ -130,8 +130,8 @@ export const NextOfKinSchema= CreateNextOfKinSchema
   .omit({ user_id: true })
   .extend({
     id: z.number(),
-    created_at: z.string(),
-    updated_at: z.string()
+    created_at: z.date(),
+    updated_at: z.date()
   })
 
 export type NextOfKinInterface = z.infer<typeof NextOfKinSchema>;
