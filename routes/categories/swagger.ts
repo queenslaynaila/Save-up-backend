@@ -31,11 +31,11 @@
  */
 
 /**
-  * @swagger
-  * tags:
-  *   name: Categories
-  *   description: The categories API endpoints
-  */
+ * @swagger
+ * tags:
+ *   name: Categories
+ *   description: The categories API endpoints
+ */
 
 /**
  * @swagger
@@ -53,7 +53,7 @@
  *               items:
  *                 $ref: '#/components/schemas/Category'
  *   post:
- *     summary: Create a new category
+ *     summary: Create a new category.ADMIN ONLY
  *     tags: [Categories]
  *     requestBody:
  *       required: true
@@ -73,38 +73,12 @@
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Category'
- *       400:
- *         description: Bad request, check request body
+ *       403:
+ *         description: Forbidden
+ *       500:
+ *         description: Internal server error
+ *
  * /categories/{id}:
- *   delete:
- *     summary: Delete a category by ID
- *     tags: [Categories]
- *     parameters:
- *       - in: path
- *         name: id
- *         schema:
- *           type: integer
- *         required: true
- *         description: ID of the category to delete
- *     responses:
- *       204:
- *         description: Category deleted successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *       404:
- *         description: Category not found
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
  *   patch:
  *     summary: Update a category by ID
  *     tags: [Categories]
@@ -116,7 +90,7 @@
  *         required: true
  *         description: ID of the category to update
  *     requestBody:
- *       required: false
+ *       required: [name, description]
  *       content:
  *         application/json:
  *           schema:
@@ -124,8 +98,12 @@
  *             properties:
  *               name:
  *                 type: string
+ *                 description: The category name.
+ *                 nullable: true
  *               description:
  *                 type: string
+ *                 description: The category description.
+ *                 nullable: true
  *     responses:
  *       200:
  *         description: Category updated successfully
@@ -135,6 +113,29 @@
  *               $ref: '#/components/schemas/Category'
  *       400:
  *         description: Bad request, check request body
+ *       404:
+ *         description: Category not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ * /categories/records/{id}:
+ *   patch:
+ *     summary: Soft delete a category by ID
+ *     tags: [Categories]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: ID of the category to delete
+ *     responses:
+ *       204:
+ *         description: Category deleted successfully
  *         content:
  *           application/json:
  *             schema:

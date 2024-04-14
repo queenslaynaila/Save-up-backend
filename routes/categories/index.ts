@@ -7,9 +7,9 @@ import getAllCategories from './getAllCategories';
 export default (baseRouter: express.Router) => {
   const router = express.Router();
   createCategory(router);
-  deleteCategories(router);
   updateCategory(router);
   getAllCategories(router);
-
+  deleteCategories(router);
+  
   baseRouter.use('/categories', router);
 };

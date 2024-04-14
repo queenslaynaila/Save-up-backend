@@ -1,8 +1,7 @@
 import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/auth';
-import { ID_SCHEMA,UserRole } from '../../types';
-import { validateRequest } from '../../middleware/validationMiddleware';
+import { UserRole }  from '../../types';
 
 const SQL_DELETE_CATEGORY = sql<{ id: number;}, Record<string, never>>(`
   UPDATE categories
@@ -11,10 +10,9 @@ const SQL_DELETE_CATEGORY = sql<{ id: number;}, Record<string, never>>(`
 `);
 
 export default (router: Router) => {
-  router.delete<{ id: string }, { message: string }, Record<string, never>, Record<string, never>>(
-    "/:id",
-    authMiddleware({roles:[UserRole.ADMIN]}),
-    validateRequest(ID_SCHEMA),
+  router.patch<{ id: string }, { message: string }, Record<string, never>, Record<string, never>>(
+    "/records/:id",
+    authMiddleware({roles:[ UserRole.ADMIN ]}),
     async (req, res) => {
       const id = parseInt(req.params.id)
       await SQL_DELETE_CATEGORY({id: id,}).exec();
