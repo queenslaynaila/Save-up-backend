@@ -20,7 +20,7 @@ export const CategorySchema = UpdateCategorySchema.extend({
 
 export type CategoryInterface = z.infer<typeof CategorySchema>;
 
-// SECURITY QUESTIONS SCHEMA
+// SECURITY QUESTIONS & ANSWERS SCHEMA
 
 export const SecurityQuestionSchema = z.object({
   id: z.number(),
@@ -28,6 +28,16 @@ export const SecurityQuestionSchema = z.object({
 })
 
 export type SecurityQuestionInterface = z.infer<typeof SecurityQuestionSchema>;
+
+export const UpdateSecurityAnswerSchema = SecurityQuestionSchema.extend({
+  answer: z.string()
+})
+
+export type UpdateSecurityAnswerInterface = z.infer<typeof UpdateSecurityAnswerSchema>;
+
+export const SecurityAnswerValidationSchema = UpdateSecurityAnswerSchema.pick({
+  answer: true
+})
 
 // USER  SCHEMA
 export const enum UserRole {
@@ -150,6 +160,8 @@ export const createSecurityAnswerSchema = z.object({
 });
 
 export type CreateSecurityAnswerInterface = z.infer<typeof createSecurityAnswerSchema>;
+
+export const SecurityAnswerRequestSchema = createSecurityAnswerSchema.omit({ user_id: true});
 
 export const SecurityAnswerSchema = createSecurityAnswerSchema.extend({
   id: z.number(),
