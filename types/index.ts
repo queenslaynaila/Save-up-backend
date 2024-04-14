@@ -237,6 +237,12 @@ export const SendInviteSchema = z.object({
   group_id:z.number(),
 });
 
+export const GetInviteSchema = SendInviteSchema.extend({
+  created_at:z.date(),
+})
+
+export type InviteInterface = z.infer<typeof GetInviteSchema>;
+
 export type SendInviteInterface = z.infer<typeof SendInviteSchema>;
 
 export const InviteSchema = z.object({

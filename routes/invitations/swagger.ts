@@ -43,6 +43,40 @@
 
 /**
  * @swagger
+ * /invitations/my-invites:
+ *   get:
+ *     summary: Retrieve invitations for the logged-in user
+ *     tags: [Invitations]
+ *     responses:
+ *       200:
+ *         description: List of invitations for the user
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   sender_id:
+ *                     type: integer
+ *                     description: The ID of the sender.
+ *                   receiver_id:
+ *                     type: integer
+ *                     description: The ID of the receiver.
+ *                   group_id:
+ *                     type: integer
+ *                     description: The ID of the group.
+ *                   created_at:
+ *                     type: string
+ *                     format: date-time
+ *                     description: The date and time when the invitation was created.
+ *       500:
+ *         description: Internal server error
+ */
+
+
+/**
+ * @swagger
  * /invitations/{groupId}:
  *   post:
  *     summary: Send an invitation
