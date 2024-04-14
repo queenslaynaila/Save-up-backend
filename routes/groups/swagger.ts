@@ -195,6 +195,8 @@
  *                     type: string
  *                   joined_at:
  *                     type: string
+ *                   is_admin:
+ *                     type: boolean
  *       500:
  *         description: Internal server error.
  */
@@ -243,9 +245,11 @@
  *               group_name:
  *                 type: string
  *                 description: The updated name of the group.
+ *                 nullable: true
  *               description:
  *                 type: string
  *                 description: The updated description of the group.
+ *                 nullable: true
  *     responses:
  *       200:
  *         description: Group updated successfully.

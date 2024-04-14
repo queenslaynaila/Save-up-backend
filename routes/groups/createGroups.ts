@@ -13,7 +13,7 @@ const SQL_CREATE_GROUP_ENTITY = sql<{entity_type: string }, { id:number }>(`
 const SQL_CREATE_GROUP = sql<CreateGroupInterface, CreateGroupResponseInterface>(`
   INSERT INTO groups (id,group_name,description,created_by)
   VALUES (:id,:group_name,:description,:created_by)
-  RETURNING * 
+  RETURNING id,group_name,description,created_by,created_at,updated_at
 `);
 
 export default (router: Router) => {
@@ -23,7 +23,7 @@ export default (router: Router) => {
     validateRequest(BaseGroupSchema),
     async (req, res) => {
       const user_id= req.user!.id
-      const entity = await SQL_CREATE_GROUP_ENTITY({ entity_type: 'Group' }).one();
+      const entity = await SQL_CREATE_GROUP_ENTITY({ entity_type: 'Groups' }).one();
       const { group_name, description} = req.body;
       const group = await SQL_CREATE_GROUP({ id:entity.id, group_name, description, created_by: user_id }).one();
       res.json(group)
