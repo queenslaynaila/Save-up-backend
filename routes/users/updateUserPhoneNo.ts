@@ -11,7 +11,7 @@ const SQL_GET_USER_PIN = sql<{ userId: string },{ pin: string }>(`
 `);
 
 const SQL_UPDATE_PHONE = sql<{ phone_number: string; userId: string }, Record<string,never>>(`
-   UPDATE users_contacts
+   UPDATE user_contacts
    SET phone_number = :phone_number 
    WHERE id = :userId
 `);
