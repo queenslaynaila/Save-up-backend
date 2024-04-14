@@ -6,6 +6,7 @@ import { HttpError } from './middleware/errorMiddleware';
 import swaggerUI from "swagger-ui-express";
 import swaggerJsDoc from "swagger-jsdoc";
 import usersRoutes from './routes/users/index';
+import nextOfKinRoutes from './routes/nextOfKin/index';
 import categoriesRoutes from './routes/categories/index';
 import savingsRoutes from './routes/goals/index';
 import expensesRoutes from './routes/expenses/index';
@@ -37,9 +38,30 @@ const options = {
         url: "http://localhost:3001",
       },
     ],
+    security: [{
+      AuthorizationToken: [],
+      RefreshToken: [],
+    }],
+    components: {
+      securitySchemes: {
+        AuthorizationToken: {
+          type: "apiKey",
+          name: "Authorization-Token",
+          in: "header",
+          description: "The access token for authentication",
+        },
+        RefreshToken: {
+          type: "apiKey",
+          name: "Refresh-token",
+          in: "header",
+          description: "The refresh token for authentication",
+        },
+      },
+    },
   },
   apis: ["./routes/**/swagger.ts"],
 };
+
 
 const specs = swaggerJsDoc(options);
 
@@ -55,12 +77,13 @@ app.use((_, res, next) => {
 });
 app.use(
   cors({
-    exposedHeaders: ['Authorization', 'X-Auth-Token', 'X-Refresh-Token','X-Reset-Token'],
+    exposedHeaders: ['Authorization','Refresh-Token','X-Auth-Token', 'X-Refresh-Token','X-Reset-Token'],
   })
 );
 
 // Routes
 usersRoutes(app);
+nextOfKinRoutes(app);
 savingsRoutes(app);
 expensesRoutes(app);
 contributionsRoutes(app);

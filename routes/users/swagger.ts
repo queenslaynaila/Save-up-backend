@@ -57,7 +57,7 @@
  *       required: true
  *       content:
  *         application/json:
-  *           schema:
+ *           schema:
  *             type: object
  *             required:
  *               - full_name

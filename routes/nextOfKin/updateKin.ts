@@ -2,23 +2,25 @@ import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/auth';
 import { validateRequest } from '../../middleware/validationMiddleware';
-import { UpdateNextOfKinInterface , NextOfKinInterface ,UpdateNextOfKinSchema } from '../../types'; 
+import { UpdateNextOfKinInterface, NextOfKinInterface, UpdateNextOfKinSchema } from '../../types'; 
 
-const SQL_UPDATE_KIN = sql<UpdateNextOfKinInterface,NextOfKinInterface>(`
-  UPDATE next_of_kin
-  SET full_name = COALESCE(:full_name,next_of_kin.full_name_),
-      relationship = COALESCE(:relationship,next_of_kin.relationship)
-      email = COALESCE(:email,next_of_kin.email)
-      phone_number = COALESCE(:phone_number,next_of_kin.phone_number)
-  WHERE user_id = user_:id AND id = :id
-  RETURNING full_name,relationship,email,phone_number,created_at,updated_at
+const SQL_UPDATE_KIN = sql<UpdateNextOfKinInterface, NextOfKinInterface>(`
+  UPDATE next_of_kins
+  SET full_name = COALESCE(:full_name, next_of_kins.full_name),
+      relationship = COALESCE(:relationship, next_of_kins.relationship),
+      email = COALESCE(:email, next_of_kins.email),
+      phone_number = COALESCE(:phone_number, next_of_kins.phone_number)
+  WHERE user_id = :user_id AND id = :id AND deleted_at IS NULL
+  RETURNING id ,full_name, relationship, email, phone_number, created_at, updated_at
 `);
+
+const nextOfKinRequest = UpdateNextOfKinSchema.omit({ user_id: true, id: true });
 
 export default (router: Router) => {
   router.patch<{ id: string }, NextOfKinInterface, UpdateNextOfKinInterface, Record<string, never>, Record<string, never>>(
     '/:id',
     authMiddleware(),
-    validateRequest(UpdateNextOfKinSchema),
+    validateRequest(nextOfKinRequest),
     async (req, res) => {
       const user_id = req.user!.id;
       const id = parseInt(req.params.id);
@@ -28,4 +30,3 @@ export default (router: Router) => {
     }
   );
 };
-

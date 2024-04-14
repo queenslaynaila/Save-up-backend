@@ -3,10 +3,10 @@ import { sql } from '../../db';
 import authMiddleware from '../../middleware/auth';
 
 const SQL_DELETE_KIN = sql<{ user_id: number, id: number },Record<string, never>>(`
-    UPDATE next_of_kins  SET deleted_at = NOW()
+    UPDATE next_of_kins  
+    SET deleted_at = NOW()
     WHERE user_id = :user_id
     AND id = :id
-    SET deleted_at = NOW()
 `);
 
 export default (router: Router) => {   

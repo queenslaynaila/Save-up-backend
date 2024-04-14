@@ -6,17 +6,19 @@ import { validateRequest } from '../../middleware/validationMiddleware';
 import { CreateNextOfKinInterface , NextOfKinInterface , CreateNextOfKinSchema  } from '../../types'; 
 
 const SQL_CREATE_KIN = sql<CreateNextOfKinInterface ,  NextOfKinInterface>(`
-  INSERT INTO next_of_kins ( id, user_id, full_name, relationship, email)
+  INSERT INTO next_of_kins (id, user_id, full_name, relationship, email, phone_number)
   SELECT COALESCE((SELECT MAX(id) FROM next_of_kins WHERE user_id = :user_id), 0) + 1,
-  :user_id,:full_name, :relationship, :email ,:phone_number
-  RETURNING id,full_name,relationship,email,phone_number;
+  :user_id, :full_name, :relationship, :email, :phone_number
+  RETURNING id, full_name, relationship, email, phone_number;
 `);
+
+const NextOfKinCreationSchema = CreateNextOfKinSchema.omit({user_id: true});
 
 export default (router: Router) => {
   router.post<Record<string, never>,NextOfKinInterface, CreateNextOfKinInterface,Record<string, never>,Record<string, never>>(
     '/', 
     authMiddleware(), 
-    validateRequest(CreateNextOfKinSchema),
+    validateRequest(NextOfKinCreationSchema),
     async (req, res) => {
       const { full_name,relationship,email,phone_number } = req.body;
       const user_id = req.user!.id
