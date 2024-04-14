@@ -195,12 +195,16 @@
  *   post:
  *     summary: Logout 
  *     tags: [Users]
+ *     security:
+ *       - AuthToken: []
+ *       - RefreshToken: []
  *     responses:
  *       200:
  *         description: User logged out successfully.
  *       500:
  *         description: Internal Server Error.
  */
+
 
 /**
  * @swagger

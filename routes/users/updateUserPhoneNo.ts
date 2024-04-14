@@ -24,9 +24,7 @@ export default (router: Router) => {
     async (req, res) => {
       const userId = req.params.id;
       const { pin, phone_number } = req.body;
-      const userPassword = await SQL_GET_USER_PIN({ userId }).one(
-        new HttpError(404, 'Not found')
-      );
+      const userPassword = await SQL_GET_USER_PIN({ userId }).one();
       if (!await bcrypt.compare(pin, userPassword.pin)) {
         throw new HttpError(401, 'Invalid password');
       }

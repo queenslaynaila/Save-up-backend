@@ -22,12 +22,14 @@ function authMiddleware(options: AuthMiddlewareOptions = {}) {
   const roles = options.roles || [];
 
   return (req: Request, res: Response, next: NextFunction) => {
-    const accessToken = req.headers['authorization'];
-    const refreshToken = req.headers['refresh-token'] as string;
+    console.log(req.headers)
+    const accessToken = req.headers['authorizationtoken'] as string;
+    const refreshToken = req.headers['refreshtoken'] as string;
+    console.log(accessToken)
+    console.log(refreshToken)
     if (!accessToken || !refreshToken) {
       throw new HttpError(401, 'Access Denied.Log in.');
     }
-
     if (accessToken) {
       const accessTokenValue = accessToken.split(' ')[1];
       const isExpired = verifyExpiration(accessTokenValue);
