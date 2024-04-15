@@ -271,6 +271,8 @@
 
 /**
  * @swagger
+/**
+ * @swagger
  * /users/{targetUser}:
  *   get:
  *     summary: Get users by various conditions
@@ -291,7 +293,8 @@
  *         name: category_id
  *         schema:
  *           type: integer
- *         description: Filter savings for a ctegory .
+ *         description: Filter savings for a category.
+ *       - in: query
  *         name: goal_id
  *         schema:
  *           type: integer
