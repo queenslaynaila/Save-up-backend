@@ -117,7 +117,7 @@ SELECT create_distributed_table('security_answers', 'user_id');
 CREATE TABLE IF NOT EXISTS reset_tokens (
   user_id       INT NOT NULL,
   id            INT NOT NULL,
-  token         INT NOT NULL CHECK (token BETWEEN 1000 AND 9999),
+  token         TEXT NOT NULL,
   created_at    TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   used_at       TIMESTAMP WITH TIME ZONE,
   expired_at    TIMESTAMP WITH TIME ZONE DEFAULT NOW() + INTERVAL '15 minutes',

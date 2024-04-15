@@ -19,7 +19,7 @@
  *           schema:
  *             type: object
  *             properties:
- *               phoneNumber:
+ *               phone_number:
  *                 type: string
  *     responses:
  *       200:
@@ -45,6 +45,13 @@
  *   post:
  *     summary: Verify password reset token
  *     tags: [Password]
+ *     parameters:
+ *       - in: header
+ *         name: X-Reset-Token
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The header sent along with the  reset token to verify.
  *     requestBody:
  *       required: true
  *       content:
@@ -81,12 +88,18 @@
  */
 
 /**
-/**
  * @swagger
  * /pin/verify-security-answers:
  *   post:
  *     summary: Verify security answers for password reset
  *     tags: [Password]
+ *     parameters:
+ *       - in: header
+ *         name: X-Reset-Token
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The header sent along with the reset token to verify.
  *     requestBody:
  *       required: true
  *       content:
@@ -118,12 +131,21 @@
  *                   description: Error message indicating the reason for failure.
  */
 
+
+
 /**
  * @swagger
  * /pin/reset:
  *   post:
  *     summary: Reset user password
  *     tags: [Password]
+ *     parameters:
+ *       - in: header
+ *         name: X-Reset-Token
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The header sent along with the reset token to verify.
  *     requestBody:
  *       required: true
  *       content:
