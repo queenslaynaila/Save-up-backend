@@ -9,7 +9,7 @@ const SQL_GET_CONTRIBUTIONS = sql<Record<string, never>, SavingInterface>(
 );
 
 export default (router: Router) => {
-  router.get<string,{ savingId: string },SavingInterface,Record<string, never>,{ category_id?: string; goal_id?: string }
+  router.get<{ savingId: string },SavingInterface,Record<string, never>,{ category_id?: string; goal_id?: string }
   >('/:savingIdentifier', 
     authMiddleware(), 
     async (req, res: Response) => {
