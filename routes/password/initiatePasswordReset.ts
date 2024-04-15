@@ -2,7 +2,7 @@ import { Router  } from 'express';
 import bcrypt from 'bcrypt';
 import jwt, { Secret } from 'jsonwebtoken';
 import { sql } from '../../db';
-import { generateRandomToken } from '../../middleware/generateRandomToken';
+import { generateResetPin } from '../../middleware/generateResetPin';
 import sendSms from '../../services/twilio';
 import { HttpError } from '../../middleware/errorMiddleware';
 
@@ -21,7 +21,7 @@ export default  (router: Router) => {
     async (req, res) => {
       const { phone_number } = req.body;
       const user = await SQL_GET_USER({ phone_number }).one(new HttpError(404, 'User not found.'));
-      const resetToken = generateRandomToken();
+      const resetToken =  generateResetPin();
       const hashedResetToken = await bcrypt.hash(resetToken, 10);
       await SQL_SAVE_TOKEN({ user_id: user.id, token:hashedResetToken }).exec();        
       const resetTokenPayload = { id: user.id };

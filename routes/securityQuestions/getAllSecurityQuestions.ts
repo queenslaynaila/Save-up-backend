@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { sql } from '../../db';
-import authMiddleware from '../../middleware/auth';
+import authMiddleware from '../../middleware/authorization';
 import { SecurityQuestionInterface } from '../../types';
 
 const SQL_GET_SECURITY_QUESTIONS = sql<Record<string, never>, SecurityQuestionInterface>(

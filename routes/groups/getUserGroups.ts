@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { sql } from '../../db';
-import authMiddleware from '../../middleware/auth';
+import authMiddleware from '../../middleware/authorization';
 import { CreateGroupResponseInterface } from '../../types';
 
 const SQL_FETCH_USER_GROUPS = sql<{ user_id: number },  CreateGroupResponseInterface>(`

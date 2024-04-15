@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { sql } from '../../db';
-import authMiddleware from '../../middleware/auth';
+import authMiddleware from '../../middleware/authorization';
 import { NominatedAdminInterface } from '../../types';
 
 const SQL_GET_NOMINATED_MEMBERS = sql<{ group_id: number }, NominatedAdminInterface>(`

@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { sql } from '../../db';
-import authMiddleware from '../../middleware/auth';
+import authMiddleware from '../../middleware/authorization';
 
 const SQL_INSERT_VOTE = sql<{ group_id: number; voter_member_id: number; nominated_member_id: number; vote: boolean }, Record<string, never>>(`
   INSERT INTO nomination_approvals (group_id, voter_member_id, nominated_member_id, vote)

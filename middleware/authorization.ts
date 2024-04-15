@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import jwt, { Secret } from 'jsonwebtoken';
 import { UserRole } from '../types';
 import { HttpError } from './errorMiddleware';
-import { generateToken, verifyExpiration } from './generatetoken';
+import { generateToken, verifyTokenExpiration } from './generatetoken';
 
 type User = {
   id: number;
@@ -29,7 +29,7 @@ function authMiddleware(options: AuthMiddlewareOptions = {}) {
     }
     if (accessToken) {
       const accessTokenValue = accessToken.split(' ')[1];
-      const isExpired = verifyExpiration(accessTokenValue);
+      const isExpired = verifyTokenExpiration(accessTokenValue);
       if (isExpired && refreshToken) {
         const refreshTokenValue = refreshToken.split(' ')[1];
         const decodedRefreshToken = jwt.verify(refreshTokenValue, process.env.JWT_SECRET as Secret);

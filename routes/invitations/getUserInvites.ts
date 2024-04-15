@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { sql } from '../../db';
-import authMiddleware from '../../middleware/auth';
+import authMiddleware from '../../middleware/authorization';
 import { InviteInterface } from '../../types';
 
 const SQL_FIND_INVITATIONS_FOR_USER = sql<{ receiver_id: number }, InviteInterface>(`

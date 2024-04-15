@@ -1,6 +1,6 @@
 import { sql } from '../../db';
 import { Router } from 'express';
-import authMiddleware from '../../middleware/auth';
+import authMiddleware from '../../middleware/authorization';
 import { validateRequest } from '../../middleware/validationMiddleware';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { convertToTitleCase } from '../../middleware/caseNormalization';

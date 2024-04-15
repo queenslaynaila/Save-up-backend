@@ -1,6 +1,6 @@
 import { Response, Router } from 'express';
 import { sql } from '../../db';
-import authMiddleware from '../../middleware/auth';
+import authMiddleware from '../../middleware/authorization';
 import { convertToTitleCase, isValidValue } from '../../middleware/caseNormalization';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { GoalInterface } from '../../types/index';

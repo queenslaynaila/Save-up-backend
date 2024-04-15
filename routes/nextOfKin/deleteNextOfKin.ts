@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { sql } from '../../db';
-import authMiddleware from '../../middleware/auth';
+import authMiddleware from '../../middleware/authorization';
 
 const SQL_DELETE_KIN = sql<{ user_id: number, id: number },Record<string, never>>(`
     UPDATE next_of_kins  

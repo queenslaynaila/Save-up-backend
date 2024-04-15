@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { sql } from '../../db';
-import authMiddleware from '../../middleware/auth';
+import authMiddleware from '../../middleware/authorization';
 
 const SQL_CREATE_GROUP_ADMIN = sql<{ user_id: number; group_id: number }, Record<string, never>>(`
   INSERT INTO group_administrators (group_id, user_id)

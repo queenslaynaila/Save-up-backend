@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { sql } from '../../db';
-import authMiddleware from '../../middleware/auth';
+import authMiddleware from '../../middleware/authorization';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { validateRequest } from '../../middleware/validationMiddleware';
 import { CreateSavingInterface, SavingInterface, ValidateSavingCreation } from '../../types';

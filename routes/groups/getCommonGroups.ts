@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { sql } from '../../db';
-import authMiddleware from '../../middleware/auth';
+import authMiddleware from '../../middleware/authorization';
 import { CommonGroupInterface } from '../../types';
 
 const SQL_GET_COMMON_GROUPS = sql<{logged_in_user_id: number, user_id: number }, CommonGroupInterface>(`

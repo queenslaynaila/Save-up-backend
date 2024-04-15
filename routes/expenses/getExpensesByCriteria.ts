@@ -1,6 +1,6 @@
 import { Router, Response } from 'express';
 import { sql } from '../../db';
-import authMiddleware from '../../middleware/auth';
+import authMiddleware from '../../middleware/authorization';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { ExpenseInterface ,ID_SCHEMA} from '../../types';
 

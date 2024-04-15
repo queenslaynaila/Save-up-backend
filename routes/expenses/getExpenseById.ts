@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { sql } from '../../db';
 import { HttpError } from '../../middleware/errorMiddleware';
-import authMiddleware from '../../middleware/auth';
+import authMiddleware from '../../middleware/authorization';
 import { ExpenseInterface  } from '../../types';
 
 const SQL_GET_EXPENSE_BY_ID = sql<{ id:number; entity_id:number },  ExpenseInterface>(`

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import authMiddleware from '../../middleware/auth';
+import authMiddleware from '../../middleware/authorization';
 
 export default (router: Router) => {
   router.post<Record<string, never>, { message: string },Record<string, never>,Record<string, never>,Record<string, never>>(
