@@ -230,8 +230,7 @@ CREATE TABLE IF NOT EXISTS savings (
   amount      NUMERIC(30, 3) NOT NULL,
   created_at  TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   PRIMARY KEY (user_id, id), 
-  FOREIGN KEY (user_id) REFERENCES users(id),
-  FOREIGN KEY (goal_id) REFERENCES goals(id) 
+  FOREIGN KEY (user_id, goal_id) REFERENCES goals(entity_id,id) 
 );
 
 SELECT create_distributed_table('savings', 'goal_id');
