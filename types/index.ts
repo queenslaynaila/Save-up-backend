@@ -324,8 +324,10 @@ export const BaseExpenseSchema = z.object({
   category_id: z.number(),
   description: z.string(),
   amount_spent: z.number(),
-  date_spent: z.date(),
+  date_spent: z.string(),
 });
+
+export const CreateExpenseSchemaValidation = BaseExpenseSchema.omit({ entity_id: true }).partial()
 
 export type CreateExpenseInterface = z.infer<typeof BaseExpenseSchema>;
 

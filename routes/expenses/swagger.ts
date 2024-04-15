@@ -62,9 +62,7 @@
  *             type: object
  *             properties:
  *               category_id:
- *                 type: number
- *               entity_id:
- *                 type: number
+ *                 type: integer
  *               description:
  *                 type: string
  *               amount_spent:
