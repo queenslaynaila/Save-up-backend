@@ -1,10 +1,8 @@
 import { Router, Response } from 'express';
-import { ExpenseInterface } from '../../types';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/auth';
 import { HttpError } from '../../middleware/errorMiddleware';
-import { ID_SCHEMA }  from '../../types/index';
-
+import { ExpenseInterface ,ID_SCHEMA} from '../../types';
 
 const SQL_GET_EXPENSES = sql<Record<string, string>, ExpenseInterface>(`
   SELECT entity_id,id,category_id,description,amount_spent,date_spent

@@ -1,19 +1,13 @@
-import authMiddleware from '../../middleware/auth';
 import { Router } from 'express';
-import { CreateExpenseInterface , ExpenseInterface , CreateExpenseSchemaValidation   } from '../../types';
 import { sql } from '../../db';
+import authMiddleware from '../../middleware/auth';
 import  { validateRequest } from '../../middleware/validationMiddleware';
+import { CreateExpenseInterface , ExpenseInterface , CreateExpenseSchemaValidation   } from '../../types';
 
 const SQL_CREATE_EXPENSES = sql<CreateExpenseInterface, ExpenseInterface >(`
   INSERT INTO expenses (id, entity_id, category_id, description, amount_spent, date_spent)
-  VALUES (
-    COALESCE((SELECT MAX(id) FROM expenses WHERE entity_id = :entity_id), 0) + 1,
-    :entity_id,
-    :category_id,
-    :description,
-    :amount_spent,
-    :date_spent
-  )
+  VALUES (COALESCE((SELECT MAX(id) FROM expenses WHERE entity_id = :entity_id), 0) + 1,
+           :entity_id, :category_id, :description, :amount_spent, :date_spent )
   RETURNING id, entity_id, category_id, description, amount_spent, date_spent, created_at;
 `);
 
