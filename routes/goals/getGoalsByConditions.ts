@@ -37,7 +37,14 @@ export default (router: Router) => {
         if (isStandardUser) {
           throw new HttpError(403, 'Forbidden');
         }
-      } else {
+      }else if (parseInt(goalsIdentifier)) { 
+        if (isStandardUser)  {
+          throw new HttpError(403, 'Forbidden');
+        }
+        filterArgs.user_id = goalsIdentifier;
+        filters.push(`entity_id = :user_id`);
+      }
+      else {
         throw new HttpError(400, 'Bad request');
       }
 

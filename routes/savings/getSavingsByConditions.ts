@@ -4,35 +4,35 @@ import authMiddleware from '../../middleware/auth';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { SavingInterface, ID_SCHEMA } from '../../types';
 
-const SQL_GET_CONTRIBUTIONS = sql<Record<string, never>, SavingInterface>(
-  `SELECT * FROM savings `
-);
+const SQL_GET_SAVINGS = sql<Record<string, never>, SavingInterface>(`
+  SELECT * FROM savings 
+`);
 
 export default (router: Router) => {
-  router.get<{ savingId: string },SavingInterface,Record<string, never>,{ category_id?: string; goal_id?: string }
+  router.get<{ savingIdentifier: string },SavingInterface,Record<string, never>,{ category_id?:string; goal_id?:string}
   >('/:savingIdentifier', 
     authMiddleware(), 
     async (req, res: Response) => {
-      const { savingId } = req.params;
+      const { savingIdentifier } = req.params;
       const { category_id, goal_id } = req.query;
       const filterArgs: Record<string, string> = {};
       const filters: string[] = [];
       const loggedInUserId = req.user!.id;
       const isStandardUser = req.user?.role === 'User';
 
-      if (savingId === 'me') {
-        filterArgs.loggedInUserId = loggedInUserId.toString();
+      if ( savingIdentifier === 'me') {
+        filterArgs.loggedInUserId = loggedInUserId.toString()
         filters.push(`user_id = :loggedInUserId`);
-      } else if (savingId === 'all') {
+      } else if ( savingIdentifier === 'all') {
         if (isStandardUser) {
           throw new HttpError(403, 'Forbidden');
         }
-      } else if(ID_SCHEMA.parse(parseInt(savingId))) {
-        if (isStandardUser && req.user!.id !== parseInt(savingId)) {
+      } else if (ID_SCHEMA.parse(parseInt( savingIdentifier))) { 
+        if (isStandardUser)  {
           throw new HttpError(403, 'Forbidden');
         }
-        filterArgs.savingId = savingId;
-        filters.push(`user_id = :savingId`);
+        filterArgs.user_id =  savingIdentifier;
+        filters.push(`user_id = :user_id`);
       } else {
         throw new HttpError(400, 'Bad request');
       }
@@ -43,10 +43,9 @@ export default (router: Router) => {
       }
       if (category_id) {
         filterArgs.category_id = category_id.toString()
-        filters.push(`saving_id IN (SELECT id FROM savings WHERE category_id = :category_id)`);
+        filters.push(`saving_id IN (SELECT id FROM goals WHERE category_id = :category_id)`);
       }
-
-      const query = SQL_GET_CONTRIBUTIONS({});
+      const query = SQL_GET_SAVINGS({});
       if (filters.length > 0) query.extend(`WHERE ${filters.join(' AND ')}`, filterArgs);
       query.extend('LIMIT 15', {});
       const savings = await query.many();

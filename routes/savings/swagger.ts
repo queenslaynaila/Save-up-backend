@@ -103,7 +103,7 @@
  *         required: true
  *         description: |
  *           Defines the scope of users to retrieve. Can be one of the following:
- *           - "me": Retrieves information about the currently logged-in users savinfs.
+ *           - "me": Retrieves information about the currently logged-in users savings.
  *           - "all": Retrieves information about all users savings(requires Admin or Moderator role).
  *           - A user ID: Retrieves information about a specific users savings based on their ID.
  *             Standard users can only request their own user ID. Admins and moderators can request any user ID.

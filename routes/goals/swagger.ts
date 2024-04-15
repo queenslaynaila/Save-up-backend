@@ -280,7 +280,7 @@
  *           The identifier for the conditions to retrieve the goals. It can be one of the following:
  *           - "me": Retrieves all goals for the currently logged-in user.
  *           - "all": Retrieves all goals on the app (accessible only to admins).
- *           - A positive integer: Retrieves goals for a specific user based on their ID (requires admin role).
+ *           - A positive integer: Retrieves goals for a specific user based on their ID (Admin or Moderator only).
  *     responses:
  *       200:
  *         description: Goals retrieved successfully.
