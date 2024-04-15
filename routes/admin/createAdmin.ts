@@ -4,7 +4,7 @@ import { sql } from '../../db';
 import { validateRequest } from '../../middleware/validationMiddleware';
 import { CreateUserContactInterface, CreateAdminInterface, UserInterface, BaseUserSchema} from '../../types';
 
-const SQL_CREATE_USER_ENTITY = sql<{entity_type: string }, { id:number }>(`
+const SQL_CREATE_USER_ENTITY = sql<{ entity_type: string }, { id:number }>(`
   INSERT INTO entities (entity_type)
   VALUES (:entity_type)
   RETURNING id
@@ -15,7 +15,7 @@ const SQL_CREATE_USER_CONTACTS = sql<CreateUserContactInterface, Record<string, 
   VALUES (:entity_id,:phone_number,:national_id)
 `);
 
-const SQL_CREATE_USER = sql< CreateAdminInterface, Record<string, never>>(`
+const SQL_CREATE_USER = sql<CreateAdminInterface, Record<string, never>>(`
   INSERT INTO users (id,full_name,gender,role,pin)
   VALUES (:id, :full_name, :gender, :role, :pin)
 `);
