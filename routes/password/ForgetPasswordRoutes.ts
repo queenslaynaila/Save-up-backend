@@ -30,18 +30,18 @@ const SQL_SAVE_TOKEN = sql<{ user_id:number; token: string }, { token: string }>
   VALUES ((SELECT COALESCE(MAX(id), 0) + 1 FROM reset_tokens WHERE user_id = :user_id), :user_id, :token)
 `);
 
-const SQL_UPDATE_TOKEN_USAGE = sql<{ user_id:number; reset_token:string }, Record<string, never>>(
-  `UPDATE reset_tokens SET used_at = NOW() WHERE user_id = :user_id AND token = :reset_token`
-);
+const SQL_UPDATE_TOKEN_USAGE = sql<{ user_id:number; reset_token:string }, Record<string, never>>(`
+ UPDATE reset_tokens SET used_at = NOW() WHERE user_id = :user_id AND token = :reset_token
+`);
 
 
-const SQL_RESET_PASSWORD = sql<{ pin: string; id:number }, Record<string, never>>(
-  `UPDATE users SET pin = :pin  WHERE  user_id = :id`
-);
+const SQL_RESET_PASSWORD = sql<{ pin: string; id:number }, Record<string, never>>(`
+  UPDATE users SET pin = :pin  WHERE  user_id = :id
+`);
 
-const SQL_GET_SECURITY_ANSWERS = sql<{ user_id:number }, { question_id:number; answer: string }>(
-  `SELECT question_id, answer FROM security_answers WHERE user_id = :user_id`
-);
+const SQL_GET_SECURITY_ANSWERS = sql<{ user_id:number }, { question_id:number; answer: string }>(`
+  SELECT question_id, answer FROM security_answers WHERE user_id = :user_id
+`);
 
 const SQL_GET_SECURITY_QUESTIONS = sql<{ user_id: number }, { question: string; question_id:number }>(`
   SELECT sq.id AS question_id, sq.question 
