@@ -11,7 +11,7 @@ const SQL_UPDATE_ROLE = sql<{ roleToUpdate: string; id: string }, UpdatedUserRol
   UPDATE users 
   SET role = :roleToUpdate 
   WHERE id = :id 
-  RETURNING :id, :full_name, :gender, :role
+  RETURNING id, full_name, gender, role
 `);
 
 export default (router: Router) => {
