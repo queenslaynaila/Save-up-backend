@@ -1,4 +1,3 @@
-
 /**
  * @swagger
  * components:
@@ -125,7 +124,58 @@
  *         description: Expense not found.
  *       500:
  *         description: Internal server error.
- 
+ * /expenses/{id}:
+ *   patch:
+ *     summary: Update an expense
+ *     tags: [Expenses]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The ID of the expense to update.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - description
+ *               - category_id
+ *               - amount_spent
+ *               - date_spent
+ *             properties:
+ *               description:
+ *                 type: string
+ *                 nullable: true
+ *               category_id:
+ *                 type: integer
+ *                 nullable: true
+ *               amount_spent:
+ *                 type: number
+ *                 nullable: true
+ *               date_spent:
+ *                 type: string
+ *                 format: date-time
+ *                 nullable: true
+ *     responses:
+ *       200:
+ *         description: Expense updated successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Success message indicating the expense was updated.
+ *       404:
+ *         description: Expense not found.
+ *       500:
+ *         description: Internal server error.
+ * 
  *   get:
  *     summary: Get an expense by ID
  *     tags: [Expenses]

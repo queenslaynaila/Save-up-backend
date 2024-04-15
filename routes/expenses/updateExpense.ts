@@ -3,22 +3,23 @@ import { sql } from '../../db';
 import { HttpError } from '../../middleware/errorMiddleware';
 import authMiddleware from '../../middleware/auth';
 import { validateRequest } from '../../middleware/validationMiddleware';
-import { UpdateExpenseInterface, ExpenseInterface, UpdateExpenseSchema } from '../../types';
+import { UpdateExpenseInterface, ExpenseInterface, ValidateUpdateExpenseSchema } from '../../types';
 
 const SQL_UPDATE_EXPENSE= sql<UpdateExpenseInterface,ExpenseInterface>(`
   UPDATE expenses
   SET description = COALESCE(:description, expenses.description),
       category_id = COALESCE(:category_id, expenses.category_id),
-      amount_spent = COALESCE(:amount, expenses.amount),
+      amount_spent = COALESCE(:amount_spent, expenses.amount_spent),
       date_spent = COALESCE(:date_spent , expenses.date_spent )
   WHERE entity_id = :entity_id AND id = :id
   RETURNING entity_id,id,category_id,description,amount_spent,date_spent
 `);
 
 export default (router: Router) => {
-  router.patch<{ id: string },ExpenseInterface, UpdateExpenseInterface, Record<string, never>>('/:id', 
+  router.patch<{ id: string },ExpenseInterface, UpdateExpenseInterface, Record<string, never>>(
+    '/:id', 
     authMiddleware(), 
-    validateRequest(UpdateExpenseSchema),
+    validateRequest( ValidateUpdateExpenseSchema),
     async (req, res) => {
       const userId = req.user!.id;
       const expenseId = parseInt(req.params.id);

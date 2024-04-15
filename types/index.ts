@@ -343,3 +343,8 @@ export type ExpenseInterface = z.infer<typeof ExpenseSchema>;
 export const UpdateExpenseSchema = BaseExpenseSchema.partial().extend({id: z.number()});
 
 export type UpdateExpenseInterface = z.infer<typeof UpdateExpenseSchema>;
+
+export const ValidateUpdateExpenseSchema = UpdateExpenseSchema.omit({
+  entity_id:true,
+  id:true
+})
