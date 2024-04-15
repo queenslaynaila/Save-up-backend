@@ -34,7 +34,7 @@ export default (router: Router) => {
 
       const query = SQL_GET_TOTAL_EXPENSES({userId });
       if (filters.length > 0) query.extend(`AND ${filters.join(' AND ')}`, filterArgs);
-      query.extend('LIMIT 15', {});
+      
       res.json(await query.one( new HttpError(500, 'An error occurred while processing your request. Please try again later.')));
 
     });

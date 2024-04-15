@@ -40,7 +40,7 @@
 
 /**
  * @swagger
- * /admin/stats/{resource}/{operator}:
+ * /admin/financial-stats/{resource}/{operator}:
  *   get:
  *     summary: Get table statistics
  *     tags: [Admin]
