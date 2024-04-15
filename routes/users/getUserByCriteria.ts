@@ -46,6 +46,7 @@ export default (router: Router) => {
         filters.push(`role = :role`);
       }
       const query = SQL_GET_ALL_USERS({});
+      
       if (filters.length > 0) query.extend(`WHERE ${filters.join(' AND ')}`, filterArgs);
       query.extend('LIMIT 15', {});
       const users = await query.many();

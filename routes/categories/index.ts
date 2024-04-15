@@ -6,6 +6,7 @@ import getAllCategories from './getAllCategories';
 
 export default (baseRouter: express.Router) => {
   const router = express.Router();
+  
   createCategory(router);
   updateCategory(router);
   getAllCategories(router);

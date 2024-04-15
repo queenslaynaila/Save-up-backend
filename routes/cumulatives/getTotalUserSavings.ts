@@ -4,10 +4,10 @@ import authMiddleware from '../../middleware/auth';
 import { HttpError } from '../../middleware/errorMiddleware';
 
 const SQL_GET_TOTAL_CONTRIBUTIONS = sql<{ userId: number }, { total_savings: number }>(`
-    SELECT COALESCE(SUM(c.amount), 0) AS total_contributed_amount
-    FROM savings c
-    JOIN savings s ON c.goal_id = s.id
-    WHERE s.user_id = :userId
+  SELECT COALESCE(SUM(c.amount), 0) AS total_contributed_amount
+  FROM savings c
+  JOIN savings s ON c.goal_id = s.id
+  WHERE s.user_id = :userId
 `);
 
 export default (router: Router) => {

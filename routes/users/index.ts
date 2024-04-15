@@ -1,17 +1,19 @@
 import { Router } from 'express';
 import createUser from './createUser';
 import login from './login';
-import signOut from './signOut';
-import updateUserPhoneNo from './updateUserPhoneNo';
-import getUsersByConditions from './getUsersByConditions';
+import updateUserPhoneNo from './getUserByCriteria';
+import getUserByCriteria from './getUserByCriteria';
+import logout from './logout';
 
 export default (baseRouter: Router) => {
   const router = Router();
+
   createUser(router);
   login(router);
-  getUsersByConditions(router);
+  getUserByCriteria(router);
   updateUserPhoneNo(router);
-  signOut(router);
+  logout(router);
+  
   baseRouter.use('/users', router);
 };
 

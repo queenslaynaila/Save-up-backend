@@ -4,8 +4,8 @@ import authMiddleware from '../../middleware/auth';
 import { HttpError } from '../../middleware/errorMiddleware';
 
 const SQL_GET_TOTAL_TARGET_AMOUNT = sql<{ [key: string]: string },{ total_target_amount: number }>(`
-    SELECT COALESCE(SUM(amount), 0) AS total_target_amount
-    FROM goals
+  SELECT COALESCE(SUM(amount), 0) AS total_target_amount
+  FROM goals
 `);
 
 export default (router: Router) => {

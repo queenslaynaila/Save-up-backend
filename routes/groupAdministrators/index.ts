@@ -6,6 +6,7 @@ import approveNomination from './approveNomination';
 
 export default (baseRouter: express.Router) => {
   const router = express.Router();
+  
   makeGroupAdmin(router);
   nominateAdmin(router);
   getNominatedAdministrators(router)
