@@ -81,6 +81,8 @@ export const CreateUserSchema = BaseUserSchema.pick({
   id: z.number()
 });
 
+export type ExtendedUserInterface = GetUserInterface & { pin: string };
+
 export type CreateUserInterface = z.infer<typeof CreateUserSchema>;
 
 
