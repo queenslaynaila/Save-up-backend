@@ -1,7 +1,7 @@
 import { Router  } from 'express';
 import bcrypt from 'bcrypt';
 import { sql } from '../../db';
-import { verifyResetToken } from '../../middleware/verifyResetToken'
+import { verifyResetToken } from '../../middleware/resetTokenMIddleware'
 import { HttpError } from '../../middleware/errorMiddleware';
 
 const SQL_GET_SECURITY_ANSWERS = sql<{ user_id:number }, { question_id:number; answer: string }>(`

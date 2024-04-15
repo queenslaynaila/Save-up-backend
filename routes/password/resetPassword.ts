@@ -1,7 +1,7 @@
 import { Router  } from 'express';
 import bcrypt from 'bcrypt';
 import { sql } from '../../db';
-import { verifyResetToken } from '../../middleware/verifyResetToken'
+import { verifyResetToken } from '../../middleware/resetTokenMIddleware'
 
 const SQL_RESET_PASSWORD = sql<{ pin: string; id:number }, Record<string, never>>(`
   UPDATE users SET pin = :pin  WHERE  user_id = :id

@@ -1,7 +1,7 @@
 import { Router  } from 'express';
 import bcrypt from 'bcrypt';
 import { sql } from '../../db';
-import { verifyResetToken } from '../../middleware/verifyResetToken'
+import { verifyResetToken } from '../../middleware/resetTokenMIddleware'
 
 interface securityQuestions{
   securityQuestions: { question_id:number; question: string }[]
