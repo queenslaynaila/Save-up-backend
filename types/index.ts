@@ -296,6 +296,8 @@ export type GoalInterface = z.infer<typeof GoalSchema>;
 
 export const UpdateGoalSchema = BaseGoalSchema.omit({ entity_id: true }).partial().extend({id: z.number()});
 
+export const UpdateGoalRequestSchema = UpdateGoalSchema.omit({ id: true });
+
 export type UpdateGoalInterface = z.infer<typeof UpdateGoalSchema>;
 
 // SAVING SCHEMAS

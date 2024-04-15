@@ -1,9 +1,8 @@
 import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/auth';
-import { validateRequest } from '../../middleware/validationMiddleware';
 import { HttpError } from '../../middleware/errorMiddleware';
-import { ID_SCHEMA, GoalInterface } from '../../types';
+import {GoalInterface } from '../../types';
 
 const SQL_GET_SAVING_BY_ID = sql<{ id: number;}, GoalInterface>(`
     SELECT id, entity_id, description, category_id, amount, priority, target_at ,created_at,completed_at FROM goals
@@ -14,7 +13,6 @@ export default (router: Router) => {
   router.get<{ goalId: string }, GoalInterface, Record<string, never>, Record<string, never>>(
     '/records/:goalId', 
     authMiddleware(), 
-    validateRequest(ID_SCHEMA),
     async (req, res) => {
       const savingId = (parseInt(req.params.goalId));
       const query = SQL_GET_SAVING_BY_ID({ id: savingId });

@@ -140,26 +140,12 @@ CREATE TABLE IF NOT EXISTS groups (
 
 SELECT create_distributed_table('groups', 'id');
 
-CREATE TABLE IF NOT EXISTS invitations (   
-  group_id      INT NOT NULL,      
-  sender_id     INT NOT NULL,
-  receiver_id   INT NOT NULL,
-  status        enum_invites NOT NULL DEFAULT 'Pending',
-  created_at    TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-  PRIMARY KEY   (group_id,receiver_id),
-  FOREIGN KEY   (group_id,sender_id) REFERENCES group_administrators(group_id,user_id),
-  FOREIGN KEY   (receiver_id) REFERENCES entities(id)
-);
-
-CREATE INDEX idx_invitations_by_group_id ON invitations(group_id);
-SELECT create_distributed_table('invitations', 'group_id');
-
 CREATE TABLE IF NOT EXISTS user_groups (
   group_id      INT NOT NULL,
   user_id       INT NOT NULL ,
   joined_at     TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   left_at       TIMESTAMP WITH TIME ZONE,
-  PRIMARY KEY   (group_id,user_id)
+  PRIMARY KEY   (group_id,user_id),
   FOREIGN KEY   (user_id) REFERENCES entities(id),
   FOREIGN KEY   (group_id) REFERENCES groups(id)
 );
@@ -178,6 +164,20 @@ CREATE TABLE IF NOT EXISTS group_administrators (
 SELECT create_distributed_table('group_administrators', 'group_id');
 CREATE INDEX idx_group_admins_by_group_id ON group_administrators(group_id);
 CREATE INDEX idx_group_admins_by_user_id ON group_administrators(user_id);
+
+CREATE TABLE IF NOT EXISTS invitations (   
+  group_id      INT NOT NULL,      
+  sender_id     INT NOT NULL,
+  receiver_id   INT NOT NULL,
+  status        enum_invites NOT NULL DEFAULT 'Pending',
+  created_at    TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  PRIMARY KEY   (group_id,receiver_id),
+  FOREIGN KEY   (group_id,sender_id) REFERENCES group_administrators(group_id,user_id),
+  FOREIGN KEY   (receiver_id) REFERENCES entities(id)
+);
+
+CREATE INDEX idx_invitations_by_group_id ON invitations(group_id);
+SELECT create_distributed_table('invitations', 'group_id');
 
 CREATE TABLE IF NOT EXISTS nominated_administrators (
   group_id         INT NOT NULL,
@@ -283,7 +283,6 @@ FOR EACH ROW
 EXECUTE FUNCTION update_goals_status();
 
 --Trigger to addcreator to admin table and the join table (user_groups) the moment he creates the group
-
 CREATE OR REPLACE FUNCTION add_creator_to_user_group()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -292,33 +291,17 @@ BEGIN
 
     INSERT INTO group_administrators(user_id, group_id)
     VALUES (NEW.created_by, NEW.id);
+
+    RETURN OLD;
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER enforce_add_creator_to_group
+CREATE TRIGGER enforce_add_creator_to_user_group
 AFTER INSERT ON groups
 FOR EACH ROW
-EXECUTE FUNCTION add_creator_to_group();
+EXECUTE FUNCTION add_creator_to_user_group();
 
 --Trigger to addgroup member to a user groups table the momemnt the user responds to an invite
-
-CREATE OR REPLACE FUNCTION add_user_to_user_groups_on_invite_response()
-RETURNS TRIGGER AS $$
-BEGIN
-  IF NEW.status = 'Accepted' THEN
-    INSERT INTO user_groups (user_id, group_id)
-    VALUES (NEW.receiver_id, OLD.group_id);
-  END IF;
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER enforce update_user_groups_after_invite
-BEFORE UPDATE ON invitations
-FOR EACH ROW
-EXECUTE PROCEDURE add_user_to_user_groups_on_invite_response();
-
---Trigger to Check if the user alaredy has an invite for the aforementioned group on ivitation
 
 CREATE OR REPLACE FUNCTION check_existing_invitation() RETURNS TRIGGER AS $$
 BEGIN
@@ -335,7 +318,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER enforce check_existing_invitation
+CREATE TRIGGER enforce_check_existing_invitation
 BEFORE INSERT ON invitations
 FOR EACH ROW
 EXECUTE FUNCTION check_existing_invitation();
@@ -361,3 +344,4 @@ CREATE TRIGGER enforce_update_user_groups_after_invite
 AFTER UPDATE ON invitations
 FOR EACH ROW
 EXECUTE FUNCTION update_user_groups_after_invite();
+

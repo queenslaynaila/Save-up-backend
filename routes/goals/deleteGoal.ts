@@ -1,8 +1,6 @@
 import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/auth';
-import { validateRequest } from '../../middleware/validationMiddleware';
-import { ID_SCHEMA } from '../../types';
 
 const SQL_DELETE_GOAL = sql<{ id: number; entity_id:number }, Record<string, never>>(`
   UPDATE goals
@@ -15,7 +13,6 @@ export default (router: Router) => {
   router.patch<{ id: string },{message:string}, Record<string, never>, Record<string, never>>(
     '/delete/:id', 
     authMiddleware(), 
-    validateRequest(ID_SCHEMA),
     async (req, res) => {
       const id = parseInt(req.params.id);
       const userId = req.user!.id;

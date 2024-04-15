@@ -11,11 +11,13 @@ const SQL_CREATE_GOAL = sql< CreateGoalInterface, GoalInterface >(`
   RETURNING id, entity_id, description, category_id, amount, priority, target_at ,created_at,completed_at
 `);
 
+const GoalSchema = BaseGoalSchema.omit({ entity_id: true })
+
 export default (router: Router) => {
   router.post<Record<string, never>,GoalInterface,CreateGoalInterface,Record<string, never>,Record<string, never>>(
     '/', 
     authMiddleware(), 
-    validateRequest(BaseGoalSchema),
+    validateRequest(GoalSchema),
     async (req, res) => {
       const entity_id = req.user!.id;
       const { description, category_id, amount, priority, target_at } = req.body;
