@@ -2,7 +2,7 @@
  * @swagger
  * /cumulatives/top-expenditure-categories:
  *   get:
- *     summary: Get categories with the highest expenses
+ *     summary: Returns an array of categories with the most expenditure in order with their total expenses
  *     tags: [Cumulatives]
  *     responses:
  *       200:

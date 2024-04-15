@@ -3,16 +3,16 @@ import { sql } from '../../db';
 import authMiddleware from '../../middleware/auth';
 import { HttpError } from '../../middleware/errorMiddleware';
 
-const SQL_GET_TOTAL_CONTRIBUTIONS = sql<{ userId: number }, { total_contributed_amount: number }>(`
+const SQL_GET_TOTAL_CONTRIBUTIONS = sql<{ userId: number }, { total_savings: number }>(`
     SELECT COALESCE(SUM(c.amount), 0) AS total_contributed_amount
-    FROM contributions c
-    JOIN savings s ON c.saving_id = s.id
+    FROM savings c
+    JOIN savings s ON c.goal_id = s.id
     WHERE s.user_id = :userId
 `);
 
 export default (router: Router) => {
-  router.get<Record<string, never>, { total_contributed_amount: number }, Record<string, never>, Record<string, never>>(
-    '/total-contributions', 
+  router.get<Record<string, never>, { total_savings: number }, Record<string, never>, Record<string, never>>(
+    '/total-savings', 
     authMiddleware(), 
     async (req, res) => {
       const userId = req.user!.id;

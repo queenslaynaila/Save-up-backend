@@ -5,9 +5,9 @@ import { HttpError } from '../../middleware/errorMiddleware';
 
 
 const SQL_GET_TOTAL_EXPENSES = sql<{ userId: number }, { total_expenses: number }>(`
-      SELECT COALESCE(SUM(amount), 0) AS total_expenses
+      SELECT COALESCE(SUM(amount_spent), 0) AS total_expenses
       FROM expenses
-      WHERE user_id = :userId`);
+      WHERE entity_id = :userId`);
 
 export default (router: Router) => {
   router.get<Record<string, never>, { total_expenses: number }, Record<string, never>,{startDate?:string;endDate?:string;categoryId?:string}>(
