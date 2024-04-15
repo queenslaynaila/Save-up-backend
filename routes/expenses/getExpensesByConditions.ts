@@ -36,7 +36,7 @@ export default (router: Router) => {
           throw new HttpError(403, 'Forbidden');
         }
         filterArgs.user_id = expenseIdentifier;
-        filters.push(`entity_id = :expenseIdentifier`);
+        filters.push(`entity_id = :user_id`);
       } else {
         throw new HttpError(400, 'Bad request');
       }
