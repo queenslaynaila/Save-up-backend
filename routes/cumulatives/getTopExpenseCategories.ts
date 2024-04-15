@@ -7,8 +7,7 @@ interface TopExpenditureCategory {
 }
 
 const SQL_GET_TOP_EXPENDITURE_CATEGORIES = sql<{ userId:number }, TopExpenditureCategory[]>(`
-  SELECT e.category_id,c.name AS category_name,
-  COALESCE(SUM(e.amount_spent), 0) AS total_expense FROM expenses e
+  SELECT e.category_id, c.name AS category_name, COALESCE(SUM(e.amount_spent), 0) AS total_expense FROM expenses e
   JOIN categories c ON e.category_id = c.id
   WHERE  e.entity_id = :userId
   GROUP BY e.category_id, c.name
