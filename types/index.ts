@@ -310,6 +310,8 @@ export const BaseSavingSchema = z.object({
 
 export type CreateSavingInterface = z.infer<typeof BaseSavingSchema>;
 
+export const ValidateSavingCreation = BaseSavingSchema.omit({ user_id: true })
+
 export const SavingSchema = BaseSavingSchema.extend({
   id: z.number(),
   created_at: z.date(),

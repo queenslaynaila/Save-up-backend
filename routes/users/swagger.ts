@@ -288,10 +288,14 @@
  *           - A user ID: Retrieves information about a specific user based on their ID.
  *             Standard users can only request their own user ID. Admins and moderators can request any user ID.
  *       - in: query
- *         name: role
+ *         name: category_id
  *         schema:
- *           type: string
- *         description: Filter users by role. Can be 'User', 'Admin', 'Moderator' (case-sensitive).
+ *           type: integer
+ *         description: Filter savings for a ctegory .
+ *         name: goal_id
+ *         schema:
+ *           type: integer
+ *         description: Filter savings for a goal.
  *     responses:
  *       '200':
  *         description: Array of users matching the specified conditions.

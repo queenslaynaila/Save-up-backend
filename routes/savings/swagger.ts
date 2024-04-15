@@ -47,7 +47,15 @@
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Saving'
+ *             type: object
+ *             required:
+ *               - user_id
+ *               - amount
+ *             properties:
+ *               goal_id:
+ *                 type: integer
+ *               amount:
+ *                 type: number
  *     responses:
  *       200:
  *         description: Saving created successfully.
@@ -93,7 +101,12 @@
  *         schema:
  *           type: string
  *         required: true
- *         description: The identifier for the conditions to retrieve the savings.
+ *         description: |
+ *           Defines the scope of users to retrieve. Can be one of the following:
+ *           - "me": Retrieves information about the currently logged-in users savinfs.
+ *           - "all": Retrieves information about all users savings(requires Admin or Moderator role).
+ *           - A user ID: Retrieves information about a specific users savings based on their ID.
+ *             Standard users can only request their own user ID. Admins and moderators can request any user ID.
  *     responses:
  *       200:
  *         description: Savings retrieved successfully.
