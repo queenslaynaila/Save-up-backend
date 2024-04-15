@@ -6,9 +6,15 @@ import  { validateRequest } from '../../middleware/validationMiddleware';
 
 const SQL_CREATE_EXPENSES = sql<CreateExpenseInterface, ExpenseInterface >(`
   INSERT INTO expenses (id, entity_id, category_id, description, amount_spent, date_spent)
-  SELECT COALESCE((SELECT MAX(id) FROM expenses WHERE entity_id = :entity_id), 0) + 1,
-  :entity_id,:description, :category_id, :amount_spent, :date_spent
-  RETURNING id, entity_id, category_id, description, amount_spent, date_spent, created_at
+  VALUES (
+    COALESCE((SELECT MAX(id) FROM expenses WHERE entity_id = :entity_id), 0) + 1,
+    :entity_id,
+    :category_id,
+    :description,
+    :amount_spent,
+    :date_spent
+  )
+  RETURNING id, entity_id, category_id, description, amount_spent, date_spent, created_at;
 `);
 
 export default (router: Router) => {
