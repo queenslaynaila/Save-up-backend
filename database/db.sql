@@ -254,7 +254,13 @@ CREATE INDEX idx_expenses_by_user_and_category ON expenses(user_id, category_id)
 CREATE INDEX idx_expenses_by_date_spent ON expenses(date_spent);
 SELECT create_distributed_table('expenses', 'id');
 
---Triggers
+===============================================================================================
+-- Trigger: Update the status of a goal from In Progress to Complete when the total savings reach the target amount for the goal.
+
+CREATE TRIGGER enforce_update_saving_status
+AFTER INSERT ON savings
+FOR EACH ROW
+EXECUTE FUNCTION update_goals_status();
 
 CREATE OR REPLACE FUNCTION update_goals_status()
 RETURNS TRIGGER AS $$
@@ -281,7 +287,9 @@ AFTER INSERT ON savings
 FOR EACH ROW
 EXECUTE FUNCTION update_goals_status();
 
---Trigger to addcreator to admin table and the join table (user_groups) the moment he creates the group
+===============================================================================================
+--Trigger: automatically adds a group creater as both a member and an administrator of that group.
+
 CREATE OR REPLACE FUNCTION add_creator_to_user_group()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -300,7 +308,8 @@ AFTER INSERT ON groups
 FOR EACH ROW
 EXECUTE FUNCTION add_creator_to_user_group();
 
---Trigger to addgroup member to a user groups table the momemnt the user responds to an invite
+===============================================================================================
+--Trigger: Prevents creating duplicate pending invitations for the same user and group.
 
 CREATE OR REPLACE FUNCTION check_existing_invitation() RETURNS TRIGGER AS $$
 BEGIN
@@ -322,7 +331,8 @@ BEFORE INSERT ON invitations
 FOR EACH ROW
 EXECUTE FUNCTION check_existing_invitation();
 
---Trigger to add user to a group if on reponse to an invite status is accepeted
+===============================================================================================
+--Trigger: Adds a user to a group if they accept an invitation and removes the invitation if they decline.
 
 CREATE OR REPLACE FUNCTION update_user_groups_after_invite()
 RETURNS TRIGGER AS $$
@@ -343,4 +353,56 @@ CREATE TRIGGER enforce_update_user_groups_after_invite
 AFTER UPDATE ON invitations
 FOR EACH ROW
 EXECUTE FUNCTION update_user_groups_after_invite();
+
+===============================================================================================
+--Trigger: Adds a nominated user as a group administrator if they meet the approval threshold.
+
+CREATE OR REPLACE FUNCTION promote_approved_admins(group_id INT, total_members INT, nominated_member_id INT)
+RETURNS VOID AS $$
+DECLARE
+  approvals_count INT;
+  approval_threshold INT;
+BEGIN
+    approval_threshold = total_members / 2;
+
+    SELECT COUNT (*) INTO approvals_count
+    FROM nomination_approvals
+    WHERE group_id = group_id AND nominated_member_id = nominated_member_id AND VOTE = 'YES';
+
+    IF approvals_count >= approval_threshold THEN
+        INSERT INTO group_administrators (user_id, group_id)
+        VALUES (nominated_member_id, group_id);
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+
+===============================================================================================
+-- Trigger: After each vote, checks if everyone has voted. If so, it calculates approval and promotes if needed.
+
+CREATE OR REPLACE FUNCTION update_admins_on_all_votes()
+RETURNS TRIGGER AS $$
+DECLARE 
+    group_id INT := NEW.group_id;
+    total_members INT;
+    voters_count INT;
+BEGIN
+  SELECT COUNT(*) INTO total_members FROM user_groups WHERE group_id = NEW.group_id;
+  
+  SELECT COUNT(DISTINCT voter_member_id) INTO voters_count FROM nomination_approvals 
+  WHERE group_id = NEW.group_id AND nominated_member_id = NEW.nominated_member_id;
+
+  IF voters_count = total_members THEN
+      PERFORM promote_approved_admins(group_id, total_members, nominated_member_id);
+  END IF;
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER update_on_all_votes
+AFTER INSERT ON nomination_approvals
+FOR EACH ROW
+EXECUTE FUNCTION update_admins_on_all_votes();
+
 
