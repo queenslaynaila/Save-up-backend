@@ -288,7 +288,7 @@ FOR EACH ROW
 EXECUTE FUNCTION update_goals_status();
 
 ===============================================================================================
---Trigger: automatically adds a group creater as both a member and an administrator of that group.
+--Trigger: automatically adds a group creater as both a member and a group administrator on group creation.
 
 CREATE OR REPLACE FUNCTION add_creator_to_user_group()
 RETURNS TRIGGER AS $$
