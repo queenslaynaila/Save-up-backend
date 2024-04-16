@@ -255,7 +255,7 @@ CREATE INDEX idx_expenses_by_date_spent ON expenses(date_spent);
 SELECT create_distributed_table('expenses', 'id');
 
 ===============================================================================================
--- Trigger: Update the status of a goal from In Progress to Complete when the total savings reach the target amount for the goal.
+-- Trigger: Update the status of a goal to Complete when total savings target amount for a goal.
 
 CREATE TRIGGER enforce_update_saving_status
 AFTER INSERT ON savings
@@ -288,7 +288,7 @@ FOR EACH ROW
 EXECUTE FUNCTION update_goals_status();
 
 ===============================================================================================
---Trigger: automatically adds a group creater as both a member and a group administrator on group creation.
+--Trigger: Adds a group creater as both a member and a group administrator on group creation.
 
 CREATE OR REPLACE FUNCTION add_creator_to_user_group()
 RETURNS TRIGGER AS $$
