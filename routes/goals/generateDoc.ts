@@ -2,7 +2,7 @@ import { z } from "zod";
 import * as yaml from 'yaml';
 import * as fs from 'fs';
 import { OpenAPIRegistry, OpenApiGeneratorV3, extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
-import { GetInviteSchema } from '../../types';
+import { getInviteSchema } from '../../types';
 
 extendZodWithOpenApi(z);
 const registry = new OpenAPIRegistry();
@@ -99,7 +99,7 @@ const deleteGoal = {
       description: 'Saving created successfully.',
       content: {
         'application/json': {
-          schema: z.array(GetInviteSchema)
+          schema: z.array(getInviteSchema)
         }
       }
     },

@@ -11,7 +11,7 @@ const SQL_GET_EXPENSE_BY_ID = sql<{ id:number; entity_id:number },  ExpenseInter
 `);
 
 export default (router: Router) => {
-  router.get<{ expenseId: string }, ExpenseInterface, Record<string, never>, Record<string, never>>(
+  router.get<{ expenseId: string }, ExpenseInterface, Record<string,never>, Record<string,never>>(
     '/records/:expenseId', 
     authMiddleware(), 
     async (req, res) => {

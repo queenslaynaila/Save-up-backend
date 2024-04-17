@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 
-const SQL_DELETE_KIN = sql<{ user_id: number, id: number },Record<string, never>>(`
+const SQL_DELETE_KIN = sql<{ user_id: number, id: number }, Record<string,never>>(`
     UPDATE next_of_kins  
     SET deleted_at = NOW()
     WHERE user_id = :user_id
@@ -10,7 +10,7 @@ const SQL_DELETE_KIN = sql<{ user_id: number, id: number },Record<string, never>
 `);
 
 export default (router: Router) => {   
-  router.patch<{ id: string },{message:string}, Record<string, never>, Record<string, never>>(
+  router.patch<{ id: string }, {message:string}, Record<string,never>, Record<string,never>>(
     '/record/:id', 
     authMiddleware(), 
     async (req, res) => {

@@ -4,12 +4,12 @@ import authMiddleware from '../../middleware/authorization';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { SavingInterface, ID_SCHEMA } from '../../types';
 
-const SQL_GET_SAVINGS = sql<Record<string, never>, SavingInterface>(`
+const SQL_GET_SAVINGS = sql<Record<string,never>, SavingInterface>(`
   SELECT * FROM savings 
 `);
 
 export default (router: Router) => {
-  router.get<{ savingIdentifier: string },SavingInterface,Record<string, never>,{ category_id?:string; goal_id?:string}
+  router.get<{ savingIdentifier: string }, SavingInterface, Record<string,never>, { category_id?:string; goal_id?:string}
   >('/:savingIdentifier', 
     authMiddleware(), 
     async (req, res: Response) => {

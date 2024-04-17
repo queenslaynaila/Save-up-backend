@@ -9,7 +9,7 @@ const SQL_FIND_INVITATIONS_FOR_USER = sql<{ receiver_id: number }, InviteInterfa
 `);
 
 export default (router: Router) => {
-  router.get<{ user_id: string }, InviteInterface[], Record<string, never>, Record<string, never>>(
+  router.get<{ user_id: string }, InviteInterface[], Record<string,never>, Record<string,never>>(
     '/my-invites', 
     authMiddleware(),
     async (req, res) => {

@@ -14,7 +14,7 @@ const SQL_UPDATE_CATEGORY = sql<UpdatedCategoryInterface, CategoryInterface>(`
 `);
 
 export default (router: Router) => {
-  router.patch<IdParamInterface, CategoryInterface, UpdatedCategoryInterface, Record<string, never>>(
+  router.patch<IdParamInterface, CategoryInterface, UpdatedCategoryInterface, Record<string,never>>(
     '/:idn', 
     authMiddleware({roles:[ UserRole.ADMIN ]}),
     validateRequest(updateCategorySchema),

@@ -1,10 +1,10 @@
 import { Router, Request, Response } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import { TopExpenseCategories } from '../../types/index'
+import { TopExpenseCategoriesInterface } from '../../types/index'
 
 
-const SQL_GET_TOP_EXPENDITURE_CATEGORIES = sql<{ userId:number }, TopExpenseCategories>(`
+const SQL_GET_TOP_EXPENDITURE_CATEGORIES = sql<{ userId:number }, TopExpenseCategoriesInterface>(`
   SELECT e.category_id, c.name AS category_name, COALESCE(SUM(e.amount_spent), 0) AS total_expense FROM expenses e
   JOIN categories c ON e.category_id = c.id
   WHERE  e.entity_id = :userId
@@ -13,7 +13,7 @@ const SQL_GET_TOP_EXPENDITURE_CATEGORIES = sql<{ userId:number }, TopExpenseCate
 `);
 
 export default (router: Router) => {
-  router.get<Record<string, never>, TopExpenseCategories, Record<string, never>, Record<string, never>>(
+  router.get<Record<string,never>, TopExpenseCategoriesInterface, Record<string,never>, Record<string,never>>(
     '/top-expenditure-categories',
     authMiddleware(),
     async (req: Request, res: Response) => {

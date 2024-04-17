@@ -1,7 +1,7 @@
 import { sql } from './db';
 import sendSms from './services/twilio';
 
-const SQL_GET_USER_PHONE_NUMBERS = sql<Record<string, never>, {  phone_numbers: string[] }>(`
+const SQL_GET_USER_PHONE_NUMBERS = sql<Record<string,never>, {  phone_numbers: string[] }>(`
       SELECT phone_number FROM users_phone
 `);
 

@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { validateRequest } from '../../middleware/validationMiddleware';
-import { UpdateNextOfKinInterface, NextOfKinInterface, UpdateNextOfKinSchema } from '../../types'; 
+import { UpdateNextOfKinInterface, NextOfKinInterface, updateNextOfKinSchema } from '../../types'; 
 
 const SQL_UPDATE_KIN = sql<UpdateNextOfKinInterface, NextOfKinInterface>(`
   UPDATE next_of_kins
@@ -14,10 +14,10 @@ const SQL_UPDATE_KIN = sql<UpdateNextOfKinInterface, NextOfKinInterface>(`
   RETURNING id ,full_name, relationship, email, phone_number, created_at, updated_at
 `);
 
-const nextOfKinRequest = UpdateNextOfKinSchema.omit({ user_id: true, id: true });
+const nextOfKinRequest = updateNextOfKinSchema.omit({ user_id: true, id: true });
 
 export default (router: Router) => {
-  router.patch<{ id: string }, NextOfKinInterface, UpdateNextOfKinInterface, Record<string, never>, Record<string, never>>(
+  router.patch<{ id: string }, NextOfKinInterface, UpdateNextOfKinInterface, Record<string,never>, Record<string,never>>(
     '/:id',
     authMiddleware(),
     validateRequest(nextOfKinRequest),

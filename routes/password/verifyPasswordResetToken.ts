@@ -14,12 +14,12 @@ const SQL_GET_SECURITY_QUESTIONS = sql<{ user_id: number }, { question: string; 
   WHERE sa.user_id = :user_id;
 `);
 
-const SQL_UPDATE_TOKEN_USAGE = sql<{ user_id:number; reset_token:string }, Record<string, never>>(`
+const SQL_UPDATE_TOKEN_USAGE = sql<{ user_id:number; reset_token:string }, Record<string,never>>(`
  UPDATE reset_tokens SET used_at = NOW() WHERE user_id = :user_id AND token = :reset_token
 `);
 
 export default(router: Router) => {
-  router.post<Record<string, never>, securityQuestions, { user_id:number; reset_token: string }, Record<string, never>, Record<string, never>>(
+  router.post<Record<string,never>, securityQuestions, { user_id:number; reset_token: string }, Record<string,never>, Record<string,never>>(
     '/verify-reset-token',
     verifyResetToken,
     async (req, res) => {

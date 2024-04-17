@@ -2,15 +2,15 @@ import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { HttpError } from '../../middleware/errorMiddleware';
-import {GoalInterface } from '../../types';
+import { GoalInterface } from '../../types';
 
-const SQL_GET_SAVING_BY_ID = sql<{ id: number;}, GoalInterface>(`
+const SQL_GET_SAVING_BY_ID = sql<{ id: number}, GoalInterface>(`
     SELECT id, entity_id, description, category_id, amount, priority, target_at ,created_at,completed_at FROM goals
     WHERE id = :id
 `);
 
 export default (router: Router) => {
-  router.get<{ goalId: string }, GoalInterface, Record<string, never>, Record<string, never>>(
+  router.get<{ goalId: string }, GoalInterface, Record<string,never>, Record<string,never>>(
     '/records/:goalId', 
     authMiddleware(), 
     async (req, res) => {

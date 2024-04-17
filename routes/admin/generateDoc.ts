@@ -2,7 +2,7 @@ import { z } from "zod";
 import * as yaml from 'yaml';
 import * as fs from 'fs';
 import { OpenAPIRegistry, OpenApiGeneratorV3, extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
-import { UpdatedUserRoleSchema, BaseUserSchema, statsParamSchema, statsQuerySchema, UserRoleUpdateSchema, financialStatsSchema, messageSchema, Method } from '../../types';
+import { updatedUserRoleSchema, baseUserSchema, statsParamSchema, statsQuerySchema, userRoleUpdateSchema, financialStatsSchema, messageSchema, Method } from '../../types';
 
 extendZodWithOpenApi(z);
 const registry = new OpenAPIRegistry();
@@ -16,7 +16,7 @@ const createAdmin = {
     body: {
       content: {
         'application/json': {
-          schema: BaseUserSchema,
+          schema: baseUserSchema,
         },
       },
     },
@@ -69,14 +69,14 @@ const updateUserRole = {
   summary: 'Either upgrade or downgrade user role',
   tags: ['Admin'],
   request: {
-    params: UserRoleUpdateSchema,
+    params: userRoleUpdateSchema,
   },
   responses: {
     200: {
       description: 'User role succesfully updated',
       content: {
         'application/json': {
-          schema: UpdatedUserRoleSchema
+          schema: updatedUserRoleSchema
         }
       }
     },

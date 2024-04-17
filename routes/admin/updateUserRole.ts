@@ -15,7 +15,7 @@ const SQL_UPDATE_ROLE = sql<UserRoleUpdateInterface, RoleUpdateResultInterface>(
 `);
 
 export default (router: Router) => {
-  router.patch<UserRoleUpdateInterface, RoleUpdateResultInterface, Record<string, never>, Record<string, never>>(
+  router.patch<UserRoleUpdateInterface, RoleUpdateResultInterface, Record<string,never>, Record<string,never>>(
     '/:roleToUpdate/:id',
     authMiddleware({ roles: [UserRole.ADMIN] }),
     async (req, res) => {

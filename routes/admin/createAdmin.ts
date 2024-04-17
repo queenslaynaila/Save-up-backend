@@ -2,7 +2,7 @@ import { Router } from 'express';
 import bcrypt from 'bcrypt';
 import { sql } from '../../db';
 import { validateRequest } from '../../middleware/validationMiddleware';
-import { CreateUserContactInterface, CreateAdminInterface, UserInterface, BaseUserSchema, MessageInterface } from '../../types';
+import { CreateUserContactInterface, CreateAdminInterface, UserInterface, MessageInterface, baseUserSchema } from '../../types';
 
 const SQL_CREATE_USER_ENTITY = sql<{ entity_type: string }, { id:number }>(`
   INSERT INTO entities (entity_type)
@@ -10,20 +10,20 @@ const SQL_CREATE_USER_ENTITY = sql<{ entity_type: string }, { id:number }>(`
   RETURNING id
 `);
 
-const SQL_CREATE_USER_CONTACTS = sql<CreateUserContactInterface, Record<string, never>>(`
+const SQL_CREATE_USER_CONTACTS = sql<CreateUserContactInterface, Record<string,never>>(`
   INSERT INTO user_contacts (id,phone_number,national_id )
   VALUES (:entity_id,:phone_number,:national_id)
 `);
 
-const SQL_CREATE_USER = sql<CreateAdminInterface, Record<string, never>>(`
+const SQL_CREATE_USER = sql<CreateAdminInterface, Record<string,never>>(`
   INSERT INTO users (id,full_name,gender,role,pin)
   VALUES (:id, :full_name, :gender, :role, :pin)
 `);
 
 export default (router: Router) => { 
-  router.post<Record<string, never> ,MessageInterface, UserInterface, Record<string, never>, Record<string, never>>(
+  router.post<Record<string,never> ,MessageInterface, UserInterface, Record<string,never>, Record<string,never>>(
     '/',
-    validateRequest(BaseUserSchema),
+    validateRequest(baseUserSchema),
     async (req, res) => {
       const { full_name, gender, national_id, phone_number, pin } = req.body;
 

@@ -2,7 +2,7 @@ import { z } from "zod";
 import * as yaml from 'yaml';
 import * as fs from 'fs';
 import { OpenAPIRegistry, OpenApiGeneratorV3, extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
-import {  getTopExpenseCategoriesSchema, GetTotalExpensesQuerySchema, getTotalExpenseResultSchema, getTotalSavingsResultSchema, totalTargetGoalsQuerySchema,  getTotalTargetsSchema } from '../../types';
+import {  getTopExpenseCategoriesSchema, getTotalExpensesQuerySchema, getTotalExpenseResultSchema, getTotalSavingsResultSchema, totalTargetGoalsQuerySchema,  getTotalTargetsSchema } from '../../types';
 
 extendZodWithOpenApi(z);
 const registry = new OpenAPIRegistry();
@@ -40,7 +40,7 @@ const getTotalUserExpenditure = {
   summary: 'Gets total expenses',
   tags: ['Cumulatives'],
   request: {
-    params:GetTotalExpensesQuerySchema
+    params:getTotalExpensesQuerySchema
   },
   responses: {
     200: {

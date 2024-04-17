@@ -3,18 +3,18 @@ import bcrypt from 'bcrypt';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { validateRequest } from '../../middleware/validationMiddleware';
-import { CreateSecurityAnswerInterface ,SecurityAnswerRequestSchema } from '../../types';
+import { CreateSecurityAnswerInterface, securityAnswerRequestSchema } from '../../types';
 
-const SQL_CREATE_ANSWER = sql<CreateSecurityAnswerInterface ,Record<string, never>>(`
+const SQL_CREATE_ANSWER = sql<CreateSecurityAnswerInterface ,Record<string,never>>(`
   INSERT INTO security_answers ( user_id, question_id, answer) 
   VALUES (:user_id, :question_id, :answer)
 `); 
 
 export default (router: Router) => {
-  router.post<Record<string, never>, { message: string }, CreateSecurityAnswerInterface , Record<string, never>>(
+  router.post<Record<string,never>, { message: string }, CreateSecurityAnswerInterface , Record<string,never>>(
     '/', 
     authMiddleware(), 
-    validateRequest(SecurityAnswerRequestSchema),
+    validateRequest(securityAnswerRequestSchema),
     async (req, res) => {
       const user_id = req.user!.id;
       const { question_id , answer } = req.body;

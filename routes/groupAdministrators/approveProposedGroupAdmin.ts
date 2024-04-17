@@ -2,13 +2,13 @@ import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 
-const SQL_INSERT_VOTE = sql<{ group_id: number; voter_member_id: number; nominated_member_id: number; vote: boolean }, Record<string, never>>(`
+const SQL_INSERT_VOTE = sql<{ group_id: number; voter_member_id: number; nominated_member_id: number; vote: boolean }, Record<string,never>>(`
   INSERT INTO nomination_approvals (group_id, voter_member_id, nominated_member_id, vote)
   VALUES (:group_id, :voter_member_id, :nominated_member_id, :vote)
 `);
 
 export default (router: Router) => {
-  router.post<{ group_id: string; nominated_member_id: string }, { message: string }, { vote: boolean }, Record<string, never>, Record<string, never>>(
+  router.post<{ group_id: string; nominated_member_id: string }, { message: string }, { vote: boolean }, Record<string,never>, Record<string,never>>(
     '/nominate/:group_id/:nominated_member_id',
     authMiddleware(),
     async (req, res) => {

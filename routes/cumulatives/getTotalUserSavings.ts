@@ -11,7 +11,7 @@ const SQL_GET_TOTAL_CONTRIBUTIONS = sql<{ userId: number }, { total_savings: num
 `);
 
 export default (router: Router) => {
-  router.get<Record<string, never>, { total_savings: number }, Record<string, never>, Record<string, never>>(
+  router.get<Record<string,never>, { total_savings: number }, Record<string,never>, Record<string,never>>(
     '/total-savings', 
     authMiddleware(), 
     async (req, res) => {

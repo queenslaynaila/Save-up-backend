@@ -4,21 +4,22 @@ import { sql } from '../../db';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { generateToken } from '../../middleware/generatetoken';
 import { validateRequest } from '../../middleware/validationMiddleware';
-import { UpdateUserPhoneSchema, GetUserInterface, UpdatePhoneInterface ,ExtendedUserInterface} from '../../types';
+import { updateUserPhoneSchema, GetUserInterface, UpdatePhoneInterface, ExtendedUserInterface} from '../../types';
 
 const SQL_GET_USER_ENTITY_ID = sql<{ phone_number: string }, { id: number }>(`
   SELECT id FROM user_contacts WHERE phone_number = :phone_number
 `);
 
-const SQL_GET_USER = sql<{ id: number },ExtendedUserInterface>(`
+const SQL_GET_USER = sql<{ id: number }, ExtendedUserInterface>(`
   SELECT * FROM users WHERE id = :id
 `);
 
 export default (router: Router) => {
-  router.post<Record<string, never>, GetUserInterface , UpdatePhoneInterface , Record<string, never>>(
+  router.post<Record<string,never>, GetUserInterface, UpdatePhoneInterface, Record<string,never>>(
     '/signin',
-    validateRequest(UpdateUserPhoneSchema),
+    validateRequest(updateUserPhoneSchema),
     async (req, res) => {
+
       const { phone_number , pin } = req.body;
       const entity_id = await SQL_GET_USER_ENTITY_ID({ phone_number }).one(
         new HttpError(404, 'User Not found')
@@ -43,6 +44,7 @@ export default (router: Router) => {
         .setHeader('X-Refresh-Token', refreshToken)
         .setHeader('X-Auth-Token', accessToken)
         .json(userResult);
+        
     }
   );
 };

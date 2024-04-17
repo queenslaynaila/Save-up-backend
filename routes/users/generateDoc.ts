@@ -2,7 +2,7 @@ import { z } from "zod";
 import * as yaml from 'yaml';
 import * as fs from 'fs';
 import { OpenAPIRegistry, OpenApiGeneratorV3, extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
-import { BaseUserSchema, UpdateUserPhoneSchema, GetUserSchema  } from '../../types';
+import { baseUserSchema, updateUserPhoneSchema, GetUserSchema  } from '../../types';
 
 extendZodWithOpenApi(z);
 const registry = new OpenAPIRegistry();
@@ -23,7 +23,7 @@ const createUser = {
     body: {
       content: {
         'application/json': {
-          schema: BaseUserSchema,
+          schema: baseUserSchema,
         },
       },
     },
@@ -50,7 +50,7 @@ const login = {
     body: {
       content: {
         'application/json': {
-          schema:UpdateUserPhoneSchema,
+          schema:updateUserPhoneSchema,
         },
       },
     },
@@ -112,7 +112,7 @@ const updateUserPhoneNo = {
     body: {
       content: {
         'application/json': {
-          schema: UpdateUserPhoneSchema
+          schema: updateUserPhoneSchema
         }
       }
     }

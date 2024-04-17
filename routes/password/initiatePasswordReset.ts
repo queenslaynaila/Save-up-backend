@@ -16,7 +16,7 @@ const SQL_SAVE_TOKEN = sql<{ user_id:number; token: string }, { token: string }>
 `);
 
 export default  (router: Router) => {
-  router.post<Record<string, never>, { message: string }, { phone_number: string }, Record<string, never>>(
+  router.post<Record<string,never>, { message: string }, { phone_number: string }, Record<string,never>>(
     '/forget-password',
     async (req, res) => {
       const { phone_number } = req.body;

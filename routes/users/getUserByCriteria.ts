@@ -4,19 +4,20 @@ import { HttpError } from '../../middleware/errorMiddleware';
 import { hasPermission } from '../../middleware/hasPermission';
 import { convertToTitleCase, isValidValue } from '../../middleware/caseNormalization';
 import authMiddleware from '../../middleware/authorization';
-import { GetUserInterface,ID_SCHEMA } from '../../types/index';
+import { GetUserInterface, ID_SCHEMA } from '../../types/index';
 
-const SQL_GET_ALL_USERS = sql<Record<string, never>,  GetUserInterface>(`
+const SQL_GET_ALL_USERS = sql<Record<string,never>,  GetUserInterface>(`
   SELECT id, full_name, role, gender, created_at FROM users
 `);
 
 const ACCEPTED_ROLES = ['User', 'Admin', 'Moderator'];
 
 export default (router: Router) => {
-  router.get<string, { targetUser: string }, GetUserInterface, Record<string, never>, { role?: string }>(
+  router.get<string, { targetUser: string }, GetUserInterface, Record<string,never>, { role?: string }>(
     '/:targetUser', 
     authMiddleware(), 
     async (req, res: Response) => {
+
       const { targetUser } = req.params;
       const { role } = req.query;
       const filters: string[] = [];
@@ -51,5 +52,6 @@ export default (router: Router) => {
       query.extend('LIMIT 15', {});
       const users = await query.many();
       res.json(users);
+      
     });
 };

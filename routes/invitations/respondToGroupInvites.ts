@@ -4,7 +4,7 @@ import authMiddleware from '../../middleware/authorization';
 import { validateRequest } from '../../middleware/validationMiddleware';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { convertToTitleCase } from '../../middleware/caseNormalization';
-import {InviteResponseInterface, InviteRequestInterface, InviteRequestSchema} from '../../types';
+import { InviteResponseInterface, InviteRequestInterface, inviteRequestSchema } from '../../types';
 
 const SQL_RESPOND_TO_INVITE = sql<InviteResponseInterface, { message:string }>(`
   UPDATE invitations
@@ -15,10 +15,10 @@ const SQL_RESPOND_TO_INVITE = sql<InviteResponseInterface, { message:string }>(`
 const VALID_RESOURCES = ['Pending', 'Accepted', 'Rejected'];
 
 export default (router: Router) => {
-  router.patch<Record<string, never>,{ message:string },InviteRequestInterface, Record<string,never>, Record<string, never>>(
+  router.patch<Record<string,never>, { message:string }, InviteRequestInterface, Record<string,never>, Record<string,never>>(
     '/update-invite',
     authMiddleware(),
-    validateRequest( InviteRequestSchema),
+    validateRequest( inviteRequestSchema),
     async (req, res) => {
       const  receiver_id = req.user!.id
       const { group_id,status} = req.body;

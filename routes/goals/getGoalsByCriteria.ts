@@ -8,14 +8,14 @@ import { GoalInterface } from '../../types/index';
 const ACCEPTED_STATUS_VALUES = ['In Progress', 'Dormant', 'Completed'];
 const ACCEPTED_PRIORITY_VALUES = ['High', 'Intermediate', 'Low'];
 
-const SQL_GET_SAVINGS = sql<Record<string, never>,GoalInterface>(`
+const SQL_GET_SAVINGS = sql<Record<string,never>,GoalInterface>(`
   SELECT id, entity_id, description, category_id, amount, priority, target_at ,created_at,completed_at FROM goals 
   WHERE deleted_at IS NULL
 `);
 
 export default (router: Router) => {
   router.get<string,{ goalsIdentifier: string },GoalInterface[],
-  Record<string, never>,
+  Record<string,never>,
   { category_id?: string; priority?: string; status?: string; start_at?: string; completed_at?: string }
   >('/:goalsIdentifier', 
     authMiddleware(), 

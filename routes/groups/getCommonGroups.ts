@@ -12,7 +12,7 @@ const SQL_GET_COMMON_GROUPS = sql<{logged_in_user_id: number, user_id: number },
 `);
 
 export default (router: Router) => {
-  router.get<{ user_id: string }, CommonGroupInterface[], Record<string, never>, Record<string, never>>(
+  router.get<{ user_id: string }, CommonGroupInterface[], Record<string,never>, Record<string,never>>(
     '/common-groups/:user_id',
     authMiddleware(),
     async (req, res) => {

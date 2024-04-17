@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { validateRequest } from '../../middleware/validationMiddleware';
-import { CreateGroupInterface, CreateGroupResponseInterface, BaseGroupSchema } from '../../types';
+import { CreateGroupInterface, CreateGroupResponseInterface, baseGroupSchema } from '../../types';
 
 const SQL_CREATE_GROUP_ENTITY = sql<{entity_type: string }, { id:number }>(`
   INSERT INTO entities (entity_type)
@@ -17,10 +17,10 @@ const SQL_CREATE_GROUP = sql<CreateGroupInterface, CreateGroupResponseInterface>
 `);
 
 export default (router: Router) => {
-  router.post<Record<string, never>, CreateGroupResponseInterface,CreateGroupInterface , Record<string, never>, Record<string, never>>(
+  router.post<Record<string,never>, CreateGroupResponseInterface,CreateGroupInterface , Record<string,never>, Record<string,never>>(
     '/',
     authMiddleware(),
-    validateRequest(BaseGroupSchema),
+    validateRequest(baseGroupSchema),
     async (req, res) => {
       const user_id= req.user!.id
       const entity = await SQL_CREATE_GROUP_ENTITY({ entity_type: 'Groups' }).one();

@@ -8,7 +8,7 @@ import { UserRole, StatsQueryInterface, StatsParamInterface, FinancialStatsInter
 const SQL_GET_CUMULATIVES = (query: string) =>sql<{ operator: string; resource: string }, FinancialStatsInterface>(query);
 
 export default (router: Router) => {
-  router.get<StatsParamInterface, FinancialStatsInterface, Record<string, never>, StatsQueryInterface>(
+  router.get<StatsParamInterface, FinancialStatsInterface, Record<string,never>, StatsQueryInterface>(
     '/financial-stats/:resource/:operator',
     authMiddleware({ roles: [UserRole.ADMIN] }),
     async (req, res) => {

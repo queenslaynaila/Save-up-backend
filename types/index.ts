@@ -64,7 +64,7 @@ export const UpdateSecurityAnswerSchema = SecurityQuestionSchema.extend({
 
 export type UpdateSecurityAnswerInterface = z.infer<typeof UpdateSecurityAnswerSchema>;
 
-export const SecurityAnswerValidationSchema = UpdateSecurityAnswerSchema.pick({
+export const securityAnswerValidationSchema = UpdateSecurityAnswerSchema.pick({
   answer: true
 })
 
@@ -75,7 +75,7 @@ export const enum UserRole {
   MODERATOR = 'Moderator'
 }
 
-export const BaseUserSchema = z.object({
+export const baseUserSchema = z.object({
   full_name: z.string(),
   gender: z.enum(['Male', 'Female', 'Prefer not to say']),
   national_id: z.number().int().min(10000000).max(99999999),                
@@ -85,15 +85,15 @@ export const BaseUserSchema = z.object({
   pin: z.string().refine((value) => /^\d{4}$/.test(value)),
 });
 
-export type UserInterface = z.infer<typeof BaseUserSchema>;
+export type UserInterface = z.infer<typeof baseUserSchema>;
 
-export const UserWithRoleSchema = BaseUserSchema.extend({
+export const UserWithRoleSchema = baseUserSchema.extend({
   role: z.enum(['Admin']).optional(),
 })
 
 export type UserWithRoleInterface = z.infer< typeof UserWithRoleSchema>
 
-export const CreateUserContactSchema = BaseUserSchema.pick({
+export const CreateUserContactSchema = baseUserSchema.pick({
   national_id: true,
   phone_number: true
 }).extend({
@@ -102,7 +102,7 @@ export const CreateUserContactSchema = BaseUserSchema.pick({
 
 export type CreateUserContactInterface = z.infer<typeof CreateUserContactSchema>;
 
-export const CreateUserSchema = BaseUserSchema.pick({
+export const CreateUserSchema = baseUserSchema.pick({
   full_name: true,
   gender: true,
   pin : true
@@ -126,7 +126,7 @@ export const GetUserSchema = CreateUserSchema.pick({
 
 export type GetUserInterface = z.infer<typeof GetUserSchema>;
 
-export const CreateAdminSchema = BaseUserSchema.omit({
+export const CreateAdminSchema = baseUserSchema.omit({
   phone_number: true,
   national_id: true
 }).extend({
@@ -136,21 +136,21 @@ export const CreateAdminSchema = BaseUserSchema.omit({
 
 export type CreateAdminInterface = z.infer<typeof CreateAdminSchema>;
 
-export const UpdatedUserRoleSchema = CreateAdminSchema.omit({
+export const updatedUserRoleSchema = CreateAdminSchema.omit({
   pin: true
 })
 
 
-export const UserSchema = BaseUserSchema.extend({
+export const UserSchema = baseUserSchema.extend({
   role: z.enum([UserRole.ADMIN, UserRole.USER, UserRole.MODERATOR])
 });
 
-export const UpdateUserPhoneSchema = BaseUserSchema.pick({
+export const updateUserPhoneSchema = baseUserSchema.pick({
   pin: true,
   phone_number: true,
 })
 
-export type UpdatePhoneInterface = z.infer<typeof UpdateUserPhoneSchema>;
+export type UpdatePhoneInterface = z.infer<typeof updateUserPhoneSchema>;
 
 // NEXT OF KIN SCHEMAS
 export const CreateNextOfKinSchema = z.object({
@@ -175,11 +175,11 @@ export const NextOfKinSchema= CreateNextOfKinSchema
 
 export type NextOfKinInterface = z.infer<typeof NextOfKinSchema>;
 
-export const UpdateNextOfKinSchema = CreateNextOfKinSchema.partial().extend({
+export const updateNextOfKinSchema = CreateNextOfKinSchema.partial().extend({
   id: z.number()
 });
 
-export type UpdateNextOfKinInterface = z.infer<typeof UpdateNextOfKinSchema>;
+export type UpdateNextOfKinInterface = z.infer<typeof updateNextOfKinSchema>;
 
 // SECURITY ANSWER SCHEMAS
 
@@ -191,7 +191,7 @@ export const createSecurityAnswerSchema = z.object({
 
 export type CreateSecurityAnswerInterface = z.infer<typeof createSecurityAnswerSchema>;
 
-export const SecurityAnswerRequestSchema = createSecurityAnswerSchema.omit({ user_id: true});
+export const securityAnswerRequestSchema = createSecurityAnswerSchema.omit({ user_id: true});
 
 export const SecurityAnswerSchema = createSecurityAnswerSchema.extend({
   id: z.number(),
@@ -202,12 +202,12 @@ export type SecurityAnswerInterface = z.infer<typeof SecurityAnswerSchema>;
 
 // GROUPS SCHEMA
 
-export const BaseGroupSchema = z.object({
+export const baseGroupSchema = z.object({
   group_name: z.string(),
   description: z.string(), 
 })
 
-export const CreateGroupSchema = BaseGroupSchema.extend({
+export const CreateGroupSchema = baseGroupSchema.extend({
   id: z.number(),
   created_by:z.number()
 })
@@ -224,13 +224,13 @@ export const CreateGroupResponse = CreateGroupSchema.extend({
 }) 
 export type CreateGroupResponseInterface = z.infer<typeof CreateGroupResponse>;
 
-export const ExitGroupSchema = z.object({
+export const exitGroupSchema = z.object({
   user_id: z.number(),
   group_id: z.number()
 })
-export type ExitGroupInterface = z.infer<typeof ExitGroupSchema>;
+export type ExitGroupInterface = z.infer<typeof exitGroupSchema>;
 
-export const UpdateGroupSchema = ExitGroupSchema.pick({
+export const UpdateGroupSchema = exitGroupSchema.pick({
   group_id: true,
 }).extend({
   group_name: z.string().optional(),
@@ -252,7 +252,7 @@ export const GetGroupMembers = z.object({
 
 export type GetGroupMembersInterface = z.infer<typeof GetGroupMembers>;
 
-export const NominatedAdminSchema = ExitGroupSchema.extend({
+export const NominatedAdminSchema = exitGroupSchema.extend({
   full_name: z.string(),
   nominated_at: z.date()
 })
@@ -267,11 +267,11 @@ export const SendInviteSchema = z.object({
   group_id:z.number(),
 });
 
-export const GetInviteSchema = SendInviteSchema.extend({
+export const getInviteSchema = SendInviteSchema.extend({
   created_at:z.date(),
 })
 
-export type InviteInterface = z.infer<typeof GetInviteSchema>;
+export type InviteInterface = z.infer<typeof getInviteSchema>;
 
 export type SendInviteInterface = z.infer<typeof SendInviteSchema>;
 
@@ -288,9 +288,9 @@ export const InviteResponseSchema = InviteSchema.extend({
 
 export type InviteResponseInterface = z.infer<typeof InviteResponseSchema>;
 
-export const InviteRequestSchema = InviteResponseSchema.omit({sender_id: true, receiver_id: true});
+export const inviteRequestSchema = InviteResponseSchema.omit({sender_id: true, receiver_id: true});
 
-export type InviteRequestInterface = z.infer<typeof InviteRequestSchema>;
+export type InviteRequestInterface = z.infer<typeof inviteRequestSchema>;
 
 // GOAL SCHEMAS
 
@@ -302,7 +302,7 @@ export const enum priority {
   LOW = 'Low',
 }
 
-export const BaseGoalSchema = z.object({
+export const baseGoalSchema = z.object({
   entity_id: z.number(),
   category_id: z.number(),
   description: z.string(),  
@@ -312,9 +312,9 @@ export const BaseGoalSchema = z.object({
 });
 
 
-export type CreateGoalInterface = z.infer<typeof BaseGoalSchema>;
+export type CreateGoalInterface = z.infer<typeof baseGoalSchema>;
 
-export const GoalSchema =  BaseGoalSchema.extend({
+export const GoalSchema =  baseGoalSchema.extend({
   id: z.number(),
   created_at: z.date(),
   target_at: z.date(),
@@ -324,7 +324,7 @@ export const GoalSchema =  BaseGoalSchema.extend({
 
 export type GoalInterface = z.infer<typeof GoalSchema>;
 
-export const UpdateGoalSchema = BaseGoalSchema.omit({ entity_id: true }).partial().extend({id: z.number()});
+export const UpdateGoalSchema = baseGoalSchema.omit({ entity_id: true }).partial().extend({id: z.number()});
 
 export const UpdateGoalRequestSchema = UpdateGoalSchema.omit({ id: true });
 
@@ -340,7 +340,7 @@ export const BaseSavingSchema = z.object({
 
 export type CreateSavingInterface = z.infer<typeof BaseSavingSchema>;
 
-export const ValidateSavingCreation = BaseSavingSchema.omit({ user_id: true })
+export const validateSavingCreationSchema = BaseSavingSchema.omit({ user_id: true })
 
 export const SavingSchema = BaseSavingSchema.extend({
   id: z.number(),
@@ -359,7 +359,7 @@ export const BaseExpenseSchema = z.object({
   date_spent: z.string(),
 });
 
-export const CreateExpenseSchemaValidation = BaseExpenseSchema.omit({ entity_id: true }).partial()
+export const createExpenseSchemaValidation = BaseExpenseSchema.omit({ entity_id: true }).partial()
 
 export type CreateExpenseInterface = z.infer<typeof BaseExpenseSchema>;
 
@@ -374,7 +374,7 @@ export const UpdateExpenseSchema = BaseExpenseSchema.partial().extend({id: z.num
 
 export type UpdateExpenseInterface = z.infer<typeof UpdateExpenseSchema>;
 
-export const ValidateUpdateExpenseSchema = UpdateExpenseSchema.omit({
+export const validateUpdateExpenseSchema = UpdateExpenseSchema.omit({
   entity_id:true,
   id:true
 })
@@ -416,17 +416,17 @@ export const financialStatsSchema = z.object({
 
 export type FinancialStatsInterface = z.infer<typeof financialStatsSchema>;
 
-export const UserRoleUpdateSchema = z.object({
+export const userRoleUpdateSchema = z.object({
   roleToUpdate: z.string(),
   id: z.string(),
 });
 
-export type UserRoleUpdateInterface = z.infer<typeof UserRoleUpdateSchema>;
+export type UserRoleUpdateInterface = z.infer<typeof userRoleUpdateSchema>;
 
-export type RoleUpdateResultInterface = z.infer<typeof UpdatedUserRoleSchema>;
+export type RoleUpdateResultInterface = z.infer<typeof updatedUserRoleSchema>;
 
 ////////////////////////////////////////////////////////////////////////////////
-export const NextOfKinCreationSchema = CreateNextOfKinSchema.omit({user_id: true});
+export const nextOfKinCreationSchema = CreateNextOfKinSchema.omit({user_id: true});
 
 export const getTopExpenseCategoriesSchema = z.array(
   z.object({
@@ -435,9 +435,9 @@ export const getTopExpenseCategoriesSchema = z.array(
   })
 )
 
-export type TopExpenseCategories = z.infer<typeof getTopExpenseCategoriesSchema>;
+export type TopExpenseCategoriesInterface = z.infer<typeof getTopExpenseCategoriesSchema>;
 
-export const GetTotalExpensesQuerySchema = z.object({
+export const getTotalExpensesQuerySchema = z.object({
   startDate: z.string().optional(),
   endDate: z.string().optional(),
   categoryId: z.string().optional()

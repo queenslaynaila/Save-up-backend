@@ -2,7 +2,7 @@ import { z } from "zod";
 import * as yaml from 'yaml';
 import * as fs from 'fs';
 import { OpenAPIRegistry, OpenApiGeneratorV3, extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
-import { NextOfKinSchema, NextOfKinCreationSchema, UpdateNextOfKinSchema } from '../../types';
+import { NextOfKinSchema, nextOfKinCreationSchema, updateNextOfKinSchema } from '../../types';
 
 extendZodWithOpenApi(z);
 
@@ -25,7 +25,7 @@ const createNextOfKin = {
     body: {
       content: {
         'application/json': {
-          schema: NextOfKinCreationSchema,
+          schema: nextOfKinCreationSchema,
         },
       },
     },
@@ -106,7 +106,7 @@ const updateNextOfKin = {
     body: {
       content: {
         'application/json': {
-          schema:UpdateNextOfKinSchema,
+          schema:updateNextOfKinSchema,
         },
       },
     },

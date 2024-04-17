@@ -17,7 +17,7 @@ const SQL_UPDATE_SAVING = sql<UpdateGoalInterface, GoalInterface>(`
 `);
 
 export default (router: Router) => {
-  router.patch<{ id: string }, GoalInterface, UpdateGoalInterface, Record<string, never>>(
+  router.patch<{ id: string }, GoalInterface, UpdateGoalInterface, Record<string,never>>(
     '/:id', 
     authMiddleware(), 
     validateRequest(UpdateGoalRequestSchema),

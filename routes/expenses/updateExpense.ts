@@ -3,7 +3,7 @@ import { sql } from '../../db';
 import { HttpError } from '../../middleware/errorMiddleware';
 import authMiddleware from '../../middleware/authorization';
 import { validateRequest } from '../../middleware/validationMiddleware';
-import { UpdateExpenseInterface, ExpenseInterface, ValidateUpdateExpenseSchema } from '../../types';
+import { UpdateExpenseInterface, ExpenseInterface, validateUpdateExpenseSchema } from '../../types';
 
 const SQL_UPDATE_EXPENSE= sql<UpdateExpenseInterface,ExpenseInterface>(`
   UPDATE expenses
@@ -16,10 +16,10 @@ const SQL_UPDATE_EXPENSE= sql<UpdateExpenseInterface,ExpenseInterface>(`
 `);
 
 export default (router: Router) => {
-  router.patch<{ id: string },ExpenseInterface, UpdateExpenseInterface, Record<string, never>>(
+  router.patch<{ id: string },ExpenseInterface, UpdateExpenseInterface, Record<string,never>>(
     '/:id', 
     authMiddleware(), 
-    validateRequest( ValidateUpdateExpenseSchema),
+    validateRequest( validateUpdateExpenseSchema),
     async (req, res) => {
       const userId = req.user!.id;
       const expenseId = parseInt(req.params.id);

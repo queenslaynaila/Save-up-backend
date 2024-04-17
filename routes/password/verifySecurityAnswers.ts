@@ -15,7 +15,7 @@ interface SecurityAnswersRequest {
 }
 
 export default (router: Router) => {
-  router.post<string, Record<string, never>, { message: string }, SecurityAnswersRequest, Record<string, never>>(
+  router.post<string, Record<string,never>, { message: string }, SecurityAnswersRequest, Record<string,never>>(
     '/verify-security-answers',
     verifyResetToken,
     async (req, res) => {

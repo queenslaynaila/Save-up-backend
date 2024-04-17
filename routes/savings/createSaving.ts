@@ -3,7 +3,7 @@ import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { validateRequest } from '../../middleware/validationMiddleware';
-import { CreateSavingInterface, SavingInterface, ValidateSavingCreation } from '../../types';
+import { CreateSavingInterface, SavingInterface, validateSavingCreationSchema } from '../../types';
 
 const SQL_CREATE_SAVING = sql<CreateSavingInterface, SavingInterface>(`
     INSERT INTO savings (id,user_id,goal_id, amount)
@@ -13,11 +13,10 @@ const SQL_CREATE_SAVING = sql<CreateSavingInterface, SavingInterface>(`
 `);
 
 export default (router: Router) => {
-  router.post<Record<string, never>,SavingInterface,CreateSavingInterface,
-  Record<string, never>,Record<string, never>>(
+  router.post<Record<string,never>, SavingInterface, CreateSavingInterface, Record<string,never>, Record<string,never>>(
     '/', 
     authMiddleware(), 
-    validateRequest(ValidateSavingCreation),
+    validateRequest(validateSavingCreationSchema),
     async (req, res) => {
       const user_id= req.user!.id
       const { goal_id, amount} = req.body;

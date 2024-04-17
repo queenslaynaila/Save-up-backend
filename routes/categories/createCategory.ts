@@ -11,7 +11,7 @@ const SQL_CREATE_CATEGORY = sql<CreateCategoryInterface, CategoryInterface>(`
 `);
 
 export default (router: Router) => {
-  router.post<Record<string, never>,CategoryInterface,CreateCategoryInterface,Record<string, never>,Record<string, never>>(
+  router.post<Record<string,never>,CategoryInterface,CreateCategoryInterface,Record<string,never>,Record<string,never>>(
     '/',
     authMiddleware({roles:[ UserRole.ADMIN ]}),
     validateRequest(createCategorySchema),

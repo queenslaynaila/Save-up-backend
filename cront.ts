@@ -3,7 +3,7 @@ import { sql } from './db';
 import sendSms from './services/twilio';
 
 
-const SQL_GET_OVERDUE_SAVINGS = sql<Record<string, never>, { user_id:number; target_at: Date,amount:number; }>(`  
+const SQL_GET_OVERDUE_SAVINGS = sql<Record<string,never>, { user_id:number; target_at: Date,amount:number; }>(`  
   SELECT s.user_id, s.amount, s.target_at,s.description,s.category_id
   FROM savings s
   WHERE s.status = 'In Progress' AND (DATE(CURRENT_TIMESTAMP) - DATE(s.target_at)) >= 90;  

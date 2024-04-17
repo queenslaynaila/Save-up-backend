@@ -13,14 +13,14 @@ const SQL_FIND_PENDING_INVITATION = sql<{ receiver_id: number, group_id: number 
   WHERE receiver_id = :receiver_id AND group_id = :group_id AND status = 'Pending'
 `);
 
-const SQL_SEND_INVITATION = sql<SendInviteInterface, Record<string, never>>(`
+const SQL_SEND_INVITATION = sql<SendInviteInterface, Record<string,never>>(`
   INSERT INTO invitations ( group_id, receiver_id, sender_id)
   VALUES(:group_id, :receiver_id, :sender_id) 
   RETURNING *
 `);
 
 export default (router: Router) => {
-  router.post<{ groupId: string }, { message: string }, { phone_number: string }, Record<string, never>, Record<string, never>>(
+  router.post<{ groupId: string }, { message: string }, { phone_number: string }, Record<string,never>, Record<string,never>>(
     '/:groupId', 
     authMiddleware(),
     async (req, res) => {

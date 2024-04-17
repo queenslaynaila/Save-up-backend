@@ -2,7 +2,7 @@ import { z } from "zod";
 import * as yaml from 'yaml';
 import * as fs from 'fs';
 import { OpenAPIRegistry, OpenApiGeneratorV3, extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
-import { SecurityAnswerRequestSchema } from '../../types';
+import { securityAnswerRequestSchema } from '../../types';
 
 extendZodWithOpenApi(z);
 const registry = new OpenAPIRegistry();
@@ -23,7 +23,7 @@ const createSecurityAnswer = {
     body: {
       content: {
         'application/json': {
-          schema: SecurityAnswerRequestSchema,
+          schema: securityAnswerRequestSchema,
         },
       },
     },
@@ -50,7 +50,7 @@ const updateSecurityAnswer = {
     body: {
       content: {
         'application/json': {
-          schema: SecurityAnswerRequestSchema,
+          schema: securityAnswerRequestSchema,
         },
       },
       required: true,
