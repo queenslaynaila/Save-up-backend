@@ -1,0 +1,206 @@
+info:
+  version: 1.0.0
+  title: Next of Kin Management API
+  description: API for managing next of kin
+tags:
+  - name: Next of Kin Management
+    description: Endpoints for managing next of kin
+openapi: ""
+components:
+  schemas: {}
+  parameters: {}
+paths:
+  /next-of-kin:
+    post:
+      summary: Create a next of kin
+      tags:
+        - Next of Kin Management
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                full_name:
+                  type: string
+                relationship:
+                  type: string
+                  enum:
+                    &a1
+                    - Parent
+                    - Spouse
+                    - Sibling
+                    - Child
+                    - Relative
+                    - Lawyer
+                    - Friend
+                email:
+                  type: string
+                  format: email
+                phone_number:
+                  type: string
+              required:
+                - full_name
+                - relationship
+                - email
+                - phone_number
+      responses:
+        "200":
+          description: Next of kin created successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  full_name:
+                    type: string
+                  relationship:
+                    type: string
+                    enum: *a1
+                  email:
+                    type: string
+                    format: email
+                  phone_number:
+                    type: string
+                  id:
+                    type: number
+                  created_at:
+                    type: string
+                  updated_at:
+                    type: string
+                required:
+                  - full_name
+                  - relationship
+                  - email
+                  - phone_number
+                  - id
+                  - created_at
+                  - updated_at
+        "400":
+          description: "Bad Request: You already have an existing next of kin. Please
+            update it"
+        "403":
+          description: "Forbidden: Unprocessable entity"
+        "500":
+          description: Internal server error.
+  "/next-of-kin/record/{id}":
+    patch:
+      summary: Soft delete a next of kin
+      tags:
+        - Next of Kin Management
+      parameters:
+        - schema:
+            type: string
+          required: true
+          name: id
+          in: path
+      responses:
+        "200":
+          description: Next of kin deleted successfully
+        "403":
+          description: "Forbidden: Unprocessable entity"
+        "500":
+          description: Internal server error.
+  /next-of-kin/:
+    get:
+      summary: Get next of kin details
+      tags:
+        - Next of Kin Management
+      responses:
+        "200":
+          description: Next of kin details retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  full_name:
+                    type: string
+                  relationship:
+                    type: string
+                    enum: *a1
+                  email:
+                    type: string
+                    format: email
+                  phone_number:
+                    type: string
+                  id:
+                    type: number
+                  created_at:
+                    type: string
+                  updated_at:
+                    type: string
+                required:
+                  - full_name
+                  - relationship
+                  - email
+                  - phone_number
+                  - id
+                  - created_at
+                  - updated_at
+        "403":
+          description: "Forbidden: Unprocessable entity"
+        "500":
+          description: Internal server error.
+    patch:
+      summary: Update next of kin details
+      tags:
+        - Next of Kin Management
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: number
+                full_name:
+                  type: string
+                relationship:
+                  type: string
+                  enum: *a1
+                email:
+                  type: string
+                  format: email
+                phone_number:
+                  type: string
+                id:
+                  type: number
+              required:
+                - id
+      responses:
+        "200":
+          description: Next of kin details updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  full_name:
+                    type: string
+                  relationship:
+                    type: string
+                    enum: *a1
+                  email:
+                    type: string
+                    format: email
+                  phone_number:
+                    type: string
+                  id:
+                    type: number
+                  created_at:
+                    type: string
+                  updated_at:
+                    type: string
+                required:
+                  - full_name
+                  - relationship
+                  - email
+                  - phone_number
+                  - id
+                  - created_at
+                  - updated_at
+        "403":
+          description: "Forbidden: Unprocessable entity"
+        "500":
+          description: Internal server error.

@@ -1,0 +1,186 @@
+info:
+  version: 1.0.0
+  title: SAPI
+  description: API for managing savings
+tags:
+  - name: Users
+    description: Endpoints for managing users
+openapi: ""
+components:
+  schemas: {}
+  parameters: {}
+paths:
+  /users:
+    post:
+      summary: Create a User
+      tags:
+        - User
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                full_name:
+                  type: string
+                gender:
+                  type: string
+                  enum:
+                    &a1
+                    - Male
+                    - Female
+                    - Prefer not to say
+                national_id:
+                  type: integer
+                  minimum: 10000000
+                  maximum: 99999999
+                phone_number:
+                  type: string
+                pin:
+                  type: string
+              required:
+                - full_name
+                - gender
+                - national_id
+                - phone_number
+                - pin
+      responses:
+        "200":
+          description: Account created Succesfully.Procced to login.
+        "403":
+          description: Unprocessable entity
+        "500":
+          description: Internal server error.
+  /users/signin:
+    post:
+      summary: Login
+      tags:
+        - User
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                pin:
+                  type: string
+                phone_number:
+                  type: string
+              required:
+                - pin
+                - phone_number
+      responses:
+        "200":
+          description: Looged in successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: number
+                  full_name:
+                    type: string
+                  gender:
+                    type: string
+                    enum: *a1
+                  role:
+                    type: string
+                    enum:
+                      &a2
+                      - Admin
+                      - User
+                      - Moderator
+                  created_at:
+                    type: string
+                required:
+                  - id
+                  - full_name
+                  - gender
+                  - role
+                  - created_at
+        "403":
+          description: Unprocessable entity
+        "500":
+          description: Internal server error.
+  "/users/{targetUser}":
+    get:
+      summary: Get a targetUserByVarious Conditions
+      tags:
+        - User
+      parameters:
+        - schema:
+            type: string
+          required: true
+          name: targetUser
+          in: path
+      responses:
+        "200":
+          description: User retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: number
+                  full_name:
+                    type: string
+                  gender:
+                    type: string
+                    enum: *a1
+                  role:
+                    type: string
+                    enum: *a2
+                  created_at:
+                    type: string
+                required:
+                  - id
+                  - full_name
+                  - gender
+                  - role
+                  - created_at
+        "500":
+          description: Internal server error.
+  "/users/update-phone/{id}":
+    patch:
+      summary: Update a users phone number
+      tags:
+        - User
+      parameters:
+        - schema:
+            type: string
+          required: true
+          name: id
+          in: path
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                pin:
+                  type: string
+                phone_number:
+                  type: string
+              required:
+                - pin
+                - phone_number
+      responses:
+        "200":
+          description: Phone number updated. For continued security, please log in again
+            with your new phone number.
+        "403":
+          description: Unprocessable entity
+        "500":
+          description: Internal server error.
+  /users/signout:
+    post:
+      summary: Get savings by criteria
+      tags:
+        - User
+      responses:
+        "200":
+          description: Logout successfull
+        "500":
+          description: Internal server error.
