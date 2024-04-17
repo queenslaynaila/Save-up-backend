@@ -2,7 +2,7 @@ import { z } from "zod";
 import * as yaml from 'yaml';
 import * as fs from 'fs';
 import { OpenAPIRegistry, OpenApiGeneratorV3, extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
-import { getInviteSchema } from '../../types';
+import { nominatedAdminSchema, messageSchema, idParamSchema, nominateParamsSchema } from '../../types';
 
 extendZodWithOpenApi(z);
 const registry = new OpenAPIRegistry();
@@ -16,23 +16,20 @@ enum Method {
 
 const proposeGroupAdmin = {
   method: Method.POST,
-  path: '/invitations/{groupId}',
-  summary: 'Invite a user to a certain group',
-  tags: ['Invitations'],
+  path: '/groups/nominate/:id',
+  summary: 'Propose certain members to be admin',
+  tags: ['Group Administrators'],
   request: {
-    params: z.object({
-      phone_number: z.string()
-    })
+    params:  idParamSchema
   },
   responses: {
     200: {
-      description: 'Invite sent successfully'
-    },
-    400: {
-      description: 'User already has a pending invitation for this group'
-    },
-    404: {
-      description:'User already has a pending invitation for this group'
+      description: 'Nomination recorded successfully',
+      content:{
+        'application/json': {
+          schema: messageSchema
+        }
+      }
     },
     500: {
       description: 'Internal server error.'
@@ -42,15 +39,18 @@ const proposeGroupAdmin = {
   
 const getProposedGroupAdmins = {
   method: Method.GET,
-  path: '/invitations/my-invites',
-  summary: 'Get recived group invites',
-  tags: ['Invitations'],
+  path: '/groups/{id}',
+  summary: 'Get all proposed admins for a group',
+  tags: ['Group Administrators'],
+  request: {
+    params: idParamSchema
+  },
   responses: {
     200: {
-      description: 'Saving created successfully.',
+      description: 'Admins retriedved successfully.',
       content: {
         'application/json': {
-          schema: z.array(getInviteSchema)
+          schema: z.array(nominatedAdminSchema)
         }
       }
     },
@@ -66,16 +66,14 @@ const getProposedGroupAdmins = {
 const approveProposedGroupAdmin = {
   method: Method.PATCH,
   path: '/savings/records/{id}',
-  summary: 'Get a saving by ID',
-  tags: ['Savings'],
+  summary: 'Approve or disaprove a proposed admin',
+  tags: ['Group Administrators'],
   request: {
-    params: z.object({
-      id: z.string()
-    })
+    params:nominateParamsSchema
   },
   responses: {
     200: {
-      description: 'Saving retrieved successfully',
+      description: 'Vote recorded successfully',
     },
     403: {
       description: 'Unprocessable entity'

@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
+import { MessageInterface, NominateParamsInterface, VoteInterface } from '../../types/index'
 
 const SQL_INSERT_VOTE = sql<{ group_id: number; voter_member_id: number; nominated_member_id: number; vote: boolean }, Record<string,never>>(`
   INSERT INTO nomination_approvals (group_id, voter_member_id, nominated_member_id, vote)
@@ -8,7 +9,7 @@ const SQL_INSERT_VOTE = sql<{ group_id: number; voter_member_id: number; nominat
 `);
 
 export default (router: Router) => {
-  router.post<{ group_id: string; nominated_member_id: string }, { message: string }, { vote: boolean }, Record<string,never>, Record<string,never>>(
+  router.post<NominateParamsInterface, MessageInterface, VoteInterface, Record<string,never>, Record<string,never>>(
     '/nominate/:group_id/:nominated_member_id',
     authMiddleware(),
     async (req, res) => {
@@ -16,7 +17,7 @@ export default (router: Router) => {
       const { vote } = req.body;
       const voter_member_id = req.user!.id;
       await SQL_INSERT_VOTE({ group_id: parseInt(group_id), voter_member_id, nominated_member_id: parseInt(nominated_member_id), vote }).exec();
-      return res.json({ message: 'Nomination recorded successfully.' });
+      return res.json({ message: 'Vote recorded successfully.' });
     }
   );
 };

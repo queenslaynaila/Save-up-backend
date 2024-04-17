@@ -252,12 +252,12 @@ export const GetGroupMembers = z.object({
 
 export type GetGroupMembersInterface = z.infer<typeof GetGroupMembers>;
 
-export const NominatedAdminSchema = exitGroupSchema.extend({
+export const nominatedAdminSchema = exitGroupSchema.extend({
   full_name: z.string(),
   nominated_at: z.date()
 })
 
-export type NominatedAdminInterface = z.infer<typeof NominatedAdminSchema>;
+export type NominatedAdminInterface = z.infer<typeof nominatedAdminSchema>;
 
 //INVITE SCHEMA
 
@@ -466,6 +466,21 @@ export const userRoleUpdateSchema = z.object({
 export type UserRoleUpdateInterface = z.infer<typeof userRoleUpdateSchema>;
 
 export type RoleUpdateResultInterface = z.infer<typeof updatedUserRoleSchema>;
+
+//GROUP ADMIN SCHEMA
+
+export const nominateParamsSchema = z.object({
+  group_id: z.string(),
+  nominated_member_id: z.string(),
+});
+
+export type NominateParamsInterface = z.infer<typeof nominateParamsSchema>;
+
+export const voteSChema = z.object({
+  vote:z.boolean()
+})
+
+export type VoteInterface = z.infer<typeof voteSChema>;
 
 ////////////////////////////////////////////////////////////////////////////////
 export const nextOfKinCreationSchema = CreateNextOfKinSchema.omit({user_id: true});

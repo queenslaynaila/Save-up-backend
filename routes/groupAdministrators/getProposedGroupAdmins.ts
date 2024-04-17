@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import { NominatedAdminInterface } from '../../types';
+import { NominatedAdminInterface, IdParamInterface } from '../../types';
 
 const SQL_GET_NOMINATED_MEMBERS = sql<{ group_id: number }, NominatedAdminInterface>(`
   SELECT na.group_id, na.user_id, na.nominated_at, u.full_name
@@ -11,11 +11,11 @@ const SQL_GET_NOMINATED_MEMBERS = sql<{ group_id: number }, NominatedAdminInterf
 `);
 
 export default (router: Router) => {
-  router.get<{ group_id: string }, NominatedAdminInterface[], Record<string,never>, Record<string,never>>(
-    '/:group_id',
+  router.get<IdParamInterface, NominatedAdminInterface[], Record<string,never>, Record<string,never>>(
+    '/:id',
     authMiddleware(),
     async (req, res) => {
-      const group_id = parseInt(req.params.group_id);
+      const group_id = parseInt(req.params.id);
       const groups = await SQL_GET_NOMINATED_MEMBERS({ group_id }).many();
       return res.json(groups);
     }
