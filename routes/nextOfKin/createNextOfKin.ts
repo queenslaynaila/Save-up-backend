@@ -3,7 +3,7 @@ import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { validateRequest } from '../../middleware/validationMiddleware';
-import { CreateNextOfKinInterface , NextOfKinInterface , CreateNextOfKinSchema  } from '../../types'; 
+import { CreateNextOfKinInterface , NextOfKinInterface ,  NextOfKinCreationSchema  } from '../../types'; 
 
 const SQL_CREATE_KIN = sql<CreateNextOfKinInterface ,  NextOfKinInterface>(`
   INSERT INTO next_of_kins (id, user_id, full_name, relationship, email, phone_number)
@@ -12,8 +12,6 @@ const SQL_CREATE_KIN = sql<CreateNextOfKinInterface ,  NextOfKinInterface>(`
     :user_id, :full_name, :relationship, :email, :phone_number )
   RETURNING id, full_name, relationship, email, phone_number;
 `);
-
-const NextOfKinCreationSchema = CreateNextOfKinSchema.omit({user_id: true});
 
 export default (router: Router) => {
   router.post<Record<string, never>,NextOfKinInterface, CreateNextOfKinInterface,Record<string, never>,Record<string, never>>(

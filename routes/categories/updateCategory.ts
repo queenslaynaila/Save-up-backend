@@ -3,9 +3,9 @@ import { sql } from '../../db';
 import { HttpError } from '../../middleware/errorMiddleware';
 import authMiddleware from '../../middleware/authorization';
 import { validateRequest } from '../../middleware/validationMiddleware';
-import { CategoryInterface,UpdatedCategoryInterface, CreateCategorySchema,UserRole } from '../../types';
+import { CategoryInterface, UpdatedCategoryInterface, IdParamInterface, CreateCategorySchema, UserRole } from '../../types';
 
-const SQL_UPDATE_CATEGORY = sql<UpdatedCategoryInterface,CategoryInterface>(`
+const SQL_UPDATE_CATEGORY = sql<UpdatedCategoryInterface, CategoryInterface>(`
   UPDATE categories
   SET name = COALESCE(:name, categories.name), 
       description = COALESCE(:description, categories.description)
@@ -14,18 +14,18 @@ const SQL_UPDATE_CATEGORY = sql<UpdatedCategoryInterface,CategoryInterface>(`
 `);
 
 export default (router: Router) => {
-  router.patch<{  id: string }, CategoryInterface,UpdatedCategoryInterface, Record<string, never>>(
-    '/:id', 
+  router.patch<IdParamInterface, CategoryInterface, UpdatedCategoryInterface, Record<string, never>>(
+    '/:idn', 
     authMiddleware({roles:[ UserRole.ADMIN ]}),
     validateRequest(CreateCategorySchema),
     async (req, res) => {
-      const categoryId = req.params.id;
+      const categoryId = parseInt(req.params.id);
       const { name, description } = req.body;
       const result = await SQL_UPDATE_CATEGORY({
-        id: parseInt(categoryId),
+        id: categoryId,
         name: name, 
         description: description ,
-      }).one(new HttpError(404, 'Unable to complete the request.Try again'));
+      }).one(new HttpError(404, 'Not found'));
       return res.json(result);
     });
 };
