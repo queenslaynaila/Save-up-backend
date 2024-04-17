@@ -1,0 +1,144 @@
+info:
+  version: 1.0.0
+  title: Password Management API
+  description: API for managing passwords
+tags:
+  - name: Password Management
+    description: Endpoints for managing passwords
+openapi: ""
+components:
+  schemas: {}
+  parameters: {}
+paths:
+  /pin/forget-password:
+    post:
+      summary: Initiate password reset
+      tags:
+        - Password Management
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                phone_number:
+                  type: string
+              required:
+                - phone_number
+      responses:
+        "200":
+          description: Password reset token generated and sent successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                required:
+                  - message
+        "403":
+          description: "Forbidden: Unprocessable entity"
+        "500":
+          description: Internal server error.
+  /pin/verify-reset-token:
+    post:
+      summary: Verify password reset token
+      tags:
+        - Password Management
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reset_token:
+                  type: string
+              required:
+                - reset_token
+      responses:
+        "200":
+          description: Password reset token verified successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  question_id:
+                    type: number
+                    minimum: 0
+                    exclusiveMinimum: true
+                  question:
+                    type: string
+                required:
+                  - question_id
+                  - question
+        "403":
+          description: "Forbidden: Unprocessable entity"
+        "500":
+          description: Internal server error.
+  /pin/reset:
+    post:
+      summary: Reset password
+      tags:
+        - Password Management
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                new_password:
+                  type: string
+              required:
+                - new_password
+      responses:
+        "200":
+          description: Password reset successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                required:
+                  - message
+        "403":
+          description: "Forbidden: Unprocessable entity"
+        "500":
+          description: Internal server error.
+  /pin/update-pin:
+    patch:
+      summary: Update password
+      tags:
+        - Password Management
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                oldPassword:
+                  type: string
+                newPassword:
+                  type: string
+              required:
+                - oldPassword
+                - newPassword
+      responses:
+        "200":
+          description: Password updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                required:
+                  - message
+        "403":
+          description: "Forbidden: Unprocessable entity"
+        "500":
+          description: Internal server error.
