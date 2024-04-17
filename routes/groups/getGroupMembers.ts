@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import { GetGroupMembersInterface  } from '../../types';
+import { GetGroupMembersInterface, IdParamInterface  } from '../../types';
 
 const SQL_GET_GROUP_MEMBERS = sql<{ group_id: number }, GetGroupMembersInterface>(`
   SELECT 
@@ -21,11 +21,11 @@ const SQL_GET_GROUP_MEMBERS = sql<{ group_id: number }, GetGroupMembersInterface
 `);
 
 export default (router: Router) => {
-  router.get<{ group_id: string }, GetGroupMembersInterface[], Record<string,never>, Record<string,never>>(
+  router.get<IdParamInterface, GetGroupMembersInterface[], Record<string,never>, Record<string,never>>(
     '/:group_id',
     authMiddleware(),
     async (req, res) => {
-      const  group_id  = parseInt(req.params.group_id); 
+      const  group_id  = parseInt(req.params.id); 
       const groups = await SQL_GET_GROUP_MEMBERS({ group_id}).many();
       return res.json(groups);
     }

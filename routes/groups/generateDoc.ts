@@ -2,37 +2,33 @@ import { z } from "zod";
 import * as yaml from 'yaml';
 import * as fs from 'fs';
 import { OpenAPIRegistry, OpenApiGeneratorV3, extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
-import { getInviteSchema } from '../../types';
+import { baseGroupSchema, Method, CreateGroupResponse, idParamSchema, CommonGroupSchema } from '../../types';
 
 extendZodWithOpenApi(z);
 const registry = new OpenAPIRegistry();
-enum Method {
-  GET = 'get',
-  POST = 'post',
-  PUT = 'put',
-  PATCH = 'patch',
-  DELETE = 'delete',
-}
 
 const createGroup = {
   method: Method.POST,
-  path: '/invitations/{groupId}',
-  summary: 'Invite a user to a certain group',
-  tags: ['Invitations'],
+  path: '/groups',
+  summary: 'Create a group',
+  tags: ['Groups'],
   request: {
-    params: z.object({
-      phone_number: z.string()
-    })
+    body: {
+      content: {
+        'application/json': {
+          schema: baseGroupSchema
+        }
+      }
+    }
   },
   responses: {
     200: {
-      description: 'Invite sent successfully'
-    },
-    400: {
-      description: 'User already has a pending invitation for this group'
-    },
-    404: {
-      description:'User already has a pending invitation for this group'
+      description: 'Invite sent successfully',
+      content: {
+        'application/json': {
+          schema:CreateGroupResponse.openapi('Groups')
+        }
+      }
     },
     500: {
       description: 'Internal server error.'
@@ -41,18 +37,18 @@ const createGroup = {
 };
 
 const getUserGroups = {
-  method: Method.PATCH,
-  path: '/savings/records/{id}',
-  summary: 'Get a saving by ID',
-  tags: ['Savings'],
-  request: {
-    params: z.object({
-      id: z.string()
-    })
-  },
+  method: Method.GET,
+  path: '/groups/my-groups',
+  summary: 'Get a logged in Users groups',
+  tags: ['Groups'],
   responses: {
     200: {
-      description: 'Saving retrieved successfully',
+      description: 'Groups retrieved successfully',
+      content: {
+        'application/json': {
+          schema:CreateGroupResponse.openapi('Groups')
+        }
+      }
     },
     403: {
       description: 'Unprocessable entity'
@@ -64,18 +60,16 @@ const getUserGroups = {
 };
 
 const getGroupMembers = {
-  method: Method.PATCH,
-  path: '/savings/records/{id}',
-  summary: 'Get a saving by ID',
-  tags: ['Savings'],
+  method: Method.GET,
+  path: '/groups/{:id}',
+  summary: 'Get members for a group',
+  tags: ['Groups'],
   request: {
-    params: z.object({
-      id: z.string()
-    })
+    params: idParamSchema,
   },
   responses: {
     200: {
-      description: 'Saving retrieved successfully',
+      description: 'Get group members',
     },
     403: {
       description: 'Unprocessable entity'
@@ -88,15 +82,18 @@ const getGroupMembers = {
   
 const getCommonGroups = {
   method: Method.GET,
-  path: '/invitations/my-invites',
-  summary: 'Get recived group invites',
-  tags: ['Invitations'],
+  path: '/groups/common-groups/{id}',
+  summary: 'Get common groups with a group member',
+  tags: ['Groups'],
+  request:{
+    params: idParamSchema
+  },
   responses: {
     200: {
       description: 'Saving created successfully.',
       content: {
         'application/json': {
-          schema: z.array(getInviteSchema)
+          schema: z.array(CommonGroupSchema)
         }
       }
     },
@@ -108,8 +105,6 @@ const getCommonGroups = {
     }
   }
 };
-  
-
   
 registry.registerPath(createGroup);
 registry.registerPath(getUserGroups);
@@ -124,10 +119,10 @@ function getOpenApiDocumentation() {
     info: {
       version: '1.0.0',
       title: 'SAPI',
-      description: 'API for managing invitations',
+      description: 'API for managing groups',
     },
     tags: [
-      { name: 'Savings', description: 'Endpoints for managing invitations' },
+      { name: 'Groups', description: 'Endpoints for managing groups' },
     ],
     openapi: ""
   });

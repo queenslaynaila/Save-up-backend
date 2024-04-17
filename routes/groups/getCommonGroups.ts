@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import { CommonGroupInterface } from '../../types';
+import { CommonGroupInterface,IdParamInterface } from '../../types';
 
 const SQL_GET_COMMON_GROUPS = sql<{logged_in_user_id: number, user_id: number }, CommonGroupInterface>(`
     SELECT g.id AS group_id, g.group_name, g.description
@@ -12,12 +12,12 @@ const SQL_GET_COMMON_GROUPS = sql<{logged_in_user_id: number, user_id: number },
 `);
 
 export default (router: Router) => {
-  router.get<{ user_id: string }, CommonGroupInterface[], Record<string,never>, Record<string,never>>(
-    '/common-groups/:user_id',
+  router.get<IdParamInterface, CommonGroupInterface[], Record<string,never>, Record<string,never>>(
+    '/common-groups/:id',
     authMiddleware(),
     async (req, res) => {
       const logged_in_user_id = req.user!.id;
-      const user_id = parseInt(req.params.user_id);
+      const user_id = parseInt(req.params.id);
       const commonGroups = await SQL_GET_COMMON_GROUPS({ logged_in_user_id, user_id }).many();
       return res.json(commonGroups);
     });
