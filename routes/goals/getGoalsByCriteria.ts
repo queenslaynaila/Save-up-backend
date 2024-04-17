@@ -3,7 +3,7 @@ import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { convertToTitleCase, isValidValue } from '../../middleware/caseNormalization';
 import { HttpError } from '../../middleware/errorMiddleware';
-import { GoalInterface } from '../../types/index';
+import { GoalInterface, GoalsConditionsQueryInterface } from '../../types/index';
 
 const ACCEPTED_STATUS_VALUES = ['In Progress', 'Dormant', 'Completed'];
 const ACCEPTED_PRIORITY_VALUES = ['High', 'Intermediate', 'Low'];
@@ -14,10 +14,8 @@ const SQL_GET_SAVINGS = sql<Record<string,never>,GoalInterface>(`
 `);
 
 export default (router: Router) => {
-  router.get<string,{ goalsIdentifier: string },GoalInterface[],
-  Record<string,never>,
-  { category_id?: string; priority?: string; status?: string; start_at?: string; completed_at?: string }
-  >('/:goalsIdentifier', 
+  router.get<string,{ goalsIdentifier: string },GoalInterface[], Record<string,never>,GoalsConditionsQueryInterface>(
+    '/:goalsIdentifier', 
     authMiddleware(), 
     async (req, res: Response) => {
       const { goalsIdentifier } = req.params;

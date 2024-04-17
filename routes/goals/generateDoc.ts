@@ -2,37 +2,28 @@ import { z } from "zod";
 import * as yaml from 'yaml';
 import * as fs from 'fs';
 import { OpenAPIRegistry, OpenApiGeneratorV3, extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
-import { getInviteSchema } from '../../types';
+import { messageSchema, baseGoalSchema, idParamSchema,goalSchema, goalsByConditionsQuerySchema, Method } from '../../types';
 
 extendZodWithOpenApi(z);
 const registry = new OpenAPIRegistry();
-enum Method {
-  GET = 'get',
-  POST = 'post',
-  PUT = 'put',
-  PATCH = 'patch',
-  DELETE = 'delete',
-}
 
 const createGoal = {
   method: Method.POST,
-  path: '/invitations/{groupId}',
-  summary: 'Invite a user to a certain group',
-  tags: ['Invitations'],
+  path: '/goals',
+  summary: 'Create a goal',
+  tags: ['Goals'],
   request: {
-    params: z.object({
-      phone_number: z.string()
-    })
+    body: {
+      content: {
+        'application/json': {
+          schema:goalSchema.openapi('Goals'),
+        }
+      }
+    }
   },
   responses: {
     200: {
-      description: 'Invite sent successfully'
-    },
-    400: {
-      description: 'User already has a pending invitation for this group'
-    },
-    404: {
-      description:'User already has a pending invitation for this group'
+      description: 'Goal created successfully'
     },
     500: {
       description: 'Internal server error.'
@@ -41,24 +32,24 @@ const createGoal = {
 };
 
 const getGoalByGoalId = {
-  method: Method.POST,
-  path: '/invitations/{groupId}',
-  summary: 'Invite a user to a certain group',
-  tags: ['Invitations'],
+  method: Method.GET,
+  path: '/goals/records/{id}',
+  summary: 'Get a goals details by Id',
+  tags: ['Goals'],
   request: {
-    params: z.object({
-      phone_number: z.string()
-    })
+    params: idParamSchema
   },
   responses: {
     200: {
-      description: 'Invite sent successfully'
-    },
-    400: {
-      description: 'User already has a pending invitation for this group'
+      description: 'Goal retrieved successfully',
+      content: {
+        'application/json': {
+          schema: goalSchema
+        }
+      }
     },
     404: {
-      description:'User already has a pending invitation for this group'
+      description:'Not found'
     },
     500: {
       description: 'Internal server error.'
@@ -70,15 +61,19 @@ const getGoalsByCriteria = {
   method: Method.GET,
   path: '/savings/{savingIdentifier}',
   summary: 'Get savings by criteria',
-  tags: ['Savings'],
+  tags: ['Goals'],
   request: {
-    params: z.object({
-      savingIdentifier: z.string()
-    })
+    params: idParamSchema,
+    query:goalsByConditionsQuerySchema
   },
   responses: {
     200: {
-      description: 'Savings retrieved successfully',
+      description: 'Goals retrieved successfully',
+      content: {
+        'application/json': {
+          schema: z.array(baseGoalSchema)
+        }
+      }
     },
     403: {
       description: 'Unprocessable entity'
@@ -93,13 +88,16 @@ const deleteGoal = {
   method: Method.GET,
   path: '/invitations/my-invites',
   summary: 'Get recived group invites',
-  tags: ['Invitations'],
+  tags: ['Goals'],
+  request: {
+    params: idParamSchema
+  },
   responses: {
     200: {
-      description: 'Saving created successfully.',
+      description: 'Goal deleted successfully.',
       content: {
         'application/json': {
-          schema: z.array(getInviteSchema)
+          schema:messageSchema
         }
       }
     },

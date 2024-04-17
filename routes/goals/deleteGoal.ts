@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
+import { IdParamInterface, MessageInterface } from '../../types/index'
 
 const SQL_DELETE_GOAL = sql<{ id: number; entity_id:number }, Record<string,never>>(`
   UPDATE goals
@@ -10,7 +11,7 @@ const SQL_DELETE_GOAL = sql<{ id: number; entity_id:number }, Record<string,neve
 `);
 
 export default (router: Router) => {
-  router.patch<{ id: string }, { message:string }, Record<string,never>, Record<string,never>>(
+  router.patch<IdParamInterface, MessageInterface , Record<string,never>, Record<string,never>>(
     '/delete/:id', 
     authMiddleware(), 
     async (req, res) => {

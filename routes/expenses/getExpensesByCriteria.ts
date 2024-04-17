@@ -2,7 +2,7 @@ import { Router, Response } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { HttpError } from '../../middleware/errorMiddleware';
-import { ExpenseInterface ,ID_SCHEMA} from '../../types';
+import { ExpenseInterface, ExpenseIdentifierInterface, ExpenseQueryInterface, ID_SCHEMA} from '../../types';
 
 const SQL_GET_EXPENSES = sql<Record<string, string>, ExpenseInterface>(`
   SELECT entity_id,id,category_id,description,amount_spent,date_spent
@@ -11,7 +11,7 @@ const SQL_GET_EXPENSES = sql<Record<string, string>, ExpenseInterface>(`
 );
 
 export default (router: Router) => {
-  router.get<string,{ expenseIdentifier: string },ExpenseInterface,Record<string,never>,{ category_id?: string; start_date?: string; end_date?: string }>(
+  router.get<ExpenseIdentifierInterface, ExpenseInterface, Record<string,never>, ExpenseQueryInterface>(
     '/:expenseIdentifier', 
     authMiddleware(), 
     async (req, res: Response) => {

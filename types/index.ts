@@ -314,7 +314,7 @@ export const baseGoalSchema = z.object({
 
 export type CreateGoalInterface = z.infer<typeof baseGoalSchema>;
 
-export const GoalSchema =  baseGoalSchema.extend({
+export const goalSchema =  baseGoalSchema.extend({
   id: z.number(),
   created_at: z.date(),
   target_at: z.date(),
@@ -322,13 +322,24 @@ export const GoalSchema =  baseGoalSchema.extend({
   completed_at: z.date(),
 })
 
-export type GoalInterface = z.infer<typeof GoalSchema>;
+export type GoalInterface = z.infer<typeof goalSchema>;
 
 export const UpdateGoalSchema = baseGoalSchema.omit({ entity_id: true }).partial().extend({id: z.number()});
 
 export const UpdateGoalRequestSchema = UpdateGoalSchema.omit({ id: true });
 
 export type UpdateGoalInterface = z.infer<typeof UpdateGoalSchema>;
+
+export const goalsByConditionsQuerySchema = z.object({
+  category_id: z.string().optional(),
+  priority: z.string().optional(),
+  status: z.string().optional(),
+  start_at: z.string().optional(),
+  completed_at: z.string().optional(),
+});
+
+export type GoalsConditionsQueryInterface = z.infer<typeof goalsByConditionsQuerySchema>;
+
 
 // SAVING SCHEMAS
 
@@ -359,16 +370,20 @@ export const BaseExpenseSchema = z.object({
   date_spent: z.string(),
 });
 
-export const createExpenseSchemaValidation = BaseExpenseSchema.omit({ entity_id: true }).partial()
+export const deleteExpenseSchema = BaseExpenseSchema.pick({entity_id: true})
+
+export type DeleteExpenseInterface = z.infer<typeof deleteExpenseSchema>;
+
+export const createExpenseSchemaValidation = BaseExpenseSchema.partial()
 
 export type CreateExpenseInterface = z.infer<typeof BaseExpenseSchema>;
 
-export const ExpenseSchema = BaseExpenseSchema.extend({
+export const expenseSchema = BaseExpenseSchema.extend({
   id: z.number(),
   created_at: z.date()
 })
 
-export type ExpenseInterface = z.infer<typeof ExpenseSchema>;
+export type ExpenseInterface = z.infer<typeof expenseSchema>;
 
 export const UpdateExpenseSchema = BaseExpenseSchema.partial().extend({id: z.number()});
 
@@ -378,6 +393,33 @@ export const validateUpdateExpenseSchema = UpdateExpenseSchema.omit({
   entity_id:true,
   id:true
 })
+
+export const expenseIdSchema = z.object({
+  expenseId: z.string(),
+});
+
+export type ExpenseIdInterface = z.infer<typeof expenseIdSchema>;
+
+export const expenseByIdSchema = z.object({
+  id: z.number(),
+  entity_id: z.number(),
+});
+
+export type ExpenseByIdInterface = z.infer<typeof expenseByIdSchema>;
+
+export const expenseIdentifierSchema = z.object({
+  expenseIdentifier: z.string(),
+});
+
+export type ExpenseIdentifierInterface = z.infer<typeof expenseIdentifierSchema>;
+
+export const expenseQuerySchema = z.object({
+  category_id: z.string().optional(),
+  start_date: z.string().optional(),
+  end_date: z.string().optional(),
+});
+
+export type ExpenseQueryInterface = z.infer<typeof expenseQuerySchema>;
 
 //SECURITY QUESTION SCHEMA
 export const securityQuestionsSchema =  z.object({

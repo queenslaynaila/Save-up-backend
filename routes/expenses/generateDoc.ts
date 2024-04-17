@@ -2,37 +2,33 @@ import { z } from "zod";
 import * as yaml from 'yaml';
 import * as fs from 'fs';
 import { OpenAPIRegistry, OpenApiGeneratorV3, extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
-import { getInviteSchema } from '../../types';
+import { createExpenseSchemaValidation, expenseSchema, expenseIdSchema, expenseIdentifierSchema, expenseQuerySchema, messageSchema, idParamSchema, deleteExpenseSchema, validateUpdateExpenseSchema, Method } from '../../types';
 
 extendZodWithOpenApi(z);
 const registry = new OpenAPIRegistry();
-enum Method {
-  GET = 'get',
-  POST = 'post',
-  PUT = 'put',
-  PATCH = 'patch',
-  DELETE = 'delete',
-}
 
 const createExpense = {
   method: Method.POST,
-  path: '/invitations/{groupId}',
+  path: '/expenses',
   summary: 'Invite a user to a certain group',
-  tags: ['Invitations'],
+  tags: ['Expenses'],
   request: {
-    params: z.object({
-      phone_number: z.string()
-    })
+    body: {
+      content: {
+        'application/json': {
+          schema: createExpenseSchemaValidation
+        },
+      },
+    }
   },
   responses: {
     200: {
-      description: 'Invite sent successfully'
-    },
-    400: {
-      description: 'User already has a pending invitation for this group'
-    },
-    404: {
-      description:'User already has a pending invitation for this group'
+      description: 'Expense created succesfully',
+      content: {
+        'application/json': {
+          schema: expenseSchema.openapi('Expenses'),
+        }
+      }
     },
     500: {
       description: 'Internal server error.'
@@ -42,15 +38,18 @@ const createExpense = {
   
 const getExpenseById = {
   method: Method.GET,
-  path: '/invitations/my-invites',
-  summary: 'Get recived group invites',
-  tags: ['Invitations'],
+  path: '/expenses/records/{expenseId}',
+  summary: 'Get an expense by Id',
+  tags: ['Expenses'],
+  request:{
+    params:expenseIdSchema
+  },
   responses: {
     200: {
-      description: 'Saving created successfully.',
+      description: 'Expense Updated successfully.',
       content: {
         'application/json': {
-          schema: z.array(getInviteSchema)
+          schema: expenseSchema
         }
       }
     },
@@ -65,17 +64,21 @@ const getExpenseById = {
 
 const getExpensesByCriteria = {
   method: Method.GET,
-  path: '/savings/{savingIdentifier}',
-  summary: 'Get savings by criteria',
-  tags: ['Savings'],
+  path: '/expenses/{expensesIdentifier}',
+  summary: 'Get expenses by criteria',
+  tags: ['Expenses'],
   request: {
-    params: z.object({
-      savingIdentifier: z.string()
-    })
+    params: expenseIdentifierSchema,
+    query:expenseQuerySchema
   },
   responses: {
     200: {
-      description: 'Savings retrieved successfully',
+      description: 'Expenses retrieved successfully',
+      content: {
+        'application/json': {
+          schema: z.array(expenseSchema)
+        }
+      }
     },
     403: {
       description: 'Unprocessable entity'
@@ -88,17 +91,20 @@ const getExpensesByCriteria = {
 
 const updateExpenses = {
   method: Method.PATCH,
-  path: '/savings/records/{id}',
-  summary: 'Get a saving by ID',
-  tags: ['Savings'],
+  path: '/expenses/{id}',
+  summary: 'Update a expenses by Id',
+  tags: ['Expenses'],
   request: {
-    params: z.object({
-      id: z.string()
-    })
+    params:idParamSchema
   },
   responses: {
     200: {
-      description: 'Saving retrieved successfully',
+      description: 'Expense Updated successfully',
+      content: {
+        'application/json': {
+          schema:validateUpdateExpenseSchema
+        }
+      }
     },
     403: {
       description: 'Unprocessable entity'
@@ -110,18 +116,28 @@ const updateExpenses = {
 };
 
 const deleteExpenses = {
-  method: Method.GET,
-  path: '/savings/{savingIdentifier}',
-  summary: 'Get savings by criteria',
-  tags: ['Savings'],
+  method: Method.PATCH,
+  path: '/records/{id}',
+  summary: 'Soft deletes an expense',
+  tags: ['Expenses'],
   request: {
-    params: z.object({
-      savingIdentifier: z.string()
-    })
+    params:idParamSchema,
+    body:{
+      content:{
+        'application/json':{
+          schema:deleteExpenseSchema
+        }
+      }
+    }
   },
   responses: {
     200: {
-      description: 'Savings retrieved successfully',
+      description: 'Expenses deleted successfully',
+      content: {
+        'application/json': {
+          schema:messageSchema
+        }
+      }
     },
     403: {
       description: 'Unprocessable entity'
@@ -146,10 +162,10 @@ function getOpenApiDocumentation() {
     info: {
       version: '1.0.0',
       title: 'SAPI',
-      description: 'API for managing invitations',
+      description: 'API for managing expenses',
     },
     tags: [
-      { name: 'Savings', description: 'Endpoints for managing invitations' },
+      { name: 'Expenses', description: 'Endpoints for managing expenses' },
     ],
     openapi: ""
   });

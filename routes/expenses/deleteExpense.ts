@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
+import { IdParamInterface, MessageInterface, DeleteExpenseInterface } from '../../types/index'
 
 const SQL_DELETE_EXPENSE = sql<{ id: number; entity_id: number }, Record<string,never>>(`
   UPDATE expenses
@@ -10,13 +11,13 @@ const SQL_DELETE_EXPENSE = sql<{ id: number; entity_id: number }, Record<string,
 `);
 
 export default (router: Router) => {
-  router.patch<{ id: string }, { message: string }, Record<string,never>, Record<string,never>>(
+  router.patch<IdParamInterface, MessageInterface , DeleteExpenseInterface, Record<string,never>>(
     '/records/:id', 
     authMiddleware(), 
     async (req, res) => {
       const expenseId = parseInt(req.params.id);
-      const userId = req.user!.id;
-      await SQL_DELETE_EXPENSE({ id: expenseId, entity_id: userId }).exec();
+      const entity_id = req.body.entity_id;
+      await SQL_DELETE_EXPENSE({ id: expenseId, entity_id}).exec();
       return res.json({ message: 'Expenses deleted successfully' });
     });
 };

@@ -19,7 +19,7 @@ export default (router: Router) => {
   router.patch<{ id: string },ExpenseInterface, UpdateExpenseInterface, Record<string,never>>(
     '/:id', 
     authMiddleware(), 
-    validateRequest( validateUpdateExpenseSchema),
+    validateRequest(validateUpdateExpenseSchema),
     async (req, res) => {
       const userId = req.user!.id;
       const expenseId = parseInt(req.params.id);
