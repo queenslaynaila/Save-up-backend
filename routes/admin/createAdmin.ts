@@ -21,7 +21,7 @@ const SQL_CREATE_USER = sql<CreateAdminInterface, Record<string,never>>(`
 `);
 
 export default (router: Router) => { 
-  router.post<Record<string,never> ,MessageInterface, UserInterface, Record<string,never>, Record<string,never>>(
+  router.post<Record<string,never>, MessageInterface, UserInterface, Record<string,never>, Record<string,never>>(
     '/',
     validateRequest(baseUserSchema),
     async (req, res) => {
