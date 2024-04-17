@@ -107,7 +107,7 @@ const deleteCategory = {
   },
   responses: {
     200: {
-      description: 'Category deleted successfully',
+      description: 'Category deleted successfully.Specific to only admins',
       content: {
         'application/json': {
           schema: z.object({
