@@ -9,6 +9,7 @@
 
 #dev
 /generate_schema.js
+/routes/swagger.yml
 .env
 .vscode
 /concerns.notes
