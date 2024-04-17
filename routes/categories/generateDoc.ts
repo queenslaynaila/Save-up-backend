@@ -2,17 +2,10 @@ import { z } from "zod";
 import * as yaml from 'yaml';
 import * as fs from 'fs';
 import { OpenAPIRegistry, OpenApiGeneratorV3, extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
-import {  CreateCategorySchema, CategorySchema, getAllCategoriesArray, idParamSchema } from '../../types';
+import {  createCategorySchema, categorySchema, categoriesArraySchema, idParamSchema, Method} from '../../types';
 
 extendZodWithOpenApi(z);
 const registry = new OpenAPIRegistry();
-enum Method {
-  GET = 'get',
-  POST = 'post',
-  PUT = 'put',
-  PATCH = 'patch',
-  DELETE = 'delete',
-}
   
 const createCategory = {
   method: Method.POST,
@@ -23,7 +16,7 @@ const createCategory = {
     body: {
       content: {
         'application/json': {
-          schema: CreateCategorySchema
+          schema: createCategorySchema
         },
       },
     },
@@ -33,7 +26,7 @@ const createCategory = {
       description: 'Category created successfully',
       content: {
         'application/json': {
-          schema: CategorySchema.openapi('Category')
+          schema: categorySchema.openapi('Category')
         }
       }},
     401: {
@@ -55,7 +48,7 @@ const getAllCategories = {
       description: 'Categories retrieved successfully',
       content: {
         'application/json': {
-          schema: getAllCategoriesArray
+          schema: categoriesArraySchema
         }
       }
     },
@@ -81,7 +74,7 @@ const updateCategory = {
       description: 'Category updated successfully',
       content: {
         'application/json': {
-          schema: CategorySchema
+          schema: categorySchema
         }
       }
     },

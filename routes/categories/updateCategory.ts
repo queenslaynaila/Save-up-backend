@@ -3,7 +3,7 @@ import { sql } from '../../db';
 import { HttpError } from '../../middleware/errorMiddleware';
 import authMiddleware from '../../middleware/authorization';
 import { validateRequest } from '../../middleware/validationMiddleware';
-import { CategoryInterface, UpdatedCategoryInterface, IdParamInterface, CreateCategorySchema, UserRole } from '../../types';
+import { CategoryInterface, UpdatedCategoryInterface, IdParamInterface, updateCategorySchema, UserRole } from '../../types';
 
 const SQL_UPDATE_CATEGORY = sql<UpdatedCategoryInterface, CategoryInterface>(`
   UPDATE categories
@@ -17,7 +17,7 @@ export default (router: Router) => {
   router.patch<IdParamInterface, CategoryInterface, UpdatedCategoryInterface, Record<string, never>>(
     '/:idn', 
     authMiddleware({roles:[ UserRole.ADMIN ]}),
-    validateRequest(CreateCategorySchema),
+    validateRequest(updateCategorySchema),
     async (req, res) => {
       const categoryId = parseInt(req.params.id);
       const { name, description } = req.body;

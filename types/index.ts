@@ -26,28 +26,28 @@ export const messageSchema = z.object({
 export type MessageInterface = z.infer<typeof messageSchema>;
 
 // CATEGORY SCHEMAS
-export const CreateCategorySchema = z.object({
+export const createCategorySchema = z.object({
   name: z.string(),
   description: z.string(),
 });
 
-export type CreateCategoryInterface = z.infer<typeof CreateCategorySchema>;
+export type CreateCategoryInterface = z.infer<typeof createCategorySchema>;
 
-export const UpdateCategorySchema = CreateCategorySchema.partial().extend({
+export const updateCategorySchema = createCategorySchema.partial().extend({
   id: z.number(),
 })
 
-export type UpdatedCategoryInterface = z.infer<typeof UpdateCategorySchema>;
+export type UpdatedCategoryInterface = z.infer<typeof updateCategorySchema>;
 
-export const CategorySchema = UpdateCategorySchema.required().extend({
+export const categorySchema = updateCategorySchema.required().extend({
   created_at: z.date()
 });
 
-export const getAllCategoriesArray = z.array(CategorySchema)
+export const categoriesArraySchema = z.array(categorySchema)
 
-export type GetAllCategoriesInterface = z.infer<typeof getAllCategoriesArray>;
+export type CategoriesArrayInterface = z.infer<typeof categoriesArraySchema>;
 
-export type CategoryInterface = z.infer<typeof CategorySchema>;
+export type CategoryInterface = z.infer<typeof categorySchema>;
 
 // SECURITY QUESTIONS & ANSWERS SCHEMA
 
