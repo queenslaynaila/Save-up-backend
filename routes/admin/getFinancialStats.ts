@@ -3,33 +3,33 @@ import { sql } from '../../db';
 import { HttpError } from '../../middleware/errorMiddleware';
 import authMiddleware from '../../middleware/authorization';
 import { convertToTitleCase } from '../../middleware/caseNormalization';
-import { UserRole } from '../../types';
+import { UserRole, StatsQueryInterface, StatsParamInterface, FinancialStatsInterface, ValidOperatorsEnum, ValidResourcesEnum, ValidStatusEnum  } from '../../types/index';
 
-const SQL_GET_CUMULATIVES = (query: string) =>sql<{ operator: string; resource: string }, { totals: number }>(query);
-const VALID_OPERATORS = ['SUM', 'MAX', 'MIN', 'AVG', 'COUNT'];
-const VALID_RESOURCES = ['goals', 'savings', 'expenses'];
-const VALID_STATUS = ['Completed', 'Dormant', 'In Progress'];
+const SQL_GET_CUMULATIVES = (query: string) =>sql<{ operator: string; resource: string }, FinancialStatsInterface>(query);
 
 export default (router: Router) => {
-  router.get<{ resource: string; operator: string },{totals:number}, Record<string, never>,{ user_id?: string; priority?: string; status?: string; category_id?: string; start_date?: string; end_date?: string}>(
+  router.get<StatsParamInterface, FinancialStatsInterface, Record<string, never>, StatsQueryInterface>(
     '/financial-stats/:resource/:operator',
     authMiddleware({ roles: [UserRole.ADMIN] }),
     async (req, res) => {
+
       req.params.resource = req.params.resource.toLowerCase();
       req.params.operator = req.params.operator.toUpperCase();
+
       const { resource, operator } = req.params;
       const { user_id, priority, status, category_id, start_date, end_date } = req.query 
       const formattedStatus = status ? convertToTitleCase(status) : '';
-      if (!VALID_RESOURCES.includes(resource)) {
+
+      if (!ValidResourcesEnum.safeParse(resource).success) {
         throw new HttpError(400, 'Invalid resource');
       }
-
-      if (!VALID_OPERATORS.includes(operator)) {
+      if (!ValidOperatorsEnum.safeParse(operator).success) {
         throw new HttpError(400, 'Invalid operator');
       }
-      if (status && !VALID_STATUS.includes(formattedStatus)) {
-        throw new HttpError(400, 'Invalid status');
+      if ( status && !ValidStatusEnum.safeParse(status).success) {
+        throw new HttpError(400, 'Invalid operator');
       }
+      
       let query = `SELECT COALESCE(${operator}(amount), 0) AS ${operator} FROM ${resource} WHERE 1=1`;
 
       if (['savings', 'expenses'].includes(resource)) {
@@ -39,6 +39,7 @@ export default (router: Router) => {
         if (start_date) query += ` AND completed_date >= '${start_date}'`;
         if (end_date) query += ` AND completed_date <= '${end_date}'`;
       }
+
       if (resource === 'savings' && status) {
         query += ` AND status = '${formattedStatus}'`;
       }
@@ -46,6 +47,7 @@ export default (router: Router) => {
       const values: { operator: string; resource: string } = { operator, resource };
       const result = await SQL_GET_CUMULATIVES(query)(values).one();
       res.json(result);
+
     }
   );
 };

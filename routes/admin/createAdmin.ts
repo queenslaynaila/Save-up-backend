@@ -2,7 +2,7 @@ import { Router } from 'express';
 import bcrypt from 'bcrypt';
 import { sql } from '../../db';
 import { validateRequest } from '../../middleware/validationMiddleware';
-import { CreateUserContactInterface, CreateAdminInterface, UserInterface, BaseUserSchema} from '../../types';
+import { CreateUserContactInterface, CreateAdminInterface, UserInterface, BaseUserSchema, MessageInterface } from '../../types';
 
 const SQL_CREATE_USER_ENTITY = sql<{ entity_type: string }, { id:number }>(`
   INSERT INTO entities (entity_type)
@@ -21,17 +21,19 @@ const SQL_CREATE_USER = sql<CreateAdminInterface, Record<string, never>>(`
 `);
 
 export default (router: Router) => { 
-  router.post<Record<string, never> ,{ message:string }, UserInterface, Record<string, never>, Record<string, never>>(
+  router.post<Record<string, never> ,MessageInterface, UserInterface, Record<string, never>, Record<string, never>>(
     '/',
     validateRequest(BaseUserSchema),
     async (req, res) => {
       const { full_name, gender, national_id, phone_number, pin } = req.body;
+
       const entity = await SQL_CREATE_USER_ENTITY({ entity_type: 'User' }).one();
       await SQL_CREATE_USER_CONTACTS({ entity_id:entity.id,phone_number ,national_id })
         .exec();
       const pinHash = bcrypt.hashSync(pin, 12);
       await SQL_CREATE_USER({ id:entity.id, full_name, role:'Admin', gender, pin: pinHash })
         .exec();
+        
       res.json({message:"Account created Succesfully.Procced to login"});
     });
 };

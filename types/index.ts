@@ -1,5 +1,30 @@
 import { z } from 'zod';
 
+//METHOD ENUM
+export enum Method {
+  GET = 'get',
+  POST = 'post',
+  PUT = 'put',
+  PATCH = 'patch',
+  DELETE = 'delete',
+}
+
+//PARAMS SCHEEMAS
+
+export const idParamSchema = z.object({
+  id: z.string()
+})
+
+export type IdParamInterface = z.infer<typeof idParamSchema>;
+
+//MESSAGE RESPONSESCHEMA
+
+export const messageSchema = z.object({
+  message: z.string()
+})
+
+export type MessageInterface = z.infer<typeof messageSchema>;
+
 // CATEGORY SCHEMAS
 export const CreateCategorySchema = z.object({
   name: z.string(),
@@ -115,7 +140,6 @@ export const UpdatedUserRoleSchema = CreateAdminSchema.omit({
   pin: true
 })
 
-export type UpdatedUserRoleInterface = z.infer<typeof UpdatedUserRoleSchema>;
 
 export const UserSchema = BaseUserSchema.extend({
   role: z.enum([UserRole.ADMIN, UserRole.USER, UserRole.MODERATOR])
@@ -355,15 +379,6 @@ export const ValidateUpdateExpenseSchema = UpdateExpenseSchema.omit({
   id:true
 })
 
-
-//PARAMS SCHEEMAS
-
-export const idParamSchema = z.object({
-  id: z.string()
-})
-
-export type IdParamInterface = z.infer<typeof idParamSchema>;
-
 //SECURITY QUESTION SCHEMA
 export const securityQuestionsSchema =  z.object({
   question_id: z.number().positive(),
@@ -372,6 +387,45 @@ export const securityQuestionsSchema =  z.object({
 
 export type SecurityQuestions = z.infer<typeof securityQuestionsSchema>;
 
+//ADMIN SCHEMA
+export const ValidOperatorsEnum = z.enum(['SUM', 'MAX', 'MIN', 'AVG', 'COUNT']);
+export const ValidResourcesEnum = z.enum(['goals', 'savings', 'expenses']);
+export const ValidStatusEnum = z.enum(['Completed', 'Dormant', 'In Progress']);
+
+export const statsQuerySchema = z.object({
+  user_id: z.string().optional(),
+  priority: z.string().optional(),
+  status: z.string().optional(),
+  category_id: z.string().optional(),
+  start_date: z.string().optional(),
+  end_date: z.string().optional(),
+});
+
+export type StatsQueryInterface = z.infer<typeof statsQuerySchema>;
+
+export const statsParamSchema = z.object({
+  resource: z.string(),
+  operator: z.string(),
+});
+
+export type StatsParamInterface = z.infer<typeof statsParamSchema>;
+
+export const financialStatsSchema = z.object({
+  totals: z.number()
+})
+
+export type FinancialStatsInterface = z.infer<typeof financialStatsSchema>;
+
+export const UserRoleUpdateSchema = z.object({
+  roleToUpdate: z.string(),
+  id: z.string(),
+});
+
+export type UserRoleUpdateInterface = z.infer<typeof UserRoleUpdateSchema>;
+
+export type RoleUpdateResultInterface = z.infer<typeof UpdatedUserRoleSchema>;
+
+////////////////////////////////////////////////////////////////////////////////
 export const NextOfKinCreationSchema = CreateNextOfKinSchema.omit({user_id: true});
 
 export const getTopExpenseCategoriesSchema = z.array(

@@ -2,17 +2,10 @@ import { z } from "zod";
 import * as yaml from 'yaml';
 import * as fs from 'fs';
 import { OpenAPIRegistry, OpenApiGeneratorV3, extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
-import { UpdatedUserRoleSchema, BaseUserSchema } from '../../types';
+import { UpdatedUserRoleSchema, BaseUserSchema, statsParamSchema, statsQuerySchema, UserRoleUpdateSchema, financialStatsSchema, messageSchema, Method } from '../../types';
 
 extendZodWithOpenApi(z);
 const registry = new OpenAPIRegistry();
-enum Method {
-  GET = 'get',
-  POST = 'post',
-  PUT = 'put',
-  PATCH = 'patch',
-  DELETE = 'delete',
-}
 
 const createAdmin = {
   method: Method.POST,
@@ -30,7 +23,12 @@ const createAdmin = {
   },
   responses: {
     200: {
-      description: 'Account created Succesfully.Procced to login'
+      description: 'Account created Succesfully.Procced to login',
+      content: {
+        'application/json': {
+          schema: messageSchema
+        },
+      }
     },
     500: {
       description: 'Internal server error.'
@@ -44,27 +42,15 @@ const getFinancialStats = {
   summary: ' Get table statistics',
   tags: ['Admin'],
   request: {
-    params: z.object({
-      resource: z.string(),
-      operator: z.string()
-    }),
-    query:z.object({
-      user_id: z.string().optional(),
-      priority: z.string().optional(),
-      status: z.string().optional(),
-      category_id: z.string().optional(),
-      start_date: z.string().optional(),
-      end_date: z.string().optional()
-    })
+    params:statsParamSchema,
+    query:statsQuerySchema
   },
   responses: {
     200: {
       description: 'Stat computed succesfully.',
       content: {
         'application/json': {
-          schema: z.object({
-            totals: z.number()
-          })
+          schema:financialStatsSchema
         }
       }
     },
@@ -83,10 +69,7 @@ const updateUserRole = {
   summary: 'Either upgrade or downgrade user role',
   tags: ['Admin'],
   request: {
-    params: z.object({
-      roleToUpdate: z.string(),
-      id: z.string()
-    }),
+    params: UserRoleUpdateSchema,
   },
   responses: {
     200: {
