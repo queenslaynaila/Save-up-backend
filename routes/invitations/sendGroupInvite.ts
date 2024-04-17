@@ -29,7 +29,7 @@ export default (router: Router) => {
       const { phone_number } = req.body;
       const receiver = await SQL_FIND_USER_BY_PHONE({ phone_number }).oneOrNull();
       if (!receiver) {
-        throw new HttpError(404, 'User with this phone number not found. You can invite them to join the app and connect with you');
+        throw new HttpError(404, 'c');
       }
       const pendingInvitation = await SQL_FIND_PENDING_INVITATION({ receiver_id: receiver.id, group_id: groupId }).one();
       if (pendingInvitation && pendingInvitation.count > 0) {
