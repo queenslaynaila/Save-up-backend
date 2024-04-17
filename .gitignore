@@ -9,12 +9,13 @@
 
 #dev
 /generate_schema.js
-/routes/swagger.yml
+
 .env
 .vscode
 /concerns.notes
 /try.ts
-# production
+/routes/swagger.yml
+routes/swagger.yml
 /build
 .notes
 db.ts

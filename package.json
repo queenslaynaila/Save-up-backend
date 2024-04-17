@@ -10,6 +10,7 @@
     "dev": "nodemon --exec ts-node index.ts",
     "build": "tsc",
     "format": "prettier --write \"**/*.ts\"",
+    "swagger": "./runGenerateDoc.sh",
     "lint": "eslint . --ext .ts"
   },
   "author": "",
