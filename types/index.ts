@@ -14,9 +14,13 @@ export const UpdateCategorySchema = CreateCategorySchema.partial().extend({
 
 export type UpdatedCategoryInterface = z.infer<typeof UpdateCategorySchema>;
 
-export const CategorySchema = UpdateCategorySchema.extend({
+export const CategorySchema = UpdateCategorySchema.required().extend({
   created_at: z.date()
-})
+});
+
+export const getAllCategoriesArray = z.array(CategorySchema)
+
+export type GetAllCategoriesInterface = z.infer<typeof getAllCategoriesArray>;
 
 export type CategoryInterface = z.infer<typeof CategorySchema>;
 
@@ -350,3 +354,55 @@ export const ValidateUpdateExpenseSchema = UpdateExpenseSchema.omit({
   entity_id:true,
   id:true
 })
+
+
+//PARAMS SCHEEMAS
+
+export const idParamSchema = z.object({
+  id: z.string()
+})
+
+export type IdParamInterface = z.infer<typeof idParamSchema>;
+
+//SECURITY QUESTION SCHEMA
+export const securityQuestionsSchema =  z.object({
+  question_id: z.number().positive(),
+  question: z.string(),
+});
+
+export type SecurityQuestions = z.infer<typeof securityQuestionsSchema>;
+
+export const NextOfKinCreationSchema = CreateNextOfKinSchema.omit({user_id: true});
+
+export const getTopExpenseCategoriesSchema = z.array(
+  z.object({
+    category_id:z.number(),
+    total_expense:z.number()
+  })
+)
+
+export type TopExpenseCategories = z.infer<typeof getTopExpenseCategoriesSchema>;
+
+export const GetTotalExpensesQuerySchema = z.object({
+  startDate: z.string().optional(),
+  endDate: z.string().optional(),
+  categoryId: z.string().optional()
+});
+
+export const getTotalExpenseResultSchema = z.object({
+  total_expenses: z.number()
+})
+
+export const getTotalSavingsResultSchema = z.object({
+  total_savings: z.number()
+})
+
+export const getTotalTargetsSchema = z.object({
+  total_target_amount: z.number()
+})
+
+export const totalTargetGoalsQuerySchema = z.object({
+  priority: z.string().optional(),
+  status: z.string().optional(),
+  category_id: z.string().optional()
+});
