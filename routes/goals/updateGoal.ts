@@ -7,7 +7,7 @@ import { validateRequest } from '../../middleware/validationMiddleware';
 
 const SQL_UPDATE_SAVING = sql<UpdateGoalInterface, GoalInterface>(`
   UPDATE goals
-  SET description = COALESCE(:description, goals.description),
+  SET name = COALESCE(:name, goals.name),
       category_id = COALESCE(:category_id, goals.category_id),
       amount = COALESCE(:amount, goals.amount),
       priority = COALESCE(:priority, goals.priority),
@@ -23,10 +23,10 @@ export default (router: Router) => {
     validateRequest(UpdateGoalRequestSchema),
     async (req, res) => {
       const savingId = parseInt(req.params.id);
-      const { description, category_id, amount, priority, target_at } = req.body;
+      const { name, category_id, amount, priority, target_at } = req.body;
       const result = await SQL_UPDATE_SAVING({
         id: savingId,
-        description: description,
+        name: name,
         category_id: category_id,
         amount: amount,
         priority: priority,
