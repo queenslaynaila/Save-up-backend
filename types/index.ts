@@ -305,7 +305,7 @@ export const enum priority {
 export const baseGoalSchema = z.object({
   entity_id: z.number(),
   category_id: z.number(),
-  description: z.string(),  
+  name: z.string(),  
   amount: z.number(),
   priority: z.enum([priority.HIGH, priority.INTERMEDIATE, priority.LOW]),
   target_at: z.string(),
