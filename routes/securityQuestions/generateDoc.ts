@@ -2,7 +2,7 @@ import { z } from "zod";
 import * as yaml from 'yaml';
 import * as fs from 'fs';
 import { OpenAPIRegistry, OpenApiGeneratorV3, extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
-import { SecurityQuestionSchema, Method } from '../../types';
+import { securityQuestionSchema, Method } from '../../types';
 
 extendZodWithOpenApi(z);
 const registry = new OpenAPIRegistry();
@@ -17,7 +17,7 @@ registry.registerPath({
       description: 'List of security questions',
       content: {
         'application/json': {
-          schema:SecurityQuestionSchema
+          schema:securityQuestionSchema
         }
       }
     },

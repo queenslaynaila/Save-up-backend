@@ -2,7 +2,7 @@ import { z } from "zod";
 import * as yaml from 'yaml';
 import * as fs from 'fs';
 import { OpenAPIRegistry, OpenApiGeneratorV3, extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
-import { baseGroupSchema, Method, CreateGroupResponse, idParamSchema, CommonGroupSchema } from '../../types';
+import { baseGroupSchema, Method, createGroupResponse, idParamSchema, commonGroupSchema } from '../../types';
 
 extendZodWithOpenApi(z);
 const registry = new OpenAPIRegistry();
@@ -26,7 +26,7 @@ const createGroup = {
       description: 'Invite sent successfully',
       content: {
         'application/json': {
-          schema:CreateGroupResponse.openapi('Groups')
+          schema:createGroupResponse.openapi('Groups')
         }
       }
     },
@@ -46,7 +46,7 @@ const getUserGroups = {
       description: 'Groups retrieved successfully',
       content: {
         'application/json': {
-          schema:CreateGroupResponse.openapi('Groups')
+          schema:createGroupResponse.openapi('Groups')
         }
       }
     },
@@ -93,7 +93,7 @@ const getCommonGroups = {
       description: 'Saving created successfully.',
       content: {
         'application/json': {
-          schema: z.array(CommonGroupSchema)
+          schema: z.array(commonGroupSchema)
         }
       }
     },
