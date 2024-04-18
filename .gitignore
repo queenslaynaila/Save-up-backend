@@ -22,3 +22,6 @@ routes/**/swagger.yml
 db.ts
 /sql.notes.ts
 /docker-compose.yml
+
+/approach.notes
+/middleware/oc.ts
