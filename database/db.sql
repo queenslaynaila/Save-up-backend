@@ -203,11 +203,11 @@ SELECT create_distributed_table('administrator_votes', 'group_id');
 
 ---Financial management 
 
-CREATE TABLE IF NOT EXISTS goals (
-  entity_id      INT NOT NULL,
-  id             INT NOT NULL,
+CREATE TABLE IF NOT EXISTS goals ( 
+  id             SERIAL PRIMARY KEY,
+  entity_id      INT NOT NULL, 
   category_id    INT NOT NULL,
-  description    TEXT NOT NULL,
+  name           TEXT NOT NULL,
   amount         NUMERIC(30, 3) NOT NULL,
   priority       enum_priorities NOT NULL,
   status         enum_statuses NOT NULL DEFAULT 'In Progress',
@@ -216,7 +216,6 @@ CREATE TABLE IF NOT EXISTS goals (
   updated_at     TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   completed_at   TIMESTAMP WITH TIME ZONE, 
   deleted_at     TIMESTAMP WITH TIME ZONE,
-  PRIMARY KEY    (entity_id,id),
   FOREIGN KEY    (entity_id) REFERENCES entities(id),
   FOREIGN KEY    (category_id) REFERENCES categories(id)
 );
@@ -225,12 +224,13 @@ SELECT create_distributed_table('goals', 'id');
 
 CREATE TABLE IF NOT EXISTS savings (
   user_id     INT NOT NULL,
-  goal_id     INT NOT NULL,
   id          INT NOT NULL,
+  goal_id     INT NOT NULL,
   amount      NUMERIC(30, 3) NOT NULL,
   created_at  TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   PRIMARY KEY (user_id, id), 
-  FOREIGN KEY (user_id, goal_id) REFERENCES goals(entity_id,id) 
+  FOREIGN KEY (user_id) REFERENCES users(id)
+  FOREIGN KEY (goal_id) REFERENCES goals(id)
 );
 
 SELECT create_distributed_table('savings', 'goal_id');
@@ -255,7 +255,7 @@ CREATE INDEX idx_expenses_by_date_spent ON expenses(date_spent);
 SELECT create_distributed_table('expenses', 'id');
 
 ===============================================================================================
--- Trigger: Update the status of a goal to Complete when total savings target amount for a goal.
+-- Trigger: Update the status of a goal to Complete when total savings exceeds target amount for a goal.
 
 CREATE TRIGGER enforce_update_saving_status
 AFTER INSERT ON savings
@@ -332,7 +332,7 @@ FOR EACH ROW
 EXECUTE FUNCTION check_existing_invitation();
 
 ===============================================================================================
---Trigger: Adds a user to a group if they accept an invitation and removes the invitation if they decline.
+--Trigger: Adds a user to a group if they accept an invitation and deletes the invitation if they decline.
 
 CREATE OR REPLACE FUNCTION update_user_groups_after_invite()
 RETURNS TRIGGER AS $$
@@ -378,7 +378,7 @@ $$ LANGUAGE plpgsql;
 
 
 ===============================================================================================
--- Trigger: After each vote, checks if everyone has voted. If so, it calculates approval and promotes if needed.
+-- Trigger: After each vote, checks if everyone has voted. If so, it calculates results and promotes if needed.
 
 CREATE OR REPLACE FUNCTION update_admins_on_all_votes()
 RETURNS TRIGGER AS $$
