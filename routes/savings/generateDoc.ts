@@ -2,18 +2,10 @@ import { z } from "zod";
 import * as yaml from 'yaml';
 import * as fs from 'fs';
 import { OpenAPIRegistry, OpenApiGeneratorV3, extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
-import {validateSavingCreationSchema} from '../../types';
-
+import {validateSavingCreationSchema, idParamSchema, Method} from '../../types';
+ 
 extendZodWithOpenApi(z);
 const registry = new OpenAPIRegistry();
-enum Method {
-  GET = 'get',
-  POST = 'post',
-  PUT = 'put',
-  PATCH = 'patch',
-  DELETE = 'delete',
-}
-  
 const createSaving = {
   method: Method.POST,
   path: '/savings',
@@ -47,9 +39,7 @@ const getSavingBySavingId = {
   summary: 'Get a saving by ID',
   tags: ['Savings'],
   request: {
-    params: z.object({
-      id: z.string()
-    })
+    params:idParamSchema
   },
   responses: {
     200: {

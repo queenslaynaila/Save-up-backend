@@ -2,19 +2,11 @@ import { z } from "zod";
 import * as yaml from 'yaml';
 import * as fs from 'fs';
 import { OpenAPIRegistry, OpenApiGeneratorV3, extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
-import { NextOfKinSchema, nextOfKinCreationSchema, updateNextOfKinSchema } from '../../types';
+import { NextOfKinSchema, nextOfKinCreationSchema, updateNextOfKinSchema, Method } from '../../types';
 
 extendZodWithOpenApi(z);
 
 const registry = new OpenAPIRegistry();
-
-enum Method {
-  GET = 'get',
-  POST = 'post',
-  PUT = 'put',
-  PATCH = 'patch',
-  DELETE = 'delete',
-}
 
 const createNextOfKin = {
   method: Method.POST,
@@ -40,7 +32,7 @@ const createNextOfKin = {
       },
     },
     400: {
-      description: 'Bad Request: You already have an existing next of kin. Please update it',
+      description: 'You already have an existing next of kin. Please update it',
     },
     403: {
       description: 'Forbidden: Unprocessable entity',
