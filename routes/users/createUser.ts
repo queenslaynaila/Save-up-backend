@@ -19,7 +19,7 @@ const SQL_CREATE_USER_CONTACTS = sql<CreateUserContactInterface, Record<string,n
 const SQL_CREATE_USER = sql<CreateUserInterface, Record<string,never>>(`
   INSERT INTO users (id,full_name,gender,pin)
   VALUES (:id, :full_name, :gender, :pin)
- `);
+`);
 
 export default (router: Router) => { 
   router.post<Record<string,never>, { message:string }, UserInterface, Record<string,never>, Record<string,never>>(
