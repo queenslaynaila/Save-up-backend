@@ -30,12 +30,22 @@ export default (router: Router) => {
 
       if (goalsIdentifier === 'me') {
         filterArgs.loggedInUserId= loggedInUserId.toString() ;
+        filterArgs.is_default_vault = 'FALSE';
         filters.push(`entity_id = :loggedInUserId`);
-      } else if (goalsIdentifier === 'all') {
+        filters.push(`is_default_vault = :is_default_vault`);
+      } 
+      else if (goalsIdentifier === 'Default') {
+        filterArgs.loggedInUserId= loggedInUserId.toString();
+        filterArgs.is_default_vault = 'TRUE';
+        filters.push(`entity_id = :loggedInUserId`);
+        filters.push(`is_default_vault = :is_default_vault`);
+      } 
+      else if (goalsIdentifier === 'all') {
         if (isStandardUser) {
           throw new HttpError(403, 'Forbidden');
         }
-      }else if (parseInt(goalsIdentifier)) { 
+      }
+      else if (parseInt(goalsIdentifier)) { 
         if (isStandardUser)  {
           throw new HttpError(403, 'Forbidden');
         }

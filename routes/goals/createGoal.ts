@@ -5,11 +5,9 @@ import { validateRequest } from '../../middleware/validationMiddleware';
 import { CreateGoalInterface, GoalInterface, baseGoalSchema } from '../../types';
 
 const SQL_CREATE_GOAL = sql<CreateGoalInterface, GoalInterface>(`
-  INSERT INTO goals (id, entity_id, description, category_id, amount, priority, target_at)
-  VALUES (
-    COALESCE((SELECT MAX(id) FROM goals WHERE entity_id = :entity_id), 0) + 1,
-    :entity_id, :description, :category_id, :amount, :priority, :target_at )
-  RETURNING id, entity_id, description, category_id, amount, priority, target_at, created_at, completed_at;
+  INSERT INTO goals (entity_id, name, category_id, amount, priority, target_at)
+  VALUES (:entity_id, :name, :category_id, :amount, :priority, :target_at )
+  RETURNING id, entity_id, name, category_id, amount, priority, target_at, created_at, completed_at;
 `);
 
 const goalSchema = baseGoalSchema.omit({ entity_id: true })
@@ -20,9 +18,9 @@ export default (router: Router) => {
     authMiddleware(), 
     validateRequest(goalSchema),
     async (req, res) => {
-      const { description, category_id, amount, priority, target_at, entity_id } = req.body;
+      const { name, category_id, amount, priority, target_at, entity_id } = req.body;
       const newGoal = await SQL_CREATE_GOAL({
-        description,
+        name,
         category_id,
         amount,
         priority,
