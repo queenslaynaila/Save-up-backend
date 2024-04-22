@@ -17,7 +17,7 @@ const SQL_GET_USER_PHONE_NUMBERS = sql<{ user_id: number }, { phone_number: stri
 
 const SQL_UPDATE_USER_REMINDERS = sql<{ user_id: number; last_reminder_sent_at: Date; security_reminder_count:number}, Record<string, never>>(`
   UPDATE users 
-  SET last_reminder_sent_at = :last_reminder_sent_at
+  SET last_reminder_sent_at = :last_reminder_sent_at,
       security_reminder_count = :security_reminder_count
   WHERE id = :user_id
 `);
