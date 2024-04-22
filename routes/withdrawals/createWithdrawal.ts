@@ -8,7 +8,7 @@ const SQL_CREATE_WITHDRAWAL = sql<{ goal_id: number; user_id: number; amount: nu
     SELECT 
         g.id AS goal_id, 
         g.name AS goal_name, 
-        g.is_locked_goal,
+        g.goal_type,
         g.entity_id AS owner_id,
         g.target_at 
         COALESCE(SUM(s.amount) AS total_saved
@@ -19,14 +19,14 @@ const SQL_CREATE_WITHDRAWAL = sql<{ goal_id: number; user_id: number; amount: nu
     WHERE 
         g.id = :goal_id
         AND g.entity_id = :user_id
-        AND COALESCE(SUM(s.amount), 0) >= :amount
-        AND (g.is_locked_goal = FALSE OR NOW() >= g.target_at)
+        AND (g.goal_type = 'Standard Goal' OR NOW() >= g.target_at)
     GROUP BY 
         g.id, g.name, g.is_locked_goal,g.entity_id
   )
   INSERT INTO withdrawals (goal_id, user_id, amount)
   SELECT c.goal_id :user_id, :amount
   FROM can_withdraw c
+  WHERE c.total_saved >= :amount  
   RETURNING c.goal_name;
 `);
 

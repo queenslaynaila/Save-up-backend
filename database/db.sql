@@ -6,6 +6,7 @@ CREATE TYPE enum_invites AS ENUM ('Pending', 'Accepted', 'Rejected');
 CREATE TYPE enum_relationships AS ENUM ('Parent', 'Spouse', 'Sibling', 'Child', 'Relative', 'Lawyer', 'Friend');
 CREATE TYPE enum_genders AS ENUM ('Male', 'Female', 'Prefer not to say');
 CREATE TYPE enum_entities AS ENUM ('User','Groups');
+CREATE TYPE enum_goals AS ENUM ('Standard Goal','Locked Goal');
 
 --- General Purpose Tables
 CREATE TABLE IF NOT EXISTS security_questions (
@@ -215,7 +216,7 @@ CREATE TABLE IF NOT EXISTS goals (
   status           enum_statuses NOT NULL DEFAULT 'In Progress',
   target_at        TIMESTAMP WITH TIME ZONE ,
   is_default_vault BOOLEAN NOT NULL DEFAULT FALSE,
-  is_locked_goal   BOOLEAN NOT NULL DEFAULT FALSE,
+  goal_type        enum_goal NOT NULL DEFAULT 'Standard Goal',
   created_at       TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   updated_at       TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   completed_at     TIMESTAMP WITH TIME ZONE, 
