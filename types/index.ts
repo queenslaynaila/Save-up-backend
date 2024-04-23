@@ -302,13 +302,19 @@ export const enum priority {
   LOW = 'Low',
 }
 
+export enum goalType {
+  STANDARD = 'Standard Goals',
+  LOCKED = 'Locked Goals',
+}
+
 export const baseGoalSchema = z.object({
   entity_id: z.number(),
   category_id: z.number(),
   name: z.string(),  
-  amount: z.number(),
+  target_amount: z.number(),
   priority: z.enum([priority.HIGH, priority.INTERMEDIATE, priority.LOW]),
   target_at: z.string(),
+  goal_type: z.enum([goalType.STANDARD, goalType.LOCKED])
 });
 
 export type CreateGoalInterface = z.infer<typeof baseGoalSchema>;
@@ -319,6 +325,7 @@ export const goalSchema =  baseGoalSchema.extend({
   target_at: z.date(),
   updated_at: z.date(),
   completed_at: z.date(),
+  interest_rate:z.number().min(0).max(100)
 })
 
 export type GoalInterface = z.infer<typeof goalSchema>;
@@ -328,6 +335,27 @@ export const updateGoalSchema = baseGoalSchema.omit({ entity_id: true }).partial
 export const UpdateGoalRequestSchema = updateGoalSchema.omit({ id: true });
 
 export type UpdateGoalInterface = z.infer<typeof updateGoalSchema>;
+
+export const goalUpdateResSchema = z.object({
+  name: z.string(),
+  category_id: z.number().positive(), 
+  target_amount: z.number().positive(), 
+  priority: z.enum(['Low', 'Medium', 'High']), 
+  target_at: z.date(),
+});
+
+export type GoalUpdateRes = z.infer<typeof goalUpdateResSchema >;
+
+const UpgradeGoalSubsetSchema = z.object({
+  target_at: z.date().optional(),
+  id: z.number(),
+});
+
+export type UpgradeGoalSubset = z.infer<typeof UpgradeGoalSubsetSchema>;
+
+export const upgradeGoalSchema = UpgradeGoalSubsetSchema.pick({target_at:true})
+
+export type UpgradeGoalInterface = z.infer<typeof upgradeGoalSchema>;
 
 export const goalsByConditionsQuerySchema = z.object({
   category_id: z.string().optional(),

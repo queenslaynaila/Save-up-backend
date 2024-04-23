@@ -8,9 +8,23 @@ import { GoalInterface, GoalsConditionsQueryInterface } from '../../types/index'
 const ACCEPTED_STATUS_VALUES = ['In Progress', 'Dormant', 'Completed'];
 const ACCEPTED_PRIORITY_VALUES = ['High', 'Intermediate', 'Low'];
 
-const SQL_GET_SAVINGS = sql<Record<string,never>,GoalInterface>(`
-  SELECT id, entity_id, description, category_id, amount, priority, target_at ,created_at,completed_at FROM goals 
-  WHERE deleted_at IS NULL
+const SQL_GET_GOALS = sql<Record<string, never>, GoalInterface>(`
+  SELECT 
+    g.id,
+    g.name,
+    g.entity_id,
+    g.category_id,
+    g.amount,
+    g.priority,
+    g.target_at,
+    g.created_at,
+    g.completed_at,
+    g.updated_at,
+    g.goal_type,
+    ir.rate AS interest_rate
+  FROM goals g
+  LEFT JOIN interest_rates ir ON g.goal_type = ir.type
+  WHERE g.deleted_at IS NULL;
 `);
 
 export default (router: Router) => {
@@ -81,7 +95,7 @@ export default (router: Router) => {
         filters.push(`status = :status`);
       }
 
-      const query = SQL_GET_SAVINGS({});
+      const query = SQL_GET_GOALS({});
       if (filters.length > 0) query.extend(`AND ${filters.join(' AND ')}`, filterArgs);
       query.extend('LIMIT 15', {});
       res.json(await query.many());

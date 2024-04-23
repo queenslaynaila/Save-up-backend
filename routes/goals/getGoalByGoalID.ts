@@ -5,8 +5,12 @@ import { HttpError } from '../../middleware/errorMiddleware';
 import { GoalInterface,IdParamInterface } from '../../types';
 
 const SQL_GET_GOAL_BY_ID = sql<{ id: number}, GoalInterface>(`
-    SELECT id, entity_id, description, category_id, amount, priority, target_at ,created_at,completed_at FROM goals
-    WHERE id = :id
+  SELECT g.id, g.name, g.entity_id, g.category_id, g.amount, g.priority, g.target_at,
+    g.created_at, g.completed_at, g.updated_at, g.goal_type, ir.rate AS interest_rate
+  FROM goals g
+  LEFT JOIN interest_rates ir ON g.goal_type = ir.type
+  WHERE g.id = :id  
+  AND g.deleted_at IS NULL;
 `);
 
 export default (router: Router) => {
@@ -16,7 +20,7 @@ export default (router: Router) => {
     async (req, res) => {
       const goalId = (parseInt(req.params.id));
       const query = SQL_GET_GOAL_BY_ID({ id: goalId });
-      const saving = await query.one(new HttpError(404, 'Not found'));
-      return res.json(saving);
+      const goal = await query.one(new HttpError(404, 'Not found'));
+      return res.json(goal);
     });
 };
