@@ -9,19 +9,9 @@ const ACCEPTED_STATUS_VALUES = ['In Progress', 'Dormant', 'Completed'];
 const ACCEPTED_PRIORITY_VALUES = ['High', 'Intermediate', 'Low'];
 
 const SQL_GET_GOALS = sql<Record<string, never>, GoalInterface>(`
-  SELECT 
-    g.id,
-    g.name,
-    g.entity_id,
-    g.category_id,
-    g.amount,
-    g.priority,
-    g.target_at,
-    g.created_at,
-    g.completed_at,
-    g.updated_at,
-    g.goal_type,
-    ir.rate AS interest_rate
+  SELECT g.id, g.name, g.entity_id, g.category_id, g.amount, g.priority,
+         g.target_at, g.created_at, g.completed_at, g.updated_at, g.goal_type, 
+         ir.rate AS interest_rate
   FROM goals g
   LEFT JOIN interest_rates ir ON g.goal_type = ir.type
   WHERE g.deleted_at IS NULL;
