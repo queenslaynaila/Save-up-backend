@@ -11,7 +11,7 @@ const SQL_CREATE_WITHDRAWAL = sql<{ goal_id: number; user_id: number; amount: nu
         g.goal_type,
         g.entity_id AS owner_id,
         g.target_at 
-        COALESCE(SUM(s.amount) AS total_saved
+        COALESCE(SUM(s.amount),0) AS total_saved
     FROM
        goals g
     LEFT JOIN 
