@@ -6,14 +6,14 @@ import { UpgradeGoalSubset, GoalInterface, upgradeGoalSchema} from '../../types'
 import { validateRequest } from '../../middleware/validationMiddleware';
 
 const SQL_UPGRADE_GOAL = sql<UpgradeGoalSubset, GoalInterface>(`
-    UPDATE goals g
-    SET goal_type = 'Locked Goals',
-        target_at = COALESCE(:target_at, target_at)
-    FROM goals g
-    LEFT JOIN interest_rates ir ON g.goal_type = ir.type
-    WHERE g.id = :id 
-    RETURNING g.id, g.name, g.entity_id, g.category_id, g.target_amount, g.priority, g.target_at,
-    g.created_at, g.completed_at, g.updated_at, g.goal_type, ir.rate AS interest_rate;
+  UPDATE goals g
+  SET goal_type = 'Locked Goals',
+    target_at = COALESCE(:target_at, target_at)
+  FROM goals g
+  LEFT JOIN interest_rates ir ON g.goal_type = ir.type
+  WHERE g.id = :id 
+  RETURNING g.id, g.name, g.entity_id, g.category_id, g.target_amount, g.priority, g.target_at,
+  g.created_at, g.completed_at, g.updated_at, g.goal_type, ir.rate AS interest_rate;
 `);
 
 export default (router: Router) => {
