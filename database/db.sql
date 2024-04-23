@@ -6,7 +6,8 @@ CREATE TYPE enum_invites AS ENUM ('Pending', 'Accepted', 'Rejected');
 CREATE TYPE enum_relationships AS ENUM ('Parent', 'Spouse', 'Sibling', 'Child', 'Relative', 'Lawyer', 'Friend');
 CREATE TYPE enum_genders AS ENUM ('Male', 'Female', 'Prefer not to say');
 CREATE TYPE enum_entities AS ENUM ('User','Groups');
-CREATE TYPE enum_goals AS ENUM ('Standard Goal','Locked Goal');
+CREATE TYPE enum_goal_types AS ENUM ('Standard Goal','Locked Goal');
+
 
 --- General Purpose Tables
 CREATE TABLE IF NOT EXISTS security_questions (
@@ -33,6 +34,7 @@ CREATE TABLE IF NOT EXISTS categories (
   id            SERIAL PRIMARY KEY,
   name          TEXT NOT NULL,
   description   TEXT,
+  image_url     TEXT,
   created_at    TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   deleted_at    TIMESTAMP WITH TIME ZONE
 );
@@ -53,6 +55,7 @@ VALUES ('Food', 'All food related expenses'),
 
 SELECT create_reference_table('categories');
 
+===============================================================================================
 --Entity
 CREATE TABLE IF NOT EXISTS entities (
   id              SERIAL PRIMARY KEY,
@@ -61,6 +64,7 @@ CREATE TABLE IF NOT EXISTS entities (
 
 SELECT create_reference_table('entities');
 
+===============================================================================================
 --- User & User Management
 CREATE TABLE IF NOT EXISTS user_contacts (
   id              INT PRIMARY KEY,
@@ -72,12 +76,12 @@ CREATE TABLE IF NOT EXISTS user_contacts (
 );
 
 CREATE TABLE IF NOT EXISTS users (
-  id              INT NOT NULL PRIMARY KEY,
-  full_name       TEXT NOT NULL,
-  role            enum_roles NOT NULL DEFAULT 'User',
-  gender          enum_genders NOT NULL,
-  pin             TEXT NOT NULL,
-  created_at      TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+  id                        INT NOT NULL PRIMARY KEY,
+  full_name                 TEXT NOT NULL,
+  role                      enum_roles NOT NULL DEFAULT 'User',
+  gender                    enum_genders NOT NULL,
+  pin                       TEXT NOT NULL,
+  created_at                TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );
 
 CREATE INDEX idx_users_by_role ON users(role);
@@ -86,17 +90,17 @@ CREATE INDEX idx_users_by_created_at ON users(created_at);
 SELECT create_distributed_table('users', 'id');
 
 CREATE TABLE IF NOT EXISTS next_of_kins (
-  user_id         INT NOT NULL,
-  id              INT NOT NULL,
-  full_name       TEXT NOT NULL,
-  relationship    enum_relationships NOT NULL,
-  email           TEXT NOT NULL,
-  phone_number    TEXT NOT NULL,
-  created_at      TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-  updated_at      TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-  deleted_at      TIMESTAMP WITH TIME ZONE,
-  PRIMARY KEY     (user_id,id),
-  FOREIGN KEY     (user_id) REFERENCES users(id)
+  user_id                INT NOT NULL,
+  id                     INT NOT NULL,
+  full_name              TEXT NOT NULL,
+  relationship           enum_relationships NOT NULL,
+  email                  TEXT NOT NULL,
+  phone_number           TEXT NOT NULL,
+  created_at             TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  updated_at             TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  deleted_at             TIMESTAMP WITH TIME ZONE,
+  PRIMARY KEY            (user_id,id),
+  FOREIGN KEY            (user_id) REFERENCES users(id)
 );
 
 --Enforce uniqueness of user IDs for non-deleted records, ensuring each user can have only one valid next of kin at a time
@@ -129,6 +133,7 @@ CREATE TABLE IF NOT EXISTS reset_tokens (
 
 SELECT create_distributed_table('reset_tokens', 'user_id');
 
+===============================================================================================
 --- Groups & Group Management
 CREATE TABLE IF NOT EXISTS groups (
   id            SERIAL PRIMARY KEY,
@@ -182,74 +187,82 @@ CREATE INDEX idx_invitations_by_group_id ON invitations(group_id);
 SELECT create_distributed_table('invitations', 'group_id');
 
 CREATE TABLE IF NOT EXISTS nominated_administrators (
-  group_id         INT NOT NULL,
-  user_id          INT NOT NULL,
+  group_id           INT NOT NULL,
+  user_id            INT NOT NULL,
   nominated_at       TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-  PRIMARY KEY      (group_id, user_id),
-  FOREIGN KEY      (group_id, user_id) REFERENCES user_groups(group_id, user_id)
+  PRIMARY KEY        (group_id, user_id),
+  FOREIGN KEY        (group_id, user_id) REFERENCES user_groups(group_id, user_id)
 );
 
 SELECT create_distributed_table('nominated_administrators', 'group_id');
 
 CREATE TABLE IF NOT EXISTS nomination_approvals (
-  group_id            INT NOT NULL,
-  voter_member_id     INT NOT NULL,
+  group_id              INT NOT NULL,
+  voter_member_id       INT NOT NULL,
   nominated_member_id   INT NOT NULL,
-  vote                BOOLEAN NOT NULL, -- True for approval, False for disapproval
-  PRIMARY KEY         (group_id, voter_member_id, nominated_member_id),
-  FOREIGN KEY         (group_id, voter_member_id) REFERENCES user_groups(group_id, user_id),
-  FOREIGN KEY         (group_id, nominated_member_id) REFERENCES nominated_administrators(group_id, user_id)
+  vote                  BOOLEAN NOT NULL, -- True for approval, False for disapproval
+  PRIMARY KEY           (group_id, voter_member_id, nominated_member_id),
+  FOREIGN KEY           (group_id, voter_member_id) REFERENCES user_groups(group_id, user_id),
+  FOREIGN KEY           (group_id, nominated_member_id) REFERENCES nominated_administrators(group_id, user_id)
 );
 
 SELECT create_distributed_table('administrator_votes', 'group_id');
 
+
+===============================================================================================
 ---Financial management 
 
-CREATE TABLE IF NOT EXISTS goals ( 
-  id               SERIAL PRIMARY KEY,
-  entity_id        NOT NULL, 
-  category_id      INT NOT NULL,
-  name             TEXT NOT NULL,
-  description      TEXT,
-  amount           NUMERIC(30, 3) NOT NULL CHECK (amount >= 0),
-  priority         enum_priorities NOT NULL,
-  status           enum_statuses NOT NULL DEFAULT 'In Progress',
-  target_at        TIMESTAMP WITH TIME ZONE ,
-  is_default_vault BOOLEAN NOT NULL DEFAULT FALSE,
-  goal_type        enum_goal NOT NULL DEFAULT 'Standard Goal',
-  created_at       TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-  updated_at       TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-  completed_at     TIMESTAMP WITH TIME ZONE, 
-  deleted_at       TIMESTAMP WITH TIME ZONE,
-  FOREIGN KEY      (entity_id) REFERENCES entities(id),
-  FOREIGN KEY      (category_id) REFERENCES categories(id)
+CREATE TABLE IF NOT EXISTS interest_rates (
+  id       SERIAL PRIMARY KEY,
+  type     enum_goal_types NOT NULL, 
+  rate     DECIMAL(2,2) NOT NULL 
 );
- 
+
+CREATE TABLE IF NOT EXISTS goals ( 
+  id                      SERIAL PRIMARY KEY,
+  entity_id               INT NOT NULL, 
+  category_id             INT NOT NULL,
+  name                    TEXT NOT NULL,
+  target_amount           NUMERIC(30, 2) NOT NULL CHECK (amount >= 0),
+  priority                enum_priorities NOT NUL,
+  status                  enum_statuses NOT NULL DEFAULT 'In Progress',
+  target_at               TIMESTAMP WITH TIME ZONE NOT NULL,
+  is_default_reserve      BOOLEAN NOT NULL DEFAULT FALSE,
+  goal_type               enum_goal_types NOT NULL DEFAULT 'Standard Goal',
+  reminder_count          INT NOT NULL DEFAULT 0,
+  last_reminder_sent_at   TIMESTAMP WITH TIME ZONE,
+  created_at              TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  updated_at              TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  completed_at            TIMESTAMP WITH TIME ZONE, 
+  deleted_at              TIMESTAMP WITH TIME ZONE,
+  FOREIGN KEY             (entity_id) REFERENCES entities(id),
+  FOREIGN KEY             (category_id) REFERENCES categories(id)
+);
+
 SELECT create_distributed_table('goals', 'id');
 
-CREATE TABLE IF NOT EXISTS savings (
-  id          INT NOT NULL,
-  goal_id     INT NOT NULL,
-  user_id     INT NOT NULL,
-  amount      NUMERIC(30, 3) NOT NULL,
-  created_at  TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  PRIMARY KEY (goal_id, id), 
-  FOREIGN KEY (user_id) REFERENCES users(id),
-  FOREIGN KEY (goal_id) REFERENCES goals(id)
+CREATE TABLE IF NOT EXISTS deposits (
+  id           INT NOT NULL,
+  goal_id      INT NOT NULL,
+  user_id      INT NOT NULL,
+  amount       NUMERIC(30, 2) NOT NULL,
+  created_at   TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  PRIMARY KEY  (goal_id, id), 
+  FOREIGN KEY  (user_id) REFERENCES users(id),
+  FOREIGN KEY  (goal_id) REFERENCES goals(id)
 );
 
-SELECT create_distributed_table('savings', 'goal_id');
-CREATE INDEX idx_savings_by_user_and_goal ON savings(user_id, goal_id);
-
+SELECT create_distributed_table('deposits', 'goal_id');
+CREATE INDEX idx_deposits_by_user_and_goal ON deposits(user_id, goal_id);
 
 CREATE TABLE IF NOT EXISTS withdrawals (
   goal_id       INT NOT NULL,
   id            INT NOT NULL,
   user_id       INT NOT NULL,
-  amount        NUMERIC(30, 3) NOT NULL CHECK (amount >= 0),
+  amount        NUMERIC(30, 2) NOT NULL CHECK (amount >= 0),
   created_at    TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   PRIMARY KEY   (goal_id, id),
-  FOREIGN KEY  (goal_id) REFERENCES goals(id),
+  FOREIGN KEY   (goal_id) REFERENCES goals(id),
   FOREIGN KEY   (user_id) REFERENCES users(id)
 );
 
@@ -262,30 +275,30 @@ CREATE TABLE IF NOT EXISTS transfers (
   id                    INT NOT NULL,
   source_goal_id        INT NOT NULL,
   destination_goal_id   INT NOT NULL,
-  amount                NUMERIC(30, 3) NOT NULL,
+  amount                NUMERIC(30, 2) NOT NULL,
   created_at            TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   FOREIGN KEY           (source_goal_id) REFERENCES goals(id),
   FOREIGN KEY           (destination_goal_id) REFERENCES goals(id),
   FOREIGN KEY           (user_id) REFERENCES users(id)
 );
 
-SELECT create_distributed_table('withdrawals', 'source_goal_id');
+SELECT create_distributed_table('transfers', 'source_goal_id');
 
---This table refers to savings towards a group goal made by outsiders who ere heloing th egrouo it bekings to agoal and a group
+--This table refers to deposits towards a group goal made by non members
 
-CREATE TABLE IF NOT EXISTS external_savings (
+CREATE TABLE IF NOT EXISTS external_deposits (
   id             SERIAL PRIMARY KEY,
   group_id       INT NOT NULL,
   goal_id        INT NOT NULL,
   contributor    TEXT NOT NULL,
   phone_number   TEXT,
-  amount         NUMERIC(30, 3) NOT NULL,
+  amount         NUMERIC(30, 2) NOT NULL,
   created_at     TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   FOREIGN KEY    (goal_id) REFERENCES goals(id),
   FOREIGN KEY    (group_id) REFERENCES groups(id)
 );
 
-SELECT create_distributed_table('external_savings', 'goal_id');
+SELECT create_distributed_table('external_deposits', 'goal_id');
 
 CREATE TABLE IF NOT EXISTS expenses (
   entity_id    INT NOT NULL,
@@ -306,27 +319,22 @@ CREATE INDEX idx_expenses_by_date_spent ON expenses(date_spent);
 SELECT create_distributed_table('expenses', 'id');
 
 ===============================================================================================
--- Trigger: Update the status of a goal to Complete when total savings exceeds target amount for a goal.
-
-CREATE TRIGGER enforce_update_saving_status
-AFTER INSERT ON savings
-FOR EACH ROW
-EXECUTE FUNCTION update_goals_status();
+-- Trigger: Update the status of a goal to Complete when total deeposits exceeds target amount for a goal.
 
 CREATE OR REPLACE FUNCTION update_goals_status()
 RETURNS TRIGGER AS $$
 DECLARE
-    total_savings NUMERIC(30, 2);
+    total_deposits NUMERIC(30, 2);
 BEGIN
-    SELECT COALESCE(SUM(amount), 0) INTO total_savings
-    FROM savings
-    WHERE user_id = NEW.user_id AND saving_id = NEW.saving_id;
+    SELECT COALESCE(SUM(amount), 0) INTO total_deposits
+    FROM deposits
+    WHERE user_id = NEW.user_id AND deposit_id = NEW.deposit_id;
 
-    IF total_savings >= (SELECT target_amount FROM goals WHERE user_id = NEW.user_id AND id = NEW.saving_id) THEN
+    IF total_deposits >= (SELECT target_amount FROM goals WHERE user_id = NEW.user_id AND id = NEW.deposit_id) THEN
         UPDATE goals
         SET status = 'Completed',
             completed_date = NOW()
-        WHERE id = NEW.saving_id;
+        WHERE id = NEW.deposit_id;
     END IF;
 
     RETURN NEW;
@@ -334,7 +342,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER enforce_update_saving_status
-AFTER INSERT ON savings
+AFTER INSERT ON deposits
 FOR EACH ROW
 EXECUTE FUNCTION update_goals_status();
 
@@ -457,17 +465,17 @@ FOR EACH ROW
 EXECUTE FUNCTION update_admins_on_all_votes();
 
 ===============================================================================================
--- Trigger: Creates a Savings vault for each user on user craetion.The vault is a flexible space where a user can save money without assigning it to specific purposes right away .
+-- Trigger: Creates a Savings vault for each user or group when either is created.Allows users/groups to save witht a goal in mind.
 
-CREATE OR REPLACE FUNCTION create_user_savings_vault()
+CREATE OR REPLACE FUNCTION create_default_savings_vault()
 RETURNS TRIGGER AS $$
 BEGIN
-  IF table_name = 'users' THEN 
-    INSERT INTO INSERT INTO goals (entity_id, category_id, name, amount,description,is_default_vault, priority)
-    VALUES (NEW.id, 11, 'Savings Vault','Your personal financial hub, where you stash your cash for safekeeping and future use.Plus you can easily transfer funds from here to your other savings goals whenever you are ready to make progress.Your money Your way',TRUE, 0, 'Low');
+  IF TG_TABLE_NAME = 'users' THEN 
+    INSERT INTO INSERT INTO goals (entity_id, category_id, name, amount, description, is_default_reserve, priority)
+    VALUES (NEW.id, 11, 'Quick Save','Your personal stash for on-the-go saving.Quick Save lets you easily deposit funds without attaching them to a goal right away.  When you''re ready to put those savings towards a dream trip, rainy day fund, or anything else, simply transfer them to any of your existing goals or create a new one!',TRUE, 0, 'Intermediate');
   ELSE
-    INSERT INTO goals (entity_id, category_id, name, amount, description, is_default_vault, priority)
-    VALUES (NEW.id, 11, 'Community Vault', 0, 'The Group Vault is our shared savings account, designed for saving without specific goals in mind. Funds deposited here can be withdrawn and distributed to members upon request and upon approval by all admins. Plus members can create group goals with deadlines for specific purposes eg Trips. Funds from the vault can be transferred to this goals as needed.', TRUE, 'Low');
+    INSERT INTO goals (entity_id, category_id, name, amount, description, is_default_reserve, priority)
+    VALUES (NEW.id, 11, 'Group Reserve', 0, 'Your dedicated space to stash funds as a team. Everyone can contribute on-the-go, without needing a specific goal right away.Once your crew has a plan, simply transfer your savings to a shared goal or create a new one from scratch', TRUE, 'Intermediate');
   END IF 
 
   RETURN NULL;
@@ -475,11 +483,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER create_default_savings_goal_trigger
-AFTER INSERT ON users
+AFTER INSERT ON users OR INSERT ON groups
 FOR EACH ROW
-EXECUTE FUNCTION create_default_savings_goal();
+EXECUTE FUNCTION create_default_savings_vault();
 
-CREATE TRIGGER create_default_group_goal_trigger
-AFTER INSERT ON groups
-FOR EACH ROW
-EXECUTE FUNCTION create_default_savings_goal();
