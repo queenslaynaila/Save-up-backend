@@ -44,28 +44,29 @@ const SQL_UPDATE_GOAL_REMINDER = sql<UpdateGoalReminder, Record<string, never>>(
   WHERE id = :goal_id
 `);
 
-export async function remindStaleSavings() {
-  console.log('Checking for stale savings...');
+export async function remindStaleGoals() {
+  console.log('Checking for stale goals...');
 
   const currentTime = new Date();
-  const overdueSavings = await SQL_GET_OVERDUE_GOALS({}).many();
+  const overdueGoals = await SQL_GET_OVERDUE_GOALS({}).many();
  
-  for (const saving of overdueSavings) {
-    const { goal_id, entity_id, amount, target_at,reminder_count , last_reminder_sent_at,name } = saving;
+  for (const goal of overdueGoals) {
+    const { goal_id, entity_id, amount, target_at,reminder_count , last_reminder_sent_at,name } = goal;
     const timeDifference = currentTime.getTime() - last_reminder_sent_at.getTime();
     const daysDifference = timeDifference / (1000 * 3600 * 24);
 
     if(reminder_count < 3 && daysDifference >= 7){
       const { phone_number } = await SQL_GET_PHONE_NUMBER({ entity_id }).one();
-      const message = `Hi! A gentle reminder that your saving goal ${name} of ${amount} is overdue by 30 days. Consider taking action to reach your saving goal by ${target_at}.`;
+      const message = `Hi! A gentle reminder that your saving goal ${name} of ${amount} is overdue by 30 days. 
+                       Consider taking action to reach your saving goal by ${target_at}.`;
       sendSms(phone_number, message);
       await SQL_UPDATE_GOAL_REMINDER({ goal_id, last_reminder_sent_at: currentTime, reminder_count: 1 }).exec();
     }
 
   }
 
-  console.log('Stale savings reminders sent');
+  console.log('Stale goalss reminders sent');
 }
 
-cron.schedule('0 10 */14 * *', remindStaleSavings);
+cron.schedule('0 10 */14 * *', remindStaleGoals);
 
