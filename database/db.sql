@@ -50,7 +50,7 @@ VALUES ('Food', 'All food related expenses'),
        ('Utilities', 'Bills for electricity, water, gas, and other essential services'),
        ('Savings', 'Funds set aside for future investments or emergencies'),
        ('Debt Repayment', 'Payments towards loans, credit cards, and other debts'),
-       ('Travel', 'Expenses or savings related to trips, vacations, and travel activities')
+       ('Travel', 'Expenses or savings related to trips, vacations, and travel activities'),
        ('Default', 'a flexible space where you can save money without assigning it to specific purposes right away. Funds saved here are readily available for future use and can be easily allocated to other goals whenever you choose.');
 
 SELECT create_reference_table('categories');
@@ -68,7 +68,6 @@ SELECT create_reference_table('entities');
 --- User & User Management
 CREATE TABLE IF NOT EXISTS user_contacts (
   id              INT PRIMARY KEY,
-  phone_number    TEXT UNIQUE NOT NULL,
   national_id     INTEGER NOT NULL UNIQUE,
   FOREIGN KEY     (id) REFERENCES entities(id),
   CONSTRAINT      phone_number_format_check CHECK (phone_number ~* '^\+?254[0-9]{9}$'),
@@ -84,9 +83,10 @@ CREATE TABLE IF NOT EXISTS users (
   created_at                TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX idx_users_by_role ON users(role);
-CREATE INDEX idx_users_by_gender ON users(gender);
-CREATE INDEX idx_users_by_created_at ON users(created_at);
+--Improve login operations via index
+CREATE INDEX idx_users_by_phone ON user_contacts (phone_number);
+CREATE INDEX idx_users_by_id ON users (id);
+
 SELECT create_distributed_table('users', 'id');
 
 CREATE TABLE IF NOT EXISTS next_of_kins (
@@ -105,7 +105,6 @@ CREATE TABLE IF NOT EXISTS next_of_kins (
 
 --Enforce uniqueness of user IDs for non-deleted records, ensuring each user can have only one valid next of kin at a time
 CREATE UNIQUE INDEX idx_next_of_kins_by_user_id ON next_of_kins(user_id) WHERE deleted_at IS NULL;
-
 SELECT create_distributed_table('next_of_kins', 'user_id');
 
 CREATE TABLE IF NOT EXISTS security_answers (
@@ -158,7 +157,7 @@ CREATE TABLE IF NOT EXISTS user_groups (
 );
 
 SELECT create_distributed_table('user_groups', 'group_id');
-CREATE INDEX idx_user_groups_by_group_id ON user_groups(group_id);
+
 
 CREATE TABLE IF NOT EXISTS group_administrators (
   group_id      INT NOT NULL,
@@ -169,8 +168,7 @@ CREATE TABLE IF NOT EXISTS group_administrators (
 );
 
 SELECT create_distributed_table('group_administrators', 'group_id');
-CREATE INDEX idx_group_admins_by_group_id ON group_administrators(group_id);
-CREATE INDEX idx_group_admins_by_user_id ON group_administrators(user_id);
+
 
 CREATE TABLE IF NOT EXISTS invitations (   
   group_id      INT NOT NULL,      
@@ -183,7 +181,7 @@ CREATE TABLE IF NOT EXISTS invitations (
   FOREIGN KEY   (receiver_id) REFERENCES entities(id)
 );
 
-CREATE INDEX idx_invitations_by_group_id ON invitations(group_id);
+
 SELECT create_distributed_table('invitations', 'group_id');
 
 CREATE TABLE IF NOT EXISTS nominated_administrators (
@@ -207,7 +205,6 @@ CREATE TABLE IF NOT EXISTS nomination_approvals (
 );
 
 SELECT create_distributed_table('administrator_votes', 'group_id');
-
 
 ===============================================================================================
 ---Financial management 
@@ -239,21 +236,26 @@ CREATE TABLE IF NOT EXISTS goals (
   FOREIGN KEY             (category_id) REFERENCES categories(id)
 );
 
+-- Index goals for faster retrievals by ownership
+Create INDEX idx_goals_by_entity_id ON goals(entity_id);
 SELECT create_distributed_table('goals', 'id');
 
 CREATE TABLE IF NOT EXISTS deposits (
-  id           INT NOT NULL,
-  goal_id      INT NOT NULL,
-  user_id      INT NOT NULL,
-  amount       NUMERIC(30, 2) NOT NULL,
-  created_at   TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  PRIMARY KEY  (goal_id, id), 
-  FOREIGN KEY  (user_id) REFERENCES users(id),
-  FOREIGN KEY  (goal_id) REFERENCES goals(id)
+  id                    INT NOT NULL,
+  goal_id               INT NOT NULL,
+  user_id               INT,
+  donor_name            TEXT,
+  donor_email           TEXT,
+  donor_phone_number    TEXT,
+  amount                NUMERIC(30, 2) NOT NULL,
+  created_at            TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  PRIMARY KEY           (goal_id, id), 
+  FOREIGN KEY           (user_id) REFERENCES users(id),
+  FOREIGN KEY           (goal_id) REFERENCES goals(id)
 );
 
+CREATE INDEX idx_deposits_by_goal_id ON deposits(goal_id);
 SELECT create_distributed_table('deposits', 'goal_id');
-CREATE INDEX idx_deposits_by_user_and_goal ON deposits(user_id, goal_id);
 
 CREATE TABLE IF NOT EXISTS withdrawals (
   goal_id       INT NOT NULL,
@@ -266,9 +268,10 @@ CREATE TABLE IF NOT EXISTS withdrawals (
   FOREIGN KEY   (user_id) REFERENCES users(id)
 );
 
+CREATE INDEX idx_withdrawals_by_goal_id ON withdrawals(goal_id);
 SELECT create_distributed_table('withdrawals', 'goal_id');
 
--- This records money transfered from vaults to other goals 
+-- This records money transfered from default goals (quick save and grp resrve) to other goals 
 
 CREATE TABLE IF NOT EXISTS transfers (
   user_id               INT NOT NULL,
@@ -282,23 +285,9 @@ CREATE TABLE IF NOT EXISTS transfers (
   FOREIGN KEY           (user_id) REFERENCES users(id)
 );
 
+CREATE INDEX idx_transfers_by_source_goal_id ON transfers(source_goal_id);
+CREATE INDEX idx_transfers_by_destination_goal_id ON transfers(destination_goal_id);
 SELECT create_distributed_table('transfers', 'source_goal_id');
-
---This table refers to deposits towards a group goal made by non members
-
-CREATE TABLE IF NOT EXISTS external_deposits (
-  id             SERIAL PRIMARY KEY,
-  group_id       INT NOT NULL,
-  goal_id        INT NOT NULL,
-  contributor    TEXT NOT NULL,
-  phone_number   TEXT,
-  amount         NUMERIC(30, 2) NOT NULL,
-  created_at     TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  FOREIGN KEY    (goal_id) REFERENCES goals(id),
-  FOREIGN KEY    (group_id) REFERENCES groups(id)
-);
-
-SELECT create_distributed_table('external_deposits', 'goal_id');
 
 CREATE TABLE IF NOT EXISTS expenses (
   entity_id    INT NOT NULL,
@@ -314,8 +303,8 @@ CREATE TABLE IF NOT EXISTS expenses (
   FOREIGN KEY  (category_id) REFERENCES categories(id)
 );
 
-CREATE INDEX idx_expenses_by_user_and_category ON expenses(user_id, category_id);
-CREATE INDEX idx_expenses_by_date_spent ON expenses(date_spent);
+-- Index expenses for faster retrievals by owners
+CREATE INDEX idx_expenses_by_entity_id ON expenses(entity_id);
 SELECT create_distributed_table('expenses', 'id');
 
 ===============================================================================================
