@@ -349,6 +349,7 @@ export type GoalUpdateRes = z.infer<typeof goalUpdateResSchema >;
 const UpgradeGoalSubsetSchema = z.object({
   target_at: z.date().optional(),
   id: z.number(),
+  goal_type:z.string()
 });
 
 export type UpgradeGoalSubset = z.infer<typeof UpgradeGoalSubsetSchema>;
