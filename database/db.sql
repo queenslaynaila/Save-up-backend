@@ -222,7 +222,7 @@ CREATE TABLE IF NOT EXISTS goals (
   category_id             INT NOT NULL,
   name                    TEXT NOT NULL,
   target_amount           NUMERIC(30, 2) NOT NULL CHECK (amount >= 0),
-  priority                enum_priorities NOT NUL,
+  priority                enum_priorities NOT NULL,
   status                  enum_statuses NOT NULL DEFAULT 'In Progress',
   target_at               TIMESTAMP WITH TIME ZONE NOT NULL,
   is_default_reserve      BOOLEAN NOT NULL DEFAULT FALSE,
