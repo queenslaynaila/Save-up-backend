@@ -5,7 +5,7 @@ import { HttpError } from '../../middleware/errorMiddleware';
 import { SendInviteInterface } from '../../types';
 
 const SQL_FIND_USER_BY_PHONE = sql<{ phone_number: string }, { id: number }>(`
-    SELECT id FROM user_contacts WHERE phone_number = :phone_number
+    SELECT id FROM user_contact_details WHERE phone_number = :phone_number
 `);
 
 const SQL_FIND_PENDING_INVITATION = sql<{ receiver_id: number, group_id: number }, { count: number }>(`

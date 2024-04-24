@@ -10,12 +10,20 @@ interface SavingInterface {
   name: string;
 }
 
-const SQL_CREATE_SAVING = sql<CreateSavingInterface, SavingInterface>(`
-  INSERT INTO savings (id,user_id,goal_id, amount)
-  VALUES (:id,:user_id,:goal_id,:amount)
-  RETURNING amount, goals.name AS name
-  FROM savings
-  INNER JOIN goals ON goals.id = savings.goal_id;
+const SQL_CREATE_DEPOSIT = sql<CreateSavingInterface, SavingInterface>(`
+  INSERT INTO deposits (id, goal_id, user_id, donor_name, donor_email, donor_phone_number, amount)
+  VALUES (
+      (SELECT COALESCE(MAX(id), 0) + 1 FROM deposits WHERE goal_id = :goal_id),
+      :goal_id,
+      :user_id,
+      :donor_name,
+      :donor_email,
+      :donor_phone_number,
+      :amount
+  )
+  RETURNING amount, (
+      SELECT name FROM goals WHERE id = :goal_id
+  ) AS name;
 `);
 
 export default (router: Router) => {
@@ -26,7 +34,7 @@ export default (router: Router) => {
     async (req, res) => {
       const user_id= req.user!.id
       const { goal_id, amount} = req.body;
-      const contributionResult = await SQL_CREATE_SAVING({ user_id,goal_id, amount })
+      const contributionResult = await SQL_CREATE_DEPOSIT({ user_id,goal_id, amount })
         .one(new HttpError(404, 'Unable to complete the request'));
       const goalName = contributionResult.name
       const amountPaid = contributionResult.amount

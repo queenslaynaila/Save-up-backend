@@ -51,7 +51,7 @@ VALUES ('Food', 'All food related expenses'),
        ('Savings', 'Funds set aside for future investments or emergencies'),
        ('Debt Repayment', 'Payments towards loans, credit cards, and other debts'),
        ('Travel', 'Expenses or savings related to trips, vacations, and travel activities'),
-       ('Default', 'a flexible space where you can save money without assigning it to specific purposes right away. Funds saved here are readily available for future use and can be easily allocated to other goals whenever you choose.');
+       ('Default', 'A flexible space where you can save money without assigning it to specific purposes right away. Funds saved here are readily available for future use and can be easily allocated to other goals whenever you choose.');
 
 SELECT create_reference_table('categories');
 
@@ -66,9 +66,10 @@ SELECT create_reference_table('entities');
 
 ===============================================================================================
 --- User & User Management
-CREATE TABLE IF NOT EXISTS user_contacts (
+CREATE TABLE IF NOT EXISTS user_contact_details (
   id              INT PRIMARY KEY,
   national_id     INTEGER NOT NULL UNIQUE,
+  phone_number    TEXT NOT NULL UNIQUE,
   FOREIGN KEY     (id) REFERENCES entities(id),
   CONSTRAINT      phone_number_format_check CHECK (phone_number ~* '^\+?254[0-9]{9}$'),
   CONSTRAINT      national_id_length_check CHECK (national_id >= 10000000 AND national_id <= 99999999)
@@ -84,7 +85,7 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 --Improve login operations via index
-CREATE INDEX idx_users_by_phone ON user_contacts (phone_number);
+CREATE INDEX idx_users_by_phone ON user_contact_details (phone_number);
 CREATE INDEX idx_users_by_id ON users (id);
 
 SELECT create_distributed_table('users', 'id');

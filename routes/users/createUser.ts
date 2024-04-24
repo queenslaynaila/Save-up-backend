@@ -12,7 +12,7 @@ const SQL_CREATE_USER_ENTITY = sql<{ entity_type: string }, { id:number }>(`
 `);
 
 const SQL_CREATE_USER_CONTACTS = sql<CreateUserContactInterface, Record<string,never>>(`
-  INSERT INTO user_contacts (id,phone_number,national_id )
+  INSERT INTO user_contact_details (id,phone_number,national_id )
   VALUES (:entity_id,:phone_number,:national_id)
 `);
 

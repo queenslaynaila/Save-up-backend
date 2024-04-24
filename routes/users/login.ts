@@ -7,7 +7,7 @@ import { validateRequest } from '../../middleware/validationMiddleware';
 import { updateUserPhoneSchema, GetUserInterface, UpdatePhoneInterface, ExtendedUserInterface} from '../../types';
 
 const SQL_GET_USER_ENTITY_ID = sql<{ phone_number: string }, { id: number }>(`
-  SELECT id FROM user_contacts WHERE phone_number = :phone_number
+  SELECT id FROM user_contact_details WHERE phone_number = :phone_number
 `);
 
 const SQL_GET_USER = sql<{ id: number }, ExtendedUserInterface>(`

@@ -7,7 +7,7 @@ import sendSms from '../../services/twilio';
 import { HttpError } from '../../middleware/errorMiddleware';
 
 const SQL_GET_USER = sql<{ phone_number: string }, { id:number }>(`
-  SELECT id FROM user_contacts WHERE phone_number = :phone_number
+  SELECT id FROM user_contact_details WHERE phone_number = :phone_number
 `);
 
 const SQL_SAVE_TOKEN = sql<{ user_id:number; token: string }, { token: string }>(`
