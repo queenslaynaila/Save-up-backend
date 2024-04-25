@@ -3,7 +3,8 @@ import { sql } from '../../db';
 import { HttpError } from '../../middleware/errorMiddleware';
 import authMiddleware from '../../middleware/authorization';
 import { convertToTitleCase } from '../../middleware/caseNormalization';
-import { UserRole, UserRoleUpdateInterface, RoleUpdateResultInterface } from '../../types';
+import { UserRoleUpdateInterface, RoleUpdateResultInterface } from './types';
+import { UserRole } from '../../types';
 
 const VALID_ROLES = ['Admin', 'User', 'Moderator'];
 

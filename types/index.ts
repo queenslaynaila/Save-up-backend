@@ -152,35 +152,6 @@ export const updateUserPhoneSchema = baseUserSchema.pick({
 
 export type UpdatePhoneInterface = z.infer<typeof updateUserPhoneSchema>;
 
-// NEXT OF KIN SCHEMAS
-export const createNextOfKinSchema = z.object({
-  user_id:z.number(),
-  full_name: z.string(),
-  relationship: z.enum(['Parent', 'Spouse', 'Sibling', 'Child', 'Relative', 'Lawyer', 'Friend']),
-  email: z.string().email(),
-  phone_number: z
-    .string()
-    .refine((value) => /^\+254\d{9}$/.test(value)),
-});
-
-export type CreateNextOfKinInterface = z.infer<typeof createNextOfKinSchema>;
-
-export const NextOfKinSchema= createNextOfKinSchema
-  .omit({ user_id: true })
-  .extend({
-    id: z.number(),
-    created_at: z.date(),
-    updated_at: z.date()
-  })
-
-export type NextOfKinInterface = z.infer<typeof NextOfKinSchema>;
-
-export const updateNextOfKinSchema = createNextOfKinSchema.partial().extend({
-  id: z.number()
-});
-
-export type UpdateNextOfKinInterface = z.infer<typeof updateNextOfKinSchema>;
-
 // SECURITY ANSWER SCHEMAS
 
 export const createSecurityAnswerSchema = z.object({
@@ -258,39 +229,6 @@ export const nominatedAdminSchema = exitGroupSchema.extend({
 })
 
 export type NominatedAdminInterface = z.infer<typeof nominatedAdminSchema>;
-
-//INVITE SCHEMA
-
-export const sendInviteSchema = z.object({
-  receiver_id:z.number(),
-  sender_id:z.number(),
-  group_id:z.number(),
-});
-
-export const getInviteSchema = sendInviteSchema.extend({
-  created_at:z.date(),
-})
-
-export type InviteInterface = z.infer<typeof getInviteSchema>;
-
-export type SendInviteInterface = z.infer<typeof sendInviteSchema>;
-
-export const inviteSchema = z.object({
-  group_id:z.number(),
-  sender_id:z.number(),
-  receiver_id:z.number(),
-});
-
-export const inviteResponseSchema = inviteSchema.extend({
-  status:z.string()
-}).omit({sender_id: true});
-
-
-export type InviteResponseInterface = z.infer<typeof inviteResponseSchema>;
-
-export const inviteRequestSchema = inviteResponseSchema.omit({sender_id: true, receiver_id: true});
-
-export type InviteRequestInterface = z.infer<typeof inviteRequestSchema>;
 
 // GOAL SCHEMAS
 
@@ -461,43 +399,6 @@ export const securityQuestionsSchema =  z.object({
 
 export type SecurityQuestions = z.infer<typeof securityQuestionsSchema>;
 
-//ADMIN SCHEMA
-export const ValidOperatorsEnum = z.enum(['SUM', 'MAX', 'MIN', 'AVG', 'COUNT']);
-export const ValidResourcesEnum = z.enum(['goals', 'savings', 'expenses']);
-export const ValidStatusEnum = z.enum(['Completed', 'Dormant', 'In Progress']);
-
-export const statsQuerySchema = z.object({
-  user_id: z.string().optional(),
-  priority: z.string().optional(),
-  status: z.string().optional(),
-  category_id: z.string().optional(),
-  start_date: z.string().optional(),
-  end_date: z.string().optional(),
-});
-
-export type StatsQueryInterface = z.infer<typeof statsQuerySchema>;
-
-export const statsParamSchema = z.object({
-  resource: z.string(),
-  operator: z.string(),
-});
-
-export type StatsParamInterface = z.infer<typeof statsParamSchema>;
-
-export const financialStatsSchema = z.object({
-  totals: z.number()
-})
-
-export type FinancialStatsInterface = z.infer<typeof financialStatsSchema>;
-
-export const userRoleUpdateSchema = z.object({
-  roleToUpdate: z.string(),
-  id: z.string(),
-});
-
-export type UserRoleUpdateInterface = z.infer<typeof userRoleUpdateSchema>;
-
-export type RoleUpdateResultInterface = z.infer<typeof updatedUserRoleSchema>;
 
 //GROUP ADMIN SCHEMA
 
@@ -515,7 +416,7 @@ export const voteSChema = z.object({
 export type VoteInterface = z.infer<typeof voteSChema>;
 
 ////////////////////////////////////////////////////////////////////////////////
-export const nextOfKinCreationSchema = createNextOfKinSchema.omit({user_id: true});
+
 
 export const getTopExpenseCategoriesSchema = z.array(
   z.object({
