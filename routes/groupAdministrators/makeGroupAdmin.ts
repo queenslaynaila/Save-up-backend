@@ -1,15 +1,17 @@
 import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
+import { MessageInterface } from '../../types/index'
+import { UserInterface, GroupInterface, ProposeAdminInterface} from './types'
 
-const SQL_CREATE_GROUP_ADMIN = sql<{ user_id: number; group_id: number }, Record<string,never>>(`
+const SQL_CREATE_GROUP_ADMIN = sql<ProposeAdminInterface, Record<string,never>>(`
   INSERT INTO group_administrators (group_id, user_id)
   VALUES (:group_id, :user_id)
   RETURNING *;
 `);
 
 export default (router: Router) => {
-  router.post<{ group_id: string }, { message: string }, { user_id: number; }, Record<string,never>, Record<string,never>>(
+  router.post<GroupInterface, MessageInterface, UserInterface, Record<string,never>, Record<string,never>>(
     '/:group_id',
     authMiddleware(),
     async (req, res) => {

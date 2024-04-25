@@ -1,9 +1,10 @@
 import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import { NominatedAdminInterface, IdParamInterface } from '../../types';
+import { NominatedAdminInterface, GetNominatedMemberInterface  } from './types'
+import { IdParamInterface } from '../../types';
 
-const SQL_GET_NOMINATED_MEMBERS = sql<{ group_id: number }, NominatedAdminInterface>(`
+const SQL_GET_NOMINATED_MEMBERS = sql<GetNominatedMemberInterface, NominatedAdminInterface>(`
   SELECT na.group_id, na.user_id, na.nominated_at, u.full_name
   FROM nominated_administrators na
   INNER JOIN users u ON na.user_id = u.id

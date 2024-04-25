@@ -251,18 +251,7 @@ export type SecurityQuestions = z.infer<typeof securityQuestionsSchema>;
 
 //GROUP ADMIN SCHEMA
 
-export const nominateParamsSchema = z.object({
-  group_id: z.string(),
-  nominated_member_id: z.string(),
-});
 
-export type NominateParamsInterface = z.infer<typeof nominateParamsSchema>;
-
-export const voteSChema = z.object({
-  vote:z.boolean()
-})
-
-export type VoteInterface = z.infer<typeof voteSChema>;
 
 ////////////////////////////////////////////////////////////////////////////////
 

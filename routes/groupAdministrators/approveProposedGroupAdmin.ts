@@ -1,9 +1,10 @@
 import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import { MessageInterface, NominateParamsInterface, VoteInterface } from '../../types/index'
+import { NominateParamsInterface, VoteInterface, ApproveAdminInterface  } from './types'
+import { MessageInterface } from '../../types/index'
 
-const SQL_INSERT_VOTE = sql<{ group_id: number; voter_member_id: number; nominated_member_id: number; vote: boolean }, Record<string,never>>(`
+const SQL_INSERT_VOTE = sql<ApproveAdminInterface, Record<string,never>>(`
   INSERT INTO nomination_approvals (group_id, voter_member_id, nominated_member_id, vote)
   VALUES (:group_id, :voter_member_id, :nominated_member_id, :vote)
 `);
