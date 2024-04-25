@@ -1,9 +1,10 @@
 import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import { CommonGroupInterface,IdParamInterface } from '../../types';
+import { IdParamInterface } from '../../types';
+import { CommonGroupInterface, SharedGroupInterface  } from './types';
 
-const SQL_GET_COMMON_GROUPS = sql<{logged_in_user_id: number, user_id: number }, CommonGroupInterface>(`
+const SQL_GET_COMMON_GROUPS = sql<SharedGroupInterface, CommonGroupInterface>(`
     SELECT g.id AS group_id, g.group_name, g.description
     FROM user_groups ug1
     INNER JOIN user_groups ug2 ON ug1.group_id = ug2.group_id

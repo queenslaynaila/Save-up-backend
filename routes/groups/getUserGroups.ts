@@ -1,9 +1,10 @@
 import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import { CreateGroupResponseInterface } from '../../types';
+import { CreateGroupResponseInterface } from './types';
+import { GetByUserInterface } from '../../types/index'
 
-const SQL_FETCH_USER_GROUPS = sql<{ user_id: number }, CreateGroupResponseInterface>(`
+const SQL_FETCH_USER_GROUPS = sql<GetByUserInterface, CreateGroupResponseInterface>(`
   SELECT g.id, g.group_name, g.description, g.created_by, g.created_at
   FROM groups g
   INNER JOIN user_groups ug ON g.id = ug.group_id
@@ -12,7 +13,7 @@ const SQL_FETCH_USER_GROUPS = sql<{ user_id: number }, CreateGroupResponseInterf
 `);
 
 export default (router: Router) => {
-  router.get<Record<string,never>, CreateGroupResponseInterface[], { user_id: number }, Record<string,never>>(
+  router.get<Record<string,never>, CreateGroupResponseInterface[], GetByUserInterface, Record<string,never>>(
     '/my-groups',
     authMiddleware(),
     async (req, res) => {

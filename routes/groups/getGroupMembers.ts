@@ -1,9 +1,10 @@
 import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import { GetGroupMembersInterface, IdParamInterface  } from '../../types';
+import { IdParamInterface } from '../../types';
+import { GetGroupMembersInterface, GroupInterface } from './types';
 
-const SQL_GET_GROUP_MEMBERS = sql<{ group_id: number }, GetGroupMembersInterface>(`
+const SQL_GET_GROUP_MEMBERS = sql<GroupInterface, GetGroupMembersInterface>(`
   SELECT 
   ug.user_id, u.full_name, ug.joined_at,
   CASE

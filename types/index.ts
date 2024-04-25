@@ -17,6 +17,12 @@ export const idParamSchema = z.object({
 
 export type IdParamInterface = z.infer<typeof idParamSchema>;
 
+export const getByuserSchema = z.object({
+  user_id: z.number()
+})
+
+export type GetByUserInterface = z.infer<typeof getByuserSchema>
+
 //MESSAGE RESPONSESCHEMA
 
 export const messageSchema = z.object({
@@ -152,62 +158,6 @@ export type SecurityAnswerInterface = z.infer<typeof securityAnswerSchema>;
 
 // GROUPS SCHEMA
 
-export const baseGroupSchema = z.object({
-  group_name: z.string(),
-  description: z.string(), 
-})
-
-export const createGroupSchema = baseGroupSchema.extend({
-  id: z.number(),
-  created_by:z.number()
-})
-
-export type CreateGroupInterface = z.infer<typeof createGroupSchema>;
-
-export const commonGroupSchema = createGroupSchema.omit({ created_by: true })
-
-export type CommonGroupInterface = z.infer<typeof commonGroupSchema>;
-
-export const createGroupResponse = createGroupSchema.extend({
-  created_at:z.date(),
-  updated_at:z.date()
-}) 
-export type CreateGroupResponseInterface = z.infer<typeof createGroupResponse>;
-
-export const exitGroupSchema = z.object({
-  user_id: z.number(),
-  group_id: z.number()
-})
-export type ExitGroupInterface = z.infer<typeof exitGroupSchema>;
-
-export const updateGroupSchema = exitGroupSchema.pick({
-  group_id: true,
-}).extend({
-  group_name: z.string().optional(),
-  description: z.string().optional()
-})
-export type UpdateGroupInterface = z.infer<typeof updateGroupSchema>;
-
-export const updateGroupResponseSchema = createGroupSchema.pick({
-  group_name: true,
-  description: true
-})
-export type UpdateGroupResponseInterface = z.infer<typeof updateGroupResponseSchema>;
-
-export const getGroupMembers = z.object({
-  user_id: z.number(),
-  full_name: z.string(),
-  joined_at: z.date()
-})
-
-export type GetGroupMembersInterface = z.infer<typeof getGroupMembers>;
-
-export const nominatedAdminSchema = exitGroupSchema.extend({
-  full_name: z.string(),
-  nominated_at: z.date()
-})
-
-export type NominatedAdminInterface = z.infer<typeof nominatedAdminSchema>;
 
 // GOAL SCHEMAS
 
@@ -218,24 +168,7 @@ export type IdInterface = z.infer<typeof idSchema>;
 export const ID_SCHEMA = z.number();
 
 
-// SAVING SCHEMAS
 
-export const BaseSavingSchema = z.object({
-  user_id: z.number(),
-  goal_id: z.number(),
-  amount: z.number(),
-});
-
-export type CreateSavingInterface = z.infer<typeof BaseSavingSchema>;
-
-export const validateSavingCreationSchema = BaseSavingSchema.omit({ user_id: true })
-
-export const SavingSchema = BaseSavingSchema.extend({
-  id: z.number(),
-  created_at: z.date(),
-})
-
-export type SavingInterface = z.infer<typeof SavingSchema>;
 
 // EXPENSES SCHEMAS
 

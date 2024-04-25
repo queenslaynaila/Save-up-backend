@@ -2,9 +2,9 @@ import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { validateRequest } from '../../middleware/validationMiddleware';
-import { CreateGroupInterface, CreateGroupResponseInterface, baseGroupSchema } from '../../types';
+import { CreateGroupInterface, CreateGroupResponseInterface, baseGroupSchema, EntityTypeInterface, IdRequestInterface } from './types';
 
-const SQL_CREATE_GROUP_ENTITY = sql<{entity_type: string }, { id:number }>(`
+const SQL_CREATE_GROUP_ENTITY = sql<EntityTypeInterface, IdRequestInterface>(`
   INSERT INTO entities (entity_type)
   VALUES (:entity_type)
   RETURNING id
@@ -17,7 +17,7 @@ const SQL_CREATE_GROUP = sql<CreateGroupInterface, CreateGroupResponseInterface>
 `);
 
 export default (router: Router) => {
-  router.post<Record<string,never>, CreateGroupResponseInterface,CreateGroupInterface , Record<string,never>, Record<string,never>>(
+  router.post<Record<string,never>, CreateGroupResponseInterface, CreateGroupInterface, Record<string,never>, Record<string,never>>(
     '/',
     authMiddleware(),
     validateRequest(baseGroupSchema),
