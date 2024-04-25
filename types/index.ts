@@ -396,36 +396,3 @@ export type VoteInterface = z.infer<typeof voteSChema>;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-
-export const getTopExpenseCategoriesSchema = z.array(
-  z.object({
-    category_id:z.number(),
-    total_expense:z.number()
-  })
-)
-
-export type TopExpenseCategoriesInterface = z.infer<typeof getTopExpenseCategoriesSchema>;
-
-export const getTotalExpensesQuerySchema = z.object({
-  startDate: z.string().optional(),
-  endDate: z.string().optional(),
-  categoryId: z.string().optional()
-});
-
-export const getTotalExpenseResultSchema = z.object({
-  total_expenses: z.number()
-})
-
-export const getTotalSavingsResultSchema = z.object({
-  total_savings: z.number()
-})
-
-export const getTotalTargetsSchema = z.object({
-  total_target_amount: z.number()
-})
-
-export const totalTargetGoalsQuerySchema = z.object({
-  priority: z.string().optional(),
-  status: z.string().optional(),
-  category_id: z.string().optional()
-});

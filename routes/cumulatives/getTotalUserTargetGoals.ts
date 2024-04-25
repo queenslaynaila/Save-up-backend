@@ -2,14 +2,15 @@ import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { HttpError } from '../../middleware/errorMiddleware';
+import { GetTotalTargetsInterface, TotalTargetGoalsQueryInterface } from './types';
 
-const SQL_GET_TOTAL_TARGET_AMOUNT = sql<{ [key: string]: string },{ total_target_amount: number }>(`
+const SQL_GET_TOTAL_TARGET_AMOUNT = sql<{ [key: string]: string }, GetTotalTargetsInterface>(`
   SELECT COALESCE(SUM(amount), 0) AS total_target_amount
   FROM goals
 `);
 
 export default (router: Router) => {
-  router.get<Record<string, string>, { total_target_amount: number }, Record<string, string>, {priority?: string;status?: string;category_id?: string;}>(
+  router.get<Record<string, string>, GetTotalTargetsInterface, Record<string, string>, TotalTargetGoalsQueryInterface>(
     '/total-target-amount', 
     authMiddleware(), 
     async (req, res) => {

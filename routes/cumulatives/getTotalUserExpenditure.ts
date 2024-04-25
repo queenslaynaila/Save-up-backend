@@ -2,16 +2,16 @@ import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { HttpError } from '../../middleware/errorMiddleware';
+import { GetTotalExpenseInterface, GetTotalExpenseQueryInterface, GetUserCumulaInterface } from './types'
 
-
-const SQL_GET_TOTAL_EXPENSES = sql<{ userId: number }, { total_expenses: number }>(`
+const SQL_GET_TOTAL_EXPENSES = sql<GetUserCumulaInterface, GetTotalExpenseInterface>(`
   SELECT COALESCE(SUM(amount_spent), 0) AS total_expenses
   FROM expenses
   WHERE entity_id = :userId
 `);
 
 export default (router: Router) => {
-  router.get<Record<string,never>, { total_expenses: number }, Record<string,never>,{startDate?:string;endDate?:string;categoryId?:string}>(
+  router.get<Record<string,never>, GetTotalExpenseInterface, Record<string,never>, GetTotalExpenseQueryInterface>(
     '/total-expenses', 
     authMiddleware(), 
     async (req, res) => {
@@ -19,6 +19,7 @@ export default (router: Router) => {
       const { startDate, endDate, categoryId } = req.query;
       const filters: string[] = [];
       const filterArgs: Record<string, string> = {};
+      
       if (startDate) {
         filterArgs.startDate = startDate;
         filters.push(`date >= :startDate`);
