@@ -2,15 +2,21 @@ import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { HttpError } from '../../middleware/errorMiddleware';
-import { SendInviteInterface } from '../../types';
+import { SendInviteInterface, GroupIdParamInterface, GetUserByPhoneInterface, FindPendingInviteInterface, CountInviteInterface } from './types';
+import { MessageInterface, IdInterface } from '../../types';
 
-const SQL_FIND_USER_BY_PHONE = sql<{ phone_number: string }, { id: number }>(`
-    SELECT id FROM user_contact_details WHERE phone_number = :phone_number
+const SQL_FIND_USER_BY_PHONE = sql<GetUserByPhoneInterface, IdInterface>(`
+  SELECT id 
+  FROM user_contact_details 
+  WHERE phone_number = :phone_number
 `);
 
-const SQL_FIND_PENDING_INVITATION = sql<{ receiver_id: number, group_id: number }, { count: number }>(`
-  SELECT COUNT(*) AS count FROM invitations
-  WHERE receiver_id = :receiver_id AND group_id = :group_id AND status = 'Pending'
+const SQL_FIND_PENDING_INVITATION = sql<FindPendingInviteInterface, CountInviteInterface>(`
+  SELECT COUNT(*) AS count 
+  FROM invitations
+  WHERE receiver_id = :receiver_id 
+  AND group_id = :group_id 
+  AND status = 'Pending'
 `);
 
 const SQL_SEND_INVITATION = sql<SendInviteInterface, Record<string,never>>(`
@@ -20,7 +26,7 @@ const SQL_SEND_INVITATION = sql<SendInviteInterface, Record<string,never>>(`
 `);
 
 export default (router: Router) => {
-  router.post<{ groupId: string }, { message: string }, { phone_number: string }, Record<string,never>, Record<string,never>>(
+  router.post<GroupIdParamInterface, MessageInterface, GetUserByPhoneInterface, Record<string,never>, Record<string,never>>(
     '/:groupId', 
     authMiddleware(),
     async (req, res) => {
@@ -29,7 +35,7 @@ export default (router: Router) => {
       const { phone_number } = req.body;
       const receiver = await SQL_FIND_USER_BY_PHONE({ phone_number }).oneOrNull();
       if (!receiver) {
-        throw new HttpError(404, 'c');
+        throw new HttpError(404, 'User not found');
       }
       const pendingInvitation = await SQL_FIND_PENDING_INVITATION({ receiver_id: receiver.id, group_id: groupId }).one();
       if (pendingInvitation && pendingInvitation.count > 0) {

@@ -1,15 +1,15 @@
 import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import { InviteInterface } from '../../types';
+import { InviteInterface, GetInvitesInterface } from './types';
 
-const SQL_FIND_INVITATIONS_FOR_USER = sql<{ receiver_id: number }, InviteInterface>(`
+const SQL_FIND_INVITATIONS_FOR_USER = sql<GetInvitesInterface, InviteInterface>(`
   SELECT * FROM invitations
   WHERE receiver_id = :receiver_id
 `);
 
 export default (router: Router) => {
-  router.get<{ user_id: string }, InviteInterface[], Record<string,never>, Record<string,never>>(
+  router.get<Record<string,never>, InviteInterface[], Record<string,never>, Record<string,never>>(
     '/my-invites', 
     authMiddleware(),
     async (req, res) => {
