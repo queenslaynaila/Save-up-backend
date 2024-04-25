@@ -2,11 +2,11 @@ import { Router } from 'express';
 import authMiddleware from '../../middleware/authorization';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { sql } from '../../db';
-import { UpdateGoalInterface,  GoalUpdateRes, UpdateGoalRequestSchema} from '../../types';
+import { UpdateGoalInterface,  GoalUpdateRes, UpdateGoalRequestSchema } from './types';
+import { IdParamInterface } from '../../types';
 import { validateRequest } from '../../middleware/validationMiddleware';
 
-
-const SQL_UPDATE_GOAL = sql<UpdateGoalInterface,  GoalUpdateRes>(`
+const SQL_UPDATE_GOAL = sql<UpdateGoalInterface, GoalUpdateRes>(`
   UPDATE goals
   SET name = COALESCE(:name, goals.name),
       category_id = COALESCE(:category_id, goals.category_id),
@@ -18,7 +18,7 @@ const SQL_UPDATE_GOAL = sql<UpdateGoalInterface,  GoalUpdateRes>(`
 `);
 
 export default (router: Router) => {
-  router.patch<{ id: string }, GoalUpdateRes, UpdateGoalInterface, Record<string,never>>(
+  router.patch<IdParamInterface, GoalUpdateRes, UpdateGoalInterface, Record<string,never>>(
     '/:id', 
     authMiddleware(), 
     validateRequest(UpdateGoalRequestSchema),

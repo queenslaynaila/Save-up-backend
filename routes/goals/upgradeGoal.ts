@@ -2,7 +2,8 @@ import { Router } from 'express';
 import authMiddleware from '../../middleware/authorization';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { sql } from '../../db';
-import { UpgradeGoalSubset, GoalInterface, upgradeGoalSchema, IdParamInterface} from '../../types';
+import { UpgradeGoalSubset, GoalInterface, upgradeGoalSchema } from './types';
+import { IdParamInterface} from '../../types';
 import { validateRequest } from '../../middleware/validationMiddleware';
 
 const SQL_UPGRADE_GOAL = sql<UpgradeGoalSubset, GoalInterface>(`
@@ -17,7 +18,7 @@ const SQL_UPGRADE_GOAL = sql<UpgradeGoalSubset, GoalInterface>(`
 `);
 
 export default (router: Router) => {
-  router.patch< IdParamInterface, GoalInterface,UpgradeGoalSubset, Record<string,never>>(
+  router.patch<IdParamInterface, GoalInterface, UpgradeGoalSubset, Record<string,never>>(
     '/:id', 
     authMiddleware(), 
     validateRequest(upgradeGoalSchema),
