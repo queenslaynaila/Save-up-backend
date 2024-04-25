@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import  { validateRequest } from '../../middleware/validationMiddleware';
-import { CreateExpenseInterface, ExpenseInterface, createExpenseSchemaValidation   } from '../../types';
+import { CreateExpenseInterface, ExpenseInterface, createExpenseSchemaValidation   } from './types';
 
 const SQL_CREATE_EXPENSES = sql<CreateExpenseInterface, ExpenseInterface>(`
   INSERT INTO expenses (id, entity_id, category_id, description, amount_spent, date_spent)

@@ -2,7 +2,8 @@ import { Router, Response } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { HttpError } from '../../middleware/errorMiddleware';
-import { ExpenseInterface, ExpenseIdentifierInterface, ExpenseQueryInterface, ID_SCHEMA} from '../../types';
+import { ExpenseInterface, ExpenseIdentifierInterface, ExpenseQueryInterface } from './types';
+import { idSchema } from '../../types';
 
 const SQL_GET_EXPENSES = sql<Record<string, string>, ExpenseInterface>(`
   SELECT entity_id,id,category_id,description,amount_spent,date_spent
@@ -29,7 +30,7 @@ export default (router: Router) => {
         if (isStandardUser) {
           throw new HttpError(403, 'Forbidden');
         }
-      } else if (ID_SCHEMA.parse(parseInt(expenseIdentifier))) { 
+      } else if (idSchema.parse(parseInt(expenseIdentifier))) { 
         if (isStandardUser)  {
           throw new HttpError(403, 'Forbidden');
         }

@@ -1,7 +1,8 @@
 import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import { IdParamInterface, MessageInterface, DeleteExpenseInterface } from '../../types/index'
+import { DeleteExpenseInterface } from './types'
+import { IdParamInterface, MessageInterface } from '../../types/index'
 
 const SQL_DELETE_EXPENSE = sql<{ id: number; entity_id: number }, Record<string,never>>(`
   UPDATE expenses

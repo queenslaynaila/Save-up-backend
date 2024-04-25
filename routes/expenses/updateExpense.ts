@@ -3,7 +3,7 @@ import { sql } from '../../db';
 import { HttpError } from '../../middleware/errorMiddleware';
 import authMiddleware from '../../middleware/authorization';
 import { validateRequest } from '../../middleware/validationMiddleware';
-import { UpdateExpenseInterface, ExpenseInterface, validateUpdateExpenseSchema } from '../../types';
+import { UpdateExpenseInterface, ExpenseInterface, validateUpdateExpenseSchema } from './types';
 
 const SQL_UPDATE_EXPENSE= sql<UpdateExpenseInterface,ExpenseInterface>(`
   UPDATE expenses
