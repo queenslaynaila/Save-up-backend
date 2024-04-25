@@ -1,16 +1,18 @@
 import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
+import { DeleteNextOfKinInterface } from './types';
+import { IdParamInterface, MessageInterface } from '../../types';
 
-const SQL_DELETE_KIN = sql<{ user_id: number, id: number }, Record<string,never>>(`
-    UPDATE next_of_kins  
-    SET deleted_at = NOW()
-    WHERE user_id = :user_id
-    AND id = :id
+const SQL_DELETE_KIN = sql<DeleteNextOfKinInterface, Record<string,never>>(`
+  UPDATE next_of_kins  
+  SET deleted_at = NOW()
+  WHERE user_id = :user_id
+  AND id = :id
 `);
 
 export default (router: Router) => {   
-  router.patch<{ id: string }, {message:string}, Record<string,never>, Record<string,never>>(
+  router.patch<IdParamInterface, MessageInterface, Record<string,never>, Record<string,never>>(
     '/record/:id', 
     authMiddleware(), 
     async (req, res) => {
