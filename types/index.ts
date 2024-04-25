@@ -294,6 +294,7 @@ export type InviteRequestInterface = z.infer<typeof inviteRequestSchema>;
 
 // GOAL SCHEMAS
 
+export const idSchema = z.number();
 export const ID_SCHEMA = z.number();
 
 export const enum priority {

@@ -2,27 +2,28 @@ import { z } from "zod";
 import * as yaml from 'yaml';
 import * as fs from 'fs';
 import { OpenAPIRegistry, OpenApiGeneratorV3, extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
-import {validateSavingCreationSchema, idParamSchema, Method} from '../../types';
+import { validateDepositCreationSchema } from './types';
+import { idParamSchema, Method } from '../../types';
  
 extendZodWithOpenApi(z);
 const registry = new OpenAPIRegistry();
-const createSaving = {
+const createDeposit = {
   method: Method.POST,
-  path: '/savings',
-  summary: 'Create a saving',
-  tags: ['Savings'],
+  path: '/deposits',
+  summary: 'Create a deposit',
+  tags: ['Deposits'],
   request: {
     body: {
       content: {
         'application/json': {
-          schema: validateSavingCreationSchema,
+          schema: validateDepositCreationSchema,
         },
       },
     },
   },
   responses: {
     200: {
-      description: 'Saving created successfully.',
+      description: 'Deposit created successfully.',
     },
     403: {
       description: 'Unprocessable entity',
@@ -33,17 +34,17 @@ const createSaving = {
   }
 };
   
-const getSavingBySavingId = {
+const getDepositByDepositId = {
   method: Method.GET,
-  path: '/savings/records/{id}',
-  summary: 'Get a saving by ID',
-  tags: ['Savings'],
+  path: '/deposits/records/{id}',
+  summary: 'Get a deposit by ID',
+  tags: ['Deposits'],
   request: {
     params:idParamSchema
   },
   responses: {
     200: {
-      description: 'Saving retrieved successfully',
+      description: 'Deposit retrieved successfully',
     },
     403: {
       description: 'Unprocessable entity'
@@ -54,19 +55,19 @@ const getSavingBySavingId = {
   }
 };
   
-const getSavingsByCriteria = {
+const getDepositsByCriteria = {
   method: Method.GET,
-  path: '/savings/{savingIdentifier}',
-  summary: 'Get savings by criteria',
-  tags: ['Savings'],
+  path: '/deposits/{depositIdentifier}',
+  summary: 'Get deposits by criteria',
+  tags: ['Deposits'],
   request: {
     params: z.object({
-      savingIdentifier: z.string()
+      depositIdentifier: z.string()
     })
   },
   responses: {
     200: {
-      description: 'Savings retrieved successfully',
+      description: 'Deposits retrieved successfully',
     },
     403: {
       description: 'Unprocessable entity'
@@ -77,11 +78,9 @@ const getSavingsByCriteria = {
   }
 };
   
-
-registry.registerPath(createSaving);
-registry.registerPath(getSavingBySavingId);
-registry.registerPath(getSavingsByCriteria);
-
+registry.registerPath(createDeposit);
+registry.registerPath(getDepositByDepositId);
+registry.registerPath(getDepositsByCriteria);
 
 function getOpenApiDocumentation() {
   const generator = new OpenApiGeneratorV3(registry.definitions);
@@ -91,10 +90,10 @@ function getOpenApiDocumentation() {
     info: {
       version: '1.0.0',
       title: 'SAPI',
-      description: 'API for managing savings',
+      description: 'API for managing deposits',
     },
     tags: [
-      { name: 'Savings', description: 'Endpoints for managing savings' },
+      { name: 'Deposits', description: 'Endpoints for managing deposits' },
     ],
     openapi: ""
   });
