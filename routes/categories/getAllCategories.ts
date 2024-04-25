@@ -1,10 +1,11 @@
 import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import { CategoryInterface } from '../../types';
+import { CategoryInterface } from './types';
 
 const SQL_GET_ALL_CATEGORIES = sql<Record<string,never>, CategoryInterface>(`
-  SELECT id, name, description FROM categories WHERE deleted_at IS NUL
+  SELECT id, name, description FROM categories 
+  WHERE deleted_at IS NUL
 `);
 
 export default (router: Router) => {
