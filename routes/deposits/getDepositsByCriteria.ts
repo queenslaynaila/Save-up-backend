@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { sql } from '../../db';
-import authMiddleware from '../../middleware/authorization';
+//import authMiddleware from '../../middleware/authorization';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { DepositInterface, DepositParamInterface, DepositsQueryInterface } from './types';
 import { idSchema } from '../../types';
@@ -12,7 +12,6 @@ const SQL_GET_DEPOSITS = sql<Record<string,never>, DepositInterface>(`
 export default (router: Router) => {
   router.get<string, DepositParamInterface, DepositInterface[], Record<string, never>, DepositsQueryInterface>(
     '/:identifier',
-    authMiddleware(),
     async (req, res) => {
       const depositIdentifier = req.params.identifier;
       const { category_id, goal_id } = req.query;
