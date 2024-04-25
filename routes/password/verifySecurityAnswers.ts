@@ -3,19 +3,16 @@ import bcrypt from 'bcrypt';
 import { sql } from '../../db';
 import { verifyResetToken } from '../../middleware/resetTokenMIddleware'
 import { HttpError } from '../../middleware/errorMiddleware';
+import {  MessageInterface, GetByUserInterface } from '../../types';
+import { VerifyAnswerInterface, SecurityAnswersRequestInterface } from './types'
 
-const SQL_GET_SECURITY_ANSWERS = sql<{ user_id:number }, { question_id:number; answer: string }>(`
+const SQL_GET_SECURITY_ANSWERS = sql<GetByUserInterface, VerifyAnswerInterface>(`
   SELECT question_id, answer FROM security_answers WHERE user_id = :user_id
 `);
 
-interface SecurityAnswersRequest {
-  message: string;
-  user_id:number;
-  answers: { question_id:number; answer: string }[];
-}
 
 export default (router: Router) => {
-  router.post<string, Record<string,never>, { message: string }, SecurityAnswersRequest, Record<string,never>>(
+  router.post<Record<string,never>, MessageInterface, SecurityAnswersRequestInterface, Record<string,never>>(
     '/verify-security-answers',
     verifyResetToken,
     async (req, res) => {

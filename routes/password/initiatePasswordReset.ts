@@ -5,18 +5,20 @@ import { sql } from '../../db';
 import { generateResetPin } from '../../middleware/generateResetPin';
 import sendSms from '../../services/twilio';
 import { HttpError } from '../../middleware/errorMiddleware';
+import {  MessageInterface, GetByPhoneInterface,  GetByIdInterface  } from '../../types';
+import { TokenInterface, InitiatePasswordResetInterface } from './types'
 
-const SQL_GET_USER = sql<{ phone_number: string }, { id:number }>(`
+const SQL_GET_USER = sql<GetByPhoneInterface,  GetByIdInterface>(`
   SELECT id FROM user_contact_details WHERE phone_number = :phone_number
 `);
 
-const SQL_SAVE_TOKEN = sql<{ user_id:number; token: string }, { token: string }>(`
+const SQL_SAVE_TOKEN = sql<InitiatePasswordResetInterface, TokenInterface>(`
   INSERT INTO reset_tokens (id, user_id, token)
   VALUES ((SELECT COALESCE(MAX(id), 0) + 1 FROM reset_tokens WHERE user_id = :user_id), :user_id, :token)
 `);
 
 export default  (router: Router) => {
-  router.post<Record<string,never>, { message: string }, { phone_number: string }, Record<string,never>>(
+  router.post<Record<string,never>, MessageInterface, GetByPhoneInterface, Record<string,never>>(
     '/forget-password',
     async (req, res) => {
       const { phone_number } = req.body;

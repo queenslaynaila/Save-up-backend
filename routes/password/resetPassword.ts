@@ -2,13 +2,15 @@ import { Router  } from 'express';
 import bcrypt from 'bcrypt';
 import { sql } from '../../db';
 import { verifyResetToken } from '../../middleware/resetTokenMIddleware'
+import {  MessageInterface } from '../../types';
+import { ResetPasswordInterface, ResetPasswordRequestInterface } from './types';
 
-const SQL_RESET_PASSWORD = sql<{ pin: string; id:number }, Record<string,never>>(`
+const SQL_RESET_PASSWORD = sql<ResetPasswordRequestInterface, Record<string,never>>(`
   UPDATE users SET pin = :pin  WHERE  user_id = :id
 `);
 
 export default (router: Router) => {
-  router.post<string, Record<string,never>, { message: string }, { new_password: string; id:number }, Record<string,never>>(
+  router.post<string, Record<string,never>, MessageInterface, ResetPasswordInterface, Record<string,never>>(
     '/reset',
     verifyResetToken,
     async (req, res) => {

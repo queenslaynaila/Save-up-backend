@@ -23,6 +23,18 @@ export const getByuserSchema = z.object({
 
 export type GetByUserInterface = z.infer<typeof getByuserSchema>
 
+export const getByPhone = z.object({
+  phone_number: z.string()
+})
+
+export type GetByPhoneInterface = z.infer<typeof getByPhone>;
+
+export const getById = z.object({
+  id: z.number()
+})
+
+export type GetByIdInterface = z.infer<typeof getById>;
+
 //MESSAGE RESPONSESCHEMA
 
 export const messageSchema = z.object({
