@@ -7,7 +7,7 @@ export const enum transactionType {
 }
 
 export const getTransactionsInputSchema = z.object({
-  goal_id: z.string()
+  goal_id: z.number()
 })
 
 export type GetTransactionsInput = z.infer<typeof getTransactionsInputSchema>;

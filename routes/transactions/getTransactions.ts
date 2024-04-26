@@ -1,8 +1,9 @@
 import { Router } from 'express';
 import { sql } from '../../db';
 import { GetTransactionsInput, GetTransactionResp, GetTransactionQuery } from './types';
+import { IdParamInterface } from '../../types';
 
-const SQL_GET_TRANSACTIONS = sql<{ goal_id:number }, GetTransactionResp>(`
+const SQL_GET_TRANSACTIONS = sql<GetTransactionsInput, GetTransactionResp>(`
     SELECT * FROM (
         SELECT 
             d.id AS transaction_id,
@@ -38,10 +39,10 @@ const SQL_GET_TRANSACTIONS = sql<{ goal_id:number }, GetTransactionResp>(`
 `);
 
 export default (router: Router) => {
-  router.get<string,GetTransactionsInput, GetTransactionResp[], Record<string,never>, GetTransactionQuery>(
+  router.get<string,IdParamInterface, GetTransactionResp[], Record<string,never>, GetTransactionQuery>(
     '/:goal_id', 
     async (req, res) => {
-      const goal_id  = parseInt(req.params.goal_id);
+      const goal_id  = parseInt(req.params.id);
       const { transaction_type, from_date, to_date } = req.query;
       const filters: string[] = [];
       const filterArgs: Record<string, string | Date> = {};
