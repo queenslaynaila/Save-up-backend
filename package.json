@@ -11,6 +11,7 @@
     "build": "tsc",
     "format": "prettier --write \"**/*.ts\"",
     "swagger": "./runGenerateDoc.sh",
+    "swaggerwindows":"./runGenerateDoc.ps1",
     "lint": "eslint . --ext .ts"
   },
   "author": "",
