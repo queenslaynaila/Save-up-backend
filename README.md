@@ -49,3 +49,5 @@ Once the server starts, navigate to [http://localhost:3001/api-docs](http://loca
 - **Routes:** URLs for accessing different functionalities.
 - **Request Types:** Expected data formats for requests to the API.
 - **Response Types:** Structures of data returned by the API in response to requests.
+- **Error Response Types:** Structures of error returned by the API in response to requests.
+
