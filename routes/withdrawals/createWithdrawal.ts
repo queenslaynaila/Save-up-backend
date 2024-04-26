@@ -2,8 +2,10 @@ import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { HttpError } from '../../middleware/errorMiddleware';
+import { WithdrawalRequest,  WithdrawalRequestInterface } from './types';
+import { MessageInterface } from '../../types/index'
 
-const SQL_CREATE_WITHDRAWAL = sql<{ goal_id: number; user_id: number; amount: number}, Record<string,never>>(`
+const SQL_CREATE_WITHDRAWAL = sql<WithdrawalRequest, Record<string,never>>(`
   WITH can_withdraw AS (
     SELECT 
         g.id AS goal_id, 
@@ -31,7 +33,7 @@ const SQL_CREATE_WITHDRAWAL = sql<{ goal_id: number; user_id: number; amount: nu
 `);
 
 export default (router: Router) => {
-  router.get<Record<string,never>,{message: string} ,{ goal_id: number; user_id: number; amount: number}, Record<string,never>>(
+  router.get<Record<string,never>, MessageInterface, WithdrawalRequestInterface, Record<string,never>>(
     '/', 
     authMiddleware(),
     async (req, res) => {

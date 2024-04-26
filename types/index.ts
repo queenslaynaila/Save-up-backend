@@ -43,12 +43,6 @@ export const messageSchema = z.object({
 
 export type MessageInterface = z.infer<typeof messageSchema>;
 
-// CATEGORY SCHEMAS
-
-
-// SECURITY QUESTIONS & ANSWERS SCHEMA
-
-
 
 // USER  SCHEMA
 export const enum UserRole {
