@@ -68,7 +68,7 @@ SELECT create_reference_table('entities');
 --- User & User Management
 CREATE TABLE IF NOT EXISTS user_contact_details (
   id              INT PRIMARY KEY,
-  national_id     INTEGER NOT NULL UNIQUE,
+  national_id     INT NOT NULL UNIQUE,
   phone_number    TEXT NOT NULL UNIQUE,
   FOREIGN KEY     (id) REFERENCES entities(id),
   CONSTRAINT      phone_number_format_check CHECK (phone_number ~* '^\+?254[0-9]{9}$'),
@@ -149,7 +149,7 @@ SELECT create_distributed_table('groups', 'id');
 
 CREATE TABLE IF NOT EXISTS user_groups (
   group_id      INT NOT NULL,
-  user_id       INT NOT NULL ,
+  user_id       INT NOT NULL,
   joined_at     TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   left_at       TIMESTAMP WITH TIME ZONE,
   PRIMARY KEY   (group_id,user_id),
