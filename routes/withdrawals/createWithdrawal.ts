@@ -17,7 +17,7 @@ const SQL_CREATE_WITHDRAWAL = sql<WithdrawalRequest, Record<string,never>>(`
     FROM
        goals g
     LEFT JOIN 
-       savings s ON s.goal_id = g.id
+       deposits d ON d.goal_id = g.id
     WHERE 
         g.id = :goal_id
         AND g.entity_id = :user_id
