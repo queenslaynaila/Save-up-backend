@@ -12,7 +12,7 @@ const SQL_CREATE_WITHDRAWAL = sql<WithdrawalRequest, Record<string,never>>(`
         g.name AS goal_name, 
         g.goal_type,
         g.entity_id AS owner_id,
-        g.target_at 
+        g.target_at,
         COALESCE(SUM(s.amount),0) AS total_saved
     FROM
        goals g
