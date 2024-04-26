@@ -3,7 +3,7 @@ import bcrypt from 'bcrypt';
 import { sql } from '../../db';
 import { verifyResetToken } from '../../middleware/resetTokenMIddleware'
 import { HttpError } from '../../middleware/errorMiddleware';
-import {  MessageInterface, GetByUserInterface } from '../../types';
+import {  MessageInterface, GetByUserInterface } from '../../globalTypes';
 import { VerifyAnswerInterface, SecurityAnswersRequestInterface } from './types'
 
 const SQL_GET_SECURITY_ANSWERS = sql<GetByUserInterface, VerifyAnswerInterface>(`

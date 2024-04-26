@@ -3,7 +3,7 @@ import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { validateRequest } from '../../middleware/validationMiddleware';
 import { UpdateGroupInterface, UpdateGroupResponseInterface, baseGroupSchema } from './types';
-import { IdParamInterface } from '../../types';
+import { IdParamInterface } from '../../globalTypes';
 
 const SQL_UPDATE_GROUP = sql<UpdateGroupInterface, UpdateGroupResponseInterface>(`
   UPDATE groups

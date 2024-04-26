@@ -1,7 +1,7 @@
 import {  NextFunction, Request, Response } from 'express';
 import jwt, { Secret } from 'jsonwebtoken';
 import { HttpError } from './errorMiddleware';
-import { UserRole } from '../types/index';
+import { UserRole } from '../globalTypes/index';
 
 type User = {
   id: number;

@@ -3,7 +3,7 @@ import authMiddleware from '../../middleware/authorization';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { sql } from '../../db';
 import { UpgradeGoalSubset, GoalInterface, upgradeGoalSchema } from './types';
-import { IdParamInterface} from '../../types';
+import { IdParamInterface} from '../../globalTypes';
 import { validateRequest } from '../../middleware/validationMiddleware';
 
 const SQL_UPGRADE_GOAL = sql<UpgradeGoalSubset, GoalInterface>(`

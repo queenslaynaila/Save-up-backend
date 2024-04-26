@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import authMiddleware from '../../middleware/authorization';
-import { MessageInterface } from '../../types';
+import { MessageInterface } from '../../globalTypes';
 
 export default (router: Router) => {
   router.post<Record<string,never>, MessageInterface, Record<string,never>, Record<string,never>, Record<string,never>>(

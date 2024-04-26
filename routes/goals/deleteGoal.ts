@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { DeleteGoal } from './types'
-import { IdParamInterface, MessageInterface } from '../../types/index'
+import { IdParamInterface, MessageInterface } from '../../globalTypes/index'
 
 const SQL_DELETE_GOAL = sql<DeleteGoal, Record<string,never>>(`
   UPDATE goals

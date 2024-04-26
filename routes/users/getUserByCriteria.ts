@@ -5,7 +5,7 @@ import { hasPermission } from '../../middleware/hasPermission';
 import { convertToTitleCase, isValidValue } from '../../middleware/caseNormalization';
 import authMiddleware from '../../middleware/authorization';
 import { GetUserInterface, GetUserQueryInterface } from './types';
-import { idSchema, IdParamInterface } from '../../types/index';
+import { idSchema, IdParamInterface } from '../../globalTypes/index';
 
 const SQL_GET_ALL_USERS = sql<Record<string,never>,  GetUserInterface>(`
   SELECT id, full_name, role, gender, created_at FROM users

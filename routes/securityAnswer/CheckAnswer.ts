@@ -3,7 +3,7 @@ import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { validateRequest } from '../../middleware/validationMiddleware';
 import { securityAnswerValidationSchema, CheckAnswerInterface } from './types'
-import { GetByUserInterface } from '../../types/index'
+import { GetByUserInterface } from '../../globalTypes/index'
 
 const SQL_CHECK_SECURITY_ANSWER = sql<GetByUserInterface, CheckAnswerInterface>(`
     SELECT EXISTS(

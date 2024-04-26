@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import { MessageInterface } from '../../types/index'
+import { MessageInterface } from '../../globalTypes/index'
 import { UserInterface, GroupInterface, ProposeAdminInterface} from './types'
 
 const SQL_CREATE_GROUP_ADMIN = sql<ProposeAdminInterface, Record<string,never>>(`

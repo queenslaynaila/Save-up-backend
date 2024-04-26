@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import { UserRole, IdParamInterface }  from '../../types';
+import { UserRole, IdParamInterface }  from '../../globalTypes';
 
 const SQL_DELETE_CATEGORY = sql<{ id: number;}, Record<string,never>>(`
   UPDATE categories

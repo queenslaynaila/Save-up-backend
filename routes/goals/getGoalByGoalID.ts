@@ -3,7 +3,7 @@ import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { GoalInterface } from './types';
-import { IdParamInterface, IdInterface } from '../../types';
+import { IdParamInterface, IdInterface } from '../../globalTypes';
 
 const SQL_GET_GOAL_BY_ID = sql<IdInterface, GoalInterface>(`
   SELECT g.id, g.name, g.entity_id, g.category_id, g.amount, g.priority, g.target_at,

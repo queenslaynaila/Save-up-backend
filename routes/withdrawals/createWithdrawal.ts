@@ -3,7 +3,7 @@ import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { WithdrawalRequest,  WithdrawalRequestInterface } from './types';
-import { MessageInterface } from '../../types/index'
+import { MessageInterface } from '../../globalTypes/index'
 
 const SQL_CREATE_WITHDRAWAL = sql<WithdrawalRequest, Record<string,never>>(`
   WITH can_withdraw AS (

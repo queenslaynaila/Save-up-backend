@@ -5,7 +5,7 @@ import authMiddleware from '../../middleware/authorization';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { resetPasswordLimiter } from '../../services/rateLimit';
 import { UpdatePasswordInterface, ResetPasswordRequestInterface, ResetPinInterface  } from './types';
-import {  MessageInterface, GetByIdInterface } from '../../types';
+import {  MessageInterface, GetByIdInterface } from '../../globalTypes';
 
 const SQL_GET_PASSWORD_BY_ID = sql<GetByIdInterface, ResetPinInterface >(`
   SELECT pin FROM users WHERE id = :id

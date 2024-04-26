@@ -3,7 +3,7 @@ import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { validateRequest } from '../../middleware/validationMiddleware';
 import { ExitGroupInterface, exitGroupSchema } from './types';
-import { MessageInterface, IdParamInterface } from '../../types';
+import { MessageInterface, IdParamInterface } from '../../globalTypes';
 
 const SQL_EXIT_GROUP = sql<ExitGroupInterface, Record<string,never>>(`
   UPDATE user_groups

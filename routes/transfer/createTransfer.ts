@@ -4,7 +4,7 @@ import authMiddleware from '../../middleware/authorization';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { validateRequest } from '../../middleware/validationMiddleware';
 import { TransferInputInterface, TransferDepositResInterface, TransferDepositBodyInterface, transferSchema } from './types'
-import { MessageInterface } from '../../types/index'
+import { MessageInterface } from '../../globalTypes/index'
 
 const SQL_CREATE_TRANSFER = sql<TransferInputInterface, TransferDepositResInterface>(`
   INSERT INTO transfers (source_goal_id, destination_goal_id, amount, user_id)

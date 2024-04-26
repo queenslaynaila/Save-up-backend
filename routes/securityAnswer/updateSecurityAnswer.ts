@@ -4,7 +4,7 @@ import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { validateRequest } from '../../middleware/validationMiddleware';
 import { securityAnswerValidationSchema, UpdateSecurityAnswerInterface,  CreateSecurityAnswerInterface } from './types'
-import { MessageInterface, IdParamInterface } from '../../types'; 
+import { MessageInterface, IdParamInterface } from '../../globalTypes'; 
 
 const SQL_UPDATE_SECURITY_ANSWER = sql< CreateSecurityAnswerInterface, Record<string,never>>(`
   UPDATE security_answers 

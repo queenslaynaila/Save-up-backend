@@ -3,7 +3,7 @@ import { sql } from '../../db';
 import { HttpError } from '../../middleware/errorMiddleware';
 import authMiddleware from '../../middleware/authorization';
 import { convertToTitleCase } from '../../middleware/caseNormalization';
-import { UserRole } from '../../types/index';
+import { UserRole } from '../../globalTypes/index';
 import { StatsQueryInterface, StatsParamInterface, FinancialStatsInterface, ValidOperatorsEnum, ValidResourcesEnum, ValidStatusEnum  } from './types';
 
 const SQL_GET_CUMULATIVES = (query: string) =>sql<{ operator: string; resource: string }, FinancialStatsInterface>(query);

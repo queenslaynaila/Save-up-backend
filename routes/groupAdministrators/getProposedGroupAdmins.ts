@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { NominatedAdminInterface, GetNominatedMemberInterface  } from './types'
-import { IdParamInterface } from '../../types';
+import { IdParamInterface } from '../../globalTypes';
 
 const SQL_GET_NOMINATED_MEMBERS = sql<GetNominatedMemberInterface, NominatedAdminInterface>(`
   SELECT na.group_id, na.user_id, na.nominated_at, u.full_name

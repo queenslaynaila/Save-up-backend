@@ -3,7 +3,7 @@ import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { ExpenseInterface, ExpenseIdentifierInterface, ExpenseQueryInterface } from './types';
-import { idSchema } from '../../types';
+import { idSchema } from '../../globalTypes';
 
 const SQL_GET_EXPENSES = sql<Record<string, string>, ExpenseInterface>(`
   SELECT entity_id,id,category_id,description,amount_spent,date_spent

@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { sql } from '../../db';
 import { GetTransactionsInput, GetTransactionResp, GetTransactionQuery } from './types';
-import { IdParamInterface } from '../../types';
+import { IdParamInterface } from '../../globalTypes';
 
 const SQL_GET_TRANSACTIONS = sql<GetTransactionsInput, GetTransactionResp>(`
     SELECT * FROM (

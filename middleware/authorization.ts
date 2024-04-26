@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import jwt, { Secret } from 'jsonwebtoken';
-import { UserRole } from '../types';
+import { UserRole } from '../globalTypes';
 import { HttpError } from './errorMiddleware';
 import { generateToken, verifyTokenExpiration } from './generatetoken';
 

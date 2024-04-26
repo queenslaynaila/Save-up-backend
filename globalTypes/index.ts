@@ -1,5 +1,13 @@
 import { z } from 'zod';
 
+//USER ROLES
+
+export const enum UserRole {
+  ADMIN = 'Admin',
+  USER = 'User',
+  MODERATOR = 'Moderator'
+}
+  
 //METHOD ENUM
 export enum Method {
   GET = 'get',

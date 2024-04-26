@@ -3,7 +3,7 @@ import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { validateRequest } from '../../middleware/validationMiddleware';
 import { UpdateNextOfKinInterface, NextOfKinInterface, updateNextOfKinSchema } from './types'; 
-import { IdParamInterface } from '../../types';
+import { IdParamInterface } from '../../globalTypes';
 
 const SQL_UPDATE_KIN = sql<UpdateNextOfKinInterface, NextOfKinInterface>(`
   UPDATE next_of_kins

@@ -1,11 +1,6 @@
 import z from 'zod'
+import { UserRole } from '../../globalTypes';
 
-export const enum UserRole {
-  ADMIN = 'Admin',
-  USER = 'User',
-  MODERATOR = 'Moderator'
-}
-  
 export const baseUserSchema = z.object({
   full_name: z.string(),
   gender: z.enum(['Male', 'Female', 'Prefer not to say']),

@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { NominateParamsInterface, VoteInterface, ApproveAdminInterface  } from './types'
-import { MessageInterface } from '../../types/index'
+import { MessageInterface } from '../../globalTypes/index'
 
 const SQL_INSERT_VOTE = sql<ApproveAdminInterface, Record<string,never>>(`
   INSERT INTO nomination_approvals (group_id, voter_member_id, nominated_member_id, vote)
