@@ -5,7 +5,7 @@ import { validateRequest } from '../../middleware/validationMiddleware';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { convertToTitleCase } from '../../middleware/caseNormalization';
 import { InviteResponseInterface, InviteRequestInterface, inviteRequestSchema } from './types';
-import { MessageInterface } from '../../globalTypes';
+import { MessageInterface } from '../../globalTypes/index';
 
 const SQL_RESPOND_TO_INVITE = sql<InviteResponseInterface, MessageInterface>(`
   UPDATE invitations

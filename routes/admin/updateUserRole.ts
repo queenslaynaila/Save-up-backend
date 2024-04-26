@@ -4,7 +4,7 @@ import { HttpError } from '../../middleware/errorMiddleware';
 import authMiddleware from '../../middleware/authorization';
 import { convertToTitleCase } from '../../middleware/caseNormalization';
 import { UserRoleUpdateInterface, RoleUpdateResultInterface } from './types';
-import { UserRole } from '../../globalTypes';
+import { UserRole } from '../../globalTypes/index';
 
 const VALID_ROLES = ['Admin', 'User', 'Moderator'];
 

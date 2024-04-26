@@ -3,7 +3,7 @@ import * as yaml from 'yaml';
 import * as fs from 'fs';
 import { OpenAPIRegistry, OpenApiGeneratorV3, extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
 import { NextOfKinSchema, nextOfKinCreationSchema, updateNextOfKinSchema } from './types';
-import { Method } from '../../globalTypes';
+import { Method } from '../../globalTypes/index';
 
 extendZodWithOpenApi(z);
 

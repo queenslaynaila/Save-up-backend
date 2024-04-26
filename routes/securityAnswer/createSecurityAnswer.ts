@@ -4,7 +4,7 @@ import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { validateRequest } from '../../middleware/validationMiddleware';
 import { CreateSecurityAnswerInterface, securityAnswerRequestSchema } from './types'
-import {  MessageInterface } from '../../globalTypes';
+import {  MessageInterface } from '../../globalTypes/index';
 
 const SQL_CREATE_ANSWER = sql<CreateSecurityAnswerInterface ,Record<string,never>>(`
   INSERT INTO security_answers ( user_id, question_id, answer) 

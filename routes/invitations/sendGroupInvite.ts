@@ -3,7 +3,7 @@ import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { SendInviteInterface, GroupIdParamInterface, GetUserByPhoneInterface, FindPendingInviteInterface, CountInviteInterface } from './types';
-import { MessageInterface, IdInterface } from '../../globalTypes';
+import { MessageInterface, IdInterface } from '../../globalTypes/index';
 
 const SQL_FIND_USER_BY_PHONE = sql<GetUserByPhoneInterface, IdInterface>(`
   SELECT id 

@@ -4,7 +4,7 @@ import { HttpError } from '../../middleware/errorMiddleware';
 import authMiddleware from '../../middleware/authorization';
 import { validateRequest } from '../../middleware/validationMiddleware';
 import { CategoryInterface, UpdatedCategoryInterface ,updateCategorySchema } from './types';
-import { IdParamInterface, UserRole } from '../../globalTypes';
+import { IdParamInterface, UserRole } from '../../globalTypes/index';
 
 const SQL_UPDATE_CATEGORY = sql<UpdatedCategoryInterface, CategoryInterface>(`
   UPDATE categories

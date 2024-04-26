@@ -3,7 +3,7 @@ import { sql } from '../../db';
 //import authMiddleware from '../../middleware/authorization';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { DepositInterface, DepositParamInterface, DepositsQueryInterface } from './types';
-import { idSchema } from '../../globalTypes';
+import { idSchema } from '../../globalTypes/index';
  
 const SQL_GET_DEPOSITS = sql<Record<string,never>, DepositInterface>(`
   SELECT * FROM deposits

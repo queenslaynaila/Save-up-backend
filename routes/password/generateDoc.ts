@@ -2,7 +2,7 @@ import { z } from "zod";
 import * as yaml from 'yaml';
 import * as fs from 'fs';
 import { OpenAPIRegistry, OpenApiGeneratorV3, extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
-import { securityQuestionsSchema } from '../../globalTypes';
+import { securityQuestionSchema } from './types'
 
 extendZodWithOpenApi(z);
 
@@ -73,7 +73,7 @@ const verifyPasswordResetToken = {
       description: 'Password reset token verified successfully',
       content: {
         'application/json': {
-          schema:securityQuestionsSchema,
+          schema:securityQuestionSchema,
         },
       },
     },

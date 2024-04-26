@@ -3,7 +3,7 @@ import bcrypt from 'bcrypt';
 import { sql } from '../../db';
 import { verifyResetToken } from '../../middleware/resetTokenMIddleware'
 import { VerifyTokenInterface, SecurityQuestionInterface, SecurityQuestionArray, UpdateTokenUsageInterface  } from './types';
-import {  GetByUserInterface } from '../../globalTypes';
+import {  GetByUserInterface } from '../../globalTypes/index';
 
 const SQL_GET_SECURITY_QUESTIONS = sql<GetByUserInterface, SecurityQuestionInterface>(`
   SELECT sq.id AS question_id, sq.question 

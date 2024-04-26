@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { DeleteNextOfKinInterface } from './types';
-import { IdParamInterface, MessageInterface } from '../../globalTypes';
+import { IdParamInterface, MessageInterface } from '../../globalTypes/index';
 
 const SQL_DELETE_KIN = sql<DeleteNextOfKinInterface, Record<string,never>>(`
   UPDATE next_of_kins  

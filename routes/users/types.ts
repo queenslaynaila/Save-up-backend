@@ -1,5 +1,5 @@
 import z from 'zod'
-import { UserRole } from '../../globalTypes';
+import { UserRole } from '../../globalTypes/index';
 
 export const baseUserSchema = z.object({
   full_name: z.string(),

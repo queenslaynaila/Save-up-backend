@@ -47,5 +47,9 @@ export const totalTargetGoalsQuerySchema = z.object({
   category_id: z.string().optional()
 });
 
+export const getTotalSavingsResultSchema = z.object({
+  total_savings: z.number()
+})
+
 export type TotalTargetGoalsQueryInterface = z.infer<typeof totalTargetGoalsQuerySchema>;
   

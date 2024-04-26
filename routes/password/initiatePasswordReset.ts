@@ -5,7 +5,7 @@ import { sql } from '../../db';
 import { generateResetPin } from '../../middleware/generateResetPin';
 import sendSms from '../../services/twilio';
 import { HttpError } from '../../middleware/errorMiddleware';
-import {  MessageInterface, GetByPhoneInterface,  GetByIdInterface  } from '../../globalTypes';
+import {  MessageInterface, GetByPhoneInterface,  GetByIdInterface  } from '../../globalTypes/index';
 import { TokenInterface, InitiatePasswordResetInterface } from './types'
 
 const SQL_GET_USER = sql<GetByPhoneInterface,  GetByIdInterface>(`

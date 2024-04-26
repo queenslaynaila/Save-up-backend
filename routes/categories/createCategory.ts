@@ -3,7 +3,7 @@ import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { validateRequest } from '../../middleware/validationMiddleware';
 import { CreateCategoryInterface, CategoryInterface, createCategorySchema } from './types';
-import { UserRole} from '../../globalTypes';
+import { UserRole } from '../../globalTypes/index';
 
 const SQL_CREATE_CATEGORY = sql<CreateCategoryInterface, CategoryInterface>(`
   INSERT INTO categories (name, description)

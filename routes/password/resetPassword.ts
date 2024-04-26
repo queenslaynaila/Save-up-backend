@@ -2,7 +2,7 @@ import { Router  } from 'express';
 import bcrypt from 'bcrypt';
 import { sql } from '../../db';
 import { verifyResetToken } from '../../middleware/resetTokenMIddleware'
-import {  MessageInterface } from '../../globalTypes';
+import {  MessageInterface } from '../../globalTypes/index';
 import { ResetPasswordInterface, ResetPasswordRequestInterface } from './types';
 
 const SQL_RESET_PASSWORD = sql<ResetPasswordRequestInterface, Record<string,never>>(`

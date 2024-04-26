@@ -3,7 +3,7 @@ import * as yaml from 'yaml';
 import * as fs from 'fs';
 import { OpenAPIRegistry, OpenApiGeneratorV3, extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
 import { createExpenseSchemaValidation, expenseSchema, expenseIdSchema, expenseIdentifierSchema, expenseQuerySchema, deleteExpenseSchema, validateUpdateExpenseSchema} from './types';
-import { Method, messageSchema, idParamSchema } from '../../globalTypes';
+import { Method, messageSchema, idParamSchema } from '../../globalTypes/index';
 
 extendZodWithOpenApi(z);
 const registry = new OpenAPIRegistry();

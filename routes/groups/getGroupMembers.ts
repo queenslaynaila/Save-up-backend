@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import { IdParamInterface } from '../../globalTypes';
+import { IdParamInterface } from '../../globalTypes/index';
 import { GetGroupMembersInterface, GroupInterface } from './types';
 
 const SQL_GET_GROUP_MEMBERS = sql<GroupInterface, GetGroupMembersInterface>(`

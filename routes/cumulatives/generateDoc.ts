@@ -2,7 +2,7 @@ import { z } from "zod";
 import * as yaml from 'yaml';
 import * as fs from 'fs';
 import { OpenAPIRegistry, OpenApiGeneratorV3, extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
-import {  getTopExpenseCategoriesSchema, getTotalExpensesQuerySchema, getTotalExpenseResultSchema, getTotalSavingsResultSchema, totalTargetGoalsQuerySchema,  getTotalTargetsSchema } from '../../globalTypes';
+import {  getTopExpenseCategoriesSchema, getTotalExpensesQuerySchema, getTotalExpenseResultSchema, getTotalSavingsResultSchema, totalTargetGoalsQuerySchema,  getTotalTargetsSchema } from './types';
 
 extendZodWithOpenApi(z);
 const registry = new OpenAPIRegistry();

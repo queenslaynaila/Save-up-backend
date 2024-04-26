@@ -2,7 +2,8 @@ import { z } from "zod";
 import * as yaml from 'yaml';
 import * as fs from 'fs';
 import { OpenAPIRegistry, OpenApiGeneratorV3, extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
-import {  createCategorySchema, categorySchema, categoriesArraySchema, idParamSchema, Method} from '../../globalTypes';
+import { createCategorySchema, categorySchema, categoriesArraySchema,  } from './types'
+import { idParamSchema, Method } from '../../globalTypes/index';
 
 extendZodWithOpenApi(z);
 const registry = new OpenAPIRegistry();
