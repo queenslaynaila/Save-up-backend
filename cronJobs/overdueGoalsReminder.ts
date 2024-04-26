@@ -1,7 +1,6 @@
-import cron from 'node-cron';
 import { z } from 'zod';
-import { sql } from './db';
-import sendSms from './services/twilio';
+import { sql } from '.././db';
+import sendSms from '../services/twilio';
 
 const GoalSchema = z.object({
   goal_id: z.number(),
@@ -44,7 +43,7 @@ const SQL_UPDATE_GOAL_REMINDER = sql<UpdateGoalReminder, Record<string, never>>(
   WHERE id = :goal_id
 `);
 
-export async function remindStaleGoals() {
+export default async function remindStaleGoals() {
   console.log('Checking for stale goals...');
 
   const currentTime = new Date();
@@ -68,5 +67,5 @@ export async function remindStaleGoals() {
   console.log('Stale goalss reminders sent');
 }
 
-cron.schedule('0 10 */14 * *', remindStaleGoals);
+
 

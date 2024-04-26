@@ -20,11 +20,12 @@ import groupRoutes from './routes/groups/index';
 import groupAdminRoutes from './routes/groupAdministrators/index'
 import inviteRoutes from './routes/invitations/index';
 import cron from 'node-cron';
-import { sendSecurityReminderSMS } from './cronjob';
+import remindStaleGoals from './cronJobs/overdueGoalsReminder'
 
 //Cron job
-cron.schedule('0 3 1 */6 *', sendSecurityReminderSMS);
+cron.schedule('0 10 */14 * *', remindStaleGoals);
 
+//Swagger docs
 const options = {
   definition: {
     openapi: "3.0.0",
