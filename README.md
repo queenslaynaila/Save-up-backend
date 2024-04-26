@@ -15,13 +15,24 @@ This guide will assist you in setting up and exploring the SaveUp Backend API. S
 
 ### Generate API Documentation
 
+#### Fo Linux Users
+
 Execute the following command to generate the API documentation:
 
 ```bash
 npm run swagger
 ```
 
-This command creates an OpenAPI (Swagger) specification file that details the API's endpoints, requests, response and error formats and samples.
+This command creates an OpenAPI (Swagger) specification file called swagger.yml in each route subfolder. The specification details the API's endpoints, requests, responses, and error formats along with samples.
+
+#### For Windows Users
+Instead of the standard command, use the following command to generate the Swagger specification:
+
+```bash
+npm run swaggerwindows
+```
+
+The command serves the same purpose as the Linux command but is tailored for Windows environments.
 
 ### Start the Server
 
