@@ -53,6 +53,7 @@ export const createAdminSchema = baseUserSchema.omit({
   role: z.enum(['Admin'])
 });
   
+export type CreateAdminInterface = z.infer<typeof createAdminSchema>;
 
 export const updatedUserRoleSchema = createAdminSchema.omit({
   pin: true
@@ -60,3 +61,14 @@ export const updatedUserRoleSchema = createAdminSchema.omit({
   
 
 export type RoleUpdateResultInterface = z.infer<typeof updatedUserRoleSchema>;
+
+export const createUserContactSchema = baseUserSchema.pick({
+  national_id: true,
+  phone_number: true
+}).extend({
+  entity_id: z.number()
+})
+  
+export type CreateUserContactInterface = z.infer<typeof createUserContactSchema>;
+
+export type UserInterface = z.infer<typeof baseUserSchema>;

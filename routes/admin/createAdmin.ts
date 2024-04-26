@@ -2,7 +2,8 @@ import { Router } from 'express';
 import bcrypt from 'bcrypt';
 import { sql } from '../../db';
 import { validateRequest } from '../../middleware/validationMiddleware';
-import { CreateUserContactInterface, CreateAdminInterface, UserInterface, MessageInterface, baseUserSchema } from '../../globalTypes';
+import {  CreateUserContactInterface, CreateAdminInterface, UserInterface, baseUserSchema  } from './types'
+import { MessageInterface } from '../../globalTypes';
 
 const SQL_CREATE_USER_ENTITY = sql<{ entity_type: string }, { id:number }>(`
   INSERT INTO entities (entity_type)
