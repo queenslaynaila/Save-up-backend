@@ -4,7 +4,7 @@ import { sql } from '../../db';
 import { HttpError } from '../../middleware/errorMiddleware';
 import authMiddleware from '../../middleware/authorization';
 import  { validateRequest } from '../../middleware/validationMiddleware';
-import { UpdatePhoneInterface, updateUserPhoneSchema } from '../../types';
+import { UpdatePhoneInterface, updateUserPhoneSchema } from './types';
 
 const SQL_GET_USER_PIN = sql<{ userId: string },{ pin: string }>(`
   SELECT pin FROM users WHERE id = :userId

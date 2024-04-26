@@ -2,7 +2,7 @@ import { z } from "zod";
 import * as yaml from 'yaml';
 import * as fs from 'fs';
 import { OpenAPIRegistry, OpenApiGeneratorV3, extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
-import { baseUserSchema, updateUserPhoneSchema, GetUserSchema  } from '../../types';
+import { baseUserSchema, updateUserPhoneSchema, GetUserSchema  } from './types';
 
 extendZodWithOpenApi(z);
 const registry = new OpenAPIRegistry();
@@ -145,8 +145,6 @@ const logout = {
   }
 };
 
-
-  
 registry.registerPath(createUser);
 registry.registerPath(login);
 registry.registerPath(getUserByCriteria);

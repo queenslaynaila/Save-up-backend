@@ -4,7 +4,8 @@ import { HttpError } from '../../middleware/errorMiddleware';
 import { hasPermission } from '../../middleware/hasPermission';
 import { convertToTitleCase, isValidValue } from '../../middleware/caseNormalization';
 import authMiddleware from '../../middleware/authorization';
-import { GetUserInterface, ID_SCHEMA } from '../../types/index';
+import { GetUserInterface, GetUserQueryInterface } from './types';
+import { idSchema, IdParamInterface } from '../../types/index';
 
 const SQL_GET_ALL_USERS = sql<Record<string,never>,  GetUserInterface>(`
   SELECT id, full_name, role, gender, created_at FROM users
@@ -13,12 +14,12 @@ const SQL_GET_ALL_USERS = sql<Record<string,never>,  GetUserInterface>(`
 const ACCEPTED_ROLES = ['User', 'Admin', 'Moderator'];
 
 export default (router: Router) => {
-  router.get<string, { targetUser: string }, GetUserInterface, Record<string,never>, { role?: string }>(
+  router.get<string, IdParamInterface, GetUserInterface, Record<string,never>, GetUserQueryInterface>(
     '/:targetUser', 
     authMiddleware(), 
     async (req, res: Response) => {
 
-      const { targetUser } = req.params;
+      const  targetUser = req.params.id;
       const { role } = req.query;
       const filters: string[] = [];
       const filterArgs: Record<string, string | number> = {};
@@ -32,7 +33,7 @@ export default (router: Router) => {
         if (isStandardUser) {
           throw new HttpError(403, 'Forbidden');
         }
-      } else if (ID_SCHEMA.safeParse(parseInt(targetUser)).success) {
+      } else if (idSchema.safeParse(parseInt(targetUser)).success) {
         if (!hasPermission(req, parseInt(targetUser))) {
           throw new HttpError(403, 'Forbidden');
         }

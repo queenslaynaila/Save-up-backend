@@ -4,7 +4,7 @@ import { sql } from '../../db';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { generateToken } from '../../middleware/generatetoken';
 import { validateRequest } from '../../middleware/validationMiddleware';
-import { updateUserPhoneSchema, GetUserInterface, UpdatePhoneInterface, ExtendedUserInterface} from '../../types';
+import { updateUserPhoneSchema, UpdatePhoneInterface, ExtendedUserInterface, GetUserInterface } from './types';
 
 const SQL_GET_USER_ENTITY_ID = sql<{ phone_number: string }, { id: number }>(`
   SELECT id FROM user_contact_details WHERE phone_number = :phone_number

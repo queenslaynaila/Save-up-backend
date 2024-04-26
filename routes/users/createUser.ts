@@ -1,9 +1,9 @@
 import { Router } from 'express';
 import bcrypt from 'bcrypt';
 import { sql } from '../../db';
-//import { HttpError } from '../../middleware/errorMiddleware';
 import { validateRequest } from '../../middleware/validationMiddleware';
-import { CreateUserContactInterface, CreateUserInterface, UserInterface, baseUserSchema } from '../../types';
+import { UserInterface, baseUserSchema, CreateUserContactInterface, CreateUserInterface } from './types';
+import { MessageInterface } from '../../types';
 
 const SQL_CREATE_USER_ENTITY = sql<{ entity_type: string }, { id:number }>(`
   INSERT INTO entities (entity_type)
@@ -22,7 +22,7 @@ const SQL_CREATE_USER = sql<CreateUserInterface, Record<string,never>>(`
 `);
 
 export default (router: Router) => { 
-  router.post<Record<string,never>, { message:string }, UserInterface, Record<string,never>, Record<string,never>>(
+  router.post<Record<string,never>, MessageInterface, UserInterface, Record<string,never>, Record<string,never>>(
     '/',
     validateRequest(baseUserSchema),
     async (req, res) => {
