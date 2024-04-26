@@ -8,22 +8,10 @@ import { MessageInterface } from '../../globalTypes/index'
 
 const SQL_CREATE_TRANSFER = sql<TransferInputInterface, TransferDepositResInterface>(`
   INSERT INTO transfers (source_goal_id, destination_goal_id, amount, user_id)
-  SELECT 
-      :source_goal_id, 
-      :destination_goal_id,
-      :amount, 
-      :user_id
-  FROM transfers AS t
-  INNER JOIN 
-        goals AS sg ON sg.id = t.source_goal_id
-  INNER JOIN 
-        goals AS dg ON dg.id = t.destination_goal_id
-  WHERE 
-      sg.is_default_vault = TRUE
-      AND sg.entity_id = :user_id
+  VALUES (:source_goal_id, :destination_goal_id, :amount, :user_id)
   RETURNING 
-      sg.name AS source_goal_name, 
-      dg.name AS destination_goal_name;
+    (SELECT name FROM goals WHERE id = :source_goal_id) AS source_goal_name, 
+    (SELECT name FROM goals WHERE id = :destination_goal_id) AS destination_goal_name;
 `);
 
 export default (router: Router) => {
