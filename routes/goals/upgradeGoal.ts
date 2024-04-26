@@ -9,7 +9,7 @@ import { validateRequest } from '../../middleware/validationMiddleware';
 const SQL_UPGRADE_GOAL = sql<UpgradeGoalSubset, GoalInterface>(`
   UPDATE goals g
   SET goal_type = :goal_type,
-    target_at = COALESCE(:target_at, target_at)
+      target_at = COALESCE(:target_at, target_at)
   FROM goals g
   LEFT JOIN interest_rates ir ON g.goal_type = ir.type
   WHERE g.id = :id 
