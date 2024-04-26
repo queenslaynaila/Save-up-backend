@@ -2,9 +2,11 @@ import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { HttpError } from '../../middleware/errorMiddleware';
+import { validateRequest } from '../../middleware/validationMiddleware';
+import { TransferInputInterface, TransferDepositResInterface, TransferDepositBodyInterface, transferSchema } from './types'
+import { MessageInterface } from '../../types/index'
 
-
-const SQL_CREATE_TRANSFER = sql<{ user_id: number; source_goal_id: number; destination_goal_id: number; amount: number}, {source_goal_name: string; destination_goal_name: string}>(`
+const SQL_CREATE_TRANSFER = sql<TransferInputInterface, TransferDepositResInterface>(`
   INSERT INTO transfers (source_goal_id, destination_goal_id, amount, user_id)
   SELECT 
       :source_goal_id, 
@@ -25,9 +27,10 @@ const SQL_CREATE_TRANSFER = sql<{ user_id: number; source_goal_id: number; desti
 `);
 
 export default (router: Router) => {
-  router.get<Record<string,never>,{message: string} ,{ source_goal_id: number; destination_goal_id: number; user_id: number; amount: number}, Record<string,never>>(
+  router.get<Record<string,never>, MessageInterface, TransferDepositBodyInterface, Record<string,never>>(
     '/', 
     authMiddleware(),
+    validateRequest(transferSchema),
     async (req, res) => {
       const { source_goal_id, destination_goal_id, amount } = req.body
       const user_id = req.user!.id
