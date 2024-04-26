@@ -3,17 +3,18 @@ import bcrypt from 'bcrypt';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { validateRequest } from '../../middleware/validationMiddleware';
-import { securityAnswerValidationSchema, UpdateSecurityAnswerInterface } from '../../types'; 
+import { securityAnswerValidationSchema, UpdateSecurityAnswerInterface,  CreateSecurityAnswerInterface } from './types'
+import { MessageInterface, IdParamInterface } from '../../types'; 
 
-
-const SQL_UPDATE_SECURITY_ANSWER = sql<{ question_id: number; user_id: number; answer: string }, Record<string,never>>(`
+const SQL_UPDATE_SECURITY_ANSWER = sql< CreateSecurityAnswerInterface, Record<string,never>>(`
   UPDATE security_answers 
-  SET answer = :answer 
-  WHERE question_id = :question_id AND user_id = :user_id
+    SET answer = :answer 
+    WHERE question_id = :question_id 
+    AND user_id = :user_id 
 `);
 
 export default (router: Router) => {
-  router.patch<{ id: string }, { message: string }, UpdateSecurityAnswerInterface, Record<string,never>>(
+  router.patch<IdParamInterface, MessageInterface, UpdateSecurityAnswerInterface, Record<string,never>>(
     '/:id',
     authMiddleware(),
     validateRequest(securityAnswerValidationSchema),

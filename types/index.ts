@@ -48,22 +48,7 @@ export type MessageInterface = z.infer<typeof messageSchema>;
 
 // SECURITY QUESTIONS & ANSWERS SCHEMA
 
-export const securityQuestionSchema = z.object({
-  id: z.number(),
-  question: z.string()
-})
 
-export type SecurityQuestionInterface = z.infer<typeof securityQuestionSchema>;
-
-export const updateSecurityAnswerSchema = securityQuestionSchema.extend({
-  answer: z.string()
-})
-
-export type UpdateSecurityAnswerInterface = z.infer<typeof updateSecurityAnswerSchema>;
-
-export const securityAnswerValidationSchema = updateSecurityAnswerSchema.pick({
-  answer: true
-})
 
 // USER  SCHEMA
 export const enum UserRole {
@@ -151,22 +136,6 @@ export type UpdatePhoneInterface = z.infer<typeof updateUserPhoneSchema>;
 
 // SECURITY ANSWER SCHEMAS
 
-export const createSecurityAnswerSchema = z.object({
-  user_id: z.number(),
-  question_id: z.number(),
-  answer: z.string()
-});
-
-export type CreateSecurityAnswerInterface = z.infer<typeof createSecurityAnswerSchema>;
-
-export const securityAnswerRequestSchema = createSecurityAnswerSchema.omit({ user_id: true});
-
-export const securityAnswerSchema = createSecurityAnswerSchema.extend({
-  id: z.number(),
-  created_at: z.date()
-})
-
-export type SecurityAnswerInterface = z.infer<typeof securityAnswerSchema>;
 
 // GROUPS SCHEMA
 
