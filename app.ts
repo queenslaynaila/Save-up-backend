@@ -19,6 +19,8 @@ import cumulativesRoutes from './routes/cumulatives/index';
 import groupRoutes from './routes/groups/index';
 import groupAdminRoutes from './routes/groupAdministrators/index'
 import inviteRoutes from './routes/invitations/index';
+import transferRoutes from './routes/transfer/index';
+import transactionRoutes from './routes/transactions';
 import cron from 'node-cron';
 import remindStaleGoals from './cronJobs/overdueGoalsReminder'
 
@@ -97,6 +99,8 @@ cumulativesRoutes(app);
 groupRoutes(app);
 inviteRoutes(app);
 groupAdminRoutes(app);
+transferRoutes(app)
+transactionRoutes(app)
 
 // 404 handler
 app.use(() => {
