@@ -10,21 +10,21 @@ const registry = new OpenAPIRegistry();
 
 const createGoal = {
   method: Method.POST,
-  path: '/goals',
+  path: '/pockets',
   summary: 'Create a goal',
-  tags: ['Goals'],
+  tags: ['Pockets'],
   request: {
     body: {
       content: {
         'application/json': {
-          schema:goalSchema.openapi('Goals'),
+          schema:goalSchema.openapi('Pockets'),
         }
       }
     }
   },
   responses: {
     200: {
-      description: 'Goal created successfully'
+      description: 'Pocket created successfully'
     },
     500: {
       description: 'Internal server error.'
@@ -34,15 +34,15 @@ const createGoal = {
 
 const getGoalByGoalId = {
   method: Method.GET,
-  path: '/goals/records/{id}',
+  path: '/pockets/records/{id}',
   summary: 'Get a goals details by Id',
-  tags: ['Goals'],
+  tags: ['Pockets'],
   request: {
     params: idParamSchema
   },
   responses: {
     200: {
-      description: 'Goal retrieved successfully',
+      description: 'Pocket retrieved successfully',
       content: {
         'application/json': {
           schema: goalSchema
@@ -62,14 +62,14 @@ const getGoalsByCriteria = {
   method: Method.GET,
   path: '/savings/{savingIdentifier}',
   summary: 'Get savings by criteria',
-  tags: ['Goals'],
+  tags: ['Pockets'],
   request: {
     params: idParamSchema,
     query:goalsByConditionsQuerySchema
   },
   responses: {
     200: {
-      description: 'Goals retrieved successfully',
+      description: 'Pockets retrieved successfully',
       content: {
         'application/json': {
           schema: z.array(baseGoalSchema)
@@ -89,13 +89,13 @@ const deleteGoal = {
   method: Method.GET,
   path: '/invitations/my-invites',
   summary: 'Get recived group invites',
-  tags: ['Goals'],
+  tags: ['Pockets'],
   request: {
     params: idParamSchema
   },
   responses: {
     200: {
-      description: 'Goal deleted successfully.',
+      description: 'Pocket deleted successfully.',
       content: {
         'application/json': {
           schema:messageSchema

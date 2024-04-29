@@ -1,18 +1,18 @@
 import express from 'express';
-import createGoal from './createGoal';
-import deleteGoal from './deleteGoal';
-import getGoalsByCriteria from './getGoalsByCriteria';
-import updateGoal from './updateGoal';
-import  getGoalByGoalID from './getGoalByGoalID';
+import createPocket from './createPocket';
+import deletePocket from './deletePocket';
+import getPocketByCriteria from './getPocketByCriteria';
+import updatePocket from './updatePocket';
+import getPocketByPktID from './getPocketByPktID';
 
 export default (baseRouter: express.Router) => {
   const router = express.Router();
   
-  createGoal(router);
-  deleteGoal(router);
-  getGoalsByCriteria(router);
-  updateGoal(router);
-  getGoalByGoalID(router);
+  createPocket(router);
+  deletePocket(router);
+  getPocketByCriteria(router);
+  updatePocket(router);
+  getPocketByPktID(router);
 
-  baseRouter.use('/goals', router);
+  baseRouter.use('/pockets', router);
 };
