@@ -6,11 +6,11 @@ import { CreatePocketInterface, PocketInterface, basePocketSchema } from './type
 
 const SQL_CREATE_POCKET = sql<CreatePocketInterface, PocketInterface>(`
   INSERT INTO pockets (entity_id, category_id, name, target_amount, priority, target_at, pocket_type)
-  VALUES (:entity_id, :category_id, :name, :target_amount, :priority, :target_at, :pocket_type) )
+  VALUES (:entityId, :categoryId, :name, :targetAmount, :priority, :targetAt, :pocketType) )
   RETURNING id, entity_id, name, category_id, target_amount, priority, target_at, created_at, completed_at;
 `);
 
-const pocketSchema = basePocketSchema.omit({ entity_id: true })
+const pocketSchema = basePocketSchema.omit({ entityId: true })
 
 export default (router: Router) => {
   router.post<Record<string,never>, PocketInterface, CreatePocketInterface, Record<string,never>, Record<string,never>>(
@@ -18,15 +18,15 @@ export default (router: Router) => {
     authMiddleware(), 
     validateRequest(pocketSchema),
     async (req, res) => {
-      const { entity_id, category_id, name, target_amount, priority, target_at, pocket_type } = req.body;
+      const { entityId, categoryId, name, targetAmount, priority, targetAt, pocketType } = req.body;
       const newPocket = await SQL_CREATE_POCKET({
-        entity_id,
-        category_id,
+        entityId,
+        categoryId,
         name,
-        target_amount,
+        targetAmount,
         priority,
-        target_at,
-        pocket_type
+        targetAt,
+        pocketType
       }).one();
       return res.json(newPocket);
     });

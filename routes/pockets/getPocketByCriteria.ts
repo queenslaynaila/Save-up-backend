@@ -23,7 +23,7 @@ export default (router: Router) => {
     authMiddleware(), 
     async (req, res: Response) => {
       const { pocketsIdentifier } = req.params;
-      const { category_id, priority, status,start_at, completed_at  } = req.query;
+      const { categoryId, priority, status, startAt, completedAt  } = req.query;
 
       const filters: string[] = [];
       const filterArgs: Record<string, string> = {};
@@ -34,15 +34,15 @@ export default (router: Router) => {
 
       if (pocketsIdentifier === 'me') {
         filterArgs.loggedInUserId= loggedInUserId.toString() ;
-        filterArgs.is_default_pocket  = 'FALSE';
+        filterArgs.isDefaultPocket  = 'FALSE';
         filters.push(`entity_id = :loggedInUserId`);
-        filters.push(`is_default_pocket  = :is_default_pocket `);
+        filters.push(`is_default_pocket  = :isDefaultPocket`);
       } 
       else if (pocketsIdentifier === 'Default') {
         filterArgs.loggedInUserId= loggedInUserId.toString();
-        filterArgs.is_default_pocket  = 'TRUE';
+        filterArgs.isDefaultPocket  = 'TRUE';
         filters.push(`entity_id = :loggedInUserId`);
-        filters.push(`is_default_pocket  = :is_default_pocket `);
+        filters.push(`is_default_pocket  = :isDefaultPocket`);
       } 
       else if (pocketsIdentifier === 'all') {
         if (isStandardUser) {
@@ -54,25 +54,25 @@ export default (router: Router) => {
           throw new HttpError(403, 'Forbidden');
         }
         filterArgs.user_id = pocketsIdentifier;
-        filters.push(`entity_id = :user_id`);
+        filters.push(`entity_id = :userId`);
       }
       else {
         throw new HttpError(400, 'Bad request');
       }
 
-      if (category_id) {
-        filterArgs.category_id = category_id;
-        filters.push(`category_id = :category_id`);
+      if (categoryId) {
+        filterArgs.category_id = categoryId;
+        filters.push(`category_id = :categoryId`);
       }
 
-      if (start_at) {
-        filterArgs.start_at = start_at;
-        filters.push(`start_at = :start_at`);
+      if (startAt) {
+        filterArgs.start_at = startAt;
+        filters.push(`start_at = :startAt`);
       }
 
-      if (completed_at) {
-        filterArgs.completed_at = completed_at;
-        filters.push(`completed_at = :completed_at`);
+      if (completedAt) {
+        filterArgs.completed_at = completedAt;
+        filters.push(`completed_at = :completedAt`);
       }
        
       if (convertedPriority && isValidValue(convertedPriority, ACCEPTED_PRIORITY_VALUES)) {

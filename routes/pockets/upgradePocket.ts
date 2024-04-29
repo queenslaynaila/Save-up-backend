@@ -9,7 +9,7 @@ import { validateRequest } from '../../middleware/validationMiddleware';
 const SQL_UPGRADE_POCKET = sql<UpgradePocketSubset, PocketInterface>(`
   UPDATE pockets p
   SET pocket_type = :pocket_type,
-      target_at = COALESCE(:target_at, target_at)
+      target_at = COALESCE(:targetAt, target_at)
   FROM pockets p
   LEFT JOIN interest_rates ir ON p.pocket_type = ir.type
   WHERE p.id = :id 
@@ -24,12 +24,12 @@ export default (router: Router) => {
     validateRequest(upgradePocketSchema),
     async (req, res) => {
       const pocketId = parseInt(req.params.id);
-      const { target_at } = req.body;
-      const pocket_type = 'Locked Pocket';
+      const { targetAt } = req.body;
+      const pocketType = 'Locked Pocket';
       const goal = await SQL_UPGRADE_POCKET({
         id: pocketId,
-        target_at,
-        pocket_type
+        targetAt,
+        pocketType
       }).one(new HttpError(404, 'Not found'));
       return res.json(goal);
     });

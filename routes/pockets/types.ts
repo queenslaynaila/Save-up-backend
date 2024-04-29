@@ -12,29 +12,29 @@ export enum pocketType {
 }
   
 export const basePocketSchema = z.object({
-  entity_id: z.number(),
-  category_id: z.number(),
+  entityId: z.number(),
+  categoryId: z.number(),
   name: z.string(),  
-  target_amount: z.number(),
+  targetAmount: z.number(),
   priority: z.enum([priority.HIGH, priority.INTERMEDIATE, priority.LOW]),
-  target_at: z.string(),
-  pocket_type: z.enum([pocketType.STANDARD, pocketType.LOCKED])
+  targetAt: z.string(),
+  pocketType: z.enum([pocketType.STANDARD, pocketType.LOCKED])
 });
   
 export type CreatePocketInterface = z.infer<typeof basePocketSchema>;
   
 export const pocketSchema =  basePocketSchema.extend({
   id: z.number(),
-  created_at: z.date(),
-  target_at: z.date(),
-  updated_at: z.date(),
-  completed_at: z.date(),
-  interest_rate:z.number().min(0).max(100)
+  createdAt: z.date(),
+  targetAt: z.date(),
+  updatedAt: z.date(),
+  completedAt: z.date(),
+  interestRate:z.number().min(0).max(100)
 })
   
 export type PocketInterface = z.infer<typeof pocketSchema>;
   
-export const updatePocketSchema = basePocketSchema.omit({ entity_id: true }).partial().extend({id: z.number()});
+export const updatePocketSchema = basePocketSchema.omit({ entityId: true }).partial().extend({id: z.number()});
   
 export const UpdatePocketRequestSchema = updatePocketSchema.omit({ id: true });
   
@@ -42,32 +42,32 @@ export type UpdatePocketInterface = z.infer<typeof updatePocketSchema>;
   
 export const pocketUpdateResSchema = z.object({
   name: z.string(),
-  category_id: z.number().positive(), 
-  target_amount: z.number().positive(), 
+  categoryId: z.number().positive(), 
+  targetAmount: z.number().positive(), 
   priority: z.enum(['Low', 'Medium', 'High']), 
-  target_at: z.date(),
+  targetAt: z.date(),
 });
   
 export type PocketUpdateRes = z.infer<typeof pocketUpdateResSchema >;
   
 const UpgradePocketSubsetSchema = z.object({
-  target_at: z.date().optional(),
+  targetAt: z.date().optional(),
   id: z.number(),
-  pocket_type:z.string()
+  pocketType:z.string()
 });
   
 export type UpgradePocketSubset = z.infer<typeof UpgradePocketSubsetSchema>;
   
-export const upgradePocketSchema = UpgradePocketSubsetSchema.pick({target_at:true})
+export const upgradePocketSchema = UpgradePocketSubsetSchema.pick({targetAt:true})
   
 export type UpgradePocketInterface = z.infer<typeof upgradePocketSchema>;
   
 export const pocketsByConditionsQuerySchema = z.object({
-  category_id: z.string().optional(),
+  categoryId: z.string().optional(),
   priority: z.string().optional(),
   status: z.string().optional(),
-  start_at: z.string().optional(),
-  completed_at: z.string().optional(),
+  startAt: z.string().optional(),
+  completedAt: z.string().optional(),
 });
   
 export type PocketsConditionsQueryInterface = z.infer<typeof pocketsByConditionsQuerySchema>;
@@ -80,7 +80,7 @@ export type PocketParam = z.infer<typeof pocketParamSchema>;
 
 export const deletePocketSchema = z.object({
   id:z.number(),
-  entity_id:z.number()
+  entityId:z.number()
 })
 
 export type DeletePocket = z.infer<typeof deletePocketSchema>;
