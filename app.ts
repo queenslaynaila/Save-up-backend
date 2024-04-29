@@ -19,7 +19,7 @@ import cumulativesRoutes from './routes/cumulatives/index';
 import groupRoutes from './routes/groups/index';
 import groupAdminRoutes from './routes/groupAdministrators/index'
 import inviteRoutes from './routes/invitations/index';
-import transferRoutes from './routes/transfer/index';
+import transferRoutes from './routes/transfers/index';
 import transactionRoutes from './routes/transactions';
 import cron from 'node-cron';
 import remindStaleGoals from './cronJobs/overdueGoalsReminder'
