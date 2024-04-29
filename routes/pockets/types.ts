@@ -73,7 +73,7 @@ export const goalsByConditionsQuerySchema = z.object({
 export type GoalsConditionsQueryInterface = z.infer<typeof goalsByConditionsQuerySchema>;
 
 export const goalParamSchema = z.object({
-  goalsIdentifier: z.string() 
+  pocketsIdentifier: z.string() 
 })
 
 export type GoalParam = z.infer<typeof goalParamSchema>;
