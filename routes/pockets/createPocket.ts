@@ -4,7 +4,7 @@ import authMiddleware from '../../middleware/authorization';
 import { validateRequest } from '../../middleware/validationMiddleware';
 import { CreateGoalInterface, GoalInterface, baseGoalSchema } from './types';
 
-const SQL_CREATE_GOAL = sql<CreateGoalInterface, GoalInterface>(`
+const SQL_CREATE_POCKET = sql<CreateGoalInterface, GoalInterface>(`
   INSERT INTO goals (entity_id, category_id, name, target_amount, priority, target_at, goal_type)
   VALUES (:entity_id, :category_id, :name, :target_amount, :priority, :target_at, :goal_type) )
   RETURNING id, entity_id, name, category_id, target_amount, priority, target_at, created_at, completed_at;
@@ -19,7 +19,7 @@ export default (router: Router) => {
     validateRequest(goalSchema),
     async (req, res) => {
       const { entity_id, category_id, name, target_amount, priority, target_at, goal_type } = req.body;
-      const newGoal = await SQL_CREATE_GOAL({
+      const newGoal = await SQL_CREATE_POCKET({
         entity_id,
         category_id,
         name,

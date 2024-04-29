@@ -6,7 +6,7 @@ import { UpgradeGoalSubset, GoalInterface, upgradeGoalSchema } from './types';
 import { IdParamInterface} from '../../globalTypes/index';
 import { validateRequest } from '../../middleware/validationMiddleware';
 
-const SQL_UPGRADE_GOAL = sql<UpgradeGoalSubset, GoalInterface>(`
+const SQL_UPGRADE_POCKET = sql<UpgradeGoalSubset, GoalInterface>(`
   UPDATE goals g
   SET goal_type = :goal_type,
       target_at = COALESCE(:target_at, target_at)
@@ -26,7 +26,7 @@ export default (router: Router) => {
       const goalId = parseInt(req.params.id);
       const { target_at } = req.body;
       const goal_type = 'Locked Goal';
-      const goal = await SQL_UPGRADE_GOAL({
+      const goal = await SQL_UPGRADE_POCKET({
         id: goalId,
         target_at,
         goal_type

@@ -6,7 +6,7 @@ import { UpdateGoalInterface,  GoalUpdateRes, UpdateGoalRequestSchema } from './
 import { IdParamInterface } from '../../globalTypes/index';
 import { validateRequest } from '../../middleware/validationMiddleware';
 
-const SQL_UPDATE_GOAL = sql<UpdateGoalInterface, GoalUpdateRes>(`
+const SQL_UPDATE_POCKET = sql<UpdateGoalInterface, GoalUpdateRes>(`
   UPDATE goals
   SET name = COALESCE(:name, goals.name),
       category_id = COALESCE(:category_id, goals.category_id),
@@ -25,7 +25,7 @@ export default (router: Router) => {
     async (req, res) => {
       const goalId = parseInt(req.params.id);
       const { name, category_id, target_amount, priority, target_at } = req.body;
-      const goal = await SQL_UPDATE_GOAL({
+      const goal = await SQL_UPDATE_POCKET({
         id: goalId,
         name,
         category_id,

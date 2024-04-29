@@ -4,7 +4,7 @@ import authMiddleware from '../../middleware/authorization';
 import { DeleteGoal } from './types'
 import { IdParamInterface, MessageInterface } from '../../globalTypes/index'
 
-const SQL_DELETE_GOAL = sql<DeleteGoal, Record<string,never>>(`
+const SQL_DELETE_POCKET = sql<DeleteGoal, Record<string,never>>(`
   UPDATE goals
   SET deleted_at = NOW()
   WHERE id = :id
@@ -18,7 +18,7 @@ export default (router: Router) => {
     async (req, res) => {
       const id = parseInt(req.params.id);
       const userId = req.user!.id;
-      await SQL_DELETE_GOAL({ id, entity_id: userId }).exec();
+      await SQL_DELETE_POCKET({ id, entity_id: userId }).exec();
       return res.json({ message: 'Goal deleted successfully' });
     });
 };
