@@ -6,18 +6,18 @@ import { UserInterface, GroupInterface, ProposeAdminInterface} from './types'
 
 const SQL_CREATE_GROUP_ADMIN = sql<ProposeAdminInterface, Record<string,never>>(`
   INSERT INTO group_administrators (group_id, user_id)
-  VALUES (:group_id, :user_id)
+  VALUES (:groupId, :userId)
   RETURNING *;
 `);
 
 export default (router: Router) => {
   router.post<GroupInterface, MessageInterface, UserInterface, Record<string,never>, Record<string,never>>(
-    '/:group_id',
+    '/:groupId',
     authMiddleware(),
     async (req, res) => {
-      const { user_id } = req.body;
-      const group_id  = parseInt(req.params.group_id);
-      await SQL_CREATE_GROUP_ADMIN({ user_id, group_id }).exec();
+      const { userId } = req.body;
+      const groupId  = parseInt(req.params.groupId);
+      await SQL_CREATE_GROUP_ADMIN({ userId, groupId }).exec();
       res.json({ message: 'Group admin created successfully' });
     }
   );

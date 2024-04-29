@@ -6,7 +6,7 @@ import { ProposeAdminInterface, UserInterface } from './types'
 
 const SQL_NOMINATE_GROUP_ADMIN = sql<ProposeAdminInterface, Record<string,never>>(`
   INSERT INTO nominated_administrators (group_id, user_id)
-  VALUES (:group_id, :user_id)
+  VALUES (:groupId, :userId)
   RETURNING *;
 `);
 
@@ -15,9 +15,9 @@ export default (router: Router) => {
     '/nominate/:id',
     authMiddleware(),
     async (req, res) => {
-      const { user_id } = req.body;
-      const  group_id  = parseInt(req.params.id);
-      await SQL_NOMINATE_GROUP_ADMIN({ user_id, group_id }).exec();
+      const { userId } = req.body;
+      const  groupId  = parseInt(req.params.id);
+      await SQL_NOMINATE_GROUP_ADMIN({ userId, groupId }).exec();
       res.json({ message: 'Member nominated as admin ' });
     }
   );
