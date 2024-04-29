@@ -457,7 +457,7 @@ EXECUTE FUNCTION update_admins_on_all_votes();
 ===============================================================================================
 -- Trigger: Creates a Savings vault for each user or group when either is created.Allows users/groups to save witht a pocket in mind.
 
-CREATE OR REPLACE FUNCTION create_default_savings_vault()
+CREATE OR REPLACE FUNCTION create_default_pockets_vault()
 RETURNS TRIGGER AS $$
 BEGIN
   IF TG_TABLE_NAME = 'users' THEN 
@@ -472,8 +472,8 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER create_default_savings_pocket_trigger
+CREATE TRIGGER create_default_pockets_pocket_trigger
 AFTER INSERT ON users OR INSERT ON groups
 FOR EACH ROW
-EXECUTE FUNCTION create_default_savings_vault();
+EXECUTE FUNCTION create_default_pockets_vault();
 

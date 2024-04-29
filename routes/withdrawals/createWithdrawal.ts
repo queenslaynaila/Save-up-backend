@@ -8,28 +8,28 @@ import { MessageInterface } from '../../globalTypes/index'
 const SQL_CREATE_WITHDRAWAL = sql<WithdrawalRequest, Record<string,never>>(`
   WITH can_withdraw AS (
     SELECT 
-        g.id AS goal_id, 
-        g.name AS goal_name, 
-        g.goal_type,
-        g.entity_id AS owner_id,
-        g.target_at,
+        p.id AS pocket_id, 
+        p.name AS pocket_name, 
+        p.pocket_type,
+        p.entity_id AS owner_id,
+        p.target_at,
         COALESCE(SUM(s.amount),0) AS total_saved
     FROM
-       goals g
+       pockets p
     LEFT JOIN 
-       deposits d ON d.goal_id = g.id
+       deposits d ON d.pocket_id = p.id
     WHERE 
-        g.id = :goal_id
-        AND g.entity_id = :user_id
-        AND (g.goal_type = 'Standard Goal' OR NOW() >= g.target_at)
+        p.id = :pocket_id
+        AND p.entity_id = :user_id
+        AND (p.pocket_type = 'Standard Pocket' OR NOW() >= p.target_at)
     GROUP BY 
-        g.id, g.name, g.is_locked_goal,g.entity_id
+        p.id, g.name, p.is_locked_pocket,p.entity_id
   )
-  INSERT INTO withdrawals (goal_id, user_id, amount)
-  SELECT c.goal_id :user_id, :amount
+  INSERT INTO withdrawals (pocket_id, user_id, amount)
+  SELECT c.pocket_id :user_id, :amount
   FROM can_withdraw c
   WHERE c.total_saved >= :amount  
-  RETURNING c.goal_name;
+  RETURNING c.pocket_name;
 `);
 
 export default (router: Router) => {
@@ -37,14 +37,14 @@ export default (router: Router) => {
     '/', 
     authMiddleware(),
     async (req, res) => {
-      const { goal_id, amount} = req.body
+      const { pocket_id, amount} = req.body
       const user_id = req.user!.id
-      const goal_name= await SQL_CREATE_WITHDRAWAL({ goal_id, user_id, amount }).oneOrNull();
-      if (!goal_name){
+      const pocket_name= await SQL_CREATE_WITHDRAWAL({ pocket_id, user_id, amount }).oneOrNull();
+      if (!pocket_name){
         throw new HttpError(400, 'There was an error processing your withdrawal request. Please try again later.');
       }
       return res.json({
-        message: `Withdrawal of amount KES ${amount.toFixed(2)} from goal ${goal_name} successful!`
+        message: `Withdrawal of amount KES ${amount.toFixed(2)} from pocket ${pocket_name} successful!`
       });      
     });
 };

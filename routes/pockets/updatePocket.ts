@@ -2,11 +2,11 @@ import { Router } from 'express';
 import authMiddleware from '../../middleware/authorization';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { sql } from '../../db';
-import { UpdateGoalInterface,  GoalUpdateRes, UpdateGoalRequestSchema } from './types';
+import { UpdatePocketInterface,  PocketUpdateRes, UpdatePocketRequestSchema } from './types';
 import { IdParamInterface } from '../../globalTypes/index';
 import { validateRequest } from '../../middleware/validationMiddleware';
 
-const SQL_UPDATE_POCKET = sql<UpdateGoalInterface, GoalUpdateRes>(`
+const SQL_UPDATE_POCKET = sql<UpdatePocketInterface, PocketUpdateRes>(`
   UPDATE pockets
   SET name = COALESCE(:name, pockets.name),
       category_id = COALESCE(:category_id, pockets.category_id),
@@ -18,10 +18,10 @@ const SQL_UPDATE_POCKET = sql<UpdateGoalInterface, GoalUpdateRes>(`
 `);
 
 export default (router: Router) => {
-  router.patch<IdParamInterface, GoalUpdateRes, UpdateGoalInterface, Record<string,never>>(
+  router.patch<IdParamInterface, PocketUpdateRes, UpdatePocketInterface, Record<string,never>>(
     '/:id', 
     authMiddleware(), 
-    validateRequest(UpdateGoalRequestSchema),
+    validateRequest(UpdatePocketRequestSchema),
     async (req, res) => {
       const pocketId = parseInt(req.params.id);
       const { name, category_id, target_amount, priority, target_at } = req.body;

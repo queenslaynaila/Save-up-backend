@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 export const baseDepositSchema = z.object({
   user_id: z.number(),
-  goal_id: z.number(),
+  pocket_id: z.number(),
   amount: z.number(),
   donor_name: z.string().optional(),
   donor_email: z.string().email().optional(),
@@ -25,7 +25,7 @@ export const depositSchema = baseDepositSchema.extend({
 export type DepositInterface = z.infer<typeof depositSchema>;
 
 export const depositsQuerySchema = baseDepositSchema.pick({
-  goal_id: true
+  pocket_id: true
 }).partial().extend({
   category_id: z.string().optional(),
 })

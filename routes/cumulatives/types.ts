@@ -41,15 +41,15 @@ export const getTotalTargetsSchema = z.object({
 
 export type GetTotalTargetsInterface = z.infer<typeof getTotalTargetsSchema>;
   
-export const totalTargetGoalsQuerySchema = z.object({
+export const totalTargetPocketsQuerySchema = z.object({
   priority: z.string().optional(),
   status: z.string().optional(),
   category_id: z.string().optional()
 });
 
 export const getTotalSavingsResultSchema = z.object({
-  total_savings: z.number()
+  total_deposits: z.number()
 })
 
-export type TotalTargetGoalsQueryInterface = z.infer<typeof totalTargetGoalsQuerySchema>;
+export type TotalTargetPocketsQueryInterface = z.infer<typeof totalTargetPocketsQuerySchema>;
   

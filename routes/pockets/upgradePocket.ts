@@ -2,11 +2,11 @@ import { Router } from 'express';
 import authMiddleware from '../../middleware/authorization';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { sql } from '../../db';
-import { UpgradeGoalSubset, GoalInterface, upgradeGoalSchema } from './types';
+import { UpgradePocketSubset, PocketInterface, upgradePocketSchema } from './types';
 import { IdParamInterface} from '../../globalTypes/index';
 import { validateRequest } from '../../middleware/validationMiddleware';
 
-const SQL_UPGRADE_POCKET = sql<UpgradeGoalSubset, GoalInterface>(`
+const SQL_UPGRADE_POCKET = sql<UpgradePocketSubset, PocketInterface>(`
   UPDATE pockets p
   SET pocket_type = :pocket_type,
       target_at = COALESCE(:target_at, target_at)
@@ -18,10 +18,10 @@ const SQL_UPGRADE_POCKET = sql<UpgradeGoalSubset, GoalInterface>(`
 `);
 
 export default (router: Router) => {
-  router.patch<IdParamInterface, GoalInterface, UpgradeGoalSubset, Record<string,never>>(
+  router.patch<IdParamInterface, PocketInterface, UpgradePocketSubset, Record<string,never>>(
     '/:id', 
     authMiddleware(), 
-    validateRequest(upgradeGoalSchema),
+    validateRequest(upgradePocketSchema),
     async (req, res) => {
       const pocketId = parseInt(req.params.id);
       const { target_at } = req.body;

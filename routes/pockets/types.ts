@@ -11,7 +11,7 @@ export enum pocketType {
   LOCKED = 'Locked Pockets',
 }
   
-export const baseGoalSchema = z.object({
+export const basePocketSchema = z.object({
   entity_id: z.number(),
   category_id: z.number(),
   name: z.string(),  
@@ -21,9 +21,9 @@ export const baseGoalSchema = z.object({
   pocket_type: z.enum([pocketType.STANDARD, pocketType.LOCKED])
 });
   
-export type CreateGoalInterface = z.infer<typeof baseGoalSchema>;
+export type CreatePocketInterface = z.infer<typeof basePocketSchema>;
   
-export const goalSchema =  baseGoalSchema.extend({
+export const pocketSchema =  basePocketSchema.extend({
   id: z.number(),
   created_at: z.date(),
   target_at: z.date(),
@@ -32,15 +32,15 @@ export const goalSchema =  baseGoalSchema.extend({
   interest_rate:z.number().min(0).max(100)
 })
   
-export type GoalInterface = z.infer<typeof goalSchema>;
+export type PocketInterface = z.infer<typeof pocketSchema>;
   
-export const updateGoalSchema = baseGoalSchema.omit({ entity_id: true }).partial().extend({id: z.number()});
+export const updatePocketSchema = basePocketSchema.omit({ entity_id: true }).partial().extend({id: z.number()});
   
-export const UpdateGoalRequestSchema = updateGoalSchema.omit({ id: true });
+export const UpdatePocketRequestSchema = updatePocketSchema.omit({ id: true });
   
-export type UpdateGoalInterface = z.infer<typeof updateGoalSchema>;
+export type UpdatePocketInterface = z.infer<typeof updatePocketSchema>;
   
-export const goalUpdateResSchema = z.object({
+export const pocketUpdateResSchema = z.object({
   name: z.string(),
   category_id: z.number().positive(), 
   target_amount: z.number().positive(), 
@@ -48,21 +48,21 @@ export const goalUpdateResSchema = z.object({
   target_at: z.date(),
 });
   
-export type GoalUpdateRes = z.infer<typeof goalUpdateResSchema >;
+export type PocketUpdateRes = z.infer<typeof pocketUpdateResSchema >;
   
-const UpgradeGoalSubsetSchema = z.object({
+const UpgradePocketSubsetSchema = z.object({
   target_at: z.date().optional(),
   id: z.number(),
   pocket_type:z.string()
 });
   
-export type UpgradeGoalSubset = z.infer<typeof UpgradeGoalSubsetSchema>;
+export type UpgradePocketSubset = z.infer<typeof UpgradePocketSubsetSchema>;
   
-export const upgradeGoalSchema = UpgradeGoalSubsetSchema.pick({target_at:true})
+export const upgradePocketSchema = UpgradePocketSubsetSchema.pick({target_at:true})
   
-export type UpgradeGoalInterface = z.infer<typeof upgradeGoalSchema>;
+export type UpgradePocketInterface = z.infer<typeof upgradePocketSchema>;
   
-export const goalsByConditionsQuerySchema = z.object({
+export const pocketsByConditionsQuerySchema = z.object({
   category_id: z.string().optional(),
   priority: z.string().optional(),
   status: z.string().optional(),
@@ -70,17 +70,17 @@ export const goalsByConditionsQuerySchema = z.object({
   completed_at: z.string().optional(),
 });
   
-export type GoalsConditionsQueryInterface = z.infer<typeof goalsByConditionsQuerySchema>;
+export type PocketsConditionsQueryInterface = z.infer<typeof pocketsByConditionsQuerySchema>;
 
-export const goalParamSchema = z.object({
+export const pocketParamSchema = z.object({
   pocketsIdentifier: z.string() 
 })
 
-export type GoalParam = z.infer<typeof goalParamSchema>;
+export type PocketParam = z.infer<typeof pocketParamSchema>;
 
-export const deleteGoalSchema = z.object({
+export const deletePocketSchema = z.object({
   id:z.number(),
   entity_id:z.number()
 })
 
-export type DeleteGoal = z.infer<typeof deleteGoalSchema>;
+export type DeletePocket = z.infer<typeof deletePocketSchema>;

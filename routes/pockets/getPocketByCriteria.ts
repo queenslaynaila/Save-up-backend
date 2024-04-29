@@ -3,12 +3,12 @@ import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { convertToTitleCase, isValidValue } from '../../middleware/caseNormalization';
 import { HttpError } from '../../middleware/errorMiddleware';
-import { GoalInterface, GoalsConditionsQueryInterface, GoalParam } from './types';
+import { PocketInterface, PocketsConditionsQueryInterface, PocketParam } from './types';
 
 const ACCEPTED_STATUS_VALUES = ['In Progress', 'Dormant', 'Completed'];
 const ACCEPTED_PRIORITY_VALUES = ['High', 'Intermediate', 'Low'];
 
-const SQL_GET_POCKETS = sql<Record<string, never>, GoalInterface>(`
+const SQL_GET_POCKETS = sql<Record<string, never>, PocketInterface>(`
   SELECT p.id, p.name, p.entity_id, p.category_id, p.amount, p.priority,
          p.target_at, p.created_at, p.completed_at, p.updated_at, p.pocket_type, 
          ir.rate AS interest_rate
@@ -18,7 +18,7 @@ const SQL_GET_POCKETS = sql<Record<string, never>, GoalInterface>(`
 `);
 
 export default (router: Router) => {
-  router.get<string, GoalParam, GoalInterface[], Record<string,never>, GoalsConditionsQueryInterface>(
+  router.get<string, PocketParam, PocketInterface[], Record<string,never>, PocketsConditionsQueryInterface>(
     '/:pocketsIdentifier', 
     authMiddleware(), 
     async (req, res: Response) => {

@@ -2,7 +2,7 @@ import { z } from "zod";
 import * as yaml from 'yaml';
 import * as fs from 'fs';
 import { OpenAPIRegistry, OpenApiGeneratorV3, extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
-import { baseGoalSchema, goalSchema, goalsByConditionsQuerySchema  } from './types';
+import { basePocketSchema, pocketSchema, pocketsByConditionsQuerySchema  } from './types';
 import { messageSchema, idParamSchema, Method } from '../../globalTypes/index';
 
 extendZodWithOpenApi(z);
@@ -17,7 +17,7 @@ const createGoal = {
     body: {
       content: {
         'application/json': {
-          schema:goalSchema.openapi('Pockets'),
+          schema:pocketSchema.openapi('Pockets'),
         }
       }
     }
@@ -35,7 +35,7 @@ const createGoal = {
 const getGoalByGoalId = {
   method: Method.GET,
   path: '/pockets/records/{id}',
-  summary: 'Get a goals details by Id',
+  summary: 'Get a pockets details by Id',
   tags: ['Pockets'],
   request: {
     params: idParamSchema
@@ -45,7 +45,7 @@ const getGoalByGoalId = {
       description: 'Pocket retrieved successfully',
       content: {
         'application/json': {
-          schema: goalSchema
+          schema: pocketSchema
         }
       }
     },
@@ -65,14 +65,14 @@ const getGoalsByCriteria = {
   tags: ['Pockets'],
   request: {
     params: idParamSchema,
-    query:goalsByConditionsQuerySchema
+    query:pocketsByConditionsQuerySchema
   },
   responses: {
     200: {
       description: 'Pockets retrieved successfully',
       content: {
         'application/json': {
-          schema: z.array(baseGoalSchema)
+          schema: z.array(basePocketSchema)
         }
       }
     },
@@ -85,7 +85,7 @@ const getGoalsByCriteria = {
   }
 };
   
-const deleteGoal = {
+const DeletePocket = {
   method: Method.GET,
   path: '/invitations/my-invites',
   summary: 'Get recived group invites',
@@ -114,7 +114,7 @@ const deleteGoal = {
 registry.registerPath(createGoal);
 registry.registerPath(getGoalByGoalId);
 registry.registerPath(getGoalsByCriteria);
-registry.registerPath(deleteGoal);
+registry.registerPath(DeletePocket);
 
 function getOpenApiDocumentation() {
   const generator = new OpenApiGeneratorV3(registry.definitions);

@@ -2,8 +2,8 @@ import { z } from 'zod';
 import { sql } from '.././db';
 import sendSms from '../services/twilio';
 
-const GoalSchema = z.object({
-  goal_id: z.number(),
+const pocketSchema = z.object({
+  pocket_id: z.number(),
   entity_id: z.number(),
   target_at: z.date(),
   amount: z.number(),
@@ -12,22 +12,22 @@ const GoalSchema = z.object({
   name: z.string(),
 });
 
-type Goal = z.infer<typeof GoalSchema>;
+type Pocket = z.infer<typeof pocketSchema>;
 
-const UpdateGoalReminderSchema = GoalSchema.pick({ 
-  goal_id: true, 
+const UpdatePocketReminderSchema = pocketSchema.pick({ 
+  pocket_id: true, 
   last_reminder_sent_at: true, 
   reminder_count: true 
 });
 
-type UpdateGoalReminder = z.infer<typeof UpdateGoalReminderSchema>;
+type UpdatePocketReminder = z.infer<typeof UpdatePocketReminderSchema>;
 
-const SQL_GET_OVERDUE_GOALS = sql<Record<string, never>, Goal>(`
-  SELECT g.id AS goal_id, g.entity_id, g.target_at, g.target_amount AS amount,name, g.reminder_count, g.last_reminder_sent_at
-  FROM goals g
-  LEFT JOIN deposits d ON g.id = d.goal_id
-  WHERE g.status = 'In Progress'
-  AND g.target_at < NOW()  - INTERVAL '14 days'
+const SQL_GET_OVERDUE_POCKETS = sql<Record<string, never>, Pocket>(`
+  SELECT p.id AS pocket_id, p.entity_id, p.target_at, p.target_amount AS amount,name, p.reminder_count, p.last_reminder_sent_at
+  FROM pockets p
+  LEFT JOIN deposits d ON p.id = d.pocket_id
+  WHERE p.status = 'In Progress'
+  AND p.target_at < NOW()  - INTERVAL '14 days'
   AND (d.created_at < NOW() - INTERVAL '30 days' OR d.created_at IS NULL)
 `);
 
@@ -37,34 +37,34 @@ const SQL_GET_PHONE_NUMBER = sql<{ entity_id: number; }, { phone_number: string;
   WHERE user_id = :entity_id;
 `);
 
-const SQL_UPDATE_GOAL_REMINDER = sql<UpdateGoalReminder, Record<string, never>>(`
-  UPDATE goals 
+const SQL_UPDATE_POCKET_REMINDER = sql<UpdatePocketReminder, Record<string, never>>(`
+  UPDATE pockets 
   SET last_reminder_sent_at = :last_reminder_sent_at, reminder_count = :reminder_count
-  WHERE id = :goal_id
+  WHERE id = :pocket_id
 `);
 
-export default async function remindStaleGoals() {
-  console.log('Checking for stale goals...');
+export default async function remindStalePockets() {
+  console.log('Checking for stale pockets...');
 
   const currentTime = new Date();
-  const overdueGoals = await SQL_GET_OVERDUE_GOALS({}).many();
+  const overduePockets = await SQL_GET_OVERDUE_POCKETS({}).many();
  
-  for (const goal of overdueGoals) {
-    const { goal_id, entity_id, amount, target_at,reminder_count , last_reminder_sent_at,name } = goal;
+  for (const pocket of overduePockets) {
+    const { pocket_id, entity_id, amount, target_at,reminder_count , last_reminder_sent_at,name } = pocket;
     const timeDifference = currentTime.getTime() - last_reminder_sent_at.getTime();
     const daysDifference = timeDifference / (1000 * 3600 * 24);
 
     if(reminder_count < 3 && daysDifference >= 7){
       const { phone_number } = await SQL_GET_PHONE_NUMBER({ entity_id }).one();
-      const message = `Hi! A gentle reminder that your saving goal ${name} of ${amount} is overdue by 30 days. 
-                       Consider taking action to reach your saving goal by ${target_at}.`;
+      const message = `Hi! A gentle reminder that your saving pocket ${name} of ${amount} is overdue by 30 days. 
+                       Consider taking action to reach your saving pocket by ${target_at}.`;
       sendSms(phone_number, message);
-      await SQL_UPDATE_GOAL_REMINDER({ goal_id, last_reminder_sent_at: currentTime, reminder_count: 1 }).exec();
+      await SQL_UPDATE_POCKET_REMINDER({ pocket_id, last_reminder_sent_at: currentTime, reminder_count: 1 }).exec();
     }
 
   }
 
-  console.log('Stale goalss reminders sent');
+  console.log('Stale pocketss reminders sent');
 }
 
 

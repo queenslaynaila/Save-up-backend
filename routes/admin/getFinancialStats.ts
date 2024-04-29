@@ -33,7 +33,7 @@ export default (router: Router) => {
       
       let query = `SELECT COALESCE(${operator}(amount), 0) AS ${operator} FROM ${resource} WHERE 1=1`;
 
-      if (['savings', 'expenses'].includes(resource)) {
+      if (['deposits', 'expenses'].includes(resource)) {
         if (user_id) query += ` AND user_id = '${user_id}'`;
         if (category_id) query += ` AND category_id = '${category_id}'`;
         if (priority) query += ` AND priority = '${priority}'`;
@@ -41,7 +41,7 @@ export default (router: Router) => {
         if (end_date) query += ` AND completed_date <= '${end_date}'`;
       }
 
-      if (resource === 'savings' && status) {
+      if (resource === 'deposits' && status) {
         query += ` AND status = '${formattedStatus}'`;
       }
 

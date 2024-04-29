@@ -8,7 +8,7 @@ import swaggerJsDoc from "swagger-jsdoc";
 import usersRoutes from './routes/users/index';
 import nextOfKinRoutes from './routes/nextOfKin/index';
 import categoriesRoutes from './routes/categories/index';
-import savingsRoutes from './routes/pockets/index';
+import pocketRoutes from './routes/pockets/index';
 import expensesRoutes from './routes/expenses/index';
 import depositRoutes from './routes/deposits/index';
 import AdminRoutes from './routes/admin/index';
@@ -85,7 +85,7 @@ app.use(
 // Routes
 usersRoutes(app);
 nextOfKinRoutes(app);
-savingsRoutes(app);
+pocketRoutes(app);
 expensesRoutes(app);
 depositRoutes(app);
 passwordRoutes(app);

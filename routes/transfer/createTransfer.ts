@@ -7,11 +7,11 @@ import { TransferInputInterface, TransferDepositResInterface, TransferDepositBod
 import { MessageInterface } from '../../globalTypes/index'
 
 const SQL_CREATE_TRANSFER = sql<TransferInputInterface, TransferDepositResInterface>(`
-  INSERT INTO transfers (source_goal_id, destination_goal_id, amount, user_id)
-  VALUES (:source_goal_id, :destination_goal_id, :amount, :user_id)
+  INSERT INTO transfers (source_pocket_id, destination_pocket_id, amount, user_id)
+  VALUES (:source_pocket_id, :destination_pocket_id, :amount, :user_id)
   RETURNING 
-    (SELECT name FROM goals WHERE id = :source_goal_id) AS source_goal_name, 
-    (SELECT name FROM goals WHERE id = :destination_goal_id) AS destination_goal_name;
+    (SELECT name FROM pockets WHERE id = :source_pocket_id) AS source_pocket_name, 
+    (SELECT name FROM pockets WHERE id = :destination_pocket_id) AS destination_pocket_name;
 `);
 
 export default (router: Router) => {
@@ -20,14 +20,14 @@ export default (router: Router) => {
     authMiddleware(),
     validateRequest(transferSchema),
     async (req, res) => {
-      const { source_goal_id, destination_goal_id, amount } = req.body
+      const { source_pocket_id, destination_pocket_id, amount } = req.body
       const user_id = req.user!.id
-      const transfer = await SQL_CREATE_TRANSFER({source_goal_id, destination_goal_id, amount, user_id}).oneOrNull();
+      const transfer = await SQL_CREATE_TRANSFER({source_pocket_id, destination_pocket_id, amount, user_id}).oneOrNull();
       if (!transfer){
         throw new HttpError(400, 'There was an error processing your transfer request. Please try again later.');
       }
       return res.json({
-        message: `Trasfer of amount KES ${amount.toFixed(2)} from goal ${transfer.source_goal_name} to goal ${transfer.destination_goal_name} successful!`
+        message: `Trasfer of amount KES ${amount.toFixed(2)} from pocket ${transfer.source_pocket_name} to pocket ${transfer.destination_pocket_name} successful!`
       });      
     });
 };

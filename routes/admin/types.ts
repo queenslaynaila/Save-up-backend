@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const ValidOperatorsEnum = z.enum(['SUM', 'MAX', 'MIN', 'AVG', 'COUNT']);
-export const ValidResourcesEnum = z.enum(['goals', 'savings', 'expenses']);
+export const ValidResourcesEnum = z.enum(['pockets', 'deposits', 'expenses']);
 export const ValidStatusEnum = z.enum(['Completed', 'Dormant', 'In Progress']);
 
 export const statsQuerySchema = z.object({

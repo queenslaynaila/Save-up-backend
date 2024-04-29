@@ -1,10 +1,10 @@
 import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import { DeleteGoal } from './types'
+import { DeletePocket } from './types'
 import { IdParamInterface, MessageInterface } from '../../globalTypes/index'
 
-const SQL_DELETE_POCKET = sql<DeleteGoal, Record<string,never>>(`
+const SQL_DELETE_POCKET = sql<DeletePocket, Record<string,never>>(`
   UPDATE pockets
   SET deleted_at = NOW()
   WHERE id = :id
