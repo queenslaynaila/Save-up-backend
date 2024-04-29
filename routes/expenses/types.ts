@@ -1,14 +1,14 @@
 import { z } from 'zod';
 
 export const baseExpenseSchema = z.object({
-  entity_id: z.number(),
-  category_id: z.number(),
+  entityId: z.number(),
+  categoryId: z.number(),
   description: z.string(),
-  amount_spent: z.number(),
-  date_spent: z.string(),
+  amountSpent: z.number(),
+  dateSpent: z.string(),
 });
   
-export const deleteExpenseSchema = baseExpenseSchema.pick({entity_id: true})
+export const deleteExpenseSchema = baseExpenseSchema.pick({entityId: true})
   
 export type DeleteExpenseInterface = z.infer<typeof deleteExpenseSchema>;
   
@@ -18,7 +18,7 @@ export type CreateExpenseInterface = z.infer<typeof baseExpenseSchema>;
   
 export const expenseSchema = baseExpenseSchema.extend({
   id: z.number(),
-  created_at: z.date()
+  createdAt: z.date()
 })
   
 export type ExpenseInterface = z.infer<typeof expenseSchema>;
@@ -28,7 +28,7 @@ export const updateExpenseSchema = baseExpenseSchema.partial().extend({id: z.num
 export type UpdateExpenseInterface = z.infer<typeof updateExpenseSchema>;
   
 export const validateUpdateExpenseSchema = updateExpenseSchema.omit({
-  entity_id:true,
+  entityId:true,
   id:true
 })
   
@@ -40,7 +40,7 @@ export type ExpenseIdInterface = z.infer<typeof expenseIdSchema>;
   
 export const expenseByIdSchema = z.object({
   id: z.number(),
-  entity_id: z.number(),
+  entityId: z.number(),
 });
   
 export type ExpenseByIdInterface = z.infer<typeof expenseByIdSchema>;
@@ -52,9 +52,9 @@ export const expenseIdentifierSchema = z.object({
 export type ExpenseIdentifierInterface = z.infer<typeof expenseIdentifierSchema>;
   
 export const expenseQuerySchema = z.object({
-  category_id: z.string().optional(),
-  start_date: z.string().optional(),
-  end_date: z.string().optional(),
+  categoryId: z.string().optional(),
+  startDate: z.string().optional(),
+  endDate: z.string().optional(),
 });
   
 export type ExpenseQueryInterface = z.infer<typeof expenseQuerySchema>;
