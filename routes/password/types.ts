@@ -7,7 +7,7 @@ export const resetPinSchema = z.object({
 export type ResetPinInterface = z.infer<typeof resetPinSchema>
 
 export const verifyAnswerSchema = z.object({
-  question_id: z.number(),
+  questionId: z.number(),
   answer: z.string(),
 })
 
@@ -15,7 +15,7 @@ export type VerifyAnswerInterface = z.infer<typeof verifyAnswerSchema>
 
 export const securityAnswersRequestSchema = z.object({
   message: z.string(),
-  user_id: z.number(),
+  userId: z.number(),
   answers: z.array(verifyAnswerSchema),
 });
 
@@ -28,9 +28,9 @@ export const tokenSchema = z.object({
 export type TokenInterface = z.infer<typeof tokenSchema>
 
 export const verifyTokenSchema = securityAnswersRequestSchema.pick({
-  user_id:true
+  userId:true
 }).extend({
-  reset_token: z.string()
+  resetToken: z.string()
 })
 
 export type VerifyTokenInterface = z.infer<typeof verifyTokenSchema>
@@ -43,7 +43,7 @@ export const updatePasswordSchema = z.object({
 export type UpdatePasswordInterface = z.infer<typeof updatePasswordSchema>
 
 export const securityQuestionSchema = z.object({
-  question_id: z.number(),
+  questionId: z.number(),
   question: z.string(),
 })
 
@@ -54,16 +54,16 @@ export const securityQuestionArray = z.array(securityQuestionSchema)
 export type SecurityQuestionArray = z.infer<typeof securityQuestionArray>
 
 export const updateTokenUsage = verifyTokenSchema.pick({
-  reset_token: true
+  resetToken: true
 }).extend({
-  user_id:z.number()
+  userId:z.number()
 })
 
 export type UpdateTokenUsageInterface = z.infer<typeof updateTokenUsage>
 
 export const resetPasswordSchema = z.object({
   id: z.number(),  
-  new_password: z.string()
+  newPassword: z.string()
 })
 
 export type ResetPasswordInterface = z.infer<typeof resetPasswordSchema>
@@ -76,7 +76,7 @@ export const resetPasswordRequest = z.object({
 export type ResetPasswordRequestInterface = z.infer<typeof resetPasswordRequest>
 
 export const initiatePasswordResetSchema = verifyTokenSchema.pick({
-  user_id: true
+  userId: true
 }).extend({
   token: z.string()
 })

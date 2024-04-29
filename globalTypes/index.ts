@@ -32,7 +32,7 @@ export const getByuserSchema = z.object({
 export type GetByUserInterface = z.infer<typeof getByuserSchema>
 
 export const getByPhone = z.object({
-  phone_number: z.string()
+  phoneNumber: z.string()
 })
 
 export type GetByPhoneInterface = z.infer<typeof getByPhone>;
