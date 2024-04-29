@@ -9,12 +9,12 @@ const ACCEPTED_STATUS_VALUES = ['In Progress', 'Dormant', 'Completed'];
 const ACCEPTED_PRIORITY_VALUES = ['High', 'Intermediate', 'Low'];
 
 const SQL_GET_POCKETS = sql<Record<string, never>, GoalInterface>(`
-  SELECT g.id, g.name, g.entity_id, g.category_id, g.amount, g.priority,
-         g.target_at, g.created_at, g.completed_at, g.updated_at, g.goal_type, 
+  SELECT p.id, p.name, p.entity_id, p.category_id, p.amount, p.priority,
+         p.target_at, p.created_at, p.completed_at, p.updated_at, p.pocket_type, 
          ir.rate AS interest_rate
-  FROM goals g
-  LEFT JOIN interest_rates ir ON g.goal_type = ir.type
-  WHERE g.deleted_at IS NULL;
+  FROM pockets p
+  LEFT JOIN interest_rates ir ON p.pocket_type = ir.type
+  WHERE p.deleted_at IS NULL;
 `);
 
 export default (router: Router) => {

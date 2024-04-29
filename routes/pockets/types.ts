@@ -6,9 +6,9 @@ export const enum priority {
   LOW = 'Low',
 }
   
-export enum goalType {
-  STANDARD = 'Standard Goals',
-  LOCKED = 'Locked Goals',
+export enum pocketType {
+  STANDARD = 'Standard Pockets',
+  LOCKED = 'Locked Pockets',
 }
   
 export const baseGoalSchema = z.object({
@@ -18,7 +18,7 @@ export const baseGoalSchema = z.object({
   target_amount: z.number(),
   priority: z.enum([priority.HIGH, priority.INTERMEDIATE, priority.LOW]),
   target_at: z.string(),
-  goal_type: z.enum([goalType.STANDARD, goalType.LOCKED])
+  pocket_type: z.enum([pocketType.STANDARD, pocketType.LOCKED])
 });
   
 export type CreateGoalInterface = z.infer<typeof baseGoalSchema>;
@@ -53,7 +53,7 @@ export type GoalUpdateRes = z.infer<typeof goalUpdateResSchema >;
 const UpgradeGoalSubsetSchema = z.object({
   target_at: z.date().optional(),
   id: z.number(),
-  goal_type:z.string()
+  pocket_type:z.string()
 });
   
 export type UpgradeGoalSubset = z.infer<typeof UpgradeGoalSubsetSchema>;

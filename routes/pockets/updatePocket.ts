@@ -7,12 +7,12 @@ import { IdParamInterface } from '../../globalTypes/index';
 import { validateRequest } from '../../middleware/validationMiddleware';
 
 const SQL_UPDATE_POCKET = sql<UpdateGoalInterface, GoalUpdateRes>(`
-  UPDATE goals
-  SET name = COALESCE(:name, goals.name),
-      category_id = COALESCE(:category_id, goals.category_id),
-      target_amount = COALESCE(:target_amount, goals.target_amount),
-      priority = COALESCE(:priority, goals.priority),
-      target_at = COALESCE(:target_at, goals.target_at)
+  UPDATE pockets
+  SET name = COALESCE(:name, pockets.name),
+      category_id = COALESCE(:category_id, pockets.category_id),
+      target_amount = COALESCE(:target_amount, pockets.target_amount),
+      priority = COALESCE(:priority, pockets.priority),
+      target_at = COALESCE(:target_at, pockets.target_at)
   WHERE id = :id 
   RETURNING name, category_id, target_amount, priority, target_at
 `);
@@ -23,10 +23,10 @@ export default (router: Router) => {
     authMiddleware(), 
     validateRequest(UpdateGoalRequestSchema),
     async (req, res) => {
-      const goalId = parseInt(req.params.id);
+      const pocketId = parseInt(req.params.id);
       const { name, category_id, target_amount, priority, target_at } = req.body;
       const goal = await SQL_UPDATE_POCKET({
-        id: goalId,
+        id: pocketId,
         name,
         category_id,
         target_amount,

@@ -6,12 +6,12 @@ import { GoalInterface } from './types';
 import { IdParamInterface, IdInterface } from '../../globalTypes/index';
 
 const SQL_GET_POCKET_BY_ID = sql<IdInterface, GoalInterface>(`
-  SELECT g.id, g.name, g.entity_id, g.category_id, g.amount, g.priority, g.target_at,
-    g.created_at, g.completed_at, g.updated_at, g.goal_type, ir.rate AS interest_rate
-  FROM goals g
-  LEFT JOIN interest_rates ir ON g.goal_type = ir.type
-  WHERE g.id = :id  
-  AND g.deleted_at IS NULL;
+  SELECT p.id, p.name, p.entity_id, p.category_id, p.amount, p.priority, p.target_at,
+    p.created_at, p.completed_at, p.updated_at, p.pocket_type, ir.rate AS interest_rate
+  FROM pockets p
+  LEFT JOIN interest_rates ir ON p.pocket_type = ir.type
+  WHERE p.id = :id  
+  AND p.deleted_at IS NULL;
 `);
 
 export default (router: Router) => {
@@ -19,9 +19,9 @@ export default (router: Router) => {
     '/records/:id', 
     authMiddleware(), 
     async (req, res) => {
-      const goalId = (parseInt(req.params.id));
-      const query = SQL_GET_POCKET_BY_ID({ id: goalId });
-      const goal = await query.one(new HttpError(404, 'Not found'));
-      return res.json(goal);
+      const pocketId = (parseInt(req.params.id));
+      const query = SQL_GET_POCKET_BY_ID({ id: pocketId });
+      const pocket = await query.one(new HttpError(404, 'Not found'));
+      return res.json(pocket);
     });
 };

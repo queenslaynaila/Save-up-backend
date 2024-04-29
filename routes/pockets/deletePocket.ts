@@ -5,7 +5,7 @@ import { DeleteGoal } from './types'
 import { IdParamInterface, MessageInterface } from '../../globalTypes/index'
 
 const SQL_DELETE_POCKET = sql<DeleteGoal, Record<string,never>>(`
-  UPDATE goals
+  UPDATE pockets
   SET deleted_at = NOW()
   WHERE id = :id
   AND entity_id = :entity_id
@@ -19,6 +19,6 @@ export default (router: Router) => {
       const id = parseInt(req.params.id);
       const userId = req.user!.id;
       await SQL_DELETE_POCKET({ id, entity_id: userId }).exec();
-      return res.json({ message: 'Goal deleted successfully' });
+      return res.json({ message: 'Pocket deleted successfully' });
     });
 };
