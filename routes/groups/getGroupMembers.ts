@@ -17,7 +17,7 @@ const SQL_GET_GROUP_MEMBERS = sql<GroupInterface, GetGroupMembersInterface>(`
   users u ON ug.user_id = u.id
   LEFT JOIN 
   group_administrators ga ON ug.user_id = ga.user_id AND ug.group_id = ga.group_id
-  WHERE  ug.group_id = :group_id AND ug.left_at IS NULL
+  WHERE  ug.group_id = :groupId AND ug.left_at IS NULL
   ORDER BY ug.joined_at ASC;
 `);
 
@@ -26,8 +26,8 @@ export default (router: Router) => {
     '/:group_id',
     authMiddleware(),
     async (req, res) => {
-      const  group_id  = parseInt(req.params.id); 
-      const groups = await SQL_GET_GROUP_MEMBERS({ group_id}).many();
+      const  groupId  = parseInt(req.params.id); 
+      const groups = await SQL_GET_GROUP_MEMBERS({ groupId}).many();
       return res.json(groups);
     }
   );

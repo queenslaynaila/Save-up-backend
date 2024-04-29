@@ -6,14 +6,14 @@ import { CreateGroupInterface, CreateGroupResponseInterface, baseGroupSchema, En
 
 const SQL_CREATE_GROUP_ENTITY = sql<EntityTypeInterface, IdRequestInterface>(`
   INSERT INTO entities (entity_type)
-  VALUES (:entity_type)
+  VALUES (:entityType)
   RETURNING id
 `);
 
 const SQL_CREATE_GROUP = sql<CreateGroupInterface, CreateGroupResponseInterface>(`
-  INSERT INTO groups (id,group_name,description,created_by)
-  VALUES (:id,:group_name,:description,:created_by)
-  RETURNING id,group_name,description,created_by,created_at,updated_at
+  INSERT INTO groups (id, group_name, description, created_by)
+  VALUES (:id, :groupName, :description, :createdBy)
+  RETURNING id, groupName, description, createdBy, createdAt, updatedAt
 `);
 
 export default (router: Router) => {
@@ -22,10 +22,10 @@ export default (router: Router) => {
     authMiddleware(),
     validateRequest(baseGroupSchema),
     async (req, res) => {
-      const user_id= req.user!.id
-      const entity = await SQL_CREATE_GROUP_ENTITY({ entity_type: 'Groups' }).one();
-      const { group_name, description} = req.body;
-      const group = await SQL_CREATE_GROUP({ id:entity.id, group_name, description, created_by: user_id }).one();
+      const userId= req.user!.id
+      const entity = await SQL_CREATE_GROUP_ENTITY({ entityType: 'Groups' }).one();
+      const { groupName, description} = req.body;
+      const group = await SQL_CREATE_GROUP({ id:entity.id, groupName, description, createdBy: userId }).one();
       res.json(group)
     }
   );
