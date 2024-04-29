@@ -8,10 +8,10 @@ import { MessageInterface } from '../../globalTypes/index'
 
 const SQL_CREATE_TRANSFER = sql<TransferInputInterface, TransferDepositResInterface>(`
   INSERT INTO transfers (source_pocket_id, destination_pocket_id, amount, user_id)
-  VALUES (:source_pocket_id, :destination_pocket_id, :amount, :user_id)
+  VALUES (:sourcePocketId, :destinationPocketId, :amount, :userId)
   RETURNING 
-    (SELECT name FROM pockets WHERE id = :source_pocket_id) AS source_pocket_name, 
-    (SELECT name FROM pockets WHERE id = :destination_pocket_id) AS destination_pocket_name;
+    (SELECT name FROM pockets WHERE id = :sourcePocketId) AS source_pocket_name, 
+    (SELECT name FROM pockets WHERE id = :destinationPocketId) AS destination_pocket_name;
 `);
 
 export default (router: Router) => {
@@ -20,9 +20,9 @@ export default (router: Router) => {
     authMiddleware(),
     validateRequest(transferSchema),
     async (req, res) => {
-      const { source_pocket_id, destination_pocket_id, amount } = req.body
-      const user_id = req.user!.id
-      const transfer = await SQL_CREATE_TRANSFER({source_pocket_id, destination_pocket_id, amount, user_id}).oneOrNull();
+      const { sourcePocketId, destinationPocketId, amount } = req.body
+      const userId = req.user!.id
+      const transfer = await SQL_CREATE_TRANSFER({ sourcePocketId, destinationPocketId, amount, userId}).oneOrNull();
       if (!transfer){
         throw new HttpError(400, 'There was an error processing your transfer request. Please try again later.');
       }
