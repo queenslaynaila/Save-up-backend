@@ -70,7 +70,7 @@ const specs = swaggerJsDoc(options);
 
 // Middleware
 const app = express();
-app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(specs));
+app.use("/", swaggerUI.serve, swaggerUI.setup(specs));
 app.use(express.urlencoded({ extended: false, limit: '10mb' }));
 app.use(express.json());
 app.use(morgan('dev'));

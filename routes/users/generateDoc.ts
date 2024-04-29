@@ -2,7 +2,8 @@ import { z } from "zod";
 import * as yaml from 'yaml';
 import * as fs from 'fs';
 import { OpenAPIRegistry, OpenApiGeneratorV3, extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
-import { baseUserSchema, updateUserPhoneSchema, GetUserSchema  } from './types';
+import {  updateUserPhoneSchema, GetUserSchema  } from './types';
+import { messageSchema }  from '../../globalTypes/index';
 
 extendZodWithOpenApi(z);
 const registry = new OpenAPIRegistry();
@@ -23,9 +24,10 @@ const createUser = {
     body: {
       content: {
         'application/json': {
-          schema: baseUserSchema,
+          schema: messageSchema,
         },
       },
+      description: 'Success message on succesful user creation',
     },
   },
   responses: {
@@ -57,7 +59,7 @@ const login = {
   }, 
   responses: {
     200: {
-      description: 'Looged in successfully',
+      description: 'Logged in successfully',
       content: {
         'application/json': {
           schema: GetUserSchema
@@ -73,7 +75,6 @@ const login = {
   }
 };
 
-  
 const getUserByCriteria = {
   method: Method.GET,
   path: '/users/{targetUser}',
@@ -82,8 +83,7 @@ const getUserByCriteria = {
   request: {
     params: z.object({
       targetUser: z.string()
-    },
-    )
+    })
   },
   responses: {
     200: {
@@ -99,6 +99,7 @@ const getUserByCriteria = {
     }
   }
 };
+
 
 const updateUserPhoneNo = {
   method: Method.PATCH,
@@ -137,13 +138,14 @@ const logout = {
   tags: ['Users'],
   responses: {
     200: {
-      description: 'Logout successfull',
+      description: 'Logout successful',
     },
     500: {
       description: 'Internal server error.'
     }
   }
 };
+
 
 registry.registerPath(createUser);
 registry.registerPath(login);
@@ -159,12 +161,12 @@ function getOpenApiDocumentation() {
     info: {
       version: '1.0.0',
       title: 'SAPI',
-      description: 'API for managing savings',
+      description: 'API for managing users',
     },
     tags: [
       { name: 'Users', description: 'Endpoints for managing users' },
     ],
-    openapi: ""
+    openapi: "3.0.0"
   });
 }
 
@@ -176,5 +178,6 @@ function writeDocumentation() {
     encoding: 'utf-8',
   });
 }
+
 
 writeDocumentation();
