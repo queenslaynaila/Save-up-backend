@@ -18,24 +18,24 @@ export const securityAnswerValidationSchema = updateSecurityAnswerSchema.pick({
 })
 
 export const createSecurityAnswerSchema = z.object({
-  user_id: z.number(),
-  question_id: z.number(),
+  userId: z.number(),
+  questionId: z.number(),
   answer: z.string()
 });
   
 export type CreateSecurityAnswerInterface = z.infer<typeof createSecurityAnswerSchema>;
   
-export const securityAnswerRequestSchema = createSecurityAnswerSchema.omit({ user_id: true});
+export const securityAnswerRequestSchema = createSecurityAnswerSchema.omit({ userId: true});
   
 export const securityAnswerSchema = createSecurityAnswerSchema.extend({
   id: z.number(),
-  created_at: z.date()
+  createdAt: z.date()
 })
   
 export type SecurityAnswerInterface = z.infer<typeof securityAnswerSchema>;
 
 export const checkAnswerSchema = z.object({
-  has_security_answer: z.boolean()
+  hasSecurityAnswer: z.boolean()
 })
 
 export type CheckAnswerInterface = z.infer<typeof checkAnswerSchema>;

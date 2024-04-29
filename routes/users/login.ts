@@ -6,8 +6,8 @@ import { generateToken } from '../../middleware/generatetoken';
 import { validateRequest } from '../../middleware/validationMiddleware';
 import { updateUserPhoneSchema, UpdatePhoneInterface, ExtendedUserInterface, GetUserInterface } from './types';
 
-const SQL_GET_USER_ENTITY_ID = sql<{ phone_number: string }, { id: number }>(`
-  SELECT id FROM user_contact_details WHERE phone_number = :phone_number
+const SQL_GET_USER_ENTITY_ID = sql<{ phoneNumber: string }, { id: number }>(`
+  SELECT id FROM user_contact_details WHERE phone_number = :phoneNumber
 `);
 
 const SQL_GET_USER = sql<{ id: number }, ExtendedUserInterface>(`
@@ -20,8 +20,8 @@ export default (router: Router) => {
     validateRequest(updateUserPhoneSchema),
     async (req, res) => {
 
-      const { phone_number , pin } = req.body;
-      const entity_id = await SQL_GET_USER_ENTITY_ID({ phone_number }).one(
+      const { phoneNumber , pin } = req.body;
+      const entity_id = await SQL_GET_USER_ENTITY_ID({ phoneNumber }).one(
         new HttpError(404, 'User Not found')
       );
       const user = await SQL_GET_USER({ id: entity_id.id }).one();
@@ -32,10 +32,10 @@ export default (router: Router) => {
       }
       const userResult = {
         id: user.id,
-        full_name: user.full_name,
+        fullName: user.fullName,
         gender: user.gender,
         role: user.role,
-        created_at: user.created_at,
+        createdAt: user.createdAt,
       };
 
       const accessToken = generateToken(user.id, user.role, '1d');

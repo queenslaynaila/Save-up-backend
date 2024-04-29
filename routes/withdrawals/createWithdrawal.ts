@@ -19,14 +19,14 @@ const SQL_CREATE_WITHDRAWAL = sql<WithdrawalRequest, Record<string,never>>(`
     LEFT JOIN 
        deposits d ON d.pocket_id = p.id
     WHERE 
-        p.id = :pocket_id
-        AND p.entity_id = :user_id
+        p.id = :pocketId
+        AND p.entity_id = :userId
         AND (p.pocket_type = 'Standard Pocket' OR NOW() >= p.target_at)
     GROUP BY 
         p.id, g.name, p.is_locked_pocket,p.entity_id
   )
   INSERT INTO withdrawals (pocket_id, user_id, amount)
-  SELECT c.pocket_id :user_id, :amount
+  SELECT c.pocketId :userId, :amount
   FROM can_withdraw c
   WHERE c.total_saved >= :amount  
   RETURNING c.pocket_name;
@@ -37,14 +37,14 @@ export default (router: Router) => {
     '/', 
     authMiddleware(),
     async (req, res) => {
-      const { pocket_id, amount} = req.body
-      const user_id = req.user!.id
-      const pocket_name= await SQL_CREATE_WITHDRAWAL({ pocket_id, user_id, amount }).oneOrNull();
-      if (!pocket_name){
+      const { pocketId, amount} = req.body
+      const userId = req.user!.id
+      const pocketName= await SQL_CREATE_WITHDRAWAL({ pocketId, userId, amount }).oneOrNull();
+      if (!pocketName){
         throw new HttpError(400, 'There was an error processing your withdrawal request. Please try again later.');
       }
       return res.json({
-        message: `Withdrawal of amount KES ${amount.toFixed(2)} from pocket ${pocket_name} successful!`
+        message: `Withdrawal of amount KES ${amount.toFixed(2)} from pocket ${pocketName} successful!`
       });      
     });
 };

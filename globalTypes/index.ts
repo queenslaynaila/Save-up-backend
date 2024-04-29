@@ -26,7 +26,7 @@ export const idParamSchema = z.object({
 export type IdParamInterface = z.infer<typeof idParamSchema>;
 
 export const getByuserSchema = z.object({
-  user_id: z.number()
+  userId: z.number()
 })
 
 export type GetByUserInterface = z.infer<typeof getByuserSchema>

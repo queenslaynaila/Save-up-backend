@@ -9,7 +9,7 @@ const SQL_CHECK_SECURITY_ANSWER = sql<GetByUserInterface, CheckAnswerInterface>(
     SELECT EXISTS(
         SELECT 1
         FROM security_answers
-        WHERE user_id = :user_id
+        WHERE user_id = :userId
     ) AS has_security_answer;  
 `);
 
@@ -20,7 +20,7 @@ export default (router: Router) => {
     validateRequest(securityAnswerValidationSchema),
     async (req, res) => {
       const loggedInUserId = req.user!.id; 
-      const checkAnswer = await SQL_CHECK_SECURITY_ANSWER({user_id: loggedInUserId}).one();
+      const checkAnswer = await SQL_CHECK_SECURITY_ANSWER({userId: loggedInUserId}).one();
       return res.json(checkAnswer);
     }
   );

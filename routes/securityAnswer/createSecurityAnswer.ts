@@ -8,7 +8,7 @@ import {  MessageInterface } from '../../globalTypes/index';
 
 const SQL_CREATE_ANSWER = sql<CreateSecurityAnswerInterface ,Record<string,never>>(`
   INSERT INTO security_answers ( user_id, question_id, answer) 
-  VALUES (:user_id, :question_id, :answer)
+  VALUES (:userId, :questionId, :answer)
 `); 
 
 export default (router: Router) => {
@@ -17,10 +17,10 @@ export default (router: Router) => {
     authMiddleware(), 
     validateRequest(securityAnswerRequestSchema),
     async (req, res) => {
-      const user_id = req.user!.id;
-      const { question_id , answer } = req.body;
+      const userId = req.user!.id;
+      const { questionId , answer } = req.body;
       const hashedAnswer = await bcrypt.hash(answer, 12);
-      await SQL_CREATE_ANSWER({ user_id,  question_id, answer: hashedAnswer }).exec();
+      await SQL_CREATE_ANSWER({ userId,  questionId, answer: hashedAnswer }).exec();
       res.json({ message: 'Security answer created successfully' });
     });
 };
