@@ -7,11 +7,11 @@ import { IdParamInterface } from '../../globalTypes/index';
 
 const SQL_UPDATE_KIN = sql<UpdateNextOfKinInterface, NextOfKinInterface>(`
   UPDATE next_of_kins
-  SET full_name = COALESCE(:full_name, next_of_kins.full_name),
+  SET full_name = COALESCE(:fullName, next_of_kins.full_name),
       relationship = COALESCE(:relationship, next_of_kins.relationship),
       email = COALESCE(:email, next_of_kins.email),
-      phone_number = COALESCE(:phone_number, next_of_kins.phone_number)
-  WHERE user_id = :user_id 
+      phone_number = COALESCE(:phoneNumber, next_of_kins.phone_number)
+  WHERE user_id = :userId 
   AND id = :id 
   AND deleted_at IS NULL
   RETURNING id ,full_name, relationship, email, phone_number, created_at, updated_at
@@ -25,10 +25,10 @@ export default (router: Router) => {
     authMiddleware(),
     validateRequest(nextOfKinRequest),
     async (req, res) => {
-      const user_id = req.user!.id;
+      const userId = req.user!.id;
       const id = parseInt(req.params.id);
-      const { full_name, relationship, email, phone_number } = req.body;
-      const result = await SQL_UPDATE_KIN({ id, user_id, full_name, relationship, email, phone_number }).one();
+      const { fullName, relationship, email, phoneNumber } = req.body;
+      const result = await SQL_UPDATE_KIN({ id, userId, fullName, relationship, email, phoneNumber }).one();
       res.json(result);
     }
   );

@@ -6,7 +6,7 @@ import { NextOfKinInterface, GetNextOfKinInterface } from './types';
 const SQL_GET_KIN = sql<GetNextOfKinInterface, NextOfKinInterface>(`
   SELECT user_id, id, full_name, relationship, email, phone_number, created_at, updated_at, deleted_at
   FROM next_of_kins 
-  WHERE user_id = :user_id
+  WHERE user_id = :userId
   AND deleted_at is null
 `);
 
@@ -15,16 +15,16 @@ export default (router: Router) => {
     '/', 
     authMiddleware(), 
     async (req, res) => { 
-      const user_id = req.user!.id
-      const nextOfKin = await SQL_GET_KIN({user_id}).one()
+      const userId = req.user!.id
+      const nextOfKin = await SQL_GET_KIN({ userId }).one()
       const nextOfKinResponse = {
         id: nextOfKin.id,
-        full_name: nextOfKin.full_name,
+        fullName: nextOfKin.fullName,
         relationship: nextOfKin.relationship,
         email: nextOfKin.email,
-        phone_number: nextOfKin.phone_number,
-        created_at: nextOfKin.created_at,
-        updated_at: nextOfKin.updated_at
+        phoneNumber: nextOfKin.phoneNumber,
+        createdAt: nextOfKin.createdAt,
+        updatedAt: nextOfKin.updatedAt
       };
       return res.json(nextOfKinResponse);
     });
