@@ -11,10 +11,10 @@ const registry = new OpenAPIRegistry();
 registry.registerPath({
   method: Method.GET,
   path: '/transactions',
-  summary: 'Get all transactions for a particular user',
+  summary: 'Get all transactions for a particular pocket.',
   tags: ['Transactions'],
   request: {
-    params: idParamSchema
+    params: idParamSchema,
   },
   responses: {
     200: {

@@ -13,11 +13,11 @@ export const getTransactionsInputSchema = z.object({
 export type GetTransactionsInput = z.infer<typeof getTransactionsInputSchema>;
 
 export const getTransactionRespSchema = z.object({
-  transactionId: z.number().positive(),
-  transactionType: z.enum([transactionType.DEPOSIT, transactionType.WITHDRAWAL, transactionType.TRANSFER]),
+  transaction_id: z.number().positive(),
+  transaction_type: z.enum([transactionType.DEPOSIT, transactionType.WITHDRAWAL, transactionType.TRANSFER]),
   amount: z.number(),
-  transactionDate: z.string(),
-  transferFrom: z.string() || null
+  transaction_date: z.string(),
+  transfer_from: z.string() || null
 })
 
 export type GetTransactionResp = z.infer<typeof getTransactionRespSchema>;

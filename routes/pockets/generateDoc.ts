@@ -11,7 +11,7 @@ const registry = new OpenAPIRegistry();
 const createGoal = {
   method: Method.POST,
   path: '/pockets',
-  summary: 'Create a goal',
+  summary: 'Create a pocket / goal',
   tags: ['Pockets'],
   request: {
     body: {
@@ -32,7 +32,7 @@ const createGoal = {
   }
 };
 
-const getGoalByGoalId = {
+const getPocketByPocketId = {
   method: Method.GET,
   path: '/pockets/records/{id}',
   summary: 'Get a pockets details by Id',
@@ -58,9 +58,9 @@ const getGoalByGoalId = {
   }
 };
   
-const getGoalsByCriteria = {
+const getPocketsByCriteria = {
   method: Method.GET,
-  path: '/savings/{savingIdentifier}',
+  path: '/pockets/{savingIdentifier}',
   summary: 'Get savings by criteria',
   tags: ['Pockets'],
   request: {
@@ -86,8 +86,60 @@ const getGoalsByCriteria = {
 };
   
 const DeletePocket = {
-  method: Method.GET,
-  path: '/invitations/my-invites',
+  method: Method.PATCH,
+  path: '/pockets/my-invites',
+  summary: 'Get recived group invites',
+  tags: ['Pockets'],
+  request: {
+    params: idParamSchema
+  },
+  responses: {
+    200: {
+      description: 'Pocket deleted successfully.',
+      content: {
+        'application/json': {
+          schema:messageSchema
+        }
+      }
+    },
+    403: {
+      description: 'Unprocessable entity',
+    },
+    500: {
+      description: 'Internal server error.',
+    }
+  }
+};
+
+const UpdatePocket = {
+  method: Method.PATCH,
+  path: '/pockets/my-invites',
+  summary: 'Get recived group invites',
+  tags: ['Pockets'],
+  request: {
+    params: idParamSchema
+  },
+  responses: {
+    200: {
+      description: 'Pocket deleted successfully.',
+      content: {
+        'application/json': {
+          schema:messageSchema
+        }
+      }
+    },
+    403: {
+      description: 'Unprocessable entity',
+    },
+    500: {
+      description: 'Internal server error.',
+    }
+  }
+};
+
+const UpgradePocket = {
+  method: Method.PATCH,
+  path: '/pockets/my-invites',
   summary: 'Get recived group invites',
   tags: ['Pockets'],
   request: {
@@ -112,9 +164,11 @@ const DeletePocket = {
 };
   
 registry.registerPath(createGoal);
-registry.registerPath(getGoalByGoalId);
-registry.registerPath(getGoalsByCriteria);
+registry.registerPath(getPocketByPocketId);
+registry.registerPath(getPocketsByCriteria);
 registry.registerPath(DeletePocket);
+registry.registerPath(UpdatePocket);
+registry.registerPath(UpgradePocket);
 
 function getOpenApiDocumentation() {
   const generator = new OpenApiGeneratorV3(registry.definitions);
@@ -124,12 +178,12 @@ function getOpenApiDocumentation() {
     info: {
       version: '1.0.0',
       title: 'SAPI',
-      description: 'API for managing invitations',
+      description: 'API for pockets / goals',
     },
     tags: [
-      { name: 'Savings', description: 'Endpoints for managing invitations' },
+      { name: 'Pockets', description: 'Endpoints for managing pockets/goals' },
     ],
-    openapi: ""
+    openapi: "3.0.0"
   });
 }
 

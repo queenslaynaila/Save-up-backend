@@ -11,8 +11,8 @@ const registry = new OpenAPIRegistry();
 registry.registerPath({
   method: Method.POST,
   path: '/transfers',
-  summary: 'Transfer money from main pocket to anotehr',
-  tags: ['Security Questions'],
+  summary: 'Transfer money from main pocket to other subpockets',
+  tags: ['Transfers'],
   request: {
     body: {
       content: {
@@ -24,7 +24,7 @@ registry.registerPath({
   }, 
   responses: {
     200: {
-      description: 'Trasfer of amount KES200 from pocket ${transfer.source_pocket_name} to pocket ${transfer.destination_pocket_name} successful!',
+      description: 'Trasfer of amount KES200 from main pocket to sub pocket successful!',
       content: {
         'application/json': {
           schema:messageSchema
@@ -47,7 +47,7 @@ function getOpenApiDocumentation() {
   return generator.generateDocument({
     info: {
       version: '1.0.0',
-      title: 'transfer API',
+      title: 'Transfer API',
       description: 'API for managing transfers',
     },
     tags: [

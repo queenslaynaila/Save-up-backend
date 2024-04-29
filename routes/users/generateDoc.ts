@@ -18,7 +18,7 @@ const createUser = {
   method: Method.POST,
   path: '/users',
   summary: 'Create a User',
-  tags: ['User'],
+  tags: ['Users'],
   request: {
     body: {
       content: {
@@ -45,7 +45,7 @@ const login = {
   method: Method.POST,
   path: '/users/signin',
   summary: 'Login',
-  tags: ['User'],
+  tags: ['Users'],
   request: {
     body: {
       content: {
@@ -78,7 +78,7 @@ const getUserByCriteria = {
   method: Method.GET,
   path: '/users/{targetUser}',
   summary: 'Get a targetUserByVarious Conditions',
-  tags: ['User'],
+  tags: ['Users'],
   request: {
     params: z.object({
       targetUser: z.string()
@@ -104,7 +104,7 @@ const updateUserPhoneNo = {
   method: Method.PATCH,
   path: '/users/update-phone/{id}',
   summary: 'Update a users phone number',
-  tags: ['User'],
+  tags: ['Users'],
   request: {
     params: z.object({
       id: z.string()
@@ -134,7 +134,7 @@ const logout = {
   method: Method.POST,
   path: '/users/signout',
   summary: 'Get savings by criteria',
-  tags: ['User'],
+  tags: ['Users'],
   responses: {
     200: {
       description: 'Logout successfull',
