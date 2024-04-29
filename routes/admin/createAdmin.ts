@@ -29,7 +29,7 @@ export default (router: Router) => {
       const { fullName, gender, nationalId, phoneNumber, pin } = req.body;
 
       const entity = await SQL_CREATE_USER_ENTITY({ entityType: 'User' }).one();
-      await SQL_CREATE_USER_CONTACTS({ entityId:entity.id, phoneNumber ,nationalId })
+      await SQL_CREATE_USER_CONTACTS({ entityId:entity.id, phoneNumber, nationalId })
         .exec();
       const pinHash = bcrypt.hashSync(pin, 12);
       await SQL_CREATE_USER({ id:entity.id, fullName, role:'Admin', gender,  pin: pinHash })
