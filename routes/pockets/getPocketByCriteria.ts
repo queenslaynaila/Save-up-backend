@@ -34,15 +34,15 @@ export default (router: Router) => {
 
       if (goalsIdentifier === 'me') {
         filterArgs.loggedInUserId= loggedInUserId.toString() ;
-        filterArgs.is_default_vault = 'FALSE';
+        filterArgs.is_default_pocket  = 'FALSE';
         filters.push(`entity_id = :loggedInUserId`);
-        filters.push(`is_default_vault = :is_default_vault`);
+        filters.push(`is_default_pocket  = :is_default_pocket `);
       } 
       else if (goalsIdentifier === 'Default') {
         filterArgs.loggedInUserId= loggedInUserId.toString();
-        filterArgs.is_default_vault = 'TRUE';
+        filterArgs.is_default_pocket  = 'TRUE';
         filters.push(`entity_id = :loggedInUserId`);
-        filters.push(`is_default_vault = :is_default_vault`);
+        filters.push(`is_default_pocket  = :is_default_pocket `);
       } 
       else if (goalsIdentifier === 'all') {
         if (isStandardUser) {
