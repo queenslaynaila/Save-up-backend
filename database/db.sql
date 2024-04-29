@@ -6,7 +6,7 @@ CREATE TYPE enum_invites AS ENUM ('Pending', 'Accepted', 'Rejected');
 CREATE TYPE enum_relationships AS ENUM ('Parent', 'Spouse', 'Sibling', 'Child', 'Relative', 'Lawyer', 'Friend');
 CREATE TYPE enum_genders AS ENUM ('Male', 'Female', 'Prefer not to say');
 CREATE TYPE enum_entities AS ENUM ('User','Groups');
-CREATE TYPE enum_goal_types AS ENUM ('Standard Goal','Locked Goal');
+CREATE TYPE enum_pocket_types AS ENUM ('Standard Pocket','Locked Pocket');
 
 
 --- General Purpose Tables
@@ -51,7 +51,7 @@ VALUES ('Food', 'All food related expenses'),
        ('Savings', 'Funds set aside for future investments or emergencies'),
        ('Debt Repayment', 'Payments towards loans, credit cards, and other debts'),
        ('Travel', 'Expenses or savings related to trips, vacations, and travel activities'),
-       ('Default', 'A flexible space where you can save money without assigning it to specific purposes right away. Funds saved here are readily available for future use and can be easily allocated to other goals whenever you choose.');
+       ('Default', 'A flexible space where you can save money without assigning it to specific purposes right away. Funds saved here are readily available for future use and can be easily allocated to other pockets whenever you choose.');
 
 SELECT create_reference_table('categories');
 
@@ -212,11 +212,11 @@ SELECT create_distributed_table('administrator_votes', 'group_id');
 
 CREATE TABLE IF NOT EXISTS interest_rates (
   id       SERIAL PRIMARY KEY,
-  type     enum_goal_types NOT NULL, 
+  type     enum_pocket_types NOT NULL, 
   rate     DECIMAL(2,2) NOT NULL 
 );
 
-CREATE TABLE IF NOT EXISTS goals ( 
+CREATE TABLE IF NOT EXISTS pockets ( 
   id                      SERIAL PRIMARY KEY,
   entity_id               INT NOT NULL, 
   category_id             INT NOT NULL,
@@ -225,8 +225,8 @@ CREATE TABLE IF NOT EXISTS goals (
   priority                enum_priorities NOT NULL,
   status                  enum_statuses NOT NULL DEFAULT 'In Progress',
   target_at               TIMESTAMP WITH TIME ZONE NOT NULL,
-  is_default_reserve      BOOLEAN NOT NULL DEFAULT FALSE,
-  goal_type               enum_goal_types NOT NULL DEFAULT 'Standard Goal',
+  is_default_pocket       BOOLEAN NOT NULL DEFAULT FALSE,
+  pocket_type             enum_pocket_types NOT NULL DEFAULT 'Standard Pocket',
   reminder_count          INT NOT NULL DEFAULT 0,
   last_reminder_sent_at   TIMESTAMP WITH TIME ZONE,
   created_at              TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
@@ -237,58 +237,58 @@ CREATE TABLE IF NOT EXISTS goals (
   FOREIGN KEY             (category_id) REFERENCES categories(id)
 );
 
--- Index goals for faster retrievals by ownership
-Create INDEX idx_goals_by_entity_id ON goals(entity_id);
-SELECT create_distributed_table('goals', 'id');
+-- Index pockets for faster retrievals by ownership
+Create INDEX idx_pockets_by_entity_id ON pockets(entity_id);
+SELECT create_distributed_table('pockets', 'id');
 
 CREATE TABLE IF NOT EXISTS deposits (
   id                    INT NOT NULL,
-  goal_id               INT NOT NULL,
+  pocket_id             INT NOT NULL,
   user_id               INT,
   donor_name            TEXT,
   donor_email           TEXT,
   donor_phone_number    TEXT,
   amount                NUMERIC(30, 2) NOT NULL,
   created_at            TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  PRIMARY KEY           (goal_id, id), 
+  PRIMARY KEY           (pocket_id, id), 
   FOREIGN KEY           (user_id) REFERENCES users(id),
-  FOREIGN KEY           (goal_id) REFERENCES goals(id)
+  FOREIGN KEY           (pocket_id) REFERENCES pockets(id)
 );
 
-CREATE INDEX idx_deposits_by_goal_id ON deposits(goal_id);
-SELECT create_distributed_table('deposits', 'goal_id');
+CREATE INDEX idx_deposits_by_pocket_id ON deposits(pocket_id);
+SELECT create_distributed_table('deposits', 'pocket_id');
 
 CREATE TABLE IF NOT EXISTS withdrawals (
-  goal_id       INT NOT NULL,
+  pocket_id       INT NOT NULL,
   id            INT NOT NULL,
   user_id       INT NOT NULL,
   amount        NUMERIC(30, 2) NOT NULL CHECK (amount >= 0),
   created_at    TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  PRIMARY KEY   (goal_id, id),
-  FOREIGN KEY   (goal_id) REFERENCES goals(id),
+  PRIMARY KEY   (pocket_id, id),
+  FOREIGN KEY   (pocket_id) REFERENCES pockets(id),
   FOREIGN KEY   (user_id) REFERENCES users(id)
 );
 
-CREATE INDEX idx_withdrawals_by_goal_id ON withdrawals(goal_id);
-SELECT create_distributed_table('withdrawals', 'goal_id');
+CREATE INDEX idx_withdrawals_by_pocket_id ON withdrawals(pocket_id);
+SELECT create_distributed_table('withdrawals', 'pocket_id');
 
--- This records money transfered from default goals (quick save and grp resrve) to other goals 
+-- This records money transfered from default pockets (quick save and grp resrve) to other pockets 
 
 CREATE TABLE IF NOT EXISTS transfers (
-  user_id               INT NOT NULL,
-  id                    INT NOT NULL,
-  source_goal_id        INT NOT NULL,
-  destination_goal_id   INT NOT NULL,
-  amount                NUMERIC(30, 2) NOT NULL,
-  created_at            TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  FOREIGN KEY           (source_goal_id) REFERENCES goals(id),
-  FOREIGN KEY           (destination_goal_id) REFERENCES goals(id),
-  FOREIGN KEY           (user_id) REFERENCES users(id)
+  user_id                 INT NOT NULL,
+  id                      INT NOT NULL,
+  source_pocket_id        INT NOT NULL,
+  destination_pocket_id   INT NOT NULL,
+  amount                  NUMERIC(30, 2) NOT NULL,
+  created_at              TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  FOREIGN KEY             (source_pocket_id) REFERENCES pockets(id),
+  FOREIGN KEY             (destination_pocket_id) REFERENCES pockets(id),
+  FOREIGN KEY             (user_id) REFERENCES users(id)
 );
 
-CREATE INDEX idx_transfers_by_source_goal_id ON transfers(source_goal_id);
-CREATE INDEX idx_transfers_by_destination_goal_id ON transfers(destination_goal_id);
-SELECT create_distributed_table('transfers', 'source_goal_id');
+CREATE INDEX idx_transfers_by_source_pocket_id ON transfers(source_pocket_id);
+CREATE INDEX idx_transfers_by_destination_pocket_id ON transfers(destination_pocket_id);
+SELECT create_distributed_table('transfers', 'source_pocket_id');
 
 CREATE TABLE IF NOT EXISTS expenses (
   entity_id    INT NOT NULL,
@@ -309,9 +309,9 @@ CREATE INDEX idx_expenses_by_entity_id ON expenses(entity_id);
 SELECT create_distributed_table('expenses', 'id');
 
 ===============================================================================================
--- Trigger: Update the status of a goal to Complete when total deeposits exceeds target amount for a goal.
+-- Trigger: Update the status of a pocket to Complete when total deeposits exceeds target amount for a pocket.
 
-CREATE OR REPLACE FUNCTION update_goals_status()
+CREATE OR REPLACE FUNCTION update_pockets_status()
 RETURNS TRIGGER AS $$
 DECLARE
     total_deposits NUMERIC(30, 2);
@@ -320,8 +320,8 @@ BEGIN
     FROM deposits
     WHERE user_id = NEW.user_id AND deposit_id = NEW.deposit_id;
 
-    IF total_deposits >= (SELECT target_amount FROM goals WHERE user_id = NEW.user_id AND id = NEW.deposit_id) THEN
-        UPDATE goals
+    IF total_deposits >= (SELECT target_amount FROM pockets WHERE user_id = NEW.user_id AND id = NEW.deposit_id) THEN
+        UPDATE pockets
         SET status = 'Completed',
             completed_date = NOW()
         WHERE id = NEW.deposit_id;
@@ -334,7 +334,7 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER enforce_update_saving_status
 AFTER INSERT ON deposits
 FOR EACH ROW
-EXECUTE FUNCTION update_goals_status();
+EXECUTE FUNCTION update_pockets_status();
 
 ===============================================================================================
 --Trigger: Adds a group creater as both a member and a group administrator on group creation.
@@ -455,24 +455,24 @@ FOR EACH ROW
 EXECUTE FUNCTION update_admins_on_all_votes();
 
 ===============================================================================================
--- Trigger: Creates a Savings vault for each user or group when either is created.Allows users/groups to save witht a goal in mind.
+-- Trigger: Creates a Savings vault for each user or group when either is created.Allows users/groups to save witht a pocket in mind.
 
 CREATE OR REPLACE FUNCTION create_default_savings_vault()
 RETURNS TRIGGER AS $$
 BEGIN
   IF TG_TABLE_NAME = 'users' THEN 
-    INSERT INTO INSERT INTO goals (entity_id, category_id, name, amount, description, is_default_reserve, priority)
-    VALUES (NEW.id, 11, 'Quick Save','Your personal stash for on-the-go saving.Quick Save lets you easily deposit funds without attaching them to a goal right away.  When you''re ready to put those savings towards a dream trip, rainy day fund, or anything else, simply transfer them to any of your existing goals or create a new one!',TRUE, 0, 'Intermediate');
+    INSERT INTO INSERT INTO pockets (entity_id, category_id, name, amount, description, is_default_pocket, priority)
+    VALUES (NEW.id, 11, 'Wallet','Your digital wallet, a secure place for your on-the-go savings.Your Wallet allows you to deposit funds without immediately assigning them to a specific pocket. When you''re ready to allocate those savings toward a dream vacation, emergency fund, or any other goal, effortlessly transfer them to an existing pocket or create a new one!',TRUE, 0, 'Intermediate');
   ELSE
-    INSERT INTO goals (entity_id, category_id, name, amount, description, is_default_reserve, priority)
-    VALUES (NEW.id, 11, 'Group Reserve', 0, 'Your dedicated space to stash funds as a team. Everyone can contribute on-the-go, without needing a specific goal right away.Once your crew has a plan, simply transfer your savings to a shared goal or create a new one from scratch', TRUE, 'Intermediate');
+    INSERT INTO pockets (entity_id, category_id, name, amount, description, is_default_pocket, priority)
+    VALUES (NEW.id, 11, 'General Fund', 0, 'Your dedicated space to stash funds as a team. Everyone can contribute on-the-go, without needing a specific pocket right away.Once your crew has a plan, simply transfer your savings to a shared pocket or create a new one from scratch', TRUE, 'Intermediate');
   END IF 
 
   RETURN NULL;
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER create_default_savings_goal_trigger
+CREATE TRIGGER create_default_savings_pocket_trigger
 AFTER INSERT ON users OR INSERT ON groups
 FOR EACH ROW
 EXECUTE FUNCTION create_default_savings_vault();
