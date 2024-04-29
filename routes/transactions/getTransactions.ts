@@ -12,7 +12,7 @@ const SQL_GET_TRANSACTIONS = sql<GetTransactionsInput, GetTransactionResp>(`
             NULL AS transfer_from
             d.created_at AS transaction_date
         FROM deposits d
-        WHERE d.pocket_id = :pocket_id
+        WHERE d.pocket_id = :pocketId
 
         UNION ALL
 
@@ -23,7 +23,7 @@ const SQL_GET_TRANSACTIONS = sql<GetTransactionsInput, GetTransactionResp>(`
             NULL AS transfer_from
             w.created_at AS transaction_date
         FROM withdrawals w
-        WHERE w.pocket_id = :pocket_id
+        WHERE w.pocket_id = :pocketId
 
         UNION ALL
 
@@ -34,7 +34,7 @@ const SQL_GET_TRANSACTIONS = sql<GetTransactionsInput, GetTransactionResp>(`
             t.source_pocket_id AS transfer_from
             t.created_at AS transaction_date
         FROM transfers t
-        WHERE t.destination_pocket_id = :pocket_id
+        WHERE t.destination_pocket_id = :pocketId
     ) AS transactions
 `);
 
@@ -42,29 +42,29 @@ export default (router: Router) => {
   router.get<string,IdParamInterface, GetTransactionResp[], Record<string,never>, GetTransactionQuery>(
     '/:pocket_id', 
     async (req, res) => {
-      const pocket_id  = parseInt(req.params.id);
-      const { transaction_type, from_date, to_date } = req.query;
+      const pocketId  = parseInt(req.params.id);
+      const { transactionType, fromDate, toDate } = req.query;
       const filters: string[] = [];
       const filterArgs: Record<string, string | Date> = {};
 
-      if (transaction_type) {
-        filterArgs.transaction_type = transaction_type;
-        filters.push(`transaction_type = :transaction_type`);
+      if (transactionType) {
+        filterArgs.transaction_type = transactionType;
+        filters.push(`transaction_type = :transactionType`);
       }
-      if (from_date) {
-        filterArgs.from_date = from_date;
-        filters.push(`transaction_date >= :from_date`);
+      if (fromDate) {
+        filterArgs.fromDate = fromDate;
+        filters.push(`transaction_date >= :fromDate`);
       }
-      if (to_date) {
-        filterArgs.to_date = to_date;
-        filters.push(`transaction_date <= :to_date`);
+      if (toDate) {
+        filterArgs.toDate = toDate;
+        filters.push(`transaction_date <= :toDate`);
       }
       if (filters.length > 0) {
-        filterArgs.pocket_id = pocket_id.toString();
-        filters.push(`pocket_id = :pocket_id`);
+        filterArgs.pocketId = pocketId.toString();
+        filters.push(`pocket_id = :pocketId`);
       }
 
-      const query = SQL_GET_TRANSACTIONS({ pocket_id });
+      const query = SQL_GET_TRANSACTIONS({ pocketId });
       if (filters.length > 0) query.extend(`WHERE ${filters.join(' AND ')}`, filterArgs);
       query.extend('LIMIT 15', {});
       return res.json(await query.many());
