@@ -13,6 +13,12 @@ export const baseUserSchema = z.object({
   
 export type UserInterface = z.infer<typeof baseUserSchema>;
 
+export const createNewUserSchema = baseUserSchema.extend({
+  entity_type: z.literal('User')
+})
+
+export type CreateNewUserInterface = z.infer<typeof createNewUserSchema>;
+
 export const createUserContactSchema = baseUserSchema.pick({
   national_id: true,
   phone_number: true
