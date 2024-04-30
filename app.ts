@@ -70,7 +70,7 @@ const specs = swaggerJsDoc(options);
 
 // Middleware
 const app = express();
-app.use("/", swaggerUI.serve, swaggerUI.setup(specs));
+app.use("/api", swaggerUI.serve, swaggerUI.setup(specs));
 app.use(express.urlencoded({ extended: false, limit: '10mb' }));
 app.use(express.json());
 app.use(morgan('dev'));
@@ -114,7 +114,8 @@ app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
   if (error instanceof HttpError) {
     return res.status(error.statusCode).json({ error: error.message });
   }
-  return res.status(500).json({ error: 'Internal Server Error' });
+  return res.status(500).json({ error: 'Internal Server error' });
 });
+
 
 export default app;
