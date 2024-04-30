@@ -8,8 +8,8 @@ import { CreateNextOfKinInterface, NextOfKinInterface, nextOfKinCreationSchema }
 const SQL_CREATE_KIN = sql<CreateNextOfKinInterface, NextOfKinInterface>(`
   INSERT INTO next_of_kins (id, user_id, full_name, relationship, email, phone_number)
   VALUES (
-    SELECT COALESCE((SELECT MAX(id) FROM next_of_kins WHERE user_id = :userId), 0) + 1,
-    :userId, :fullName, :relationship, :email, :phoneNumber )
+    SELECT COALESCE((SELECT MAX(id) FROM next_of_kins WHERE user_id = :user_id), 0) + 1,
+    :user_id, :full_name, :relationship, :email, :phone_number )
   RETURNING id, full_name, relationship, email, phone_number;
 `);
 
@@ -19,14 +19,14 @@ export default (router: Router) => {
     authMiddleware(), 
     validateRequest(nextOfKinCreationSchema),
     async (req, res) => {
-      const { fullName,relationship,email,phoneNumber } = req.body;
-      const userId = req.user!.id
+      const { full_name, relationship, email, phone_number } = req.body;
+      const user_id = req.user!.id
       const nextOfKin = await SQL_CREATE_KIN({
-        userId,
-        fullName,
+        user_id,
+        full_name,
         relationship,
         email,
-        phoneNumber
+        phone_number
       }).one(new HttpError(400, 'You already have an existing next of kin. Please update it'));
       return res.json(nextOfKin);
     });
