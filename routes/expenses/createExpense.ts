@@ -6,8 +6,8 @@ import { CreateExpenseInterface, ExpenseInterface, createExpenseSchemaValidation
 
 const SQL_CREATE_EXPENSES = sql<CreateExpenseInterface, ExpenseInterface>(`
   INSERT INTO expenses (id, entity_id, category_id, description, amount_spent, date_spent)
-  VALUES (COALESCE((SELECT MAX(id) FROM expenses WHERE entity_id = :entityId), 0) + 1,
-           :entityId, :categoryId, :description, :amountSpent, :dateSpent )
+  VALUES (COALESCE((SELECT MAX(id) FROM expenses WHERE entity_id = :entity_id), 0) + 1,
+           :entity_id, :category_id, :description, :amount_spent, :date_spent )
   RETURNING id, entity_id, category_id, description, amount_spent, date_spent, created_at;
 `);
 
@@ -17,13 +17,13 @@ export default (router: Router) => {
     authMiddleware(), 
     validateRequest(createExpenseSchemaValidation),
     async (req, res) => {
-      const { description, categoryId, amountSpent, dateSpent, entityId } = req.body;
+      const { description, category_id, amount_spent, date_spent, entity_id } = req.body;
       const expense = await SQL_CREATE_EXPENSES({
         description,
-        categoryId,
-        amountSpent,
-        dateSpent,
-        entityId
+        category_id,
+        amount_spent,
+        date_spent,
+        entity_id
       }).one()
       return res.json(expense);
     });

@@ -8,11 +8,11 @@ import { UpdateExpenseInterface, ExpenseInterface, validateUpdateExpenseSchema }
 const SQL_UPDATE_EXPENSE= sql<UpdateExpenseInterface,ExpenseInterface>(`
   UPDATE expenses
   SET description = COALESCE(:description, expenses.description),
-      category_id = COALESCE(:categoryId, expenses.category_id),
-      amount_spent = COALESCE(:amountSpent, expenses.amount_spent),
-      date_spent = COALESCE(:dateSpent , expenses.date_spent )
-  WHERE entity_id = :entityId AND id = :id
-  RETURNING entity_id, id, category_id, description, amount_spent, date_spent
+      category_id = COALESCE(:category_id, expenses.category_id),
+      amount_spent = COALESCE(:amount_spent, expenses.amount_spent),
+      date_spent = COALESCE(:date_spent , expenses.date_spent )
+  WHERE entity_id = :entity_id AND id = :id
+  RETURNING entity_id,id,category_id,description,amount_spent,date_spent
 `);
 
 export default (router: Router) => {
@@ -23,14 +23,14 @@ export default (router: Router) => {
     async (req, res) => {
       const userId = req.user!.id;
       const expenseId = parseInt(req.params.id);
-      const { description, categoryId, amountSpent, dateSpent} = req.body;
+      const { description, category_id, amount_spent,date_spent} = req.body;
       const result = await SQL_UPDATE_EXPENSE({
-        entityId: userId,
+        entity_id: userId,
         id: expenseId,
         description,
-        categoryId,
-        amountSpent,
-        dateSpent,
+        category_id,
+        amount_spent,
+        date_spent,
       }).one(new HttpError(404, 'Not found'));
       res.json(result);
     });

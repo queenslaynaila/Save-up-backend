@@ -17,7 +17,7 @@ export default (router: Router) => {
     authMiddleware(), 
     async (req, res: Response) => {
       const { expenseIdentifier } = req.params;
-      const { categoryId, startDate, endDate } = req.query;
+      const { category_id, start_date, end_date } = req.query;
       const filterArgs: Record<string, string> = {};
       const filters: string[] = [];
       const loggedInUserId = req.user!.id;
@@ -34,20 +34,20 @@ export default (router: Router) => {
         if (isStandardUser)  {
           throw new HttpError(403, 'Forbidden');
         }
-        filterArgs.userId = expenseIdentifier;
+        filterArgs.user_id = expenseIdentifier;
         filters.push(`entity_id = :user_id`);
       } else {
         throw new HttpError(400, 'Bad request');
       }
 
-      if (startDate && endDate) {
-        filterArgs.startDate = startDate;
-        filterArgs.endDate = endDate;
-        filters.push(`spent_at BETWEEN :startDate AND :endDate`);
+      if (start_date && end_date) {
+        filterArgs.start_date = start_date;
+        filterArgs.end_date = end_date;
+        filters.push(`spent_at BETWEEN :start_date AND :end_date`);
       }
-      if (categoryId) {
-        filterArgs.categoryId = categoryId;
-        filters.push(`categoryId = :categoryId`);
+      if (category_id) {
+        filterArgs.category_id = category_id;
+        filters.push(`category_id = :category_id`);
       }
       const query = SQL_GET_EXPENSES({});
       if (filters.length > 0) query.extend(`AND ${filters.join(' AND ')}`, filterArgs);
