@@ -24,8 +24,8 @@ export default (router: Router) => {
       const answer = await bcrypt.hash(req.body.answer, 12); 
       console.log(req.body)
       await SQL_UPDATE_SECURITY_ANSWER({
-        questionId: securityQuestionId,
-        userId: loggedInUserId,
+        question_id: securityQuestionId,
+        user_id: loggedInUserId,
         answer: answer,
       }).exec();
       return res.json({ message: 'Answer updated successfully' });

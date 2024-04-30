@@ -17,10 +17,10 @@ export default (router: Router) => {
     authMiddleware(), 
     validateRequest(securityAnswerRequestSchema),
     async (req, res) => {
-      const userId = req.user!.id;
-      const { questionId , answer } = req.body;
+      const user_id = req.user!.id;
+      const { question_id , answer } = req.body;
       const hashedAnswer = await bcrypt.hash(answer, 12);
-      await SQL_CREATE_ANSWER({ userId,  questionId, answer: hashedAnswer }).exec();
+      await SQL_CREATE_ANSWER({ user_id, question_id, answer: hashedAnswer }).exec();
       res.json({ message: 'Security answer created successfully' });
     });
 };
