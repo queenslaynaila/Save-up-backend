@@ -1,33 +1,33 @@
 import { z } from 'zod';
 
 export const baseDepositSchema = z.object({
-  userId: z.number(),
-  pocketId: z.number(),
+  user_id: z.number(),
+  goal_id: z.number(),
   amount: z.number(),
-  donorName: z.string().optional(),
-  donorEmail: z.string().email().optional(),
-  donorPhoneNumber:  z.string().refine((value) => /^\+254\d{9}$/.test(value)).optional(),
+  donor_name: z.string().optional(),
+  donor_email: z.string().email().optional(),
+  donor_phone_number:  z.string().refine((value) => /^\+254\d{9}$/.test(value)).optional(),
 });
 
-export const createDepositSchema = baseDepositSchema.omit({ userId: true }).extend({
-  userId: z.number().optional(),
+export const createDepositSchema = baseDepositSchema.omit({ user_id: true }).extend({
+  user_id: z.number().optional(),
 })
   
 export type CreateDepositInterface = z.infer<typeof createDepositSchema>;
   
-export const validateDepositCreationSchema = baseDepositSchema.omit({ userId: true })
+export const validateDepositCreationSchema = baseDepositSchema.omit({ user_id: true })
   
 export const depositSchema = baseDepositSchema.extend({
   id: z.number(),
-  createdAt: z.date(),
+  created_at: z.date(),
 })
   
 export type DepositInterface = z.infer<typeof depositSchema>;
 
 export const depositsQuerySchema = baseDepositSchema.pick({
-  pocketId: true
+  goal_id: true
 }).partial().extend({
-  categoryId: z.string().optional(),
+  category_id: z.string().optional(),
 })
 
 export type DepositsQueryInterface = z.infer<typeof depositsQuerySchema>;

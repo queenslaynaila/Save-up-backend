@@ -14,7 +14,7 @@ export default (router: Router) => {
     '/:identifier',
     async (req, res) => {
       const depositIdentifier = req.params.identifier;
-      const { categoryId, pocketId } = req.query;
+      const { category_id, goal_id } = req.query;
       const filterArgs: Record<string, string> = {};
       const filters: string[] = [];
       const loggedInUserId = req.user!.id;
@@ -32,18 +32,18 @@ export default (router: Router) => {
           throw new HttpError(403, 'Forbidden');
         }
         filterArgs.user_id =  depositIdentifier;
-        filters.push(`user_id = :userId`);
+        filters.push(`user_id = :user_id`);
       } else {
         throw new HttpError(400, 'Bad request');
       }
 
-      if (pocketId) {
-        filterArgs.pocketId = pocketId.toString();
-        filters.push(`pocket_id = :pocketId`);
+      if (goal_id) {
+        filterArgs.goal_id = goal_id.toString();
+        filters.push(`goal_id = :goal_id`);
       }
-      if (categoryId) {
-        filterArgs.categoryId = categoryId.toString()
-        filters.push(`deposit_id IN (SELECT id FROM pockets WHERE category_id = :categoryId)`);
+      if (category_id) {
+        filterArgs.category_id = category_id.toString()
+        filters.push(`deposit_id IN (SELECT id FROM goals WHERE category_id = :category_id)`);
       }
 
       const query = SQL_GET_DEPOSITS({});
