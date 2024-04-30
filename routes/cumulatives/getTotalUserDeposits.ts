@@ -8,7 +8,7 @@ const SQL_GET_TOTAL_DEPOSITS = sql<GetUserCumulaInterface, GetTotalDepositsInter
   SELECT COALESCE(SUM(c.amount), 0) AS total_contributed_amount
   FROM deposits d
   JOIN pockets p ON d.pocket_id = p.id
-  WHERE s.user_id = :userId
+  WHERE s.user_id = :user_id
 `);
 
 export default (router: Router) => {
@@ -16,21 +16,21 @@ export default (router: Router) => {
     '/total-deposits', 
     authMiddleware(), 
     async (req, res) => {
-      const userId = req.user!.id;
-      const { startDate, endDate } = req.query;
+      const user_id = req.user!.id;
+      const { start_date, end_date } = req.query;
       const filters: string[] = [];
       const filterArgs: Record<string, string> = {};
 
-      if (startDate) {
-        filterArgs.startDate = startDate;
-        filters.push(`date >= :startDate`);
+      if (start_date) {
+        filterArgs.start_date = start_date;
+        filters.push(`date >= :start_date`);
       }
-      if (endDate) {
-        filterArgs.endDate = endDate;
-        filters.push(`date <= :endDate`);
+      if (end_date) {
+        filterArgs.end_date = end_date;
+        filters.push(`date <= :end_date`);
       }
 
-      const query = SQL_GET_TOTAL_DEPOSITS({userId });
+      const query = SQL_GET_TOTAL_DEPOSITS({user_id });
       if (filters.length > 0) query.extend(`AND ${filters.join(' AND ')}`, filterArgs);
       query.extend('LIMIT 15', {});
       res.json(await query.one(new HttpError(500, 'Unable to complete the request')));

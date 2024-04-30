@@ -17,7 +17,7 @@ export default (router: Router) => {
       const userId = req.user!.id;
       const filters: string[] = [];
       const filterArgs: Record<string, string> = {};
-      const { priority, status, categoryId } = req.query 
+      const { priority, status, category_id } = req.query 
       const values: Record<string, number> = { userId };
   
       if (priority) {
@@ -28,8 +28,8 @@ export default (router: Router) => {
         filterArgs.status = status;
         filters.push ('status = :status');
       }
-      if (categoryId) {
-        filterArgs.category_id = categoryId;
+      if (category_id) {
+        filterArgs.category_id =  category_id;
         filters.push ('category_id = :category_id')
       }
       const query = SQL_GET_TOTAL_TARGET_AMOUNT({});

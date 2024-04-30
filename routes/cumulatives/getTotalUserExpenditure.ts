@@ -7,7 +7,7 @@ import { GetTotalExpenseInterface, GetTotalExpenseQueryInterface, GetUserCumulaI
 const SQL_GET_TOTAL_EXPENSES = sql<GetUserCumulaInterface, GetTotalExpenseInterface>(`
   SELECT COALESCE(SUM(amount_spent), 0) AS total_expenses
   FROM expenses
-  WHERE entity_id = :userId
+  WHERE entity_id = :user_id
 `);
 
 export default (router: Router) => {
@@ -15,25 +15,25 @@ export default (router: Router) => {
     '/total-expenses', 
     authMiddleware(), 
     async (req, res) => {
-      const userId = req.user!.id;
-      const { startDate, endDate, categoryId } = req.query;
+      const user_id = req.user!.id;
+      const {  start_date, end_date, category_id } = req.query;
       const filters: string[] = [];
       const filterArgs: Record<string, string> = {};
       
-      if (startDate) {
-        filterArgs.startDate = startDate;
-        filters.push(`date >= :startDate`);
+      if (start_date) {
+        filterArgs.start_date = start_date;
+        filters.push(`date >= :start_date`);
       }
-      if (endDate) {
-        filterArgs.endDate = endDate;
-        filters.push(`date <= :endDate`);
+      if (end_date) {
+        filterArgs.end_date = end_date;
+        filters.push(`date <= :end_date`);
       }
-      if (categoryId){
-        filterArgs.categoryId = categoryId;
+      if (category_id){
+        filterArgs.category_id = category_id;
         filters.push(`category_id = :categoryId`);
       }
 
-      const query = SQL_GET_TOTAL_EXPENSES({userId });
+      const query = SQL_GET_TOTAL_EXPENSES({user_id });
       if (filters.length > 0) query.extend(`AND ${filters.join(' AND ')}`, filterArgs);
       
       res.json(await query.one( new HttpError(500, 'An error occurred while processing your request. Please try again later.')));
