@@ -19,11 +19,11 @@ const SQL_GET_POCKETS = sql<Record<string, never>, PocketInterface>(`
 
 export default (router: Router) => {
   router.get<string, PocketParam, PocketInterface[], Record<string,never>, PocketsConditionsQueryInterface>(
-    '/:pocketsIdentifier', 
+    '/:pockets_identifier', 
     authMiddleware(), 
     async (req, res: Response) => {
-      const { pocketsIdentifier } = req.params;
-      const { categoryId, priority, status, startAt, completedAt  } = req.query;
+      const { pockets_identifier } = req.params;
+      const { category_id, priority, status, start_at, completed_at  } = req.query;
 
       const filters: string[] = [];
       const filterArgs: Record<string, string> = {};
@@ -32,47 +32,47 @@ export default (router: Router) => {
       const convertedPriority = priority ? convertToTitleCase(priority) : undefined;
       const isStandardUser = req.user?.role === 'User';
 
-      if (pocketsIdentifier === 'me') {
+      if (pockets_identifier === 'me') {
         filterArgs.loggedInUserId= loggedInUserId.toString() ;
         filterArgs.isDefaultPocket  = 'FALSE';
         filters.push(`entity_id = :loggedInUserId`);
         filters.push(`is_default_pocket  = :isDefaultPocket`);
       } 
-      else if (pocketsIdentifier === 'Default') {
+      else if (pockets_identifier === 'Default') {
         filterArgs.loggedInUserId= loggedInUserId.toString();
         filterArgs.isDefaultPocket  = 'TRUE';
         filters.push(`entity_id = :loggedInUserId`);
         filters.push(`is_default_pocket  = :isDefaultPocket`);
       } 
-      else if (pocketsIdentifier === 'all') {
+      else if (pockets_identifier === 'all') {
         if (isStandardUser) {
           throw new HttpError(403, 'Forbidden');
         }
       }
-      else if (parseInt(pocketsIdentifier)) { 
+      else if (parseInt(pockets_identifier)) { 
         if (isStandardUser)  {
           throw new HttpError(403, 'Forbidden');
         }
-        filterArgs.user_id = pocketsIdentifier;
-        filters.push(`entity_id = :userId`);
+        filterArgs.user_id = pockets_identifier;
+        filters.push(`entity_id = :user_id`);
       }
       else {
         throw new HttpError(400, 'Bad request');
       }
 
-      if (categoryId) {
-        filterArgs.category_id = categoryId;
-        filters.push(`category_id = :categoryId`);
+      if (category_id) {
+        filterArgs.category_id = category_id;
+        filters.push(`category_id = :category_id`);
       }
 
-      if (startAt) {
-        filterArgs.start_at = startAt;
-        filters.push(`start_at = :startAt`);
+      if (start_at) {
+        filterArgs.start_at = start_at;
+        filters.push(`start_at = :start_at`);
       }
 
-      if (completedAt) {
-        filterArgs.completed_at = completedAt;
-        filters.push(`completed_at = :completedAt`);
+      if (completed_at) {
+        filterArgs.completed_at = completed_at;
+        filters.push(`completed_at = :completed_at`);
       }
        
       if (convertedPriority && isValidValue(convertedPriority, ACCEPTED_PRIORITY_VALUES)) {

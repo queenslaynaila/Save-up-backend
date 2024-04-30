@@ -24,12 +24,12 @@ export default (router: Router) => {
     validateRequest(upgradePocketSchema),
     async (req, res) => {
       const pocketId = parseInt(req.params.id);
-      const { targetAt } = req.body;
-      const pocketType = 'Locked Pocket';
+      const { target_at } = req.body;
+      const pocket_type = 'Locked Pocket';
       const goal = await SQL_UPGRADE_POCKET({
         id: pocketId,
-        targetAt,
-        pocketType
+        target_at,
+        pocket_type
       }).one(new HttpError(404, 'Not found'));
       return res.json(goal);
     });

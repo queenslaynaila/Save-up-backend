@@ -8,7 +8,7 @@ const SQL_DELETE_POCKET = sql<DeletePocket, Record<string,never>>(`
   UPDATE pockets
   SET deleted_at = NOW()
   WHERE id = :id
-  AND entity_id = :entityId
+  AND entity_id = :entity_id
 `);
 
 export default (router: Router) => {
@@ -18,7 +18,7 @@ export default (router: Router) => {
     async (req, res) => {
       const id = parseInt(req.params.id);
       const userId = req.user!.id;
-      await SQL_DELETE_POCKET({ id, entityId: userId }).exec();
+      await SQL_DELETE_POCKET({ id, entity_id: userId }).exec();
       return res.json({ message: 'Pocket deleted successfully' });
     });
 };

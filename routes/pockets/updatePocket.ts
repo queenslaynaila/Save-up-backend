@@ -9,10 +9,10 @@ import { validateRequest } from '../../middleware/validationMiddleware';
 const SQL_UPDATE_POCKET = sql<UpdatePocketInterface, PocketUpdateRes>(`
   UPDATE pockets
   SET name = COALESCE(:name, pockets.name),
-      category_id = COALESCE(:categoryId, pockets.category_id),
-      target_amount = COALESCE(:targetAmount, pockets.target_amount),
+      category_id = COALESCE(:category_id, pockets.category_id),
+      target_amount = COALESCE(:target_amount, pockets.target_amount),
       priority = COALESCE(:priority, pockets.priority),
-      target_at = COALESCE(:targetAt, pockets.target_at)
+      target_at = COALESCE(:target_at, pockets.target_at)
   WHERE id = :id 
   RETURNING name, category_id, target_amount, priority, target_at
 `);
@@ -24,14 +24,14 @@ export default (router: Router) => {
     validateRequest(UpdatePocketRequestSchema),
     async (req, res) => {
       const pocketId = parseInt(req.params.id);
-      const { name, categoryId, targetAmount, priority, targetAt } = req.body;
+      const { name, category_id, target_amount, priority, target_at } = req.body;
       const goal = await SQL_UPDATE_POCKET({
         id: pocketId,
         name,
-        categoryId,
-        targetAmount,
+        category_id,
+        target_amount,
         priority,
-        targetAt,
+        target_at,
       })
         .one(new HttpError(404, 'Not found'));
       return res.json(goal);
