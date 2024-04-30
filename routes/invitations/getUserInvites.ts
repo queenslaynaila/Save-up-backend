@@ -5,7 +5,7 @@ import { InviteInterface, GetInvitesInterface } from './types';
 
 const SQL_FIND_INVITATIONS_FOR_USER = sql<GetInvitesInterface, InviteInterface>(`
   SELECT * FROM invitations
-  WHERE receiver_id = :receiverId
+  WHERE receiver_id = :receiver_id
 `);
 
 export default (router: Router) => {
@@ -14,7 +14,7 @@ export default (router: Router) => {
     authMiddleware(),
     async (req, res) => {
       const userId = req.user!.id;
-      const invitations = await SQL_FIND_INVITATIONS_FOR_USER({ receiverId: userId }).many();
+      const invitations = await SQL_FIND_INVITATIONS_FOR_USER({ receiver_id: userId }).many();
       return res.json(invitations);     
     }
   );

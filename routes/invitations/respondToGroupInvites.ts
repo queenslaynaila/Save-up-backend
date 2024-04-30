@@ -10,8 +10,8 @@ import { MessageInterface } from '../../globalTypes/index';
 const SQL_RESPOND_TO_INVITE = sql<InviteResponseInterface, MessageInterface>(`
   UPDATE invitations
   SET status = :status
-  WHERE receiver_id = :receiverId 
-  AND group_id = :groupId
+  WHERE receiver_id = :receiver_id 
+  AND group_id = :group_id
 `);
 
 const VALID_RESOURCES = ['Pending', 'Accepted', 'Rejected'];
@@ -22,13 +22,13 @@ export default (router: Router) => {
     authMiddleware(),
     validateRequest( inviteRequestSchema),
     async (req, res) => {
-      const  receiverId = req.user!.id
-      const { groupId,status } = req.body;
+      const  receiver_id = req.user!.id
+      const { group_id,status } = req.body;
       const formattedStatus = status ? convertToTitleCase(status) : '';
       if (!VALID_RESOURCES.includes(formattedStatus)) {
         throw new HttpError(400, 'Invalid response');
       }
-      await SQL_RESPOND_TO_INVITE({groupId, receiverId, status:formattedStatus}).exec();
+      await SQL_RESPOND_TO_INVITE({group_id, receiver_id, status:formattedStatus}).exec();
       return res.json({ message: 'Invite response processed successfully' });
     }
   );
