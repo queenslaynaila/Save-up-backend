@@ -7,7 +7,7 @@ export const enum transactionType {
 }
 
 export const getTransactionsInputSchema = z.object({
-  pocketId: z.number()
+  pocket_id: z.number()
 })
 
 export type GetTransactionsInput = z.infer<typeof getTransactionsInputSchema>;
@@ -23,9 +23,9 @@ export const getTransactionRespSchema = z.object({
 export type GetTransactionResp = z.infer<typeof getTransactionRespSchema>;
 
 export const getTransactionQuery = z.object({
-  transactionType: z.enum([transactionType.DEPOSIT, transactionType.WITHDRAWAL, transactionType.TRANSFER]).optional(),
-  fromDate: z.date().optional(),
-  toDate: z.date().optional()
+  transaction_type: z.enum([transactionType.DEPOSIT, transactionType.WITHDRAWAL, transactionType.TRANSFER]).optional(),
+  from_date: z.date().optional(),
+  to_date: z.date().optional()
 }) 
 
 export type GetTransactionQuery = z.infer<typeof getTransactionQuery>;
