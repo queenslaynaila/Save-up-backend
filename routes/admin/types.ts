@@ -1,16 +1,16 @@
 import { z } from 'zod';
 
 export const ValidOperatorsEnum = z.enum(['SUM', 'MAX', 'MIN', 'AVG', 'COUNT']);
-export const ValidResourcesEnum = z.enum(['pockets', 'deposits', 'expenses']);
+export const ValidResourcesEnum = z.enum(['goals', 'savings', 'expenses']);
 export const ValidStatusEnum = z.enum(['Completed', 'Dormant', 'In Progress']);
 
 export const statsQuerySchema = z.object({
-  userId: z.string().optional(),
+  user_id: z.string().optional(),
   priority: z.string().optional(),
   status: z.string().optional(),
-  categoryId: z.string().optional(),
-  startDate: z.string().optional(),
-  endDate: z.string().optional(),
+  category_id: z.string().optional(),
+  start_date: z.string().optional(),
+  end_date: z.string().optional(),
 });
 
 export type StatsQueryInterface = z.infer<typeof statsQuerySchema>;
@@ -36,18 +36,18 @@ export const userRoleUpdateSchema = z.object({
 export type UserRoleUpdateInterface = z.infer<typeof userRoleUpdateSchema>;
 
 export const baseUserSchema = z.object({
-  fullName: z.string(),
+  full_name: z.string(),
   gender: z.enum(['Male', 'Female', 'Prefer not to say']),
-  nationalId: z.number().int().min(10000000).max(99999999),                
-  phoneNumber: z
+  national_id: z.number().int().min(10000000).max(99999999),                
+  phone_number: z
     .string()
     .refine((value) => /^\+254\d{9}$/.test(value)),
   pin: z.string().refine((value) => /^\d{4}$/.test(value)),
 });
 
 export const createAdminSchema = baseUserSchema.omit({
-  phoneNumber: true,
-  nationalId: true
+  phone_number: true,
+  national_id: true
 }).extend({
   id: z.number(),
   role: z.enum(['Admin'])
@@ -59,13 +59,14 @@ export const updatedUserRoleSchema = createAdminSchema.omit({
   pin: true
 })
   
+
 export type RoleUpdateResultInterface = z.infer<typeof updatedUserRoleSchema>;
 
 export const createUserContactSchema = baseUserSchema.pick({
-  nationalId: true,
-  phoneNumber: true
+  national_id: true,
+  phone_number: true
 }).extend({
-  entityId: z.number()
+  entity_id: z.number()
 })
   
 export type CreateUserContactInterface = z.infer<typeof createUserContactSchema>;

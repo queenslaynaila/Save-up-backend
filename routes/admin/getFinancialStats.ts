@@ -18,7 +18,7 @@ export default (router: Router) => {
       req.params.operator = req.params.operator.toUpperCase();
 
       const { resource, operator } = req.params;
-      const { userId, priority, status, categoryId, startDate, endDate } = req.query 
+      const { user_id, priority, status, category_id, start_date, end_date } = req.query 
       const formattedStatus = status ? convertToTitleCase(status) : '';
 
       if (!ValidResourcesEnum.safeParse(resource).success) {
@@ -33,15 +33,15 @@ export default (router: Router) => {
       
       let query = `SELECT COALESCE(${operator}(amount), 0) AS ${operator} FROM ${resource} WHERE 1=1`;
 
-      if (['deposits', 'expenses'].includes(resource)) {
-        if (userId) query += ` AND user_id = '${userId}'`;
-        if (categoryId) query += ` AND category_id = '${categoryId}'`;
+      if (['savings', 'expenses'].includes(resource)) {
+        if (user_id) query += ` AND user_id = '${user_id}'`;
+        if (category_id) query += ` AND category_id = '${category_id}'`;
         if (priority) query += ` AND priority = '${priority}'`;
-        if (startDate) query += ` AND completed_date >= '${startDate}'`;
-        if (endDate) query += ` AND completed_date <= '${endDate}'`;
+        if (start_date) query += ` AND completed_date >= '${start_date}'`;
+        if (end_date) query += ` AND completed_date <= '${end_date}'`;
       }
 
-      if (resource === 'deposits' && status) {
+      if (resource === 'savings' && status) {
         query += ` AND status = '${formattedStatus}'`;
       }
 
