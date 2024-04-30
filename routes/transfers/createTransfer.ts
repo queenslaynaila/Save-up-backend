@@ -20,9 +20,9 @@ export default (router: Router) => {
     authMiddleware(),
     validateRequest(transferSchema),
     async (req, res) => {
-      const { sourcePocketId, destinationPocketId, amount } = req.body
-      const userId = req.user!.id
-      const transfer = await SQL_CREATE_TRANSFER({ sourcePocketId, destinationPocketId, amount, userId}).oneOrNull();
+      const { source_pocket_id, destination_pocket_id, amount } = req.body
+      const user_id = req.user!.id
+      const transfer = await SQL_CREATE_TRANSFER({ source_pocket_id, destination_pocket_id, amount, user_id }).oneOrNull();
       if (!transfer){
         throw new HttpError(400, 'There was an error processing your transfer request. Please try again later.');
       }
@@ -31,3 +31,4 @@ export default (router: Router) => {
       });      
     });
 };
+ 

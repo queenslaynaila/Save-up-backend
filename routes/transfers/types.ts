@@ -1,16 +1,16 @@
 import z from 'zod'
 
 export const transferSchema = z.object({
-  userId: z.number().positive(),
-  sourcePocketId: z.number().positive(),
-  destinationPocketId: z.number().positive(),
+  user_id: z.number().positive(),
+  source_pocket_id: z.number().positive(),
+  destination_pocket_id: z.number().positive(),
   amount: z.number()
 });
   
 export type TransferInputInterface = z.infer<typeof transferSchema>;
 
 export const transferDepositBody = transferSchema.omit({
-  userId: true
+  user_id: true
 })
 
 export type TransferDepositBodyInterface = z.infer<typeof transferDepositBody>;
