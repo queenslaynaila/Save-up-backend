@@ -17,16 +17,16 @@ export default (router: Router) => {
     verifyResetToken,
     async (req, res) => {
       const { answers } = req.body;
-      const userId = req.user!.id;
-      const userSecurityAnswers = await SQL_GET_SECURITY_ANSWERS({ userId }).many();
+      const user_id = req.user!.id;
+      const userSecurityAnswers = await SQL_GET_SECURITY_ANSWERS({ user_id }).many();
      
       const incorrectAnswers: number[] = [];
         
-      answers.forEach(({ questionId, answer }: { questionId:number; answer: string }) => {
-        const storedAnswer = userSecurityAnswers.find((a: { questionId:number; answer: string }) => a.questionId === questionId);
+      answers.forEach(({ question_id, answer }: { question_id:number; answer: string }) => {
+        const storedAnswer = userSecurityAnswers.find((a: { question_id:number; answer: string }) => a.question_id === question_id);
         if (!storedAnswer || !bcrypt.compare(answer, storedAnswer.answer)) {
           console.log(storedAnswer)
-          incorrectAnswers.push(questionId);
+          incorrectAnswers.push(question_id);
         }
       });
         

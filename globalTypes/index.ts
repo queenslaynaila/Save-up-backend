@@ -26,13 +26,13 @@ export const idParamSchema = z.object({
 export type IdParamInterface = z.infer<typeof idParamSchema>;
 
 export const getByuserSchema = z.object({
-  userId: z.number()
+  user_id: z.number()
 })
 
 export type GetByUserInterface = z.infer<typeof getByuserSchema>
 
 export const getByPhone = z.object({
-  phoneNumber: z.string()
+  phone_number: z.string()
 })
 
 export type GetByPhoneInterface = z.infer<typeof getByPhone>;

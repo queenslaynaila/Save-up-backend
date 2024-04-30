@@ -14,9 +14,9 @@ export default (router: Router) => {
     '/reset',
     verifyResetToken,
     async (req, res) => {
-      const { newPassword } = req.body;
+      const { new_password } = req.body;
       const user_id = req.user!.id;
-      const hashPassword = bcrypt.hashSync(newPassword, 10);
+      const hashPassword = bcrypt.hashSync(new_password, 10);
       await SQL_RESET_PASSWORD({ id: user_id, pin: hashPassword }).exec();
       res.json({ message: 'Password updated successfully. Login' });
     });
