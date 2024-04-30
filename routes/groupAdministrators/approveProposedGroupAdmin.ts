@@ -6,18 +6,18 @@ import { MessageInterface } from '../../globalTypes/index'
 
 const SQL_INSERT_VOTE = sql<ApproveAdminInterface, Record<string,never>>(`
   INSERT INTO nomination_approvals (group_id, voter_member_id, nominated_member_id, vote)
-  VALUES (:groupId, :voterMemberId, :nominatedMemberId, :vote)
+  VALUES (:group_id, :voter_member_id, :nominated_member_id, :vote)
 `);
 
 export default (router: Router) => {
   router.post<NominateParamsInterface, MessageInterface, VoteInterface, Record<string,never>, Record<string,never>>(
-    '/nominate/:groupId/:nominatedMemberId',
+    '/nominate/:group_id/:nominated_member_id',
     authMiddleware(),
     async (req, res) => {
-      const { groupId, nominatedMemberId } = req.params;
+      const { group_id, nominated_member_id } = req.params;
       const { vote } = req.body;
-      const voterMemberId = req.user!.id;
-      await SQL_INSERT_VOTE({ groupId: parseInt(groupId), voterMemberId, nominatedMemberId: parseInt(nominatedMemberId), vote }).exec();
+      const voter_member_id = req.user!.id;
+      await SQL_INSERT_VOTE({ group_id: parseInt(group_id), voter_member_id, nominated_member_id: parseInt(nominated_member_id), vote }).exec();
       return res.json({ message: 'Vote recorded successfully.' });
     }
   );

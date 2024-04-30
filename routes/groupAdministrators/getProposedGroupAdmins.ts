@@ -8,7 +8,7 @@ const SQL_GET_NOMINATED_MEMBERS = sql<GetNominatedMemberInterface, NominatedAdmi
   SELECT na.group_id, na.user_id, na.nominated_at, u.full_name
   FROM nominated_administrators na
   INNER JOIN users u ON na.user_id = u.id
-  WHERE na.group_id = :groupId
+  WHERE na.group_id = :group_id
 `);
 
 export default (router: Router) => {
@@ -16,8 +16,8 @@ export default (router: Router) => {
     '/:id',
     authMiddleware(),
     async (req, res) => {
-      const groupId = parseInt(req.params.id);
-      const groups = await SQL_GET_NOMINATED_MEMBERS({ groupId }).many();
+      const group_id = parseInt(req.params.id);
+      const groups = await SQL_GET_NOMINATED_MEMBERS({ group_id }).many();
       return res.json(groups);
     }
   );
