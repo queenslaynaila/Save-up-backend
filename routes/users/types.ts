@@ -2,10 +2,10 @@ import z from 'zod'
 import { UserRole } from '../../globalTypes/index';
 
 export const baseUserSchema = z.object({
-  fullName: z.string(),
+  full_name: z.string(),
   gender: z.enum(['Male', 'Female', 'Prefer not to say']),
-  nationalId: z.number().int().min(10000000).max(99999999),                
-  phoneNumber: z
+  national_id: z.number().int().min(10000000).max(99999999),                
+  phone_number: z
     .string()
     .refine((value) => /^\+254\d{9}$/.test(value)),
   pin: z.string().refine((value) => /^\d{4}$/.test(value)),
@@ -14,16 +14,16 @@ export const baseUserSchema = z.object({
 export type UserInterface = z.infer<typeof baseUserSchema>;
 
 export const createUserContactSchema = baseUserSchema.pick({
-  nationalId: true,
-  phoneNumber: true
+  national_id: true,
+  phone_number: true
 }).extend({
-  entityId: z.number()
+  entity_id: z.number()
 })
   
 export type CreateUserContactInterface = z.infer<typeof createUserContactSchema>;
 
 export const createUserSchema = baseUserSchema.pick({
-  fullName: true,
+  full_name: true,
   gender: true,
   pin : true
 }).extend({
@@ -34,11 +34,11 @@ export type CreateUserInterface = z.infer<typeof createUserSchema>;
 
 export const GetUserSchema = createUserSchema.pick({
   id: true,
-  fullName: true,
+  full_name: true,
   gender: true,
 }).extend({
   role: z.enum([UserRole.ADMIN, UserRole.USER, UserRole.MODERATOR]),
-  createdAt: z.string()
+  created_at: z.string()
 })
   
 export type GetUserInterface = z.infer<typeof GetUserSchema>;
@@ -51,7 +51,7 @@ export type GetUserQueryInterface = z.infer<typeof getUserQuery>;
 
 export const updateUserPhoneSchema = baseUserSchema.pick({
   pin: true,
-  phoneNumber: true,
+  phone_number: true,
 })
   
 export type UpdatePhoneInterface = z.infer<typeof updateUserPhoneSchema>;
