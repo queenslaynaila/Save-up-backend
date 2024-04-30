@@ -8,7 +8,7 @@ const SQL_FETCH_USER_GROUPS = sql<GetByUserInterface, CreateGroupResponseInterfa
   SELECT g.id, g.group_name, g.description, g.created_by, g.created_at
   FROM groups g
   INNER JOIN user_groups ug ON g.id = ug.group_id
-  WHERE ug.user_id = :userId
+  WHERE ug.user_id = :user_id
   AND ug.left_at IS NULL
 `);
 
@@ -18,7 +18,7 @@ export default (router: Router) => {
     authMiddleware(),
     async (req, res) => {
       const userId = req.user!.id;
-      const groups = await SQL_FETCH_USER_GROUPS({ userId }).many();
+      const groups = await SQL_FETCH_USER_GROUPS({ user_id: userId }).many();
       return res.json(groups);
     }
   );

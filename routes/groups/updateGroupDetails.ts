@@ -1,15 +1,15 @@
 import { Router } from 'express';
 import { sql } from '../../db';
-import authMiddleware from '../../middleware/authorization';
+import  authMiddleware from '../../middleware/authorization';
 import { validateRequest } from '../../middleware/validationMiddleware';
 import { UpdateGroupInterface, UpdateGroupResponseInterface, baseGroupSchema } from './types';
 import { IdParamInterface } from '../../globalTypes/index';
 
 const SQL_UPDATE_GROUP = sql<UpdateGroupInterface, UpdateGroupResponseInterface>(`
   UPDATE groups
-  SET group_name = COALESCE(:groupName, group_name),
+  SET group_name = COALESCE(:group_name, group_name),
       description = COALESCE(:description, description)
-  WHERE id = :groupId
+  WHERE id = :group_id
   RETURNING group_name, description;
 `);
 
@@ -20,10 +20,9 @@ export default (router: Router) => {
     validateRequest(baseGroupSchema),
     async (req, res) => {
       const groupId = parseInt(req.params.id);
-      const { groupName, description } = req.body;
-      const updatedGroup = await SQL_UPDATE_GROUP({ groupId, groupName, description }).one();
+      const { group_name, description } = req.body;
+      const updatedGroup = await SQL_UPDATE_GROUP({ group_id: groupId, group_name, description }).one();
       res.json(updatedGroup);
     }
   );
 };
-
