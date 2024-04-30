@@ -37,14 +37,14 @@ export default (router: Router) => {
     '/', 
     authMiddleware(),
     async (req, res) => {
-      const { pocketId, amount} = req.body
-      const userId = req.user!.id
-      const pocketName= await SQL_CREATE_WITHDRAWAL({ pocketId, userId, amount }).oneOrNull();
-      if (!pocketName){
+      const { pocket_id, amount} = req.body
+      const user_id = req.user!.id
+      const pocket_name= await SQL_CREATE_WITHDRAWAL({ pocket_id, user_id, amount }).oneOrNull();
+      if (!pocket_name){
         throw new HttpError(400, 'There was an error processing your withdrawal request. Please try again later.');
       }
       return res.json({
-        message: `Withdrawal of amount KES ${amount.toFixed(2)} from pocket ${pocketName} successful!`
+        message: `Withdrawal of amount KES ${amount.toFixed(2)} from pocket ${pocket_name} successful!`
       });      
     });
 };
