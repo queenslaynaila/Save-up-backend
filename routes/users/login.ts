@@ -20,7 +20,7 @@ export default (router: Router) => {
     validateRequest(updateUserPhoneSchema),
     async (req, res) => {
 
-      const { phoneNumber , pin } = req.body;
+      const { phoneNumber, pin } = req.body;
       const entity_id = await SQL_GET_USER_ENTITY_ID({ phoneNumber }).one(
         new HttpError(404, 'User Not found')
       );
