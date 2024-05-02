@@ -7,6 +7,7 @@ CREATE TYPE enum_relationships AS ENUM ('Parent', 'Spouse', 'Sibling', 'Child', 
 CREATE TYPE enum_genders AS ENUM ('Male', 'Female', 'Prefer not to say');
 CREATE TYPE enum_entities AS ENUM ('User','Groups');
 CREATE TYPE enum_pocket_types AS ENUM ('Standard Pocket','Locked Pocket');
+CREATE TYPE enum_transaction_type AS ENUM ('Saving', 'External Saving', 'Withdrawal', 'Transfer', 'Interests');
 
 
 --- General Purpose Tables
@@ -320,6 +321,48 @@ CREATE TABLE IF NOT EXISTS expenses (
 -- Index expenses for faster retrievals by owners
 CREATE INDEX idx_expenses_by_entity_id ON expenses(entity_id);
 SELECT create_distributed_table('expenses', 'id');
+
+===============================================================================================
+--Logs
+
+CREATE TABLE IF NOT EXISTS transaction_logs (
+  user_id                 INT NOT NULL,
+  transaction_id          INT NOT NULL,
+  pocket_id               INT NOT NULL,
+  transaction_type        enum_transaction_type NOT NULL,,
+  amount                  NUMERIC(30, 2) NOT NULL CHECK (amount > 0),
+  reference_no            TEXT NOT NULL,
+  created_at              TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  PRIMARY KEY             (user_id, log_id)
+  FOREIGN KEY             (user_id) REFERENCES users(id),
+  FOREIGN KEY             (pocket_id) REFERENCES pockets(id)
+);
+
+CREATE OR REPLACE FUNCTION log_transaction()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF TG_TABLE_NAME = 'savings' THEN
+        INSERT INTO transaction_logs (user_id, transaction_id, pocket_id, transaction_type, amount, reference_no, created_at)
+        SELECT NEW.user_id, COALESCE((SELECT MAX(id) FROM transaction_logs WHERE user_id = NEW.user_id), 0), NEW.pocket_id, 'Saving', NEW.amount, NEW.id, NOW();
+    ELSIF TG_TABLE_NAME = 'external_savings' THEN
+        INSERT INTO transaction_logs (user_id, transaction_id, pocket_id, transaction_type, amount, reference_no, created_at)
+        SELECT NEW.user_id, COALESCE((SELECT MAX(id) FROM transaction_logs WHERE user_id = NEW.user_id), 0), NEW.pocket_id, 'External Saving', NEW.amount, NEW.id, NOW();
+    ELSIF TG_TABLE_NAME = 'withdrawals' THEN
+        INSERT INTO transaction_logs (user_id, transaction_id, pocket_id, transaction_type, amount, reference_no, created_at)
+        SELECT NEW.user_id, COALESCE((SELECT MAX(id) FROM transaction_logs WHERE user_id = NEW.user_id), 0), NEW.pocket_id, 'Withdrawal', NEW.amount, NEW.id, NOW();
+    ELSIF TG_TABLE_NAME = 'transfers' THEN
+        INSERT INTO transaction_logs (user_id, transaction_id, pocket_id, transaction_type, amount, reference_no, created_at)
+        SELECT NEW.user_id, COALESCE((SELECT MAX(id) FROM transaction_logs WHERE user_id = NEW.user_id), 0), NEW.source_pocket_id, 'Transfer', NEW.amount, NEW.id, NOW();
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE TRIGGER enforce_log_transaction
+AFTER INSERT ON savings OR INSERT ON external_savings OR INSERT ON withdrawals OR INSERT ON transfers
+FOR EACH ROW
+EXECUTE FUNCTION log_transaction();
 
 ===============================================================================================
 -- Trigger: Update the status of a pocket to Complete when total savings exceeds target amount for a pocket.

@@ -17,7 +17,7 @@ export const getTransactionRespSchema = z.object({
   transaction_type: z.enum([transactionType.DEPOSIT, transactionType.WITHDRAWAL, transactionType.TRANSFER]),
   amount: z.number(),
   transaction_date: z.string(),
-  transfer_from: z.string() || null
+  reference_no : z.string()
 })
 
 export type GetTransactionResp = z.infer<typeof getTransactionRespSchema>;

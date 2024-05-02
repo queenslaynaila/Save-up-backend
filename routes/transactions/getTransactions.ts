@@ -4,38 +4,7 @@ import { GetTransactionsInput, GetTransactionResp, GetTransactionQuery } from '.
 import { IdParamInterface } from '../../globalTypes/index';
 
 const SQL_GET_TRANSACTIONS = sql<GetTransactionsInput, GetTransactionResp>(`
-    SELECT * FROM (
-        SELECT 
-            d.id AS transaction_id,
-            'Deposit' AS transaction_type
-             d.amount,
-            NULL AS transfer_from
-            d.created_at AS transaction_date
-        FROM deposits d
-        WHERE d.pocket_id = :pocket_id
-
-        UNION ALL
-
-        SELECT 
-            w.id AS transaction_id,
-            'Withdrawal' AS transaction_type
-            -w.amount ,
-            NULL AS transfer_from
-            w.created_at AS transaction_date
-        FROM withdrawals w
-        WHERE w.pocket_id = :pocket_id
-
-        UNION ALL
-
-        SELECT 
-            t.id AS transaction_id,
-            'Transfer' AS transaction_type
-            amount,
-            t.source_pocket_id AS transfer_from
-            t.created_at AS transaction_date
-        FROM transfers t
-        WHERE t.destination_pocket_id = :pocket_id
-    ) AS transactions
+    SELECT * FROM transaction_logs WHERE pocket_id = :pocket_id
 `);
 
 export default (router: Router) => {
