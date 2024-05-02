@@ -241,7 +241,7 @@ CREATE TABLE IF NOT EXISTS pockets (
 Create INDEX idx_pockets_by_entity_id ON pockets(entity_id);
 SELECT create_distributed_table('pockets', 'id');
 
-CREATE TABLE IF NOT EXISTS deposits (
+CREATE TABLE IF NOT EXISTS savings (
   id                    INT NOT NULL,
   pocket_id             INT NOT NULL,
   user_id               INT,
@@ -255,8 +255,8 @@ CREATE TABLE IF NOT EXISTS deposits (
   FOREIGN KEY           (pocket_id) REFERENCES pockets(id)
 );
 
-CREATE INDEX idx_deposits_by_pocket_id ON deposits(pocket_id);
-SELECT create_distributed_table('deposits', 'pocket_id');
+CREATE INDEX idx_deposits_by_pocket_id ON savings(pocket_id);
+SELECT create_distributed_table('savings', 'pocket_id');
 
 CREATE TABLE IF NOT EXISTS withdrawals (
   pocket_id       INT NOT NULL,
@@ -317,7 +317,7 @@ DECLARE
     total_deposits NUMERIC(30, 2);
 BEGIN
     SELECT COALESCE(SUM(amount), 0) INTO total_deposits
-    FROM deposits
+    FROM savings
     WHERE user_id = NEW.user_id AND deposit_id = NEW.deposit_id;
 
     IF total_deposits >= (SELECT target_amount FROM pockets WHERE user_id = NEW.user_id AND id = NEW.deposit_id) THEN
@@ -332,7 +332,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER enforce_update_saving_status
-AFTER INSERT ON deposits
+AFTER INSERT ON savings
 FOR EACH ROW
 EXECUTE FUNCTION update_pockets_status();
 
@@ -462,7 +462,7 @@ RETURNS TRIGGER AS $$
 BEGIN
   IF TG_TABLE_NAME = 'users' THEN 
     INSERT INTO INSERT INTO pockets (entity_id, category_id, name, amount, description, is_default_pocket, priority)
-    VALUES (NEW.id, 11, 'Wallet','Your digital wallet, a secure place for your on-the-go savings.Your Wallet allows you to deposit funds without immediately assigning them to a specific pocket. When you''re ready to allocate those savings toward a dream vacation, emergency fund, or any other goal, effortlessly transfer them to an existing pocket or create a new one!',TRUE, 0, 'Intermediate');
+    VALUES (NEW.id, 11, 'Wallet','Your digital wallet, a secure place for your on-the-go savings.Your Wallet allows you to save funds without immediately assigning them to a specific pocket. When you''re ready to allocate those savings toward a dream vacation, emergency fund, or any other goal, effortlessly transfer them to an existing pocket or create a new one!',TRUE, 0, 'Intermediate');
   ELSE
     INSERT INTO pockets (entity_id, category_id, name, amount, description, is_default_pocket, priority)
     VALUES (NEW.id, 11, 'General Fund', 0, 'Your dedicated space to stash funds as a team. Everyone can contribute on-the-go, without needing a specific pocket right away.Once your crew has a plan, simply transfer your savings to a shared pocket or create a new one from scratch', TRUE, 'Intermediate');
