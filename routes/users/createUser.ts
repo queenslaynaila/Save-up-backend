@@ -36,3 +36,4 @@ export default (router: Router) => {
       res.json({ message:"Account created Succesfully.Procced to login" });
     });
 };
+

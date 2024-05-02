@@ -8,7 +8,7 @@ const SQL_GET_TRANSACTIONS = sql<GetTransactionsInput, GetTransactionResp>(`
         SELECT 
             d.id AS transaction_id,
             'Deposit' AS transaction_type
-            d.amount,
+             d.amount,
             NULL AS transfer_from
             d.created_at AS transaction_date
         FROM deposits d
