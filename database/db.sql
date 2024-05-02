@@ -244,7 +244,20 @@ SELECT create_distributed_table('pockets', 'id');
 CREATE TABLE IF NOT EXISTS savings (
   id                    INT NOT NULL,
   pocket_id             INT NOT NULL,
-  user_id               INT,
+  user_id               INT NOT NULL,
+  amount                NUMERIC(30, 2) NOT NULL,
+  created_at            TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  PRIMARY KEY           (pocket_id, id), 
+  FOREIGN KEY           (user_id) REFERENCES users(id),
+  FOREIGN KEY           (pocket_id) REFERENCES pockets(id)
+);
+
+CREATE INDEX idx_savings_by_pocket_id ON savings(pocket_id);
+SELECT create_distributed_table('savings', 'pocket_id');
+
+CREATE TABLE IF NOT EXISTS external_savings (
+  id                    INT NOT NULL,
+  pocket_id             INT NOT NULL,
   donor_name            TEXT,
   donor_email           TEXT,
   donor_phone_number    TEXT,
@@ -255,8 +268,8 @@ CREATE TABLE IF NOT EXISTS savings (
   FOREIGN KEY           (pocket_id) REFERENCES pockets(id)
 );
 
-CREATE INDEX idx_deposits_by_pocket_id ON savings(pocket_id);
-SELECT create_distributed_table('savings', 'pocket_id');
+CREATE INDEX idx_external_savings_by_pocket_id ON external_savings(pocket_id);
+SELECT create_distributed_table('external_savings', 'pocket_id');
 
 CREATE TABLE IF NOT EXISTS withdrawals (
   pocket_id       INT NOT NULL,
@@ -309,22 +322,22 @@ CREATE INDEX idx_expenses_by_entity_id ON expenses(entity_id);
 SELECT create_distributed_table('expenses', 'id');
 
 ===============================================================================================
--- Trigger: Update the status of a pocket to Complete when total deeposits exceeds target amount for a pocket.
+-- Trigger: Update the status of a pocket to Complete when total savings exceeds target amount for a pocket.
 
 CREATE OR REPLACE FUNCTION update_pockets_status()
 RETURNS TRIGGER AS $$
 DECLARE
-    total_deposits NUMERIC(30, 2);
+    total_savings NUMERIC(30, 2);
 BEGIN
-    SELECT COALESCE(SUM(amount), 0) INTO total_deposits
+    SELECT COALESCE(SUM(amount), 0) INTO total_savings
     FROM savings
-    WHERE user_id = NEW.user_id AND deposit_id = NEW.deposit_id;
+    WHERE user_id = NEW.user_id AND saving_id = NEW.saving_id;
 
-    IF total_deposits >= (SELECT target_amount FROM pockets WHERE user_id = NEW.user_id AND id = NEW.deposit_id) THEN
+    IF total_savings >= (SELECT target_amount FROM pockets WHERE user_id = NEW.user_id AND id = NEW.saving_id) THEN
         UPDATE pockets
         SET status = 'Completed',
             completed_date = NOW()
-        WHERE id = NEW.deposit_id;
+        WHERE id = NEW.saving_id;
     END IF;
 
     RETURN NEW;
