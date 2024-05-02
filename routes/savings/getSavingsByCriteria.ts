@@ -2,36 +2,36 @@ import { Router } from 'express';
 import { sql } from '../../db';
 //import authMiddleware from '../../middleware/authorization';
 import { HttpError } from '../../middleware/errorMiddleware';
-import { DepositInterface, DepositParamInterface, DepositsQueryInterface } from './types';
+import { SavingInterface, SavingParamInterface, SavingsQueryInterface } from './types';
 import { idSchema } from '../../globalTypes/index';
  
-const SQL_GET_DEPOSITS = sql<Record<string,never>, DepositInterface>(`
-  SELECT * FROM deposits
+const SQL_GET_SAVINGS = sql<Record<string,never>, SavingInterface>(`
+  SELECT * FROM savings
 `);
 
 export default (router: Router) => {
-  router.get<string, DepositParamInterface, DepositInterface[], Record<string, never>, DepositsQueryInterface>(
+  router.get<string, SavingParamInterface, SavingInterface[], Record<string, never>, SavingsQueryInterface>(
     '/:identifier',
     async (req, res) => {
-      const depositIdentifier = req.params.identifier;
+      const savingIdentifier = req.params.identifier;
       const { category_id, goal_id } = req.query;
       const filterArgs: Record<string, string> = {};
       const filters: string[] = [];
       const loggedInUserId = req.user!.id;
       const isStandardUser = req.user?.role === 'User';
 
-      if ( depositIdentifier === 'me') {
+      if ( savingIdentifier === 'me') {
         filterArgs.loggedInUserId = loggedInUserId.toString()
         filters.push(`user_id = :loggedInUserId`);
-      } else if ( depositIdentifier === 'all') {
+      } else if ( savingIdentifier === 'all') {
         if (isStandardUser) {
           throw new HttpError(403, 'Forbidden');
         }
-      } else if (idSchema.parse(parseInt( depositIdentifier))) { 
+      } else if (idSchema.parse(parseInt( savingIdentifier))) { 
         if (isStandardUser)  {
           throw new HttpError(403, 'Forbidden');
         }
-        filterArgs.user_id =  depositIdentifier;
+        filterArgs.user_id =  savingIdentifier;
         filters.push(`user_id = :user_id`);
       } else {
         throw new HttpError(400, 'Bad request');
@@ -43,13 +43,13 @@ export default (router: Router) => {
       }
       if (category_id) {
         filterArgs.category_id = category_id.toString()
-        filters.push(`deposit_id IN (SELECT id FROM goals WHERE category_id = :category_id)`);
+        filters.push(`saving_id IN (SELECT id FROM goals WHERE category_id = :category_id)`);
       }
 
-      const query = SQL_GET_DEPOSITS({});
+      const query = SQL_GET_SAVINGS({});
       if (filters.length > 0) query.extend(`WHERE ${filters.join(' AND ')}`, filterArgs);
       query.extend('LIMIT 15', {});
-      const deposits = await query.many();
-      res.json(deposits)
+      const savings = await query.many();
+      res.json(savings)
     }
   )};
