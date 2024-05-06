@@ -63,3 +63,9 @@ export const updateUserPhoneSchema = baseUserSchema.pick({
 export type UpdatePhoneInterface = z.infer<typeof updateUserPhoneSchema>;
 
 export type ExtendedUserInterface = GetUserInterface & { pin: string };
+
+export const targetParamSchema = z.object({
+  targetUser: z.string()
+})
+
+export type TargetParamInterface = z.infer<typeof targetParamSchema>;
