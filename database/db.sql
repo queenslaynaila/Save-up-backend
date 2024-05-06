@@ -212,9 +212,22 @@ SELECT create_distributed_table('administrator_votes', 'group_id');
 ---Financial management 
 
 CREATE TABLE IF NOT EXISTS interest_rates (
-  id       SERIAL PRIMARY KEY,
-  type     enum_pocket_types NOT NULL, 
-  rate     DECIMAL(2,2) NOT NULL 
+  id            SERIAL PRIMARY KEY,
+  pocket_type   enum_pocket_types NOT NULL,
+  default_rate  NUMERIC(3,2) NOT NULL CHECK (default_rate > 0),
+  created_at    TIMESTAMP WITH TIME ZONE DEFAULT NOW(), 
+  updated_at    TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS interest_rate_tiers (
+  id            SERIAL PRIMARY KEY,
+  tier          TEXT NOT NULL,   -- name we  are giving to this tier or offer
+  pocket_type   enum_pocket_types NOT NULL,
+  tier_rate     NUMERIC(3,2) NOT NULL CHECK (tier_rate > 0),
+  start_date    TIMESTAMP WITH TIME ZONE NOT NULL, -- Start date of the interest rate validity if its an offer
+  end_date      TIMESTAMP WITH TIME ZONE NOT NULL, -- Enda date of the interest rate validity if its an offer
+  created_at    TIMESTAMP WITH TIME ZONE DEFAULT NOW(), 
+  updated_at    TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 CREATE TABLE IF NOT EXISTS pockets ( 
@@ -230,6 +243,7 @@ CREATE TABLE IF NOT EXISTS pockets (
   pocket_type             enum_pocket_types NOT NULL DEFAULT 'Standard Pocket',
   reminder_count          INT NOT NULL DEFAULT 0,
   last_reminder_sent_at   TIMESTAMP WITH TIME ZONE,
+  interest_earned         NUMERIC(30, 2) NOT NULL DEFAULT O,
   created_at              TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   updated_at              TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   completed_at            TIMESTAMP WITH TIME ZONE, 
@@ -259,10 +273,11 @@ SELECT create_distributed_table('savings', 'pocket_id');
 CREATE TABLE IF NOT EXISTS external_savings (
   id                    INT NOT NULL,
   pocket_id             INT NOT NULL,
-  donor_name            TEXT,
-  donor_email           TEXT,
-  donor_phone_number    TEXT,
+  donor_name            TEXT NOT NULL,
+  donor_email           TEXT NOT NULL,
+  donor_phone_number    TEXT NOT NULL,
   amount                NUMERIC(30, 2) NOT NULL,
+  show_details          BOOLEAN NOT NULL,
   created_at            TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   PRIMARY KEY           (pocket_id, id), 
   FOREIGN KEY           (user_id) REFERENCES users(id),
@@ -558,3 +573,22 @@ EXCEPTION
       RAISE EXCEPTION 'User with that national ID or phone number already exists.';
 END;
 $$ LANGUAGE plpgsql;
+
+
+===============================================================================================
+--Trigger: Update interest rates
+
+CREATE OR REPLACE FUNCTION compute_interest_earned
+RETURNS TRIGGER AS $$
+BEGIN
+
+
+
+
+END
+$$ LANGUAGE plgpgsql
+
+CREATE TRIGGER enforce_compute_interest_earned
+AFTER INSERT ON savings
+FOR EACH ROW
+EXECUTE FUNCTION compute_interest_earned();
