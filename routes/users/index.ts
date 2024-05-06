@@ -1,8 +1,8 @@
 import { Router } from 'express';
 import createUser from './createUser';
 import login from './login';
-import updateUserPhoneNo from './getUserByCriteria';
 import getUserByCriteria from './getUserByCriteria';
+import updateUserPhoneNo from './updateUserPhoneNo';
 import logout from './logout';
 
 export default (baseRouter: Router) => {
