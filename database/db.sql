@@ -580,15 +580,38 @@ $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION compute_interest_earned
 RETURNS TRIGGER AS $$
+DECLARE
+      total_savings NUMERIC(30, 2);
+      pocket_rate   NUMERIC(3, 2);
+      pocket_type   enum_pocket_types;
 BEGIN
+   --Pocket type for the given pokcet
+    SELECT pocket_type INTO pocket_type
+    FROM pockets
+    WHERE id = NEW.pocket_id;
 
+   --Fetch rate for the pocket type
+    SELECT default_rate INTO pocket_rate
+    FROM interest_rates
+    WHERE pocket_type = pocket_type;
+ 
+   --Compute total savings for the ggiven pocket
+    SELECT COALESCE(SUM(amount), 0) INTO total_savings
+    FROM savings
+    WHERE user_id = NEW.user_id AND saving_id = NEW.saving_id;
+ 
+    --Calculate interest earned aad update
+    NEW.interest_earned := total_savings * pocket_rate / 100;  
 
+    UPDATE pockets
+    SET interest_earned = NEW.interest_earned
+    WHERE id = NEW.pocket_id;
 
-
+    RETURN NEW;
 END
 $$ LANGUAGE plgpgsql
 
 CREATE TRIGGER enforce_compute_interest_earned
-AFTER INSERT ON savings
+AFTER INSERT ON savings OR INSERT ON external_savings
 FOR EACH ROW
 EXECUTE FUNCTION compute_interest_earned();
