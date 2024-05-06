@@ -19,7 +19,7 @@ export default (router: Router) => {
       const pinHash = bcrypt.hashSync(pin, 12);
       await SQL_CREATE_USER({ full_name, gender, pin: pinHash, national_id, phone_number })
         .exec();
-      res.json({ message:"Account created Succesfully. Procced to login" });
+      res.json({ message:"Account created Succesfully. Proceed to login" });
     });
 };
 
