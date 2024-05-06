@@ -1,24 +1,13 @@
 import { z } from 'zod';
 
-export const enum priority {
-  HIGH = 'High',
-  INTERMEDIATE = 'Intermediate',
-  LOW = 'Low',
-}
-  
-export enum pocketType {
-  STANDARD = 'Standard Pockets',
-  LOCKED = 'Locked Pockets',
-}
-  
 export const basePocketSchema = z.object({
   entity_id: z.number(),
   category_id: z.number(),
   name: z.string(),  
   target_amount: z.number(),
-  priority: z.enum(['HIGH', 'INTERMEDIATE', 'LOW']),
+  priority: z.enum(['High', 'Intermediate', 'Low']),
   target_at: z.string(),
-  pocket_type: z.enum(['STANDARD', 'LOCKED'])
+  pocket_type: z.enum(['Standard Pocket', 'Locked Pocket'])
 });
   
 export type CreatePocketInterface = z.infer<typeof basePocketSchema>;
@@ -44,7 +33,7 @@ export const pocketUpdateResSchema = z.object({
   name: z.string(),
   category_id: z.number().positive(), 
   target_amount: z.number().positive(), 
-  priority: z.enum(['Low', 'Medium', 'High']), 
+  priority: z.enum(['Low', 'Intermediate', 'High']), 
   target_at: z.date(),
 });
   
