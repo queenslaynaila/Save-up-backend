@@ -209,6 +209,16 @@ CREATE TABLE IF NOT EXISTS nomination_approvals (
 SELECT create_distributed_table('administrator_votes', 'group_id');
 
 ===============================================================================================
+---Donors
+CREATE TABLE IF NOT EXISTS donors (
+  donor_id             SERIAL PRIMARY KEY,
+  donor_name           TEXT NOT NULL,
+  donor_phone_number   TEXT NOT NULL UNIQUE,
+  created_at           TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at           TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+===============================================================================================
 ---Financial management 
 
 CREATE TABLE IF NOT EXISTS interest_rates (
@@ -236,6 +246,7 @@ CREATE TABLE IF NOT EXISTS pockets (
   category_id             INT NOT NULL,
   name                    TEXT NOT NULL,
   target_amount           NUMERIC(30, 2) NOT NULL CHECK (amount >= 0),
+  saved_amount            NUMERIC(30, 2) NOT NULL DEFAULT 0 CHECK (saved_amount >= 0),
   priority                enum_priorities NOT NULL,
   status                  enum_statuses NOT NULL DEFAULT 'In Progress',
   target_at               TIMESTAMP WITH TIME ZONE NOT NULL,
@@ -273,14 +284,12 @@ SELECT create_distributed_table('savings', 'pocket_id');
 CREATE TABLE IF NOT EXISTS external_savings (
   id                    INT NOT NULL,
   pocket_id             INT NOT NULL,
-  donor_name            TEXT NOT NULL,
-  donor_email           TEXT NOT NULL,
-  donor_phone_number    TEXT NOT NULL,
+  donor_id              INT NOT NULL,
   amount                NUMERIC(30, 2) NOT NULL,
-  show_details          BOOLEAN NOT NULL,
+  show_donor_details    BOOLEAN NOT NULL DEFAULT TRUE,
   created_at            TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   PRIMARY KEY           (pocket_id, id), 
-  FOREIGN KEY           (user_id) REFERENCES users(id),
+  FOREIGN KEY           (donor_id) REFERENCES donors(id),
   FOREIGN KEY           (pocket_id) REFERENCES pockets(id)
 );
 
@@ -336,48 +345,6 @@ CREATE TABLE IF NOT EXISTS expenses (
 -- Index expenses for faster retrievals by owners
 CREATE INDEX idx_expenses_by_entity_id ON expenses(entity_id);
 SELECT create_distributed_table('expenses', 'id');
-
-===============================================================================================
---Logs
-
-CREATE TABLE IF NOT EXISTS transaction_logs (
-  user_id                 INT NOT NULL,
-  transaction_id          INT NOT NULL,
-  pocket_id               INT NOT NULL,
-  transaction_type        enum_transaction_type NOT NULL,,
-  amount                  NUMERIC(30, 2) NOT NULL CHECK (amount > 0),
-  reference_no            TEXT NOT NULL,
-  created_at              TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  PRIMARY KEY             (user_id, log_id)
-  FOREIGN KEY             (user_id) REFERENCES users(id),
-  FOREIGN KEY             (pocket_id) REFERENCES pockets(id)
-);
-
-CREATE OR REPLACE FUNCTION log_transaction()
-RETURNS TRIGGER AS $$
-BEGIN
-    IF TG_TABLE_NAME = 'savings' THEN
-        INSERT INTO transaction_logs (user_id, transaction_id, pocket_id, transaction_type, amount, reference_no, created_at)
-        SELECT NEW.user_id, COALESCE((SELECT MAX(id) FROM transaction_logs WHERE user_id = NEW.user_id), 0), NEW.pocket_id, 'Saving', NEW.amount, NEW.id, NOW();
-    ELSIF TG_TABLE_NAME = 'external_savings' THEN
-        INSERT INTO transaction_logs (user_id, transaction_id, pocket_id, transaction_type, amount, reference_no, created_at)
-        SELECT NEW.user_id, COALESCE((SELECT MAX(id) FROM transaction_logs WHERE user_id = NEW.user_id), 0), NEW.pocket_id, 'External Saving', NEW.amount, NEW.id, NOW();
-    ELSIF TG_TABLE_NAME = 'withdrawals' THEN
-        INSERT INTO transaction_logs (user_id, transaction_id, pocket_id, transaction_type, amount, reference_no, created_at)
-        SELECT NEW.user_id, COALESCE((SELECT MAX(id) FROM transaction_logs WHERE user_id = NEW.user_id), 0), NEW.pocket_id, 'Withdrawal', NEW.amount, NEW.id, NOW();
-    ELSIF TG_TABLE_NAME = 'transfers' THEN
-        INSERT INTO transaction_logs (user_id, transaction_id, pocket_id, transaction_type, amount, reference_no, created_at)
-        SELECT NEW.user_id, COALESCE((SELECT MAX(id) FROM transaction_logs WHERE user_id = NEW.user_id), 0), NEW.source_pocket_id, 'Transfer', NEW.amount, NEW.id, NOW();
-    END IF;
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-
-CREATE TRIGGER enforce_log_transaction
-AFTER INSERT ON savings OR INSERT ON external_savings OR INSERT ON withdrawals OR INSERT ON transfers
-FOR EACH ROW
-EXECUTE FUNCTION log_transaction();
 
 ===============================================================================================
 -- Trigger: Update the status of a pocket to Complete when total savings exceeds target amount for a pocket.
@@ -615,3 +582,99 @@ CREATE TRIGGER enforce_compute_interest_earned
 AFTER INSERT ON savings OR INSERT ON external_savings
 FOR EACH ROW
 EXECUTE FUNCTION compute_interest_earned();
+
+===============================================================================================
+--Trigger: Compute and store total saved amount for a pocket
+
+CREATE OR REPLACE FUNCTION compute_total_savings
+RETURNS TRIGGER AS $$
+DECLARE
+      total_savings NUMERIC(30, 2);
+BEGIN 
+    SELECT COALESCE(SUM(amount), 0) INTO total_savings
+    FROM savings
+    WHERE user_id = NEW.user_id AND saving_id = NEW.saving_id;
+
+    UPDATE pockets
+    SET  saved_amount = total_savings
+    WHERE id = NEW.pocket_id AND user_id = NEW.user_id;
+
+    RETURN NEW;
+END
+$$ LANGUAGE plgpgsql
+
+CREATE TRIGGER enforce_compute_total_savings
+AFTER INSERT ON savings OR INSERT ON external_savings
+FOR EACH ROW
+EXECUTE FUNCTION compute_total_savings();
+
+===============================================================================================
+--Logs
+
+CREATE TABLE IF NOT EXISTS transaction_logs (
+  user_id                 INT NOT NULL,
+  transaction_id          INT NOT NULL,
+  pocket_id               INT NOT NULL,
+  transaction_type        enum_transaction_type NOT NULL,,
+  amount                  NUMERIC(30, 2) NOT NULL CHECK (amount > 0),
+  reference_no            TEXT NOT NULL,
+  created_at              TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  PRIMARY KEY             (user_id, log_id)
+  FOREIGN KEY             (user_id) REFERENCES users(id),
+  FOREIGN KEY             (pocket_id) REFERENCES pockets(id)
+);
+
+CREATE OR REPLACE FUNCTION log_transaction()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF TG_TABLE_NAME = 'savings' THEN
+        INSERT INTO transaction_logs (user_id, transaction_id, pocket_id, transaction_type, amount, reference_no, created_at)
+        SELECT NEW.user_id, COALESCE((SELECT MAX(id) FROM transaction_logs WHERE user_id = NEW.user_id), 0), NEW.pocket_id, 'Saving', NEW.amount, NEW.id, NOW();
+    ELSIF TG_TABLE_NAME = 'external_savings' THEN
+        INSERT INTO transaction_logs (user_id, transaction_id, pocket_id, transaction_type, amount, reference_no, created_at)
+        SELECT NEW.user_id, COALESCE((SELECT MAX(id) FROM transaction_logs WHERE user_id = NEW.user_id), 0), NEW.pocket_id, 'External Saving', NEW.amount, NEW.id, NOW();
+    ELSIF TG_TABLE_NAME = 'withdrawals' THEN
+        INSERT INTO transaction_logs (user_id, transaction_id, pocket_id, transaction_type, amount, reference_no, created_at)
+        SELECT NEW.user_id, COALESCE((SELECT MAX(id) FROM transaction_logs WHERE user_id = NEW.user_id), 0), NEW.pocket_id, 'Withdrawal', NEW.amount, NEW.id, NOW();
+    ELSIF TG_TABLE_NAME = 'transfers' THEN
+        INSERT INTO transaction_logs (user_id, transaction_id, pocket_id, transaction_type, amount, reference_no, created_at)
+        SELECT NEW.user_id, COALESCE((SELECT MAX(id) FROM transaction_logs WHERE user_id = NEW.user_id), 0), NEW.source_pocket_id, 'Transfer', NEW.amount, NEW.id, NOW();
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE TRIGGER enforce_log_transaction
+AFTER INSERT ON savings OR INSERT ON external_savings OR INSERT ON withdrawals OR INSERT ON transfers
+FOR EACH ROW
+EXECUTE FUNCTION log_transaction();
+
+===============================================================================================
+--Trigger: Capture a donation and the donor
+
+CREATE OR REPLACE FUNCTION capture_and_save_external_savings()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- Check if the donor exists if not create a donor account for the donor
+    IF NOT EXISTS (
+        SELECT 1 FROM donors WHERE donor_phone_number = NEW.donor_phone_number
+    ) THEN
+        INSERT INTO donors (donor_name, donor_phone_number)
+        VALUES (NEW.donor_name, NEW.donor_phone_number);
+    END IF;
+
+    -- Capture the donation
+    INSERT INTO external_savings (pocket_id, donor_id, amount, show_donor_details)
+    SELECT NEW.pocket_id, d.id, NEW.amount, TRUE
+    FROM donors d
+    WHERE d.donor_phone_number = NEW.donor_phone_number;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER capture_external_savings_trigger
+AFTER INSERT ON external_savings
+FOR EACH ROW
+EXECUTE FUNCTION capture_and_save_external_savings();
