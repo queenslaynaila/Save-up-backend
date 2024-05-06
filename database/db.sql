@@ -212,8 +212,8 @@ SELECT create_distributed_table('administrator_votes', 'group_id');
 ---Donors
 CREATE TABLE IF NOT EXISTS donors (
   donor_id             SERIAL PRIMARY KEY,
-  donor_name           TEXT NOT NULL,
-  donor_phone_number   TEXT NOT NULL UNIQUE,
+  full_name            TEXT NOT NULL,
+  phone_number         TEXT NOT NULL UNIQUE,
   created_at           TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at           TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -658,17 +658,17 @@ RETURNS TRIGGER AS $$
 BEGIN
     -- Check if the donor exists if not create a donor account for the donor
     IF NOT EXISTS (
-        SELECT 1 FROM donors WHERE donor_phone_number = NEW.donor_phone_number
+        SELECT 1 FROM donors WHERE phone_number = NEW.phone_number
     ) THEN
-        INSERT INTO donors (donor_name, donor_phone_number)
-        VALUES (NEW.donor_name, NEW.donor_phone_number);
+        INSERT INTO donors (full_name, phone_number)
+        VALUES (NEW.full_name, NEW.phone_number);
     END IF;
 
     -- Capture the donation
     INSERT INTO external_savings (pocket_id, donor_id, amount, show_donor_details)
-    SELECT NEW.pocket_id, d.id, NEW.amount, TRUE
+    SELECT NEW.pocket_id, d.id, NEW.amount, NEW.show_donor_details
     FROM donors d
-    WHERE d.donor_phone_number = NEW.donor_phone_number;
+    WHERE d.phone_number = NEW.phone_number;
 
     RETURN NEW;
 END;
