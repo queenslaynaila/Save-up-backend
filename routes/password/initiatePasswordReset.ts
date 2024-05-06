@@ -32,7 +32,7 @@ export default  (router: Router) => {
         phone_number,
         `Your password reset token is: ${resetToken}. It expires in 10 minutes. Do not share with anyone.`
       );
-      res.setHeader('X-Reset-Token', resetTokenHeader).json({ message: 'Password reset token generated and sent successfully.' });
+      res.setHeader('reset-token', resetTokenHeader).json({ message: 'Password reset token generated and sent successfully.' });
     });
 };
   

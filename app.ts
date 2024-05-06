@@ -80,7 +80,7 @@ app.use((_, res, next) => {
 });
 app.use(
   cors({
-    exposedHeaders: ['Authorization','Refresh-Token','X-Auth-Token', 'X-Refresh-Token','X-Reset-Token'],
+    exposedHeaders: ['authorization-token','refresh-Token','reset-token'],
   })
 );
 

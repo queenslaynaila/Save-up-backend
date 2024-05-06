@@ -41,8 +41,8 @@ export default (router: Router) => {
       const accessToken = generateToken(user.id, user.role, '1d');
       const refreshToken = generateToken(user.id, user.role, '7d');
       res
-        .setHeader('X-Refresh-Token', refreshToken)
-        .setHeader('X-Auth-Token', accessToken)
+        .setHeader('refresh-token', refreshToken)
+        .setHeader('auth-token', accessToken)
         .json(userResult);
     }
   );

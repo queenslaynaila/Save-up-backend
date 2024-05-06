@@ -6,9 +6,10 @@ export default (router: Router) => {
   router.post<Record<string,never>, MessageInterface, Record<string,never>, Record<string,never>, Record<string,never>>(
     '/signout', 
     authMiddleware(), 
-    async (_, res) => {
-      res.removeHeader('X-Auth-Token');
-      res.removeHeader('X-Refresh-Token');
+    async (req, res) => {
+      console.log(req.headers)
+      res.removeHeader('authorization-token');
+      res.removeHeader('refresh-token');
       return res.json({ message: 'Logout successful' });
     });
 };

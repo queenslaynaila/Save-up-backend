@@ -9,7 +9,7 @@ type User = {
 }
 
 export const verifyResetToken = (req: Request, res: Response, next: NextFunction) => {
-  const token = req.headers['x-reset-token'] as string;
+  const token = req.headers['reset-token'] as string;
   if (!token) {
     throw new HttpError(403, 'Access denied');
   }
