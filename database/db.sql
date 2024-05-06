@@ -347,6 +347,32 @@ CREATE INDEX idx_expenses_by_entity_id ON expenses(entity_id);
 SELECT create_distributed_table('expenses', 'id');
 
 ===============================================================================================
+--Function: Create User
+
+CREATE OR REPLACE FUNCTION create_user(full_name TEXT, gender enum_genders, national_id INT, phone_number TEXT, pin TEXT)
+RETURNS VOID AS $$
+DECLARE
+  entity_id INTEGER;
+BEGIN 
+      --Insert into entities and retrieve the generated ID
+      INSERT INTO entities (entity_type)
+      VALUES ('User')
+      RETURNING id INTO entity_id;
+
+      -- Insert into user_contact_details
+      INSERT INTO user_contact_details (id, phone_number, national_id)
+      VALUES (entity_id, phone_number, national_id);
+
+      -- Insert into users
+      INSERT INTO users (id, full_name, gender, pin)
+      VALUES (entity_id, full_name, gender, pin);
+EXCEPTION 
+    WHEN unique_violation THEN
+      RAISE EXCEPTION 'User with that national ID or phone number already exists.';
+END;
+$$ LANGUAGE plpgsql;
+
+===============================================================================================
 -- Trigger: Update the status of a pocket to Complete when total savings exceeds target amount for a pocket.
 
 CREATE OR REPLACE FUNCTION update_pockets_status()
@@ -514,32 +540,6 @@ CREATE TRIGGER create_default_pockets_pocket_trigger
 AFTER INSERT ON users OR INSERT ON groups
 FOR EACH ROW
 EXECUTE FUNCTION create_default_pockets_vault();
-
-===============================================================================================
---Trigger: .
-
-CREATE OR REPLACE FUNCTION create_user(full_name TEXT, gender enum_genders, national_id INT, phone_number TEXT, pin TEXT)
-RETURNS VOID AS $$
-DECLARE
-  entity_id INTEGER;
-BEGIN 
-      --Insert into entities and retrieve the generated ID
-      INSERT INTO entities (entity_type)
-      VALUES ('User')
-      RETURNING id INTO entity_id;
-
-      -- Insert into user_contact_details
-      INSERT INTO user_contact_details (id, phone_number, national_id)
-      VALUES (entity_id, phone_number, national_id);
-
-      -- Insert into users
-      INSERT INTO users (id, full_name, gender, pin)
-      VALUES (entity_id, full_name, gender, pin);
-EXCEPTION 
-    WHEN unique_violation THEN
-      RAISE EXCEPTION 'User with that national ID or phone number already exists.';
-END;
-$$ LANGUAGE plpgsql;
 
 
 ===============================================================================================
