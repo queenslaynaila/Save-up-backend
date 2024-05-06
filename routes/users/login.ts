@@ -16,7 +16,7 @@ const SQL_GET_USER = sql<{ id: number }, ExtendedUserInterface>(`
 
 export default (router: Router) => {
   router.post<Record<string,never>, GetUserInterface, UpdatePhoneInterface, Record<string,never>>(
-    '/signin',
+    '/login',
     validateRequest(updateUserPhoneSchema),
     async (req, res) => {
 

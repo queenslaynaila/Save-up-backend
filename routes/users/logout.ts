@@ -4,7 +4,7 @@ import { MessageInterface } from '../../globalTypes/index';
 
 export default (router: Router) => {
   router.post<Record<string,never>, MessageInterface, Record<string,never>, Record<string,never>, Record<string,never>>(
-    '/signout', 
+    '/logout', 
     authMiddleware(), 
     async (req, res) => {
       console.log(req.headers)
