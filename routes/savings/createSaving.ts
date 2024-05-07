@@ -11,14 +11,11 @@ interface SavingInterface {
 }
 
 const SQL_CREATE_SAVING = sql<CreateSavingInterface, SavingInterface>(`
-  INSERT INTO savings (id, goal_id, user_id, donor_name, donor_email, donor_phone_number, amount)
+  INSERT INTO savings (id, goal_id, user_id, amount)
   VALUES (
       (SELECT COALESCE(MAX(id), 0) + 1 FROM savings WHERE goal_id = :goal_id),
       :goal_id,
       :user_id,
-      COALESCE(:donor_name, NULL),
-      COALESCE(:donor_email, NULL),
-      COALESCE(:donor_phone_number, NULL),
       :amount
   )
   RETURNING amount, (
@@ -33,8 +30,8 @@ export default (router: Router) => {
     validateRequest(validateSavingCreationSchema),
     async (req, res) => {
       const user_id= req.user!.id
-      const { goal_id, amount, donor_name, donor_email, donor_phone_number  } = req.body;
-      const savingResult = await SQL_CREATE_SAVING({ user_id, goal_id, amount, donor_name, donor_email, donor_phone_number })
+      const { goal_id, amount  } = req.body;
+      const savingResult = await SQL_CREATE_SAVING({ user_id, goal_id, amount })
         .one(new HttpError(400, 'Unable to complete the request'));
       const goalName = savingResult.name
       const amountPaid = savingResult.amount

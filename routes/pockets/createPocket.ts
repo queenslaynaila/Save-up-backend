@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { validateRequest } from '../../middleware/validationMiddleware';
-import { CreatePocketInterface, PocketInterface, basePocketSchema } from './types';
+import { CreatePocketInterface, PocketInterface, createPocketSchema } from './types';
 
 const SQL_CREATE_POCKET = sql<CreatePocketInterface, PocketInterface>(`
   INSERT INTO pockets (id, entity_id, category_id, name, target_amount, priority, target_at, pocket_type)
@@ -11,14 +11,14 @@ const SQL_CREATE_POCKET = sql<CreatePocketInterface, PocketInterface>(`
   RETURNING id, entity_id, name, category_id, target_amount, priority, target_at, created_at, completed_at;
 `);
 
-
 export default (router: Router) => {
   router.post<Record<string,never>, PocketInterface, CreatePocketInterface, Record<string,never>, Record<string,never>>(
     '/', 
     authMiddleware(), 
-    validateRequest(basePocketSchema),
+    validateRequest(createPocketSchema),
     async (req, res) => {
-      const { entity_id, category_id, name, target_amount, priority, target_at, pocket_type } = req.body;
+      const { category_id, name, target_amount, priority, target_at, pocket_type } = req.body;
+      const entity_id = req.body.entity_id ? req.body.entity_id : req.user!.id;
       const newPocket = await SQL_CREATE_POCKET({
         entity_id,
         category_id,

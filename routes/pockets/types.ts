@@ -9,6 +9,10 @@ export const basePocketSchema = z.object({
   target_at: z.string(),
   pocket_type: z.enum(['Standard Pocket', 'Locked Pocket'])
 });
+
+export const createPocketSchema = basePocketSchema.extend({
+  entity_id: z.number().optional(),
+}); 
   
 export type CreatePocketInterface = z.infer<typeof basePocketSchema>;
   
