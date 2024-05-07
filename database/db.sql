@@ -222,27 +222,20 @@ CREATE TABLE IF NOT EXISTS donors (
 ---Financial management 
 
 CREATE TABLE IF NOT EXISTS interest_rates (
-  id            SERIAL PRIMARY KEY,
-  pocket_type   enum_pocket_types NOT NULL,
-  default_rate  NUMERIC(3,2) NOT NULL CHECK (default_rate > 0),
-  created_at    TIMESTAMP WITH TIME ZONE DEFAULT NOW(), 
-  updated_at    TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
-CREATE TABLE IF NOT EXISTS interest_rate_tiers (
-  id            SERIAL PRIMARY KEY,
-  tier          TEXT NOT NULL,   -- name we  are giving to this tier or offer
-  pocket_type   enum_pocket_types NOT NULL,
-  tier_rate     NUMERIC(3,2) NOT NULL CHECK (tier_rate > 0),
-  start_date    TIMESTAMP WITH TIME ZONE NOT NULL, -- Start date of the interest rate validity if its an offer
-  end_date      TIMESTAMP WITH TIME ZONE NOT NULL, -- Enda date of the interest rate validity if its an offer
-  created_at    TIMESTAMP WITH TIME ZONE DEFAULT NOW(), 
-  updated_at    TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+  id                  SERIAL PRIMARY KEY,
+  pocket_type         enum_pocket_types NOT NULL,
+  name                TEXT NOT NULL,
+  is_default_rate     BOOLEAN NOT NULL DEFAULT FALSE,
+  rate                NUMERIC(3,2) NOT NULL CHECK (rate > 0),
+  start_date          TIMESTAMP WITH TIME ZONE NOT NULL, -- Start date of the interest rate validity if its an offer
+  end_date            TIMESTAMP WITH TIME ZONE NOT NULL, -- Enda date of the interest rate validity if its an offer
+  created_at          TIMESTAMP WITH TIME ZONE DEFAULT NOW(), 
+  updated_at          TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 CREATE TABLE IF NOT EXISTS pockets ( 
-  id                      INT NOT NULL,
   entity_id               INT NOT NULL, 
+  id                      INT NOT NULL,
   category_id             INT NOT NULL,
   name                    TEXT NOT NULL,
   target_amount           NUMERIC(30, 2) NOT NULL CHECK (target_amount > 0),
@@ -259,6 +252,7 @@ CREATE TABLE IF NOT EXISTS pockets (
   updated_at              TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   completed_at            TIMESTAMP WITH TIME ZONE, 
   deleted_at              TIMESTAMP WITH TIME ZONE,
+  PRIMARY KEY             (entity_id, id), 
   FOREIGN KEY             (entity_id) REFERENCES entities(id),
   FOREIGN KEY             (category_id) REFERENCES categories(id)
 );
@@ -274,8 +268,7 @@ CREATE TABLE IF NOT EXISTS savings (
   amount                NUMERIC(30, 2) NOT NULL,
   created_at            TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   PRIMARY KEY           (pocket_id, id), 
-  FOREIGN KEY           (user_id) REFERENCES users(id),
-  FOREIGN KEY           (pocket_id) REFERENCES pockets(id)
+  FOREIGN KEY           (user_id) REFERENCES users(id)
 );
 
 CREATE INDEX idx_savings_by_pocket_id ON savings(pocket_id);
@@ -289,8 +282,7 @@ CREATE TABLE IF NOT EXISTS external_savings (
   show_donor_details    BOOLEAN NOT NULL DEFAULT TRUE,
   created_at            TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   PRIMARY KEY           (pocket_id, id), 
-  FOREIGN KEY           (donor_id) REFERENCES donors(id),
-  FOREIGN KEY           (pocket_id) REFERENCES pockets(id)
+  FOREIGN KEY           (donor_id) REFERENCES donors(id)
 );
 
 CREATE INDEX idx_external_savings_by_pocket_id ON external_savings(pocket_id);
@@ -558,7 +550,7 @@ BEGIN
     WHERE id = NEW.pocket_id;
 
    --Fetch rate for the pocket type
-    SELECT default_rate INTO pocket_rate
+    SELECT rate INTO pocket_rate
     FROM interest_rates
     WHERE pocket_type = pocket_type;
  
@@ -566,9 +558,15 @@ BEGIN
     SELECT COALESCE(SUM(amount), 0) INTO total_savings
     FROM savings
     WHERE user_id = NEW.user_id AND saving_id = NEW.saving_id;
+
+    -- Fetch the timestamp of the last interest calculation
+    SELECT MAX(created_at) INTO last_interest_calculation
+    FROM transaction_logs
+    WHERE user_id = NEW.user_id AND pocket_id = NEW.pocket_id AND transaction_type = SAVINGS;
+    days_elapsed = DATE_PART('day', NOW() - last_interest_calculation);
  
     --Calculate interest earned aad update
-    NEW.interest_earned := total_savings * pocket_rate / 100;  
+     NEW.interest_earned = (total_savings * pocket_rate/100 * days_elapsed) / (* 365); 
 
     UPDATE pockets
     SET interest_earned = NEW.interest_earned
