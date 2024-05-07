@@ -110,8 +110,9 @@ app.use(() => {
 // Global error handler
 /* eslint-disable @typescript-eslint/no-unused-vars */
 app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
+  console.log(error)
   if (error instanceof HttpError) {
-    console.log('http errror starts here')  
+    console.log('http errror starts here:', error);  
     return res.status(error.statusCode).json({ error: error.message });
   }
   return res.status(500).json({ error: 'Internal Server error' });
