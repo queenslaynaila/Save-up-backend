@@ -18,10 +18,11 @@ export type CreatePocketInterface = z.infer<typeof basePocketSchema>;
   
 export const pocketSchema =  basePocketSchema.extend({
   id: z.number(),
-  created_at: z.date(),
+  status:z.string(),
   target_at: z.date(),
   updated_at: z.date(),
   completed_at: z.date(),
+  created_at : z.date(),
   interest_rate: z.number().min(0).max(100)
 })
   
@@ -59,7 +60,7 @@ export const pocketsByConditionsQuerySchema = z.object({
   category_id: z.string().optional(),
   priority: z.string().optional(),
   status: z.string().optional(),
-  start_at: z.string().optional(),
+  created_at: z.string().optional(),
   completed_at: z.string().optional(),
 })
   
