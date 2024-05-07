@@ -3,6 +3,7 @@ import createPocket from './createPocket';
 import deletePocket from './deletePocket';
 import getPocketByCriteria from './getPocketByCriteria';
 import updatePocket from './updatePocket';
+import upgradePocket from './upgradePocket';
 import getPocketByPktID from './getPocketByPktID';
 
 export default (baseRouter: express.Router) => {
@@ -12,6 +13,7 @@ export default (baseRouter: express.Router) => {
   deletePocket(router);
   getPocketByCriteria(router);
   updatePocket(router);
+  upgradePocket(router);
   getPocketByPktID(router);
 
   baseRouter.use('/pockets', router);

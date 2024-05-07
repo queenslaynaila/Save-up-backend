@@ -7,14 +7,15 @@ import { IdParamInterface } from '../../globalTypes/index';
 import { validateRequest } from '../../middleware/validationMiddleware';
 
 const SQL_UPDATE_POCKET = sql<UpdatePocketInterface, PocketUpdateRes>(`
-  UPDATE pockets
-  SET name = COALESCE(:name, pockets.name),
-      category_id = COALESCE(:category_id, pockets.category_id),
-      target_amount = COALESCE(:target_amount, pockets.target_amount),
-      priority = COALESCE(:priority, pockets.priority),
-      target_at = COALESCE(:target_at, pockets.target_at)
-  WHERE id = :id 
-  RETURNING name, category_id, target_amount, priority, target_at
+  UPDATE pockets p
+  SET name = COALESCE(:name, p.name),
+      category_id = COALESCE(:category_id, p.category_id),
+      target_amount = COALESCE(:target_amount, p.target_amount),
+      priority = COALESCE(:priority, p.priority),
+      target_at = COALESCE(:target_at, p.target_at)
+  FROM categories c
+  WHERE p.category_id = c.id AND p.id = :id
+  RETURNING p.name, c.name AS category_name, p.target_amount, p.priority, p.target_at;
 `);
 
 export default (router: Router) => {

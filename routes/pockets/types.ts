@@ -36,7 +36,7 @@ export type UpdatePocketInterface = z.infer<typeof updatePocketSchema>;
   
 export const pocketUpdateResSchema = z.object({
   name: z.string(),
-  category_id: z.number().positive(), 
+  category_name: z.number().positive(), 
   target_amount: z.number().positive(), 
   priority: z.enum(['Low', 'Intermediate', 'High']), 
   target_at: z.date(),
@@ -78,3 +78,11 @@ export const deletePocketSchema = z.object({
 });
 
 export type DeletePocket = z.infer<typeof deletePocketSchema>;
+
+export const upgradedPocketSChema = z.object({
+  pocket_type : z.string(),
+  interest_rate: z.number(),
+  target_at: z.date().optional()
+})
+
+export type upgradedPocketInterface = z.infer<typeof updatePocketSchema>
