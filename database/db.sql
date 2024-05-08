@@ -341,6 +341,19 @@ CREATE TABLE IF NOT EXISTS expenses (
 CREATE INDEX idx_expenses_by_entity_id ON expenses(entity_id);
 SELECT create_distributed_table('expenses', 'id');
 
+CREATE TABLE IF NOT EXISTS transaction_logs (
+  user_id                 INT NOT NULL,
+  transaction_id          INT NOT NULL,
+  pocket_id               INT NOT NULL,
+  transaction_type        enum_transaction_type NOT NULL,
+  amount                  NUMERIC(30, 2) NOT NULL CHECK (amount > 0),
+  reference_no            TEXT NOT NULL,
+  created_at              TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  PRIMARY KEY             (user_id, log_id),
+  FOREIGN KEY             (user_id) REFERENCES users(id),
+  FOREIGN KEY             (pocket_id) REFERENCES pockets(id)
+);
+
 ===============================================================================================
 --Function: Create User
 
@@ -625,19 +638,6 @@ EXECUTE FUNCTION compute_total_savings();
 ===============================================================================================
 --Logs
 
-CREATE TABLE IF NOT EXISTS transaction_logs (
-  user_id                 INT NOT NULL,
-  transaction_id          INT NOT NULL,
-  pocket_id               INT NOT NULL,
-  transaction_type        enum_transaction_type NOT NULL,,
-  amount                  NUMERIC(30, 2) NOT NULL CHECK (amount > 0),
-  reference_no            TEXT NOT NULL,
-  created_at              TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  PRIMARY KEY             (user_id, log_id)
-  FOREIGN KEY             (user_id) REFERENCES users(id),
-  FOREIGN KEY             (pocket_id) REFERENCES pockets(id)
-);
-
 CREATE OR REPLACE FUNCTION log_transaction()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -657,6 +657,23 @@ BEGIN
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
+
+CREATE TRIGGER enforce_log_transaction
+AFTER INSERT ON savings
+FOR EACH ROW
+EXECUTE FUNCTION log_transaction();
+
+
+CREATE TRIGGER enforce_log_transaction
+AFTER INSERT ON external_savings OR INSERT ON withdrawals OR INSERT ON transfers
+FOR EACH ROW
+EXECUTE FUNCTION log_transaction();
+
+
+CREATE TRIGGER enforce_log_transaction
+AFTER INSERT ON savings OR INSERT ON external_savings OR INSERT ON withdrawals OR INSERT ON transfers
+FOR EACH ROW
+EXECUTE FUNCTION log_transaction();
 
 
 CREATE TRIGGER enforce_log_transaction

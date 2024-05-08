@@ -4,23 +4,23 @@ GRANT ALL PRIVILEGES ON DATABASE saveupapi TO db_management_user;
 
 ===============================================================================================
 
--- ADMIN USER
-CREATE USER admin_user WITH PASSWORD 'mimiNdiyeAdminWaSaveup@2024';
+-- -- ADMIN USER
+-- CREATE USER admin_user WITH PASSWORD 'mimiNdiyeAdminWaSaveup@2024';
 
---Read Only pemissions
-GRANT SELECT ON next_of_kins, groups, user_groups, group_administrators, nomination_approvals TO admin_user;
+-- --Read Only pemissions
+-- GRANT SELECT ON next_of_kins, groups, user_groups, group_administrators, nomination_approvals TO admin_user;
 
---Write only permissions
-GRANT INSERT ON categories, security_questions, interest_rates TO admin_user;
+-- --Write only permissions
+-- GRANT INSERT ON categories, security_questions, interest_rates TO admin_user;
 
---Read Write permissions
-GRANT SELECT, INSERT ON savings, external_savings, withdrawals, transfers TO admin_user;
+-- --Read Write permissions
+-- GRANT SELECT, INSERT ON savings, external_savings, withdrawals, transfers TO admin_user;
 
---Read Delete Permisons
-GRANT SELECT, DELETE ON security_answers TO admin_user;
+-- --Read Delete Permisons
+-- GRANT SELECT, DELETE ON security_answers TO admin_user;
 
---Write, Read, Update, Delete Permissions
-GRANT SELECT, INSERT, UPDATE, DELETE ON user_contacts, transaction_logs TO admin_user;
+-- --Write, Read, Update, Delete Permissions
+-- GRANT SELECT, INSERT, UPDATE, DELETE ON user_contacts, transaction_logs TO admin_user;
 
 ==================================================================================================
 
