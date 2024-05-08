@@ -14,7 +14,7 @@ export default (router: Router) => {
     '/:identifier',
     async (req, res) => {
       const savingIdentifier = req.params.identifier;
-      const { category_id, goal_id } = req.query;
+      const { category_id, pocket_id } = req.query;
       const filterArgs: Record<string, string> = {};
       const filters: string[] = [];
       const loggedInUserId = req.user!.id;
@@ -37,13 +37,13 @@ export default (router: Router) => {
         throw new HttpError(400, 'Bad request');
       }
 
-      if (goal_id) {
-        filterArgs.goal_id = goal_id.toString();
-        filters.push(`goal_id = :goal_id`);
+      if (pocket_id) {
+        filterArgs.pocket_id = pocket_id.toString();
+        filters.push(`pocket_id = :pocket_id`);
       }
       if (category_id) {
         filterArgs.category_id = category_id.toString()
-        filters.push(`saving_id IN (SELECT id FROM goals WHERE category_id = :category_id)`);
+        filters.push(`id IN (SELECT id FROM pockets WHERE category_id = :category_id)`);
       }
 
       const query = SQL_GET_SAVINGS({});
