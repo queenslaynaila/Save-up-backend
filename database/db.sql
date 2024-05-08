@@ -285,7 +285,7 @@ CREATE TABLE IF NOT EXISTS external_savings (
   show_donor_details    BOOLEAN NOT NULL DEFAULT TRUE,
   created_at            TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   PRIMARY KEY           (pocket_id, id), 
-  FOREIGN KEY           (donor_id) REFERENCES donors(id)
+  FOREIGN KEY           (donor_id) REFERENCES donors(donor_id)
 );
 
 CREATE INDEX idx_external_savings_by_pocket_id ON external_savings(pocket_id);
@@ -587,25 +587,38 @@ EXECUTE FUNCTION compute_interest_earned();
 ===============================================================================================
 --Trigger: Compute and store total saved amount for a pocket
 
-CREATE OR REPLACE FUNCTION compute_total_savings
+CREATE OR REPLACE FUNCTION compute_total_savings()
 RETURNS TRIGGER AS $$
 DECLARE
-      total_savings NUMERIC(30, 2);
-BEGIN 
+  total_savings NUMERIC(30, 2);
+BEGIN
+  IF TG_TABLE_NAME = 'savings' THEN
     SELECT COALESCE(SUM(amount), 0) INTO total_savings
     FROM savings
-    WHERE user_id = NEW.user_id AND saving_id = NEW.saving_id;
-
-    UPDATE pockets
-    SET  saved_amount = total_savings
-    WHERE id = NEW.pocket_id AND user_id = NEW.user_id;
-
-    RETURN NEW;
+    WHERE pocket_id = NEW.pocket_id;
+  ELSE
+    SELECT COALESCE(SUM(amount), 0) INTO total_savings
+    FROM external_savings
+    WHERE pocket_id = NEW.pocket_id;   
+  END IF;
+  
+  UPDATE pockets
+  SET saved_amount = total_savings
+  WHERE id = NEW.pocket_id;
+  
+  RETURN NEW;
 END
-$$ LANGUAGE plgpgsql
+$$ LANGUAGE plpgsql;
 
+-- Trigger for the 'savings' table
 CREATE TRIGGER enforce_compute_total_savings
-AFTER INSERT ON savings OR INSERT ON external_savings
+AFTER INSERT ON savings
+FOR EACH ROW
+EXECUTE FUNCTION compute_total_savings();
+
+-- Trigger for the 'external_savings' table
+CREATE TRIGGER enforce_compute_total_external_savings
+AFTER INSERT ON external_savings
 FOR EACH ROW
 EXECUTE FUNCTION compute_total_savings();
 
