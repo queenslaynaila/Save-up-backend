@@ -263,11 +263,14 @@ SELECT create_distributed_table('pockets', 'id');
 
 CREATE TABLE IF NOT EXISTS savings (
   id                    INT NOT NULL,
+  entity_id             INT NOT NULL,  -- The id of the user or group who owns the savings
   pocket_id             INT NOT NULL,
-  user_id               INT NOT NULL,
+  user_id               INT NOT NULL,  -- Represents the  user making the saving. Incase its a personal pocket its the same as entity id and when its a group pocket it represents the grp member saving the money and in this case its diff from enetity id
   amount                NUMERIC(30, 2) NOT NULL,
   created_at            TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   PRIMARY KEY           (pocket_id, id), 
+  FOREIGN KEY           (entity_id, pocket_id) REFERENCES pockets (entity_id, id),
+  FOREIGN KEY           (entity_id) REFERENCES entities(id),
   FOREIGN KEY           (user_id) REFERENCES users(id)
 );
 
