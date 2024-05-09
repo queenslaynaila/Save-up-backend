@@ -55,6 +55,7 @@ VALUES ('Food', 'All food related expenses'),
        ('Default', 'A flexible space where you can save money without assigning it to specific purposes right away. Funds saved here are readily available for future use and can be easily allocated to other pockets whenever you choose.');
 
 SELECT create_reference_table('categories');
+GRANT SELECT ON categories, security_questions, users, interest_rates, transaction_logs TO app_user;
 
 ===============================================================================================
 --Entity
@@ -64,6 +65,7 @@ CREATE TABLE IF NOT EXISTS entities (
 );
 
 SELECT create_reference_table('entities');
+GRANT INSERT ON entities, reset_tokens TO app_user;
 
 ===============================================================================================
 --- User & User Management
@@ -75,6 +77,8 @@ CREATE TABLE IF NOT EXISTS user_contact_details (
   CONSTRAINT      phone_number_format_check CHECK (phone_number ~* '^\+?254[0-9]{9}$'),
   CONSTRAINT      national_id_length_check CHECK (national_id >= 10000000 AND national_id <= 99999999)
 );
+
+GRANT INSERT, SELECT, UPDATE ON user_contact_details, invitations, expenses, pockets TO app_user;
 
 CREATE TABLE IF NOT EXISTS users (
   id                        INT NOT NULL PRIMARY KEY,
@@ -120,6 +124,8 @@ CREATE TABLE IF NOT EXISTS security_answers (
 );
 
 SELECT create_distributed_table('security_answers', 'user_id');
+GRANT INSERT, UPDATE ON security_answers TO app_user;
+
 
 CREATE TABLE IF NOT EXISTS reset_tokens (
   user_id       INT NOT NULL,
@@ -159,7 +165,7 @@ CREATE TABLE IF NOT EXISTS user_groups (
 );
 
 SELECT create_distributed_table('user_groups', 'group_id');
-
+GRANT SELECT, UPDATE ON user_groups, next_of_kins TO app_user;
 
 CREATE TABLE IF NOT EXISTS group_administrators (
   group_id      INT NOT NULL,
@@ -195,6 +201,7 @@ CREATE TABLE IF NOT EXISTS nominated_administrators (
 );
 
 SELECT create_distributed_table('nominated_administrators', 'group_id');
+GRANT SELECT, INSERT ON nominations_approvals, savings, external_savings, withdrawals, transfers TO app_user;
 
 CREATE TABLE IF NOT EXISTS nomination_approvals (
   group_id              INT NOT NULL,
@@ -291,19 +298,21 @@ CREATE TABLE IF NOT EXISTS external_savings (
 CREATE INDEX idx_external_savings_by_pocket_id ON external_savings(pocket_id);
 SELECT create_distributed_table('external_savings', 'pocket_id');
 
+===============================================================================================
+
 CREATE TABLE IF NOT EXISTS withdrawals (
-  pocket_id       INT NOT NULL,
+  pocket_id     INT NOT NULL,
   id            INT NOT NULL,
-  user_id       INT NOT NULL,
+  entity_id     INT NOT NULL,  -- The id of the user or group who owns the savings.If its a user then its value is the id of the user if its a grp the value is the group id
+  user_id       INT NOT NULL, --- The usser who withdrwas the money incase its a personal pocket or the group administrator who withdrwas the money incase its a grp pocket
   amount        NUMERIC(30, 2) NOT NULL CHECK (amount >= 0),
   created_at    TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   PRIMARY KEY   (pocket_id, id),
-  FOREIGN KEY   (pocket_id) REFERENCES pockets(id),
+  FOREIGN KEY   (entity_id, pocket_id) REFERENCES pockets (entity_id, id),
   FOREIGN KEY   (user_id) REFERENCES users(id)
 );
 
-CREATE INDEX idx_withdrawals_by_pocket_id ON withdrawals(pocket_id);
-SELECT create_distributed_table('withdrawals', 'pocket_id');
+===============================================================================================
 
 -- This records money transfered from default pockets (quick save and grp resrve) to other pockets 
 
@@ -341,20 +350,100 @@ CREATE TABLE IF NOT EXISTS expenses (
 CREATE INDEX idx_expenses_by_entity_id ON expenses(entity_id);
 SELECT create_distributed_table('expenses', 'id');
 
+===============================================================================================
+
 CREATE TABLE IF NOT EXISTS transaction_logs (
   user_id                 INT NOT NULL,
   transaction_id          INT NOT NULL,
   pocket_id               INT NOT NULL,
+  entity_id               INT NOT NULL, 
   transaction_type        enum_transaction_type NOT NULL,
   amount                  NUMERIC(30, 2) NOT NULL CHECK (amount > 0),
+  cumulative_amount       NUMERIC(30, 2) NOT NULL,
   reference_no            TEXT NOT NULL,
   created_at              TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  PRIMARY KEY             (user_id, log_id),
+  PRIMARY KEY             (user_id, transaction_id),
   FOREIGN KEY             (user_id) REFERENCES users(id),
-  FOREIGN KEY             (pocket_id) REFERENCES pockets(id)
+  FOREIGN KEY             (entity_id, pocket_id) REFERENCES pockets (entity_id, id)
 );
 
+CREATE INDEX idx_transaction_logs_user_id ON transaction_logs(user_id);
+CREATE INDEX idx_transaction_logs_transaction_id ON transaction_logs(transaction_id);
+
 ===============================================================================================
+
+CREATE OR REPLACE FUNCTION log_saving_transaction()
+RETURNS TRIGGER AS $$
+DECLARE
+  previous_cumulative NUMERIC(30, 2);
+  new_cumulative NUMERIC(30, 2);
+BEGIN 
+  SELECT COALESCE(cumulative_amount, 0) INTO previous_cumulative
+  FROM transaction_logs
+  WHERE user_id = NEW.user_id
+  ORDER BY transaction_id DESC
+  LIMIT 1;
+
+  new_cumulative = COALESCE(previous_cumulative, 0) + NEW.amount;
+
+  INSERT INTO transaction_logs (user_id, transaction_id, pocket_id, entity_id, transaction_type, amount, cumulative_amount, reference_no, created_at)
+  SELECT NEW.user_id,
+         COALESCE((SELECT MAX(transaction_id) + 1 FROM transaction_logs WHERE pocket_id = NEW.pocket_id), 1),
+         NEW.pocket_id,
+         NEW.entity_id,
+         'Saving',
+         NEW.amount,
+         new_cumulative,
+         NEW.id,
+         NOW();
+  RETURN NEW;
+END
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER enforce_log_saving_transaction
+AFTER INSERT ON savings
+FOR EACH ROW
+EXECUTE FUNCTION log_saving_transaction();
+
+===============================================================================================
+
+CREATE OR REPLACE FUNCTION log_withdrawal_transaction()
+RETURNS TRIGGER AS $$
+DECLARE
+  previous_cumulative NUMERIC(30, 2);
+  new_cumulative NUMERIC(30, 2);
+BEGIN 
+  SELECT COALESCE(cumulative_amount, 0) INTO previous_cumulative
+  FROM transaction_logs
+  WHERE user_id = NEW.user_id
+  ORDER BY transaction_id DESC
+  LIMIT 1;
+
+  new_cumulative = COALESCE(previous_cumulative, 0) - NEW.amount;
+
+  INSERT INTO transaction_logs (user_id, transaction_id, pocket_id, entity_id, transaction_type, amount, cumulative_amount, reference_no, created_at)
+  SELECT
+         NEW.user_id,
+         COALESCE((SELECT MAX(transaction_id) + 1 FROM transaction_logs WHERE pocket_id = NEW.pocket_id), 1),
+         NEW.pocket_id,
+         NEW.entity_id,
+         'Withdrawal',
+         NEW.amount,
+         new_cumulative,
+         NEW.id, --id of the withdrawal in the withdrawal table for now  --In production, this should be the mpesa or bank transaction no.
+         NOW();
+  RETURN NEW;
+END
+$$ LANGUAGE plpgsql;
+
+
+CREATE TRIGGER enforce_log_withdrawal_transaction
+AFTER INSERT ON withdrawals
+FOR EACH ROW
+EXECUTE FUNCTION log_withdrawal_transaction();
+
+===============================================================================================
+
 --Function: Create User
 
 CREATE OR REPLACE FUNCTION create_user(full_name TEXT, gender enum_genders, national_id INT, phone_number TEXT, pin TEXT)
@@ -638,46 +727,82 @@ EXECUTE FUNCTION compute_total_savings();
 ===============================================================================================
 --Logs
 
-CREATE OR REPLACE FUNCTION log_transaction()
+
+
+CREATE OR REPLACE FUNCTION log_saving_transaction()
 RETURNS TRIGGER AS $$
 BEGIN
-    IF TG_TABLE_NAME = 'savings' THEN
-        INSERT INTO transaction_logs (user_id, transaction_id, pocket_id, transaction_type, amount, reference_no, created_at)
-        SELECT NEW.user_id, COALESCE((SELECT MAX(id) FROM transaction_logs WHERE user_id = NEW.user_id), 0), NEW.pocket_id, 'Saving', NEW.amount, NEW.id, NOW();
-    ELSIF TG_TABLE_NAME = 'external_savings' THEN
-        INSERT INTO transaction_logs (user_id, transaction_id, pocket_id, transaction_type, amount, reference_no, created_at)
-        SELECT NEW.user_id, COALESCE((SELECT MAX(id) FROM transaction_logs WHERE user_id = NEW.user_id), 0), NEW.pocket_id, 'External Saving', NEW.amount, NEW.id, NOW();
-    ELSIF TG_TABLE_NAME = 'withdrawals' THEN
-        INSERT INTO transaction_logs (user_id, transaction_id, pocket_id, transaction_type, amount, reference_no, created_at)
-        SELECT NEW.user_id, COALESCE((SELECT MAX(id) FROM transaction_logs WHERE user_id = NEW.user_id), 0), NEW.pocket_id, 'Withdrawal', NEW.amount, NEW.id, NOW();
-    ELSIF TG_TABLE_NAME = 'transfers' THEN
-        INSERT INTO transaction_logs (user_id, transaction_id, pocket_id, transaction_type, amount, reference_no, created_at)
-        SELECT NEW.user_id, COALESCE((SELECT MAX(id) FROM transaction_logs WHERE user_id = NEW.user_id), 0), NEW.source_pocket_id, 'Transfer', NEW.amount, NEW.id, NOW();
-    END IF;
-    RETURN NEW;
-END;
+  -- Get the previous cumulative amount from the transaction_logs table
+  SELECT COALESCE(SUM(amount), 0)
+  INTO NEW.cumulative_amount
+  FROM transaction_logs
+  WHERE user_id = NEW.user_id;
+
+  -- Update the cumulative amount with the new amount from the current record
+  NEW.cumulative_amount := NEW.cumulative_amount + NEW.amount;
+
+  -- Insert the new log entry with the cumulative_amount
+  INSERT INTO transaction_logs (user_id, transaction_id, pocket_id, entity_id, transaction_type, amount, cumulative_amount, reference_no, created_at)
+  VALUES (NEW.user_id,
+          COALESCE((SELECT MAX(transaction_id) + 1 FROM transaction_logs WHERE user_id = NEW.user_id), 1),
+          NEW.pocket_id,
+          NEW.entity_id,
+          'Saving',
+          NEW.amount,
+          NEW.cumulative_amount,
+          NEW.id,
+          NOW());
+
+  RETURN NEW;
+END
 $$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION log_saving_transaction()
+RETURNS TRIGGER AS $$
+BEGIN
+  SELECT COALESCE(cumulative_amount, 0) INTO NEW.cumulative_amount
+  FROM transaction_logs
+  WHERE user_id = NEW.user_id
+  ORDER BY transaction_id DESC
+  LIMIT 1;
+
+  NEW.cumulative_amount := NEW.cumulative_amount + NEW.amount;
+
+  -- Insert the new log entry with the cumulative amount
+  INSERT INTO transaction_logs (user_id, transaction_id, pocket_id, entity_id, transaction_type, amount, cumulative_amount, reference_no, created_at)
+  VALUES (NEW.user_id,
+          COALESCE((SELECT MAX(transaction_id) + 1 FROM transaction_logs WHERE user_id = NEW.user_id), 1),
+          NEW.pocket_id,
+          NEW.entity_id,
+          'Saving',
+          NEW.amount,
+          NEW.cumulative_amount,
+          NEW.id,
+          NOW());
+
+  RETURN NEW;
+END
+$$ LANGUAGE plpgsql;
+
+
+
+
+
+
 CREATE TRIGGER enforce_log_transaction
-AFTER INSERT ON savings
+AFTER INSERT ON external_savings 
 FOR EACH ROW
 EXECUTE FUNCTION log_transaction();
 
 
 CREATE TRIGGER enforce_log_transaction
-AFTER INSERT ON external_savings OR INSERT ON withdrawals OR INSERT ON transfers
+AFTER INSERT ON withdrawals 
 FOR EACH ROW
 EXECUTE FUNCTION log_transaction();
 
 
 CREATE TRIGGER enforce_log_transaction
-AFTER INSERT ON savings OR INSERT ON external_savings OR INSERT ON withdrawals OR INSERT ON transfers
-FOR EACH ROW
-EXECUTE FUNCTION log_transaction();
-
-
-CREATE TRIGGER enforce_log_transaction
-AFTER INSERT ON savings OR INSERT ON external_savings OR INSERT ON withdrawals OR INSERT ON transfers
+AFTER INSERT ON transfers
 FOR EACH ROW
 EXECUTE FUNCTION log_transaction();
 
