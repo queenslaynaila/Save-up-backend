@@ -3,49 +3,55 @@ import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { WithdrawalRequest,  WithdrawalRequestInterface } from './types';
-import { MessageInterface } from '../../globalTypes/index'
+import { MessageInterface } from '../../globalTypes/index';
 
-const SQL_CREATE_WITHDRAWAL = sql<WithdrawalRequest, Record<string,never>>(`
-  WITH can_withdraw AS (
-    SELECT 
-        p.id AS pocket_id, 
-        p.name AS pocket_name, 
-        p.pocket_type,
-        p.entity_id AS owner_id,
-        p.target_at,
-        COALESCE(SUM(s.amount),0) AS total_saved
-    FROM
-       pockets p
-    LEFT JOIN 
-       deposits d ON d.pocket_id = p.id
-    WHERE 
-        p.id = :pocketId
-        AND p.entity_id = :userId
-        AND (p.pocket_type = 'Standard Pocket' OR NOW() >= p.target_at)
-    GROUP BY 
-        p.id, g.name, p.is_locked_pocket,p.entity_id
-  )
-  INSERT INTO withdrawals (pocket_id, user_id, amount)
-  SELECT c.pocketId :userId, :amount
-  FROM can_withdraw c
-  WHERE c.total_saved >= :amount  
-  RETURNING c.pocket_name;
-`);
+const SQL_CREATE_WITHDRAWAL = sql<WithdrawalRequest, Record<string, never>>(`
+  INSERT INTO withdrawals (pocket_id, id, user_id, entity_id, amount)
+  SELECT 
+    :pocket_id, 
+    COALESCE((SELECT MAX(id) + 1 FROM withdrawals WHERE pocket_id = :pocket_id), 1), 
+    :user_id, 
+    :entity_id,
+    :amount
+  FROM (
+    SELECT cumulative_amount
+    FROM transaction_logs
+    WHERE pocket_id = :pocket_id
+    ORDER BY created_at DESC
+    LIMIT 1
+  ) AS t
+  CROSS JOIN (
+    SELECT pocket_type, target_at, name
+    FROM pockets
+    WHERE id = :pocket_id
+  ) AS p
+  WHERE 
+    (
+      p.pocket_type = 'Standard Pocket' 
+      AND t.cumulative_amount >= :amount
+    )
+    OR (
+      p.pocket_type = 'Locked Pocket' 
+      AND t.cumulative_amount >= :amount 
+      AND p.target_at <= NOW()
+    )
+  RETURNING *;
+
+`); 
 
 export default (router: Router) => {
-  router.get<Record<string,never>, MessageInterface, WithdrawalRequestInterface, Record<string,never>>(
+  router.post<Record<string,never>, MessageInterface, WithdrawalRequestInterface, Record<string,never>>(
     '/', 
     authMiddleware(),
     async (req, res) => {
       const { pocket_id, amount} = req.body
       const user_id = req.user!.id
-      const pocket_name= await SQL_CREATE_WITHDRAWAL({ pocket_id, user_id, amount }).oneOrNull();
-      if (!pocket_name){
-        throw new HttpError(400, 'There was an error processing your withdrawal request. Please try again later.');
-      }
+      await SQL_CREATE_WITHDRAWAL({ pocket_id, user_id, amount, entity_id: user_id }).one(
+        new HttpError(400, `Insufficient funds to make withdrawal of ${amount.toFixed(2)}` )
+      );
       return res.json({
-        message: `Withdrawal of amount KES ${amount.toFixed(2)} from pocket ${pocket_name} successful!`
-      });      
+        message: `Withdrawal of amount KES ${amount.toFixed(2)} successful!`
+      });     
     });
 };
 `1`
