@@ -31,11 +31,6 @@ export default (router: Router) => {
     validateRequest(validateSavingCreationSchema),
     async (req, res) => {
       const user_id= req.user!.id
-      console.log({
-        pocket_id: req.body.pocket_id,
-        entity_id: user_id,
-        amount: req.body.amount
-      })
       const { pocket_id, amount  } = req.body;
       const savingResult = await SQL_CREATE_SAVING({ user_id, pocket_id, amount, entity_id:user_id })
         .one(new HttpError(400, 'Unable to complete the request'));
