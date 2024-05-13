@@ -15,7 +15,7 @@ const SQL_GET_SECURITY_QUESTIONS = sql<GetByUserInterface, SecurityQuestionInter
 const SQL_UPDATE_TOKEN_USAGE = sql<UpdateTokenUsageInterface, Record<string,never>>(`
   UPDATE reset_tokens 
   SET used_at = NOW() 
-  WHERE user_id = :userId 
+  WHERE user_id = :user_id
   AND token = :reset_token
 `);
 
@@ -25,6 +25,7 @@ export default(router: Router) => {
     verifyResetToken,
     async (req, res) => {
       const { reset_token } = req.body;
+      console.log(req.user)
       const user_id = req.user!.id;
       const hashedResetToken = await bcrypt.hash(reset_token, 10); 
       await SQL_UPDATE_TOKEN_USAGE({ user_id, reset_token: hashedResetToken }).exec(); 

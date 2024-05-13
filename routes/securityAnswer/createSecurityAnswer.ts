@@ -8,7 +8,7 @@ import {  MessageInterface } from '../../globalTypes/index';
 
 const SQL_CREATE_ANSWER = sql<CreateSecurityAnswerInterface ,Record<string,never>>(`
   INSERT INTO security_answers ( user_id, question_id, answer) 
-  VALUES (:userId, :questionId, :answer)
+  VALUES (:user_id, :question_id, :answer)
 `); 
 
 export default (router: Router) => {

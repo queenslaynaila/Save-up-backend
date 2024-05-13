@@ -7,9 +7,8 @@ import {  MessageInterface, GetByUserInterface } from '../../globalTypes/index';
 import { VerifyAnswerInterface, SecurityAnswersRequestInterface } from './types'
 
 const SQL_GET_SECURITY_ANSWERS = sql<GetByUserInterface, VerifyAnswerInterface>(`
-  SELECT question_id, answer FROM security_answers WHERE user_id = :userId
+  SELECT question_id, answer FROM security_answers WHERE user_id = :user_id
 `);
-
 
 export default (router: Router) => {
   router.post<Record<string,never>, MessageInterface, SecurityAnswersRequestInterface, Record<string,never>>(
@@ -19,7 +18,7 @@ export default (router: Router) => {
       const { answers } = req.body;
       const user_id = req.user!.id;
       const userSecurityAnswers = await SQL_GET_SECURITY_ANSWERS({ user_id }).many();
-     
+      console.log(userSecurityAnswers)
       const incorrectAnswers: number[] = [];
         
       answers.forEach(({ question_id, answer }: { question_id:number; answer: string }) => {
@@ -29,6 +28,7 @@ export default (router: Router) => {
           incorrectAnswers.push(question_id);
         }
       });
+      console.log(`this are wrong ${incorrectAnswers}`)
         
       if (incorrectAnswers.length > 0) {
         throw new HttpError(401, `Incorrect answers. Contact customer service for help.`);

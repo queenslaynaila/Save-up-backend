@@ -36,8 +36,8 @@ export const verifyTokenSchema = securityAnswersRequestSchema.pick({
 export type VerifyTokenInterface = z.infer<typeof verifyTokenSchema>
 
 export const updatePasswordSchema = z.object({ 
-  old_password: z.string(),
-  new_password: z.string(),
+  old_pin: z.string(),
+  new_pin: z.string(),
 })
 
 export type UpdatePasswordInterface = z.infer<typeof updatePasswordSchema>
@@ -63,7 +63,7 @@ export type UpdateTokenUsageInterface = z.infer<typeof updateTokenUsage>
 
 export const resetPasswordSchema = z.object({
   id: z.number(),  
-  new_password: z.string()
+  new_pin: z.string()
 })
 
 export type ResetPasswordInterface = z.infer<typeof resetPasswordSchema>

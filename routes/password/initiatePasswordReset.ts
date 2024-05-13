@@ -28,6 +28,8 @@ export default  (router: Router) => {
       await SQL_SAVE_TOKEN({ user_id: user.id, token:hashedResetToken }).exec();        
       const resetTokenPayload = { id: user.id };
       const resetTokenHeader = jwt.sign(resetTokenPayload, process.env.JWT_SECRET as Secret, { expiresIn: '15m' });
+      console.log(resetToken)
+      console.log(resetTokenHeader)
       sendSms(
         phone_number,
         `Your password reset token is: ${resetToken}. It expires in 10 minutes. Do not share with anyone.`

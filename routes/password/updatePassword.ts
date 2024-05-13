@@ -21,14 +21,14 @@ export default (router: Router) => {
     authMiddleware(), 
     resetPasswordLimiter,
     async (req, res) => {
-      const { old_password, new_password } = req.body;
+      const { old_pin, new_pin } = req.body;
       const userId = req.user!.id;
       const { pin: hashedPassword } = await SQL_GET_PASSWORD_BY_ID({ id: userId }).one();
-      const isPasswordCorrect = await bcrypt.compare(old_password, hashedPassword);
+      const isPasswordCorrect = await bcrypt.compare(old_pin, hashedPassword);
       if (!isPasswordCorrect) {
         throw new HttpError(400, 'Incorrect pin');
       }
-      const hashedNewPassword = bcrypt.hashSync(new_password, 10);
+      const hashedNewPassword = bcrypt.hashSync(new_pin, 10);
       await SQL_UPDATE_PASSWORD({ id: userId, pin: hashedNewPassword }).exec();
       
       res.json({ message: 'Password updated successfully.' });
