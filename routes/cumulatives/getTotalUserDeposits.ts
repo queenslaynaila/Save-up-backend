@@ -4,10 +4,10 @@ import authMiddleware from '../../middleware/authorization';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { GetTotalDepositsInterface, GetUserCumulaInterface } from './types';
 
-const SQL_GET_TOTAL_DEPOSITS = sql<GetUserCumulaInterface, GetTotalDepositsInterface>(`
-  SELECT COALESCE(SUM(c.amount), 0) AS total_contributed_amount
-  FROM deposits d
-  JOIN pockets p ON d.pocket_id = p.id
+const SQL_GET_TOTAL_DEPOSIT_FOR_USER = sql<GetUserCumulaInterface, GetTotalDepositsInterface>(`
+  SELECT COALESCE(SUM(s.amount), 0) AS total_contributed_amount
+  FROM savings s
+  JOIN pockets p ON s.pocket_id = p.id
   WHERE s.user_id = :user_id
 `);
 
@@ -30,7 +30,7 @@ export default (router: Router) => {
         filters.push(`date <= :end_date`);
       }
 
-      const query = SQL_GET_TOTAL_DEPOSITS({user_id });
+      const query = SQL_GET_TOTAL_DEPOSIT_FOR_USER({user_id });
       if (filters.length > 0) query.extend(`AND ${filters.join(' AND ')}`, filterArgs);
       query.extend('LIMIT 15', {});
       res.json(await query.one(new HttpError(500, 'Unable to complete the request')));

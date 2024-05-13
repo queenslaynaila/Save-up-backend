@@ -5,7 +5,7 @@ import { HttpError } from '../../middleware/errorMiddleware';
 import { GetTotalTargetsInterface, TotalTargetPocketsQueryInterface } from './types';
 
 const SQL_GET_TOTAL_TARGET_AMOUNT = sql<{ [key: string]: string }, GetTotalTargetsInterface>(`
-  SELECT COALESCE(SUM(amount), 0) AS total_target_amount
+  SELECT COALESCE(SUM(target_amount), 0) AS total_target_amount
   FROM pockets
 `);
 
