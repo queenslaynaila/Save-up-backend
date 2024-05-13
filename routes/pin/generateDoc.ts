@@ -96,7 +96,7 @@ const resetPassword = {
       content: {
         'application/json': {
           schema: z.object({
-            new_password: z.string(),
+            new_pin: z.string(),
           }),
         },
       },

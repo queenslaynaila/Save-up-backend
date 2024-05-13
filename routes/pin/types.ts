@@ -1,10 +1,10 @@
 import { z } from 'zod';
 
-export const resetPinSchema = z.object({
+export const resetPinRequestSchema = z.object({
   pin: z.string(),
 })
 
-export type ResetPinInterface = z.infer<typeof resetPinSchema>
+export type ResetPinInterface = z.infer<typeof resetPinRequestSchema>
 
 export const verifyAnswerSchema = z.object({
   question_id: z.number(),
