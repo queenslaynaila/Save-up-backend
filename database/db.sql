@@ -5,9 +5,9 @@ CREATE TYPE enum_priorities AS ENUM ('High', 'Intermediate', 'Low');
 CREATE TYPE enum_invites AS ENUM ('Pending', 'Accepted', 'Rejected');
 CREATE TYPE enum_relationships AS ENUM ('Parent', 'Spouse', 'Sibling', 'Child', 'Relative', 'Lawyer', 'Friend');
 CREATE TYPE enum_genders AS ENUM ('Male', 'Female', 'Prefer not to say');
-CREATE TYPE enum_entities AS ENUM ('User','Groups');
+CREATE TYPE enum_entities AS ENUM ('User', 'Groups', 'Donors');
 CREATE TYPE enum_pocket_types AS ENUM ('Standard Pocket','Locked Pocket');
-CREATE TYPE enum_transaction_type AS ENUM ('Saving', 'External Saving', 'Withdrawal', 'Transfer', 'Interests');
+CREATE TYPE enum_transaction_type AS ENUM ('Saving', 'External Saving', 'Withdrawal', 'Transfer In', 'Transfer Out', 'Interest Earned');
 
 
 --- General Purpose Tables
@@ -177,7 +177,6 @@ CREATE TABLE IF NOT EXISTS group_administrators (
 
 SELECT create_distributed_table('group_administrators', 'group_id');
 
-
 CREATE TABLE IF NOT EXISTS invitations (   
   group_id      INT NOT NULL,      
   sender_id     INT NOT NULL,
@@ -245,11 +244,12 @@ CREATE TABLE IF NOT EXISTS pockets (
   id                      INT NOT NULL,
   category_id             INT NOT NULL,
   name                    TEXT NOT NULL,
-  target_amount           NUMERIC(30, 2) NOT NULL CHECK (target_amount > 0),
+  description             TEXT,
+  target_amount           NUMERIC(30, 2) NOT NULL DEFAULT 0,
   saved_amount            NUMERIC(30, 2) NOT NULL DEFAULT 0 CHECK (saved_amount >= 0),
   priority                enum_priorities NOT NULL DEFAULT 'Intermediate',
   status                  enum_statuses NOT NULL DEFAULT 'In Progress',
-  target_at               TIMESTAMP WITH TIME ZONE NOT NULL,
+  target_at               TIMESTAMP WITH TIME ZONE,
   is_default_pocket       BOOLEAN NOT NULL DEFAULT FALSE,
   pocket_type             enum_pocket_types NOT NULL DEFAULT 'Standard Pocket',
   reminder_count          INT NOT NULL DEFAULT 0,
@@ -313,7 +313,6 @@ CREATE TABLE IF NOT EXISTS withdrawals (
 );
 
 ===============================================================================================
-
 -- This records money transfered from default pockets (quick save and grp resrve) to other pockets 
 
 CREATE TABLE IF NOT EXISTS transfers (
@@ -323,14 +322,17 @@ CREATE TABLE IF NOT EXISTS transfers (
   destination_pocket_id   INT NOT NULL,
   amount                  NUMERIC(30, 2) NOT NULL,
   created_at              TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  FOREIGN KEY             (source_pocket_id) REFERENCES pockets(id),
-  FOREIGN KEY             (destination_pocket_id) REFERENCES pockets(id),
+  FOREIGN KEY             (source_pocket_id, user_id) REFERENCES pockets(entity_id, id),
+  FOREIGN KEY             (destination_pocket_id, user_id) REFERENCES pockets(entity_id, id),
   FOREIGN KEY             (user_id) REFERENCES users(id)
 );
 
-CREATE INDEX idx_transfers_by_source_pocket_id ON transfers(source_pocket_id);
-CREATE INDEX idx_transfers_by_destination_pocket_id ON transfers(destination_pocket_id);
+CREATE INDEX idx_transfers_by_source_and_user ON transfers(source_pocket_id, user_id);
+CREATE INDEX idx_transfers_by_destination_and_user ON transfers(destination_pocket_id,user_id);
 SELECT create_distributed_table('transfers', 'source_pocket_id');
+
+===============================================================================================
+-- Stores records of a users expenses its from here that we will give the user recomendations using data from pockets savings withdrwals on how to spend their money
 
 CREATE TABLE IF NOT EXISTS expenses (
   entity_id    INT NOT NULL,
@@ -362,7 +364,7 @@ CREATE TABLE IF NOT EXISTS transaction_logs (
   cumulative_amount       NUMERIC(30, 2) NOT NULL,
   reference_no            TEXT NOT NULL,
   created_at              TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  PRIMARY KEY             (user_id, transaction_id),
+  PRIMARY KEY             (pocket_id, transaction_id),
   FOREIGN KEY             (user_id) REFERENCES users(id),
   FOREIGN KEY             (entity_id, pocket_id) REFERENCES pockets (entity_id, id)
 );
@@ -407,6 +409,42 @@ EXECUTE FUNCTION log_saving_transaction();
 
 ===============================================================================================
 
+CREATE OR REPLACE FUNCTION log_external_saving_transaction()
+RETURNS TRIGGER AS $$
+DECLARE
+  previous_cumulative NUMERIC(30, 2);
+  new_cumulative NUMERIC(30, 2);
+BEGIN 
+  SELECT COALESCE(cumulative_amount, 0) INTO previous_cumulative
+  FROM transaction_logs
+  WHERE pocket_id = NEW.pocket_id
+  ORDER BY transaction_id DESC
+  LIMIT 1;
+
+  new_cumulative = COALESCE(previous_cumulative, 0) + NEW.amount;
+
+  INSERT INTO transaction_logs (user_id, transaction_id, pocket_id, entity_id, transaction_type, amount, cumulative_amount, reference_no, created_at)
+  SELECT NEW.user_id,
+         COALESCE((SELECT MAX(transaction_id) + 1 FROM transaction_logs WHERE pocket_id = NEW.pocket_id), 1),
+         NEW.pocket_id,
+         NEW.entity_id,
+         'External Saving',
+         NEW.amount,
+         new_cumulative,
+         NEW.donor_id,
+         NOW();
+
+  RETURN NEW;
+END
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER enforce_log_external_saving_transaction
+AFTER INSERT ON external_savings 
+FOR EACH ROW
+EXECUTE FUNCTION log_external_saving_transaction();
+
+===============================================================================================
+
 CREATE OR REPLACE FUNCTION log_withdrawal_transaction()
 RETURNS TRIGGER AS $$
 DECLARE
@@ -441,6 +479,57 @@ CREATE TRIGGER enforce_log_withdrawal_transaction
 AFTER INSERT ON withdrawals
 FOR EACH ROW
 EXECUTE FUNCTION log_withdrawal_transaction();
+
+===============================================================================================
+
+CREATE OR REPLACE FUNCTION log_transfer_transaction()
+RETURNS TRIGGER AS $$
+DECLARE
+  previous_cumulative NUMERIC(30, 2);
+  new_source_balance NUMERIC(30, 2);
+  new_destination_balance NUMERIC(30, 2);
+BEGIN 
+  SELECT COALESCE(cumulative_amount, 0) INTO previous_cumulative
+  FROM transaction_logs
+  WHERE user_id = NEW.user_id
+  ORDER BY transaction_id DESC
+  LIMIT 1;
+
+  new_source_balance = COALESCE(previous_cumulative, 0) - NEW.amount;
+  new_destination_balance = COALESCE(previous_cumulative, 0) + NEW.amount;
+
+  INSERT INTO transaction_logs (user_id, transaction_id, pocket_id, entity_id, transaction_type, amount, cumulative_amount, reference_no, created_at)
+  SELECT
+         NEW.user_id,
+         COALESCE((SELECT MAX(transaction_id) + 1 FROM transaction_logs WHERE pocket_id = NEW.source_pocket_id), 1),
+         NEW.source_pocket_id,
+         NEW.user_id,
+         'Transfer Out', 
+         NEW.amount,
+         new_source_balance,
+         NEW.id,  
+         NOW();
+
+  INSERT INTO transaction_logs (user_id, transaction_id, pocket_id, entity_id, transaction_type, amount, cumulative_amount, reference_no, created_at)
+  SELECT
+         NEW.user_id,
+         COALESCE((SELECT MAX(transaction_id) + 1 FROM transaction_logs WHERE pocket_id = NEW.destination_pocket_id), 1),
+         NEW.destination_pocket_id,
+         NEW.user_id,
+         'Transfer In', 
+         NEW.amount,
+         new_destination_balance,
+         NEW.id, 
+         NOW();
+  RETURN NEW;
+
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER enforce_log_transfer_transaction
+AFTER INSERT ON transfers
+FOR EACH ROW
+EXECUTE FUNCTION log_transfer_transaction();
 
 ===============================================================================================
 
@@ -618,25 +707,34 @@ EXECUTE FUNCTION update_admins_on_all_votes();
 ===============================================================================================
 -- Trigger: Creates a Savings vault for each user or group when either is created.Allows users/groups to save witht a pocket in mind.
 
-CREATE OR REPLACE FUNCTION create_default_pockets_vault()
+CREATE OR REPLACE FUNCTION create_default_pockets_for_user()
 RETURNS TRIGGER AS $$
 BEGIN
-  IF TG_TABLE_NAME = 'users' THEN 
-    INSERT INTO INSERT INTO pockets (entity_id, category_id, name, amount, description, is_default_pocket, priority)
-    VALUES (NEW.id, 11, 'Wallet','Your digital wallet, a secure place for your on-the-go savings.Your Wallet allows you to save funds without immediately assigning them to a specific pocket. When you''re ready to allocate those savings toward a dream vacation, emergency fund, or any other goal, effortlessly transfer them to an existing pocket or create a new one!',TRUE, 0, 'Intermediate');
-  ELSE
-    INSERT INTO pockets (entity_id, category_id, name, amount, description, is_default_pocket, priority)
-    VALUES (NEW.id, 11, 'General Fund', 0, 'Your dedicated space to stash funds as a team. Everyone can contribute on-the-go, without needing a specific pocket right away.Once your crew has a plan, simply transfer your savings to a shared pocket or create a new one from scratch', TRUE, 'Intermediate');
-  END IF 
-
+    INSERT INTO pockets (id, entity_id, category_id, name, target_amount, description, is_default_pocket, priority)
+    VALUES ((SELECT COALESCE(MAX(id), 0) + 1 FROM pockets WHERE entity_id = :entity_id), 11, 'Wallet','Your digital wallet, a secure place for your on-the-go savings.Your Wallet allows you to save funds without immediately assigning them to a specific pocket. When you''re ready to allocate those savings toward a dream vacation, emergency fund, or any other goal, effortlessly transfer them to an existing pocket or create a new one!',TRUE, 0, 'Intermediate');
   RETURN NULL;
 END;
 $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER create_default_pockets_pocket_trigger
-AFTER INSERT ON users OR INSERT ON groups
+AFTER INSERT ON users
 FOR EACH ROW
-EXECUTE FUNCTION create_default_pockets_vault();
+EXECUTE FUNCTION create_default_pockets_for_user();
+
+
+CREATE OR REPLACE FUNCTION create_default_pockets_for_group()
+RETURNS TRIGGER AS $$
+BEGIN
+    INSERT INTO pockets (id, entity_id, category_id, name, target_amount, description, is_default_pocket, priority)
+    VALUES ((SELECT COALESCE(MAX(id), 0) + 1 FROM pockets WHERE entity_id = NEW.id), NEW.id, 11, 'General Fund', 0, 'Your dedicated space to stash funds as a team. Everyone can contribute on-the-go, without needing a specific pocket right away.Once your crew has a plan, simply transfer your savings to a shared pocket or create a new one from scratch', TRUE, 'Intermediate');
+  RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER create_default_pockets_pocket_trigger
+AFTER INSERT ON groups
+FOR EACH ROW
+EXECUTE FUNCTION create_default_pockets_for_group();
 
 
 ===============================================================================================
@@ -686,125 +784,6 @@ AFTER INSERT ON savings OR INSERT ON external_savings
 FOR EACH ROW
 EXECUTE FUNCTION compute_interest_earned();
 
-===============================================================================================
---Trigger: Compute and store total saved amount for a pocket
-
-CREATE OR REPLACE FUNCTION compute_total_savings()
-RETURNS TRIGGER AS $$
-DECLARE
-  total_savings NUMERIC(30, 2);
-BEGIN
-  IF TG_TABLE_NAME = 'savings' THEN
-    SELECT COALESCE(SUM(amount), 0) INTO total_savings
-    FROM savings
-    WHERE pocket_id = NEW.pocket_id;
-  ELSE
-    SELECT COALESCE(SUM(amount), 0) INTO total_savings
-    FROM external_savings
-    WHERE pocket_id = NEW.pocket_id;   
-  END IF;
-  
-  UPDATE pockets
-  SET saved_amount = total_savings
-  WHERE id = NEW.pocket_id;
-  
-  RETURN NEW;
-END
-$$ LANGUAGE plpgsql;
-
--- Trigger for the 'savings' table
-CREATE TRIGGER enforce_compute_total_savings
-AFTER INSERT ON savings
-FOR EACH ROW
-EXECUTE FUNCTION compute_total_savings();
-
--- Trigger for the 'external_savings' table
-CREATE TRIGGER enforce_compute_total_external_savings
-AFTER INSERT ON external_savings
-FOR EACH ROW
-EXECUTE FUNCTION compute_total_savings();
-
-===============================================================================================
---Logs
-
-
-
-CREATE OR REPLACE FUNCTION log_saving_transaction()
-RETURNS TRIGGER AS $$
-BEGIN
-  -- Get the previous cumulative amount from the transaction_logs table
-  SELECT COALESCE(SUM(amount), 0)
-  INTO NEW.cumulative_amount
-  FROM transaction_logs
-  WHERE user_id = NEW.user_id;
-
-  -- Update the cumulative amount with the new amount from the current record
-  NEW.cumulative_amount := NEW.cumulative_amount + NEW.amount;
-
-  -- Insert the new log entry with the cumulative_amount
-  INSERT INTO transaction_logs (user_id, transaction_id, pocket_id, entity_id, transaction_type, amount, cumulative_amount, reference_no, created_at)
-  VALUES (NEW.user_id,
-          COALESCE((SELECT MAX(transaction_id) + 1 FROM transaction_logs WHERE user_id = NEW.user_id), 1),
-          NEW.pocket_id,
-          NEW.entity_id,
-          'Saving',
-          NEW.amount,
-          NEW.cumulative_amount,
-          NEW.id,
-          NOW());
-
-  RETURN NEW;
-END
-$$ LANGUAGE plpgsql;
-
-CREATE OR REPLACE FUNCTION log_saving_transaction()
-RETURNS TRIGGER AS $$
-BEGIN
-  SELECT COALESCE(cumulative_amount, 0) INTO NEW.cumulative_amount
-  FROM transaction_logs
-  WHERE user_id = NEW.user_id
-  ORDER BY transaction_id DESC
-  LIMIT 1;
-
-  NEW.cumulative_amount := NEW.cumulative_amount + NEW.amount;
-
-  -- Insert the new log entry with the cumulative amount
-  INSERT INTO transaction_logs (user_id, transaction_id, pocket_id, entity_id, transaction_type, amount, cumulative_amount, reference_no, created_at)
-  VALUES (NEW.user_id,
-          COALESCE((SELECT MAX(transaction_id) + 1 FROM transaction_logs WHERE user_id = NEW.user_id), 1),
-          NEW.pocket_id,
-          NEW.entity_id,
-          'Saving',
-          NEW.amount,
-          NEW.cumulative_amount,
-          NEW.id,
-          NOW());
-
-  RETURN NEW;
-END
-$$ LANGUAGE plpgsql;
-
-
-
-
-
-
-CREATE TRIGGER enforce_log_transaction
-AFTER INSERT ON external_savings 
-FOR EACH ROW
-EXECUTE FUNCTION log_transaction();
-
-
-CREATE TRIGGER enforce_log_transaction
-AFTER INSERT ON withdrawals 
-FOR EACH ROW
-EXECUTE FUNCTION log_transaction();
-
-
-CREATE TRIGGER enforce_log_transaction
-AFTER INSERT ON transfers
-FOR EACH ROW
-EXECUTE FUNCTION log_transaction();
 
 ===============================================================================================
 --Trigger: Capture a donation and the donor
