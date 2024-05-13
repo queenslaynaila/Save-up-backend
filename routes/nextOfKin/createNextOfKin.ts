@@ -8,7 +8,7 @@ import { CreateNextOfKinInterface, NextOfKinInterface, nextOfKinCreationSchema }
 const SQL_CREATE_KIN = sql<CreateNextOfKinInterface, NextOfKinInterface>(`
 INSERT INTO next_of_kins (id, user_id, full_name, relationship, email, phone_number)
 VALUES (
-  COALESCE((SELECT MAX(id) + 1 FROM next_of_kins WHERE user_id = :user_id), 0),  -- Get next ID
+  COALESCE((SELECT MAX(id) + 1 FROM next_of_kins WHERE user_id = :user_id), 1),
   :user_id,
   :full_name,
   :relationship,
