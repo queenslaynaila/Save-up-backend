@@ -19,6 +19,6 @@ export default (router: Router) => {
       const expenseId = parseInt(req.params.id);
       const entity_id = req.body.entity_id;
       await SQL_DELETE_EXPENSE({ id: expenseId, entity_id}).exec();
-      return res.json({ message: 'Expenses deleted successfully' });
+      return res.json({ message: 'Expense(s) deleted successfully' });
     });
 };
