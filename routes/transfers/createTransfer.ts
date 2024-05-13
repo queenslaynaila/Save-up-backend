@@ -10,8 +10,7 @@ const SQL_CREATE_TRANSFER = sql<TransferInputInterface, TransferDepositResInterf
   INSERT INTO transfers (source_pocket_id, destination_pocket_id, amount, user_id)
   VALUES (:sourcePocketId, :destinationPocketId, :amount, :userId)
   RETURNING 
-    (SELECT name FROM pockets WHERE id = :sourcePocketId) AS source_pocket_name, 
-    (SELECT name FROM pockets WHERE id = :destinationPocketId) AS destination_pocket_name;
+   
 `);
 
 export default (router: Router) => {
