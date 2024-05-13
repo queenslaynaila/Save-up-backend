@@ -12,7 +12,7 @@ import pocketRoutes from './routes/pockets/index';
 import expensesRoutes from './routes/expenses/index';
 import savingRoutes from './routes/savings/index';
 import AdminRoutes from './routes/admin/index';
-import passwordRoutes from './routes/password/index';
+import passwordRoutes from './routes/pin/index';
 import securityQuestionsRoutes from './routes/securityQuestions';
 import securityAnswerRoutes from './routes/securityAnswer/index';
 import cumulativesRoutes from './routes/cumulatives/index';
