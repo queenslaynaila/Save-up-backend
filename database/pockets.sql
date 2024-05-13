@@ -3,8 +3,6 @@ CREATE TYPE enum_statuses AS ENUM ('In Progress', 'Completed');
 CREATE TYPE enum_priorities AS ENUM ('High', 'Intermediate', 'Low');
 CREATE TYPE enum_pocket_types AS ENUM ('Standard Pocket','Locked Pocket');
 
-===============================================================================================
-
 CREATE TABLE IF NOT EXISTS pockets ( 
   entity_id               INT NOT NULL, 
   id                      INT NOT NULL,
@@ -30,12 +28,10 @@ CREATE TABLE IF NOT EXISTS pockets (
   FOREIGN KEY             (category_id) REFERENCES categories(id)
 );
 
--- Index pockets for faster retrievals by ownership
 Create INDEX idx_pockets_by_entity_id ON pockets(entity_id);
 SELECT create_distributed_table('pockets', 'id');
 
-===============================================================================================
--- Trigger: Update the status of a pocket to Complete when total savings exceeds target amount set.
+--Trigger: Update pocket status to Completed when target amount is reached
 
 CREATE OR REPLACE FUNCTION update_pockets_status()
 RETURNS TRIGGER AS $$
@@ -62,8 +58,7 @@ AFTER INSERT ON savings
 FOR EACH ROW
 EXECUTE FUNCTION update_pockets_status();
 
-===============================================================================================
---Trigger: Update interest rates
+--Trigger:Calculate Interest earned by a pocket
 
 CREATE OR REPLACE FUNCTION compute_interest_earned
 RETURNS TRIGGER AS $$
@@ -72,7 +67,7 @@ DECLARE
       pocket_rate   NUMERIC(3, 2);
       pocket_type   enum_pocket_types;
 BEGIN
-   --Pocket type for the given pokcet
+   --Retrieve pocket type for given pocket
     SELECT pocket_type INTO pocket_type
     FROM pockets
     WHERE id = NEW.pocket_id;
