@@ -1,3 +1,5 @@
+CREATE TYPE enum_relationships AS ENUM ('Parent', 'Spouse', 'Sibling', 'Child', 'Relative', 'Lawyer', 'Friend');
+
 CREATE TABLE IF NOT EXISTS next_of_kins (
   user_id                INT NOT NULL,
   id                     INT NOT NULL,
