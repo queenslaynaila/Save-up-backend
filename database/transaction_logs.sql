@@ -32,6 +32,7 @@ BEGIN
   SELECT COALESCE(cumulative_amount, 0) INTO previous_cumulative
   FROM transaction_logs
   WHERE user_id = NEW.user_id
+  AND pocket_id = NEW.pocket_id
   ORDER BY transaction_id DESC
   LIMIT 1;
 
@@ -104,6 +105,7 @@ BEGIN
   SELECT COALESCE(cumulative_amount, 0) INTO previous_cumulative
   FROM transaction_logs
   WHERE user_id = NEW.user_id
+  AND pocket_id = NEW.pocket_id
   ORDER BY transaction_id DESC
   LIMIT 1;
 
