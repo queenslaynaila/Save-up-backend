@@ -1,26 +1,29 @@
 import { Router } from 'express';
 import { sql } from '../../db';
-import authMiddleware from '../../middleware/authorization';
+//import authMiddleware from '../../middleware/authorization';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { validateRequest } from '../../middleware/validationMiddleware';
-import { TransferInputInterface, TransferDepositResInterface, TransferDepositBodyInterface, transferSchema } from './types'
+import { TransferInputInterface, TransferDepositResInterface, TransferDepositBodyInterface, transferDepositBody  } from './types'
 import { MessageInterface } from '../../globalTypes/index'
 
 const SQL_CREATE_TRANSFER = sql<TransferInputInterface, TransferDepositResInterface>(`
-  INSERT INTO transfers (source_pocket_id, destination_pocket_id, amount, user_id)
-  VALUES (:sourcePocketId, :destinationPocketId, :amount, :userId)
-  RETURNING 
-   
+INSERT INTO transfers (id, source_pocket_id, destination_pocket_id, amount, user_id)
+VALUES (  (SELECT COALESCE(MAX(id), 0) + 1 FROM transfers WHERE user_id = :user_id),
+          :source_pocket_id, :destination_pocket_id, :amount, :user_id
+        )
+RETURNING 
+    (SELECT name FROM pockets WHERE id = :source_pocket_id) AS source_pocket_name,
+    (SELECT name FROM pockets WHERE id = :destination_pocket_id) AS destination_pocket_name;
 `);
 
 export default (router: Router) => {
-  router.get<Record<string,never>, MessageInterface, TransferDepositBodyInterface, Record<string,never>>(
+  router.post<Record<string,never>, MessageInterface, TransferDepositBodyInterface, Record<string,never>>(
     '/', 
-    authMiddleware(),
-    validateRequest(transferSchema),
+
+    validateRequest(transferDepositBody),
     async (req, res) => {
       const { source_pocket_id, destination_pocket_id, amount } = req.body
-      const user_id = req.user!.id
+      const user_id = 3
       const transfer = await SQL_CREATE_TRANSFER({ source_pocket_id, destination_pocket_id, amount, user_id }).oneOrNull();
       if (!transfer){
         throw new HttpError(400, 'There was an error processing your transfer request. Please try again later.');
