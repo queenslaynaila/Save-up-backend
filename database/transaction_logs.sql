@@ -137,44 +137,55 @@ EXECUTE FUNCTION log_withdrawal_transaction();
 CREATE OR REPLACE FUNCTION log_transfer_transaction()
 RETURNS TRIGGER AS $$
 DECLARE
-  previous_cumulative NUMERIC(30, 2);
+  source_pocket_balance NUMERIC(30, 2);
+  destination_pocket_balance NUMERIC(30, 2);
   new_source_balance NUMERIC(30, 2);
   new_destination_balance NUMERIC(30, 2);
 BEGIN 
-  SELECT COALESCE(cumulative_amount, 0) INTO previous_cumulative
+  SELECT COALESCE(cumulative_amount, 0) INTO source_pocket_balance
   FROM transaction_logs
   WHERE user_id = NEW.user_id
+  AND pocket_id = NEW.source_pocket_id
   ORDER BY transaction_id DESC
   LIMIT 1;
+  --Run transaction only if the source pocket has enough money to transfer
+  IF source_pocket_balance >= NEW.amount THEN
+    SELECT COALESCE(cumulative_amount, 0) INTO destination_pocket_balance
+    FROM transaction_logs
+    WHERE user_id = NEW.user_id
+    AND pocket_id = NEW.destination_pocket_id
+    ORDER BY transaction_id DESC
+    LIMIT 1;
 
-  new_source_balance = COALESCE(previous_cumulative, 0) - NEW.amount;
-  new_destination_balance = COALESCE(previous_cumulative, 0) + NEW.amount;
+    new_source_balance = COALESCE(source_pocket_balance, 0) - NEW.amount;
+    new_destination_balance = COALESCE(destination_pocket_balance, 0) + NEW.amount;
 
-  INSERT INTO transaction_logs (user_id, transaction_id, pocket_id, entity_id, transaction_type, amount, cumulative_amount, reference_no, created_at)
-  SELECT
-         NEW.user_id,
-         COALESCE((SELECT MAX(transaction_id) + 1 FROM transaction_logs WHERE pocket_id = NEW.source_pocket_id), 1),
-         NEW.source_pocket_id,
-         NEW.user_id,
-         'Transfer Out', 
-         NEW.amount,
-         new_source_balance,
-         NEW.id,  
-         NOW();
-
-  INSERT INTO transaction_logs (user_id, transaction_id, pocket_id, entity_id, transaction_type, amount, cumulative_amount, reference_no, created_at)
-  SELECT
-         NEW.user_id,
-         COALESCE((SELECT MAX(transaction_id) + 1 FROM transaction_logs WHERE pocket_id = NEW.destination_pocket_id), 1),
-         NEW.destination_pocket_id,
-         NEW.user_id,
-         'Transfer In', 
-         NEW.amount,
-         new_destination_balance,
-         NEW.id, 
-         NOW();
-  RETURN NEW;
-
+    INSERT INTO transaction_logs (user_id, transaction_id, pocket_id, entity_id, transaction_type, amount, cumulative_amount, reference_no, created_at)
+    SELECT
+          NEW.user_id,
+          COALESCE((SELECT MAX(transaction_id) + 1 FROM transaction_logs WHERE pocket_id = NEW.source_pocket_id), 1),
+          NEW.source_pocket_id,
+          NEW.user_id,
+          'Transfer Out', 
+          NEW.amount,
+          new_source_balance,
+          NEW.id,  
+          NOW();
+    INSERT INTO transaction_logs (user_id, transaction_id, pocket_id, entity_id, transaction_type, amount, cumulative_amount, reference_no, created_at)
+    SELECT
+          NEW.user_id,
+          COALESCE((SELECT MAX(transaction_id) + 1 FROM transaction_logs WHERE pocket_id = NEW.destination_pocket_id), 1),
+          NEW.destination_pocket_id,
+          NEW.user_id,
+          'Transfer In', 
+          NEW.amount,
+          new_destination_balance,
+          NEW.id, 
+          NOW();
+    RETURN NEW;
+  ELSE
+    RAISE EXCEPTION 'Insufficient funds in source pocket for transfer.';
+  END IF;
 END;
 $$ LANGUAGE plpgsql;
 
