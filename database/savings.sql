@@ -53,6 +53,3 @@ CREATE TRIGGER capture_external_savings_trigger
 AFTER INSERT ON external_savings
 FOR EACH ROW
 EXECUTE FUNCTION create_donor_account();
-
-
-
