@@ -19,15 +19,14 @@ RETURNING
 export default (router: Router) => {
   router.post<Record<string,never>, MessageInterface, TransferDepositBodyInterface, Record<string,never>>(
     '/', 
-
+    //authMiddleware,
     validateRequest(transferDepositBody),
     async (req, res) => {
       const { source_pocket_id, destination_pocket_id, amount } = req.body
       const user_id = 3
-      const transfer = await SQL_CREATE_TRANSFER({ source_pocket_id, destination_pocket_id, amount, user_id }).oneOrNull();
-      if (!transfer){
-        throw new HttpError(400, 'There was an error processing your transfer request. Please try again later.');
-      }
+      const transfer = await SQL_CREATE_TRANSFER({ source_pocket_id, destination_pocket_id, amount, user_id }).one(
+        new HttpError(400, 'Insufficient funds in source pocket for transfer.')
+      );
       return res.json({
         message: `Trasfer of amount KES ${amount.toFixed(2)} from pocket ${transfer.source_pocket_name} to pocket ${transfer.destination_pocket_name} successful!`
       });      
