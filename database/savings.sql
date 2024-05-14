@@ -34,22 +34,40 @@ CREATE TABLE IF NOT EXISTS external_savings (
 CREATE INDEX idx_external_savings_by_pocket_id ON external_savings(pocket_id);
 SELECT create_distributed_table('external_savings', 'pocket_id');
 
-CREATE OR REPLACE FUNCTION create_donor_account()
-RETURNS TRIGGER AS $$
+---Donors
+CREATE TABLE IF NOT EXISTS donors (
+  donor_id             INT NOT NULL PRIMARY KEY,
+  full_name            TEXT NOT NULL,
+  phone_number         TEXT NOT NULL UNIQUE,
+  created_at           TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at           TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE OR REPLACE FUNCTION create_external_savings(pocket_id INT, amount NUMERIC(30, 2), show_donor_details BOOLEAN, full_name, phone_number)
+RETURNS VOID AS $$
+DECLARE
+   entity_id INTEGER;
+   donor_id INTEGER;
 BEGIN
-    -- Check if the donor exists if not create a donor account for the donor
-    IF NOT EXISTS (
-        SELECT 1 FROM donors WHERE phone_number = NEW.phone_number
-    ) THEN
-        INSERT INTO donors (full_name, phone_number)
-        VALUES (NEW.full_name, NEW.phone_number);
+    SELECT d.donor_id INTO donor_id
+    FROM donors d
+    WHERE d.phone_number = new_phone_number;
+    
+    IF donor_id IS NULL THEN
+        INSERT INTO entities (entity_type)
+        VALUES ('Donor')
+        RETURNING id INTO donor_id;
+
+        INSERT INTO donors (donor_id, full_name, phone_number)
+        VALUES (donor_id, full_name, phone_number);
     END IF;
 
-    RETURN NEW;
+    INSERT INTO external_savings (id, pocket_id, donor_id, amount, show_donor_details)
+    VALUES (COALESCE((SELECT MAX(id) + 1 FROM external_savings WHERE pocket_id = pocket_id), 1), 
+            pocket_id, 
+            donor_id, 
+            amount, 
+            show_donor_details
+          );
 END;
 $$ LANGUAGE plpgsql;
-
-CREATE TRIGGER capture_external_savings_trigger
-AFTER INSERT ON external_savings
-FOR EACH ROW
-EXECUTE FUNCTION create_donor_account();
