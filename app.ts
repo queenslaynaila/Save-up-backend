@@ -22,6 +22,7 @@ import inviteRoutes from './routes/invitations/index';
 import withdrawalRoutes from './routes/withdrawals/index';
 import transferRoutes from './routes/transfers/index';
 import transactionRoutes from './routes/transactions';
+import createExSaving from './routes/externalSaving/createExSaving';
 import cron from 'node-cron';
 import remindStaleGoals from './cronJobs/overdueGoalsReminder'
 
@@ -103,6 +104,7 @@ groupAdminRoutes(app);
 withdrawalRoutes(app);
 transferRoutes(app)
 transactionRoutes(app)
+createExSaving(app)
 
 // 404 handler
 app.use(() => {
