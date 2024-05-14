@@ -1,9 +1,9 @@
 CREATE TYPE enum_transaction_type AS ENUM ('Saving', 'External Saving', 'Withdrawal', 'Transfer In', 'Transfer Out', 'Interest Earned');
-
 -- Records details of all ongoing financial transactions 
+-- Stores current available balance as cumulative_amount
 -- Captures all withdrawal, deposit through savings or transfers or external savings or interest accumulation
 CREATE TABLE IF NOT EXISTS transaction_logs (
-  user_id                 INT NOT NULL,
+  user_id                 INT,
   transaction_id          INT NOT NULL,
   pocket_id               INT NOT NULL,
   entity_id               INT NOT NULL, 
@@ -77,8 +77,8 @@ BEGIN
   FROM pockets
   WHERE id = NEW.pocket_id;
 
-  INSERT INTO transaction_logs (user_id, transaction_id, pocket_id, entity_id, transaction_type, amount, cumulative_amount, reference_no, created_at)
-  SELECT NEW.user_id,
+  INSERT INTO transaction_logs (transaction_id, pocket_id, entity_id, transaction_type, amount, cumulative_amount, reference_no, created_at)
+  SELECT 
          COALESCE((SELECT MAX(transaction_id) + 1 FROM transaction_logs WHERE pocket_id = NEW.pocket_id), 1),
          NEW.pocket_id,
          pocket_entity_id,
