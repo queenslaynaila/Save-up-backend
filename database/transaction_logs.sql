@@ -2,7 +2,6 @@ CREATE TYPE enum_transaction_type AS ENUM ('Saving', 'External Saving', 'Withdra
 
 -- Records details of all ongoing financial transactions 
 -- Captures all withdrawal, deposit through savings or transfers or external savings or interest accumulation
-
 CREATE TABLE IF NOT EXISTS transaction_logs (
   user_id                 INT NOT NULL,
   transaction_id          INT NOT NULL,
@@ -63,7 +62,8 @@ CREATE OR REPLACE FUNCTION log_external_saving_transaction()
 RETURNS TRIGGER AS $$
 DECLARE
   previous_cumulative NUMERIC(30, 2);
-  new_cumulative NUMERIC(30, 2);
+  new_cumulative NUMERIC(30, 2); 
+  pocket_entity_id INT;
 BEGIN 
   SELECT COALESCE(cumulative_amount, 0) INTO previous_cumulative
   FROM transaction_logs
@@ -72,18 +72,21 @@ BEGIN
   LIMIT 1;
 
   new_cumulative = COALESCE(previous_cumulative, 0) + NEW.amount;
+  -- Find the entity that owns the pocket
+  SELECT entity_id INTO pocket_entity_id
+  FROM pockets
+  WHERE id = NEW.pocket_id;
 
   INSERT INTO transaction_logs (user_id, transaction_id, pocket_id, entity_id, transaction_type, amount, cumulative_amount, reference_no, created_at)
   SELECT NEW.user_id,
          COALESCE((SELECT MAX(transaction_id) + 1 FROM transaction_logs WHERE pocket_id = NEW.pocket_id), 1),
          NEW.pocket_id,
-         NEW.entity_id,
+         pocket_entity_id,
          'External Saving',
          NEW.amount,
          new_cumulative,
-         NEW.donor_id,
+         NEW.id,
          NOW();
-
   RETURN NEW;
 END
 $$ LANGUAGE plpgsql;
@@ -125,7 +128,6 @@ BEGIN
   RETURN NEW;
 END
 $$ LANGUAGE plpgsql;
-
 
 CREATE TRIGGER enforce_log_withdrawal_transaction
 AFTER INSERT ON withdrawals
@@ -196,36 +198,71 @@ EXECUTE FUNCTION log_transfer_transaction();
 
 ===============================================================================================
 
-CREATE OR REPLACE FUNCTION log_interest_transaction()
+CREATE OR REPLACE FUNCTION log_interest()
 RETURNS TRIGGER AS $$
 DECLARE
-  previous_cumulative NUMERIC(30, 2);
-  new_cumulative NUMERIC(30, 2);
-BEGIN 
-  SELECT COALESCE(cumulative_amount, 0) INTO previous_cumulative
-  FROM transaction_logs
-  WHERE pocket_id = NEW.pocket_id
-  ORDER BY transaction_id DESC
-  LIMIT 1;
+    total_savings NUMERIC(30, 2);
+    interest_earned NUMERIC(30, 2);
+    interest_rate   NUMERIC(3, 2);
+    account_type   enum_pocket_types;
+    last_interest_calculation TIMESTAMP;
+    days_elapsed NUMERIC;
+    new_cumulative NUMERIC;
+BEGIN
+    -- Retrieve pocket type for given pocket
+    SELECT p.pocket_type INTO account_type
+    FROM pockets p
+    WHERE p.id = NEW.pocket_id;
 
-  new_cumulative = COALESCE(previous_cumulative, 0) + NEW.amount;
+    -- Fetch rate for the pocket type
+    SELECT ir.rate INTO interest_rate
+    FROM interest_rates ir
+    WHERE ir.pocket_type = account_type;
 
-  INSERT INTO transaction_logs (user_id, transaction_id, pocket_id, entity_id, transaction_type, amount, cumulative_amount, reference_no, created_at)
-  SELECT NEW.user_id,
-         COALESCE((SELECT MAX(transaction_id) + 1 FROM transaction_logs WHERE pocket_id = NEW.pocket_id), 1),
-         NEW.pocket_id,
-         NEW.entity_id,
-         'Interest Earned',
-         NEW.amount,
-         new_cumulative,
-         NEW.donor_id,
-         NOW();
+    -- Compute balance for the given pocket
+    SELECT COALESCE(cumulative_amount, 0) INTO total_savings
+    FROM transaction_logs
+    WHERE pocket_id = NEW.pocket_id
+    ORDER BY transaction_id DESC
+    LIMIT 1;
 
-  RETURN NEW;
-END
+    -- Fetch the timestamp of the last interest calculation
+    SELECT MAX(created_at) INTO last_interest_calculation
+    FROM transaction_logs
+    WHERE user_id = NEW.user_id AND pocket_id = NEW.pocket_id AND transaction_type = 'Interest Earned';
+
+    IF last_interest_calculation IS NOT NULL THEN
+        days_elapsed := DATE_PART('day', NOW() - last_interest_calculation);
+    ELSE
+        days_elapsed := 0;
+    END IF;
+
+    -- Calculate interest earned and update into logs
+    interest_earned := (total_savings * interest_rate / 100 * days_elapsed) / 365;
+
+    IF interest_earned > 0 THEN
+        new_cumulative := total_savings + interest_earned;
+        INSERT INTO transaction_logs (user_id, transaction_id, pocket_id, entity_id, transaction_type, amount, cumulative_amount, reference_no, created_at)
+        VALUES (
+            NEW.user_id,
+            COALESCE((SELECT MAX(transaction_id) + 1 FROM transaction_logs WHERE pocket_id = NEW.pocket_id), 1),
+            NEW.pocket_id,
+            NEW.entity_id,
+            'Interest Earned',
+            interest_earned,
+            new_cumulative,
+            NEW.id,
+            NOW()
+        );
+    END IF;
+
+    RETURN NULL;
+END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER enforce_log_interest_transaction
-AFTER INSERT ON transfers
+CREATE TRIGGER enforce_log_transfer_interest
+AFTER INSERT ON savings
 FOR EACH ROW
-EXECUTE FUNCTION log_transfer_transaction();
+EXECUTE FUNCTION log_interest_transaction();
+
+
