@@ -1,6 +1,5 @@
 import { Router } from 'express';
 import bcrypt from 'bcrypt';
-//import { HttpError } from '../../middleware/errorMiddleware';
 import { sql } from '../../db';
 import { validateRequest } from '../../middleware/validationMiddleware';
 import { UserInterface, baseUserSchema } from './types';

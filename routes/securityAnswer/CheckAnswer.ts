@@ -20,7 +20,7 @@ export default (router: Router) => {
     validateRequest(securityAnswerValidationSchema),
     async (req, res) => {
       const loggedInUserId = req.user!.id; 
-      const checkAnswer = await SQL_CHECK_SECURITY_ANSWER({userId: loggedInUserId}).one();
+      const checkAnswer = await SQL_CHECK_SECURITY_ANSWER({user_id: loggedInUserId}).one();
       return res.json(checkAnswer);
     }
   );

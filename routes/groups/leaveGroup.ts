@@ -11,7 +11,6 @@ const SQL_EXIT_GROUP = sql<ExitGroupInterface, Record<string,never>>(`
   WHERE user_id = :user_id AND group_id = :group_id;
 `);
 
-
 export default (router: Router) => {
   router.patch<IdParamInterface, MessageInterface, Record<string,never>, Record<string,never>, Record<string,never>>(
     'exit-group/:groupId',

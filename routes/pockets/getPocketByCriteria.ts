@@ -28,8 +28,6 @@ export default (router: Router) => {
       const filters: string[] = [];
       const filterArgs: Record<string, string> = {};
       const loggedInUserId = req.user!.id;
-      console.log(req.user)
-      console.log('my name is ')
       const convertedStatus = status ? convertToTitleCase(status) : undefined;
       const convertedPriority = priority ? convertToTitleCase(priority) : undefined;
       const isStandardUser = req.user?.role === 'User';
@@ -91,7 +89,6 @@ export default (router: Router) => {
       const query = SQL_GET_POCKETS({});
       if (filters.length > 0) query.extend(`AND ${filters.join(' AND ')}`, filterArgs);
       query.extend('LIMIT 15', {});
-      console.log(query)
       res.json(await query.many());
     });
 };

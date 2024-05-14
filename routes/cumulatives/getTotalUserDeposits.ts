@@ -20,7 +20,6 @@ export default (router: Router) => {
       const { start_date, end_date } = req.query;
       const filters: string[] = [];
       const filterArgs: Record<string, string> = {};
-
       if (start_date) {
         filterArgs.start_date = start_date;
         filters.push(`date >= :start_date`);
@@ -29,7 +28,6 @@ export default (router: Router) => {
         filterArgs.end_date = end_date;
         filters.push(`date <= :end_date`);
       }
-
       const query = SQL_GET_TOTAL_DEPOSIT_FOR_USER({user_id });
       if (filters.length > 0) query.extend(`AND ${filters.join(' AND ')}`, filterArgs);
       query.extend('LIMIT 15', {});

@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import {Response, Router } from 'express';
 import { sql } from '../../db';
 //import authMiddleware from '../../middleware/authorization';
 import { HttpError } from '../../middleware/errorMiddleware';
@@ -12,8 +12,10 @@ const SQL_GET_SAVINGS = sql<Record<string,never>, SavingInterface>(`
 export default (router: Router) => {
   router.get<string, SavingParamInterface, SavingInterface[], Record<string, never>, SavingsQueryInterface>(
     '/:identifier',
-    async (req, res) => {
+    //authMiddleware,
+    async (req, res:Response) => {
       const savingIdentifier = req.params.identifier;
+      console.log(savingIdentifier)
       const { category_id, pocket_id } = req.query;
       const filterArgs: Record<string, string> = {};
       const filters: string[] = [];

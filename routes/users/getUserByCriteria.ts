@@ -2,9 +2,10 @@ import { Router, Response } from 'express';
 import { sql } from '../../db';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { hasPermission } from '../../middleware/hasPermission';
+import { validateRequest } from '../../middleware/validationMiddleware';
 import { convertToTitleCase, isValidValue } from '../../middleware/caseNormalization';
 import authMiddleware from '../../middleware/authorization';
-import { GetUserInterface, GetUserQueryInterface, TargetParamInterface } from './types';
+import { GetUserInterface, GetUserQueryInterface, TargetParamInterface, targetParamSchema } from './types';
 
 const SQL_GET_ALL_USERS = sql<Record<string,never>,  GetUserInterface>(`
   SELECT id, full_name, role, gender, created_at FROM users
@@ -16,8 +17,8 @@ export default (router: Router) => {
   router.get<string, TargetParamInterface, GetUserInterface, Record<string,never>, GetUserQueryInterface>(
     '/:targetUser', 
     authMiddleware(), 
+    validateRequest(targetParamSchema),
     async (req, res: Response) => {
-
       const  targetUser = req.params.targetUser;
       const { role } = req.query;
       const filters: string[] = [];
@@ -52,6 +53,5 @@ export default (router: Router) => {
       query.extend('LIMIT 15', {});
       const users = await query.many();
       res.json(users);
-      
     });
 };

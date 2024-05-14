@@ -19,7 +19,6 @@ export default (router: Router) => {
       const {  start_date, end_date, category_id } = req.query;
       const filters: string[] = [];
       const filterArgs: Record<string, string> = {};
-      
       if (start_date) {
         filterArgs.start_date = start_date;
         filters.push(`date >= :start_date`);
@@ -32,11 +31,8 @@ export default (router: Router) => {
         filterArgs.category_id = category_id;
         filters.push(`category_id = :categoryId`);
       }
-
       const query = SQL_GET_TOTAL_EXPENSES({user_id });
       if (filters.length > 0) query.extend(`AND ${filters.join(' AND ')}`, filterArgs);
-      
       res.json(await query.one( new HttpError(500, 'An error occurred while processing your request. Please try again later.')));
-
     });
 };
