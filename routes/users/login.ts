@@ -42,7 +42,7 @@ export default (router: Router) => {
       const refreshToken = generateToken(user.id, user.role, '7d');
       res
         .setHeader('refresh-token', refreshToken)
-        .setHeader('auth-token', accessToken)
+        .setHeader('authorization-token', accessToken)
         .json(userResult);
     }
   );
