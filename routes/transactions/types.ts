@@ -16,8 +16,9 @@ export const getTransactionRespSchema = z.object({
   transaction_id: z.number().positive(),
   transaction_type: z.enum([transactionType.DEPOSIT, transactionType.WITHDRAWAL, transactionType.TRANSFER]),
   amount: z.number(),
-  transaction_date: z.string(),
-  reference_no : z.string()
+  cumulative_amount: z.number(),
+  reference_no : z.string(),
+  transaction_date: z.date()
 })
 
 export type GetTransactionResp = z.infer<typeof getTransactionRespSchema>;
