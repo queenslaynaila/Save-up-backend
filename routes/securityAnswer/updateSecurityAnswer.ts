@@ -8,9 +8,9 @@ import { MessageInterface, IdParamInterface } from '../../globalTypes/index';
 
 const SQL_UPDATE_SECURITY_ANSWER = sql< CreateSecurityAnswerInterface, Record<string,never>>(`
   UPDATE security_answers 
-    SET answer = :answer 
-    WHERE question_id = :questionId 
-    AND user_id = :userId 
+  SET answer = :answer 
+  WHERE question_id = :questionId 
+  AND user_id = :userId 
 `);
 
 export default (router: Router) => {
