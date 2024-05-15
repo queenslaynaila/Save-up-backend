@@ -27,14 +27,12 @@ export default (router: Router) => {
     validateRequest(baseUserSchema),
     async (req, res) => {
       const { full_name, gender, national_id, phone_number, pin } = req.body;
-
       const entity = await SQL_CREATE_USER_ENTITY({ entity_type: 'User' }).one();
       await SQL_CREATE_USER_CONTACTS({ entity_id:entity.id,phone_number ,national_id })
         .exec();
       const pinHash = bcrypt.hashSync(pin, 12);
       await SQL_CREATE_USER({ id:entity.id, full_name, role:'Admin', gender, pin: pinHash })
-        .exec();
-        
+        .exec(); 
       res.json({message:"Account created Succesfully.Procced to login"});
     });
 };
