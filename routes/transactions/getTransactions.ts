@@ -5,16 +5,18 @@ import { GetTransactionsInput, GetTransactionResp, GetTransactionQuery } from '.
 import { IdParamInterface } from '../../globalTypes/index';
 
 const SQL_GET_TRANSACTIONS = sql<GetTransactionsInput, GetTransactionResp>(`
-    SELECT * FROM transaction_logs WHERE pocket_id = :pocket_id
-    RETURNING transaction_id, transaction_type, amount, cumulative_amount, reference_no, created_at AS transaction_date
+    SELECT transaction_id, transaction_type, amount, cumulative_amount, reference_no, created_at AS transaction_date
+    FROM transaction_logs 
+    WHERE pocket_id = :pocket_id
 `);
 
 export default (router: Router) => {
   router.get<IdParamInterface, GetTransactionResp[], Record<string,never>, GetTransactionQuery>(
-    '/:pocket_id', 
+    '/:id', 
     authMiddleware(),
     async (req, res) => {
       const pocket_id  = parseInt(req.params.id);
+      console.log(pocket_id )
       const { transaction_type, from_date, to_date } = req.query;
       const filters: string[] = [];
       const filterArgs: Record<string, string  > = {};
