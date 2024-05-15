@@ -1,6 +1,6 @@
 import {Response, Router } from 'express';
 import { sql } from '../../db';
-//import authMiddleware from '../../middleware/authorization';
+import authMiddleware from '../../middleware/authorization';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { SavingInterface, SavingParamInterface, SavingsQueryInterface } from './types';
 import { idSchema } from '../../globalTypes/index';
@@ -10,10 +10,10 @@ const SQL_GET_SAVINGS = sql<Record<string,never>, SavingInterface>(`
 `);
 
 export default (router: Router) => {
-  router.get<string, SavingParamInterface, SavingInterface[], Record<string, never>, SavingsQueryInterface>(
-    '/:identifier',
-    //authMiddleware,
-    async (req, res:Response) => {
+  router.get<string, SavingParamInterface, SavingInterface[], Record<string,never>, SavingsQueryInterface>(
+    '/:pockets_identifier', 
+    authMiddleware(), 
+    async (req, res: Response) => {
       const savingIdentifier = req.params.identifier;
       console.log(savingIdentifier)
       const { category_id, pocket_id } = req.query;
@@ -53,5 +53,5 @@ export default (router: Router) => {
       query.extend('LIMIT 15', {});
       const savings = await query.many();
       res.json(savings)
-    }
-  )};
+    });
+};
