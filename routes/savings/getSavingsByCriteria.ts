@@ -15,7 +15,6 @@ export default (router: Router) => {
     authMiddleware(), 
     async (req, res: Response) => {
       const savingIdentifier = req.params.identifier;
-      console.log(savingIdentifier)
       const { category_id, pocket_id } = req.query;
       const filterArgs: Record<string, string> = {};
       const filters: string[] = [];
