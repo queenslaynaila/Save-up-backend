@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { sql } from '../../db';
-//import authMiddleware from '../../middleware/authorization';
+import authMiddleware from '../../middleware/authorization';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { validateRequest } from '../../middleware/validationMiddleware';
 import { TransferInputInterface, TransferDepositResInterface, TransferDepositBodyInterface, transferDepositBody  } from './types'
@@ -19,17 +19,16 @@ RETURNING
 export default (router: Router) => {
   router.post<Record<string,never>, MessageInterface, TransferDepositBodyInterface, Record<string,never>>(
     '/', 
-    //authMiddleware,
+    authMiddleware(),
     validateRequest(transferDepositBody),
     async (req, res) => {
       const { source_pocket_id, destination_pocket_id, amount } = req.body
-      const user_id = 3
+      const user_id = req.user!.id
       const transfer = await SQL_CREATE_TRANSFER({ source_pocket_id, destination_pocket_id, amount, user_id }).one(
         new HttpError(400, 'Insufficient funds in source pocket for transfer.')
       );
       return res.json({
         message: `Trasfer of amount KES ${amount.toFixed(2)} from pocket ${transfer.source_pocket_name} to pocket ${transfer.destination_pocket_name} successful!`
-      });      
+      }); 
     });
 };
- 
