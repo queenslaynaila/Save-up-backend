@@ -24,8 +24,8 @@ export type GetTransactionResp = z.infer<typeof getTransactionRespSchema>;
 
 export const getTransactionQuery = z.object({
   transaction_type: z.enum([transactionType.DEPOSIT, transactionType.WITHDRAWAL, transactionType.TRANSFER]).optional(),
-  from_date: z.date().optional(),
-  to_date: z.date().optional()
+  from_date: z.string().optional(),
+  to_date: z.string().optional()
 }) 
 
 export type GetTransactionQuery = z.infer<typeof getTransactionQuery>;

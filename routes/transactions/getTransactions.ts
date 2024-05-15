@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { sql } from '../../db';
+import authMiddleware from '../../middleware/authorization';
 import { GetTransactionsInput, GetTransactionResp, GetTransactionQuery } from './types';
 import { IdParamInterface } from '../../globalTypes/index';
 
@@ -7,14 +8,16 @@ const SQL_GET_TRANSACTIONS = sql<GetTransactionsInput, GetTransactionResp>(`
     SELECT * FROM transaction_logs WHERE pocket_id = :pocket_id
 `);
 
+
 export default (router: Router) => {
-  router.get<string,IdParamInterface, GetTransactionResp[], Record<string,never>, GetTransactionQuery>(
+  router.get<IdParamInterface, GetTransactionResp[], Record<string,never>, GetTransactionQuery>(
     '/:pocket_id', 
+    authMiddleware(),
     async (req, res) => {
       const pocket_id  = parseInt(req.params.id);
       const { transaction_type, from_date, to_date } = req.query;
       const filters: string[] = [];
-      const filterArgs: Record<string, string | Date> = {};
+      const filterArgs: Record<string, string  > = {};
 
       if (transaction_type) {
         filterArgs.transaction_type = transaction_type;
@@ -38,4 +41,4 @@ export default (router: Router) => {
       query.extend('LIMIT 15', {});
       return res.json(await query.many());
     });
-}
+};
