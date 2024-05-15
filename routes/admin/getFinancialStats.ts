@@ -13,14 +13,11 @@ export default (router: Router) => {
     '/financial-stats/:resource/:operator',
     authMiddleware({ roles: [UserRole.ADMIN] }),
     async (req, res) => {
-
       req.params.resource = req.params.resource.toLowerCase();
       req.params.operator = req.params.operator.toUpperCase();
-
       const { resource, operator } = req.params;
       const { user_id, priority, status, category_id, start_date, end_date } = req.query 
       const formattedStatus = status ? convertToTitleCase(status) : '';
-
       if (!ValidResourcesEnum.safeParse(resource).success) {
         throw new HttpError(400, 'Invalid resource');
       }
@@ -30,9 +27,7 @@ export default (router: Router) => {
       if ( status && !ValidStatusEnum.safeParse(status).success) {
         throw new HttpError(400, 'Invalid operator');
       }
-      
       let query = `SELECT COALESCE(${operator}(amount), 0) AS ${operator} FROM ${resource} WHERE 1=1`;
-
       if (['savings', 'expenses'].includes(resource)) {
         if (user_id) query += ` AND user_id = '${user_id}'`;
         if (category_id) query += ` AND category_id = '${category_id}'`;
@@ -40,15 +35,12 @@ export default (router: Router) => {
         if (start_date) query += ` AND completed_date >= '${start_date}'`;
         if (end_date) query += ` AND completed_date <= '${end_date}'`;
       }
-
       if (resource === 'savings' && status) {
         query += ` AND status = '${formattedStatus}'`;
       }
-
       const values: { operator: string; resource: string } = { operator, resource };
       const result = await SQL_GET_CUMULATIVES(query)(values).one();
       res.json(result);
-
     }
   );
 };
