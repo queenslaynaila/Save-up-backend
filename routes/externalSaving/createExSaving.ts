@@ -1,16 +1,19 @@
 import { Router } from 'express';
 import { sql } from '../../db';
+import authMiddleware from '../../middleware/authorization';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { validateRequest } from '../../middleware/validationMiddleware';
 import {  ExternalSavingInterface, externalSavingSchema } from './types';
+import { MessageInterface } from '../../globalTypes';
 
 const SQL_CREATE_SAVING = sql<ExternalSavingInterface, Record<string,never>>(`
   SELECT create_external_savings( :pocket_id, :amount, :show_donor_details)
 `);
 
 export default (router: Router) => {
-  router.post<Record<string,never>,{ message:string },  ExternalSavingInterface, Record<string,never>, Record<string,never>>(
+  router.post<Record<string,never>, MessageInterface, ExternalSavingInterface, Record<string,never>>(
     '/', 
+    authMiddleware(),
     validateRequest(externalSavingSchema),
     async (req, res) => {
       const { pocket_id, amount, show_donor_details } = req.body;
@@ -20,4 +23,3 @@ export default (router: Router) => {
       return res.json({ message: `Your saving of KES ${amountPaid}  was successful!` });
     });
 };
-
