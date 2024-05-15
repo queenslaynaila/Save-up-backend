@@ -164,12 +164,14 @@ BEGIN
     approval_threshold = total_members / 2;
 
     SELECT COUNT (*) INTO approvals_count
-    FROM nomination_approvals
-    WHERE group_id = group_id AND nominated_member_id = nominated_member_id AND VOTE = 'YES';
+    FROM nomination_approvals 
+    WHERE nomination_approvals.group_id = promote_approved_admins.group_id 
+    AND nomination_approvals.nominated_member_id = promote_approved_admins.nominated_member_id 
+    AND VOTE = 'YES';
 
     IF approvals_count >= approval_threshold THEN
         INSERT INTO group_administrators (user_id, group_id)
-        VALUES (nominated_member_id, group_id);
+        VALUES (promote_approved_admins.nominated_member_id, promote_approved_admins.group_id);
     END IF;
 END;
 $$ LANGUAGE plpgsql;
@@ -180,17 +182,16 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION update_admins_on_all_votes()
 RETURNS TRIGGER AS $$
 DECLARE 
-    group_id INT := NEW.group_id;
     total_members INT;
     voters_count INT;
 BEGIN
-  SELECT COUNT(*) INTO total_members FROM user_groups WHERE group_id = NEW.group_id;
+  SELECT COUNT(*) INTO total_members FROM user_groups ug WHERE ug.group_id = NEW.group_id;
   
-  SELECT COUNT(DISTINCT voter_member_id) INTO voters_count FROM nomination_approvals 
-  WHERE group_id = NEW.group_id AND nominated_member_id = NEW.nominated_member_id;
+  SELECT COUNT(DISTINCT voter_member_id) INTO voters_count FROM nomination_approvals n
+  WHERE n.group_id = NEW.group_id AND nominated_member_id = NEW.nominated_member_id;
 
   IF voters_count = total_members THEN
-      PERFORM promote_approved_admins(group_id, total_members, nominated_member_id);
+      PERFORM promote_approved_admins(NEW.group_id, total_members, NEW.nominated_member_id);
   END IF;
 
   RETURN NEW;
