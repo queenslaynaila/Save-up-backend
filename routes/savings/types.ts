@@ -24,9 +24,8 @@ export const savingSchema = baseSavingSchema.extend({
   
 export type SavingInterface = z.infer<typeof savingSchema>;
 
-export const savingsQuerySchema = baseSavingSchema.pick({
-  pocket_id: true
-}).partial().extend({
+export const savingsQuerySchema = z.object({
+  pocket_id: z.string().optional(),
   category_id: z.string().optional(),
 })
 
