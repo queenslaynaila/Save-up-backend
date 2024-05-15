@@ -61,9 +61,7 @@ export default async function remindStalePockets() {
       sendSms(phone_number, message);
       await SQL_UPDATE_POCKET_REMINDER({ pocket_id, last_reminder_sent_at: currentTime, reminder_count: 1 }).exec();
     }
-
   }
-
   console.log('Stale pocketss reminders sent');
 }
 
