@@ -10,7 +10,6 @@ CREATE TABLE IF NOT EXISTS pockets (
   name                    TEXT NOT NULL,
   description             TEXT,
   target_amount           NUMERIC(30, 2) NOT NULL DEFAULT 0,
-  saved_amount            NUMERIC(30, 2) NOT NULL DEFAULT 0 CHECK (saved_amount >= 0),
   priority                enum_priorities NOT NULL DEFAULT 'Intermediate',
   status                  enum_statuses NOT NULL DEFAULT 'In Progress',
   target_at               TIMESTAMP WITH TIME ZONE,
