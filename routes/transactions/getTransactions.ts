@@ -6,6 +6,7 @@ import { IdParamInterface } from '../../globalTypes/index';
 
 const SQL_GET_TRANSACTIONS = sql<GetTransactionsInput, GetTransactionResp>(`
     SELECT * FROM transaction_logs WHERE pocket_id = :pocket_id
+    RETURNING transaction_id, transaction_type, amount, cumulative_amount, reference_no, created_at AS transaction_date
 `);
 
 export default (router: Router) => {
