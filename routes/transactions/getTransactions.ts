@@ -8,7 +8,6 @@ const SQL_GET_TRANSACTIONS = sql<GetTransactionsInput, GetTransactionResp>(`
     SELECT * FROM transaction_logs WHERE pocket_id = :pocket_id
 `);
 
-
 export default (router: Router) => {
   router.get<IdParamInterface, GetTransactionResp[], Record<string,never>, GetTransactionQuery>(
     '/:pocket_id', 
