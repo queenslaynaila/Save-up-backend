@@ -15,7 +15,7 @@ const SQL_UPDATE_GROUP = sql<UpdateGroupInterface, UpdateGroupResponseInterface>
 
 export default (router: Router) => {
   router.patch<IdParamInterface, UpdateGroupResponseInterface, UpdateGroupInterface, Record<string,never>, Record<string,never>>(
-    '/:groupId',
+    '/:id',
     authMiddleware(),
     validateRequest(baseGroupSchema),
     async (req, res) => {

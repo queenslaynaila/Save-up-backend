@@ -23,7 +23,7 @@ const SQL_GET_GROUP_MEMBERS = sql<GroupInterface, GetGroupMembersInterface>(`
 
 export default (router: Router) => {
   router.get<IdParamInterface, GetGroupMembersInterface[], Record<string,never>, Record<string,never>>(
-    '/:group_id',
+    '/:id',
     authMiddleware(),
     async (req, res) => {
       const  group_id  = parseInt(req.params.id); 

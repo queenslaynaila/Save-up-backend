@@ -13,7 +13,7 @@ const SQL_EXIT_GROUP = sql<ExitGroupInterface, Record<string,never>>(`
 
 export default (router: Router) => {
   router.patch<IdParamInterface, MessageInterface, Record<string,never>, Record<string,never>, Record<string,never>>(
-    'exit-group/:groupId',
+    'exit-group/:id',
     authMiddleware(),
     validateRequest(exitGroupSchema),
     async (req, res) => {
