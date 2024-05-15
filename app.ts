@@ -25,9 +25,11 @@ import transactionRoutes from './routes/transactions';
 import createExSaving from './routes/externalSaving/createExSaving';
 import cron from 'node-cron';
 import remindStaleGoals from './cronJobs/overdueGoalsReminder'
+import creditInterest from './cronJobs/creditInterest';
 
-//Cron job
+//Cron jobs
 cron.schedule('0 10 */14 * *', remindStaleGoals);
+cron.schedule('0 2 */7 * *', creditInterest);
 
 //Swagger docs
 const options = {
@@ -66,7 +68,6 @@ const options = {
   },
   apis: ["./routes/**/swagger.yml"],
 };
-
 
 const specs = swaggerJsDoc(options);
 
@@ -114,7 +115,7 @@ app.use(() => {
 // Global error handler
 /* eslint-disable @typescript-eslint/no-unused-vars */
 app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
-  console.log(error)
+  console.log(`this is error ${error}`)
   if (error instanceof HttpError) {
     console.log('http errror starts here:', error);  
     return res.status(error.statusCode).json({ error: error.message });
