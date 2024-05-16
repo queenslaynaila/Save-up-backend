@@ -3,6 +3,7 @@ import { z } from 'zod';
 export const baseExpenseSchema = z.object({
   entity_id: z.number(),
   category_id: z.number(),
+  expense_name: z.string(),
   description: z.string(),
   amount_spent: z.number(),
   date_spent: z.string(),

@@ -17,14 +17,15 @@ export default (router: Router) => {
     authMiddleware(), 
     validateRequest(createExpenseSchemaValidation),
     async (req, res) => {
-      const { description, category_id, amount_spent, date_spent } = req.body;
+      const { description, category_id, amount_spent, date_spent, expense_name } = req.body;
       const entity_id = req.body.entity_id ? req.body.entity_id : req.user!.id;
       const expense = await SQL_CREATE_EXPENSES({
         description,
         category_id,
         amount_spent,
         date_spent,
-        entity_id
+        entity_id,
+        expense_name
       }).one()
       return res.json(expense);
     });
