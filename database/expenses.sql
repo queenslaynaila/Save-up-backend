@@ -14,6 +14,6 @@ CREATE TABLE IF NOT EXISTS expenses (
   FOREIGN KEY    (category_id) REFERENCES categories(id)
 );
 
-
+GRANT INSERT, SELECT, UPDATE ON expenses TO app_user;
 CREATE INDEX idx_expenses_by_entity_id ON expenses(entity_id);
 SELECT create_distributed_table('expenses', 'entity_id');  -- As expenses is frequently accesed by entity id
