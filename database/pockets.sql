@@ -26,6 +26,7 @@ CREATE TABLE IF NOT EXISTS pockets (
   FOREIGN KEY             (category_id) REFERENCES categories(id)
 );
 
+GRANT INSERT, SELECT, UPDATE ON expenses TO app_user;
 Create INDEX idx_pockets_by_entity_id ON pockets(entity_id);
 SELECT create_distributed_table('pockets', 'id');
 
