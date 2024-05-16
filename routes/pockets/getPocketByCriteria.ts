@@ -3,7 +3,7 @@ import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { convertToTitleCase, isValidValue } from '../../middleware/caseNormalization';
 import { HttpError } from '../../middleware/errorMiddleware';
-import { PocketInterface, PocketsConditionsQueryInterface, PocketParam } from './types';
+import { PocketInterface, PocketsConditionsQueryInterface, getPocketInterface, PocketParam } from './types';
 
 const ACCEPTED_STATUS_VALUES = ['In Progress', 'Dormant', 'Completed'];
 const ACCEPTED_PRIORITY_VALUES = ['High', 'Intermediate', 'Low'];
@@ -18,31 +18,35 @@ const SQL_GET_POCKETS = sql<Record<string, never>, PocketInterface>(`
 `);
 
 export default (router: Router) => {
-  router.get<string, PocketParam, PocketInterface[], Record<string,never>, PocketsConditionsQueryInterface>(
+  router.get<string, PocketParam, PocketInterface[], getPocketInterface, PocketsConditionsQueryInterface>(
     '/:pockets_identifier', 
     authMiddleware(), 
     async (req, res: Response) => {
       const { pockets_identifier } = req.params;
+      const entity_id = req.body.entity_id ? req.body.entity_id : req.user!.id;
       const { category_id, priority, status, created_at, completed_at  } = req.query;
 
       const filters: string[] = [];
       const filterArgs: Record<string, string> = {};
-      const loggedInUserId = req.user!.id;
       const convertedStatus = status ? convertToTitleCase(status) : undefined;
       const convertedPriority = priority ? convertToTitleCase(priority) : undefined;
       const isStandardUser = req.user?.role === 'User';
 
       if (pockets_identifier === 'me') {
-        filterArgs.loggedInUserId= loggedInUserId.toString() ;
+        filterArgs.loggedInUserId= entity_id.toString() ;
         filterArgs.isDefaultPocket  = 'FALSE';
         filters.push(`entity_id = :loggedInUserId`);
         filters.push(`is_default_pocket  = :isDefaultPocket`);
       } 
-      else if (pockets_identifier === 'Default') {
-        filterArgs.loggedInUserId= loggedInUserId.toString();
+      else if (pockets_identifier === 'default') {
+        filterArgs.loggedInUserId= entity_id.toString();
         filterArgs.isDefaultPocket  = 'TRUE';
         filters.push(`entity_id = :loggedInUserId`);
         filters.push(`is_default_pocket  = :isDefaultPocket`);
+      } 
+      else if (pockets_identifier === 'group') {
+        filterArgs.group_id = entity_id.toString();
+        filters.push(`entity_id = :group_id`);
       } 
       else if (pockets_identifier === 'all') {
         if (isStandardUser) {

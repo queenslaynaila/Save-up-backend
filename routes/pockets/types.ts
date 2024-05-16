@@ -10,6 +10,12 @@ export const basePocketSchema = z.object({
   pocket_type: z.enum(['Standard Pocket', 'Locked Pocket'])
 });
 
+export const getPocketSchema = basePocketSchema.pick({
+  entity_id:true
+}).partial()
+
+export type getPocketInterface = z.infer< typeof getPocketSchema>
+
 export const createPocketSchema = basePocketSchema.extend({
   entity_id: z.number().optional(),
 }); 
