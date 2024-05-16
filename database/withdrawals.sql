@@ -10,6 +10,9 @@ CREATE TABLE IF NOT EXISTS withdrawals (
   FOREIGN KEY   (user_id) REFERENCES users(id)
 );
 
+GRANT INSERT, SELECT ON withdrawals TO app_user;
+CREATE INDEX idx_withdrawals_by_pockets_and_user ON withdrawals(pocket_id, user_id);
+
 CREATE OR REPLACE FUNCTION withdraw_savings(pocket_id INT, user_id INT, amount NUMERIC(30, 2), entity_id INT)
 RETURNS VOID AS $$
 DECLARE
