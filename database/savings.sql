@@ -33,9 +33,12 @@ CREATE TABLE IF NOT EXISTS donors (
   FOREIGN KEY          (entity_id) REFERENCES entities(id)
 );
 
--- Stores contributions/ donations made by non members of the app towards an individual or group goal.
--- Once a non member makes a donations we create a donor account for him in donors table 
--- so in case they donate again he doesnt have to re enter their details
+-- Create the 'external savings' table without the distributed 
+-- pockets foreign key constraint as citus 
+-- doesnt allow a normal psql table to ref a distributed table
+-- Distribute table by pocket_id
+-- Use alter command to add the fk constaint thereby bypasing citus
+
 CREATE TABLE IF NOT EXISTS external_savings (
   id                    INT NOT NULL,
   entity_id             INT NOT NULL, -- Entity ID of the donor owning the savings.
@@ -47,6 +50,7 @@ CREATE TABLE IF NOT EXISTS external_savings (
   FOREIGN KEY           (entity_id) REFERENCES entities(id)
 );
 
+GRANT INSERT, SELECT ON external_savings TO app_user;
 CREATE INDEX idx_external_savings_by_pocket_id ON external_savings(pocket_id);
 SELECT create_distributed_table('external_savings', 'pocket_id');
 
