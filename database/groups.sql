@@ -1,4 +1,3 @@
---- Groups & Group Management
 CREATE TABLE IF NOT EXISTS groups (
   id            SERIAL PRIMARY KEY,
   group_name    TEXT NOT NULL,
@@ -6,10 +5,49 @@ CREATE TABLE IF NOT EXISTS groups (
   created_by    INT NOT NULL,
   created_at    TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   updated_at    TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-  deleted_at    TIMESTAMP WITH TIME ZONE
+  deleted_at    TIMESTAMP WITH TIME ZONE,
+  FOREIGN KEY   (id) REFERENCES entities(id)
 );
 
+GRANT INSERT, SELECT, UPDATE ON groups TO app_user;
 SELECT create_distributed_table('groups', 'id');
+
+-- Create the group table without the grps foreign key constraint as 
+-- citus doesnt allow a normal psql table to ref a distributed table
+-- Distribute table by group id
+-- Use alter command to add the fk constaint thereby bypasing citus limitation
+
+CREATE TABLE IF NOT EXISTS user_groups (
+  group_id      INT NOT NULL,
+  user_id       INT NOT NULL,
+  joined_at     TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  left_at       TIMESTAMP WITH TIME ZONE,
+  PRIMARY KEY   (group_id,user_id),
+  FOREIGN KEY   (user_id) REFERENCES entities(id)
+);
+
+GRANT INSERT, SELECT, UPDATE ON user_groups TO app_user;
+SELECT create_distributed_table('user_groups', 'group_id');
+
+ALTER TABLE user_groups
+ADD CONSTRAINT fk_group_id
+FOREIGN KEY (group_id) REFERENCES groups(id)
+
+CREATE TABLE IF NOT EXISTS group_administrators (
+  group_id      INT NOT NULL,
+  user_id       INT NOT NULL,
+  created_at    TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  PRIMARY KEY   (group_id,user_id),
+  FOREIGN KEY   (group_id,user_id) REFERENCES user_groups(group_id,user_id)
+);
+
+GRANT INSERT, SELECT, UPDATE ON group_administrators TO app_user;
+SELECT create_distributed_table('group_administrators', 'group_id');
+
+-- Create the invitations table without the grps admin foreign key constraint as 
+-- citus doesnt allow a normal psql table to ref a distributed table
+-- Distribute table by group id
+-- Use alter command to add the fk constaint thereby bypasing citus limitation
 
 CREATE TABLE IF NOT EXISTS invitations (   
   group_id      INT NOT NULL,      
@@ -18,24 +56,16 @@ CREATE TABLE IF NOT EXISTS invitations (
   status        enum_invites NOT NULL DEFAULT 'Pending',
   created_at    TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   PRIMARY KEY   (group_id,receiver_id),
-  FOREIGN KEY   (group_id,sender_id) REFERENCES group_administrators(group_id,user_id),
-  FOREIGN KEY   (receiver_id) REFERENCES entities(id)
+  FOREIGN KEY   (receiver_id) REFERENCES entities(id),
+  FOREIGN KEY   (sender_id) REFERENCES entities(id)
 );
 
+GRANT INSERT, SELECT, UPDATE ON invitations TO app_user;
 SELECT create_distributed_table('invitations', 'group_id');
 
-CREATE TABLE IF NOT EXISTS user_groups (
-  group_id      INT NOT NULL,
-  user_id       INT NOT NULL,
-  joined_at     TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-  left_at       TIMESTAMP WITH TIME ZONE,
-  PRIMARY KEY   (group_id,user_id),
-  FOREIGN KEY   (user_id) REFERENCES entities(id),
-  FOREIGN KEY   (group_id) REFERENCES groups(id)
-);
-
-SELECT create_distributed_table('user_groups', 'group_id');
-GRANT SELECT, UPDATE ON user_groups, next_of_kins TO app_user;
+ALTER TABLE invitations
+ADD CONSTRAINT fk_group_admin_id
+FOREIGN KEY (group_id,sender_id) REFERENCES group_administrators(group_id,user_id)
 
 CREATE TABLE IF NOT EXISTS nominated_administrators (
   group_id           INT NOT NULL,
@@ -45,8 +75,8 @@ CREATE TABLE IF NOT EXISTS nominated_administrators (
   FOREIGN KEY        (group_id, user_id) REFERENCES user_groups(group_id, user_id)
 );
 
+GRANT SELECT, INSERT ON nominated_administrators TO app_user;
 SELECT create_distributed_table('nominated_administrators', 'group_id');
-GRANT SELECT, INSERT ON nominations_approvals, savings, external_savings, withdrawals, transfers TO app_user;
 
 CREATE TABLE IF NOT EXISTS nomination_approvals (
   group_id              INT NOT NULL,
@@ -58,17 +88,8 @@ CREATE TABLE IF NOT EXISTS nomination_approvals (
   FOREIGN KEY           (group_id, nominated_member_id) REFERENCES nominated_administrators(group_id, user_id)
 );
 
-SELECT create_distributed_table('administrator_votes', 'group_id');
-
-CREATE TABLE IF NOT EXISTS group_administrators (
-  group_id      INT NOT NULL,
-  user_id       INT NOT NULL,
-  created_at    TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-  PRIMARY KEY   (group_id,user_id),
-  FOREIGN KEY   (group_id,user_id) REFERENCES user_groups(group_id,user_id)
-);
-
-SELECT create_distributed_table('group_administrators', 'group_id');
+GRANT SELECT, INSERT ON nomination_approvals TO app_user;
+SELECT create_distributed_table('nomination_approvals', 'group_id');
 
 ===============================================================================================
 --TRigger adds a group creator as a member of a group  once on creation
