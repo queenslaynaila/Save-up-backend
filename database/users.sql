@@ -9,8 +9,8 @@ CREATE TABLE IF NOT EXISTS entities (
   entity_type     enum_entities NOT NULL 
 );
 
+GRANT INSERT ON entities TO app_user;  
 SELECT create_reference_table('entities');
-GRANT INSERT ON entities, reset_tokens TO app_user;
 
 --- User Contacts: Stores contact details and identification details
 CREATE TABLE IF NOT EXISTS user_contact_details (
@@ -22,20 +22,21 @@ CREATE TABLE IF NOT EXISTS user_contact_details (
   CONSTRAINT      national_id_length_check CHECK (national_id >= 10000000 AND national_id <= 99999999)
 );
 
-GRANT INSERT, SELECT, UPDATE ON user_contact_details, invitations, expenses, pockets TO app_user;
+GRANT INSERT, SELECT, UPDATE ON user_contact_details TO app_user;
+CREATE INDEX idx_user_contacts_by_phone ON user_contact_details (phone_number);
 
 -- Users Table: Store general user details
 CREATE TABLE IF NOT EXISTS users (
-  id                        INT NOT NULL PRIMARY KEY,  -- The entity id
-  full_name                 TEXT NOT NULL,
-  role                      enum_roles NOT NULL DEFAULT 'User',
-  gender                    enum_genders NOT NULL,
-  pin                       TEXT NOT NULL,
-  created_at                TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+  id              INT NOT NULL PRIMARY KEY,  -- The entity id
+  full_name       TEXT NOT NULL,
+  role            enum_roles NOT NULL DEFAULT 'User',
+  gender          enum_genders NOT NULL,
+  pin             TEXT NOT NULL,
+  created_at      TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  FOREIGN KEY     (id) REFERENCES entities(id)
 );
 
-CREATE INDEX idx_users_by_phone ON user_contact_details (phone_number);
-CREATE INDEX idx_users_by_id ON users (id);
+GRANT INSERT, SELECT, UPDATE ON user_contact_details TO app_user;
 SELECT create_distributed_table('users', 'id');
 
 -- Function to create a new user 

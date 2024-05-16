@@ -23,4 +23,4 @@ VALUES ('Food', 'All food related expenses'),
        Funds saved here are readily available for future use and can be easily allocated to other pockets whenever you choose.');
 
 SELECT create_reference_table('categories');
-GRANT SELECT ON categories, security_questions, users, interest_rates, transaction_logs TO app_user;
+GRANT SELECT ON categories TO app_user;
