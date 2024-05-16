@@ -43,36 +43,26 @@ SELECT create_distributed_table('users', 'id');
 CREATE OR REPLACE FUNCTION create_user(full_name TEXT, gender enum_genders, national_id INT, phone_number TEXT, pin TEXT)
 RETURNS VOID AS $$
 DECLARE
-  entity_id INTEGER;
+  user_id INTEGER;
 BEGIN 
       INSERT INTO entities (entity_type)
       VALUES ('User')
-      RETURNING id INTO entity_id;
+      RETURNING id INTO user_id;
 
       INSERT INTO user_contact_details (id, phone_number, national_id)
-      VALUES (entity_id, phone_number, national_id);
+      VALUES (user_id, phone_number, national_id);
 
       INSERT INTO users (id, full_name, gender, pin)
-      VALUES (entity_id, full_name, gender, pin);
+      VALUES (user_id, full_name, gender, pin);
+      
+      INSERT INTO pockets (id, entity_id, category_id, name, description, is_default_pocket, target_amount, priority)
+      SELECT COALESCE(MAX(id), 0) + 1, user_id, 11, 'Wallet', 'Your digital wallet, a secure place for your on-the-go savings.
+      Your Wallet allows you to save funds without immediately assigning them to a specific pocket. When you''re ready to allocate those savings toward a dream vacation, 
+      emergency fund, or any other goal, effortlessly transfer them to an existing pocket or create a new one!', TRUE, 0, 'Intermediate'
+      FROM pockets 
+      WHERE pockets.entity_id = user_id;
 EXCEPTION 
     WHEN unique_violation THEN
       RAISE EXCEPTION 'User with that national ID or phone number already exists.';
 END;
 $$ LANGUAGE plpgsql;
-
--- Create a default Wallet pocket for new users (triggered on user creation)
-CREATE OR REPLACE FUNCTION create_default_pockets_for_user()
-RETURNS TRIGGER AS $$
-BEGIN
-    INSERT INTO pockets (id, entity_id, category_id, name, target_amount, description, is_default_pocket, priority)
-    VALUES ((SELECT COALESCE(MAX(id), 0) + 1 FROM pockets WHERE entity_id = :entity_id), 11, 'Wallet','Your digital wallet, a secure place for your on-the-go savings.
-    Your Wallet allows you to save funds without immediately assigning them to a specific pocket. When you''re ready to allocate those savings toward a dream vacation, 
-    emergency fund, or any other goal, effortlessly transfer them to an existing pocket or create a new one!',TRUE, 0, 'Intermediate');
-  RETURN NULL;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER create_default_pockets_pocket_trigger
-AFTER INSERT ON users
-FOR EACH ROW
-EXECUTE FUNCTION create_default_pockets_for_user();
