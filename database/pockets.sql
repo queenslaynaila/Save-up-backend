@@ -29,31 +29,3 @@ CREATE TABLE IF NOT EXISTS pockets (
 GRANT INSERT, SELECT, UPDATE ON pockets TO app_user;
 Create INDEX idx_pockets_by_entity_id ON pockets(entity_id);
 SELECT create_distributed_table('pockets', 'id');
-
---Trigger: Update pocket status to Completed when target amount is reached
-
-CREATE OR REPLACE FUNCTION update_pockets_status()
-RETURNS TRIGGER AS $$
-DECLARE
-    total_savings NUMERIC(30, 2);
-BEGIN
-    SELECT COALESCE(SUM(amount), 0) INTO total_savings
-    FROM savings
-    WHERE user_id = NEW.user_id AND saving_id = NEW.saving_id;
-
-    IF total_savings >= (SELECT target_amount FROM pockets WHERE user_id = NEW.user_id AND id = NEW.saving_id) THEN
-        UPDATE pockets
-        SET status = 'Completed',
-            completed_date = NOW()
-        WHERE id = NEW.saving_id;
-    END IF;
-
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER enforce_update_saving_status
-AFTER INSERT ON savings
-FOR EACH ROW
-EXECUTE FUNCTION update_pockets_status();
-
