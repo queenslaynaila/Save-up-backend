@@ -19,13 +19,11 @@ export default (router: Router) => {
     '/login',
     validateRequest(updateUserPhoneSchema),
     async (req, res) => {
-
       const { phone_number , pin } = req.body;
       const entity_id = await SQL_GET_USER_ENTITY_ID({ phone_number }).one(
         new HttpError(404, 'User Not found')
       );
       const user = await SQL_GET_USER({ id: entity_id.id }).one();
-
       const isPasswordCorrect = await bcrypt.compare(pin, user.pin);
       if (!isPasswordCorrect) {
         throw new HttpError(400, 'Invalid phone number or password combination');
@@ -37,7 +35,6 @@ export default (router: Router) => {
         role: user.role,
         created_at: user.created_at,
       };
-
       const accessToken = generateToken(user.id, user.role, '1d');
       const refreshToken = generateToken(user.id, user.role, '7d');
       res
