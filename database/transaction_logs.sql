@@ -15,6 +15,8 @@ CREATE TABLE IF NOT EXISTS transaction_logs (
   FOREIGN KEY             (entity_id, pocket_id) REFERENCES pockets (entity_id, id)
 );
 
+GRANT INSERT, SELECT ON transfers TO app_user;
+SELECT create_distributed_table('transaction_logs', 'pocket_id');
 CREATE INDEX idx_transaction_logs_pocket_id ON transaction_logs(pocket_id);
 CREATE INDEX idx_transaction_logs_transaction_id ON transaction_logs(transaction_id);
 
