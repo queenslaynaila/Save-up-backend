@@ -1,4 +1,3 @@
-
 CREATE TABLE IF NOT EXISTS default_pockets ( 
   entity_id               INT NOT NULL, 
   pocket_id               INT NOT NULL,
