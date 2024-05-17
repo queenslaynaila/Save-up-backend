@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS reset_tokens (
   FOREIGN KEY   (user_id) REFERENCES users(id)
 );
 
-GRANT INSERT, UPDATE ON reset_tokens TO app_user; 
+GRANT INSERT, SELECT, UPDATE ON reset_tokens TO app_user; 
 SELECT create_distributed_table('reset_tokens', 'user_id');
  
                                                    
