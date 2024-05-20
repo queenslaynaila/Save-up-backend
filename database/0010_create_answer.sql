@@ -8,7 +8,7 @@ RETURNS VOID AS $$
 DECLARE
   v_answer_count   INT;
 BEGIN 
-  SELECT COUNT(*) INTO v_answer_count 
+  SELECT COUNT(*) INTO STRICT v_answer_count 
   FROM security_answers 
   WHERE user_id = p_user_id;
   
