@@ -8,7 +8,7 @@ const SQL_DELETE_KIN = sql<DeleteNextOfKinInterface, Record<string,never>>(`
   UPDATE next_of_kins  
   SET deleted_at = NOW()
   WHERE user_id = :user_id
-  AND id = :id
+  AND id = :xid
 `);
 
 export default (router: Router) => {   
@@ -17,8 +17,8 @@ export default (router: Router) => {
     authMiddleware(), 
     async (req, res) => {
       const user_id = req.user!.id;
-      const id = parseInt(req.params.id);
-      await SQL_DELETE_KIN({user_id, id }).exec();
+      const xid = parseInt(req.params.id);
+      await SQL_DELETE_KIN({user_id, xid }).exec();
       return res.json({ message: 'Kin deleted successfully' });
     }
   );

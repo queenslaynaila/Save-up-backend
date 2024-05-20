@@ -6,16 +6,24 @@ import { validateRequest } from '../../middleware/validationMiddleware';
 import { CreateNextOfKinInterface, NextOfKinInterface, nextOfKinCreationSchema } from './types'; 
 
 const SQL_CREATE_KIN = sql<CreateNextOfKinInterface, NextOfKinInterface>(`
-INSERT INTO next_of_kins (id, user_id, full_name, relationship, email, phone_number)
-VALUES (
-  COALESCE((SELECT MAX(id) + 1 FROM next_of_kins WHERE user_id = :user_id), 1),
-  :user_id,
-  :full_name,
-  :relationship,
-  :email,
-  :phone_number
-)
-RETURNING id, full_name, relationship, email, phone_number;
+  INSERT INTO next_of_kins (
+    user_id,
+    xid,
+    full_name,
+    relationship,
+    email,
+    phone_number
+  )
+  SELECT 
+    :user_id,
+    COALESCE(MAX(xid) + 1, 1),
+    :full_name,
+    :relationship,
+    :email,
+    :phone_number
+  FROM next_of_kins
+  WHERE user_id = :user_id
+  RETURNING xid, full_name, relationship, email, phone_number, created_at;
 `);
 
 export default (router: Router) => {

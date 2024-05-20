@@ -15,7 +15,7 @@ export type CreateNextOfKinInterface = z.infer<typeof createNextOfKinSchema>;
 export const NextOfKinSchema= createNextOfKinSchema
   .omit({ user_id: true })
   .extend({
-    id: z.number(),
+    xid: z.number(),
     created_at: z.date(),
     updated_at: z.date()
   })
@@ -31,7 +31,7 @@ export type UpdateNextOfKinInterface = z.infer<typeof updateNextOfKinSchema>;
 export const nextOfKinCreationSchema = createNextOfKinSchema.omit({ user_id: true });
 
 export const deleteNextOfKinSchema = NextOfKinSchema
-  .pick({id: true}).
+  .pick({xid: true}).
   extend({user_id: z.number()})
 
 export type DeleteNextOfKinInterface = z.infer<typeof deleteNextOfKinSchema>;
