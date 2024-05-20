@@ -3,8 +3,9 @@ import { UserRole } from '../../globalTypes/index';
 
 export const baseUserSchema = z.object({
   full_name: z.string(),
-  gender: z.enum(['Male', 'Female', 'Prefer not to say']),
-  national_id: z.number().int().min(10000000).max(99999999),                
+  gender: z.enum(['Male', 'Female']),
+  id_type: z.enum(['National ID', 'Passport']),
+  id_number: z.string().refine(value => /^[0-9]+$/.test(value)),            
   phone_number: z
     .string()
     .refine((value) => /^\+254\d{9}$/.test(value)),
@@ -20,7 +21,7 @@ export const createNewUserSchema = baseUserSchema.extend({
 export type CreateNewUserInterface = z.infer<typeof createNewUserSchema>;
 
 export const createUserContactSchema = baseUserSchema.pick({
-  national_id: true,
+  id_number : true,
   phone_number: true
 }).extend({
   entity_id: z.number()

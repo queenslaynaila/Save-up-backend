@@ -23,13 +23,14 @@ CREATE TABLE IF NOT EXISTS user_contact_details (
 GRANT INSERT, SELECT ON user_contact_details TO app_user;
 CREATE INDEX user_contacts_phone_number_idx ON user_contact_details(phone_number);
 
--- Ref entities instead as a distributed table can only reference another colocated distributed table or a reference table
+-- Ref entities instead as a distributed table can only reference 
+--another colocated distributed table or a reference table
 CREATE TABLE IF NOT EXISTS users (
   id              INT NOT NULL PRIMARY KEY,  
   full_name       TEXT NOT NULL,
   role            enum_user_role NOT NULL DEFAULT 'User',
   gender          enum_gender,
-  pin             TEXT NOT NULL CHECK (pin ~ '^[0-9]{4}$'),
+  pin             TEXT NOT NULL CHECK,
   created_at      TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   FOREIGN KEY     (id) REFERENCES entities(id)
 );
