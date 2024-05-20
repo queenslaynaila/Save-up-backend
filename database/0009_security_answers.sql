@@ -8,8 +8,7 @@ CREATE TABLE IF NOT EXISTS security_answers (
   answer        TEXT NOT NULL,
   created_at    TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   PRIMARY KEY   (user_id, question_id),
-  FOREIGN KEY   (question_id) REFERENCES security_questions(id),
-  FOREIGN KEY   (user_id) REFERENCES users(id)
+  FOREIGN KEY   (question_id) REFERENCES security_questions(id)
 );
 
 GRANT INSERT, SELECT ON security_answers TO app_user; 

@@ -10,14 +10,14 @@ CREATE TYPE enum_relationship AS ENUM (
 
 CREATE TABLE IF NOT EXISTS next_of_kins (
   user_id                INT NOT NULL,
-  ex_id                  INT NOT NULL,
+  xid                    INT NOT NULL,
   full_name              TEXT NOT NULL,
   relationship           enum_relationship NOT NULL,
   email                  TEXT NOT NULL,
   phone_number           TEXT NOT NULL,
   created_at             TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   deleted_at             TIMESTAMP WITH TIME ZONE,
-  PRIMARY KEY            (user_id, id),
+  PRIMARY KEY            (user_id, xid),
   FOREIGN KEY            (user_id) REFERENCES users(id)
 );
 

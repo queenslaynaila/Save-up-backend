@@ -4,7 +4,7 @@ CREATE TYPE enum_pocket_type AS ENUM ('Standard', 'Locked');
 
 CREATE TABLE IF NOT EXISTS pockets ( 
   entity_id               INT NOT NULL, 
-  ex_id                   INT NOT NULL,
+  xid                     INT NOT NULL,
   category_id             INT NOT NULL,
   name                    TEXT,
   priority                enum_priority NOT NULL DEFAULT 'Intermediate',
@@ -19,10 +19,10 @@ CREATE TABLE IF NOT EXISTS pockets (
   created_at              TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   updated_at              TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   deleted_at              TIMESTAMP WITH TIME ZONE,
-  PRIMARY KEY             (entity_id, ex_id), 
+  PRIMARY KEY             (entity_id, xid), 
   FOREIGN KEY             (entity_id) REFERENCES entities(id),
   FOREIGN KEY             (category_id) REFERENCES categories(id)
 );
 
 GRANT INSERT, SELECT, UPDATE ON pockets TO app_user;
-SELECT create_distributed_table('pockets', 'ex_id');
+SELECT create_distributed_table('pockets', 'entity_id');
