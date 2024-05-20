@@ -1,4 +1,3 @@
-
 CREATE TABLE IF NOT EXISTS security_questions (
   id           SERIAL PRIMARY KEY, 
   question     TEXT NOT NULL,

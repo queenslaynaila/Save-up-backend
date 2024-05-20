@@ -11,5 +11,4 @@ CREATE TABLE IF NOT EXISTS transfers (
   FOREIGN KEY             (user_id) REFERENCES users(id)
 );
 GRANT INSERT, SELECT ON transfers TO app_user;
-CREATE INDEX idx_transfers_by_source_and_user ON transfers(source_pocket_id, user_id);
-CREATE INDEX idx_transfers_by_destination_and_user ON transfers(destination_pocket_id,user_id);
+

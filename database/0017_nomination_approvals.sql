@@ -1,0 +1,12 @@
+CREATE TABLE IF NOT EXISTS nomination_approvals (
+  group_id              INT NOT NULL,
+  voter_member_id       INT NOT NULL,
+  nominated_member_id   INT NOT NULL,
+  vote                  BOOLEAN NOT NULL, -- True for approval, False for disapproval
+  PRIMARY KEY           (group_id, voter_member_id, nominated_member_id),
+  FOREIGN KEY           (group_id, voter_member_id) REFERENCES user_groups(group_id, user_id),
+  FOREIGN KEY           (group_id, nominated_member_id) REFERENCES nominated_administrators(group_id, user_id)
+);
+
+GRANT SELECT, INSERT ON nomination_approvals TO app_user;
+SELECT create_distributed_table('nomination_approvals', 'group_id');

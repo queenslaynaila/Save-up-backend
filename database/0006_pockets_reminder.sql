@@ -3,8 +3,8 @@ CREATE TABLE IF NOT EXISTS pocket_reminders (
   pocket_id               INT NOT NULL,
   reminder_count          INT NOT NULL DEFAULT 0,
   last_sent_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-  PRIMARY KEY             (entity_id, id), 
-  FOREIGN KEY             (entity_id, id) REFERENCES pockets(entity_id, id)
+  PRIMARY KEY             (entity_id, pocket_id), 
+  FOREIGN KEY             (entity_id, pocket_id) REFERENCES pockets(entity_id, ex_id)
 );
 
 GRANT INSERT, SELECT, UPDATE ON pockets TO app_user;

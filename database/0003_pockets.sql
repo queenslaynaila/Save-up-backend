@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS pockets (
   entity_id               INT NOT NULL, 
   ex_id                   INT NOT NULL,
   category_id             INT NOT NULL,
-  description             TEXT,
+  name                    TEXT,
   priority                enum_priority NOT NULL DEFAULT 'Intermediate',
   status                  enum_status NOT NULL DEFAULT 'In Progress',
   pocket_type             enum_pocket_type NOT NULL DEFAULT 'Standard',
@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS pockets (
   created_at              TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   updated_at              TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   deleted_at              TIMESTAMP WITH TIME ZONE,
-  PRIMARY KEY             (entity_id, id), 
+  PRIMARY KEY             (entity_id, ex_id), 
   FOREIGN KEY             (entity_id) REFERENCES entities(id),
   FOREIGN KEY             (category_id) REFERENCES categories(id)
 );

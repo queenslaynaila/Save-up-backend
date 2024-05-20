@@ -1,10 +1,10 @@
 -- Function to create a new user 
 CREATE OR REPLACE FUNCTION create_user(
-  p_full_name    TEXT, 
-  p_gender       enum_genders,
-  p_id_number    INT, 
-  p_phone_number TEXT, 
-  p_pin TEXT
+  p_full_name     TEXT, 
+  p_gender        enum_genders,
+  p_id_number     INT, 
+  p_phone_number  TEXT, 
+  p_pin           TEXT
   )
 RETURNS VOID AS $$
 DECLARE
@@ -22,15 +22,14 @@ BEGIN
       VALUES (v_user_id, p_full_name, p_gender, p_pin);
       
       INSERT INTO pockets ( 
-       id, 
        entity_id, 
+       ex_id, 
        category_id, 
        name, 
-       is_default_pocket,
-       target_amount,
-       priority
+       priority,
+       pocket_type
       )
-      VALUES(1, v_user_id, 11, 'Wallet', TRUE, 0, 'Intermediate'::enum_priorities);
+      VALUES(v_user_id, 1, 12, 'Wallet',  'Intermediate'::enum_priorities, 'Locked'::enum_pocket_types);
       RETURNING id INTO STRICT v_pocket_id;
 
       INSERT INTO default_pockets (entity_id, pocket_id)

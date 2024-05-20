@@ -1,4 +1,3 @@
-
 -- Create the 'security_answers' table without the users foreign key constraint as 
 -- citus doesnt allow foreign keys from local tables to distributed tables
 -- Distribute table by user id

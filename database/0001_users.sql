@@ -21,11 +21,10 @@ CREATE TABLE IF NOT EXISTS user_contact_details (
   phone_number    TEXT NOT NULL UNIQUE,
   created_at      TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   FOREIGN KEY     (id) REFERENCES entities(id),
-  CONSTRAINT      id_number_format_check CHECK (id_number ~ '^[0-9]+$'),
-  CONSTRAINT      id_number_length_check CHECK (id_number ~ '^\d{8}$')
+  CONSTRAINT      id_number_format_check CHECK (id_number ~ '^[0-9]+$')
 );
 GRANT INSERT, SELECT ON user_contact_details TO app_user;
-CREATE INDEX idx_user_contacts_by_phone ON user_contact_details(phone_number);
+CREATE INDEX user_contacts_phone_number_idx ON user_contact_details(phone_number);
 
 -- Users Table: Store general user details
 CREATE TABLE IF NOT EXISTS users (
@@ -35,7 +34,8 @@ CREATE TABLE IF NOT EXISTS users (
   gender          enum_gender,
   pin             TEXT NOT NULL,
   created_at      TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-  FOREIGN KEY     (id) REFERENCES user_contact_details(id)
+  FOREIGN KEY     (id) REFERENCES user_contact_details(id),
+  CONSTRAINT      pin_length_format_check CHECK (id_number ~ '^[0-9]+$')
 );
 GRANT INSERT, SELECT, UPDATE ON user_contact_details TO app_user;
 SELECT create_distributed_table('users', 'id');
