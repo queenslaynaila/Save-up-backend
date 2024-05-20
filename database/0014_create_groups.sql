@@ -30,7 +30,7 @@ BEGIN
 
     INSERT INTO pockets (
         entity_id, 
-        ex_id,
+        xid,
         category_id, 
         name, 
         priority,

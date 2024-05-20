@@ -39,13 +39,13 @@ BEGIN
        (v_pocket_type = 'Locked Pocket' AND v_current_balance >= p_amount AND v_target_at <= NOW()) THEN
         INSERT INTO withdrawals (
             pocket_id, 
-            ex_id,
+            xid,
             entity_id,
             amount
         )
         SELECT 
             p_pocket_id,
-            COALESCE((SELECT MAX(ex_id) + 1 FROM withdrawals WHERE pocket_id = p_pocket_id), 1),
+            COALESCE((SELECT MAX(xid) + 1 FROM withdrawals WHERE pocket_id = p_pocket_id), 1),
             p_entity_id,
             p_amount
         ;

@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS savings (
 
 ALTER TABLE savings
 ADD CONSTRAINT fk_pocket_id
-FOREIGN KEY (entity_id, pocket_id) REFERENCES pockets (entity_id, ex_id);
+FOREIGN KEY (entity_id, pocket_id) REFERENCES pockets (entity_id, xid);
 
 ALTER TABLE savings
 ADD CONSTRAINT fk_user_id

@@ -27,7 +27,7 @@ BEGIN
     SELECT target_amount INTO STRICT v_target_amount 
     FROM pockets 
     WHERE entity_id =p_entity_id 
-    AND ex_id = p_pocket_id ;
+    AND xid = p_pocket_id ;
 	
     IF total_savings >= v_target_amount THEN
         UPDATE pockets
