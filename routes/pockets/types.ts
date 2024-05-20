@@ -7,7 +7,7 @@ export const basePocketSchema = z.object({
   target_amount: z.number(),
   priority: z.enum(['High', 'Intermediate', 'Low']),
   target_at: z.string(),
-  pocket_type: z.enum(['Standard Pocket', 'Locked Pocket'])
+  pocket_type: z.enum(['Standard', 'Locked'])
 });
 
 export const getPocketSchema = basePocketSchema.pick({
