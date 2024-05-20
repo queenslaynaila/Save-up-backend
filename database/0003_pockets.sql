@@ -25,4 +25,4 @@ CREATE TABLE IF NOT EXISTS pockets (
 );
 
 GRANT INSERT, SELECT, UPDATE ON pockets TO app_user;
-SELECT create_distributed_table('pockets', 'id');
+SELECT create_distributed_table('pockets', 'ex_id');
