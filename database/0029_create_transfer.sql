@@ -30,12 +30,8 @@ BEGIN
           p_source_pocket_id, 
           p_destination_pocket_id, 
           p_amount, 
-          p_user_id
-        )
-   RETURNING 
-    (SELECT name FROM pockets WHERE id = :source_pocket_id) AS source_pocket_name,
-    (SELECT name FROM pockets WHERE id = :destination_pocket_id) AS destination_pocket_name;
-
+          p_user_id);
+          
     v_new_source_balance = COALESCE(v_source_pocket_balance, 0) - p_amount;
     v_new_destination_balance = COALESCE(v_destination_pocket_balance, 0) + p_amount;
     v_reference_no = 'TRANSFERIN' || nextval('transfer_transaction_seq');
@@ -51,7 +47,7 @@ BEGIN
         created_at
       )
     SELECT
-          COALESCE((SELECT MAX(transaction_id) + 1 FROM transaction_logs WHERE pocket_id = NEW.source_pocket_id), 1),
+          COALESCE((SELECT MAX(transaction_id) + 1 FROM transaction_logs WHERE pocket_id = p_source_pocket_id), 1),
           p_source_pocket_id,
           p_user_id,
           'Transfer Out'::enum_transaction_type, 
@@ -60,20 +56,29 @@ BEGIN
           v_reference_no,  
           NOW();
 
-    INSERT INTO transaction_logs (transaction_id, pocket_id, entity_id, transaction_type, amount, cumulative_amount, reference_no, created_at)
+    INSERT INTO transaction_logs (
+        transaction_id, 
+        pocket_id, 
+        entity_id, 
+        transaction_type, 
+        amount, 
+        cumulative_amount, 
+        reference_no, 
+        created_at
+      )
     SELECT
-          COALESCE((SELECT MAX(transaction_id) + 1 FROM transaction_logs WHERE pocket_id = NEW.destination_pocket_id), 1),
+          COALESCE((SELECT MAX(transaction_id) + 1 FROM transaction_logs WHERE pocket_id = p_destination_pocket_id), 1),
           p_destination_pocket_id,
           p_user_id,
-          'Transfer In'::enum_transaction_type,, 
+          'Transfer In'::enum_transaction_type, 
           p_amount,
           v_new_destination_balance,
           v_reference_no, 
           NOW();
 
       RETURN QUERY SELECT 
-      (SELECT name FROM pockets WHERE id = :source_pocket_id) AS source_pocket_name,
-    (SELECT name FROM pockets WHERE id = :destination_pocket_id) AS destination_pocket_name;
+         (SELECT name FROM pockets WHERE id = p_source_pocket_id) AS source_pocket_name,
+         (SELECT name FROM pockets WHERE id = p_destination_pocket_id) AS destination_pocket_name;
   ELSE
     RAISE EXCEPTION 'Insufficient funds in source pocket for transfer.';
   END IF;
