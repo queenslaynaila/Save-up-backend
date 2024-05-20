@@ -20,3 +20,5 @@ BEGIN
   END IF;
 END;
 $$ LANGUAGE plpgsql;
+
+GRANT EXECUTE ON FUNCTION create_answer(INT, INT, TEXT) TO app_user;

@@ -35,3 +35,5 @@ EXCEPTION
     RAISE EXCEPTION 'User with that national ID or phone number already exists.';
 END;
 $$ LANGUAGE plpgsql;
+
+GRANT EXECUTE ON FUNCTION create_user(TEXT, enum_gender, enum_id_type, INT, TEXT, TEXT) TO app_user;
