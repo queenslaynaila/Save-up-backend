@@ -1,3 +1,4 @@
+--Leave it as a local table as it only ref 2 pockets so distributing will create unncesary overload 
 CREATE TABLE IF NOT EXISTS default_pockets ( 
   entity_id               INT NOT NULL, 
   pocket_id               INT NOT NULL,
@@ -6,4 +7,3 @@ CREATE TABLE IF NOT EXISTS default_pockets (
 );
 
 GRANT INSERT, SELECT ON pockets TO app_user;
-SELECT create_distributed_table('default_pockets', 'pocket_id');
