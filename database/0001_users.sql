@@ -1,4 +1,3 @@
--- Custom enums for user-related data
 CREATE TYPE enum_entity_type AS ENUM ('User', 'Group', 'Donor');
 CREATE TYPE enum_id_type AS ENUM ('National ID', 'Passport ID');
 CREATE TYPE enum_user_role AS ENUM ('Admin', 'User', 'Moderator');
