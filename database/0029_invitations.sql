@@ -1,5 +1,6 @@
+ CREATE TYPE enum_invite AS ENUM ('Pending', 'Accept', 'Decline');
 -- Create the invitations table without the grps admin foreign key constraint as 
--- citus doesnt allow a normal psql table to ref a distributed table
+-- citus doesnt allow a normal psql table o ref a distributed table
 -- Distribute table by group id
 -- Use alter command to add the fk constaint thereby bypasing citus limitation
 
@@ -7,8 +8,9 @@ CREATE TABLE IF NOT EXISTS invitations (
   id            INT NOT NULL,      
   sender_id     INT NOT NULL,
   receiver_id   INT NOT NULL,
-  status        enum_invites NOT NULL DEFAULT 'Pending',
+  status        enum_invite NOT NULL DEFAULT 'Pending',
   created_at    TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  deleted_at    TIMESTAMP WITH TIME ZONE
   PRIMARY KEY   (id, receiver_id),
   FOREIGN KEY   (receiver_id) REFERENCES entities(id),
   FOREIGN KEY   (sender_id) REFERENCES entities(id),
