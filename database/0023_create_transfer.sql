@@ -37,7 +37,7 @@ BEGIN
     v_reference_no = 'TRANSFERIN' || nextval('transfer_transaction_seq');
 
     INSERT INTO transaction_logs (
-        transaction_id, 
+        xid, 
         pocket_id, 
         entity_id, 
         transaction_type, 
@@ -57,7 +57,7 @@ BEGIN
           NOW();
 
     INSERT INTO transaction_logs (
-        transaction_id, 
+        xid, 
         pocket_id, 
         entity_id, 
         transaction_type, 

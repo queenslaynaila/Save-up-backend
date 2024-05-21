@@ -7,7 +7,7 @@ import { ExpenseInterface, ExpenseIdInterface, ExpenseByIdInterface } from './ty
 const SQL_GET_EXPENSE_BY_ID = sql<ExpenseByIdInterface,  ExpenseInterface>(`
   SELECT entity_id, id, category_id, description, amount_spent, date_spent
   FROM expenses 
-  WHERE id = :id AND entity_id = :entity_id
+  WHERE xid = :xid AND entity_id = :entity_id
 `);
 
 export default (router: Router) => {
@@ -17,7 +17,7 @@ export default (router: Router) => {
     async (req, res) => {
       const expenseId = parseInt(req.params.expenseId); 
       const entity_id = req.user!.id;
-      const query = SQL_GET_EXPENSE_BY_ID({ id: expenseId, entity_id });
+      const query = SQL_GET_EXPENSE_BY_ID({ xid: expenseId, entity_id });
       const result = await query.one(new HttpError(404, 'Not found'));
       return res.json(result);
     });

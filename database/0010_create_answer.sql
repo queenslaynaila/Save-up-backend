@@ -10,7 +10,7 @@ DECLARE
 BEGIN 
   SELECT COUNT(*) INTO STRICT v_answer_count 
   FROM security_answers 
-  WHERE user_id = p_user_id;
+  WHERE security_answers.user_id = p_user_id;
   
   IF v_answer_count = 3 THEN
      RAISE EXCEPTION 'User cannot have more than 3 security answers.';

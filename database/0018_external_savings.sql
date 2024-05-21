@@ -5,13 +5,13 @@
 -- Use alter command to add the fk constaint thereby bypasing citus
 
 CREATE TABLE IF NOT EXISTS external_savings (
-  entity_id             INT NOT NULL, -- Entity ID of the donor owning the savings.
+  id             INT NOT NULL, -- Entity ID of the donor owning the savings.
   pocket_id             INT NOT NULL,
   amount                NUMERIC(30, 2) NOT NULL,
   show_details          BOOLEAN NOT NULL DEFAULT TRUE,
   created_at            TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   PRIMARY KEY           (pocket_id, id), 
-  FOREIGN KEY           (entity_id) REFERENCES entities(id)
+  FOREIGN KEY           (id) REFERENCES entities(id)
 );
 
 GRANT INSERT, SELECT ON external_savings TO app_user;

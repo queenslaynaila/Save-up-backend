@@ -5,20 +5,19 @@ import { validateRequest } from '../../middleware/validationMiddleware';
 import { CreatePocketInterface, PocketInterface, createPocketSchema } from './types';
 
 const SQL_CREATE_POCKET = sql<CreatePocketInterface, PocketInterface>(`
-INSERT INTO pockets (entity_id, xid, category_id, name, priority, pocket_type, target_amount, target_at)
-SELECT :entity_id,
-       COALESCE(MAX(xid), 0) + 1,
-       :category_id,
-       :name,
-       :priority,
-       :pocket_type,
-       :target_amount,
-       :target_at
-FROM pockets 
-WHERE entity_id = :entity_id
-GROUP BY entity_id
-RETURNING xid, entity_id, name, category_id, target_amount, priority, target_at, created_at;
-
+  INSERT INTO pockets (entity_id, xid, category_id, name, priority, pocket_type, target_amount, target_at)
+  SELECT :entity_id,
+        COALESCE(MAX(xid), 0) + 1,
+        :category_id,
+        :name,
+        :priority,
+        :pocket_type,
+        :target_amount,
+        :target_at
+  FROM pockets 
+  WHERE entity_id = :entity_id
+  GROUP BY entity_id
+  RETURNING xid, entity_id, name, category_id, target_amount, priority, target_at, created_at;
 `);
 
 export default (router: Router) => {

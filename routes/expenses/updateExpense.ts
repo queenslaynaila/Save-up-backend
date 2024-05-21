@@ -23,14 +23,14 @@ export default (router: Router) => {
     async (req, res) => {
       const userId = req.user!.id;
       const expenseId = parseInt(req.params.id);
-      const { description, category_id, amount_spent,date_spent} = req.body;
+      const { description, category_id, amount, spent_at} = req.body;
       const result = await SQL_UPDATE_EXPENSE({
         entity_id: userId,
-        id: expenseId,
+        xid: expenseId,
         description,
         category_id,
-        amount_spent,
-        date_spent,
+        amount,
+        spent_at
       }).one(new HttpError(404, 'Not found'));
       res.json(result);
     });

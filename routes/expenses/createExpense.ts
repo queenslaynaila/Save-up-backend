@@ -5,10 +5,17 @@ import  { validateRequest } from '../../middleware/validationMiddleware';
 import { CreateExpenseInterface, ExpenseInterface, createExpenseSchemaValidation   } from './types';
 
 const SQL_CREATE_EXPENSES = sql<CreateExpenseInterface, ExpenseInterface>(`
-  INSERT INTO expenses (id, entity_id, category_id, description, amount_spent, date_spent)
-  VALUES (COALESCE((SELECT MAX(id) FROM expenses WHERE entity_id = :entity_id), 0) + 1,
-           :entity_id, :category_id, :description, :amount_spent, :date_spent )
-  RETURNING id, entity_id, category_id, description, amount_spent, date_spent, created_at;
+  INSERT INTO expenses (entity_id, xid, category_id, description, amount, spent_at)
+  SELECT 
+      :entity_id,
+      COALESCE(MAX(xid), 0) + 1,
+      :category_id, 
+      :description, 
+      :amount, 
+      :spent_at 
+  FROM expenses 
+  WHERE entity_id = :entity_id
+  RETURNING xid, entity_id, category_id, description, amount, spent_at, created_at;
 `);
 
 export default (router: Router) => {
@@ -17,16 +24,15 @@ export default (router: Router) => {
     authMiddleware(), 
     validateRequest(createExpenseSchemaValidation),
     async (req, res) => {
-      const { description, category_id, amount_spent, date_spent, expense_name } = req.body;
+      const { description, category_id, amount, spent_at } = req.body;
       const entity_id = req.body.entity_id ? req.body.entity_id : req.user!.id;
       const expense = await SQL_CREATE_EXPENSES({
-        description,
-        category_id,
-        amount_spent,
-        date_spent,
         entity_id,
-        expense_name
+        category_id,
+        description,     
+        amount,
+        spent_at
       }).one()
       return res.json(expense);
     });
-};
+}

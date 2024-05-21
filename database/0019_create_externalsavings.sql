@@ -11,7 +11,7 @@ RETURNS VOID AS $$
 DECLARE
     v_entity_id           INTEGER;
     v_donor_id            INTEGER;
-    v_previous_cumulative NUMERIC(30, 2);
+    v_current_balance     NUMERIC(30, 2);
     v_reference_no        TEXT;
     v_new_cumulative      NUMERIC(30, 2);
 BEGIN
@@ -22,12 +22,12 @@ BEGIN
     IF v_donor_id IS NULL THEN
         INSERT INTO entities (entity_type)
         VALUES ('Donor')
-        RETURNING id INTO v_entity_id;
+        RETURNING id INTO STRICT v_entity_id;
 
         INSERT INTO donors (entity_id, full_name, phone_number)
         VALUES (v_entity_id, p_full_name, p_phone_number);
 
-        v_donor_id := v_entity_id;
+        v_donor_id = v_entity_id;
     END IF;
 
     INSERT INTO external_savings (
@@ -43,17 +43,17 @@ BEGIN
         p_show_details
     );
 
-    SELECT COALESCE(cumulative_amount, 0) INTO v_previous_cumulative
+    SELECT COALESCE(cumulative_amount, 0) INTO v_current_balance
     FROM transaction_logs
     WHERE pocket_id = p_pocket_id
     ORDER BY transaction_id DESC
     LIMIT 1;
 
-    v_new_cumulative := COALESCE(v_previous_cumulative, 0) + p_amount;
-    v_reference_no := 'DONATE' || nextval('donation_transaction_seq');
+    v_new_cumulative = COALESCE(v_current_balance, 0) + p_amount;
+    v_reference_no = 'DONATE' || nextval('donation_transaction_seq');
 
     INSERT INTO transaction_logs (
-        transaction_id, 
+        xid, 
         pocket_id, 
         entity_id, 
         transaction_type, 

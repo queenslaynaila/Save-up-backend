@@ -25,7 +25,7 @@ BEGIN
   VALUES (v_contact_id, p_full_name, p_gender, p_pin);
   
   INSERT INTO pockets (entity_id, xid, category_id, name, priority, pocket_type)
-  VALUES (v_entity_id, 1, 12, 'Wallet',  'Intermediate'::enum_priority, 'Locked'::enum_pocket_type)
+  VALUES (v_entity_id, 1, 12, 'Wallet',  'Intermediate'::enum_priority, 'Standard'::enum_pocket_type)
   RETURNING  pockets.xid INTO STRICT v_pocket_id;
 
   INSERT INTO default_pockets (entity_id, pocket_id)

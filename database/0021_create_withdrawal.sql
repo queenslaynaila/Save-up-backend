@@ -54,7 +54,7 @@ BEGIN
         v_reference_no = 'WITHDRAW' || nextval('withdrawal_transaction_seq');
 
         INSERT INTO transaction_logs (
-            transaction_id, 
+            xid, 
             pocket_id, 
             entity_id, 
             transaction_type, 
