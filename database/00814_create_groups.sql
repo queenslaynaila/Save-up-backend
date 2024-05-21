@@ -4,10 +4,10 @@ CREATE OR REPLACE FUNCTION create_group(
   p_created_by  INT
 )
 RETURNS TABLE (
-  r_group_id    INT,
-  r_name        TEXT,
-  r_full_name   TEXT,
-  r_created_at  TIMESTAMP WITH TIME ZONE
+  group_id    INT,
+  name        TEXT,
+  full_name   TEXT,
+  created_at  TIMESTAMP WITH TIME ZONE
 ) AS $$
 DECLARE
   v_entity_id   INT,
@@ -38,25 +38,25 @@ BEGIN
     )
     SELECT
         v_entity_id,
-        COALESCE(MAX(id), 0) + 1,
+        COALESCE(MAX(xid), 0) + 1,
         12, 
         'Group Wallet', 
-        'Intermediate'::enum_priorities,
-        'Standard'::enum_pocket_types,
+        'Intermediate'::enum_priority,
+        'Standard'::enum_pocket_type
     FROM pockets
     WHERE entity_id = v_entity_id
     GROUP BY entity_id;
-    RETURNING id INTO STRICT v_pocket_id ;
+    RETURNING id INTO STRICT v_pocket_id;
 
     INSERT INTO default_pockets (entity_id, pocket_id)
     VALUES(v_entity_id, v_pocket_id);
 
     -- Join groups and users to get full name of creator
     RETURN QUERY SELECT 
-      g.id AS r_group_id, 
-      g.name AS r_name, 
-      u.full_name AS r_full_name, 
-      g.created_at AS r_created_at 
+      g.id AS group_id ,
+      g.name, 
+      u.full_name, 
+      g.created_at
       FROM groups g
       INNER JOIN users u ON g.created_by = u.id
       WHERE g.id = group_id;

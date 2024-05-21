@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS user_groups (
   left_at       TIMESTAMP WITH TIME ZONE,
   PRIMARY KEY   (group_id,user_id),
   FOREIGN KEY   (user_id) REFERENCES users(id),
-  FOREIGN KEY   (group_id) REFERENCES groups(id)
+  FOREIGN KEY   (group_id) REFERENCES groups(id)  ---which ref the entities
 );
 GRANT INSERT, SELECT, UPDATE ON user_groups TO app_user;
 SELECT create_distributed_table('user_groups', 'group_id');

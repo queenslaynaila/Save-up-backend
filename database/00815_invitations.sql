@@ -4,15 +4,15 @@
 -- Use alter command to add the fk constaint thereby bypasing citus limitation
 
 CREATE TABLE IF NOT EXISTS invitations (   
-  group_id      INT NOT NULL,      
+  id            INT NOT NULL,      
   sender_id     INT NOT NULL,
   receiver_id   INT NOT NULL,
   status        enum_invites NOT NULL DEFAULT 'Pending',
   created_at    TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-  PRIMARY KEY   (group_id,receiver_id),
+  PRIMARY KEY   (id, receiver_id),
   FOREIGN KEY   (receiver_id) REFERENCES entities(id),
   FOREIGN KEY   (sender_id) REFERENCES entities(id),
-  FOREIGN KEY   (group_id) REFERENCES groups(id)
+  FOREIGN KEY   (id) REFERENCES groups(id)
 );
 
 GRANT INSERT, SELECT, UPDATE ON invitations TO app_user;

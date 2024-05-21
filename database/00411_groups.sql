@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS groups (
   id            SERIAL PRIMARY KEY,
   name          TEXT NOT NULL,
-  created_by    INT NOT NULL,
+  created_by    INT NOT NULL,  --user id of the creator
   created_at    TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   updated_at    TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   deleted_at    TIMESTAMP WITH TIME ZONE,
