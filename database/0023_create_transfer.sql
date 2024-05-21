@@ -84,3 +84,5 @@ BEGIN
   END IF;
 END;
 $$ LANGUAGE plpgsql;
+
+GRANT EXECUTE ON FUNCTION log_transfer_transaction(INT, INT, NUMERIC, INT) TO app_user;

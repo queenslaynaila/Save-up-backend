@@ -78,3 +78,5 @@ BEGIN
     END IF;
 END
 $$ LANGUAGE plpgsql;
+
+GRANT EXECUTE ON FUNCTION create_withdrawal(INT, INT, NUMERIC, INT) TO app_user;

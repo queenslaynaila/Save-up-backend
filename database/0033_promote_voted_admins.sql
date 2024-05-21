@@ -22,3 +22,5 @@ BEGIN
     END IF;
 END;
 $$ LANGUAGE plpgsql;
+
+GRANT EXECUTE ON FUNCTION  promote_approved_admins(INT, INT, INT) TO app_user;

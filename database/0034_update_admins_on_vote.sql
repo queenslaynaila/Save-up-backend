@@ -21,3 +21,5 @@ BEGIN
   END IF;
 END;
 $$ LANGUAGE plpgsql;
+
+GRANT EXECUTE ON FUNCTION pdate_admins_on_all_votes (INT, INT) TO app_user;

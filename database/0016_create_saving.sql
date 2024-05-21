@@ -79,3 +79,5 @@ BEGIN
     RETURN QUERY SELECT pockets.name FROM pockets WHERE xid = p_pocket_id;
 END;
 $$ LANGUAGE plpgsql;
+
+GRANT EXECUTE ON FUNCTION create_saving(INT, INT, INT, NUMERIC) TO app_user;

@@ -67,3 +67,4 @@ END;
 $$ LANGUAGE plpgsql;
 
 GRANT EXECUTE ON FUNCTION create_group(TEXT, INT) TO app_user;
+

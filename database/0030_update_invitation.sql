@@ -21,3 +21,5 @@ BEGIN
     END IF;
 END;
 $$ LANGUAGE plpgsql;
+
+GRANT EXECUTE ON FUNCTION update_user_groups_after_invite(INT, INT, enum_invite) TO app_user;

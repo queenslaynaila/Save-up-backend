@@ -73,3 +73,5 @@ BEGIN
         NOW();
 END;
 $$ LANGUAGE plpgsql;
+
+GRANT EXECUTE ON FUNCTION create_external_savings(INT, NUMERIC, BOOLEAN, TEXT, TEXT) TO app_user;
