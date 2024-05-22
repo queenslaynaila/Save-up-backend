@@ -14,7 +14,7 @@ const SQL_UPDATE_POCKET = sql<UpdatePocketInterface, PocketUpdateRes>(`
       priority = COALESCE(:priority, p.priority),
       target_at = COALESCE(:target_at, p.target_at)
   FROM categories c
-  WHERE p.category_id = c.id AND p.id = :id
+  WHERE p.category_id = c.id AND p.xid = :id
   RETURNING p.name, c.name AS category_name, p.target_amount, p.priority, p.target_at;
 `);
 
