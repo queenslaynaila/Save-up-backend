@@ -6,12 +6,11 @@ import { PocketInterface } from './types';
 import { IdParamInterface, IdInterface } from '../../globalTypes/index';
 
 const SQL_GET_POCKET_BY_ID = sql<IdInterface, PocketInterface>(`
-  SELECT p.id, p.name, c.name AS category_name, p.target_amount, p.priority, 
-        p.pocket_type, ir.rate AS interest_rate, p.target_at
+  SELECT p.xid, p.name, c.name AS category_name, p.target_amount, p.priority, 
+        p.pocket_type, p.target_at
   FROM pockets p
-  LEFT JOIN interest_rates ir ON p.pocket_type = ir.pocket_type  
   LEFT JOIN categories c ON p.category_id = c.id       
-  WHERE p.id = :id  
+  WHERE p.xid = :id  
   AND p.deleted_at IS NULL;
 `);
 
