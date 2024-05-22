@@ -67,6 +67,8 @@ export const pocketsByConditionsQuerySchema = z.object({
   priority: z.string().optional(),
   status: z.string().optional(),
   created_at: z.string().optional(),
+  month:z.string().optional(),
+  year:z.string().optional(),
   completed_at: z.string().optional(),
 })
   
