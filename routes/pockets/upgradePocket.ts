@@ -7,12 +7,11 @@ import { IdParamInterface} from '../../globalTypes/index';
 import { validateRequest } from '../../middleware/validationMiddleware';
 
 const SQL_UPGRADE_POCKET = sql<UpgradePocketSubset, upgradedPocketInterface>(`
-  UPDATE pockets p
-  SET pocket_type = :pocket_type,
-      target_at = COALESCE(:target_at, p.target_at)
-  FROM interest_rates ir
-  WHERE p.pocket_type = ir.pocket_type AND p.id = :id 
-  RETURNING p.pocket_type, ir.rate AS interest_rate, p.target_at;
+  UPDATE pockets 
+  SET pocket_type =COALESCE(:pocket_type, pocket_type),
+      target_at = COALESCE(:target_at, target_at)
+  WHERE xid = :id 
+  RETURNING pocket_type, target_at;
 `);
 
 export default (router: Router) => {
@@ -22,8 +21,7 @@ export default (router: Router) => {
     validateRequest(upgradePocketSchema),
     async (req, res) => {
       const pocketId = parseInt(req.params.id);
-      const { target_at } = req.body;
-      const pocket_type = 'Locked Pocket';
+      const { target_at, pocket_type } = req.body;
       const goal = await SQL_UPGRADE_POCKET({
         id: pocketId,
         target_at,
