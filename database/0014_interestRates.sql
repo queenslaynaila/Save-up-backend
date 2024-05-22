@@ -9,3 +9,6 @@ CREATE TABLE IF NOT EXISTS interest_rates (
   created_at          TIMESTAMP WITH TIME ZONE DEFAULT NOW(), 
   updated_at          TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
+
+GRANT SELECT ON interest_rates TO app_user;
+SELECT create_reference_table('interest_rates');
