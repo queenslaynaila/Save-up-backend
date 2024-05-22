@@ -79,7 +79,7 @@ export const pocketParamSchema = z.object({
 export type PocketParam = z.infer<typeof pocketParamSchema>;
 
 export const deletePocketSchema = z.object({
-  id: z.number(),
+  pocket_id: z.number(),
   entity_id: z.number()
 });
 
