@@ -8,7 +8,7 @@ const SQL_DELETE_KIN = sql<DeleteNextOfKinInterface, Record<string,never>>(`
   UPDATE next_of_kins  
   SET deleted_at = NOW()
   WHERE user_id = :user_id
-  AND id = :xid
+  AND xid = :xid
 `);
 
 export default (router: Router) => {   
