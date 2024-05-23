@@ -9,28 +9,28 @@ RETURNS VOID AS $$
 DECLARE
     v_entity_id           INTEGER;
     v_donor_id            INTEGER;
-    v_current_balance       NUMERIC(30, 2);
+    v_current_balance     NUMERIC(30, 2);
     v_reference_no        TEXT;
     v_new_cumulative      NUMERIC(30, 2);
     v_transaction_id      INTEGER;
 BEGIN
-    SELECT entity_id INTO v_donor_id
+    SELECT id INTO v_donor_id
     FROM donors
     WHERE phone_number = p_phone_number;
 
     IF v_donor_id IS NULL THEN
         INSERT INTO entities (entity_type)
-        VALUES ('Donor':: enum_entity_type)
+        VALUES ('Donor'::enum_entity_type)
         RETURNING id INTO STRICT v_entity_id;
 
-        INSERT INTO donors (entity_id, full_name, phone_number)
+        INSERT INTO donors (id, full_name, phone_number)
         VALUES (v_entity_id, p_full_name, p_phone_number);
 
         v_donor_id = v_entity_id;
     END IF;
 
     INSERT INTO external_savings (
-        entity_id, 
+        id, 
         pocket_id, 
         amount, 
         show_details
@@ -55,7 +55,7 @@ BEGIN
     AND entity_id = v_donor_id;
 
     v_new_cumulative = v_current_balance + p_amount;
-    v_reference_no = 'DONATE' || substr(md5(random()::text), 1, 5);
+    v_reference_no = 'DONATE' || left(md5(random()::text), 5);
 
     -- Insert the transaction log
     INSERT INTO transaction_logs (
