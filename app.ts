@@ -21,8 +21,8 @@ import groupAdminRoutes from './routes/groupAdministrators/index'
 import inviteRoutes from './routes/invitations/index';
 import withdrawalRoutes from './routes/withdrawals/index';
 import transferRoutes from './routes/transfers/index';
-import transactionRoutes from './routes/transactions';
-import createExSaving from './routes/externalSaving/createExSaving';
+import transactionRoutes from './routes/transactions/index';
+import createExSaving from './routes/externalSaving/index';
 import cron from 'node-cron';
 import remindStaleGoals from './cronJobs/overdueGoalsReminder'
 import creditInterest from './cronJobs/creditInterest';
