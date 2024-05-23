@@ -11,7 +11,7 @@ DECLARE
     v_pocket_type          TEXT;
     v_target_at            TIMESTAMP;
     v_transaction_id       INT;
-    v_total_savings        NUMERIC(30, 2);
+    v_current_balance        NUMERIC(30, 2);
 BEGIN 
     SELECT 
         COALESCE(MAX(xid) + 1, 1) AS v_transaction_id,
@@ -19,8 +19,8 @@ BEGIN
                 FROM transaction_logs
                 WHERE pocket_id = p_pocket_id
                 ORDER BY xid DESC
-                LIMIT 1), 0) AS v_total_savings
-        INTO STRICT v_transaction_id, v_total_savings
+                LIMIT 1), 0) AS v_current_balance
+        INTO STRICT v_transaction_id, v_current_balance
     FROM transaction_logs
     WHERE pocket_id = p_pocket_id
     AND entity_id = p_entity_id;
@@ -31,8 +31,8 @@ BEGIN
     WHERE pockets.xid = p_pocket_id
     AND pockets.entity_id = p_entity_id;
 
-    IF (v_pocket_type = 'Standard Pocket' AND v_total_savings >= p_amount) OR 
-       (v_pocket_type = 'Locked Pocket' AND v_total_savings >= p_amount AND v_target_at <= NOW()) THEN
+    IF (v_pocket_type = 'Standard Pocket' AND v_current_balance >= p_amount) OR 
+       (v_pocket_type = 'Locked Pocket' AND v_current_balance >= p_amount AND v_target_at <= NOW()) THEN
         INSERT INTO withdrawals (
             pocket_id, 
             xid,
@@ -46,7 +46,7 @@ BEGIN
             p_amount
         ;
 
-        v_new_cumulative =  v_total_savings - p_amount;
+        v_new_cumulative =  v_current_balance - p_amount;
         v_reference_no = 'WITHDRAW' || substr(md5(random()::text), 1, 5);
 
         INSERT INTO transaction_logs (

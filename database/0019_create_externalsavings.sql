@@ -9,7 +9,7 @@ RETURNS VOID AS $$
 DECLARE
     v_entity_id           INTEGER;
     v_donor_id            INTEGER;
-    v_total_savings       NUMERIC(30, 2);
+    v_current_balance       NUMERIC(30, 2);
     v_reference_no        TEXT;
     v_new_cumulative      NUMERIC(30, 2);
     v_transaction_id      INTEGER;
@@ -48,13 +48,13 @@ BEGIN
                 FROM transaction_logs
                 WHERE pocket_id = p_pocket_id
                 ORDER BY xid DESC
-                LIMIT 1), 0) AS v_total_savings
-        INTO STRICT v_transaction_id, v_total_savings
+                LIMIT 1), 0) AS v_current_balance
+        INTO STRICT v_transaction_id, v_current_balance
     FROM transaction_logs
     WHERE pocket_id = p_pocket_id
     AND entity_id = v_donor_id;
 
-    v_new_cumulative = v_total_savings + p_amount;
+    v_new_cumulative = v_current_balance + p_amount;
     v_reference_no = 'DONATE' || substr(md5(random()::text), 1, 5);
 
     -- Insert the transaction log

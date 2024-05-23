@@ -8,7 +8,7 @@ RETURNS TABLE (
     name  TEXT
 ) AS $$
 DECLARE
-    v_total_savings  NUMERIC;
+    v_current_balance  NUMERIC;
     v_transaction_id  INT;
     v_target_amount  NUMERIC;
     v_new_cumulative NUMERIC;
@@ -31,8 +31,8 @@ BEGIN
                 FROM transaction_logs
                 WHERE pocket_id = p_pocket_id
                 ORDER BY xid DESC
-                LIMIT 1), 0) AS v_total_savings
-        INTO STRICT v_transaction_id, v_total_savings
+                LIMIT 1), 0) AS v_current_balance
+        INTO STRICT v_transaction_id, v_current_balance
     FROM transaction_logs
     WHERE pocket_id = p_pocket_id
     AND entity_id = p_entity_id;
@@ -42,7 +42,7 @@ BEGIN
     WHERE entity_id = p_entity_id 
     AND xid = p_pocket_id;
 
-    IF v_total_savings >= v_target_amount THEN
+    IF v_current_balance >= v_target_amount THEN
         UPDATE pockets
         SET status = 'Completed'::enum_status,
           completed_at = NOW()
@@ -50,7 +50,7 @@ BEGIN
         AND xid = p_pocket_id;
     END IF;
 
-    v_new_cumulative = COALESCE(v_total_savings, 0) + p_amount;
+    v_new_cumulative = COALESCE(v_current_balance, 0) + p_amount;
     v_reference_no = 'SAVE' || substr(md5(random()::text), 1, 5);
 
     INSERT INTO transaction_logs (
