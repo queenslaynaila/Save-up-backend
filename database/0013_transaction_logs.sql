@@ -1,7 +1,6 @@
 CREATE TYPE enum_transaction_type AS ENUM ('Saving', 'External Saving', 'Withdrawal', 'Transfer In', 'Transfer Out', 'Interest');
 CREATE TYPE enum_transaction_type AS ENUM ('Succesful', 'Pending');
 
-
 CREATE TABLE IF NOT EXISTS transaction_logs (
   entity_id               INT NOT NULL, -- rhe client himself
   pocket_id               INT NOT NULL, -- theaccount no of the clienr 
