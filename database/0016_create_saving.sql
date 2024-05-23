@@ -1,8 +1,8 @@
 CREATE OR REPLACE FUNCTION create_saving(
-    p_pocket_id    INT, 
-    p_entity_id    INT,
     p_user_id      INT, 
-    p_amount       NUMERIC
+    p_pocket_id    INT, 
+    p_amount       NUMERIC,
+    p_entity_id    INT
 )
 RETURNS TABLE (
     name  TEXT
@@ -15,35 +15,33 @@ DECLARE
     v_reference_no   TEXT;
 BEGIN 
     INSERT INTO savings (entity_id, xid, pocket_id, user_id, amount)
-    SELECT  p_entity_id,
-            COALESCE(MAX(xid), 0) + 1,
-            p_pocket_id,
-            p_user_id,
-            p_amount
+    SELECT entity_id,
+           COALESCE(MAX(xid) + 1, 1),
+           pocket_id,
+           user_id,
+           amount
     FROM savings
     WHERE entity_id = p_entity_id
-    GROUP BY entity_id;
-     
+    AND pocket_id = p_pocket_id
+    GROUP BY entity_id,pocket_id,user_id,amount;
+
     SELECT 
-        COALESCE(cumulative_amount, 0), 
-        COALESCE(MAX(xid) + 1, 1)  
-    INTO STRICT
-        v_total_savings,
-        v_transaction_id 
-    FROM 
-        transaction_logs
-    WHERE 
-        pocket_id = p_pocket_id
-        AND entity_id = p_entity_id
-    ORDER BY 
-        xid DESC
-    LIMIT 1;
+        COALESCE(MAX(xid) + 1, 1) AS v_transaction_id,
+        COALESCE((SELECT cumulative_amount
+                FROM transaction_logs
+                WHERE pocket_id = p_pocket_id
+                ORDER BY xid DESC
+                LIMIT 1), 0) AS v_total_savings
+        INTO STRICT v_transaction_id, v_total_savings
+    FROM transaction_logs
+    WHERE pocket_id = p_pocket_id
+    AND entity_id = p_entity_id;
 
     SELECT target_amount INTO STRICT v_target_amount  
     FROM pockets 
     WHERE entity_id = p_entity_id 
     AND xid = p_pocket_id;
-	
+
     IF v_total_savings >= v_target_amount THEN
         UPDATE pockets
         SET status = 'Completed'::enum_status,
@@ -80,4 +78,5 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-GRANT EXECUTE ON FUNCTION create_saving(INT, INT, INT, NUMERIC) TO app_user;
+
+GRANT EXECUTE ON FUNCTION create_saving(INT, INT, NUMERIC, INT) TO app_user;
