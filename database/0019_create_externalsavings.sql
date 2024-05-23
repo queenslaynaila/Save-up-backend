@@ -1,5 +1,3 @@
-CREATE SEQUENCE donation_transaction_seq START 1;
-
 CREATE OR REPLACE FUNCTION create_external_savings(
     p_pocket_id      INT, 
     p_amount         NUMERIC(30, 2), 
@@ -11,9 +9,10 @@ RETURNS VOID AS $$
 DECLARE
     v_entity_id           INTEGER;
     v_donor_id            INTEGER;
-    v_current_balance     NUMERIC(30, 2);
+    v_total_savings       NUMERIC(30, 2);
     v_reference_no        TEXT;
     v_new_cumulative      NUMERIC(30, 2);
+    v_transaction_id      INTEGER;
 BEGIN
     SELECT entity_id INTO v_donor_id
     FROM donors
@@ -21,7 +20,7 @@ BEGIN
 
     IF v_donor_id IS NULL THEN
         INSERT INTO entities (entity_type)
-        VALUES ('Donor')
+        VALUES ('Donor':: enum_entity_type)
         RETURNING id INTO STRICT v_entity_id;
 
         INSERT INTO donors (entity_id, full_name, phone_number)
@@ -42,16 +41,23 @@ BEGIN
         p_amount, 
         p_show_details
     );
-
-    SELECT COALESCE(cumulative_amount, 0) INTO v_current_balance
+    
+    SELECT 
+        COALESCE(MAX(xid) + 1, 1) AS v_transaction_id,
+        COALESCE((SELECT cumulative_amount
+                FROM transaction_logs
+                WHERE pocket_id = p_pocket_id
+                ORDER BY xid DESC
+                LIMIT 1), 0) AS v_total_savings
+        INTO STRICT v_transaction_id, v_total_savings
     FROM transaction_logs
     WHERE pocket_id = p_pocket_id
-    ORDER BY transaction_id DESC
-    LIMIT 1;
+    AND entity_id = v_donor_id;
 
-    v_new_cumulative = COALESCE(v_current_balance, 0) + p_amount;
+    v_new_cumulative = v_total_savings + p_amount;
     v_reference_no = 'DONATE' || nextval('donation_transaction_seq');
 
+    -- Insert the transaction log
     INSERT INTO transaction_logs (
         xid, 
         pocket_id, 
@@ -62,16 +68,18 @@ BEGIN
         reference_no, 
         created_at
     )
-    SELECT 
-        COALESCE((SELECT MAX(transaction_id) + 1 FROM transaction_logs WHERE pocket_id = p_pocket_id), 1),
+    VALUES (
+        v_transaction_id,
         p_pocket_id,
         v_donor_id,
         'External Saving'::enum_transaction_type,
         p_amount,
         v_new_cumulative,
         v_reference_no,
-        NOW();
+        NOW()
+    );
 END;
 $$ LANGUAGE plpgsql;
+
 
 GRANT EXECUTE ON FUNCTION create_external_savings(INT, NUMERIC, BOOLEAN, TEXT, TEXT) TO app_user;

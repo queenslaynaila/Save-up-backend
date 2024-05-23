@@ -28,4 +28,3 @@ export default (router: Router) => {
       return res.json({ message: `Your saving of KES ${amount.toFixed(2)} to ${goalName} was successful!` });
     });
 };
-

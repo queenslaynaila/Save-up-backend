@@ -8,35 +8,33 @@ CREATE OR REPLACE FUNCTION create_withdrawal(
 )
 RETURNS VOID AS $$
 DECLARE
-    v_current_balance      NUMERIC(30, 2),
-    v_reference_no         TEXT,
-    v_new_cumulative       NUMERIC(30, 2),
-    v_pocket_type          TEXT,
-    v_target_at            TIMESTAMP,
+    v_reference_no         TEXT;
+    v_new_cumulative       NUMERIC(30, 2);
+    v_pocket_type          TEXT;
+    v_target_at            TIMESTAMP;
+    v_transaction_id       INT;
+    v_total_savings        NUMERIC(30, 2);
 BEGIN 
-    SELECT COALESCE(cumulative_amount, 0) INTO v_current_balance
+    SELECT 
+        COALESCE(MAX(xid) + 1, 1) AS v_transaction_id,
+        COALESCE((SELECT cumulative_amount
+                FROM transaction_logs
+                WHERE pocket_id = p_pocket_id
+                ORDER BY xid DESC
+                LIMIT 1), 0) AS v_total_savings
+        INTO STRICT v_transaction_id, v_total_savings
     FROM transaction_logs
     WHERE pocket_id = p_pocket_id
-    ORDER BY transaction_id DESC
-    LIMIT 1;
+    AND entity_id = p_entity_id;
 
-    SELECT t.cumulative_amount, p.pocket_type, p.target_at
-    INTO v_current_balance, v_pocket_type, v_target_at
-    FROM (
-        SELECT tl.cumulative_amount
-        FROM transaction_logs tl
-        WHERE tl.pocket_id = p_pocket_id
-        ORDER BY tl.created_at DESC
-        LIMIT 1
-    ) AS t
-    CROSS JOIN (
-        SELECT pk.pocket_type, pk.target_at
-        FROM pockets pk
-        WHERE pk.id = p_pocket_id
-    ) AS p;
+    SELECT pocket_type, target_at
+    INTO v_pocket_type, v_target_at
+    FROM pockets
+    WHERE pockets.xid = p_pocket_id
+    AND pockets.entity_id = p_entity_id;
 
-    IF (v_pocket_type = 'Standard Pocket' AND v_current_balance >= p_amount) OR 
-       (v_pocket_type = 'Locked Pocket' AND v_current_balance >= p_amount AND v_target_at <= NOW()) THEN
+    IF (v_pocket_type = 'Standard Pocket' AND v_total_savings >= p_amount) OR 
+       (v_pocket_type = 'Locked Pocket' AND v_total_savings >= p_amount AND v_target_at <= NOW()) THEN
         INSERT INTO withdrawals (
             pocket_id, 
             xid,
@@ -50,7 +48,7 @@ BEGIN
             p_amount
         ;
 
-        v_new_cumulative = COALESCE(v_current_balance, 0) - p_amount;
+        v_new_cumulative =  v_total_savings - p_amount;
         v_reference_no = 'WITHDRAW' || nextval('withdrawal_transaction_seq');
 
         INSERT INTO transaction_logs (
@@ -63,8 +61,8 @@ BEGIN
             reference_no, 
             created_at
         )
-        SELECT 
-            COALESCE((SELECT MAX(transaction_id) + 1 FROM transaction_logs WHERE pocket_id = p_pocket_id), 1),
+        VALUES (
+            v_transaction_id,
             p_pocket_id,
             p_entity_id,
             'Withdrawal'::enum_transaction_type,
@@ -72,11 +70,12 @@ BEGIN
             v_new_cumulative,
             v_reference_no,
             NOW()
-        ;
+        );
     ELSE
         RAISE EXCEPTION 'Insufficient funds or conditions not met for withdrawal.';
     END IF;
-END
+END;
 $$ LANGUAGE plpgsql;
+
 
 GRANT EXECUTE ON FUNCTION create_withdrawal(INT, INT, NUMERIC, INT) TO app_user;
