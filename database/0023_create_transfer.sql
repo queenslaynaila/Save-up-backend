@@ -58,7 +58,7 @@ BEGIN
           
     v_new_source_balance =  v_source_balance  - p_amount;
     v_new_destination_balance = v_destination_balance + p_amount;
-    v_reference_no = 'TRANSFERIN' || nextval('transfer_transaction_seq');
+    v_reference_no = 'TRANSFERIN' || substr(md5(random()::text), 1, 5);
 
     INSERT INTO transaction_logs (
         xid, 

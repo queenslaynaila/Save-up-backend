@@ -1,5 +1,3 @@
-CREATE SEQUENCE withdrawal_transaction_seq START 1;
-
 CREATE OR REPLACE FUNCTION create_withdrawal(
     p_pocket_id        INT,
     p_user_id          INT,
@@ -49,7 +47,7 @@ BEGIN
         ;
 
         v_new_cumulative =  v_total_savings - p_amount;
-        v_reference_no = 'WITHDRAW' || nextval('withdrawal_transaction_seq');
+        v_reference_no = 'WITHDRAW' || substr(md5(random()::text), 1, 5);
 
         INSERT INTO transaction_logs (
             xid, 

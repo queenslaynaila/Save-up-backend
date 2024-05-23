@@ -55,7 +55,7 @@ BEGIN
     AND entity_id = v_donor_id;
 
     v_new_cumulative = v_total_savings + p_amount;
-    v_reference_no = 'DONATE' || nextval('donation_transaction_seq');
+    v_reference_no = 'DONATE' || substr(md5(random()::text), 1, 5);
 
     -- Insert the transaction log
     INSERT INTO transaction_logs (

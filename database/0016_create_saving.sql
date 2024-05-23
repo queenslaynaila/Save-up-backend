@@ -51,7 +51,7 @@ BEGIN
     END IF;
 
     v_new_cumulative = COALESCE(v_total_savings, 0) + p_amount;
-    v_reference_no = 'SAVE' || nextval('saving_transaction_seq');
+    v_reference_no = 'SAVE' || substr(md5(random()::text), 1, 5);
 
     INSERT INTO transaction_logs (
         xid, 
