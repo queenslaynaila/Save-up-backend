@@ -34,10 +34,10 @@ BEGIN
                 LIMIT 1), 0) AS v_current_balance
         INTO STRICT v_transaction_id, v_current_balance
     FROM transaction_logs
-    WHERE pocket_id = p_pocket_id
-    AND entity_id = p_entity_id;
+    WHERE transaction_logs.pocket_id = p_pocket_id
+    AND transaction_logs.entity_id = p_entity_id;
 
-    SELECT target_amount INTO STRICT v_target_amount  
+    SELECT pockets.target_amount INTO STRICT v_target_amount  
     FROM pockets 
     WHERE entity_id = p_entity_id 
     AND xid = p_pocket_id;
@@ -50,7 +50,7 @@ BEGIN
         AND xid = p_pocket_id;
     END IF;
 
-    v_new_cumulative = COALESCE(v_current_balance, 0) + p_amount;
+    v_new_cumulative = v_current_balance + p_amount;
     v_reference_no = 'SAVE' || substr(md5(random()::text), 1, 5);
 
     INSERT INTO transaction_logs (
