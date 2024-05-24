@@ -22,4 +22,4 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-GRANT EXECUTE ON FUNCTION pdate_admins_on_all_votes (INT, INT) TO app_user;
+GRANT EXECUTE ON FUNCTION update_admins_on_all_votes (INT, INT) TO app_user;

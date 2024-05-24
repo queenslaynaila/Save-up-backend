@@ -7,7 +7,7 @@ CREATE OR REPLACE FUNCTION create_withdrawal(
 RETURNS VOID AS $$
 DECLARE
     v_reference_no         TEXT;
-    v_new_cumulative       NUMERIC(30, 2);
+    v_new_balance       NUMERIC(30, 2);
     v_pocket_type          TEXT;
     v_target_at            TIMESTAMP;
     v_transaction_id       INT;
@@ -46,7 +46,7 @@ BEGIN
             p_amount
         ;
 
-        v_new_cumulative =  v_current_balance - p_amount;
+        v_new_balance =  v_current_balance - p_amount;
         v_reference_no = 'WITHDRAW' || substr(md5(random()::text), 1, 5);
 
         INSERT INTO transaction_logs (
@@ -65,7 +65,7 @@ BEGIN
             p_entity_id,
             'Withdrawal'::enum_transaction_type,
             p_amount,
-            v_new_cumulative,
+            v_new_balance,
             v_reference_no,
             NOW()
         );

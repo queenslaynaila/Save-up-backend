@@ -10,9 +10,9 @@ RETURNS TABLE (
   created_at  TIMESTAMP WITH TIME ZONE
 ) AS $$
 DECLARE
-  v_entity_id   INT,
-  v_group_id    INT,
-  v_pocket_id   INT
+  v_entity_id   INT;
+  v_group_id    INT;
+  v_pocket_id   INT;
 BEGIN 
     INSERT INTO entities (entity_type)
     VALUES ('Group')
@@ -20,7 +20,7 @@ BEGIN
 
     INSERT INTO groups (name, created_by)
     VALUES (p_name, p_created_by)
-    RETURNING id INTO STRICT v_group_id, created_by, name, created_at;
+    RETURNING id INTO STRICT v_group_id;
 
     INSERT INTO user_groups (user_id, group_id)
     VALUES (p_created_by, v_group_id);
@@ -45,7 +45,7 @@ BEGIN
         'Standard'::enum_pocket_type
     FROM pockets
     WHERE entity_id = v_entity_id
-    GROUP BY entity_id;
+    GROUP BY entity_id
     RETURNING id INTO STRICT v_pocket_id;
 
     INSERT INTO default_pockets (entity_id, pocket_id)
@@ -62,7 +62,7 @@ BEGIN
       WHERE g.id = group_id;
 EXCEPTION 
     WHEN OTHERS THEN
-        RAISE EXCEPTION 'An error occurred while creating the group';
+        RAISE EXCEPTION 'An error occurred while creating the group: %', SQLERRM;
 END;
 $$ LANGUAGE plpgsql;
 
