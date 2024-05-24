@@ -1,9 +1,9 @@
 import { z } from 'zod';
 
 export const sendInviteSchema = z.object({
-  receiver_id:z.number(),
   sender_id:z.number(),
   group_id:z.number(),
+  phone_number:z.string()
 });
   
 export const getInviteSchema = sendInviteSchema.extend({
@@ -30,12 +30,6 @@ export type InviteResponseInterface = z.infer<typeof inviteResponseSchema>;
 export const inviteRequestSchema = inviteResponseSchema.omit({sender_id: true, receiver_id: true});
   
 export type InviteRequestInterface = z.infer<typeof inviteRequestSchema>;
-
-export const getUserInvitesSchema = sendInviteSchema.pick({
-  receiver_id: true
-})
-
-export type GetInvitesInterface = z.infer<typeof getUserInvitesSchema>
 
 export const idParamSchema = z.object({
   group_id: z.string()

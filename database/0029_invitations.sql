@@ -5,7 +5,7 @@
 -- Use alter command to add the fk constaint thereby bypasing citus limitation
 
 CREATE TABLE IF NOT EXISTS invitations (   
-  id            INT NOT NULL,      
+  id            INT NOT NULL,      --the group id
   sender_id     INT NOT NULL,
   receiver_id   INT NOT NULL,
   status        enum_invite NOT NULL DEFAULT 'Pending',
