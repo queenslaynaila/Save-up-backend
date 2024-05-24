@@ -11,19 +11,18 @@ DECLARE
     v_current_balance  NUMERIC;
     v_transaction_id  INT;
     v_target_amount  NUMERIC;
-    v_new_cumulative NUMERIC;
+    v_new_balance NUMERIC;
     v_reference_no   TEXT;
 BEGIN 
-    INSERT INTO savings (entity_id, xid, pocket_id, user_id, amount)
-    SELECT entity_id,
-           COALESCE(MAX(xid) + 1, 1),
-           pocket_id,
-           user_id,
-           amount
-    FROM savings
-    WHERE entity_id = p_entity_id
-    AND pocket_id = p_pocket_id
-    GROUP BY entity_id,pocket_id,user_id,amount;
+    INSERT INTO savings (entity_id, xid, pocket_id, user_id,  amount)
+    SELECT 
+            p_entity_id, 
+            COALESCE(MAX(xid), 0) + 1, 
+            p_pocket_id, 
+            p_user_id, 
+            p_amount 
+    FROM savings 
+    WHERE entity_id = p_entity_id;
 
     SELECT 
         COALESCE(MAX(xid) + 1, 1) AS v_transaction_id,
@@ -41,7 +40,7 @@ BEGIN
     FROM pockets 
     WHERE entity_id = p_entity_id 
     AND xid = p_pocket_id;
-
+    
     IF v_current_balance >= v_target_amount THEN
         UPDATE pockets
         SET status = 'Completed'::enum_status,
@@ -50,7 +49,7 @@ BEGIN
         AND xid = p_pocket_id;
     END IF;
 
-    v_new_cumulative = v_current_balance + p_amount;
+    v_new_balance = v_current_balance + p_amount;
     v_reference_no = 'SAVE' || substr(md5(random()::text), 1, 5);
 
     INSERT INTO transaction_logs (
@@ -69,7 +68,7 @@ BEGIN
         p_entity_id,
         'Saving'::enum_transaction_type,
         p_amount,
-        v_new_cumulative,
+        v_new_balance,
         v_reference_no,
         NOW()
     );
