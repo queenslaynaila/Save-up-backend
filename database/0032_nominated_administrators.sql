@@ -1,4 +1,3 @@
-
 CREATE TABLE IF NOT EXISTS nominated_administrators (
   group_id           INT NOT NULL,
   user_id            INT NOT NULL,
