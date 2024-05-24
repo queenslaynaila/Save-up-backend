@@ -3,7 +3,6 @@
 -- doesnt allow a normal psql table to ref a distributed table
 -- Distribute table by user id
 -- Use alter command to add the fk constaint thereby bypasing citus
-
 CREATE TABLE IF NOT EXISTS savings (
   entity_id             INT NOT NULL, 
   xid                   INT NOT NULL,
