@@ -11,7 +11,7 @@ DECLARE
     v_donor_id            INTEGER;
     v_current_balance     NUMERIC(30, 2);
     v_reference_no        TEXT;
-    v_new_cumulative      NUMERIC(30, 2);
+    v_new_balance      NUMERIC(30, 2);
     v_transaction_id      INTEGER;
 BEGIN
     SELECT id INTO v_donor_id
@@ -54,7 +54,7 @@ BEGIN
     WHERE pocket_id = p_pocket_id
     AND entity_id = v_donor_id;
 
-    v_new_cumulative = v_current_balance + p_amount;
+    v_new_balance = v_current_balance + p_amount;
     v_reference_no = 'DONATE' || left(md5(random()::text), 5);
 
     -- Insert the transaction log
@@ -74,7 +74,7 @@ BEGIN
         v_donor_id,
         'External Saving'::enum_transaction_type,
         p_amount,
-        v_new_cumulative,
+        v_new_balance,
         v_reference_no,
         NOW()
     );
