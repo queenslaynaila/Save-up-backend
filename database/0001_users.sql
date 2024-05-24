@@ -22,8 +22,6 @@ CREATE TABLE IF NOT EXISTS user_contact_details (
 
 GRANT INSERT, SELECT ON user_contact_details TO app_user;
 
--- Ref entities instead as a distributed table can only reference 
---another colocated distributed table or a reference table
 CREATE TABLE IF NOT EXISTS users (
   id              INT NOT NULL PRIMARY KEY,  
   full_name       TEXT NOT NULL,
