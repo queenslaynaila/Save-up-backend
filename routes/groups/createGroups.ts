@@ -4,7 +4,6 @@ import authMiddleware from '../../middleware/authorization';
 import { validateRequest } from '../../middleware/validationMiddleware';
 import { CreateGroupInterface, CreateGroupResponseInterface, baseGroupSchema } from './types';
 
-
 const SQL_CREATE_GROUP = sql<CreateGroupInterface, CreateGroupResponseInterface>(`
     SELECT create_group(:group_name, :created_by )
 `);
