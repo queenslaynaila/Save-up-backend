@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS groups (
-  id            SERIAL PRIMARY KEY,
+  id            INT NOT NULL PRIMARY KEY,
   name          TEXT NOT NULL,
   created_by    INT NOT NULL,  --user id of the creator
   created_at    TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),

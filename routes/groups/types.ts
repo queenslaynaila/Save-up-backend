@@ -27,11 +27,9 @@ export type SharedGroupInterface = z.infer<typeof sharedGRoupSchema>;
 
 export const baseGroupSchema = z.object({
   group_name: z.string(),
-  description: z.string(), 
 })
   
 export const createGroupSchema = baseGroupSchema.extend({
-  id: z.number(),
   created_by:z.number()
 })
   

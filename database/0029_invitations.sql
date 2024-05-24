@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS invitations (
   receiver_id   INT NOT NULL,
   status        enum_invite NOT NULL DEFAULT 'Pending',
   created_at    TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-  deleted_at    TIMESTAMP WITH TIME ZONE
+  deleted_at    TIMESTAMP WITH TIME ZONE,
   PRIMARY KEY   (id, receiver_id),
   FOREIGN KEY   (receiver_id) REFERENCES entities(id),
   FOREIGN KEY   (sender_id) REFERENCES entities(id),
