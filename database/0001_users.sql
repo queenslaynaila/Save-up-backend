@@ -14,11 +14,12 @@ SELECT create_reference_table('entities');
 CREATE TABLE IF NOT EXISTS user_contact_details (
   id              INT PRIMARY KEY,  
   id_type         enum_id_type NOT NULL DEFAULT 'National ID',
-  id_number       TEXT NOT NULL UNIQUE CHECK (id_number ~ '^[0-9]+$'),
+  id_number       TEXT NOT NULL CHECK (id_number ~ '^[0-9]+$'),
   phone_number    TEXT NOT NULL UNIQUE,
   created_at      TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   FOREIGN KEY     (id) REFERENCES entities(id)
 );
+
 GRANT INSERT, SELECT ON user_contact_details TO app_user;
 
 -- Ref entities instead as a distributed table can only reference 
