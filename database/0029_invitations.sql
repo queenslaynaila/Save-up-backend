@@ -13,13 +13,16 @@ CREATE TABLE IF NOT EXISTS invitations (
   deleted_at    TIMESTAMP WITH TIME ZONE,
   PRIMARY KEY   (id, receiver_id),
   FOREIGN KEY   (receiver_id) REFERENCES entities(id),
-  FOREIGN KEY   (sender_id) REFERENCES entities(id),
-  FOREIGN KEY   (id) REFERENCES groups(id)
+  FOREIGN KEY   (sender_id) REFERENCES entities(id)
 );
 
 GRANT INSERT, SELECT, UPDATE ON invitations TO app_user;
-SELECT create_distributed_table('invitations', 'group_id');
+SELECT create_distributed_table('invitations', 'id');
 
 ALTER TABLE invitations
 ADD CONSTRAINT fk_group_admin_id
-FOREIGN KEY (group_id,sender_id) REFERENCES group_administrators(group_id,user_id)
+FOREIGN KEY (id,sender_id) REFERENCES group_administrators(group_id,user_id)
+
+ALTER TABLE invitations
+ADD CONSTRAINT fk_group_id
+FOREIGN KEY  (id) REFERENCES groups(id)
