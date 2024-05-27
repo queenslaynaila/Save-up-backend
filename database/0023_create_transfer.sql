@@ -1,5 +1,3 @@
-CREATE SEQUENCE transfer_transaction_seq START 1;
-
 CREATE OR REPLACE FUNCTION log_transfer_transaction(
     p_source_pocket_id        INT, 
     p_destination_pocket_id   INT, 
@@ -58,7 +56,7 @@ BEGIN
           
     v_new_source_balance =  v_source_balance  - p_amount;
     v_new_destination_balance = v_destination_balance + p_amount;
-    v_reference_no = 'TRANSFERIN' || substr(md5(random()::text), 1, 5);
+    v_reference_no = substr(md5(random()::text), 1, 5);
 
     INSERT INTO transaction_logs (
         xid, 

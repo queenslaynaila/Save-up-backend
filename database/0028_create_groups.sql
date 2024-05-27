@@ -56,11 +56,11 @@ BEGIN
       WHERE groups.id = v_group_id;
 EXCEPTION 
     WHEN OTHERS THEN
-        RAISE EXCEPTION 'An error occurred while creating the group: %', SQLERRM;
+        RAISE EXCEPTION 'An error occurred while creating the group';
 END;
 $$ LANGUAGE plpgsql;
 
 GRANT EXECUTE ON FUNCTION create_group(TEXT, INT) TO app_user;
 SELECT create_distributed_function(
-  'create_group(TEXT, INT)', '$1',
+  'create_group(TEXT, INT)'
 );

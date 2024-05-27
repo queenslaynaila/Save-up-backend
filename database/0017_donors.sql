@@ -1,8 +1,9 @@
 CREATE TABLE IF NOT EXISTS donors (
-  id                   INT NOT NULL PRIMARY KEY,
+  entity_id            INT NOT NULL PRIMARY KEY,
   full_name            TEXT NOT NULL,
   phone_number         TEXT NOT NULL UNIQUE,
   created_at           TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at           TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  FOREIGN KEY          (id) REFERENCES entities(id)
+  FOREIGN KEY          (entity_id) REFERENCES entities(id)
 );
+SELECT create_distributed_table('donors', 'entity_id');

@@ -15,12 +15,12 @@ BEGIN
     VALUES( p_group_id , p_sender_id, v_receiver_id); 
 EXCEPTION 
     WHEN OTHERS THEN
-        RAISE EXCEPTION 'An error occurred while sending the invite: %', SQLERRM;
+        RAISE EXCEPTION 'An error occurred while sending the invite';
 END;
 $$ LANGUAGE plpgsql;
 
 GRANT EXECUTE ON FUNCTION send_group_invite(TEXT, INT, INT) TO app_user;
 SELECT create_distributed_function(
-  'send_group_invite(TEXT, INT, INT)', ' p_group_id  ',
-    collocate_with := 'invitations'
+  'send_group_invite(TEXT, INT, INT)', 'p_group_id',
+  collocate_with := 'invitations'
 );

@@ -24,6 +24,7 @@ $$ LANGUAGE plpgsql;
 
 GRANT EXECUTE ON FUNCTION update_user_groups_after_invite(INT, INT, enum_invite) TO app_user;
 SELECT create_distributed_function(
-  'update_user_groups_after_invite(INT, INT, enum_invite)', 'p_group_id',
+  'update_user_groups_after_invite(INT, INT, enum_invite)', 
+  'p_group_id',
   colocate_with := 'invitations'
 );

@@ -1,6 +1,3 @@
-
-CREATE SEQUENCE interest_transaction_seq START 1
-
 CREATE OR REPLACE PROCEDURE calculate_interest()
 LANGUAGE plpgsql
 AS $$
@@ -57,7 +54,7 @@ BEGIN
 
         IF interest_earned > 0 THEN
             new_cumulative = current_balance + interest_earned;
-            new_reference_no = 'INT' || nextval('interest_transaction_seq');
+            new_reference_no =  substr(md5(random()::text), 1, 5);
             INSERT INTO transaction_logs (
                 xid, pocket_id, entity_id, transaction_type, amount, cumulative_amount, reference_no, created_at
             ) VALUES (
