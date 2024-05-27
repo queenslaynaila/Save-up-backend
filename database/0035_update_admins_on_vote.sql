@@ -17,9 +17,13 @@ BEGIN
   AND nomination_approvals.nominated_member_id = p_nominated_member_id;
 
   IF v_voters_count = v_total_members THEN
-      PERFORM promote_approved_admins(p_group_id, v_total_members, p_nominated_member_id);
+     
   END IF;
 END;
 $$ LANGUAGE plpgsql;
 
 GRANT EXECUTE ON FUNCTION update_admins_on_all_votes (INT, INT) TO app_user;
+SELECT create_distributed_function(
+  'promote_approved_admins(INT, INT, INT)', 'p_group_id',
+  colocate_with := 'nomination_approvals'
+);

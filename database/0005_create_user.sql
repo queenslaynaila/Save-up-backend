@@ -38,7 +38,7 @@ BEGIN
   VALUES (v_entity_id, v_pocket_id);
 EXCEPTION 
   WHEN unique_violation THEN
-    RAISE EXCEPTION 'User with that national ID or phone number already exists.';
+    RAISE EXCEPTION 'User with that phone number already exists.';
 END;
 $$ LANGUAGE plpgsql;
 

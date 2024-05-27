@@ -82,3 +82,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 GRANT EXECUTE ON FUNCTION create_external_saving(INT, NUMERIC, BOOLEAN, TEXT, TEXT) TO app_user;
+SELECT create_distributed_function(
+  'create_external_saving(INT, NUMERIC, BOOLEAN, TEXT, TEXT)', 'p_pocket_id',
+   colocate_with := 'external_savings'
+);
