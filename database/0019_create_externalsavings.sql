@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION create_external_savings(
+CREATE OR REPLACE FUNCTION create_external_saving(
     p_pocket_id      INT, 
     p_amount         NUMERIC(30, 2), 
     p_show_details   BOOLEAN, 
@@ -81,5 +81,4 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-
-GRANT EXECUTE ON FUNCTION create_external_savings(INT, NUMERIC, BOOLEAN, TEXT, TEXT) TO app_user;
+GRANT EXECUTE ON FUNCTION create_external_saving(INT, NUMERIC, BOOLEAN, TEXT, TEXT) TO app_user;

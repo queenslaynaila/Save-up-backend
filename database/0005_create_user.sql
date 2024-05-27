@@ -1,4 +1,3 @@
--- Function to create a new user 
 CREATE OR REPLACE FUNCTION create_user(
   p_full_name     TEXT, 
   p_gender        enum_gender,
@@ -44,3 +43,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 GRANT EXECUTE ON FUNCTION create_user(TEXT, enum_gender, enum_id_type, INT, TEXT, TEXT) TO app_user;
+SELECT create_distributed_function(
+  'create_user(TEXT, enum_gender, enum_id_type, INT, TEXT, TEXT)', '$1',
+  colocate_with := 'users'
+);

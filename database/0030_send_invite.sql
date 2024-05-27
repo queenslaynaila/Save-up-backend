@@ -20,3 +20,6 @@ END;
 $$ LANGUAGE plpgsql;
 
 GRANT EXECUTE ON FUNCTION send_group_invite(TEXT, INT, INT) TO app_user;
+SELECT create_distributed_function(
+  'send_group_invite(TEXT, INT, INT)', '$1',
+);

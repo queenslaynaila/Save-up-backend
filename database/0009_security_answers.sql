@@ -17,4 +17,4 @@ SELECT create_distributed_table('security_answers', 'user_id');
 --run this separately to avoid cannot execute multiple utility events  error
 ALTER TABLE security_answers
 ADD CONSTRAINT security_answers_user_id_fkey
-FOREIGN KEY (user_id) REFERENCES users(id);
+FOREIGN KEY () REFERENCES users(id);

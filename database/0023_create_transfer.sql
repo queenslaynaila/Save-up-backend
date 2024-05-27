@@ -112,3 +112,6 @@ END;
 $$ LANGUAGE plpgsql;
 
 GRANT EXECUTE ON FUNCTION log_transfer_transaction(INT, INT, NUMERIC, INT) TO app_user;
+SELECT create_distributed_function(
+  'create_transfer(INT, INT, NUMERIC, INT)', '$1',
+);

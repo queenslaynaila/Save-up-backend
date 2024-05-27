@@ -77,5 +77,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-
 GRANT EXECUTE ON FUNCTION create_saving(INT, INT, NUMERIC, INT) TO app_user;
+SELECT create_distributed_function(
+  'create_saving(INT, INT, NUMERIC, INT)', '$1',
+);

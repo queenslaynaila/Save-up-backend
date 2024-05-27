@@ -75,5 +75,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-
 GRANT EXECUTE ON FUNCTION create_withdrawal(INT, INT, NUMERIC, INT) TO app_user;
+SELECT create_distributed_function(
+  ' create_withdrawal(INT, INT, NUMERIC, INT)', '$1',
+);

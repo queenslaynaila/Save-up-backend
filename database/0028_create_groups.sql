@@ -61,3 +61,6 @@ END;
 $$ LANGUAGE plpgsql;
 
 GRANT EXECUTE ON FUNCTION create_group(TEXT, INT) TO app_user;
+SELECT create_distributed_function(
+  'create_group(TEXT, INT)', '$1',
+);
