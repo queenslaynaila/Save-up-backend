@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS user_contact_details (
   created_at      TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   FOREIGN KEY     (id) REFERENCES entities(id)
 );
-
+SELECT create_reference_table('user_contact_details');
 GRANT INSERT, SELECT ON user_contact_details TO app_user;
 
 CREATE TABLE IF NOT EXISTS users (
@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS users (
   gender          enum_gender,
   pin             TEXT NOT NULL,
   created_at      TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-  FOREIGN KEY     (id) REFERENCES entities(id)
+  FOREIGN KEY     (id) REFERENCES user_contact_details(id)
 );
 GRANT INSERT, SELECT, UPDATE ON user_contact_details TO app_user;
 SELECT create_distributed_table('users', 'id');

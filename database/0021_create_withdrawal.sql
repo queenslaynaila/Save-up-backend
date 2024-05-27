@@ -77,6 +77,6 @@ $$ LANGUAGE plpgsql;
 
 GRANT EXECUTE ON FUNCTION create_withdrawal(INT, INT, NUMERIC, INT) TO app_user;
 SELECT create_distributed_function(
-  'create_withdrawal(INT, INT, INT, NUMERIC)', 'p_pocket_id',
+  'create_withdrawal(INT, INT, INT, NUMERIC)', 'p_entity_id',
    colocate_with := 'withdrawals'
 );

@@ -79,6 +79,6 @@ $$ LANGUAGE plpgsql;
 
 GRANT EXECUTE ON FUNCTION create_saving(INT, INT, NUMERIC, INT) TO app_user;
 SELECT create_distributed_function(
-  'create_saving(INT, INT, NUMERIC, INT)', 'p_pocket_id',
+  'create_saving(INT, INT, NUMERIC, INT)', 'p_entity_id',
    collocate_with := 'savings'
 );
