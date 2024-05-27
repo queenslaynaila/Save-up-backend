@@ -1,4 +1,3 @@
--- Table: Expenses
 CREATE TABLE IF NOT EXISTS expenses (
   entity_id      INT NOT NULL,
   xid            INT NOT NULL,

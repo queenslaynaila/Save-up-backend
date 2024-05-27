@@ -9,12 +9,12 @@ RETURNS TABLE (
 ) AS $$
 DECLARE
     v_current_balance  NUMERIC;
-    v_transaction_id  INT;
-    v_target_amount  NUMERIC;
-    v_new_balance NUMERIC;
-    v_reference_no   TEXT;
+    v_transaction_id   INT;
+    v_target_amount    NUMERIC;
+    v_new_balance      NUMERIC;
+    v_reference_no     TEXT;
 BEGIN 
-    INSERT INTO savings (entity_id, xid, pocket_id, user_id,  amount)
+    INSERT INTO savings (entity_id, xid, pocket_id, user_id, amount)
     SELECT 
             p_entity_id, 
             COALESCE(MAX(xid), 0) + 1, 
@@ -50,7 +50,7 @@ BEGIN
     END IF;
 
     v_new_balance = v_current_balance + p_amount;
-    v_reference_no = 'SAVE' || substr(md5(random()::text), 1, 5);
+    v_reference_no = substr(md5(random()::text), 1, 5);
 
     INSERT INTO transaction_logs (
         xid, 
@@ -79,6 +79,7 @@ $$ LANGUAGE plpgsql;
 
 GRANT EXECUTE ON FUNCTION create_saving(INT, INT, NUMERIC, INT) TO app_user;
 SELECT create_distributed_function(
-  'create_saving(INT, INT, NUMERIC, INT)', 'p_entity_id',
-   collocate_with := 'savings'
+  'create_saving(INT, INT, NUMERIC, INT)', 
+  'p_entity_id', 
+  colocate_with := 'savings'
 );

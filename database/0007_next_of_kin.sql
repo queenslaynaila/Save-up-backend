@@ -21,7 +21,6 @@ CREATE TABLE IF NOT EXISTS next_of_kins (
   FOREIGN KEY            (user_id) REFERENCES users(id)
 );
 
---Enforce uniqueness of user IDs for non-deleted records, ensuring each user can have only one valid next of kin at a time
 CREATE UNIQUE INDEX next_of_kins_user_id_key ON next_of_kins(user_id) WHERE deleted_at IS NULL;
 GRANT INSERT, SELECT ON user_contact_details TO app_user;
 SELECT create_distributed_table ('next_of_kins', 'user_id');

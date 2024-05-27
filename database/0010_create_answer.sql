@@ -1,4 +1,3 @@
--- Function to create a security answer
 CREATE OR REPLACE FUNCTION create_answer(
   p_user_id       INT, 
   p_question_id   INT,

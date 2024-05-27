@@ -43,4 +43,6 @@ END;
 $$ LANGUAGE plpgsql;
 
 GRANT EXECUTE ON FUNCTION create_user(TEXT, enum_gender, enum_id_type, INT, TEXT, TEXT) TO app_user;
-SELECT create_distributed_function('function_name(INT, TEXT)', NULL);
+SELECT create_distributed_function(
+  'create_user(TEXT, enum_gender, enum_id_type, INT, TEXT, TEXT)'
+);
