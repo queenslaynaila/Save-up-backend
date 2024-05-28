@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS savings (
   created_at            TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   PRIMARY KEY           (entity_id, xid),
   FOREIGN KEY           (entity_id, pocket_id) REFERENCES pockets (entity_id, xid),
-  FOREIGN KEY           (user_id) REFERENCES entities (id);
+  FOREIGN KEY           (user_id) REFERENCES entities (id)
 );
 
 SELECT create_distributed_table('savings', 'entity_id');
