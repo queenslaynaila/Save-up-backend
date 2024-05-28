@@ -7,5 +7,4 @@ CREATE TABLE IF NOT EXISTS security_answers (
   FOREIGN KEY   (question_id) REFERENCES security_questions(id),
   FOREIGN KEY   (user_id) REFERENCES users(id)
 );
-GRANT INSERT, SELECT ON security_answers TO app_user; 
 SELECT create_distributed_table('security_answers', 'user_id');

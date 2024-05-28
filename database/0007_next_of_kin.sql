@@ -22,5 +22,5 @@ CREATE TABLE IF NOT EXISTS next_of_kins (
 );
 
 CREATE UNIQUE INDEX next_of_kins_user_id_key ON next_of_kins(user_id) WHERE deleted_at IS NULL;
-GRANT INSERT, SELECT ON user_contact_details TO app_user;
 SELECT create_distributed_table ('next_of_kins', 'user_id');
+GRANT INSERT, SELECT ON user_contact_details TO app_user;

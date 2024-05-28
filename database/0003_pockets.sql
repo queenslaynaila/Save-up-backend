@@ -24,8 +24,8 @@ CREATE TABLE IF NOT EXISTS pockets (
   FOREIGN KEY             (category_id) REFERENCES categories(id)
 );
 
-GRANT INSERT, SELECT, UPDATE ON pockets TO app_user;
 SELECT create_distributed_table('pockets', 'entity_id');
+GRANT INSERT, SELECT, UPDATE ON pockets TO app_user;
 
 CREATE TABLE IF NOT EXISTS default_pockets ( 
   entity_id               INT PRIMARY KEY, 
@@ -44,5 +44,5 @@ CREATE TABLE IF NOT EXISTS pocket_reminders (
   FOREIGN KEY             (entity_id, pocket_id) REFERENCES pockets(entity_id, xid)
 );
 
-GRANT INSERT, SELECT, UPDATE ON pockets TO app_user;
 SELECT create_distributed_table('pocket_reminders', 'entity_id');
+GRANT INSERT, SELECT, UPDATE ON pockets TO app_user;
