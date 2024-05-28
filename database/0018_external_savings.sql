@@ -10,5 +10,4 @@ CREATE TABLE IF NOT EXISTS external_savings (
 );
 
 GRANT INSERT, SELECT ON external_savings TO app_user;
-CREATE INDEX idx_external_savings_by_pocket_id ON external_savings(pocket_id);
 SELECT create_distributed_table('external_savings', 'pocket_id');
