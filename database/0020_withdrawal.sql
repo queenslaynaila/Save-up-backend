@@ -10,4 +10,5 @@ CREATE TABLE IF NOT EXISTS withdrawals (
   FOREIGN KEY   (user_id) REFERENCES users(id)
 );
 
+SELECT create_distributed_table('withdrawals', 'entity_id');
 GRANT INSERT, SELECT ON withdrawals TO app_user;
