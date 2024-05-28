@@ -6,4 +6,4 @@ CREATE TABLE IF NOT EXISTS donors (
   updated_at           TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   FOREIGN KEY          (entity_id) REFERENCES entities(id)
 );
-SELECT create_distributed_table('donors', 'entity_id');
+SELECT create_distributed_table('donors', 'entity_id'); 
