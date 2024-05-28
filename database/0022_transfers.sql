@@ -11,3 +11,4 @@ CREATE TABLE IF NOT EXISTS transfers (
 );
 
 GRANT INSERT, SELECT ON transfers TO app_user;
+SELECT create_distributed_table('transfers', 'entity_id');
