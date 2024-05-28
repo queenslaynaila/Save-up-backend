@@ -2,7 +2,7 @@ CREATE OR REPLACE FUNCTION create_user(
   p_full_name     TEXT, 
   p_gender        enum_gender,
   p_id_type       enum_id_type,
-  p_id_number     INT, 
+  p_id_number     TEXT, 
   p_phone_number  TEXT, 
   p_pin           TEXT
 )
@@ -13,7 +13,8 @@ DECLARE
   v_pocket_id   INT;
 BEGIN 
   INSERT INTO entities (entity_type)
-  VALUES ('User');
+  VALUES ('User')
+  RETURNING entities.id INTO STRICT v_entity_id;
 
   INSERT INTO user_contact_details (id, id_type, id_number, phone_number)
   VALUES (v_entity_id, p_id_type, p_id_number, p_phone_number)
@@ -43,5 +44,5 @@ $$ LANGUAGE plpgsql;
 
 GRANT EXECUTE ON FUNCTION create_user(TEXT, enum_gender, enum_id_type, INT, TEXT, TEXT) TO app_user;
 SELECT create_distributed_function(
-  'create_user(TEXT, enum_gender, enum_id_type, INT, TEXT, TEXT)'
+  'create_user(TEXT, enum_gender, enum_id_type, TEXT, TEXT, TEXT)'
 );
