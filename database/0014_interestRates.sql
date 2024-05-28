@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS interest_rates (
   id                  SERIAL PRIMARY KEY,
-  pocket_type         enum_pocket_types NOT NULL,
+  pocket_type         enum_pocket_type NOT NULL,
   name                TEXT NOT NULL,
   rate                NUMERIC NOT NULL CHECK (rate > 0),
   is_default_rate     BOOLEAN NOT NULL,
