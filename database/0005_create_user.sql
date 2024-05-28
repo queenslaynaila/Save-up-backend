@@ -13,8 +13,7 @@ DECLARE
   v_pocket_id   INT;
 BEGIN 
   INSERT INTO entities (entity_type)
-  VALUES ('User')
-  RETURNING entities.id INTO STRICT v_entity_id;
+  VALUES ('User');
 
   INSERT INTO user_contact_details (id, id_type, id_number, phone_number)
   VALUES (v_entity_id, p_id_type, p_id_number, p_phone_number)
