@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS user_contact_details (
   id              INT PRIMARY KEY,  
   id_type         enum_id_type NOT NULL DEFAULT 'National ID',
   id_number       TEXT NOT NULL CHECK (id_number ~ '^[0-9]+$'),
-  phone_number    TEXT NOT NULL CHECK (phone_number ~ '^+[0-9]{10,12}$'),
+  phone_number    TEXT NOT NULL CHECK (phone_number ~ '^+[0-9]{10,12}$') UNIQUE,
   created_at      TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   FOREIGN KEY     (id) REFERENCES entities(id)
 );
@@ -23,7 +23,7 @@ SELECT create_reference_table('user_contact_details');
 GRANT INSERT, SELECT ON user_contact_details TO app_user;
 
 CREATE TABLE IF NOT EXISTS users (
-  id              INT NOT NULL PRIMARY KEY,  
+  id              INT PRIMARY KEY,  
   full_name       TEXT NOT NULL,
   role            enum_user_role NOT NULL DEFAULT 'User',
   gender          enum_gender,
