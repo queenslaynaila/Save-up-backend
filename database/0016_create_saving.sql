@@ -29,6 +29,7 @@ BEGIN
         COALESCE((SELECT cumulative_amount
                 FROM transaction_logs
                 WHERE pocket_id = p_pocket_id
+                AND entity_id = p_entity_id
                 ORDER BY xid DESC
                 LIMIT 1), 0) AS v_current_balance
         INTO STRICT v_transaction_id, v_current_balance
@@ -73,7 +74,7 @@ BEGIN
         NOW()
     );
 
-    RETURN QUERY SELECT pockets.name FROM pockets WHERE xid = p_pocket_id;
+    RETURN QUERY SELECT pockets.name FROM pockets WHERE xid = p_pocket_id AND entity_id = p_entity_id;
 END;
 $$ LANGUAGE plpgsql;
 
