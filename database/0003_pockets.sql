@@ -2,7 +2,8 @@ CREATE TYPE enum_status AS ENUM ('In Progress', 'Completed');
 CREATE TYPE enum_priority AS ENUM ('High', 'Intermediate', 'Low');
 CREATE TYPE enum_pocket_type AS ENUM ('Standard', 'Locked');
 
--- As pockets references the reference table to categories create it and all its associated tables in one single transaction 
+-- As pockets references the reference table to categories create it 
+-- and all tables referrencing it in one single transaction 
 -- as when there is a foreign key to a reference table, Citus 
 -- needs to perform all operations over a single connection to ensure consistency
 
@@ -64,3 +65,17 @@ CREATE TABLE IF NOT EXISTS savings (
 
 SELECT create_distributed_table('savings', 'entity_id');
 GRANT INSERT, SELECT ON savings TO app_user;
+
+CREATE TABLE IF NOT EXISTS external_savings (
+  entity_id             INT NOT NULL,
+  xid                   INT NOT NULL,
+  pocket_id             INT NOT NULL, 
+  amount                NUMERIC(30, 2) NOT NULL,
+  show_details          BOOLEAN NOT NULL DEFAULT TRUE,
+  created_at            TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  PRIMARY KEY           (entity_id, xid),
+  FOREIGN KEY           (entity_id, pocket_id) REFERENCES pockets (entity_id, xid)
+);
+
+GRANT INSERT, SELECT ON external_savings TO app_user;
+SELECT create_distributed_table('external_savings', 'entity_id');
