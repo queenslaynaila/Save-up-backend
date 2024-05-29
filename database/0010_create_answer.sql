@@ -22,6 +22,5 @@ $$ LANGUAGE plpgsql;
 
 GRANT EXECUTE ON FUNCTION create_answer(INT, INT, TEXT) TO app_user;
 SELECT create_distributed_function(
-  'create_answer(INT, INT, TEXT)', 'p_user_id',
-  colocate_with := 'security_answers'
+  'create_answer(INT, INT, TEXT)', 'p_user_id'
 );
