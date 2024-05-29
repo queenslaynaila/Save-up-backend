@@ -45,7 +45,7 @@ BEGIN
         v_new_balance =  v_current_balance - p_amount;
         v_reference_no = substr(md5(random()::text), 1, 5);
 
-        SELECT insert_transaction_log(
+        PERFORM insert_transaction_log(
             p_entity_id,
             p_pocket_id,
             v_transaction_id,
