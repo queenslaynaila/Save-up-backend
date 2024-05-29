@@ -24,18 +24,8 @@ BEGIN
     FROM savings 
     WHERE entity_id = p_entity_id;
 
-    SELECT 
-        COALESCE(MAX(xid) + 1, 1) AS v_transaction_id,
-        COALESCE((SELECT cumulative_amount
-                FROM transaction_logs
-                WHERE pocket_id = p_pocket_id
-                AND entity_id = p_entity_id
-                ORDER BY xid DESC
-                LIMIT 1), 0) AS v_current_balance
-        INTO STRICT v_transaction_id, v_current_balance
-    FROM transaction_logs
-    WHERE transaction_logs.pocket_id = p_pocket_id
-    AND transaction_logs.entity_id = p_entity_id;
+    SELECT * FROM get_transaction_info(p_pocket_id, p_entity_id) 
+    INTO v_transaction_id, v_current_balance;
 
     SELECT pockets.target_amount INTO STRICT v_target_amount  
     FROM pockets 
