@@ -43,25 +43,14 @@ BEGIN
     v_new_balance = v_current_balance + p_amount;
     v_reference_no = substr(md5(random()::text), 1, 5);
 
-    INSERT INTO transaction_logs (
-        xid, 
-        pocket_id, 
-        entity_id, 
-        transaction_type, 
-        amount, 
-        cumulative_amount, 
-        reference_no, 
-        created_at
-    )
-    VALUES (
-        v_transaction_id,
-        p_pocket_id,
+    SELECT insert_transaction_log(
         p_entity_id,
+        p_pocket_id,
+        v_transaction_id,
         'Saving'::enum_transaction_type,
         p_amount,
-        v_new_balance,
         v_reference_no,
-        NOW()
+        v_new_balance
     );
 
     RETURN QUERY SELECT pockets.name FROM pockets WHERE xid = p_pocket_id AND entity_id = p_entity_id;
@@ -70,7 +59,5 @@ $$ LANGUAGE plpgsql;
 
 GRANT EXECUTE ON FUNCTION create_saving(INT, INT, NUMERIC, INT) TO app_user;
 SELECT create_distributed_function(
-  'create_saving(INT, INT, NUMERIC, INT)', 
-  'p_entity_id', 
-  colocate_with := 'savings'
+  'create_saving(INT, INT, NUMERIC, INT)', 'p_entity_id'
 );

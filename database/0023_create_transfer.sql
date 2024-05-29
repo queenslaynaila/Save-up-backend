@@ -58,26 +58,15 @@ BEGIN
     v_new_destination_balance = v_destination_balance + p_amount;
     v_reference_no = substr(md5(random()::text), 1, 5);
 
-    INSERT INTO transaction_logs (
-        xid, 
-        pocket_id, 
-        entity_id, 
-        transaction_type, 
-        amount, 
-        cumulative_amount, 
-        reference_no, 
-        created_at
-      )
-    VALUES (
-          v_source_transaction_id,
-          p_source_pocket_id,
-          p_user_id,
-          'Transfer Out'::enum_transaction_type, 
-          p_amount,
-          v_new_source_balance,
-          v_reference_no,  
-          NOW()
-      );
+    SELECT insert_transaction_log(
+        p_entity_id,
+        p_source_pocket_id,
+        v_transaction_id,
+        'Saving'::enum_transaction_type,
+        p_amount,
+        v_reference_no,
+        v_new_balance
+    );
 
     INSERT INTO transaction_logs (
         xid, 

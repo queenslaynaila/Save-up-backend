@@ -1,11 +1,13 @@
 CREATE OR REPLACE FUNCTION create_external_saving(
-    entity_id        INT,
+    p_entity_id        INT,
     p_pocket_id      INT, 
     p_amount         NUMERIC(30, 2), 
     p_show_details   BOOLEAN, 
     p_full_name      TEXT
 )
-RETURNS VOID AS $$
+RETURNS TABLE (
+    name  TEXT
+) AS $$
 DECLARE
     v_entity_id           INT;
     v_donor_id            INT;
@@ -30,15 +32,17 @@ BEGIN
     END IF;
 
     INSERT INTO external_savings (
-        id, 
+        entity_id, 
+        xid,
         pocket_id, 
         amount, 
         show_details
     )
     VALUES (
-        v_donor_id, 
+        p_entity_id,
+        xid(),
         p_pocket_id, 
-        p_amount, 
+        p_amount,
         p_show_details
     );
     
@@ -46,28 +50,19 @@ BEGIN
     INTO v_transaction_id, v_current_balance;
 
     v_new_balance = v_current_balance + p_amount;
-    v_reference_no = 'DONATE' || left(md5(random()::text), 5);
+    v_reference_no = left(md5(random()::text), 5);
 
-    INSERT INTO transaction_logs (
-        xid, 
-        pocket_id, 
-        entity_id, 
-        transaction_type, 
-        amount, 
-        cumulative_amount, 
-        reference_no, 
-        created_at
-    )
-    VALUES (
-        v_transaction_id,
+    SELECT insert_transaction_log(
+        p_entity_id,
         p_pocket_id,
-        v_donor_id,
+        v_transaction_id,
         'External Saving'::enum_transaction_type,
         p_amount,
-        v_new_balance,
         v_reference_no,
-        NOW()
+        v_new_balance
     );
+
+    RETURN QUERY SELECT pockets.name FROM pockets WHERE xid = p_pocket_id AND entity_id = p_entity_id;
 END;
 $$ LANGUAGE plpgsql;
 
