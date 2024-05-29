@@ -67,9 +67,10 @@ SELECT create_distributed_table('savings', 'entity_id');
 GRANT INSERT, SELECT ON savings TO app_user;
 
 CREATE TABLE IF NOT EXISTS external_savings (
-  entity_id             INT NOT NULL,
+  entity_id             INT NOT NULL,-- owner of the pocket
   xid                   INT NOT NULL,
-  pocket_id             INT NOT NULL, 
+  donor_id              INT NOT NULL, -- the donor
+  pocket_id             INT NOT NULL, --the pocket itself                                                                                                                                                                
   amount                NUMERIC(30, 2) NOT NULL,
   show_details          BOOLEAN NOT NULL DEFAULT TRUE,
   created_at            TIMESTAMP WITH TIME ZONE DEFAULT NOW(),

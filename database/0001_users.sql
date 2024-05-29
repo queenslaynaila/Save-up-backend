@@ -8,8 +8,8 @@ CREATE TABLE IF NOT EXISTS entities (
   entity_type     enum_entity_type NOT NULL, 
   created_at      TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );
-GRANT INSERT, SELECT ON entities TO app_user;  
 SELECT create_reference_table('entities');
+GRANT INSERT, SELECT ON entities TO app_user;  
 
 CREATE TABLE IF NOT EXISTS user_contact_details (
   id              INT PRIMARY KEY,  
@@ -31,5 +31,16 @@ CREATE TABLE IF NOT EXISTS users (
   created_at      TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   FOREIGN KEY     (id) REFERENCES user_contact_details(id)
 );
-GRANT INSERT, SELECT, UPDATE ON user_contact_details TO app_user;
 SELECT create_distributed_table('users', 'id');
+GRANT INSERT, SELECT, UPDATE ON users TO app_user;
+
+CREATE TABLE IF NOT EXISTS donors (
+  id                   INT NOT NULL PRIMARY KEY,
+  full_name            TEXT NOT NULL,
+  phone_number         TEXT NOT NULL,
+  created_at           TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at           TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  FOREIGN KEY          (id) REFERENCES entities(id)
+);
+SELECT create_distributed_table('donors', 'id'); 
+GRANT INSERT, SELECT, UPDATE ON donors TO app_user;
