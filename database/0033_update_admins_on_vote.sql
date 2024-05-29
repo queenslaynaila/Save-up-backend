@@ -24,6 +24,5 @@ $$ LANGUAGE plpgsql;
 
 GRANT EXECUTE ON FUNCTION update_admins_on_all_votes (INT, INT) TO app_user;
 SELECT create_distributed_function(
-  'promote_approved_admins(INT, INT, INT)', 'p_group_id',
-  colocate_with := 'nomination_approvals'
+  'update_admins_on_all_votes(INT, INT, INT)', 'p_group_id'
 );

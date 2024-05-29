@@ -100,6 +100,5 @@ $$ LANGUAGE plpgsql;
 
 GRANT EXECUTE ON FUNCTION log_transfer_transaction(INT, INT, NUMERIC, INT) TO app_user;
 SELECT create_distributed_function(
-  'log_transfer_transaction(INT, INT, NUMERIC, INT)', 'p_source_pocket_id',
-  colocate_with := 'transaction_logs'
+  'log_transfer_transaction(INT, INT, NUMERIC, INT)', 'p_source_pocket_id'
 );
