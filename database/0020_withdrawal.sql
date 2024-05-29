@@ -20,4 +20,4 @@ GRANT INSERT, SELECT ON withdrawals TO app_user;
 
 ALTER TABLE withdrawals
 ADD CONSTRAINT fk_pockets
-FOREIGN KEY (entity_id, pocket_id) REFERENCES pockets (entity_id, xid),
+FOREIGN KEY (entity_id, pocket_id) REFERENCES pockets (entity_id, xid);
