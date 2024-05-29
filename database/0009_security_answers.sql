@@ -15,4 +15,4 @@ SELECT create_distributed_table('security_answers', 'user_id');
 
 ALTER TABLE security_answers
 ADD CONSTRAINT fk_users
-FOREIGN KEY   (user_id) REFERENCES users(id);
+FOREIGN KEY (user_id) REFERENCES users(id);
