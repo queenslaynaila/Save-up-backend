@@ -24,20 +24,19 @@ BEGIN
    SELECT * FROM get_transaction_info(p_destination_pocket_id, p_entity_id) 
    INTO STRICT v_destination_transaction_id, v_destination_balance;
 
-  IF  v_source_balance >= p_amount THEN
+  IF v_source_balance >= p_amount THEN
     INSERT INTO transfers (entity_id, xid, user_id, source_pocket_id, destination_pocket_id, amount)
-    VALUES (
+    SELECT 
               p_entity_id,
               COALESCE(MAX(xid), 0) + 1, 
-              p_user_id
+              p_user_id,
               p_source_pocket_id,    
               p_destination_pocket_id,
               p_amount
-           )
     FROM transfers 
     WHERE entity_id = p_entity_id;
-          
-    v_new_source_balance =  v_source_balance  - p_amount;
+
+    v_new_source_balance =  v_source_balance - p_amount;
     v_new_destination_balance = v_destination_balance + p_amount;
     v_reference_no = substr(md5(random()::text), 1, 5);
 
@@ -53,7 +52,7 @@ BEGIN
 
     PERFORM insert_transaction_log(
         p_entity_id,
-        p_destination_pocket_id 
+        p_destination_pocket_id,
         v_destination_transaction_id,
         'Transfer In'::enum_transaction_type,
         p_amount,
@@ -62,8 +61,8 @@ BEGIN
     );
 
     RETURN QUERY SELECT 
-      (SELECT name FROM pockets WHERE id = p_source_pocket_id) AS source_pocket_name,
-      (SELECT name FROM pockets WHERE id = p_destination_pocket_id) AS destination_pocket_name;
+      (SELECT name FROM pockets WHERE xid = p_source_pocket_id AND entity_id = p_entity_id) AS source_pocket_name,
+      (SELECT name FROM pockets WHERE xid = p_destination_pocket_id AND entity_id = p_entity_id) AS destination_pocket_name;
   ELSE
     RAISE EXCEPTION 'Insufficient funds for transfer.';
   END IF;
