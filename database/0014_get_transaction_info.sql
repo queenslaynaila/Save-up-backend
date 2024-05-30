@@ -3,8 +3,8 @@ CREATE OR REPLACE FUNCTION get_transaction_info(
     p_entity_id   INT
 )
 RETURNS TABLE (
-    v_transaction_id   INT,
-    v_current_balance  NUMERIC
+    v_transaction_id   INT;
+    v_current_balance  NUMERIC;
 ) AS $$
 BEGIN
     SELECT 
