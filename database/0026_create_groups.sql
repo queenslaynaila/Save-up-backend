@@ -9,7 +9,6 @@ RETURNS TABLE (
 ) AS $$
 DECLARE
   v_entity_id   INT;
-  v_group_id    INT;
   v_pocket_id   INT;
 BEGIN 
     INSERT INTO entities (entity_type)
@@ -17,14 +16,13 @@ BEGIN
     RETURNING entities.id INTO STRICT v_entity_id;
 
     INSERT INTO groups (id, name, created_by)
-    VALUES (v_entity_id, p_name, p_created_by)
-    RETURNING groups.id INTO STRICT v_group_id;
+    VALUES (v_entity_id, p_name, p_created_by);
 
     INSERT INTO user_groups (user_id, group_id)
-    VALUES (p_created_by, v_group_id);
+    VALUES (p_created_by, v_entity_id);
 
     INSERT INTO group_administrators(user_id, group_id)
-    VALUES (p_created_by, v_group_id);
+    VALUES (p_created_by, v_entity_id);
 
     INSERT INTO pockets (
         entity_id, 
@@ -53,7 +51,7 @@ BEGIN
       groups.name, 
       groups.created_at 
       FROM groups 
-      WHERE groups.id = v_group_id;
+      WHERE groups.id = v_entity_id;
 EXCEPTION 
     WHEN OTHERS THEN
         RAISE EXCEPTION 'An error occurred while creating the group';
@@ -61,6 +59,4 @@ END;
 $$ LANGUAGE plpgsql;
 
 GRANT EXECUTE ON FUNCTION create_group(TEXT, INT) TO app_user;
-SELECT create_distributed_function(
-  'create_group(TEXT, INT)'
-);
+SELECT create_distributed_function('create_group(TEXT, INT)');

@@ -7,7 +7,8 @@ DECLARE
     v_total_members INT;
     voters_count INT;
 BEGIN
-  SELECT COUNT(*) INTO STRICT v_total_members FROM user_groups 
+  SELECT COUNT(*) INTO STRICT v_total_members 
+  FROM user_groups 
   WHERE user_groups.group_id = p_group_id;
   
   SELECT COUNT(DISTINCT voter_member_id) 
@@ -17,12 +18,12 @@ BEGIN
   AND nomination_approvals.nominated_member_id = p_nominated_member_id;
 
   IF v_voters_count = v_total_members THEN
-     
+     PERFORM promote_approved_admins(p_group_id, v_total_members, p_nominated_member_id);
   END IF;
 END;
 $$ LANGUAGE plpgsql;
 
 GRANT EXECUTE ON FUNCTION update_admins_on_all_votes (INT, INT) TO app_user;
 SELECT create_distributed_function(
-  'update_admins_on_all_votes(INT, INT, INT)', 'p_group_id'
+  'update_admins_on_all_votes(INT, INT)', 'p_group_id'
 );

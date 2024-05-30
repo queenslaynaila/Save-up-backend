@@ -8,7 +8,7 @@ BEGIN
     UPDATE invitations
     SET status = p_status
     WHERE receiver_id = p_receiver_id 
-    AND id = p_group_id;
+    AND group_id = p_group_id;
 
     IF p_status = 'Accept'::enum_invite THEN
         INSERT INTO user_groups (user_id, group_id)
@@ -17,7 +17,7 @@ BEGIN
         UPDATE invitations
         SET deleted_at = NOW()
         WHERE receiver_id = p_receiver_id
-        AND id = p_group_id;
+        AND group_id = p_group_id;
     END IF;
 END;
 $$ LANGUAGE plpgsql;
