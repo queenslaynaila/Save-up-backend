@@ -14,8 +14,8 @@ DECLARE
     new_reference_no TEXT;
 BEGIN
     -- Fetch interest rates for each pocket type once
-    SELECT rate INTO interest_rate_standard FROM interest_rates WHERE pocket_type = 'Standard Pocket';
-    SELECT rate INTO interest_rate_locked FROM interest_rates WHERE pocket_type = 'Locked Pocket';
+    SELECT rate INTO STRICT interest_rate_standard FROM interest_rates WHERE pocket_type = 'Standard Pocket';
+    SELECT rate INTO STRICT interest_rate_locked FROM interest_rates WHERE pocket_type = 'Locked Pocket';
 
     FOR pocket IN
         SELECT p.id AS pocket_id, p.pocket_type, p.entity_id
@@ -32,14 +32,14 @@ BEGIN
         END IF;
 
         -- Compute balance for the given pocket
-        SELECT COALESCE(cumulative_amount, 0) INTO current_balance
+        SELECT COALESCE(cumulative_amount, 0) INTO STRICT current_balance
         FROM transaction_logs
         WHERE pocket_id = pocket.pocket_id
         ORDER BY transaction_id DESC
         LIMIT 1;
 
         -- Fetch the timestamp of the last interest calculation
-        SELECT MAX(created_at) INTO last_interest_calculation
+        SELECT MAX(created_at) INTO STRICT last_interest_calculation
         FROM transaction_logs
         WHERE pocket_id = pocket.pocket_id AND transaction_type = 'Interest Earned';
 

@@ -10,7 +10,7 @@ DECLARE
 BEGIN
     v_approval_threshold = p_total_members / 2;
 
-    SELECT COUNT (*) INTO V_approvals_count
+    SELECT COUNT (*) INTO STRICT v_approvals_count
     FROM nomination_approvals nm
     WHERE nm.group_id =p_group_id
     AND nm.nominated_member_id = p_nominated_member_id 

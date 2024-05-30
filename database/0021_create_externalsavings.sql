@@ -1,6 +1,6 @@
 CREATE OR REPLACE FUNCTION create_external_saving(
     p_entity_id      INT, 
-    p_donor_id       INT,
+    p_donor_id       INT, -- owner of the pocket user or grp
     p_pocket_id      INT, 
     p_amount         NUMERIC(30, 2), 
     p_show_details   BOOLEAN

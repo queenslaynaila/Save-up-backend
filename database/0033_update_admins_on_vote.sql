@@ -7,7 +7,7 @@ DECLARE
     v_total_members INT;
     voters_count INT;
 BEGIN
-  SELECT COUNT(*) INTO v_total_members FROM user_groups 
+  SELECT COUNT(*) INTO STRICT v_total_members FROM user_groups 
   WHERE user_groups.group_id = p_group_id;
   
   SELECT COUNT(DISTINCT voter_member_id) 

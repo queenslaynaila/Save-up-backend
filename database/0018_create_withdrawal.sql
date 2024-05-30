@@ -16,10 +16,10 @@ DECLARE
     v_reference_no         TEXT;
 BEGIN 
     SELECT * FROM get_transaction_info(p_pocket_id, p_entity_id) 
-    INTO v_transaction_id, v_current_balance;
+    INTO STRICT v_transaction_id, v_current_balance;
 
     SELECT pocket_type, target_at
-    INTO v_pocket_type, v_target_at
+    INTO STRICT v_pocket_type, v_target_at
     FROM pockets
     WHERE pockets.xid = p_pocket_id
     AND pockets.entity_id = p_entity_id;

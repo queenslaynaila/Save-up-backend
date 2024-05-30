@@ -25,7 +25,7 @@ BEGIN
     WHERE entity_id = p_entity_id;
 
     SELECT * FROM get_transaction_info(p_pocket_id, p_entity_id) 
-    INTO v_transaction_id, v_current_balance;
+    INTO STRICT v_transaction_id, v_current_balance;
 
     SELECT pockets.target_amount INTO STRICT v_target_amount  
     FROM pockets 

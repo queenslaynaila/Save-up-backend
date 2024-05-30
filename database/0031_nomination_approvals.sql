@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS nomination_approvals (
   group_id              INT NOT NULL,
   voter_member_id       INT NOT NULL,
   nominated_member_id   INT NOT NULL,
-  vote                  BOOLEAN NOT NULL, -- True for approval, False for disapproval
+  vote                  BOOLEAN NOT NULL, 
   PRIMARY KEY           (group_id, voter_member_id, nominated_member_id),
   FOREIGN KEY           (group_id, voter_member_id) REFERENCES user_groups(group_id, user_id),
   FOREIGN KEY           (group_id, nominated_member_id) REFERENCES nominated_administrators(group_id, user_id)

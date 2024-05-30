@@ -7,4 +7,4 @@ CREATE TABLE IF NOT EXISTS nominated_administrators (
 );
 
 GRANT SELECT, INSERT ON nominated_administrators TO app_user;
-SELECT create_distributed_table('nominated_administrators', 'group_id');
+SELECT create_distributed_table('nominated_administrators', 'group_id');  
