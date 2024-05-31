@@ -1,13 +1,13 @@
 CREATE OR REPLACE FUNCTION log_transfer_transaction(
     p_source_pocket_id        INT, 
     p_destination_pocket_id   INT, 
+    p_user_id                 INT, -- The group member or a standard user doing the transfer
     p_amount                  NUMERIC(30, 2), 
-    p_user_id                 INT,
     p_entity_id               INT
 )
 RETURNS TABLE (
- source_pocket_name       TEXT,
- destination_pocket_name  TEXT
+ source_pocket_name       TEXT;
+ destination_pocket_name  TEXT;
 ) AS $$
 DECLARE
   v_source_transaction_id         INT;
@@ -61,8 +61,16 @@ BEGIN
     );
 
     RETURN QUERY SELECT 
-      (SELECT name FROM pockets WHERE xid = p_source_pocket_id AND entity_id = p_entity_id) AS source_pocket_name,
-      (SELECT name FROM pockets WHERE xid = p_destination_pocket_id AND entity_id = p_entity_id) AS destination_pocket_name;
+      (
+        SELECT name FROM pockets 
+        WHERE xid = p_source_pocket_id 
+        AND entity_id = p_entity_id
+      ) AS source_pocket_name,
+      (
+        SELECT name FROM pockets 
+        WHERE xid = p_destination_pocket_id 
+        AND entity_id = p_entity_id 
+      ) AS destination_pocket_name;
   ELSE
     RAISE EXCEPTION 'Insufficient funds for transfer.';
   END IF;

@@ -1,8 +1,8 @@
 CREATE OR REPLACE FUNCTION create_saving(
+    p_entity_id    INT,
     p_user_id      INT, 
     p_pocket_id    INT, 
-    p_amount       NUMERIC,
-    p_entity_id    INT
+    p_amount       NUMERIC
 )
 RETURNS TABLE (
     name  TEXT
@@ -14,12 +14,12 @@ DECLARE
     v_new_balance      NUMERIC;
     v_reference_no     TEXT;
 BEGIN 
-    INSERT INTO savings (entity_id, xid, pocket_id, user_id, amount)
+    INSERT INTO savings (entity_id, xid, user_id, pocket_id, amount)
     SELECT 
             p_entity_id, 
             COALESCE(MAX(xid), 0) + 1, 
-            p_pocket_id, 
             p_user_id, 
+            p_pocket_id, 
             p_amount 
     FROM savings 
     WHERE entity_id = p_entity_id;

@@ -1,8 +1,8 @@
 CREATE OR REPLACE FUNCTION create_withdrawal(
+    p_entity_id        INT   -- 0wner of the pocket. Either a group or a user
     p_pocket_id        INT,
-    p_user_id          INT,    --user processing the withdrwal
+    p_user_id          INT,    --Group member or user proccessing the withdrawal
     p_amount           NUMERIC(30, 2), 
-    p_entity_id        INT   -- 0wner of the pocket
 )
 RETURNS TABLE (
     name  TEXT

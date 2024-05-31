@@ -1,7 +1,7 @@
 CREATE OR REPLACE FUNCTION create_external_saving(
     p_entity_id      INT, -- owner of the pocket either user or group
-    p_donor_id       INT, 
     p_pocket_id      INT, 
+    p_donor_id       INT, 
     p_amount         NUMERIC(30, 2), 
     p_show_details   BOOLEAN
 )
@@ -30,8 +30,7 @@ BEGIN
         p_amount,
         p_show_details
     FROM external_savings
-    WHERE entity_id = p_entity_id
-    AND pocket_id = p_pocket_id;
+    WHERE entity_id = p_entity_id;
     
     SELECT * FROM get_transaction_info(p_pocket_id, p_entity_id) 
     INTO STRICT v_transaction_id, v_current_balance;
