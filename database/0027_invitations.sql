@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS invitations (
 SELECT create_distributed_table('invitations', 'group_id');
 
 ALTER TABLE invitations
-ADD CONSTRAINT fk_groups
+ADD CONSTRAINT invitations_group_id_sender_id_fkey
 FOREIGN KEY (group_id,sender_id) REFERENCES group_administrators(group_id,user_id);
 
 GRANT INSERT, SELECT, UPDATE ON invitations TO app_user;

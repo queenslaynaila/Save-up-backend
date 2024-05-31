@@ -14,5 +14,5 @@ CREATE TABLE IF NOT EXISTS security_answers (
 SELECT create_distributed_table('security_answers', 'user_id');
 
 ALTER TABLE security_answers
-ADD CONSTRAINT fk_users
+ADD CONSTRAINT security_answers_user_id_fkey
 FOREIGN KEY (user_id) REFERENCES users(id);

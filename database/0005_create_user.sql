@@ -25,7 +25,7 @@ BEGIN
   VALUES (
           v_entity_id, 
           1, 
-          12, 
+          12,  
           'Wallet',  
           'Intermediate'::enum_priority, 
           'Standard'::enum_pocket_type

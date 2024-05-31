@@ -19,5 +19,5 @@ SELECT create_distributed_table('withdrawals', 'entity_id');
 GRANT INSERT, SELECT ON withdrawals TO app_user;
 
 ALTER TABLE withdrawals
-ADD CONSTRAINT fk_pockets
+ADD CONSTRAINT withdrawals_entity_id_pocket_id_fkey
 FOREIGN KEY (entity_id, pocket_id) REFERENCES pockets (entity_id, xid);
