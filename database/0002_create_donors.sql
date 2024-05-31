@@ -1,17 +1,12 @@
 CREATE OR REPLACE FUNCTION create_donor(
   p_full_name     TEXT, 
-  p_gender        enum_gender,
-  p_id_type       enum_id_type,
-  p_id_number     TEXT, 
-  p_phone_number  TEXT, 
-  p_pin           TEXT
+  p_phone_number  TEXT
 )
 RETURNS TABLE (
     donor_id       INT
 ) AS $$
 DECLARE
   v_entity_id   INT;
-  v_pocket_id   INT;
 BEGIN 
     INSERT INTO entities (entity_type)
     VALUES ('Donor'::enum_entity_type)
@@ -24,7 +19,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-GRANT EXECUTE ON FUNCTION create_user(TEXT, enum_gender, enum_id_type, TEXT, TEXT, TEXT) TO app_user;
+GRANT EXECUTE ON FUNCTION create_user(TEXT, TEXT) TO app_user;
 SELECT create_distributed_function(
   'create_donor(TEXT, enum_gender, enum_id_type, TEXT, TEXT, TEXT)'
 );
