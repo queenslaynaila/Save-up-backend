@@ -46,7 +46,7 @@ export type GetByIdInterface = z.infer<typeof getById>;
 //MESSAGE RESPONSESCHEMA
 
 export const messageSchema = z.object({
-  message: z.string()
+  statusCode: z.number()
 })
 
 export type MessageInterface = z.infer<typeof messageSchema>;

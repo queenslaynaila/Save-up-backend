@@ -3,13 +3,12 @@ import authMiddleware from '../../middleware/authorization';
 import { MessageInterface } from '../../globalTypes/index';
 
 export default (router: Router) => {
-  router.post<Record<string,never>, MessageInterface, Record<string,never>, Record<string,never>, Record<string,never>>(
-    '/logout', 
+  router.delete<Record<string,never>, MessageInterface, Record<string,never>, Record<string,never>, Record<string,never>>(
+    '/', 
     authMiddleware(), 
-    async (req, res) => {
-      console.log(req.headers)
+    async (_req, res) => {
       res.removeHeader('authorization-token');
       res.removeHeader('refresh-token');
-      return res.json({ message: 'Logout successful' });
+      res.sendStatus(204);
     });
 };
