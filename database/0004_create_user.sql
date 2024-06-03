@@ -40,7 +40,7 @@ EXCEPTION
 END;
 $$ LANGUAGE plpgsql;
 
-GRANT EXECUTE ON FUNCTION create_user(TEXT, enum_gender, enum_id_type, TEXT, TEXT, TEXT) TO app_user;
+GRANT EXECUTE ON FUNCTION create_user(enum_id_type, TEXT, TEXT, TEXT, enum_gender, TEXT) TO app_user;
 SELECT create_distributed_function(
-  'create_user(TEXT, enum_gender, enum_id_type, TEXT, TEXT, TEXT)'
+  'create_user(enum_id_type, TEXT, TEXT, TEXT, enum_gender, TEXT)'
 );

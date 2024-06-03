@@ -6,19 +6,17 @@ import { UserInterface, baseUserSchema } from './types';
 import { MessageInterface } from '../../globalTypes/index';
 
 const SQL_CREATE_USER = sql<UserInterface, MessageInterface>(`
-  SELECT create_user(:full_name, :gender, :id_type, :id_number, :phone_number, :pin)
+  SELECT create_user(:id_type, :id_number, :phone_number, :full_name, :gender, :pin)
 `);
 
 export default (router: Router) => { 
   router.post<Record<string,never>, MessageInterface, UserInterface, Record<string,never>, Record<string,never>>(
     '/',
     validateRequest(baseUserSchema),
-    async (req, res) => {
-      const { full_name, gender, id_type, id_number,  phone_number, pin } = req.body;
-      const pinHash = bcrypt.hashSync(pin, 12);
-      await SQL_CREATE_USER({ full_name, gender, pin: pinHash, id_type, id_number,  phone_number })
+    async (req, res) => {         
+      const pinHash = bcrypt.hashSync(req.body.pin, 12);
+      await SQL_CREATE_USER({ ...req.body, pin: pinHash })
         .exec();
-      res.json({ message:"Account created Succesfully. Proceed to login" });
+      res.sendStatus(201);
     });
 };
-
