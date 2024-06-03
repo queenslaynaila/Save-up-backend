@@ -1,9 +1,9 @@
 CREATE OR REPLACE FUNCTION create_user(
-  p_full_name     TEXT, 
-  p_gender        enum_gender,
   p_id_type       enum_id_type,
   p_id_number     TEXT, 
   p_phone_number  TEXT, 
+  p_full_name     TEXT, 
+  p_gender        enum_gender,
   p_pin           TEXT
 )
 RETURNS VOID AS $$

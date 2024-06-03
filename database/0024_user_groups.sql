@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS user_groups (
 SELECT create_distributed_table('user_groups', 'group_id');
 
 ALTER TABLE user_groups
-ADD CONSTRAINT user_groups_group_id_fkey
+ADD CONSTRAINT 
 FOREIGN KEY (group_id) REFERENCES groups(id);
 
 GRANT INSERT, SELECT, UPDATE ON user_groups TO app_user;

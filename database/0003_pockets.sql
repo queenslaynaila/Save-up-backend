@@ -38,25 +38,26 @@ CREATE TABLE IF NOT EXISTS default_pockets (
   FOREIGN KEY             (entity_id, pocket_id) REFERENCES pockets(entity_id, xid)
 );
 
-GRANT INSERT, SELECT ON pockets TO app_user;
+GRANT INSERT, SELECT ON default_pockets TO app_user;
 SELECT create_distributed_table('default_pockets', 'entity_id');
 
+-- Leave as a local table due to its rarity in being accessed and since access is only for admin users
 CREATE TABLE IF NOT EXISTS pocket_reminders ( 
-  entity_id               INT PRIMARY KEY, 
+  entity_id               INT NOT NULL, 
+  xid                     INT NOT NULL,
   pocket_id               INT NOT NULL,
   reason                  TEXT,
   created_at              TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  PRIMARY KEY             (entity_id, xid), 
   FOREIGN KEY             (entity_id, pocket_id) REFERENCES pockets(entity_id, xid)
 );
-
-SELECT create_distributed_table('pocket_reminders', 'entity_id');
-GRANT INSERT, SELECT, UPDATE ON pockets TO app_user;
+GRANT INSERT, SELECT pocket_reminders TO app_user;
 
 CREATE TABLE IF NOT EXISTS savings (
-  entity_id             INT NOT NULL, 
+  entity_id             INT NOT NULL, -- owner of the pocket, either a group or a standard user
   xid                   INT NOT NULL,
   pocket_id             INT NOT NULL,
-  user_id               INT NOT NULL, 
+  user_id               INT NOT NULL, -- the user depositing the cash, either a grp member or a standard user
   amount                NUMERIC(30, 2) NOT NULL CHECK (amount > 0),
   created_at            TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   PRIMARY KEY           (entity_id, xid),
@@ -69,8 +70,8 @@ GRANT INSERT, SELECT ON savings TO app_user;
 CREATE TABLE IF NOT EXISTS external_savings (
   entity_id             INT NOT NULL,-- owner of the pocket
   xid                   INT NOT NULL,
-  donor_id              INT NOT NULL, -- the donor
-  pocket_id             INT NOT NULL, --the pocket itself                                                                                                                                                                
+  pocket_id             INT NOT NULL, --the pocket itself      
+  donor_id              INT NOT NULL, -- the donor                                                                                                                                                         
   amount                NUMERIC(30, 2) NOT NULL,
   show_details          BOOLEAN NOT NULL DEFAULT TRUE,
   created_at            TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
