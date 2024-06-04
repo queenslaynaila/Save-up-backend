@@ -24,10 +24,6 @@ export default (router: Router) => {
       if ( savingIdentifier === 'me') {
         filterArgs.loggedInUserId = loggedInUserId.toString()
         filters.push(`user_id = :loggedInUserId`);
-      } else if ( savingIdentifier === 'all') {
-        if (isStandardUser) {
-          throw new HttpError(403, 'Forbidden');
-        }
       } else if (idSchema.parse(parseInt( savingIdentifier))) { 
         if (isStandardUser)  {
           throw new HttpError(403, 'Forbidden');

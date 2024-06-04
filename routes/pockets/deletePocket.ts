@@ -7,18 +7,19 @@ import { IdParamInterface, MessageInterface } from '../../globalTypes/index'
 const SQL_DELETE_POCKET = sql<DeletePocket, Record<string,never>>(`
   UPDATE pockets
   SET deleted_at = NOW()
-  WHERE xid = :pocket_id
-  AND entity_id = :entity_id
+  WHERE entity_id = :entity_id
+  AND xid = :pocket_id
+  AND deleted_at IS NULL
 `);
 
 export default (router: Router) => {
-  router.patch<IdParamInterface, MessageInterface, Record<string,never>, Record<string,never>>(
-    '/delete/:id', 
+  router.delete<IdParamInterface, MessageInterface, Record<string,never>, Record<string,never>>(
+    '/:id', 
     authMiddleware(), 
     async (req, res) => {
-      const pocket_id = parseInt(req.params.id);
-      const userId = req.user!.id;
-      await SQL_DELETE_POCKET({ pocket_id, entity_id: userId }).exec();
-      return res.json({ message: 'Pocket deleted successfully' });
+      const pocketId = parseInt(req.params.id);
+      const entity_id = req.body.entity_id ? req.body.entity_id : req.user!.id;
+      await SQL_DELETE_POCKET({ pocket_id: pocketId, entity_id}).exec();
+      res.sendStatus(204);
     });
 };

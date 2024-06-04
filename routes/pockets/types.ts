@@ -1,14 +1,36 @@
 import { z } from 'zod';
+//mport { entityTypeSchema } from '../groups/types';
 
 export const basePocketSchema = z.object({
   entity_id: z.number(),
   category_id: z.number(),
   name: z.string(),  
-  target_amount: z.number(),
   priority: z.enum(['High', 'Intermediate', 'Low']),
+  target_amount: z.number(),
   target_at: z.string(),
   pocket_type: z.enum(['Standard', 'Locked'])
 });
+
+export const pocketSchema =  basePocketSchema.extend({
+  xid: z.number(),
+  status:z.string(),
+  created_at : z.date(),
+  updated_at: z.date(),
+  completed_at: z.date()
+})
+  
+export type PocketInterface = z.infer<typeof pocketSchema>;
+
+export const updatePocketSchema = basePocketSchema.partial().extend({
+  xid: z.number()
+});
+
+export type UpdatePocketInterface = z.infer<typeof updatePocketSchema>;
+
+
+
+
+
 
 export const getPocketSchema = basePocketSchema.pick({
   entity_id:true
@@ -22,23 +44,10 @@ export const createPocketSchema = basePocketSchema.extend({
   
 export type CreatePocketInterface = z.infer<typeof basePocketSchema>;
   
-export const pocketSchema =  basePocketSchema.extend({
-  id: z.number(),
-  status:z.string(),
-  target_at: z.date(),
-  updated_at: z.date(),
-  completed_at: z.date(),
-  created_at : z.date(),
-  interest_rate: z.number().min(0).max(100)
-})
+
   
-export type PocketInterface = z.infer<typeof pocketSchema>;
-  
-export const updatePocketSchema = basePocketSchema.omit({ entity_id: true }).partial().extend({id: z.number()});
-  
-export const UpdatePocketRequestSchema = updatePocketSchema.omit({ id: true });
-  
-export type UpdatePocketInterface = z.infer<typeof updatePocketSchema>;
+
+
   
 export const pocketUpdateResSchema = z.object({
   name: z.string(),
@@ -66,10 +75,8 @@ export const pocketsByConditionsQuerySchema = z.object({
   category_id: z.string().optional(),
   priority: z.string().optional(),
   status: z.string().optional(),
-  created_at: z.string().optional(),
-  month:z.string().optional(),
-  year:z.string().optional(),
-  completed_at: z.string().optional(),
+  start_date: z.string().optional(),
+  end_date: z.string().optional()
 })
   
 export type PocketsConditionsQueryInterface = z.infer<typeof pocketsByConditionsQuerySchema>;

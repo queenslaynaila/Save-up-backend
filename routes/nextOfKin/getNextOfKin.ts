@@ -4,7 +4,7 @@ import authMiddleware from '../../middleware/authorization';
 import { NextOfKinInterface, GetNextOfKinInterface } from './types';
 
 const SQL_GET_KIN = sql<GetNextOfKinInterface, NextOfKinInterface>(`
-  SELECT xid, full_name, relationship, email, phone_number, created_at
+  SELECT xid, full_name, relationship, phone_number, created_at
   FROM next_of_kins 
   WHERE user_id = :user_id
   AND deleted_at is null

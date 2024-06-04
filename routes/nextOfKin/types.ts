@@ -4,7 +4,6 @@ export const createNextOfKinSchema = z.object({
   user_id:z.number(),
   full_name: z.string(),
   relationship: z.enum(['Parent', 'Spouse', 'Sibling', 'Child', 'Relative', 'Lawyer', 'Friend']),
-  email: z.string().email(),
   phone_number: z
     .string()
     .refine((value) => /^\+254\d{9}$/.test(value)),

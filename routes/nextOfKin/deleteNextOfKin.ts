@@ -9,17 +9,18 @@ const SQL_DELETE_KIN = sql<DeleteNextOfKinInterface, Record<string,never>>(`
   SET deleted_at = NOW()
   WHERE user_id = :user_id
   AND xid = :xid
+  AND deleted_at IS NULL
 `);
 
 export default (router: Router) => {   
-  router.patch<IdParamInterface, MessageInterface, Record<string,never>, Record<string,never>>(
-    '/record/:id', 
+  router.delete<IdParamInterface, MessageInterface, Record<string,never>, Record<string,never>>(
+    '/:id', 
     authMiddleware(), 
     async (req, res) => {
       const user_id = req.user!.id;
       const xid = parseInt(req.params.id);
       await SQL_DELETE_KIN({user_id, xid }).exec();
-      return res.json({ message: 'Kin deleted successfully' });
+      res.sendStatus(201);
     }
   );
 };

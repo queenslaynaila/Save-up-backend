@@ -2,23 +2,24 @@ import { Router } from 'express';
 import { sql } from '../../db';
 import { HttpError } from '../../middleware/errorMiddleware';
 import authMiddleware from '../../middleware/authorization';
-import { ExpenseInterface, ExpenseIdInterface, ExpenseByIdInterface } from './types';
+import { ExpenseInterface } from './types';
+import { IdParamInterface, XidEntityInterface } from '../../globalTypes/index'
 
-const SQL_GET_EXPENSE_BY_ID = sql<ExpenseByIdInterface,  ExpenseInterface>(`
-  SELECT entity_id, id, category_id, description, amount_spent, date_spent
+const SQL_GET_EXPENSE_BY_ID = sql<XidEntityInterface,  ExpenseInterface>(`
+  SELECT xid, entity_id, category_id, description, amount, spent_at, created_at
   FROM expenses 
-  WHERE xid = :xid AND entity_id = :entity_id
+  WHERE xid = :xid 
+  AND entity_id = :entity_id
 `);
 
 export default (router: Router) => {
-  router.get<ExpenseIdInterface, ExpenseInterface, Record<string,never>, Record<string,never>>(
-    '/records/:expenseId', 
+  router.get<IdParamInterface, ExpenseInterface, Record<string,never>, Record<string,never>>(
+    '/:id', 
     authMiddleware(), 
     async (req, res) => {
-      const expenseId = parseInt(req.params.expenseId); 
-      const entity_id = req.user!.id;
-      const query = SQL_GET_EXPENSE_BY_ID({ xid: expenseId, entity_id });
-      const result = await query.one(new HttpError(404, 'Not found'));
+      const entity_id = req.body.entity_id ? req.body.entity_id : req.user!.id;
+      const result = await SQL_GET_EXPENSE_BY_ID({ xid:parseInt(req.params.id), entity_id })
+        .one(new HttpError(404, 'Not found'));
       return res.json(result);
     });
 };

@@ -54,11 +54,13 @@ export type MessageInterface = z.infer<typeof messageSchema>;
 //ID SCHEMA
 
 export const idSchema = z.object({
-  id: z.number()
+  xid: z.number()
 });
 
 export type IdInterface = z.infer<typeof idSchema>;
 
+export const xidEntitySchema = idSchema.extend({
+  entity_id: z.number()
+});
 
-
-
+export type XidEntityInterface = z.infer<typeof xidEntitySchema>

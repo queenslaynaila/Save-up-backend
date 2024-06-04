@@ -17,9 +17,8 @@ export default (router: Router) => {
     validateRequest(securityAnswerRequestSchema),
     async (req, res) => {
       const user_id = req.user!.id;
-      const { question_id , answer } = req.body;
-      const hashedAnswer = await bcrypt.hash(answer, 12);
-      await SQL_CREATE_ANSWER({ user_id, question_id, answer: hashedAnswer }).exec();
-      res.json({ message: 'Security answer created successfully' });
+      const hashedAnswer = await bcrypt.hash(req.body.answer, 12);
+      await SQL_CREATE_ANSWER({  ...req.body, answer: hashedAnswer, user_id}).exec();
+      res.sendStatus(201);
     });
 };

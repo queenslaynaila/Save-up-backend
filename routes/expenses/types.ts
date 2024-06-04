@@ -5,52 +5,24 @@ export const baseExpenseSchema = z.object({
   category_id: z.number(),
   description: z.string(),
   amount: z.number(),
-  spent_at: z.string(),
+  spent_at: z.string()
 });
-  
-export const deleteExpenseSchema = baseExpenseSchema.pick({entity_id: true})
-  
-export type DeleteExpenseInterface = z.infer<typeof deleteExpenseSchema>;
-  
-export const createExpenseSchemaValidation = baseExpenseSchema.partial()
-  
-export type CreateExpenseInterface = z.infer<typeof baseExpenseSchema>;
-  
+
+export const createExpenseSchema = baseExpenseSchema.extend({
+  entity_id: z.number().optional()
+})
+
+export type CreateExpenseInterface = z.infer<typeof createExpenseSchema>;
+
+export const createExpenseSchemaValidation = createExpenseSchema.partial()
+
 export const expenseSchema = baseExpenseSchema.extend({
   xid: z.number(),
   created_at: z.date()
 })
   
 export type ExpenseInterface = z.infer<typeof expenseSchema>;
-  
-export const updateExpenseSchema = baseExpenseSchema.partial().extend({xid: z.number()});
-  
-export type UpdateExpenseInterface = z.infer<typeof updateExpenseSchema>;
-  
-export const validateUpdateExpenseSchema = updateExpenseSchema.omit({
-  entity_id:true,
-  xid:true
-})
-  
-export const expenseIdSchema = z.object({
-  expenseId: z.string(),
-});
-  
-export type ExpenseIdInterface = z.infer<typeof expenseIdSchema>;
-  
-export const expenseByIdSchema = z.object({
-  xid: z.number(),
-  entity_id: z.number(),
-});
-  
-export type ExpenseByIdInterface = z.infer<typeof expenseByIdSchema>;
-  
-export const expenseIdentifierSchema = z.object({
-  expenseIdentifier: z.string(),
-});
-  
-export type ExpenseIdentifierInterface = z.infer<typeof expenseIdentifierSchema>;
-  
+
 export const expenseQuerySchema = z.object({
   category_id: z.string().optional(),
   start_date: z.string().optional(),
@@ -58,3 +30,13 @@ export const expenseQuerySchema = z.object({
 });
   
 export type ExpenseQueryInterface = z.infer<typeof expenseQuerySchema>;
+
+export const updateExpenseSchema = baseExpenseSchema.partial().extend({
+  xid: z.number()
+});
+  
+export type UpdateExpenseInterface = z.infer<typeof updateExpenseSchema>;
+
+export const validateUpdateExpenseSchema = updateExpenseSchema.omit({
+  xid:true
+})

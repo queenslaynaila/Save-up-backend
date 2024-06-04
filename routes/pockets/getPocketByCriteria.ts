@@ -23,7 +23,7 @@ export default (router: Router) => {
     async (req, res: Response) => {
       const { pockets_identifier } = req.params;
       const entity_id = req.body.entity_id ? req.body.entity_id : req.user!.id;
-      const { category_id, priority, status, created_at, month, year, completed_at  } = req.query;
+      const { category_id, priority, status, start_date, end_date  } = req.query;
 
       const filters: string[] = [];
       const filterArgs: Record<string, string> = {};
@@ -52,41 +52,29 @@ export default (router: Router) => {
         filterArgs.user_id = pockets_identifier;
         filters.push(`entity_id = :user_id`);
       }
-      else if (pockets_identifier === 'all') {
-        if (isStandardUser) {
-          throw new HttpError(403, 'Forbidden');
-        }
-      }
       else {
         throw new HttpError(400, 'Bad request');
       }
 
       if (category_id) {
-        console.log('category_id', category_id)
         filterArgs.category_id = category_id;
         filters.push(`category_id = :category_id`);
       }
 
-      if (created_at) {
-        filterArgs.created_at = created_at;
-        filters.push(`DATE(p.created_at) = :created_at`);
+      if (start_date ) {
+        filterArgs.start_date = start_date;
+        filters.push(`DATE(p.created_at) > :start_date`);
+      }
+      if ( end_date) {
+        filterArgs.end_date = end_date;
+        filters.push(`DATE(p.created_at) <= :end_date`);
+      }
+      if (start_date && end_date) {
+        filterArgs.start_date = start_date;
+        filterArgs.end_date = end_date;
+        filters.push(`DATE(p.created_at) BETWEEN :start_date AND :end_date`);
       }
 
-      if (month) {
-        filterArgs.month = month;
-        filters.push(`EXTRACT(MONTH FROM p.created_at) = :month`);
-      }
-
-      if (completed_at) {
-        filterArgs.completed_at = completed_at;
-        filters.push(`DATE(completed_at) = :completed_at`);
-      }
-
-      if (year) {
-        filterArgs.year = year;
-        filters.push(`EXTRACT(YEAR FROM p.created_at) = :year`);
-      }
-       
       if (convertedPriority && isValidValue(convertedPriority, ACCEPTED_PRIORITY_VALUES)) {
         filterArgs.priority = convertedPriority;
         filters.push(`priority = :priority`);

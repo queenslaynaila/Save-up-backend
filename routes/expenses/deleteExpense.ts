@@ -1,24 +1,23 @@
 import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import { DeleteExpenseInterface } from './types'
-import { IdParamInterface, MessageInterface } from '../../globalTypes/index'
+import { IdParamInterface, XidEntityInterface, MessageInterface } from '../../globalTypes/index'
 
-const SQL_DELETE_EXPENSE = sql<{ id: number; entity_id: number }, Record<string,never>>(`
+const SQL_DELETE_EXPENSE = sql<XidEntityInterface, Record<string,never>>(`
   UPDATE expenses
   SET deleted_at = NOW()
-  WHERE id = :id
+  WHERE xid = :xid
   AND entity_id = :entity_id
+  AND deleted_at IS NULL
 `);
 
 export default (router: Router) => {
-  router.patch<IdParamInterface, MessageInterface , DeleteExpenseInterface, Record<string,never>>(
-    '/records/:id', 
+  router.delete<IdParamInterface, MessageInterface , XidEntityInterface, Record<string,never>>(
+    '/:id', 
     authMiddleware(), 
     async (req, res) => {
-      const expenseId = parseInt(req.params.id);
-      const entity_id = req.body.entity_id;
-      await SQL_DELETE_EXPENSE({ id: expenseId, entity_id}).exec();
-      return res.json({ message: 'Expense(s) deleted successfully' });
+      const entity_id = req.body.entity_id ? req.body.entity_id : req.user!.id;
+      await SQL_DELETE_EXPENSE({ xid: parseInt(req.params.id), entity_id}).exec();
+      res.sendStatus(201);
     });
 };

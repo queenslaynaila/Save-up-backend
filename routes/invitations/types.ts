@@ -5,14 +5,29 @@ export const sendInviteSchema = z.object({
   group_id:z.number(),
   phone_number:z.string()
 });
+
+export type SendInviteInterface = z.infer<typeof sendInviteSchema>;
+
   
 export const getInviteSchema = sendInviteSchema.extend({
   created_at:z.date(),
 })
   
 export type InviteInterface = z.infer<typeof getInviteSchema>;
-  
-export type SendInviteInterface = z.infer<typeof sendInviteSchema>;
+
+export const receivedInviteSchema = sendInviteSchema
+  .omit({
+    phone_number: true
+  })
+  .extend({
+    group_name:z.string(),
+    sender_name:z.string(),
+    created_at:z.date(),
+  })
+
+export type ReceivedInviteInterface = z.infer<typeof receivedInviteSchema>;
+
+
   
 export const inviteSchema = z.object({
   group_id:z.number(),
@@ -31,17 +46,6 @@ export const inviteRequestSchema = inviteResponseSchema.omit({sender_id: true, r
   
 export type InviteRequestInterface = z.infer<typeof inviteRequestSchema>;
 
-export const idParamSchema = z.object({
-  group_id: z.string()
-})
-
-export type GroupIdParamInterface = z.infer<typeof idParamSchema>;
-
-export const getUserByPhoneSchema = z.object({
-  phone_number: z.string()
-})
-
-export type GetUserByPhoneInterface = z.infer<typeof getUserByPhoneSchema>
 
 export const findPendingInviteSchema = sendInviteSchema.pick({
   group_id: true,

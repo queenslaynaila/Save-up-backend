@@ -4,33 +4,30 @@ import { HttpError } from '../../middleware/errorMiddleware';
 import authMiddleware from '../../middleware/authorization';
 import { validateRequest } from '../../middleware/validationMiddleware';
 import { UpdateExpenseInterface, ExpenseInterface, validateUpdateExpenseSchema } from './types';
+import { IdParamInterface } from '../../globalTypes/index'
 
 const SQL_UPDATE_EXPENSE= sql<UpdateExpenseInterface,ExpenseInterface>(`
   UPDATE expenses
   SET description = COALESCE(:description, expenses.description),
       category_id = COALESCE(:category_id, expenses.category_id),
-      amount_spent = COALESCE(:amount_spent, expenses.amount_spent),
-      date_spent = COALESCE(:date_spent , expenses.date_spent )
-  WHERE entity_id = :entity_id AND id = :id
-  RETURNING entity_id,id,category_id,description,amount_spent,date_spent
+      amount = COALESCE(:amount_spent, expenses.amount_spent),
+      spent_at = COALESCE(:date_spent , expenses.date_spent )
+  WHERE entity_id = :entity_id 
+  AND xid = xid
+  AND deleted_at IS NULL
+  RETURNING category_id, description, amount, spent_at
 `);
 
 export default (router: Router) => {
-  router.patch<{ id: string },ExpenseInterface, UpdateExpenseInterface, Record<string,never>>(
+  router.patch<IdParamInterface, ExpenseInterface, UpdateExpenseInterface, Record<string,never>>(
     '/:id', 
     authMiddleware(), 
     validateRequest(validateUpdateExpenseSchema),
     async (req, res) => {
-      const userId = req.user!.id;
-      const expenseId = parseInt(req.params.id);
-      const { description, category_id, amount, spent_at} = req.body;
+      const entity_id = req.body.entity_id ? req.body.entity_id : req.user!.id;
+      const xid = parseInt(req.params.id);
       const result = await SQL_UPDATE_EXPENSE({
-        entity_id: userId,
-        xid: expenseId,
-        description,
-        category_id,
-        amount,
-        spent_at
+        ...req.body, entity_id, xid
       }).one(new HttpError(404, 'Not found'));
       res.json(result);
     });

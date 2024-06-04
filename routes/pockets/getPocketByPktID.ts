@@ -3,25 +3,35 @@ import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { PocketInterface } from './types';
-import { IdParamInterface, IdInterface } from '../../globalTypes/index';
+import { IdParamInterface, XidEntityInterface } from '../../globalTypes/index';
 
-const SQL_GET_POCKET_BY_ID = sql<IdInterface, PocketInterface>(`
-  SELECT p.xid, p.name, c.name AS category_name, p.target_amount, p.priority, 
-        p.pocket_type, p.target_at
-  FROM pockets p
-  LEFT JOIN categories c ON p.category_id = c.id       
-  WHERE p.xid = :id  
-  AND p.deleted_at IS NULL;
+const SQL_GET_POCKET_BY_ID = sql<XidEntityInterface, PocketInterface>(`
+  SELECT entity_id, 
+         xid, 
+         category_id, 
+         name, 
+         priority, 
+         status, 
+         pocket_type, 
+         target_amount,  
+         target_at, 
+         created_at, 
+         updated_at, 
+         completed_at
+  FROM pockets  
+  WHERE  entity_id = :entity_id
+  AND xid = :xid
+  AND deleted_at IS NULL
 `);
 
 export default (router: Router) => {
   router.get<IdParamInterface, PocketInterface, Record<string,never>, Record<string,never>>(
-    '/records/:id', 
+    '/:id', 
     authMiddleware(), 
     async (req, res) => {
-      const pocketId = (parseInt(req.params.id));
-      const query = SQL_GET_POCKET_BY_ID({ id: pocketId });
-      const pocket = await query.one(new HttpError(404, 'Not found'));
+      const entity_id = req.body.entity_id ? req.body.entity_id : req.user!.id;
+      const pocket = await SQL_GET_POCKET_BY_ID({ xid:parseInt(req.params.id), entity_id })
+        .one(new HttpError(404, 'Not found'));
       return res.json(pocket);
     });
 };

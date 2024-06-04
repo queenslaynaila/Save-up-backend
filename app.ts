@@ -6,23 +6,23 @@ import { HttpError } from './middleware/errorMiddleware';
 import swaggerUI from "swagger-ui-express";
 import swaggerJsDoc from "swagger-jsdoc";
 import usersRoutes from './routes/users/index';
-import nextOfKinRoutes from './routes/nextOfKin/index';
-import categoriesRoutes from './routes/categories/index';
-import pocketRoutes from './routes/pockets/index';
-import expensesRoutes from './routes/expenses/index';
-import savingRoutes from './routes/savings/index';
-import AdminRoutes from './routes/admin/index';
-import passwordRoutes from './routes/pin/index';
-import securityQuestionsRoutes from './routes/securityQuestions';
-import securityAnswerRoutes from './routes/securityAnswer/index';
-import cumulativesRoutes from './routes/cumulatives/index';
-import groupRoutes from './routes/groups/index';
-import groupAdminRoutes from './routes/groupAdministrators/index'
-import inviteRoutes from './routes/invitations/index';
-import withdrawalRoutes from './routes/withdrawals/index';
-import transferRoutes from './routes/transfers/index';
-import transactionRoutes from './routes/transactions/index';
-import createExSaving from './routes/externalSaving/index';
+// import nextOfKinRoutes from './routes/nextOfKin/index';
+// import categoriesRoutes from './routes/categories/index';
+// import pocketRoutes from './routes/pockets/index';
+// import expensesRoutes from './routes/expenses/index';
+// import savingRoutes from './routes/savings/index';
+// import AdminRoutes from './routes/admin/index';
+// import passwordRoutes from './routes/pin/index';
+// import securityQuestionsRoutes from './routes/securityQuestions';
+// import securityAnswerRoutes from './routes/securityAnswer/index';
+// import cumulativesRoutes from './routes/cumulatives/index';
+// import groupRoutes from './routes/groups/index';
+// import groupAdminRoutes from './routes/groupAdministrators/index'
+// import inviteRoutes from './routes/invitations/index';
+// import withdrawalRoutes from './routes/withdrawals/index';
+// import transferRoutes from './routes/transfers/index';
+// import transactionRoutes from './routes/transactions/index';
+// import createExSaving from './routes/externalSaving/index';
 import cron from 'node-cron';
 import remindStaleGoals from './cronJobs/overdueGoalsReminder'
 import creditInterest from './cronJobs/creditInterest';
@@ -89,23 +89,23 @@ app.use(
 
 // Routes
 usersRoutes(app);
-nextOfKinRoutes(app);
-pocketRoutes(app);
-expensesRoutes(app);
-savingRoutes(app);
-passwordRoutes(app);
-categoriesRoutes(app);
-AdminRoutes(app);
-securityQuestionsRoutes(app);
-securityAnswerRoutes(app);
-cumulativesRoutes(app);
-groupRoutes(app);
-inviteRoutes(app);
-groupAdminRoutes(app);
-withdrawalRoutes(app);
-transferRoutes(app)
-transactionRoutes(app)
-createExSaving(app)
+// nextOfKinRoutes(app);
+// pocketRoutes(app);
+// expensesRoutes(app);
+// savingRoutes(app);
+// passwordRoutes(app);
+// categoriesRoutes(app);
+// AdminRoutes(app);
+// securityQuestionsRoutes(app);
+// securityAnswerRoutes(app);
+// cumulativesRoutes(app);
+// groupRoutes(app);
+// inviteRoutes(app);
+// groupAdminRoutes(app);
+// withdrawalRoutes(app);
+// transferRoutes(app)
+// transactionRoutes(app)
+//createExSaving(app)
 
 // 404 handler
 app.use(() => {

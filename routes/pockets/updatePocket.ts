@@ -2,39 +2,40 @@ import { Router } from 'express';
 import authMiddleware from '../../middleware/authorization';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { sql } from '../../db';
-import { UpdatePocketInterface,  PocketUpdateRes, UpdatePocketRequestSchema } from './types';
+import { UpdatePocketInterface,  PocketUpdateRes, basePocketSchema} from './types';
 import { IdParamInterface } from '../../globalTypes/index';
 import { validateRequest } from '../../middleware/validationMiddleware';
 
 const SQL_UPDATE_POCKET = sql<UpdatePocketInterface, PocketUpdateRes>(`
-  UPDATE pockets p
-  SET name = COALESCE(:name, p.name),
-      category_id = COALESCE(:category_id, p.category_id),
-      target_amount = COALESCE(:target_amount, p.target_amount),
-      priority = COALESCE(:priority, p.priority),
-      target_at = COALESCE(:target_at, p.target_at)
-  FROM categories c
-  WHERE p.category_id = c.id AND p.xid = :id
-  RETURNING p.name, c.name AS category_name, p.target_amount, p.priority, p.target_at;
+  UPDATE pockets
+  SET name = COALESCE(:name, name),
+      category_id = COALESCE(:category_id, category_id),
+      target_amount = COALESCE(:target_amount, target_amount),
+      priority = COALESCE(:priority, priority),
+      pocket_type = COALESCE(:pocket_type, pocket_type),
+      target_at = COALESCE(:target_at, target_at)
+  WHERE entity_id = :entity_id
+  AND xid = :xid
+  RETURNING name, 
+            category_id, 
+            (SELECT name FROM categories WHERE id = pockets.category_id) AS category_name,
+            target_amount, 
+            priority, 
+            pocket_type, 
+            target_at
 `);
 
 export default (router: Router) => {
   router.patch<IdParamInterface, PocketUpdateRes, UpdatePocketInterface, Record<string,never>>(
     '/:id', 
     authMiddleware(), 
-    validateRequest(UpdatePocketRequestSchema),
+    validateRequest(basePocketSchema),
     async (req, res) => {
-      const pocketId = parseInt(req.params.id);
-      const { name, category_id, target_amount, priority, target_at } = req.body;
+      const xid = parseInt(req.params.id);
+      const entity_id = req.body.entity_id ? req.body.entity_id : req.user!.id;
       const goal = await SQL_UPDATE_POCKET({
-        id: pocketId,
-        name,
-        category_id,
-        target_amount,
-        priority,
-        target_at,
-      })
-        .one(new HttpError(404, 'Not found'));
+        ...req.body, xid, entity_id
+      }).one(new HttpError(404, 'Not found'));
       return res.json(goal);
     });
 };

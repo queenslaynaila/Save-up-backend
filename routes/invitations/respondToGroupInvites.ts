@@ -26,7 +26,7 @@ export default (router: Router) => {
         throw new HttpError(400, 'Invalid response type');
       }
       await SQL_RESPOND_TO_INVITE({group_id, receiver_id, status:formattedStatus}).exec();
-      return res.json({ message: 'Invite response processed successfully' });
+      res.sendStatus(201);
     }
   );
 };

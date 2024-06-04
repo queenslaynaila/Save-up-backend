@@ -3,22 +3,24 @@ import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { SavingInterface } from './types';
-import { IdParamInterface } from '../../globalTypes/index';
+import { IdParamInterface,  XidEntityInterface } from '../../globalTypes/index';
 
-const  SQL_GET_DEPOSIT_BY_ID = sql<{ id: number; user_id:number}, SavingInterface>(`
-  SELECT * FROM savings WHERE id = :id AND user_id = :user_id
+const  SQL_GET_DEPOSIT_BY_ID = sql<XidEntityInterface, SavingInterface>(`
+  SELECT * FROM savings 
+  WHERE xid = :id 
+  AND entity_id = :user_id
 `);
 
 export default (router: Router) => {
   router.get<IdParamInterface, SavingInterface, Record<string,never>, Record<string,never>>(
-    '/records/:id', 
+    '/:id', 
     authMiddleware(), 
     async (req, res) => {
-      const contributionsId = parseInt(req.params.id);
-      const user_id= req.user!.id
-      const result = await SQL_GET_DEPOSIT_BY_ID({ id: contributionsId,user_id })
+      const entity_id = req.body.entity_id ? req.body.entity_id : req.user!.id;
+      const result = await SQL_GET_DEPOSIT_BY_ID({ 
+        xid:parseInt(req.params.id), 
+        entity_id })
         .one(new HttpError(404, 'Not found'));
       return res.json(result);
     });
 };
- 

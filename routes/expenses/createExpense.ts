@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import  { validateRequest } from '../../middleware/validationMiddleware';
-import { CreateExpenseInterface, ExpenseInterface, createExpenseSchemaValidation   } from './types';
+import { CreateExpenseInterface, ExpenseInterface, createExpenseSchemaValidation } from './types';
 
 const SQL_CREATE_EXPENSES = sql<CreateExpenseInterface, ExpenseInterface>(`
   INSERT INTO expenses (entity_id, xid, category_id, description, amount, spent_at)
@@ -24,14 +24,9 @@ export default (router: Router) => {
     authMiddleware(), 
     validateRequest(createExpenseSchemaValidation),
     async (req, res) => {
-      const { description, category_id, amount, spent_at } = req.body;
       const entity_id = req.body.entity_id ? req.body.entity_id : req.user!.id;
       const expense = await SQL_CREATE_EXPENSES({
-        entity_id,
-        category_id,
-        description,     
-        amount,
-        spent_at
+        ...req.body, entity_id
       }).one()
       return res.json(expense);
     });

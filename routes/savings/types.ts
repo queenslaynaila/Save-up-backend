@@ -1,21 +1,19 @@
 import { z } from 'zod';
 
 export const baseSavingSchema = z.object({
-  user_id: z.number(),
+  entity_id: z.number(),
   pocket_id: z.number(),
-  amount: z.number(),
-  donor_name: z.string().optional(),
-  donor_email: z.string().email().optional(),
-  donor_phone_number:  z.string().refine((value) => /^\+254\d{9}$/.test(value)).optional(),
+  user_id: z.number(),
+  amount: z.number()
 });
 
-export const createSavingSchema = baseSavingSchema.extend({
-  entity_id:z.number()
-})
+export type CreateSavingInterface = z.infer<typeof baseSavingSchema>;
   
-export type CreateSavingInterface = z.infer<typeof createSavingSchema>;
-  
-export const validateSavingCreationSchema = baseSavingSchema.omit({ user_id: true })
+export const validateSavingCreationSchema = baseSavingSchema
+  .omit({ user_id: true })
+  .extend({
+    entity_id: z.number().optional(),
+  })
   
 export const savingSchema = baseSavingSchema.extend({
   id: z.number(),
