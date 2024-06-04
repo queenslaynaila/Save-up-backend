@@ -4,8 +4,13 @@ import authMiddleware from '../../middleware/authorization';
 import { ReceivedInviteInterface } from './types';
 
 const SQL_FIND_INVITATIONS_FOR_USER = sql<{ receiver_id: number }, ReceivedInviteInterface>(`
-  SELECT * FROM invitations
-  WHERE receiver_id = :receiver_id
+  SELECT invitations.group_id, 
+         invitations.sender_id,
+         (SELECT full_name FROM users WHERE id = invitations.sender_id) AS sender_name,
+         (SELECT name FROM groups WHERE id = invitations.group_id) AS group_name,
+         invitations.created_at
+  FROM invitations
+  WHERE invitations.receiver_id = :receiver_id;
 `);
 
 export default (router: Router) => {

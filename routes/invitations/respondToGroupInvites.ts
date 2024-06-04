@@ -14,20 +14,20 @@ const SQL_RESPOND_TO_INVITE = sql<InviteResponseInterface, MessageInterface>(`
 const VALID_RESOURCES = ['Pending', 'Accepted', 'Rejected'];
 
 export default (router: Router) => {
-  router.patch<Record<string,never>, MessageInterface, InviteRequestInterface, Record<string,never>, Record<string,never>>(
-    '/update-invite',
+  router.patch<{ id:string }, MessageInterface, InviteRequestInterface, Record<string,never>, Record<string,never>>(
+    '/:id',
     authMiddleware(),
     validateRequest( inviteRequestSchema),
     async (req, res) => {
+      const group_id  = parseInt(req.params.id);
       const  receiver_id = req.user!.id
-      const { group_id, status } = req.body;
-      const formattedStatus = status ? convertToTitleCase(status) : '';
+      const { status } = req.body;
+      const formattedStatus = convertToTitleCase(status) 
       if (!VALID_RESOURCES.includes(formattedStatus)) {
         throw new HttpError(400, 'Invalid response type');
       }
-      await SQL_RESPOND_TO_INVITE({group_id, receiver_id, status:formattedStatus}).exec();
+      await SQL_RESPOND_TO_INVITE({ group_id, receiver_id, status:formattedStatus }).exec();
       res.sendStatus(201);
     }
   );
 };
-  
