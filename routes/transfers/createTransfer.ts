@@ -6,16 +6,13 @@ import { TransferInputInterface, transferSchema } from './types'
 import { StatusCodeInterface } from '../../globalTypes/index'
 
 const SQL_CREATE_TRANSFER = sql<TransferInputInterface, Record<string,never>>(`
-  INSERT INTO transfers (entity_id, xid, user_id, source_pocket_id, destination_pocket_id, amount)
-  SELECT 
-      :entity_id,
-      COALESCE(MAX(id), 0) + 1,
-      :user_id,
-      :source_pocket_id,
-      :destination_pocket_id,
-      :amount
-  FROM transfers
-  WHERE entity_id = :entity_id;
+  SELECT create_transfer(
+    :source_pocket_id, 
+    :destination_pocket_id, 
+    :user_id, 
+    :amount, 
+    :entity_id
+  )
 `);
 
 export default (router: Router) => {
