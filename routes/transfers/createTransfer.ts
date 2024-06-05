@@ -2,7 +2,11 @@ import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { validateRequest } from '../../middleware/validationMiddleware';
-import { TransferInputInterface, TransferDepositResInterface, TransferDepositBodyInterface, transferDepositBody  } from './types'
+import { TransferInputInterface, 
+  TransferDepositResInterface, 
+  TransferDepositBodyInterface, 
+  transferDepositBody  
+} from './types'
 import { StatusCodeInterface } from '../../globalTypes/index'
 
 const SQL_CREATE_TRANSFER = sql<TransferInputInterface, TransferDepositResInterface>(`
