@@ -7,6 +7,7 @@ import { idSchema } from '../../globalTypes/index';
  
 const SQL_GET_SAVINGS = sql<Record<string,never>, SavingInterface>(`
   SELECT * FROM savings
+  WHERE entity_id = :entity_id
 `);
 
 export default (router: Router) => {
@@ -38,11 +39,7 @@ export default (router: Router) => {
         filterArgs.pocket_id = pocket_id.toString();
         filters.push(`pocket_id = :pocket_id`);
       }
-      if (category_id) {
-        filterArgs.category_id = category_id.toString()
-        filters.push(`id IN (SELECT id FROM pockets WHERE category_id = :category_id)`);
-      }
-
+     
       const query = SQL_GET_SAVINGS({});
       if (filters.length > 0) query.extend(`WHERE ${filters.join(' AND ')}`, filterArgs);
       query.extend('LIMIT 15', {});

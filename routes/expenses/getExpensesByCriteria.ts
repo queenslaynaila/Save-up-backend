@@ -26,14 +26,16 @@ export default (router: Router) => {
       if (expenseIdentifier === 'me') { // expense for logged in user or requestd grp
         filterArgs.loggedInUserId = entity_id
         filters.push(`entity_id = :loggedInUserId`);
-      } else if (!isStandardUser(req.user!.role)) {
+      } 
+      else if (!isStandardUser(req.user!.role)) {
         if  (idSchema.parse(parseInt(expenseIdentifier))) {  //by entity id
           filterArgs.user_id = expenseIdentifier;
           filters.push(`entity_id = :user_id`);
         } else {
           throw new HttpError(400, 'Bad request');
         }
-      } else {
+      } 
+      else {
         throw new HttpError(403, 'Forbidden');
       }
 
@@ -48,11 +50,11 @@ export default (router: Router) => {
       } else {
         if (start_date) {
           filterArgs.start_date = start_date;
-          filters.push(`created_at >= :from_date`);
+          filters.push(`created_at >= :start_date`);
         }
         if (end_date) {
           filterArgs.end_date = end_date;
-          filters.push(`created_at <= :to_date`);
+          filters.push(`created_at <= :end_date`);
         }
       }
 

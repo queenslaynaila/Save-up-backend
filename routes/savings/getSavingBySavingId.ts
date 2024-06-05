@@ -6,7 +6,8 @@ import { SavingInterface } from './types';
 import { IdParamInterface,  XidEntityInterface } from '../../globalTypes/index';
 
 const  SQL_GET_DEPOSIT_BY_ID = sql<XidEntityInterface, SavingInterface>(`
-  SELECT * FROM savings 
+  SELECT pocket_id, amount 
+  FROM savings 
   WHERE xid = :id 
   AND entity_id = :user_id
 `);
@@ -16,7 +17,7 @@ export default (router: Router) => {
     '/:id', 
     authMiddleware(), 
     async (req, res) => {
-      const entity_id = req.body.entity_id ? req.body.entity_id : req.user!.id;
+      const entity_id = req.body.entity_id ?? req.user!.id;
       const result = await SQL_GET_DEPOSIT_BY_ID({ 
         xid:parseInt(req.params.id), 
         entity_id })

@@ -3,14 +3,14 @@ import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { validateRequest } from '../../middleware/validationMiddleware';
 import { CreateSavingInterface, validateSavingCreationSchema } from './types';
-import { MessageInterface } from '../../globalTypes/index';
+import { StatusCodeInterface } from '../../globalTypes/index';
 
 const SQL_CREATE_SAVING = sql<CreateSavingInterface, Record<string,never>>(`
   SELECT create_saving(:entity_id, :user_id, :pocket_id, :amount, )
 `);
 
 export default (router: Router) => {
-  router.post<Record<string,never>, MessageInterface, CreateSavingInterface, Record<string,never>, Record<string,never>>(
+  router.post<Record<string,never>, StatusCodeInterface, CreateSavingInterface, Record<string,never>, Record<string,never>>(
     '/', 
     authMiddleware(), 
     validateRequest(validateSavingCreationSchema),
