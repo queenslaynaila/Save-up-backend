@@ -10,7 +10,7 @@ const SQL_GET_CUMULATIVES = (query: string) =>sql<{ operator: string; resource: 
 
 export default (router: Router) => {
   router.get<StatsParamInterface, FinancialStatsInterface, Record<string,never>, StatsQueryInterface>(
-    '/financial-stats/:resource/:operator',
+    '/:resource/:operator',
     authMiddleware({ roles: [UserRole.ADMIN] }),
     async (req, res) => {
       req.params.resource = req.params.resource.toLowerCase();
