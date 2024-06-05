@@ -1,11 +1,11 @@
 import { z } from 'zod';
 
 export const externalSavingSchema = z.object({
-  pocket_id: z.number().int(),
+  entity_id: z.number(),
+  pocket_id: z.number(),
+  donor_id: z.number(),
   amount: z.number(), 
-  show_donor_details:z.boolean(),
-  full_name: z.string(),
-  phone_number:z.string()
+  show_details:z.boolean()
 })
 
 export type ExternalSavingInterface = z.infer<typeof externalSavingSchema>
