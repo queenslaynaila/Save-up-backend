@@ -5,20 +5,19 @@ import { CreateGroupResponseInterface } from './types';
 import { GetByUserInterface } from '../../globalTypes/index'
 
 const SQL_FETCH_USER_GROUPS = sql<GetByUserInterface, CreateGroupResponseInterface>(`
-  SELECT g.id, g.group_name, g.description, g.created_by, g.created_at
-  FROM groups g
-  INNER JOIN user_groups ug ON g.id = ug.group_id
-  WHERE ug.user_id = :user_id
-  AND ug.left_at IS NULL
+  SELECT groups.id, groups.name, groups.created_by, groups.created_at
+  FROM groups 
+  LEFT JOIN user_groups ON groups.id = user_groups.group_id
+  WHERE user_groups.user_id = :user_id
+  AND user_groups.left_at IS NULL;
 `);
 
 export default (router: Router) => {
   router.get<Record<string,never>, CreateGroupResponseInterface[], GetByUserInterface, Record<string,never>>(
-    '/my-groups',
+    '/me/:userId/',
     authMiddleware(),
     async (req, res) => {
-      const userId = req.user!.id;
-      const groups = await SQL_FETCH_USER_GROUPS({ user_id: userId }).many();
+      const groups = await SQL_FETCH_USER_GROUPS({ user_id: req.user!.id}).many();
       return res.json(groups);
     }
   );

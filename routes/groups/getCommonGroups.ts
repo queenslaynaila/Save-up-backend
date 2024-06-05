@@ -5,17 +5,21 @@ import { IdParamInterface } from '../../globalTypes/index';
 import { CommonGroupInterface, SharedGroupInterface  } from './types';
 
 const SQL_GET_COMMON_GROUPS = sql<SharedGroupInterface, CommonGroupInterface>(`
-  SELECT g.id AS group_id, g.group_name, g.description, g.created_at
-  FROM groups g
-  INNER JOIN user_groups ug1 ON g.id = ug1.group_id  
-  INNER JOIN user_groups ug2 ON g.id = ug2.group_id  
-  WHERE ug1.user_id = :logged_in_user_id AND ug2.user_id = :user_id
-  AND ug1.left_at IS NULL AND ug2.left_at IS NULL;
+  SELECT groups.id AS group_id, 
+         groups.name, 
+         groups.created_at
+  FROM groups
+  LEFT JOIN user_groups AS ug1 ON groups.id = ug1.group_id  
+  LEFT JOIN user_groups AS ug2 ON groups.id = ug2.group_id  
+  WHERE ug1.user_id = :logged_in_user_id 
+  AND ug2.user_id = :user_id
+  AND ug1.left_at IS NULL 
+  AND ug2.left_at IS NULL;
 `);
 
 export default (router: Router) => {
   router.get<IdParamInterface, CommonGroupInterface[],Record<string,never>, Record<string,never>>(
-    '/common-groups/:id',
+    '/:id/common-groups',
     authMiddleware(),
     async (req, res) => {
       const logged_in_user_id = req.user!.id;
