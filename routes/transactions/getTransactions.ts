@@ -48,15 +48,7 @@ export default (router: Router) => {
           filters.push(`transaction_date <= :to_date`);
         }
       }
-      if (from_date) {
-        filterArgs.from_date = from_date;
-        filters.push(`transaction_date >= :from_date`);
-      }
-      if (to_date) {
-        filterArgs.to_date = to_date;
-        filters.push(`transaction_date <= :to_date`);
-      }
-
+      
       const query = SQL_GET_TRANSACTIONS({ pocket_id:req.params.id, entity_id });
       if (filters.length > 0) query.extend(`AND ${filters.join(' AND ')}`, filterArgs);
       query.extend('LIMIT 15', {});

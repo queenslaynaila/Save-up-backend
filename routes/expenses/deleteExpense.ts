@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import { IdParamInterface, XidEntityInterface, MessageInterface } from '../../globalTypes/index'
+import { IdParamInterface, XidEntityInterface, StatusCodeInterface } from '../../globalTypes/index'
 
 const SQL_DELETE_EXPENSE = sql<XidEntityInterface, Record<string,never>>(`
   UPDATE expenses
@@ -12,12 +12,12 @@ const SQL_DELETE_EXPENSE = sql<XidEntityInterface, Record<string,never>>(`
 `);
 
 export default (router: Router) => {
-  router.delete<IdParamInterface, MessageInterface , XidEntityInterface, Record<string,never>>(
+  router.delete<IdParamInterface, StatusCodeInterface , XidEntityInterface, Record<string,never>>(
     '/:id', 
     authMiddleware(), 
     async (req, res) => {
       const entity_id = req.body.entity_id ? req.body.entity_id : req.user!.id;
       await SQL_DELETE_EXPENSE({ xid: parseInt(req.params.id), entity_id}).exec();
-      res.sendStatus(201);
+      res.sendStatus(204);
     });
 };
