@@ -1,14 +1,14 @@
 import express from 'express';
-import sendGroupInvite from './sendGroupInvite';
-import getUserInvites from './getUserInvites';
-import respondToGroupInvite from './respondToGroupInvites';
+import sendInvite from './sendInvite';
+import getInvites from './getInvites';
+import updateInvites from './updateInvites';
 
 export default (baseRouter: express.Router) => {
   const router = express.Router();
 
-  sendGroupInvite(router);
-  getUserInvites(router);
-  respondToGroupInvite(router);
+  sendInvite(router);
+  getInvites(router);
+  updateInvites(router);
   
   baseRouter.use('/invitations', router);
 };

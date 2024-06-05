@@ -7,8 +7,7 @@ export const sendInviteSchema = z.object({
 });
 
 export type SendInviteInterface = z.infer<typeof sendInviteSchema>;
-
-  
+ 
 export const getInviteSchema = sendInviteSchema.extend({
   created_at:z.date(),
 })
@@ -27,8 +26,6 @@ export const receivedInviteSchema = sendInviteSchema
 
 export type ReceivedInviteInterface = z.infer<typeof receivedInviteSchema>;
 
-
-  
 export const inviteSchema = z.object({
   group_id:z.number(),
   sender_id:z.number(),
@@ -39,13 +36,11 @@ export const inviteResponseSchema = inviteSchema.extend({
   status:z.string()
 }).omit({sender_id: true});
   
-  
 export type InviteResponseInterface = z.infer<typeof inviteResponseSchema>;
   
 export const inviteRequestSchema = inviteResponseSchema.omit({sender_id: true, receiver_id: true});
   
 export type InviteRequestInterface = z.infer<typeof inviteRequestSchema>;
-
 
 export const findPendingInviteSchema = sendInviteSchema.pick({
   group_id: true,

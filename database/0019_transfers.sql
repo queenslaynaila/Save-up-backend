@@ -5,9 +5,9 @@
 -- Add the other foreign key in a separate transaction after distribution.
 
 CREATE TABLE IF NOT EXISTS transfers (
-  entity_id               INT NOT NULL,  --owner of pkt
+  entity_id               INT NOT NULL,  --owner of pkt, user or group
   xid                     INT NOT NULL,
-  user_id                 INT NOT NULL,  --user doing withdrawal
+  user_id                 INT NOT NULL,  --user doing transfer, a user or grp member
   source_pocket_id        INT NOT NULL,
   destination_pocket_id   INT NOT NULL,
   amount                  NUMERIC(30, 2) NOT NULL,

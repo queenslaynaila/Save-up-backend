@@ -5,16 +5,16 @@ import { validateRequest } from '../../middleware/validationMiddleware';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { convertToTitleCase } from '../../middleware/caseNormalization';
 import { InviteResponseInterface, InviteRequestInterface, inviteRequestSchema } from './types';
-import { MessageInterface } from '../../globalTypes/index';
+import { StatusCodeInterface } from '../../globalTypes/index';
 
-const SQL_RESPOND_TO_INVITE = sql<InviteResponseInterface, MessageInterface>(`
-   SELECT update_user_groups_after_invite(:group_id, :receiver_id, :status)
+const SQL_RESPOND_TO_INVITE = sql<InviteResponseInterface, StatusCodeInterface>(`
+   SELECT update_invites(:group_id, :receiver_id, :status)
 `);
 
 const VALID_RESOURCES = ['Pending', 'Accepted', 'Rejected'];
 
 export default (router: Router) => {
-  router.patch<{ id:string }, MessageInterface, InviteRequestInterface, Record<string,never>, Record<string,never>>(
+  router.patch<{ id:string }, StatusCodeInterface, InviteRequestInterface, Record<string,never>, Record<string,never>>(
     '/:id',
     authMiddleware(),
     validateRequest( inviteRequestSchema),

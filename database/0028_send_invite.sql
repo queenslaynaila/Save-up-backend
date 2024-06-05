@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION send_group_invite(
+CREATE OR REPLACE FUNCTION send_invite(
   p_phone_number        TEXT, 
   p_group_id            INT,
   p_sender_id           INT
