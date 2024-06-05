@@ -14,8 +14,6 @@ export const createExpenseSchema = baseExpenseSchema.extend({
 
 export type CreateExpenseInterface = z.infer<typeof createExpenseSchema>;
 
-export const createExpenseSchemaValidation = createExpenseSchema.partial()
-
 export const expenseSchema = baseExpenseSchema.extend({
   xid: z.number(),
   created_at: z.date()
