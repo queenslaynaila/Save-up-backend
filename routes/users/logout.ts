@@ -1,9 +1,9 @@
 import { Router } from 'express';
 import authMiddleware from '../../middleware/authorization';
-import { MessageInterface } from '../../globalTypes/index';
+import { StatusCodeInterface } from '../../globalTypes/index';
 
 export default (router: Router) => {
-  router.delete<Record<string,never>, MessageInterface, Record<string,never>, Record<string,never>, Record<string,never>>(
+  router.delete<Record<string,never>, StatusCodeInterface, Record<string,never>, Record<string,never>, Record<string,never>>(
     '/', 
     authMiddleware(), 
     async (_req, res) => {
