@@ -1,22 +1,31 @@
 import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import { GetTransactionsInput, GetTransactionResp, GetTransactionQuery } from './types';
+import { GetTransactionsInput, 
+  GetTransactionResp, 
+  GetTransactionQuery,
+  GetByEntity 
+} from './types';
 import { IdParamInterface } from '../../globalTypes/index';
 
 const SQL_GET_TRANSACTIONS = sql<GetTransactionsInput, GetTransactionResp>(`
-    SELECT transaction_id, transaction_type, amount, cumulative_amount, reference_no, created_at AS transaction_date
-    FROM transaction_logs 
-    WHERE pocket_id = :pocket_id
+  SELECT xid AS transaction_id, 
+         transaction_type, 
+         amount, 
+         reference_no, 
+         cumulative_amount, 
+         created_at AS transaction_date
+  FROM transaction_logs 
+  WHERE entity_id = :entity_id
+  AND pocket_id = :pocket_id
 `);
 
 export default (router: Router) => {
-  router.get<IdParamInterface, GetTransactionResp[], Record<string,never>, GetTransactionQuery>(
+  router.get<IdParamInterface, GetTransactionResp[], GetByEntity, GetTransactionQuery>(
     '/:id', 
     authMiddleware(),
     async (req, res) => {
-      const pocket_id  = parseInt(req.params.id);
-      console.log(pocket_id )
+      const entity_id = req.body.entity_id ?? req.user!.id;
       const { transaction_type, from_date, to_date } = req.query;
       const filters: string[] = [];
       const filterArgs: Record<string, string  > = {};
@@ -24,6 +33,20 @@ export default (router: Router) => {
       if (transaction_type) {
         filterArgs.transaction_type = transaction_type;
         filters.push(`transaction_type = :transaction_type`);
+      }
+      if (from_date && to_date) {
+        filterArgs.from_date = from_date;
+        filterArgs.to_date = to_date;
+        filters.push(`transaction_date BETWEEN :from_date AND :to_date`);
+      } else {
+        if (from_date) {
+          filterArgs.from_date = from_date;
+          filters.push(`transaction_date >= :from_date`);
+        }
+        if (to_date) {
+          filterArgs.to_date = to_date;
+          filters.push(`transaction_date <= :to_date`);
+        }
       }
       if (from_date) {
         filterArgs.from_date = from_date;
@@ -33,13 +56,9 @@ export default (router: Router) => {
         filterArgs.to_date = to_date;
         filters.push(`transaction_date <= :to_date`);
       }
-      if (filters.length > 0) {
-        filterArgs.pocket_id = pocket_id.toString();
-        filters.push(`pocket_id = :pocket_id`);
-      }
 
-      const query = SQL_GET_TRANSACTIONS({ pocket_id });
-      if (filters.length > 0) query.extend(`WHERE ${filters.join(' AND ')}`, filterArgs);
+      const query = SQL_GET_TRANSACTIONS({ pocket_id:req.params.id, entity_id });
+      if (filters.length > 0) query.extend(`AND ${filters.join(' AND ')}`, filterArgs);
       query.extend('LIMIT 15', {});
       return res.json(await query.many());
     });
