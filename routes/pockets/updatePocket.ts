@@ -31,11 +31,9 @@ export default (router: Router) => {
     authMiddleware(), 
     validateRequest(basePocketSchema),
     async (req, res) => {
-      const xid = parseInt(req.params.id);
-      const entity_id = req.body.entity_id ? req.body.entity_id : req.user!.id;
-      const goal = await SQL_UPDATE_POCKET({
-        ...req.body, xid, entity_id
-      }).one(new HttpError(404, 'Not found'));
+      const entity_id = req.body.entity_id ?? req.user!.id;
+      const goal = await SQL_UPDATE_POCKET({ ...req.body, entity_id, xid:parseInt(req.params.id)})
+        .one(new HttpError(404, 'Not found'));
       return res.json(goal);
     });
 };

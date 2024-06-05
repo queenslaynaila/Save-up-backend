@@ -45,11 +45,11 @@ export type GetByIdInterface = z.infer<typeof getById>;
 
 //MESSAGE RESPONSESCHEMA
 
-export const messageSchema = z.object({
+export const statusCodeSchema = z.object({
   statusCode: z.number()
 })
 
-export type MessageInterface = z.infer<typeof messageSchema>;
+export type StatusCodeInterface = z.infer<typeof statusCodeSchema>;
 
 //ID SCHEMA
 
