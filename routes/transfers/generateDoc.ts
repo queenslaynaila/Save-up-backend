@@ -3,7 +3,7 @@ import * as yaml from 'yaml';
 import * as fs from 'fs';
 import { OpenAPIRegistry, OpenApiGeneratorV3, extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
 import { transferSchema } from './types'
-import { Method, messageSchema } from '../../globalTypes/index';
+import { Method, statusCodeSchema } from '../../globalTypes/index';
 
 extendZodWithOpenApi(z);
 const registry = new OpenAPIRegistry();
@@ -27,7 +27,7 @@ registry.registerPath({
       description: 'Trasfer of amount KES200 from main pocket to sub pocket successful!',
       content: {
         'application/json': {
-          schema:messageSchema
+          schema:statusCodeSchema
         }
       }
     },
