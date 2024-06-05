@@ -11,9 +11,9 @@ const SQL_UPDATE_EXPENSE= sql<UpdateExpenseInterface,ExpenseInterface>(`
   SET description = COALESCE(:description, expenses.description),
       category_id = COALESCE(:category_id, expenses.category_id),
       amount = COALESCE(:amount_spent, expenses.amount_spent),
-      spent_at = COALESCE(:date_spent , expenses.date_spent )
+      spent_at = COALESCE(:date_spent , expenses.date_spent)
   WHERE entity_id = :entity_id 
-  AND xid = xid
+  AND xid = :xid
   AND deleted_at IS NULL
   RETURNING category_id, description, amount, spent_at
 `);

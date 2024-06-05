@@ -14,7 +14,7 @@ const SQL_GET_EXPENSE_BY_ID = sql<XidEntityInterface,  ExpenseInterface>(`
 
 export default (router: Router) => {
   router.get<IdParamInterface, ExpenseInterface, Record<string,never>, Record<string,never>>(
-    '/:id', 
+    '/me/:id', 
     authMiddleware(), 
     async (req, res) => {
       const entity_id = req.body.entity_id ? req.body.entity_id : req.user!.id;
