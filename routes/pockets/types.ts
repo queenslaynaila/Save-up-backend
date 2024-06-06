@@ -72,6 +72,7 @@ export const upgradePocketSchema = UpgradePocketSubsetSchema.pick({target_at:tru
 export type UpgradePocketInterface = z.infer<typeof upgradePocketSchema>;
   
 export const pocketsByConditionsQuerySchema = z.object({
+  is_default: z.string().optional(),
   category_id: z.string().optional(),
   priority: z.string().optional(),
   status: z.string().optional(),
