@@ -12,5 +12,5 @@ export default (baseRouter: express.Router) => {
   approveProposedGroupAdmin(router);
   makeGroupAdmin(router);
 
-  baseRouter.use('/group-admin', router);
+  baseRouter.use('/group-admins', router);
 };

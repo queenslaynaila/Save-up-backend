@@ -1,8 +1,17 @@
 import { z } from 'zod';
 
-export const proposeAdminSchema = z.object({
+export const nominatedAdminSchema = z.object({
   user_id: z.number(),
   group_id: z.number(),
+  full_name: z.string(),
+  nominated_at: z.date()
+})
+
+export type NominatedAdminInterface = z.infer<typeof nominatedAdminSchema>;
+
+export const proposeAdminSchema = nominatedAdminSchema.pick({
+  user_id: true,
+  group_id: true,
 })
   
 export type ProposeAdminInterface = z.infer<typeof proposeAdminSchema>;
