@@ -1,10 +1,12 @@
 import express from 'express';
-import proposeAdmin from './proposeAdmin';
+import nominateAdmin from './nominateAdmin';
+import getNominatedAdmins from './getNominatedAdmins';
 
 export default (baseRouter: express.Router) => {
   const router = express.Router();
   
-  proposeAdmin(router);
+  nominateAdmin(router);
+  getNominatedAdmins(router);
 
   baseRouter.use('/nominations', router);
 };
