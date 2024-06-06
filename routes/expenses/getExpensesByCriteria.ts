@@ -1,4 +1,4 @@
-import { Router, Response } from 'express';
+import { Router} from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import isStandardUser from '../../middleware/isStandardUser';
@@ -13,10 +13,10 @@ const SQL_GET_EXPENSES = sql<Record<string, string>, ExpenseInterface>(`
 );
 
 export default (router: Router) => {
-  router.get<IdParamInterface, ExpenseInterface, Record<string,never>, ExpenseQueryInterface>(
+  router.get<IdParamInterface, ExpenseInterface[], Record<string,never>, ExpenseQueryInterface>(
     '/:expenseIdentifier', 
     authMiddleware(), 
-    async (req, res: Response) => {
+    async (req, res) => {
       const expenseIdentifier  = req.params.id;
       const entity_id = req.body.entity_id ?? req.user!.id;
       const { category_id, start_date, end_date } = req.query;

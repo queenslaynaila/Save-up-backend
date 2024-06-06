@@ -1,4 +1,4 @@
-import { Router, Response } from 'express';
+import { Router } from 'express';
 import { sql } from '../../db';
 import { HttpError } from '../../middleware/errorMiddleware';
 import authMiddleware from '../../middleware/authorization';
@@ -25,7 +25,7 @@ export default (router: Router) => {
   router.get<string, TargetParamInterface, GetUserInterface[], Record<string,never>,Record<string,never>>(
     '/:entity', 
     authMiddleware(), 
-    async (req, res: Response) => {
+    async (req, res) => {
       const  targetUser = req.params.entity;
       const filters: string[] = [];
       const filterArgs: Record<string, string | number> = {};

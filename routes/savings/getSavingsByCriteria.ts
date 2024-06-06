@@ -1,4 +1,4 @@
-import {Response, Router } from 'express';
+import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { SavingInterface, SavingParamInterface, SavingsQueryInterface } from './types';
@@ -12,7 +12,7 @@ export default (router: Router) => {
   router.get<string, SavingParamInterface, SavingInterface[], Record<string,never>, SavingsQueryInterface>(
     '/', 
     authMiddleware(), 
-    async (req, res: Response) => {
+    async (req, res) => {
       const entity_id = req.body.entity_id ?? req.user!.id; // either grp or user
       const { pocket_id, start_date, end_date } = req.query;
 
