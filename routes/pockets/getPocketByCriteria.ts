@@ -1,4 +1,4 @@
-import { Response, Router } from 'express';
+import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { convertToTitleCase, isValidValue } from '../../middleware/caseNormalization';
@@ -29,7 +29,7 @@ export default (router: Router) => {
   router.get<string, Record<string, never>, PocketInterface[], getPocketInterface, PocketsConditionsQueryInterface>(
     '/', 
     authMiddleware(), 
-    async (req, res: Response) => {
+    async (req, res) => {
       const entity_id = req.body.entity_id ?? req.user!.id; // either grp or user
       const { category_id, priority, status, start_date, end_date, is_default } = req.query;
 

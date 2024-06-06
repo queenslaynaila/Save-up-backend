@@ -11,7 +11,7 @@ BEGIN
   FROM security_answers 
   WHERE security_answers.user_id = p_user_id;
   
-  IF v_answer_count = 4 THEN
+  IF v_answer_count >= 3 THEN
      RAISE EXCEPTION 'User cannot have more than 3 security answers.';
   ELSE
     INSERT INTO security_answers (user_id, question_id, answer) 
