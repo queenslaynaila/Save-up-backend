@@ -16,6 +16,7 @@ const SQL_UPDATE_POCKET = sql<UpdatePocketInterface, PocketUpdateRes>(`
       target_at = COALESCE(:target_at, target_at)
   WHERE entity_id = :entity_id
   AND xid = :xid
+  AND deleted_at IS NULL
   RETURNING name, 
             category_id, 
             (SELECT name FROM categories WHERE id = pockets.category_id) AS category_name,
