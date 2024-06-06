@@ -7,7 +7,8 @@ import { GetByUserInterface } from '../../globalTypes/index'
 const SQL_FETCH_USER_GROUPS = sql<GetByUserInterface, CreateGroupResponseInterface>(`
   SELECT groups.id, groups.name, groups.created_by, groups.created_at
   FROM groups 
-  LEFT JOIN user_groups ON groups.id = user_groups.group_id
+  LEFT JOIN user_groups 
+  ON groups.id = user_groups.group_id
   WHERE user_groups.user_id = :user_id
   AND user_groups.left_at IS NULL;
 `);
