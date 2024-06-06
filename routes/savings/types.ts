@@ -24,7 +24,8 @@ export type SavingInterface = z.infer<typeof savingSchema>;
 
 export const savingsQuerySchema = z.object({
   pocket_id: z.string().optional(),
-  category_id: z.string().optional(),
+  start_date: z.string().optional(),
+  end_date: z.string().optional()
 })
 
 export type SavingsQueryInterface = z.infer<typeof savingsQuerySchema>;
