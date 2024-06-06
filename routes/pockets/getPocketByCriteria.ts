@@ -2,8 +2,6 @@ import { Response, Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { convertToTitleCase, isValidValue } from '../../middleware/caseNormalization';
-//import { HttpError } from '../../middleware/errorMiddleware';
-//import isStandardUser from '../../middleware/isStandardUser';
 import { PocketInterface, 
   PocketsConditionsQueryInterface, 
   getPocketInterface
@@ -13,7 +11,7 @@ const ACCEPTED_STATUS_VALUES = ['In Progress', 'Dormant', 'Completed'];
 const ACCEPTED_PRIORITY_VALUES = ['High', 'Intermediate', 'Low'];
 
 const SQL_GET_POCKETS = sql<{entity_id: number}, PocketInterface>(`
-  SELECT pockets.id, 
+  SELECT pockets.xid, 
         pockets.name, 
         (SELECT categories.name FROM categories WHERE categories.id = pockets.category_id) AS category_name, 
         pockets.target_amount, 
@@ -27,18 +25,21 @@ const SQL_GET_POCKETS = sql<{entity_id: number}, PocketInterface>(`
   AND pockets.entity_id = :entity_id
 `);
 
-
 export default (router: Router) => {
   router.get<string, Record<string, never>, PocketInterface[], getPocketInterface, PocketsConditionsQueryInterface>(
     '/', 
     authMiddleware(), 
     async (req, res: Response) => {
-      const entity_id = req.body.entity_id ?? req.user!.id;
-      const { category_id, priority, status, start_date, end_date  } = req.query;
+      const entity_id = req.body.entity_id ?? req.user!.id; // either grp or user
+      const { category_id, priority, status, start_date, end_date, is_default } = req.query;
 
       const filters: string[] = [];
       const filterArgs: Record<string, string> = {};
 
+      if (is_default) {
+        filterArgs.is_default = is_default;
+        filters.push(`is_default = :is_default`);
+      }
       if (category_id) {
         filterArgs.category_id = category_id;
         filters.push(`category_id = :category_id`);
@@ -46,7 +47,7 @@ export default (router: Router) => {
       if (start_date && end_date) {
         filterArgs.start_date = start_date;
         filterArgs.end_date = end_date;
-        filters.push(`DATE(created_at) BETWEEN :start_date AND :end_date`);
+        filters.push(`DATE(completed_at) BETWEEN :start_date AND :end_date`);
       } else {
         if (start_date) {
           filterArgs.start_date = start_date;
