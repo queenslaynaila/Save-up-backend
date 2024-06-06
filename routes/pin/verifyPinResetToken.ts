@@ -20,12 +20,11 @@ const SQL_UPDATE_TOKEN_USAGE = sql<UpdateTokenUsageInterface, Record<string,neve
 `);
 
 export default(router: Router) => {
-  router.post<Record<string,never>, SecurityQuestionArray, VerifyTokenInterface, Record<string,never>, Record<string,never>>(
-    '/verify-reset-token',
+  router.patch<Record<string,never>, SecurityQuestionArray, VerifyTokenInterface, Record<string,never>, Record<string,never>>(
+    '/verify-token',
     verifyResetToken,
     async (req, res) => {
       const { reset_token } = req.body;
-      console.log(req.user)
       const user_id = req.user!.id;
       const hashedResetToken = await bcrypt.hash(reset_token, 10); 
       await SQL_UPDATE_TOKEN_USAGE({ user_id, reset_token: hashedResetToken }).exec(); 

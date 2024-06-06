@@ -3,7 +3,7 @@ import bcrypt from 'bcrypt';
 import { sql } from '../../db';
 import { verifyResetToken } from '../../middleware/resetTokenMIddleware'
 import { HttpError } from '../../middleware/errorMiddleware';
-import {  MessageInterface, GetByUserInterface } from '../../globalTypes/index';
+import {  StatusCodeInterface, GetByUserInterface } from '../../globalTypes/index';
 import { VerifyAnswerInterface, SecurityAnswersRequestInterface } from './types'
 
 const SQL_GET_SECURITY_ANSWERS = sql<GetByUserInterface, VerifyAnswerInterface>(`
@@ -11,8 +11,8 @@ const SQL_GET_SECURITY_ANSWERS = sql<GetByUserInterface, VerifyAnswerInterface>(
 `);
 
 export default (router: Router) => {
-  router.post<Record<string,never>, MessageInterface, SecurityAnswersRequestInterface, Record<string,never>>(
-    '/verify-security-answers',
+  router.get<Record<string,never>, StatusCodeInterface, SecurityAnswersRequestInterface, Record<string,never>>(
+    '/verify-answers',
     verifyResetToken,
     async (req, res) => {
       const { answers } = req.body;
@@ -29,9 +29,7 @@ export default (router: Router) => {
       if (incorrectAnswers.length > 0) {
         throw new HttpError(401, `Incorrect answers. Contact customer service for help.`);
       }
-      res.json({
-        message: 'Security questions answered successfully. You can now reset your password.',
-      });
+      res.sendStatus(201);
     }
   );
 };

@@ -5,7 +5,7 @@ import authMiddleware from '../../middleware/authorization';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { resetPasswordLimiter } from '../../services/rateLimit';
 import { UpdatePasswordInterface, ResetPasswordRequestInterface, ResetPinInterface  } from './types';
-import {  MessageInterface, GetByIdInterface } from '../../globalTypes/index';
+import {  StatusCodeInterface, GetByIdInterface } from '../../globalTypes/index';
 
 const SQL_GET_PASSWORD_BY_ID = sql<GetByIdInterface, ResetPinInterface >(`
   SELECT pin FROM users WHERE id = :id
@@ -16,8 +16,8 @@ const SQL_UPDATE_PASSWORD = sql< ResetPasswordRequestInterface, Record<string,ne
 `);
 
 export default (router: Router) => {
-  router.patch<Record<string,never>, MessageInterface, UpdatePasswordInterface, Record<string,never>>(
-    '/update-pin', 
+  router.patch<Record<string,never>, StatusCodeInterface, UpdatePasswordInterface, Record<string,never>>(
+    '/', 
     authMiddleware(), 
     resetPasswordLimiter,
     async (req, res) => {
@@ -31,6 +31,6 @@ export default (router: Router) => {
       const hashedNewPassword = bcrypt.hashSync(new_pin, 10);
       await SQL_UPDATE_PASSWORD({ id: userId, pin: hashedNewPassword }).exec();
       
-      res.json({ message: 'Password updated successfully.' });
+      res.sendStatus(201);
     });
 };

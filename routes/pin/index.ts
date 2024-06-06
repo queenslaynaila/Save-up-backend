@@ -14,5 +14,5 @@ export default (baseRouter: express.Router) => {
   verifySecurityAnswers(router);
   resetPin(router);
 
-  baseRouter.use('/pin', router);
+  baseRouter.use('/pin-reset', router);
 };
