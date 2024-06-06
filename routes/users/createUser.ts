@@ -5,7 +5,7 @@ import { validateRequest } from '../../middleware/validationMiddleware';
 import { UserInterface, baseUserSchema } from './types';
 import { StatusCodeInterface } from '../../globalTypes/index';
 
-const SQL_CREATE_USER = sql<UserInterface, StatusCodeInterface>(`
+const SQL_CREATE_USER = sql<UserInterface, Record<string,never>>(`
   SELECT create_user(:id_type, :id_number, :phone_number, :full_name, :gender, :pin)
 `);
 

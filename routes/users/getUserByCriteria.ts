@@ -5,7 +5,7 @@ import authMiddleware from '../../middleware/authorization';
 import isStandardUser from '../../middleware/isStandardUser';
 import { GetUserInterface, TargetParamInterface } from './types';
 
-const SQL_GET_USER_BY_CRITERIA = sql<Record<string,never>,  GetUserInterface>(`
+const SQL_GET_USER_BY_CRITERIA = sql<Record<string,never>, GetUserInterface>(`
   SELECT 
     users.id, 
     user_contact_details.id_type, 

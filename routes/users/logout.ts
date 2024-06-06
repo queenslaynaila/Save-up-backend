@@ -4,7 +4,7 @@ import { StatusCodeInterface } from '../../globalTypes/index';
 
 export default (router: Router) => {
   router.delete<Record<string,never>, StatusCodeInterface, Record<string,never>, Record<string,never>, Record<string,never>>(
-    '/', 
+    '/logout', 
     authMiddleware(), 
     async (_req, res) => {
       res.removeHeader('authorization-token');

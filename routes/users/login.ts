@@ -8,7 +8,7 @@ import { updateUserPhoneSchema, UpdatePhoneInterface, ExtendedUserInterface } fr
 
 type UserWithoutPin = Omit<ExtendedUserInterface, 'pin'>;
 
-const SQL_GET_USER = sql<{  phone_number: string }, ExtendedUserInterface>(`
+const SQL_GET_USER = sql<{ phone_number: string }, ExtendedUserInterface>(`
   SELECT 
     users.id, 
     user_contact_details.id_type, 

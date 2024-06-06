@@ -3,20 +3,19 @@ import { sql } from '../../db';
 import { HttpError } from '../../middleware/errorMiddleware';
 import authMiddleware from '../../middleware/authorization';
 import { convertToTitleCase } from '../../middleware/caseNormalization';
-import { UserRoleUpdateInterface, RoleUpdateResultInterface } from '../admin/types';
-import { UserRole } from '../../globalTypes/index';
+import { UserRoleUpdateInterface } from '../admin/types';
+import { UserRole, StatusCodeInterface } from '../../globalTypes/index';
 
 const VALID_ROLES = ['Admin', 'User', 'Moderator'];
 
-const SQL_UPDATE_ROLE = sql<UserRoleUpdateInterface, RoleUpdateResultInterface>(`
+const SQL_UPDATE_ROLE = sql<UserRoleUpdateInterface, Record<string,never>>(`
   UPDATE users 
   SET role = :role 
   WHERE id = :id 
-  RETURNING id, full_name, gender, role
 `);
 
 export default (router: Router) => {
-  router.patch<UserRoleUpdateInterface, RoleUpdateResultInterface, Record<string,never>, Record<string,never>>(
+  router.patch<UserRoleUpdateInterface, StatusCodeInterface, Record<string,never>, Record<string,never>>(
     '/:id/:role',
     authMiddleware({ roles: [UserRole.ADMIN] }),
     async (req, res) => {
@@ -25,9 +24,8 @@ export default (router: Router) => {
       if (!VALID_ROLES.includes(role)) {
         throw new HttpError(400, 'Invalid role.');
       }
-      const result = await SQL_UPDATE_ROLE({ role, id })
-        .one(new HttpError (404, 'User with given ID not found.'));
-      res.json(result);
+      await SQL_UPDATE_ROLE({ role, id }).exec();
+      res.sendStatus(204);
     }
   );
 };
