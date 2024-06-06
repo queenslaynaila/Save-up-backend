@@ -16,7 +16,18 @@ const SQL_CREATE_POCKET = sql<CreatePocketInterface, PocketInterface>(`
           :target_at
   FROM pockets 
   WHERE entity_id = :entity_id
-  RETURNING entity_id, xid, category_id, name, priority, status, pocket_type, target_amount,  target_at, created_at, updated_at, completed_at
+  RETURNING entity_id, 
+            xid, 
+            category_id, 
+            name, 
+            priority, 
+            status, 
+            pocket_type, 
+            target_amount,  
+            target_at, 
+            created_at, 
+            updated_at, 
+            completed_at
 `);
 
 export default (router: Router) => {
