@@ -27,12 +27,12 @@ BEGIN
 
   INSERT INTO transfers (entity_id, xid, user_id, source_pocket_id, destination_pocket_id, amount)
   SELECT 
-              p_entity_id,
-              COALESCE(MAX(xid), 0) + 1, 
-              p_user_id,
-              p_source_pocket_id,    
-              p_destination_pocket_id,
-              p_amount
+    p_entity_id,
+    COALESCE(MAX(xid), 0) + 1, 
+    p_user_id,
+    p_source_pocket_id,    
+    p_destination_pocket_id,
+    p_amount
   FROM transfers 
   WHERE entity_id = p_entity_id;
 
