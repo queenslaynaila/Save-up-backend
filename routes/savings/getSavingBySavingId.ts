@@ -9,7 +9,7 @@ const  SQL_GET_DEPOSIT_BY_ID = sql<XidEntityInterface, SavingInterface>(`
   SELECT pocket_id, amount 
   FROM savings 
   WHERE xid = :id 
-  AND entity_id = :user_id
+  AND entity_id = :entity_id
 `);
 
 export default (router: Router) => {

@@ -15,9 +15,8 @@ export default (router: Router) => {
     authMiddleware(), 
     validateRequest(validateSavingCreationSchema),
     async (req, res) => {
-      const entity_id = req.body.entity_id ? req.body.entity_id : req.user!.id;
-      const user_id= req.user!.id
-      await SQL_CREATE_SAVING({ ...req.body, user_id, entity_id})
+      const entity_id = req.body.entity_id ?? req.user!.id; //either logged in user or group
+      await SQL_CREATE_SAVING({ ...req.body, user_id:req.user!.id, entity_id})
         .exec();
       res.sendStatus(201);
     });
