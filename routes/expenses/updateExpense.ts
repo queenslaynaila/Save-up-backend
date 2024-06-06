@@ -24,7 +24,7 @@ export default (router: Router) => {
     authMiddleware(), 
     validateRequest(validateUpdateExpenseSchema),
     async (req, res) => {
-      const entity_id = req.body.entity_id ? req.body.entity_id : req.user!.id;
+      const entity_id = req.body.entity_id ?? req.user!.id;
       const xid = parseInt(req.params.id);
       const result = await SQL_UPDATE_EXPENSE({
         ...req.body, entity_id, xid
