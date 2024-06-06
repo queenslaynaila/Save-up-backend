@@ -13,7 +13,7 @@ const SQL_GET_NOMINATED_MEMBERS = sql<{ group_id: number}, NominatedAdminInterfa
 
 export default (router: Router) => {
   router.get<IdParamInterface, NominatedAdminInterface[], Record<string,never>, Record<string,never>>(
-    '/:id/nominations',
+    '/:id/nominated-members',
     authMiddleware(),
     async (req, res) => {
       const group_id = parseInt(req.params.id);
