@@ -5,9 +5,7 @@ CREATE OR REPLACE FUNCTION create_external_saving(
     p_amount         NUMERIC(30, 2), 
     p_show_details   BOOLEAN
 )
-RETURNS TABLE (
-    name  TEXT
-) AS $$
+RETURNS VOID AS $$
 DECLARE
     v_transaction_id      INT;
     v_current_balance     NUMERIC(30, 2);
@@ -47,8 +45,6 @@ BEGIN
         v_reference_no,
         v_new_balance
     );
-
-    RETURN QUERY SELECT pockets.name FROM pockets WHERE xid = p_pocket_id AND entity_id = p_entity_id;
 END;
 $$ LANGUAGE plpgsql;
 

@@ -13,7 +13,9 @@ BEGIN
     IF p_status = 'Accept'::enum_invite THEN
         INSERT INTO user_groups (user_id, group_id)
         VALUES (p_receiver_id, p_group_id);
-    ELSIF p_status = 'Decline'::enum_invite THEN
+    END IF;
+
+    IF p_status = 'Decline'::enum_invite THEN
         UPDATE invitations
         SET deleted_at = NOW()
         WHERE receiver_id = p_receiver_id

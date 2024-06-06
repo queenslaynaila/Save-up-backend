@@ -13,10 +13,10 @@ BEGIN
   
   IF v_answer_count >= 3 THEN
      RAISE EXCEPTION 'User cannot have more than 3 security answers.';
-  ELSE
-    INSERT INTO security_answers (user_id, question_id, answer) 
-    VALUES (p_user_id, p_question_id, p_answer);
   END IF;
+  
+  INSERT INTO security_answers (user_id, question_id, answer) 
+  VALUES (p_user_id, p_question_id, p_answer);
 END;
 $$ LANGUAGE plpgsql;
 

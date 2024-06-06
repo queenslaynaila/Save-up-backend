@@ -4,9 +4,7 @@ CREATE OR REPLACE FUNCTION create_saving(
     p_pocket_id    INT, 
     p_amount       NUMERIC
 )
-RETURNS TABLE (
-    name  TEXT
-) AS $$
+RETURNS VOID AS $$
 DECLARE
     v_current_balance  NUMERIC;
     v_transaction_id   INT;
@@ -52,8 +50,6 @@ BEGIN
         v_reference_no,
         v_new_balance
     );
-
-    RETURN QUERY SELECT pockets.name FROM pockets WHERE xid = p_pocket_id AND entity_id = p_entity_id;
 END;
 $$ LANGUAGE plpgsql;
 
