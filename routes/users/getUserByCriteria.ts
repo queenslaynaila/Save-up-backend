@@ -23,10 +23,10 @@ const SQL_GET_USER_BY_CRITERIA = sql<Record<string,never>,  GetUserInterface>(`
 
 export default (router: Router) => {
   router.get<string, TargetParamInterface, GetUserInterface[], Record<string,never>,Record<string,never>>(
-    '/:targetUser', 
+    '/:entity', 
     authMiddleware(), 
     async (req, res: Response) => {
-      const  targetUser = req.params.targetUser;
+      const  targetUser = req.params.entity;
       const filters: string[] = [];
       const filterArgs: Record<string, string | number> = {};
 

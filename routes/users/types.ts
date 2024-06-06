@@ -71,7 +71,7 @@ export type ExtendedUserInterface = GetUserInterface & {
 };
 
 export const targetParamSchema = z.object({
-  targetUser: z.string()
+  entity: z.string()
 })
 
 export type TargetParamInterface = z.infer<typeof targetParamSchema>;
