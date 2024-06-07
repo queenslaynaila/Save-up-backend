@@ -8,7 +8,7 @@ import { generateResetPin } from '../../middleware/generateResetPin';
 import {  AnswerTokenType} from './types'
 import { StatusCodeInterface } from '../../globalTypes/index'; 
 
-const SQL_UPDATE_SECURITY_ANSWER = sql< AnswerTokenType, {phone_number: string}>(`
+const SQL_UPDATE_SECURITY_ANSWER = sql<AnswerTokenType, { phone_number: string }>(`
    SELECT update_security_answer(:user_id, token)
 `);
 

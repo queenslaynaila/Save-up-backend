@@ -10,7 +10,7 @@ const SQL_UPDATE_SECURITY_ANSWER = sql<AnswerUpdateType, Record<string,never>>(`
   UPDATE security_answers 
   SET 
     question_id = COALESCE(:new_question, question_id),
-    answer = :answer,
+    answer = :answer
   WHERE user_id = :user_id 
   AND question_id = :question_id
 `);
