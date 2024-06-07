@@ -28,7 +28,7 @@ export default (router: Router) => {
         user_id: req.user!.id,
         question_id: parseInt(req.params.id),
       }).exec();
-      res.sendStatus(201);
+      res.sendStatus(204);
     }
   );
 };
