@@ -1,9 +1,9 @@
 import { Router } from 'express';
 import { sql } from '../../db';
-import { SecurityQuestionInterface } from '../securityQuestions/types';
+import { SecurityQuestionType } from '../securityQuestions/types';
 import { AnswerByUserType } from './types';
 
-const SQL_GET_USER_SECURITY_QUESTIONS = sql<AnswerByUserType, SecurityQuestionInterface>(`
+const SQL_GET_USER_SECURITY_QUESTIONS = sql<AnswerByUserType, SecurityQuestionType>(`
   SELECT security_questions.id, security_questions.question 
   FROM security_questions
   LEFT JOIN security_answers 
@@ -12,7 +12,7 @@ const SQL_GET_USER_SECURITY_QUESTIONS = sql<AnswerByUserType, SecurityQuestionIn
 `);
 
 export default (router: Router) => {
-  router.get<Record<string,never>, SecurityQuestionInterface[], Record<string,never>, Record<string,never>>(
+  router.get<Record<string,never>, SecurityQuestionType[], Record<string,never>, Record<string,never>>(
     '/', 
     async (req, res) => {
       const securityQuestions = await SQL_GET_USER_SECURITY_QUESTIONS({
