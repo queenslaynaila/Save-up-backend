@@ -2,36 +2,35 @@ import { z } from 'zod';
 
 export const baseSavingSchema = z.object({
   entity_id: z.number(),
+  xid: z.number(),
   pocket_id: z.number(),
   user_id: z.number(),
-  amount: z.number()
+  amount: z.number(),
+  created_at: z.string(),
 });
 
-export type CreateSavingInterface = z.infer<typeof baseSavingSchema>;
-  
-export const validateSavingCreationSchema = baseSavingSchema
-  .omit({ user_id: true })
-  .extend({
-    entity_id: z.number().optional(),
-  })
-  
-export const savingSchema = baseSavingSchema.extend({
-  id: z.number(),
-  created_at: z.date(),
-})
-  
-export type SavingInterface = z.infer<typeof savingSchema>;
+export type BaseSavingType = z.infer<typeof baseSavingSchema>;
 
-export const savingsQuerySchema = z.object({
-  pocket_id: z.string().optional(),
-  start_date: z.string().optional(),
-  end_date: z.string().optional()
+export const savingCreateSchema = baseSavingSchema.pick({
+  entity_id: true,
+  user_id: true,
+  pocket_id: true,
+  amount: true
 })
 
-export type SavingsQueryInterface = z.infer<typeof savingsQuerySchema>;
+export type SavingCreateType = z.infer<typeof savingCreateSchema>;
 
-export const savingParamSchema = z.object({
-  identifier: z.string()
+export const savingPostRequestSchema =  baseSavingSchema.pick({
+  amount: true
+}).extend({
+  pocket_id: z.number(),
+  entity_id: z.number().optional()
 })
 
-export type SavingParamInterface = z.infer<typeof savingParamSchema>;
+export const savingsQueryParamSchema = z.object({
+  pocket_id:z.string(),
+  start_date: z.string(),
+  end_date: z.string()
+}).partial()
+
+export type SavingsQueryParamType = z.infer<typeof savingsQueryParamSchema>;

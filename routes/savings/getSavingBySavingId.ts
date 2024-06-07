@@ -2,10 +2,10 @@ import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { HttpError } from '../../middleware/errorMiddleware';
-import { SavingInterface } from './types';
+import { BaseSavingType } from './types';
 import { IdParamInterface,  XidEntityInterface } from '../../globalTypes/index';
 
-const  SQL_GET_DEPOSIT_BY_ID = sql<XidEntityInterface, SavingInterface>(`
+const  SQL_GET_DEPOSIT_BY_ID = sql<XidEntityInterface, BaseSavingType>(`
   SELECT pocket_id, amount 
   FROM savings 
   WHERE xid = :id 
@@ -13,7 +13,7 @@ const  SQL_GET_DEPOSIT_BY_ID = sql<XidEntityInterface, SavingInterface>(`
 `);
 
 export default (router: Router) => {
-  router.get<IdParamInterface, SavingInterface, Record<string,never>, Record<string,never>>(
+  router.get<IdParamInterface, BaseSavingType, Record<string,never>, Record<string,never>>(
     '/:id', 
     authMiddleware(), 
     async (req, res) => {

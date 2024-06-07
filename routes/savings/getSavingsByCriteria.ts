@@ -1,15 +1,15 @@
 import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import { SavingInterface, SavingParamInterface, SavingsQueryInterface } from './types';
+import { BaseSavingType, SavingsQueryParamType } from './types';
  
-const SQL_GET_SAVINGS = sql<{entity_id: number}, SavingInterface>(`
+const SQL_GET_SAVINGS = sql<{entity_id: number}, BaseSavingType>(`
   SELECT * FROM savings
   WHERE entity_id = :entity_id
 `);
 
 export default (router: Router) => {
-  router.get<string, SavingParamInterface, SavingInterface[], Record<string,never>, SavingsQueryInterface>(
+  router.get<string, Record<string,never>, BaseSavingType[], Record<string,never>, SavingsQueryParamType>(
     '/', 
     authMiddleware(), 
     async (req, res) => {
