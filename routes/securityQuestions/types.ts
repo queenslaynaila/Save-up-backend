@@ -5,4 +5,4 @@ export const securityQuestionSchema = z.object({
   question: z.string()
 })
     
-export type SecurityQuestionInterface = z.infer<typeof securityQuestionSchema>;
+export type SecurityQuestionType = z.infer<typeof securityQuestionSchema>;
