@@ -54,15 +54,16 @@ export const PocketQueryParamsSchema = basePocketSchema.pick({
 export type PocketQueryParamsType = z.infer<typeof PocketQueryParamsSchema>;
 
 export const PocketUpdateSchema = basePocketSchema.pick({
-  entity_id: true,
-  xid: true,
   name: true,
   category_id: true,
   priority: true,
   target_amount: true,
   target_at: true,
   pocket_type: true
-}).partial();
+}).partial().extend({
+  entity_id: z.number(),
+  xid: z.number(),
+});
 
 export type PocketUpdateType = z.infer<typeof PocketUpdateSchema>;
 
