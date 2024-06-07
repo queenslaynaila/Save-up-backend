@@ -2,11 +2,11 @@ import { Router } from 'express';
 import authMiddleware from '../../middleware/authorization';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { sql } from '../../db';
-import { UpdatePocketInterface,  PocketUpdateRes, basePocketSchema} from './types';
+import { PocketUpdateType, pocketPatchRequestSchema, BasePocketType} from './types';
 import { IdParamInterface } from '../../globalTypes/index';
 import { validateRequest } from '../../middleware/validationMiddleware';
 
-const SQL_UPDATE_POCKET = sql<UpdatePocketInterface, PocketUpdateRes>(`
+const SQL_UPDATE_POCKET = sql<PocketUpdateType, BasePocketType>(`
   UPDATE pockets
   SET name = COALESCE(:name, name),
       category_id = COALESCE(:category_id, category_id),
@@ -27,10 +27,10 @@ const SQL_UPDATE_POCKET = sql<UpdatePocketInterface, PocketUpdateRes>(`
 `);
 
 export default (router: Router) => {
-  router.patch<IdParamInterface, PocketUpdateRes, UpdatePocketInterface, Record<string,never>>(
+  router.patch<IdParamInterface, BasePocketType, PocketUpdateType, Record<string,never>>(
     '/:id', 
     authMiddleware(), 
-    validateRequest(basePocketSchema),
+    validateRequest(pocketPatchRequestSchema),
     async (req, res) => {
       const entity_id = req.body.entity_id ?? req.user!.id;
       const goal = await SQL_UPDATE_POCKET({ ...req.body, entity_id, xid:parseInt(req.params.id)})

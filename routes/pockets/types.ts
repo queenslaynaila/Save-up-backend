@@ -1,104 +1,74 @@
 import { z } from 'zod';
-//mport { entityTypeSchema } from '../groups/types';
 
-export const basePocketSchema = z.object({
+const basePocketSchema = z.object({
   entity_id: z.number(),
+  xid: z.number(),
   category_id: z.number(),
-  name: z.string(),  
+  name: z.string(),
   priority: z.enum(['High', 'Intermediate', 'Low']),
+  status: z.enum(['In Progress', 'Completed']),
+  pocket_type: z.enum(['Standard', 'Locked']),
   target_amount: z.number(),
   target_at: z.string(),
-  pocket_type: z.enum(['Standard', 'Locked'])
+  created_at: z.string(),
+  updated_at: z.string(),
+  completed_at: z.string(),
 });
 
-export const pocketSchema =  basePocketSchema.extend({
-  xid: z.number(),
-  status:z.string(),
-  created_at : z.date(),
-  updated_at: z.date(),
-  completed_at: z.date()
-})
-  
-export type PocketInterface = z.infer<typeof pocketSchema>;
+export type BasePocketType = z.infer<typeof basePocketSchema>;
 
-export const updatePocketSchema = basePocketSchema.partial().extend({
-  xid: z.number()
+const pocketCreateSchema = basePocketSchema.pick({
+  entity_id: true,
+  category_id: true,
+  name: true,
+  priority: true,
+  pocket_type: true,
+  target_amount: true,
+  target_at: true,
 });
 
-export type UpdatePocketInterface = z.infer<typeof updatePocketSchema>;
+export type PocketCreateType = z.infer<typeof pocketCreateSchema>;
 
-
-
-
-
-
-export const getPocketSchema = basePocketSchema.pick({
-  entity_id:true
-}).partial()
-
-export type getPocketInterface = z.infer< typeof getPocketSchema>
-
-export const createPocketSchema = basePocketSchema.extend({
-  entity_id: z.number().optional(),
-}); 
-  
-export type CreatePocketInterface = z.infer<typeof basePocketSchema>;
-  
-
-  
-
-
-  
-export const pocketUpdateResSchema = z.object({
-  name: z.string(),
-  category_name: z.number().positive(), 
-  target_amount: z.number().positive(), 
-  priority: z.enum(['Low', 'Intermediate', 'High']), 
-  target_at: z.date(),
-});
-  
-export type PocketUpdateRes = z.infer<typeof pocketUpdateResSchema >;
-  
-export const UpgradePocketSubsetSchema = z.object({
-  target_at: z.date().optional(),
-  id: z.number(),
-  pocket_type: z.string()
+export const PocketByEntityIdSchema =  basePocketSchema.pick({
+  entity_id: true
 });
 
-export type UpgradePocketSubset = z.infer<typeof UpgradePocketSubsetSchema>;
-  
-export const upgradePocketSchema = UpgradePocketSubsetSchema.pick({target_at:true})
-  
-export type UpgradePocketInterface = z.infer<typeof upgradePocketSchema>;
-  
-export const pocketsByConditionsQuerySchema = z.object({
-  is_default: z.string().optional(),
+export type PocketByEntityType = z.infer<typeof PocketByEntityIdSchema>;
+
+export const pocketPostRequestSchema = pocketCreateSchema.omit({
+  entity_id: true
+}).extend({
+  entity_id: z.number().optional()
+});
+
+export const PocketQueryParamsSchema = basePocketSchema.pick({
+  priority: true,
+  status: true
+}).partial().extend({
   category_id: z.string().optional(),
-  priority: z.string().optional(),
-  status: z.string().optional(),
   start_date: z.string().optional(),
-  end_date: z.string().optional()
-})
-  
-export type PocketsConditionsQueryInterface = z.infer<typeof pocketsByConditionsQuerySchema>;
-
-export const pocketParamSchema = z.object({
-  pockets_identifier: z.string() 
+  end_date: z.string().optional(),
+  is_default: z.string().optional()
 });
 
-export type PocketParam = z.infer<typeof pocketParamSchema>;
+export type PocketQueryParamsType = z.infer<typeof PocketQueryParamsSchema>;
 
-export const deletePocketSchema = z.object({
-  pocket_id: z.number(),
-  entity_id: z.number()
+export const PocketUpdateSchema = basePocketSchema.pick({
+  entity_id: true,
+  xid: true,
+  name: true,
+  category_id: true,
+  priority: true,
+  target_amount: true,
+  target_at: true,
+  pocket_type: true
+}).partial();
+
+export type PocketUpdateType = z.infer<typeof PocketUpdateSchema>;
+
+export const pocketPatchRequestSchema = PocketUpdateSchema.omit({
+  entity_id: true,
+  xid: true
 });
 
-export type DeletePocket = z.infer<typeof deletePocketSchema>;
-
-export const upgradedPocketSChema = z.object({
-  pocket_type : z.string(),
-  interest_rate: z.number(),
-  target_at: z.date().optional()
-})
-
-export type upgradedPocketInterface = z.infer<typeof updatePocketSchema>
+export type PocketPatchType = z.infer<typeof pocketPatchRequestSchema>;

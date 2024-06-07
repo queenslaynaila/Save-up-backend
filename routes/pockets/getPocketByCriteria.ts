@@ -2,15 +2,15 @@ import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { convertToTitleCase, isValidValue } from '../../middleware/caseNormalization';
-import { PocketInterface, 
-  PocketsConditionsQueryInterface, 
-  getPocketInterface
+import { BasePocketType, 
+  PocketQueryParamsType, 
+  PocketByEntityType 
 } from './types';
 
 const ACCEPTED_STATUS_VALUES = ['In Progress', 'Dormant', 'Completed'];
 const ACCEPTED_PRIORITY_VALUES = ['High', 'Intermediate', 'Low'];
 
-const SQL_GET_POCKETS = sql<{entity_id: number}, PocketInterface>(`
+const SQL_GET_POCKETS = sql<{entity_id: number}, BasePocketType>(`
   SELECT pockets.xid, 
         pockets.name, 
         (SELECT categories.name FROM categories WHERE categories.id = pockets.category_id) AS category_name, 
@@ -26,7 +26,7 @@ const SQL_GET_POCKETS = sql<{entity_id: number}, PocketInterface>(`
 `);
 
 export default (router: Router) => {
-  router.get<string, Record<string, never>, PocketInterface[], getPocketInterface, PocketsConditionsQueryInterface>(
+  router.get<string, Record<string, never>, BasePocketType[], PocketByEntityType , PocketQueryParamsType>(
     '/', 
     authMiddleware(), 
     async (req, res) => {
