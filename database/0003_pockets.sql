@@ -1,7 +1,6 @@
-CREATE TYPE enum_status AS ENUM ('In Progress', 'Completed');
-CREATE TYPE enum_priority AS ENUM ('High', 'Intermediate', 'Low');
 CREATE TYPE enum_pocket_type AS ENUM ('Standard', 'Locked');
-
+CREATE TYPE enum_priority AS ENUM ('High', 'Intermediate', 'Low');
+CREATE TYPE enum_status AS ENUM ('In Progress', 'Completed');
 -- As pockets references the reference table categories create it 
 -- and all tables referrencing it in one single transaction 
 -- as when there is a foreign key to a reference table, Citus 
@@ -12,9 +11,9 @@ CREATE TABLE IF NOT EXISTS pockets (
   xid                     INT NOT NULL,
   category_id             INT NOT NULL,
   name                    TEXT,
+  pocket_type             enum_pocket_type NOT NULL DEFAULT 'Standard',
   priority                enum_priority NOT NULL DEFAULT 'Intermediate',
   status                  enum_status NOT NULL DEFAULT 'In Progress',
-  pocket_type             enum_pocket_type NOT NULL DEFAULT 'Standard',
 
   -- TODO: Should these be moved to a separate table?
   target_amount           NUMERIC(30, 2) NOT NULL DEFAULT 0,

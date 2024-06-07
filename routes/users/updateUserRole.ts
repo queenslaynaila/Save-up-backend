@@ -3,19 +3,19 @@ import { sql } from '../../db';
 import { HttpError } from '../../middleware/errorMiddleware';
 import authMiddleware from '../../middleware/authorization';
 import { convertToTitleCase } from '../../middleware/caseNormalization';
-import { UserRoleUpdateInterface } from '../admin/types';
+import { UserRoleUpdateType, UserRoleParamType } from './types';
 import { UserRole, StatusCodeInterface } from '../../globalTypes/index';
 
 const VALID_ROLES = ['Admin', 'User', 'Moderator'];
 
-const SQL_UPDATE_ROLE = sql<UserRoleUpdateInterface, Record<string,never>>(`
+const SQL_UPDATE_ROLE = sql<UserRoleUpdateType, Record<string,never>>(`
   UPDATE users 
   SET role = :role 
   WHERE id = :id 
 `);
 
 export default (router: Router) => {
-  router.patch<UserRoleUpdateInterface, StatusCodeInterface, Record<string,never>, Record<string,never>>(
+  router.patch<UserRoleParamType, StatusCodeInterface, Record<string,never>, Record<string,never>>(
     '/:id/:role',
     authMiddleware({ roles: [UserRole.ADMIN] }),
     async (req, res) => {

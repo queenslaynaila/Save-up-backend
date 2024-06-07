@@ -2,76 +2,63 @@ import z from 'zod'
 import { UserRole } from '../../globalTypes/index';
 
 export const baseUserSchema = z.object({
-  full_name: z.string(),
-  gender: z.enum(['Male', 'Female']),
+  id: z.number(),
   id_type: z.enum(['National ID', 'Passport']),
-  id_number: z.string().refine(value => /^[0-9]+$/.test(value)),            
+  id_number: z.string().refine(value => /^[0-9]+$/.test(value)),    
+  full_name: z.string(),
+  role: z.enum([UserRole.ADMIN, UserRole.USER, UserRole.MODERATOR]),
+  gender: z.enum(['Male', 'Female']),
   phone_number: z
     .string()
     .refine((value) => /^\+254\d{9}$/.test(value)),
   pin: z.string().refine((value) => /^\d{4}$/.test(value)),
-});
-  
-export type UserInterface = z.infer<typeof baseUserSchema>;
-
-export const createNewUserSchema = baseUserSchema.extend({
-  entity_type: z.literal('User')
-})
-
-export type CreateNewUserInterface = z.infer<typeof createNewUserSchema>;
-
-export const createUserContactSchema = baseUserSchema.pick({
-  id_number : true,
-  phone_number: true
-}).extend({
-  entity_id: z.number()
-})
-  
-export type CreateUserContactInterface = z.infer<typeof createUserContactSchema>;
-
-export const createUserSchema = baseUserSchema.pick({
-  full_name: true,
-  gender: true,
-  pin : true
-}).extend({
-  id: z.number()
-});
-
-export type CreateUserInterface = z.infer<typeof createUserSchema>;
-
-export const GetUserSchema = createUserSchema.pick({
-  id: true,
-  full_name: true,
-  gender: true,
-}).extend({
-  role: z.enum([UserRole.ADMIN, UserRole.USER, UserRole.MODERATOR]),
   created_at: z.string()
-})
-  
-export type GetUserInterface = z.infer<typeof GetUserSchema>;
+});
 
-export const getUserQuery = GetUserSchema.pick({
-  role: true
-}).partial()
+export type UserType = z.infer<typeof baseUserSchema>;
 
-export type GetUserQueryInterface = z.infer<typeof getUserQuery>;
-
-export const updateUserPhoneSchema = baseUserSchema.pick({
-  pin: true,
+export const userCreationSchema = baseUserSchema.pick({
+  id_type: true,
+  id_number: true,
   phone_number: true,
-})
-  
-export type UpdatePhoneInterface = z.infer<typeof updateUserPhoneSchema>;
+  full_name: true,
+  gender: true,
+  pin: true
+});
 
-export type ExtendedUserInterface = GetUserInterface & { 
-  pin: string,
-  id_type:string,
-  id_number:string,
-  phone_number:string
-};
+export type UserCreationType = z.infer<typeof userCreationSchema>;
 
-export const targetParamSchema = z.object({
-  entity: z.string()
+export const loginSchema = baseUserSchema.pick({
+  phone_number: true,
+  pin: true
 })
 
-export type TargetParamInterface = z.infer<typeof targetParamSchema>;
+export type LoginType = z.infer<typeof loginSchema>;
+
+export const userByEntitySchema = z.object({
+  entity: z.string(),
+});
+
+export type UserByEntityType = z.infer<typeof userByEntitySchema>;
+
+export const userRoleUpdateSchema = z.object({
+  id: z.string(),
+  role: z.string()
+});
+
+export type UserRoleUpdateType = z.infer<typeof userRoleUpdateSchema>;
+
+export const userRoleParamSchema = z.object({
+  id: z.string(),
+  role: z.enum([UserRole.ADMIN, UserRole.USER, UserRole.MODERATOR])
+});
+
+export type UserRoleParamType = z.infer<typeof userRoleParamSchema>;
+
+export const phoneNoUpdateSchema = baseUserSchema.pick({
+  phone_number: true,
+  pin: true,
+  id: true
+})
+
+export type PhoneNoUpdateType = z.infer<typeof phoneNoUpdateSchema>;

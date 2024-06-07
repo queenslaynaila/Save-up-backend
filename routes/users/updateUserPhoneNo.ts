@@ -4,32 +4,33 @@ import { sql } from '../../db';
 import { HttpError } from '../../middleware/errorMiddleware';
 import authMiddleware from '../../middleware/authorization';
 import  { validateRequest } from '../../middleware/validationMiddleware';
-import { UpdatePhoneInterface, updateUserPhoneSchema } from './types';
+import { loginSchema, PhoneNoUpdateType } from './types';
+import { StatusCodeInterface } from '../../globalTypes/index';
 
-const SQL_GET_USER_PIN = sql<{ userId: number },{ pin: string }>(`
-  SELECT pin FROM users WHERE id = :userId
+const SQL_GET_USER_PIN = sql<{ id: number }, { pin: string }>(`
+  SELECT pin FROM users WHERE id = :id
 `);
 
-const SQL_UPDATE_PHONE = sql<{ phone_number: string; userId: number }, Record<string,never>>(`
+const SQL_UPDATE_PHONE = sql<{ phone_number: string; id: number }, Record<string,never>>(`
    UPDATE user_contact_details
    SET phone_number = :phone_number 
    WHERE id = :userId
 `);
 
 export default (router: Router) => {
-  router.patch<Record<string,never>,{ message: string }, UpdatePhoneInterface , Record<string,never>>(
+  router.patch<Record<string,never>, StatusCodeInterface, PhoneNoUpdateType , Record<string,never>>(
     '/me', 
     authMiddleware(), 
-    validateRequest(updateUserPhoneSchema),
+    validateRequest(loginSchema),
     async (req, res) => {
-      const userId= req.user!.id;
-      const userPassword = await SQL_GET_USER_PIN({ userId}).one(
+      const id= req.user!.id;
+      const userPassword = await SQL_GET_USER_PIN({ id}).one(
         new HttpError(400, 'User not found')
       );
       if (!await bcrypt.compare(req.body.pin, userPassword.pin)) {
         throw new HttpError(401, 'Invalid password');
       }
-      await SQL_UPDATE_PHONE({ phone_number:req.body.phone_number, userId}).exec();
+      await SQL_UPDATE_PHONE({ phone_number:req.body.phone_number, id}).exec();
       res.sendStatus(204);
     });
 };
