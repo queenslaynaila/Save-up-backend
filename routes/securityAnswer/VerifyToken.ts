@@ -6,15 +6,15 @@ import sendSms from '../../services/twilio';
 import authMiddleware from '../../middleware/authorization';
 import { generateResetPin } from '../../middleware/generateResetPin';
 import {  AnswerTokenType} from './types'
-import { StatusCodeInterface, IdParamInterface } from '../../globalTypes/index'; 
+import { StatusCodeInterface } from '../../globalTypes/index'; 
 
 const SQL_UPDATE_SECURITY_ANSWER = sql< AnswerTokenType, {phone_number: string}>(`
    SELECT update_security_answer(:user_id, token)
 `);
 
 export default (router: Router) => {
-  router.patch<IdParamInterface, StatusCodeInterface, AnswerTokenType, Record<string,never>>(
-    '/:id',
+  router.get<Record<string,never>, StatusCodeInterface, AnswerTokenType, Record<string,never>>(
+    '/verify',
     authMiddleware(),
     async (req, res) => {
       const resetToken =  generateResetPin();

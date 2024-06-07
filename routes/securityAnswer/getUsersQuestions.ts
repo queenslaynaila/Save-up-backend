@@ -8,7 +8,7 @@ const SQL_GET_USER_SECURITY_QUESTIONS = sql<AnswerByUserType, SecurityQuestionIn
   FROM security_questions
   LEFT JOIN security_answers 
   ON security_questions.id = security_answers.question_id
-  WHERE security_answers.user_id = :user_id
+  AND security_answers.user_id = :user_id
 `);
 
 export default (router: Router) => {
