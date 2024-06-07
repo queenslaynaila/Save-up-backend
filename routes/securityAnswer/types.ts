@@ -1,42 +1,40 @@
 import z from 'zod';
 
-export const securityQuestionSchema = z.object({
-  id: z.number(),
-  question: z.string()
-})
-  
-export type SecurityQuestionInterface = z.infer<typeof securityQuestionSchema>;
-  
-export const updateSecurityAnswerSchema = securityQuestionSchema.extend({
-  answer: z.string()
-})
-  
-export type UpdateSecurityAnswerInterface = z.infer<typeof updateSecurityAnswerSchema>;
-  
-export const securityAnswerValidationSchema = updateSecurityAnswerSchema.pick({
-  answer: true
-})
-
-export const createSecurityAnswerSchema = z.object({
+export const securityAnswersBaseSchema = z.object({
   user_id: z.number(),
   question_id: z.number(),
   answer: z.string()
-});
-  
-export type CreateSecurityAnswerInterface = z.infer<typeof createSecurityAnswerSchema>;
-  
-export const securityAnswerRequestSchema = createSecurityAnswerSchema.omit({ user_id: true});
-  
-export const securityAnswerSchema = createSecurityAnswerSchema.extend({
-  id: z.number(),
-  created_at: z.date()
-})
-  
-export type SecurityAnswerInterface = z.infer<typeof securityAnswerSchema>;
-
-export const checkAnswerSchema = z.object({
-  has_security_answer: z.boolean()
 })
 
-export type CheckAnswerInterface = z.infer<typeof checkAnswerSchema>;
-  
+export type SecurityAnswersBaseType = z.infer<typeof securityAnswersBaseSchema>;
+
+export const answerCreationValidation = securityAnswersBaseSchema.pick({
+  question_id: true,
+  answer: true
+})
+
+export const answerByUserSchema = securityAnswersBaseSchema.pick({
+  user_id: true
+})
+
+export type AnswerByUserType = z.infer<typeof answerByUserSchema>;
+
+export const AnswerUpdateSchema = securityAnswersBaseSchema.extend({
+  new_question_id:z.string().optional()
+})
+
+export type AnswerUpdateType = z.infer<typeof AnswerUpdateSchema>;
+
+export const answerTokenSchema =  AnswerUpdateSchema.pick({
+  user_id: true
+}).extend({
+  token: z.string()
+})
+
+export type AnswerTokenType = z.infer<typeof answerTokenSchema>;
+
+export const answerUpdateValidationSchema = AnswerUpdateSchema.pick({
+  answer: true,
+}).extend({
+  new_question_id:z.string().optional()
+})
