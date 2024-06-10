@@ -29,7 +29,7 @@ export default (router: Router) => {
       if (incorrectAnswers.length > 0) {
         throw new HttpError(401, `Incorrect answers. Contact customer service for help.`);
       }
-      res.sendStatus(201);
+      res.sendStatus(204);
     }
   );
 };

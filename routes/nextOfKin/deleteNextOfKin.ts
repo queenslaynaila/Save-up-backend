@@ -20,7 +20,7 @@ export default (router: Router) => {
       const user_id = req.user!.id;
       const xid = parseInt(req.params.id);
       await SQL_DELETE_KIN({user_id, xid }).exec();
-      res.sendStatus(201);
+      res.sendStatus(204);
     }
   );
 };

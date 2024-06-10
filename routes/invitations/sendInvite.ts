@@ -15,7 +15,7 @@ export default (router: Router) => {
     async (req, res) => {
       await SQL_SEND_INVITATION({...req.body, sender_id:req.user!.id })
         .exec()
-      res.sendStatus(201);
+      res.sendStatus(204);
     }
   );
 };

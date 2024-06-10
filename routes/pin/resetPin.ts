@@ -6,7 +6,8 @@ import {  StatusCodeInterface } from '../../globalTypes/index';
 import { ResetPasswordInterface, ResetPasswordRequestInterface } from './types';
 
 const SQL_RESET_PASSWORD = sql<ResetPasswordRequestInterface, Record<string,never>>(`
-  UPDATE users SET pin = :pin  WHERE  user_id = :id
+  UPDATE users SET pin = :pin  
+  WHERE  user_id = :id
 `);
 
 export default (router: Router) => {
@@ -18,6 +19,6 @@ export default (router: Router) => {
       const user_id = req.user!.id;
       const hashPassword = bcrypt.hashSync(new_pin, 10);
       await SQL_RESET_PASSWORD({ id: user_id, pin: hashPassword }).exec();
-      res.sendStatus(201);
+      res.sendStatus(204);
     });
 };

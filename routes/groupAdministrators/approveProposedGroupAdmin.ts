@@ -22,7 +22,7 @@ export default (router: Router) => {
         voter_member_id, 
         nominated_member_id: parseInt(nominated_member_id), 
         vote }).exec();
-      res.sendStatus(201);
+      res.sendStatus(204);
     }
   );
 };

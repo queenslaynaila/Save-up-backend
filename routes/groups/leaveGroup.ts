@@ -22,7 +22,7 @@ export default (router: Router) => {
       const user_id = req.user!.id;
       const  group_id  = parseInt(req.params.id); 
       await SQL_EXIT_GROUP({ user_id, group_id }).exec();
-      res.sendStatus(201);
+      res.sendStatus(204);
     }
   );
 };

@@ -31,6 +31,6 @@ export default (router: Router) => {
       const hashedNewPassword = bcrypt.hashSync(new_pin, 10);
       await SQL_UPDATE_PASSWORD({ id: userId, pin: hashedNewPassword }).exec();
       
-      res.sendStatus(201);
+      res.sendStatus(204);
     });
 };
