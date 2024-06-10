@@ -2,16 +2,16 @@ import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { HttpError } from '../../middleware/errorMiddleware';
-import { GetTotalExpenseInterface, GetTotalExpenseQueryInterface, GetUserCumulaInterface } from './types'
+import { TotalExpenseInterface, TotalExpenseQueryInterface, UserCumulaInterface } from './types'
 
-const SQL_GET_TOTAL_EXPENSES = sql<GetUserCumulaInterface, GetTotalExpenseInterface>(`
+const SQL_GET_TOTAL_EXPENSES = sql<UserCumulaInterface, TotalExpenseInterface>(`
   SELECT COALESCE(SUM(amount_spent), 0) AS total_expenses
   FROM expenses
   WHERE entity_id = :user_id
 `);
 
 export default (router: Router) => {
-  router.get<Record<string,never>, GetTotalExpenseInterface, Record<string,never>, GetTotalExpenseQueryInterface>(
+  router.get<Record<string,never>, TotalExpenseInterface, Record<string,never>, TotalExpenseQueryInterface>(
     '/total-expenses', 
     authMiddleware(), 
     async (req, res) => {

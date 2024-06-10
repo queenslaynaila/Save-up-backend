@@ -1,45 +1,45 @@
 import { z } from 'zod';
 
-export const getUserCumulaSchema = z.object({
+export const userCumulaSchema = z.object({
   user_id:z.number()
 })
 
-export type GetUserCumulaInterface = z.infer< typeof getUserCumulaSchema>
+export type UserCumulaInterface = z.infer< typeof userCumulaSchema>
 
-export const getTopExpenseCategoriesSchema = z.array(
+export const topExpenseCategoriesSchema = z.array(
   z.object({
     category_id:z.number(),
     total_expense:z.number()
   })
 )
   
-export type TopExpenseCategoriesInterface = z.infer<typeof getTopExpenseCategoriesSchema>;
+export type TopExpenseCategoriesInterface = z.infer<typeof topExpenseCategoriesSchema>;
   
-export const getTotalExpensesQuerySchema = z.object({
+export const totalExpensesQuerySchema = z.object({
   start_date: z.string().optional(),
   end_date: z.string().optional(),
   category_id: z.string().optional()
 });
 
-export type GetTotalExpenseQueryInterface = z.infer<typeof getTotalExpensesQuerySchema>;
+export type TotalExpenseQueryInterface = z.infer<typeof totalExpensesQuerySchema>;
   
-export const getTotalExpenseResultSchema = z.object({
+export const totalExpenseResultSchema = z.object({
   total_expenses: z.number()
 })
 
-export type GetTotalExpenseInterface = z.infer<typeof getTotalExpenseResultSchema>;
+export type TotalExpenseInterface = z.infer<typeof totalExpenseResultSchema>;
   
-export const getTotalDepositsResultSchema = z.object({
+export const totalDepositsResultSchema = z.object({
   total_deposits: z.number()
 })
 
-export type GetTotalDepositsInterface = z.infer<typeof getTotalDepositsResultSchema>
+export type TotalDepositsInterface = z.infer<typeof totalDepositsResultSchema>
   
-export const getTotalTargetsSchema = z.object({
+export const totalTargetsSchema = z.object({
   total_target_amount: z.number()
 })
 
-export type GetTotalTargetsInterface = z.infer<typeof getTotalTargetsSchema>;
+export type TotalTargetsInterface = z.infer<typeof totalTargetsSchema>;
   
 export const totalTargetPocketsQuerySchema = z.object({
   priority: z.string().optional(),
@@ -47,9 +47,8 @@ export const totalTargetPocketsQuerySchema = z.object({
   category_id: z.string().optional()
 });
 
-export const getTotalSavingsResultSchema = z.object({
+export const totalSavingsResultSchema = z.object({
   total_deposits: z.number()
 })
 
 export type TotalTargetPocketsQueryInterface = z.infer<typeof totalTargetPocketsQuerySchema>;
-  
