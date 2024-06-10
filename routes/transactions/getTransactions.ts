@@ -1,14 +1,14 @@
 import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import { GetTransactionsInput, 
-  GetTransactionResp, 
-  GetTransactionQuery,
-  GetByEntity 
+import { TransactionInput, 
+  TransactionInterface, 
+  TransactionQueryParams,
+  TransactionByEntity 
 } from './types';
 import { IdParamInterface } from '../../globalTypes/index';
 
-const SQL_GET_TRANSACTIONS = sql<GetTransactionsInput, GetTransactionResp>(`
+const SQL_GET_TRANSACTIONS = sql<TransactionInput,  TransactionInterface>(`
   SELECT xid AS transaction_id, 
          transaction_type, 
          amount, 
@@ -21,7 +21,7 @@ const SQL_GET_TRANSACTIONS = sql<GetTransactionsInput, GetTransactionResp>(`
 `);
 
 export default (router: Router) => {
-  router.get<IdParamInterface, GetTransactionResp[], GetByEntity, GetTransactionQuery>(
+  router.get<IdParamInterface,  TransactionInterface[], TransactionByEntity, TransactionQueryParams>(
     '/:id', 
     authMiddleware(),
     async (req, res) => {

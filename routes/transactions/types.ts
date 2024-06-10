@@ -12,7 +12,7 @@ export const getByEntitySchema = z.object({
   entity_id: z.number().optional()
 })
 
-export type GetByEntity = z.infer<typeof getByEntitySchema>;
+export type TransactionByEntity = z.infer<typeof getByEntitySchema>;
 
 export const getTransactionsInputSchema = getByEntitySchema
   .required()
@@ -20,7 +20,7 @@ export const getTransactionsInputSchema = getByEntitySchema
     pocket_id: z.string()
   })
 
-export type GetTransactionsInput = z.infer<typeof getTransactionsInputSchema>;
+export type TransactionInput = z.infer<typeof getTransactionsInputSchema>;
 
 export const getTransactionRespSchema = z.object({
   transaction_id: z.number().positive(),
@@ -37,7 +37,7 @@ export const getTransactionRespSchema = z.object({
   transaction_date: z.date()
 });
 
-export type GetTransactionResp = z.infer<typeof getTransactionRespSchema>;
+export type  TransactionInterface = z.infer<typeof getTransactionRespSchema>;
 
 export const getTransactionQuery = z.object({
   transaction_type: z.enum([
@@ -51,4 +51,4 @@ export const getTransactionQuery = z.object({
   to_date: z.string().optional()
 });
 
-export type GetTransactionQuery = z.infer<typeof getTransactionQuery>;
+export type  TransactionQueryParams = z.infer<typeof getTransactionQuery>;

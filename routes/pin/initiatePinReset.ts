@@ -28,7 +28,6 @@ export default  (router: Router) => {
     '/',
     async (req, res) => {
       const { phone_number } = req.body;
-
       const user = await SQL_GET_USER({ phone_number })
         .one(new HttpError(404, 'User not found.'));
 
