@@ -3,10 +3,10 @@ import { sql } from '../../db';
 import { HttpError } from '../../middleware/errorMiddleware';
 import authMiddleware from '../../middleware/authorization';
 import { validateRequest } from '../../middleware/validationMiddleware';
-import { UpdateExpenseInterface, ExpenseInterface, validateUpdateExpenseSchema } from './types';
+import { ExpenseUpdateInterface, ExpenseUpdateRes, validateUpdateExpenseSchema } from './types';
 import { IdParamInterface } from '../../globalTypes/index'
 
-const SQL_UPDATE_EXPENSE= sql<UpdateExpenseInterface,ExpenseInterface>(`
+const SQL_UPDATE_EXPENSE= sql<ExpenseUpdateInterface, ExpenseUpdateRes>(`
   UPDATE expenses
   SET description = COALESCE(:description, expenses.description),
       category_id = COALESCE(:category_id, expenses.category_id),
@@ -19,7 +19,7 @@ const SQL_UPDATE_EXPENSE= sql<UpdateExpenseInterface,ExpenseInterface>(`
 `);
 
 export default (router: Router) => {
-  router.patch<IdParamInterface, ExpenseInterface, UpdateExpenseInterface, Record<string,never>>(
+  router.patch<IdParamInterface, ExpenseUpdateRes, ExpenseUpdateInterface, Record<string,never>>(
     '/:id', 
     authMiddleware(), 
     validateRequest(validateUpdateExpenseSchema),

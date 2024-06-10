@@ -2,10 +2,10 @@ import { Router } from 'express';
 import { sql } from '../../db';
 import { HttpError } from '../../middleware/errorMiddleware';
 import authMiddleware from '../../middleware/authorization';
-import { ExpenseInterface } from './types';
+import { BaseExpenseInterface } from './types';
 import { IdParamInterface, XidEntityInterface } from '../../globalTypes/index'
 
-const SQL_GET_EXPENSE_BY_ID = sql<XidEntityInterface,  ExpenseInterface>(`
+const SQL_GET_EXPENSE_BY_ID = sql<XidEntityInterface,  BaseExpenseInterface>(`
   SELECT xid, entity_id, category_id, description, amount, spent_at, created_at
   FROM expenses 
   WHERE xid = :xid 
@@ -13,7 +13,7 @@ const SQL_GET_EXPENSE_BY_ID = sql<XidEntityInterface,  ExpenseInterface>(`
 `);
 
 export default (router: Router) => {
-  router.get<IdParamInterface, ExpenseInterface, Record<string,never>, Record<string,never>>(
+  router.get<IdParamInterface, BaseExpenseInterface, Record<string,never>, Record<string,never>>(
     '/me/:id', 
     authMiddleware(), 
     async (req, res) => {

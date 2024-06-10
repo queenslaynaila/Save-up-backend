@@ -3,17 +3,17 @@ import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import isStandardUser from '../../middleware/isStandardUser';
 import { HttpError } from '../../middleware/errorMiddleware';
-import { ExpenseInterface, ExpenseQueryInterface } from './types';
+import { BaseExpenseInterface, ExpenseQueryInterface } from './types';
 import { IdParamInterface, idSchema } from '../../globalTypes/index'
 
-const SQL_GET_EXPENSES = sql<Record<string, string>, ExpenseInterface>(`
+const SQL_GET_EXPENSES = sql<Record<string, string>, BaseExpenseInterface>(`
   SELECT entity_id, xid, category_id, description, amount, spent_at, created_at
   FROM expenses 
   WHERE deleted_at IS NULL`
 );
 
 export default (router: Router) => {
-  router.get<IdParamInterface, ExpenseInterface[], Record<string,never>, ExpenseQueryInterface>(
+  router.get<IdParamInterface, BaseExpenseInterface[], Record<string,never>, ExpenseQueryInterface>(
     '/:expenseIdentifier', 
     authMiddleware(), 
     async (req, res) => {
