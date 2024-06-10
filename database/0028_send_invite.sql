@@ -13,9 +13,6 @@ BEGIN
 
     INSERT INTO invitations (id, sender_id, receiver_id)
     VALUES( p_group_id , p_sender_id, v_receiver_id); 
-EXCEPTION 
-    WHEN OTHERS THEN
-        RAISE EXCEPTION 'An error occurred while sending the invite';
 END;
 $$ LANGUAGE plpgsql;
 
