@@ -44,7 +44,6 @@ BEGIN
     PERFORM insert_transaction_log(
         p_entity_id,
         p_pocket_id,
-        v_transaction_id,
         'Saving'::enum_transaction_type,
         p_amount,
         v_reference_no,
