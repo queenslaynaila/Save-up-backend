@@ -19,7 +19,8 @@ BEGIN
         UPDATE invitations
         SET deleted_at = NOW()
         WHERE receiver_id = p_receiver_id
-        AND group_id = p_group_id;
+        AND group_id = p_group_id
+        AND deleted_at is NULL;
     END IF;
 END;
 $$ LANGUAGE plpgsql;
