@@ -11,7 +11,7 @@ BEGIN
     AND group_id = p_group_id;
 
     IF p_status = 'Accept'::enum_invite THEN
-        INSERT INTO user_groups (user_id, group_id)
+        INSERT INTO group_users (user_id, group_id)
         VALUES (p_receiver_id, p_group_id);
     END IF;
 

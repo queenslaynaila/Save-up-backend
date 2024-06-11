@@ -5,7 +5,7 @@ import { GroupExitInterface } from './types';
 import { StatusCodeInterface, IdParamInterface } from '../../globalTypes/index';
 
 const SQL_EXIT_GROUP = sql<GroupExitInterface , Record<string,never>>(`
-  UPDATE user_groups
+  UPDATE group_users
   SET left_at = NOW()
   WHERE user_id = :user_id 
   AND group_id = :group_id

@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS user_groups (
+CREATE TABLE IF NOT EXISTS group_users (
   group_id      INT NOT NULL,
   user_id       INT NOT NULL,
   joined_at     TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
@@ -7,10 +7,10 @@ CREATE TABLE IF NOT EXISTS user_groups (
   FOREIGN KEY   (user_id) REFERENCES entities(id)
 );
 
-SELECT create_distributed_table('user_groups', 'group_id');
+SELECT create_distributed_table('group_users', 'group_id');
 
-ALTER TABLE user_groups
+ALTER TABLE group_users
 ADD CONSTRAINT user_groups_group_id_fk
 FOREIGN KEY (group_id) REFERENCES groups(id);
 
-GRANT INSERT, SELECT, UPDATE ON user_groups TO app_user;
+GRANT INSERT, SELECT, UPDATE ON group_users TO app_user;

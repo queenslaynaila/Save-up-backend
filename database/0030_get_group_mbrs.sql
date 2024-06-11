@@ -11,7 +11,7 @@ DECLARE
 BEGIN
     FOR rec_user IN
         SELECT ug.user_id, ug.joined_at
-        FROM user_groups ug
+        FROM group_users ug
         WHERE ug.group_id = p_group_id 
         AND ug.left_at IS NULL
     LOOP

@@ -9,8 +9,8 @@ const SQL_GET_COMMON_GROUPS = sql<SharedGroupInterface, CommonGroupInterface>(`
          groups.name, 
          groups.created_at
   FROM groups
-  LEFT JOIN user_groups AS ug1 ON groups.id = ug1.group_id  
-  LEFT JOIN user_groups AS ug2 ON groups.id = ug2.group_id  
+  LEFT JOIN group_users AS ug1 ON groups.id = ug1.group_id  
+  LEFT JOIN group_users AS ug2 ON groups.id = ug2.group_id  
   WHERE ug1.user_id = :logged_in_user_id 
   AND ug2.user_id = :user_id
   AND ug1.left_at IS NULL 

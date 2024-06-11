@@ -18,7 +18,7 @@ BEGIN
     INSERT INTO groups (id, name, created_by)
     VALUES (v_entity_id, p_name, p_created_by);
 
-    INSERT INTO user_groups (user_id, group_id)
+    INSERT INTO group_users (user_id, group_id)
     VALUES (p_created_by, v_entity_id);
 
     INSERT INTO group_administrators(user_id, group_id)

@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS group_administrators (
   created_at    TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   removed_at    TIMESTAMP WITH TIME ZONE,
   PRIMARY KEY   (group_id,user_id),
-  FOREIGN KEY   (group_id,user_id) REFERENCES user_groups(group_id,user_id)
+  FOREIGN KEY   (group_id,user_id) REFERENCES group_users(group_id,user_id)
 );
 
 GRANT INSERT, SELECT, UPDATE ON group_administrators TO app_user;
