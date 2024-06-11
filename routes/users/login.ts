@@ -13,11 +13,11 @@ const SQL_GET_USER = sql<{ phone_number: string }, UserType>(`
     users.id, 
     user_contact_details.id_type, 
     user_contact_details.id_number, 
+    user_contact_details.phone_number, 
     users.full_name, 
     users.role, 
     users.gender, 
     users.pin,
-    user_contact_details.phone_number, 
     users.created_at
   FROM 
     users
