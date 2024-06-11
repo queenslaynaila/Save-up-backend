@@ -52,9 +52,6 @@ BEGIN
       groups.created_at 
       FROM groups 
       WHERE groups.id = v_entity_id;
-EXCEPTION 
-    WHEN OTHERS THEN
-        RAISE EXCEPTION 'An error occurred while creating the group';
 END;
 $$ LANGUAGE plpgsql;
 
