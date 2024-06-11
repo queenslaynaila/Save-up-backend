@@ -1,8 +1,8 @@
 CREATE TABLE IF NOT EXISTS nominated_administrators (
-  group_id           INT NOT NULL,
+  group_id           INT PRIMARY KEY,
   user_id            INT NOT NULL,
-  nominated_at       TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-  PRIMARY KEY        (group_id, user_id),
+  created_at         TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  revoked_at         TIMESTAMP WITH TIME ZONE,
   FOREIGN KEY        (group_id, user_id) REFERENCES group_users(group_id, user_id)
 );
 
