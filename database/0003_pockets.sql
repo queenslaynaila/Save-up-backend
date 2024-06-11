@@ -14,12 +14,9 @@ CREATE TABLE IF NOT EXISTS pockets (
   pocket_type             enum_pocket_type NOT NULL DEFAULT 'Standard',
   priority                enum_priority NOT NULL DEFAULT 'Intermediate',
   status                  enum_status NOT NULL DEFAULT 'In Progress',
-
-  -- TODO: Should these be moved to a separate table?
   target_amount           NUMERIC(30, 2) NOT NULL DEFAULT 0,
   target_at               TIMESTAMP WITH TIME ZONE,
   completed_at            TIMESTAMP WITH TIME ZONE, 
-
   created_at              TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   updated_at              TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   deleted_at              TIMESTAMP WITH TIME ZONE,

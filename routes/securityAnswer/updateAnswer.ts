@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import bcrypt from 'bcrypt'; 
 import { sql } from '../../db';
-import { verifyResetToken } from '../../middleware/resetTokenMIddleware'
+import authMiddleware from '../../middleware/authorization';
 import { validateRequest } from '../../middleware/validationMiddleware';
 import { answerUpdateValidationSchema, AnswerUpdateType } from './types'
 import { StatusCodeInterface, IdParamInterface } from '../../globalTypes/index'; 
@@ -18,7 +18,7 @@ const SQL_UPDATE_SECURITY_ANSWER = sql<AnswerUpdateType, Record<string,never>>(`
 export default (router: Router) => {
   router.patch<IdParamInterface, StatusCodeInterface, AnswerUpdateType, Record<string,never>>(
     '/:id',
-    verifyResetToken,
+    authMiddleware(),
     validateRequest(answerUpdateValidationSchema),
     async (req, res) => {
       const answer = await bcrypt.hash(req.body.answer, 12); 

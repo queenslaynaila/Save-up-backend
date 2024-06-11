@@ -5,7 +5,7 @@ CREATE OR REPLACE FUNCTION insert_transaction_log(
     p_transaction_type      enum_transaction_type,
     p_amount                NUMERIC,
     p_reference_no          TEXT,
-    p_cumulative_amount     NUMERIC
+    p_current_balance    NUMERIC
 )
 RETURNS VOID AS $$
 BEGIN 
@@ -16,7 +16,7 @@ BEGIN
         transaction_type, 
         amount, 
         reference_no,
-        cumulative_amount
+        current_balance
     )
     VALUES (
         p_entity_id,
@@ -25,7 +25,7 @@ BEGIN
         p_transaction_type,
         p_amount,
         p_reference_no,
-        p_cumulative_amount
+        p_current_balance 
     );
 END;
 $$ LANGUAGE plpgsql;

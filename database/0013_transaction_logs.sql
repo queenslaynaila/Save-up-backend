@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS transaction_logs (
   amount                  NUMERIC(30, 2) NOT NULL CHECK (amount > 0),
   reference_no            TEXT NOT NULL,
   status                  enum_transaction_status  NOT NULL DEFAULT 'Pending',
-  cumulative_amount       NUMERIC(30, 2) NOT NULL CHECK (cumulative_amount >= 0), 
+  current_balance         NUMERIC(30, 2) NOT NULL CHECK (current_balance >= 0), 
   created_at              TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   PRIMARY KEY             (entity_id, xid),
   FOREIGN KEY             (entity_id, pocket_id) REFERENCES pockets (entity_id, xid)

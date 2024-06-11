@@ -18,6 +18,5 @@ $$ LANGUAGE plpgsql;
 
 GRANT EXECUTE ON FUNCTION send_group_invite(TEXT, INT, INT) TO app_user;
 SELECT create_distributed_function(
-  'send_group_invite(TEXT, INT, INT)', 'p_group_id',
-  collocate_with := 'invitations'
+  'send_group_invite(TEXT, INT, INT)', 'p_group_id'
 );

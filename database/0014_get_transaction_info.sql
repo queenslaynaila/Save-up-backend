@@ -9,7 +9,7 @@ RETURNS TABLE (
 BEGIN
     SELECT 
         COALESCE(MAX(xid) + 1, 1) AS v_transaction_id,
-        COALESCE((SELECT cumulative_amount
+        COALESCE((SELECT current_balance
                 FROM transaction_logs
                 WHERE pocket_id = p_pocket_id
                 AND entity_id = p_entity_id
