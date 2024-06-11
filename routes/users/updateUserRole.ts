@@ -9,7 +9,9 @@ import { UserRole, StatusCodeInterface } from '../../globalTypes/index';
 const VALID_ROLES = ['Admin', 'User', 'Moderator'];
 
 const SQL_UPDATE_ROLE = sql<UserRoleUpdateType, Record<string,never>>(`
-  SELECT update_user_role (:id, :role)
+  UPDATE users 
+  SET role = :role 
+  WHERE id = :id; 
 `);
 
 export default (router: Router) => {

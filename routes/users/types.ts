@@ -20,6 +20,7 @@ export type UserType = z.infer<typeof baseUserSchema>;
 export const userCreationSchema = baseUserSchema.pick({
   id_type: true,
   id_number: true,
+  role: true,
   phone_number: true,
   full_name: true,
   gender: true,

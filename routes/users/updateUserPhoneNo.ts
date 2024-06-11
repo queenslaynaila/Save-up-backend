@@ -14,7 +14,7 @@ const SQL_GET_USER_PIN = sql<{ id: number }, { pin: string }>(`
 const SQL_UPDATE_PHONE = sql<{ phone_number: string; id: number }, Record<string,never>>(`
    UPDATE user_contact_details
    SET phone_number = :phone_number 
-   WHERE id = :userId
+   WHERE id = :id
 `);
 
 export default (router: Router) => {
