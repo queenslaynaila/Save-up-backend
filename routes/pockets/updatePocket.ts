@@ -33,7 +33,17 @@ export default (router: Router) => {
     validateRequest(pocketPatchRequestSchema),
     async (req, res) => {
       const entity_id = req.body.entity_id ?? req.user!.id;
-      const goal = await SQL_UPDATE_POCKET({ ...req.body, entity_id, xid:parseInt(req.params.id)})
+      const { name, category_id, target_amount, priority, target_at, pocket_type } = req.body;      
+      const goal = await SQL_UPDATE_POCKET({
+        xid: parseInt(req.params.id),
+        entity_id,
+        name,
+        category_id,
+        target_amount,
+        priority,
+        target_at,
+        pocket_type
+      })
         .one(new HttpError(404, 'Not found'));
       return res.json(goal);
     });

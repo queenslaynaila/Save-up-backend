@@ -27,18 +27,18 @@ const SQL_GET_POCKETS = sql<{entity_id: number}, BasePocketType>(`
 
 export default (router: Router) => {
   router.get<string, Record<string, never>, BasePocketType[], PocketByEntityType , PocketQueryParamsType>(
-    '/', 
+    '/me/', 
     authMiddleware(), 
     async (req, res) => {
       const entity_id = req.body.entity_id ?? req.user!.id; // either grp or user
       const { category_id, priority, status, start_date, end_date, is_default } = req.query;
-
+      
       const filters: string[] = [];
       const filterArgs: Record<string, string> = {};
 
       if (is_default) {
-        filterArgs.is_default = is_default;
-        filters.push(`is_default = :is_default`);
+        filterArgs.xid  = '1';
+        filters.push(`xid = :xid`);
       }
       if (category_id) {
         filterArgs.category_id = category_id;
