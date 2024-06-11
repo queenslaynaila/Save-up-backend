@@ -4,7 +4,7 @@ import authMiddleware from '../../middleware/authorization';
 import { validateRequest } from '../../middleware/validationMiddleware';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { convertToTitleCase } from '../../middleware/caseNormalization';
-import { InviteResponseInterface, InviteRequestInterface, inviteRequestSchema } from './types';
+import { InviteResponseInterface, inviteValidationSchema } from './types';
 import { StatusCodeInterface } from '../../globalTypes/index';
 
 const SQL_RESPOND_TO_INVITE = sql<InviteResponseInterface, StatusCodeInterface>(`
@@ -14,10 +14,10 @@ const SQL_RESPOND_TO_INVITE = sql<InviteResponseInterface, StatusCodeInterface>(
 const VALID_RESOURCES = ['Pending', 'Accepted', 'Rejected'];
 
 export default (router: Router) => {
-  router.patch<{ id:string }, StatusCodeInterface, InviteRequestInterface, Record<string,never>, Record<string,never>>(
+  router.patch<{ id:string }, StatusCodeInterface, InviteResponseInterface, Record<string,never>, Record<string,never>>(
     '/:id',
     authMiddleware(),
-    validateRequest( inviteRequestSchema),
+    validateRequest(inviteValidationSchema),
     async (req, res) => {
       const group_id  = parseInt(req.params.id);
       const  receiver_id = req.user!.id

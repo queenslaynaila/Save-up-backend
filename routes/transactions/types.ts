@@ -14,15 +14,7 @@ export const getByEntitySchema = z.object({
 
 export type TransactionByEntity = z.infer<typeof getByEntitySchema>;
 
-export const getTransactionsInputSchema = getByEntitySchema
-  .required()
-  .extend({
-    pocket_id: z.string()
-  })
-
-export type TransactionInput = z.infer<typeof getTransactionsInputSchema>;
-
-export const getTransactionRespSchema = z.object({
+export const baseTransactionSchema = z.object({
   transaction_id: z.number().positive(),
   transaction_type: z.enum([
     transactionType.SAVING,
@@ -31,24 +23,29 @@ export const getTransactionRespSchema = z.object({
     transactionType.TRANSFER_IN,
     transactionType.TRANSFER_OUT
   ]),
-  amount: z.number(),
   reference_no: z.string(),
-  cumulative_amount: z.number(),
+  amount: z.number(),
+  current_balance: z.number().positive(),
   transaction_date: z.date()
-});
+})
 
-export type  TransactionInterface = z.infer<typeof getTransactionRespSchema>;
+export type BaseTransaction = z.infer<typeof baseTransactionSchema>;
 
-export const getTransactionQuery = z.object({
-  transaction_type: z.enum([
-    transactionType.SAVING,
-    transactionType.EXTERNAL_SAVING,
-    transactionType.WITHDRAWAL,
-    transactionType.TRANSFER_IN,
-    transactionType.TRANSFER_OUT
-  ]).optional(),
-  from_date: z.string().optional(),
-  to_date: z.string().optional()
-});
 
-export type  TransactionQueryParams = z.infer<typeof getTransactionQuery>;
+export const getTransactionsInputSchema = getByEntitySchema
+  .required()
+  .extend({
+    pocket_id: z.string()
+  })
+
+export type TransactionInput = z.infer<typeof getTransactionsInputSchema>;
+
+export const transactionQueryParams = baseTransactionSchema.pick({
+  transaction_type: true,
+}).extend({
+  pocket_id: z.string(),
+  from_date:z.string(),
+  to_date:z.string()
+}) 
+
+export type  TransactionQueryParams = z.infer<typeof transactionQueryParams>;

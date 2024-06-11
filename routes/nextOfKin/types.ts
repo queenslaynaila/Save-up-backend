@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const createNextOfKinSchema = z.object({
+export const nextOfKinCreationSchema = z.object({
   user_id:z.number(),
   full_name: z.string(),
   relationship: z.enum(['Parent', 'Spouse', 'Sibling', 'Child', 'Relative', 'Lawyer', 'Friend']),
@@ -9,9 +9,9 @@ export const createNextOfKinSchema = z.object({
     .refine((value) => /^\+254\d{9}$/.test(value)),
 });
   
-export type CreateNextOfKinInterface = z.infer<typeof createNextOfKinSchema>;
+export type NextOfKinCreationInterface = z.infer<typeof nextOfKinCreationSchema>;
   
-export const NextOfKinSchema= createNextOfKinSchema
+export const NextOfKinSchema= nextOfKinCreationSchema
   .omit({ user_id: true })
   .extend({
     xid: z.number(),
@@ -21,22 +21,22 @@ export const NextOfKinSchema= createNextOfKinSchema
   
 export type NextOfKinInterface = z.infer<typeof NextOfKinSchema>;
   
-export const updateNextOfKinSchema = createNextOfKinSchema.partial().extend({
+export const nextOfKinUpdateSchema = nextOfKinCreationSchema.partial().extend({
   id: z.number()
 });
   
-export type UpdateNextOfKinInterface = z.infer<typeof updateNextOfKinSchema>;
+export type NextOfKinUpdateInterface = z.infer<typeof nextOfKinUpdateSchema>;
 
-export const nextOfKinCreationSchema = createNextOfKinSchema.omit({ user_id: true });
+export const nextOfKinCreationScheman = nextOfKinCreationSchema.omit({ user_id: true });
 
-export const deleteNextOfKinSchema = NextOfKinSchema
+export const nextOfKinDeletionSchema = NextOfKinSchema
   .pick({xid: true}).
   extend({user_id: z.number()})
 
-export type DeleteNextOfKinInterface = z.infer<typeof deleteNextOfKinSchema>;
+export type NextOfKinDeletionInterface = z.infer<typeof nextOfKinDeletionSchema>;
 
-export const getNextOfKinSchema = createNextOfKinSchema.pick({
+export const nextOfKinInputSchema= nextOfKinCreationSchema.pick({
   user_id: true
 })
 
-export type GetNextOfKinInterface = z.infer<typeof getNextOfKinSchema>;
+export type NextOfKinInputInterface = z.infer<typeof nextOfKinInputSchema>;

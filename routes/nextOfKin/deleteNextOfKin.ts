@@ -1,10 +1,10 @@
 import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import { DeleteNextOfKinInterface } from './types';
+import {NextOfKinDeletionInterface } from './types';
 import { IdParamInterface, StatusCodeInterface } from '../../globalTypes/index';
 
-const SQL_DELETE_KIN = sql<DeleteNextOfKinInterface, Record<string,never>>(`
+const SQL_DELETE_KIN = sql<NextOfKinDeletionInterface, Record<string,never>>(`
   UPDATE next_of_kins  
   SET deleted_at = NOW()
   WHERE user_id = :user_id

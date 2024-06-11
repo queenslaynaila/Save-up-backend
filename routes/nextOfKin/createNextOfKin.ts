@@ -3,9 +3,9 @@ import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { validateRequest } from '../../middleware/validationMiddleware';
-import { CreateNextOfKinInterface, NextOfKinInterface, nextOfKinCreationSchema } from './types'; 
+import { NextOfKinCreationInterface, NextOfKinInterface, nextOfKinCreationSchema } from './types'; 
 
-const SQL_CREATE_KIN = sql<CreateNextOfKinInterface, NextOfKinInterface>(`
+const SQL_CREATE_KIN = sql<NextOfKinCreationInterface, NextOfKinInterface>(`
   INSERT INTO next_of_kins (
     user_id,
     xid,
@@ -25,7 +25,7 @@ const SQL_CREATE_KIN = sql<CreateNextOfKinInterface, NextOfKinInterface>(`
 `);
 
 export default (router: Router) => {
-  router.post<Record<string,never>, NextOfKinInterface, CreateNextOfKinInterface, Record<string,never>, Record<string,never>>(
+  router.post<Record<string,never>, NextOfKinInterface, NextOfKinCreationInterface, Record<string,never>, Record<string,never>>(
     '/', 
     authMiddleware(), 
     validateRequest(nextOfKinCreationSchema),

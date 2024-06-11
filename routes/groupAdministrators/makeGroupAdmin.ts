@@ -2,22 +2,22 @@ import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { StatusCodeInterface } from '../../globalTypes/index'
-import { UserInterface, GroupInterface, ProposeAdminInterface} from './types'
+import { AdminProposalInterface, GroupInterface } from './types'
 
-const SQL_CREATE_GROUP_ADMIN = sql<ProposeAdminInterface, Record<string,never>>(`
+const SQL_CREATE_GROUP_ADMIN = sql<AdminProposalInterface, Record<string,never>>(`
   INSERT INTO group_administrators (group_id, user_id)
   VALUES (:group_id, :user_id)
   RETURNING *;
 `);
 
 export default (router: Router) => {
-  router.post<GroupInterface, StatusCodeInterface, UserInterface, Record<string,never>, Record<string,never>>(
+  router.post<GroupInterface, StatusCodeInterface, AdminProposalInterface, Record<string,never>, Record<string,never>>(
     '/:group_id',
     authMiddleware(),
     async (req, res) => {
-      const { user_id } = req.body;
+      const { receiver_id } = req.body;
       const group_id  = parseInt(req.params.group_id);
-      await SQL_CREATE_GROUP_ADMIN({ user_id, group_id }).exec();
+      await SQL_CREATE_GROUP_ADMIN({ receiver_id, group_id }).exec();
       res.sendStatus(201);
     }
   );

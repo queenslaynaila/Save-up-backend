@@ -1,56 +1,41 @@
 import { z } from 'zod';
 
-export const sendInviteSchema = z.object({
-  sender_id:z.number(),
+export const inviteByReceiverSchema = z.object({
+  receiver_id:z.number()
+})
+
+export type InviteByReceiverInterface = z.infer<typeof inviteByReceiverSchema>;
+
+export const baseInviteSchema = z.object({
   group_id:z.number(),
-  phone_number:z.string()
+  sender_id:z.number(),
+  sender_name:z.string(),
+  group_name:z.string(),
+  created_at:z.date()
 });
 
-export type SendInviteInterface = z.infer<typeof sendInviteSchema>;
- 
-export const getInviteSchema = sendInviteSchema.extend({
-  created_at:z.date(),
-})
-  
-export type InviteInterface = z.infer<typeof getInviteSchema>;
+export type baseInviteInterface = z.infer<typeof baseInviteSchema>;
 
-export const receivedInviteSchema = sendInviteSchema
-  .omit({
-    phone_number: true
+export const inviteInputSchema = baseInviteSchema
+  .pick({
+    group_id:true,
+    sender_id: true
   })
   .extend({
-    group_name:z.string(),
-    sender_name:z.string(),
-    created_at:z.date(),
+    phone_number:z.string(),
   })
 
-export type ReceivedInviteInterface = z.infer<typeof receivedInviteSchema>;
+export type InviteInputInterface = z.infer<typeof inviteInputSchema>;
 
-export const inviteSchema = z.object({
+export const inviteResponseSchema = z.object({
   group_id:z.number(),
-  sender_id:z.number(),
   receiver_id:z.number(),
-});
-  
-export const inviteResponseSchema = inviteSchema.extend({
   status:z.string()
-}).omit({sender_id: true});
-  
+})
+
 export type InviteResponseInterface = z.infer<typeof inviteResponseSchema>;
-  
-export const inviteRequestSchema = inviteResponseSchema.omit({sender_id: true, receiver_id: true});
-  
-export type InviteRequestInterface = z.infer<typeof inviteRequestSchema>;
 
-export const findPendingInviteSchema = sendInviteSchema.pick({
+export const inviteValidationSchema = inviteResponseSchema.pick({
   group_id: true,
-  receiver_id: true
+  status: true
 })
-
-export type FindPendingInviteInterface = z.infer<typeof findPendingInviteSchema>
-
-export const countInviteSchema = z.object({
-  count:z.number()
-})
-
-export type CountInviteInterface = z.infer<typeof countInviteSchema>

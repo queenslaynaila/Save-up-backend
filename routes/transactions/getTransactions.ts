@@ -2,13 +2,15 @@ import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { TransactionInput, 
-  TransactionInterface, 
+  BaseTransaction,
   TransactionQueryParams,
-  TransactionByEntity 
+  TransactionByEntity,
+  baseTransactionSchema 
 } from './types';
+import { validateRequest } from '../../middleware/validationMiddleware';
 import { IdParamInterface } from '../../globalTypes/index';
 
-const SQL_GET_TRANSACTIONS = sql<TransactionInput,  TransactionInterface>(`
+const SQL_GET_TRANSACTIONS = sql<TransactionInput,  BaseTransaction>(`
   SELECT xid AS transaction_id, 
          transaction_type, 
          amount, 
@@ -21,8 +23,9 @@ const SQL_GET_TRANSACTIONS = sql<TransactionInput,  TransactionInterface>(`
 `);
 
 export default (router: Router) => {
-  router.get<IdParamInterface,  TransactionInterface[], TransactionByEntity, TransactionQueryParams>(
+  router.get<IdParamInterface,  BaseTransaction[], TransactionByEntity, TransactionQueryParams>(
     '/:id', 
+    validateRequest(baseTransactionSchema),
     authMiddleware(),
     async (req, res) => {
       const entity_id = req.body.entity_id ?? req.user!.id;

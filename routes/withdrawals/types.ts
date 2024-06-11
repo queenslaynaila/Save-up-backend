@@ -10,4 +10,4 @@ export const withdrawalCreationSchema = withdrawalValidationSchema.extend({
   user_id: z.number().positive(),
 });
 
-export type WithdrawalCreationType = z.infer<typeof withdrawalCreationSchema>
+export type WithdrawalCreation = z.infer<typeof withdrawalCreationSchema>

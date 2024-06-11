@@ -1,9 +1,9 @@
 import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import { ReceivedInviteInterface } from './types';
+import { baseInviteInterface, InviteByReceiverInterface } from './types';
 
-const SQL_FIND_INVITATIONS_FOR_USER = sql<{ receiver_id: number }, ReceivedInviteInterface>(`
+const SQL_FIND_INVITATIONS_FOR_USER = sql<InviteByReceiverInterface, baseInviteInterface>(`
   SELECT invitations.group_id, 
          invitations.sender_id,
          (SELECT full_name FROM users WHERE id = invitations.sender_id) AS sender_name,
@@ -14,12 +14,11 @@ const SQL_FIND_INVITATIONS_FOR_USER = sql<{ receiver_id: number }, ReceivedInvit
 `);
 
 export default (router: Router) => {
-  router.get<Record<string,never>, ReceivedInviteInterface[], Record<string,never>, Record<string,never>>(
+  router.get<Record<string,never>, baseInviteInterface[], InviteByReceiverInterface, Record<string,never>>(
     '/', 
     authMiddleware(),
     async (req, res) => {
-      const userId = req.user!.id;
-      const invitations = await SQL_FIND_INVITATIONS_FOR_USER({ receiver_id: userId }).many();
+      const invitations = await SQL_FIND_INVITATIONS_FOR_USER({ receiver_id: req.user!.id }).many();
       return res.json(invitations);     
     }
   );

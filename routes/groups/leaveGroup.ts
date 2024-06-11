@@ -1,11 +1,10 @@
 import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import { validateRequest } from '../../middleware/validationMiddleware';
-import { ExitGroupInterface, exitGroupSchema } from './types';
+import { GroupExitInterface } from './types';
 import { StatusCodeInterface, IdParamInterface } from '../../globalTypes/index';
 
-const SQL_EXIT_GROUP = sql<ExitGroupInterface, Record<string,never>>(`
+const SQL_EXIT_GROUP = sql<GroupExitInterface , Record<string,never>>(`
   UPDATE user_groups
   SET left_at = NOW()
   WHERE user_id = :user_id 
@@ -17,7 +16,6 @@ export default (router: Router) => {
   router.delete<IdParamInterface, StatusCodeInterface, Record<string,never>, Record<string,never>, Record<string,never>>(
     '/:id',
     authMiddleware(),
-    validateRequest(exitGroupSchema),
     async (req, res) => {
       const user_id = req.user!.id;
       const  group_id  = parseInt(req.params.id); 

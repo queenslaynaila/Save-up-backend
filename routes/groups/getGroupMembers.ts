@@ -2,14 +2,14 @@ import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { IdParamInterface } from '../../globalTypes/index';
-import { GetGroupMembersInterface} from './types';
+import { GroupMemberInterface } from './types';
 
-const SQL_GET_GROUP_MEMBERS = sql<{ group_id: number}, GetGroupMembersInterface>(`
+const SQL_GET_GROUP_MEMBERS = sql<{ group_id: number}, GroupMemberInterface>(`
   SELECT get_group_members(:group_id)
 `);
 
 export default (router: Router) => {
-  router.get<IdParamInterface, GetGroupMembersInterface[], Record<string,never>, Record<string,never>>(
+  router.get<IdParamInterface, GroupMemberInterface[], Record<string,never>, Record<string,never>>(
     '/:id',
     authMiddleware(),
     async (req, res) => {

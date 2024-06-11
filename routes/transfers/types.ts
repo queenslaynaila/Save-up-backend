@@ -11,4 +11,4 @@ export const transferCreationSchema = transferValidationSchema.extend({
   user_id: z.number().positive(),
 });
 
-export type TransferCreationType = z.infer<typeof transferCreationSchema>;
+export type TransferInput = z.infer<typeof transferCreationSchema>;

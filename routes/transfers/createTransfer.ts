@@ -2,10 +2,10 @@ import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { validateRequest } from '../../middleware/validationMiddleware';
-import { TransferCreationType ,  transferValidationSchema } from './types'
+import { TransferInput ,  transferValidationSchema } from './types'
 import { StatusCodeInterface } from '../../globalTypes/index'
 
-const SQL_CREATE_TRANSFER = sql<TransferCreationType , Record<string,never>>(`
+const SQL_CREATE_TRANSFER = sql<TransferInput , Record<string,never>>(`
   SELECT create_transfer(
     :source_pocket_id, 
     :destination_pocket_id, 
@@ -16,7 +16,7 @@ const SQL_CREATE_TRANSFER = sql<TransferCreationType , Record<string,never>>(`
 `);
 
 export default (router: Router) => {
-  router.post<Record<string,never>, StatusCodeInterface, TransferCreationType, Record<string,never>>(
+  router.post<Record<string,never>, StatusCodeInterface, TransferInput, Record<string,never>>(
     '/', 
     authMiddleware(),
     validateRequest( transferValidationSchema),
