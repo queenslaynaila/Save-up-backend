@@ -7,6 +7,8 @@ CREATE TABLE IF NOT EXISTS group_administrators (
   FOREIGN KEY   (group_id,user_id) REFERENCES group_users(group_id,user_id)
 );
 
-CREATE UNIQUE INDEX group_administrators_user_id_key ON group_administrators(user_id, group_id) WHERE revoked_at  IS NULL;
+CREATE UNIQUE INDEX group_administrators_user_id_key 
+ON group_administrators(user_id, group_id) 
+WHERE revoked_at  IS NULL;
 GRANT INSERT, SELECT, UPDATE ON group_administrators TO app_user;
 SELECT create_distributed_table('group_administrators', 'group_id');
