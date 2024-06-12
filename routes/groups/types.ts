@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const baseGroupSchema = z.object({
-  group_id: z.number(),
+  id: z.number(),
   name: z.string(),
   created_by: z.string(),
   created_at:z.string()
@@ -34,7 +34,7 @@ export type SharedGroupInterface = z.infer<typeof sharedGRoupSchema>;
 
 export const groupMemberSchema = z.object({
   user_id: z.number(),
-  group_id: z.number(),
+  id: z.number(),
   full_name: z.string(),
   joined_at: z.date()
 })
@@ -42,18 +42,18 @@ export const groupMemberSchema = z.object({
 export type GroupMemberInterface = z.infer<typeof groupMemberSchema>;
 
 export const groupUpdateSchema = baseGroupSchema.pick({
-  group_id: true,
+  id: true,
   name: true
 })
 
 export type GroupUpdateInterface = z.infer<typeof groupUpdateSchema>;
 
 export const validateGroupUpdateSchema = groupUpdateSchema.omit({
-  group_id:true
+  id:true
 })
 
 export const groupExitSchema = baseGroupSchema.pick({
-  group_id: true
+  id: true
 }).extend({
   user_id:z.number()
 })

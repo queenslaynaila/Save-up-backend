@@ -2,9 +2,9 @@ import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { IdParamInterface } from '../../globalTypes/index';
-import { CommonGroupInterface, SharedGroupInterface  } from './types';
+import { BaseGroupInterface, SharedGroupInterface  } from './types';
 
-const SQL_GET_COMMON_GROUPS = sql<SharedGroupInterface, CommonGroupInterface>(`
+const SQL_GET_COMMON_GROUPS = sql<SharedGroupInterface, BaseGroupInterface>(`
   SELECT groups.id AS group_id, 
          groups.name, 
          groups.created_at
@@ -18,7 +18,7 @@ const SQL_GET_COMMON_GROUPS = sql<SharedGroupInterface, CommonGroupInterface>(`
 `);
 
 export default (router: Router) => {
-  router.get<IdParamInterface, CommonGroupInterface[],Record<string,never>, Record<string,never>>(
+  router.get<IdParamInterface, BaseGroupInterface[],Record<string,never>, Record<string,never>>(
     '/:id/common-groups',
     authMiddleware(),
     async (req, res) => {

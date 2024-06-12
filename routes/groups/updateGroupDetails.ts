@@ -7,8 +7,8 @@ import { IdParamInterface } from '../../globalTypes/index';
 
 const SQL_UPDATE_GROUP = sql<GroupUpdateInterface, GroupUpdateInterface>(`
   UPDATE groups
-  SET group_name = COALESCE(:name, name),
-  WHERE id = :group_id
+  SET name = :name
+  WHERE id = :id
   RETURNING name;
 `);
 
@@ -18,7 +18,7 @@ export default (router: Router) => {
     authMiddleware(),
     validateRequest(validateGroupUpdateSchema),
     async (req, res) => {
-      const updatedGroup = await SQL_UPDATE_GROUP({ ...req.body, group_id: parseInt(req.params.id)}).one();
+      const updatedGroup = await SQL_UPDATE_GROUP({ ...req.body, id: parseInt(req.params.id)}).one();
       res.json(updatedGroup);
     }
   );

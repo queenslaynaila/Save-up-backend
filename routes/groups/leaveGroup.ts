@@ -8,7 +8,7 @@ const SQL_EXIT_GROUP = sql<GroupExitInterface , Record<string,never>>(`
   UPDATE group_users
   SET left_at = NOW()
   WHERE user_id = :user_id 
-  AND group_id = :group_id
+  AND id = :id
   AND left_at IS NULL;
 `);
 
@@ -18,8 +18,8 @@ export default (router: Router) => {
     authMiddleware(),
     async (req, res) => {
       const user_id = req.user!.id;
-      const  group_id  = parseInt(req.params.id); 
-      await SQL_EXIT_GROUP({ user_id, group_id }).exec();
+      const  id  = parseInt(req.params.id); 
+      await SQL_EXIT_GROUP({ user_id, id }).exec();
       res.sendStatus(204);
     }
   );
