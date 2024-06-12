@@ -22,6 +22,10 @@ export const expenseCreationSchema = baseExpenseSchem.extend({
 
 export type ExpenseCreationInterface = z.infer<typeof expenseCreationSchema>;
 
+export const ExpenseUpdateValidationSchema = expenseCreationSchema.omit({
+  entity_id: true
+}).partial()
+
 export const expenseQuerySchema = z.object({
   category_id: z.string().optional(),
   start_date: z.string().optional(),

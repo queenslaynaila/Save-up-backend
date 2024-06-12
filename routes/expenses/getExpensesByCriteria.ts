@@ -1,43 +1,31 @@
 import { Router} from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import isStandardUser from '../../middleware/isStandardUser';
-import { HttpError } from '../../middleware/errorMiddleware';
 import { BaseExpenseInterface, ExpenseQueryInterface } from './types';
-import { IdParamInterface, idSchema } from '../../globalTypes/index'
 
 const SQL_GET_EXPENSES = sql<Record<string, string>, BaseExpenseInterface>(`
-  SELECT entity_id, xid, category_id, description, amount, spent_at, created_at
+  SELECT entity_id, 
+         xid, 
+         category_id, 
+         description, 
+         amount, 
+         spent_at, 
+         created_at
   FROM expenses 
-  WHERE deleted_at IS NULL`
-);
+  WHERE deleted_at IS NULL
+  AND entity_id = :entity_id
+`);
 
 export default (router: Router) => {
-  router.get<IdParamInterface, BaseExpenseInterface[], Record<string,never>, ExpenseQueryInterface>(
-    '/:expenseIdentifier', 
+  router.get<Record<string,never>, BaseExpenseInterface[], Record<string,never>, ExpenseQueryInterface>(
+    '/me', 
     authMiddleware(), 
     async (req, res) => {
-      const expenseIdentifier  = req.params.id;
       const entity_id = req.body.entity_id ?? req.user!.id;
       const { category_id, start_date, end_date } = req.query;
+
       const filterArgs: Record<string, string> = {};
       const filters: string[] = [];
-
-      if (expenseIdentifier === 'me') { // expense for logged in user or requestd grp
-        filterArgs.loggedInUserId = entity_id
-        filters.push(`entity_id = :loggedInUserId`);
-      } 
-      else if (!isStandardUser(req.user!.role)) {
-        if  (idSchema.parse(parseInt(expenseIdentifier))) {  //by entity id
-          filterArgs.user_id = expenseIdentifier;
-          filters.push(`entity_id = :user_id`);
-        } else {
-          throw new HttpError(400, 'Bad request');
-        }
-      } 
-      else {
-        throw new HttpError(403, 'Forbidden');
-      }
 
       if (category_id) {
         filterArgs.category_id = category_id;
@@ -46,19 +34,19 @@ export default (router: Router) => {
       if (start_date && end_date) {
         filterArgs.start_date = start_date;
         filterArgs.end_date = end_date;
-        filters.push(`created_at BETWEEN :start_date AND :end_date`);
+        filters.push(`DATE(created_at) BETWEEN :start_date AND :end_date`);
       } else {
         if (start_date) {
           filterArgs.start_date = start_date;
-          filters.push(`created_at >= :start_date`);
+          filters.push(`DATE(created_at) >= :start_date`);
         }
         if (end_date) {
           filterArgs.end_date = end_date;
-          filters.push(`created_at <= :end_date`);
+          filters.push(`DATE(created_at) <= :end_date`);
         }
       }
 
-      const query = SQL_GET_EXPENSES({});
+      const query = SQL_GET_EXPENSES({ entity_id });
       if (filters.length > 0) query.extend(`AND ${filters.join(' AND ')}`, filterArgs);
       query.extend('LIMIT 15', {});
       const expenses = await query.many();
