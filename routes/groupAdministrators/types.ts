@@ -16,8 +16,9 @@ export type GroupByIdInterface = z.infer<typeof groupByIdSchema>;
 export const adminApprovalSchema = adminProposalSchema.pick({
   group_id: true
 }).extend({
-  voter_member_id: z.number(),
-  nominated_member_id: z.number(),
+  voter_id: z.number(),
+  nominee_id: z.number(),
+  election_id:z.number(),
   vote: z.boolean()
 })
 
@@ -25,7 +26,7 @@ export type AdminApprovalInterface = z.infer<typeof adminApprovalSchema>;
 
 export const nominateParamsSchema = z.object({
   group_id: z.string(),
-  nominated_member_id: z.string(),
+  nominee_id: z.string(),
 });
   
 export type NominateParamsInterface = z.infer<typeof nominateParamsSchema>;
