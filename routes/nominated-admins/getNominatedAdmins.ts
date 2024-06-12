@@ -5,15 +5,12 @@ import { NominatedAdminInterface } from './types'
 import { IdParamInterface } from '../../globalTypes/index';
 
 const SQL_GET_NOMINATED_MEMBERS = sql<{ group_id: number}, NominatedAdminInterface>(`
-  SELECT na.group_id, na.user_id, na.nominated_at, u.full_name
-  FROM nominated_administrators na
-  INNER JOIN users u ON na.user_id = u.id
-  WHERE na.group_id = :group_id
+  get_nominated_admins(:group_id) 
 `);
 
 export default (router: Router) => {
   router.get<IdParamInterface, NominatedAdminInterface[], Record<string,never>, Record<string,never>>(
-    '/:id/nominated-members',
+    '/:id/',
     authMiddleware(),
     async (req, res) => {
       const group_id = parseInt(req.params.id);
