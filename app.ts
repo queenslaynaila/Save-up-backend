@@ -18,6 +18,8 @@ import securityAnswerRoutes from './routes/securityAnswer/index';
 import cumulativesRoutes from './routes/cumulatives/index';
 import groupRoutes from './routes/groups/index';
 import groupAdminRoutes from './routes/groupAdministrators/index'
+import electionRoutes from './routes/elections/index'
+import nominationRoutes from './routes/nominated-admins/index'
 import inviteRoutes from './routes/invitations/index';
 import withdrawalRoutes from './routes/withdrawals/index';
 import transferRoutes from './routes/transfers/index';
@@ -101,10 +103,12 @@ cumulativesRoutes(app);
 groupRoutes(app);
 inviteRoutes(app);
 groupAdminRoutes(app);
+electionRoutes(app);
+nominationRoutes(app);
 withdrawalRoutes(app);
-transferRoutes(app)
-transactionRoutes(app)
-createExSaving(app)
+transferRoutes(app);
+transactionRoutes(app);
+createExSaving(app);
 
 // 404 handler
 app.use(() => {
