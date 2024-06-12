@@ -15,7 +15,7 @@ BEGIN
     VALUES ('Group')
     RETURNING entities.id INTO STRICT v_entity_id;
 
-    INSERT INTO groups (id, name, created_by)
+    INSERT INTO groups (id, name, creator_id)
     VALUES (v_entity_id, p_name, p_created_by);
 
     INSERT INTO group_users (user_id, group_id)
