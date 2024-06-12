@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS group_administrators (
   group_id      INT NOT NULL,
-  xid           INT NOT NULL
+  xid           INT NOT NULL,
   user_id       INT NOT NULL,
   created_at    TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   revoked_at    TIMESTAMP WITH TIME ZONE,
