@@ -5,7 +5,7 @@ import { NominatedAdminInterface } from './types'
 import { IdParamInterface } from '../../globalTypes/index';
 
 const SQL_GET_NOMINATED_MEMBERS = sql<{ group_id: number}, NominatedAdminInterface>(`
-  get_nominated_admins(:group_id) 
+  SELECT get_nominated_admins(:group_id) 
 `);
 
 export default (router: Router) => {
