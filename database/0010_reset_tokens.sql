@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS reset_tokens (
   user_id       INT NOT NULL,
   xid           INT NOT NULL,
   token         TEXT NOT NULL,
-  reason        enum_token_reason NOT NULL DEFAULT 'password_reset';,
+  reason        enum_token_reason NOT NULL DEFAULT 'password_reset',
   created_at    TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   used_at       TIMESTAMP WITH TIME ZONE,
   expired_at    TIMESTAMP WITH TIME ZONE DEFAULT NOW() + INTERVAL '15 minutes',
