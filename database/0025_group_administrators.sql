@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS group_administrators (
   created_at    TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   revoked_at    TIMESTAMP WITH TIME ZONE,
   PRIMARY KEY   (group_id, user_id),
-  FOREIGN KEY   (group_id,user_id) REFERENCES group_users(group_id,user_id)
+  FOREIGN KEY   (group_id) REFERENCES groups(id)
 );
 
 CREATE UNIQUE INDEX group_administrators_group_id_user_id_key 
