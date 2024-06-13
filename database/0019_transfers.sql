@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS transfers (
   user_id                 INT NOT NULL,  --user doing transfer, a user or grp member
   source_pocket_id        INT NOT NULL,
   destination_pocket_id   INT NOT NULL,
-  amount                  NUMERIC(30, 2) NOT NULL,
+  amount                  NUMERIC(30, 2) NOT NULL CHECK (amount > 0),
   created_at              TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   PRIMARY KEY             (entity_id, xid),
   FOREIGN KEY             (entity_id, source_pocket_id) REFERENCES pockets(entity_id, xid),

@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION log_transfer_transaction(
+CREATE OR REPLACE FUNCTION create_transfer(
     p_source_pocket_id        INT, 
     p_destination_pocket_id   INT, 
     p_user_id                 INT, -- The group member or a standard user doing the transfer

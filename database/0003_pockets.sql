@@ -68,7 +68,7 @@ CREATE TABLE IF NOT EXISTS external_savings (
   xid                   INT NOT NULL,
   pocket_id             INT NOT NULL, --the pocket itself      
   donor_id              INT NOT NULL, -- the donor                                                                                                                                                         
-  amount                NUMERIC(30, 2) NOT NULL,
+  amount                NUMERIC(30, 2) NOT NULL CHECK (amount > 0),
   show_details          BOOLEAN NOT NULL DEFAULT TRUE,
   created_at            TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   PRIMARY KEY           (entity_id, xid),
