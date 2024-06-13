@@ -20,3 +20,9 @@ BEGIN
     VALUES (p_group_id, p_voter_id, p_nominee_id, p_election_id, p_vote);
 END;
 $$ LANGUAGE plpgsql;
+
+SELECT create_distributed_function(
+  'cast_vote(INT, INT, INT, INT, BOOLEAN)' , 'p_group_id'
+);
+
+GRANT EXECUTE ON FUNCTION cast_vote(INT, INT, INT, INT, BOOLEAN) TO app_user;

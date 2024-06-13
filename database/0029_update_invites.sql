@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION update_invites(
+CREATE OR REPLACE FUNCTION update_invite(
     p_group_id      INT,  
     p_receiver_id   INT,
     p_status        enum_invite
@@ -28,7 +28,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-GRANT EXECUTE ON FUNCTION update_user_groups_after_invite(INT, INT, enum_invite) TO app_user;
+GRANT EXECUTE ON FUNCTION update_invite(INT, INT, enum_invite) TO app_user;
 SELECT create_distributed_function(
-  'update_user_groups_after_invite(INT, INT, enum_invite)', 'p_group_id'
+  'update_invite(INT, INT, enum_invite)', 'p_group_id'
 );

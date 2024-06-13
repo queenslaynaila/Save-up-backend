@@ -28,3 +28,9 @@ BEGIN
     VALUES (p_group_id, v_winner_id, NOW());
 END;
 $$ LANGUAGE plpgsql;
+
+SELECT create_distributed_function(
+  'compute_election_results(INT, INT)' , 'p_group_id'
+);
+
+GRANT EXECUTE ON FUNCTION compute_election_results(INT, INT) TO app_user;

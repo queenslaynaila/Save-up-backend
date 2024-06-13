@@ -21,3 +21,9 @@ BEGIN
     WHERE group_id = p_group_id;
 END;
 $$ LANGUAGE plpgsql;
+
+SELECT create_distributed_function(
+  'start_election(INT, INT)' , 'p_group_id'
+);
+
+GRANT EXECUTE ON FUNCTION start_election(INT, INT) TO app_user;

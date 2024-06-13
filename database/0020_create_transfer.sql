@@ -65,5 +65,5 @@ $$ LANGUAGE plpgsql;
 
 GRANT EXECUTE ON FUNCTION log_transfer_transaction(INT, INT, INT, NUMERIC, INT) TO app_user;
 SELECT create_distributed_function(
-  'log_transfer_transaction(INT, INT, INT, NUMERIC, INT)', 'p_source_pocket_id'
+  'create_transfer(INT, INT, INT, NUMERIC, INT)', 'p_source_pocket_id'
 );
