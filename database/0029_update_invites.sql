@@ -15,6 +15,7 @@ BEGIN
         SELECT p_group_id, 
                COALESCE(MAX(xid), 0) + 1,
                p_receiver_id
+        FROM group_users
         WHERE group_id = p_group_id;
     END IF;
 

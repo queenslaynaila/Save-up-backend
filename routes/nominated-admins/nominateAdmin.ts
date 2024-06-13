@@ -5,8 +5,14 @@ import {  StatusCodeInterface } from '../../globalTypes/index';
 import { ProposeAdminInterface } from './types'
 
 const SQL_NOMINATE_GROUP_ADMIN = sql<ProposeAdminInterface, Record<string,never>>(`
-  INSERT INTO nominated_administrators (group_id, nominee_id, nominator_id, election_id)
-  VALUES (:group_id, :nominee_id, :nominator_id, :election_id);
+  INSERT INTO nominated_administrators (group_id, xid, nominee_id, nominator_id, election_id)
+  SELECT :group_id, 
+          COALESCE(MAX(xid), 0) + 1, 
+         :nominee_id, 
+         :nominator_id, 
+         :election_id
+  FROM nominated_administrators
+  WHERE group_id = :group_id;
 `);
 
 export default (router: Router) => {
