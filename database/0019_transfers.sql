@@ -20,7 +20,6 @@ CREATE TABLE IF NOT EXISTS transfers (
 GRANT INSERT, SELECT ON transfers TO app_user;
 SELECT create_distributed_table('transfers', 'entity_id');
 
-
 ALTER TABLE  transfers
 ADD CONSTRAINT transfers_user_id_fkey
 FOREIGN KEY (user_id) REFERENCES entities(id);
