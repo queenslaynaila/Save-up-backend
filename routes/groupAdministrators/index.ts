@@ -1,5 +1,5 @@
 import express from 'express';
-import approveProposedGroupAdmin from './approveProposedGroupAdmin';
+import approveProposedGroupAdmin from './voteGroupAdmin';
 import makeGroupAdmin from './makeGroupAdmin';
 
 export default (baseRouter: express.Router) => {
