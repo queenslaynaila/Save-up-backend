@@ -5,7 +5,7 @@ CREATE OR REPLACE FUNCTION insert_transaction_log(
     p_transaction_type      enum_transaction_type,
     p_amount                NUMERIC,
     p_reference_no          TEXT,
-    p_current_balance    NUMERIC
+    p_current_balance       NUMERIC
 )
 RETURNS VOID AS $$
 BEGIN 
@@ -25,6 +25,12 @@ BEGIN
            p_amount, 
            p_reference_no,
            p_current_balance
-    WHERE entity_id = p_entity_id
+    WHERE entity_id = p_entity_id;
 END;
 $$ LANGUAGE plpgsql;
+
+GRANT EXECUTE ON FUNCTION insert_transaction_log(INT, INT, INT, enum_transaction_type, NUMERIC, TEXT, NUMERIC) TO app_user;
+SELECT create_distributed_function(
+  'insert_transaction_log(INT, INT, INT, enum_transaction_type, NUMERIC, TEXT, NUMERIC)', 
+  'p_entity_id'
+);
