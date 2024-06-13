@@ -18,8 +18,11 @@ BEGIN
     INSERT INTO groups (id, name, creator_id)
     VALUES (v_entity_id, p_name, p_creator_id);
 
-    INSERT INTO group_users (group_id, user_id)
-    VALUES (v_entity_id, p_creator_id);
+    INSERT INTO group_users (group_id, xid, user_id)
+    SELECT v_entity_id, 
+           COALESCE(MAX(xid), 0) + 1,
+           p_creator_id
+    WHERE group_id = v_entity_id;
 
     INSERT INTO group_administrators(group_id, user_id)
     VALUES (v_entity_id, p_creator_id);
