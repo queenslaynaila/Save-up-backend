@@ -15,7 +15,7 @@ DECLARE
     v_nominator_name   TEXT;
     v_created_at       TIMESTAMP WITH TIME ZONE;
 BEGIN
-   FOR v_nominee_id, v_nominator_id, v_created_at IN
+    FOR v_nominee_id, v_nominator_id, v_created_at IN
         SELECT nm.nominee_id, nm.nominator_id, nm.created_at
         FROM nominated_administrators nm
         WHERE nm.group_id = p_group_id  
@@ -31,7 +31,12 @@ BEGIN
         FROM users u
         WHERE u.id = v_nominator_id;
 
-        RETURN NEXT;
+        RETURN QUERY
+        SELECT v_nominee_id,
+               v_nominee_name,
+               v_nominator_id,
+               v_nominator_name,
+               v_created_at;
     END LOOP;
     
     RETURN;
