@@ -13,3 +13,4 @@ ON elections(group_id)
 WHERE end_at IS NULL;
 
 SELECT create_distributed_table('elections', 'group_id');
+GRANT INSERT, SELECT ON elections TO app_user;  
