@@ -3,8 +3,8 @@ CREATE OR REPLACE FUNCTION get_transaction_info(
     p_entity_id   INT
 )
 RETURNS TABLE (
-    v_transaction_id   INT;
-    v_current_balance  NUMERIC;
+    v_transaction_id   INT,
+    v_current_balance  NUMERIC
 ) AS $$
 BEGIN
     SELECT 
@@ -23,3 +23,8 @@ BEGIN
     RETURN QUERY SELECT v_transaction_id, v_current_balance;
 END;
 $$ LANGUAGE plpgsql;
+
+GRANT EXECUTE ON FUNCTION get_transaction_info(INT, INT) TO app_user;
+SELECT create_distributed_function(
+  'get_transaction_info(INT, INT)', 'p_entity_id'
+);
