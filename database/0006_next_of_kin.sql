@@ -20,6 +20,9 @@ CREATE TABLE IF NOT EXISTS next_of_kins (
   FOREIGN KEY            (user_id) REFERENCES users(id)
 );
 
-CREATE UNIQUE INDEX next_of_kins_user_id_key ON next_of_kins(user_id) WHERE deleted_at IS NULL;
+CREATE UNIQUE INDEX next_of_kins_user_id_key 
+ON next_of_kins(user_id) 
+WHERE deleted_at IS NULL;
+
 SELECT create_distributed_table ('next_of_kins', 'user_id');
-GRANT INSERT, SELECT ON user_contact_details TO app_user;
+GRANT INSERT, SELECT, UPDATE ON next_of_kins TO app_user;
