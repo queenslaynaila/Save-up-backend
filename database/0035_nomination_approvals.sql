@@ -8,8 +8,6 @@ CREATE TABLE IF NOT EXISTS nomination_approvals (
   revoked_at            TIMESTAMP WITH TIME ZONE,
   created_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   PRIMARY KEY           (group_id, voter_id, nominee_id, election_id),
-  FOREIGN KEY           (group_id, voter_id) REFERENCES group_users(group_id, user_id),
-  FOREIGN KEY           (group_id, nominee_id) REFERENCES nominated_administrators(group_id, nominee_id),
   FOREIGN KEY           (group_id, election_id) REFERENCES elections(group_id, xid)
 );
 
