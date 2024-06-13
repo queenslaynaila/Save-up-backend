@@ -5,7 +5,7 @@ import { validateRequest } from '../../middleware/validationMiddleware';
 import { GroupCreationInterface, groupCreationValidation, BaseGroupInterface} from './types';
 
 const SQL_CREATE_GROUP = sql<GroupCreationInterface, BaseGroupInterface>(`
-    SELECT create_group(:name, :created_by )
+    SELECT * FROM create_group(:name, :created_by )
 `);
 
 export default (router: Router) => {
