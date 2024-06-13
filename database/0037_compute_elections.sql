@@ -14,12 +14,7 @@ BEGIN
     GROUP BY nominee_id
     ORDER BY COUNT(*) DESC
     LIMIT 1;
-
-    UPDATE elections
-    SET end_at = NOW()
-    WHERE group_id = p_group_id 
-    AND xid = p_election_id;
-
+    
     UPDATE nominated_administrators
     SET revoked_at = NOW()
     WHERE group_id = p_group_id;
