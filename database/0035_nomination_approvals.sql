@@ -14,7 +14,8 @@ CREATE TABLE IF NOT EXISTS nomination_approvals (
 );
 
 CREATE UNIQUE INDEX nomination_approvals_voter_id_nominee_id_key
-ON nomination_approvals(group_id, voter_id, nominee_id) WHERE revoked_at IS NULL;
+ON nomination_approvals(group_id, voter_id, nominee_id) 
+WHERE revoked_at IS NULL;
 
 GRANT SELECT, INSERT ON nomination_approvals TO app_user;
 SELECT create_distributed_table('nomination_approvals', 'group_id');

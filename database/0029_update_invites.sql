@@ -11,8 +11,11 @@ BEGIN
     AND group_id = p_group_id;
 
     IF p_status = 'Accept'::enum_invite THEN
-        INSERT INTO group_users (user_id, group_id)
-        VALUES (p_receiver_id, p_group_id);
+        INSERT INTO group_users (group_id, xid, user_id)
+        SELECT p_group_id, 
+               COALESCE(MAX(xid), 0) + 1,
+               p_receiver_id
+        WHERE group_id = p_group_id;
     END IF;
 
     IF p_status = 'Decline'::enum_invite THEN

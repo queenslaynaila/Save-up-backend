@@ -11,7 +11,7 @@ BEGIN
     FROM user_contact_details 
     WHERE phone_number = p_phone_number; 
 
-    INSERT INTO invitations (id, sender_id, receiver_id)
+    INSERT INTO invitations (group_id, sender_id, receiver_id)
     VALUES( p_group_id, p_sender_id, v_receiver_id); 
 END;
 $$ LANGUAGE plpgsql;
