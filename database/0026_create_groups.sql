@@ -1,6 +1,6 @@
 CREATE OR REPLACE FUNCTION create_group(
-  p_name        TEXT, 
-  p_created_by  INT
+  p_name         TEXT, 
+  p_creator_id   INT
 )
 RETURNS TABLE (
   id            INT,
@@ -16,13 +16,13 @@ BEGIN
     RETURNING entities.id INTO STRICT v_entity_id;
 
     INSERT INTO groups (id, name, creator_id)
-    VALUES (v_entity_id, p_name, p_created_by);
+    VALUES (v_entity_id, p_name, p_creator_id);
 
-    INSERT INTO group_users (user_id, group_id)
-    VALUES (p_created_by, v_entity_id);
+    INSERT INTO group_users (group_id, user_id)
+    VALUES (v_entity_id, p_creator_id);
 
-    INSERT INTO group_administrators(user_id, group_id)
-    VALUES (p_created_by, v_entity_id);
+    INSERT INTO group_administrators(group_id, user_id)
+    VALUES (v_entity_id, p_creator_id);
 
     INSERT INTO pockets (
         entity_id, 
