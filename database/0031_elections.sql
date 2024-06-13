@@ -9,7 +9,3 @@ CREATE TABLE elections (
 );
 
 SELECT create_distributed_table('elections', 'group_id');
-
-ALTER TABLE elections
-ADD CONSTRAINT elections_group_id_fkey  
-FOREIGN KEY (group_id) REFERENCES groups(id);
