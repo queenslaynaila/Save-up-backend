@@ -3,40 +3,41 @@ CREATE OR REPLACE FUNCTION get_nominated_admins(
 )
 RETURNS TABLE(
     nominee_id         INT, 
-    nominee_name          TEXT,
+    nominee_name       TEXT,
     nominator_id       INT,
     nominator_name     TEXT, 
     created_at         TIMESTAMP WITH TIME ZONE
 ) AS $$
 DECLARE
-    nominee_record RECORD;
+    v_nominee_id       INT;
+    v_nominee_name     TEXT;
+    v_nominator_id     INT;
+    v_nominator_name   TEXT;
+    v_created_at       TIMESTAMP WITH TIME ZONE;
 BEGIN
-    SELECT nm.user_id AS nominee_id, 
-           nm.nominator_id, 
-           nm.created_at
-    INTO nominee_record
-    FROM nominated_administrators nm
-    WHERE nm.group_id = p_group_id  
-      AND nm.revoked_at IS NULL;
-
+   FOR v_nominee_id, v_nominator_id, v_created_at IN
+        SELECT nm.nominee_id, nm.nominator_id, nm.created_at
+        FROM nominated_administrators nm
+        WHERE nm.group_id = p_group_id  
+        AND nm.revoked_at IS NULL
     LOOP
-        SELECT u.full_name AS nominee_name
-        INTO nominee_record
+        SELECT u.full_name 
+        INTO v_nominee_name
         FROM users u
-        WHERE u.id = nominee_record.nominee_id;
+        WHERE u.id = v_nominee_id;
 
-        SELECT u.full_name AS nominator_name
-        INTO nominee_record
+        SELECT u.full_name 
+        INTO v_nominator_name
         FROM users u
-        WHERE u.id = nominee_record.nominator_id;
+        WHERE u.id = v_nominator_id;
 
-        RETURN NEXT
-            nominee_record(nominee_id, nominee_name, nominator_id, nominator_name, created_at);
+        RETURN NEXT;
     END LOOP;
-
-    RETURN; 
+    
+    RETURN;
 END;
 $$ LANGUAGE plpgsql;
+
 
 GRANT EXECUTE ON FUNCTION get_nominated_admins(INT) TO app_user;
 SELECT create_distributed_function(
