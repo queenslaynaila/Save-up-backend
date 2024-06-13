@@ -5,7 +5,7 @@ import { IdParamInterface } from '../../globalTypes/index';
 import { GroupMemberInterface } from './types';
 
 const SQL_GET_GROUP_MEMBERS = sql<{ group_id: number}, GroupMemberInterface>(`
-  SELECT get_group_members(:group_id)
+  SELECT * FROM get_group_members(:group_id)
 `);
 
 export default (router: Router) => {
