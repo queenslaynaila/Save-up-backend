@@ -17,7 +17,6 @@ import securityQuestionsRoutes from './routes/securityQuestions';
 import securityAnswerRoutes from './routes/securityAnswer/index';
 import cumulativesRoutes from './routes/cumulatives/index';
 import groupRoutes from './routes/groups/index';
-import groupAdminRoutes from './routes/groupAdministrators/index'
 import electionRoutes from './routes/elections/index'
 import nominationRoutes from './routes/nominated-admins/index'
 import inviteRoutes from './routes/invitations/index';
@@ -102,7 +101,6 @@ securityAnswerRoutes(app);
 cumulativesRoutes(app);
 groupRoutes(app);
 inviteRoutes(app);
-groupAdminRoutes(app);
 electionRoutes(app);
 nominationRoutes(app);
 withdrawalRoutes(app);
