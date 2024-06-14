@@ -11,8 +11,13 @@ BEGIN
     FROM user_contact_details 
     WHERE phone_number = p_phone_number; 
 
-    INSERT INTO invitations (group_id, sender_id, receiver_id)
-    VALUES( p_group_id, p_sender_id, v_receiver_id); 
+    INSERT INTO invitations (group_id, xid, sender_id, receiver_id)
+    SELECT p_group_id, 
+           COALESCE(MAX(xid), 0) + 1, 
+           p_sender_id,
+           v_receiver_id
+    FROM invitations
+    WHERE group_id = p_group_id
 END;
 $$ LANGUAGE plpgsql;
 
