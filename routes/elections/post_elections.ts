@@ -20,15 +20,9 @@ export default (router: Router) => {
     '/',
     authMiddleware(),
     async (req, res) => {
-      const { group_id } = req.body;
-      console.log('Type of group_id:', typeof group_id, group_id);
       const started_by = req.user!.id
-      console.log('Type of started_by:', typeof started_by);
-      console.log('Value of req.user!.id:', req.user!.id);
-
       await SQL_NOMINATE_GROUP_ADMIN({ ...req.body, started_by}).exec();
       res.sendStatus(201);
     }
   );
 };
-  
