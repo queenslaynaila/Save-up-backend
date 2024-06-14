@@ -47,7 +47,7 @@ CREATE TABLE IF NOT EXISTS pocket_reminders (
   PRIMARY KEY             (entity_id, xid), 
   FOREIGN KEY             (entity_id, pocket_id) REFERENCES pockets(entity_id, xid)
 );
-GRANT INSERT, SELECT pocket_reminders TO app_user;
+GRANT INSERT, SELECT ON pocket_reminders TO app_user;
 
 CREATE TABLE IF NOT EXISTS savings (
   entity_id             INT NOT NULL, -- owner of the pocket, either a group or a standard user
