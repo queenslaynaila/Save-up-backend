@@ -18,4 +18,4 @@ ALTER TABLE security_answers
 ADD CONSTRAINT security_answers_user_id_fkey  
 FOREIGN KEY (user_id) REFERENCES users(id);
 
-GRANT INSERT, SELECT ON security_answers TO app_user;
+GRANT INSERT, SELECT, UPDATE ON security_answers TO app_user;
