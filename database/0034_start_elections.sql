@@ -1,6 +1,6 @@
 CREATE OR REPLACE FUNCTION start_election(
     p_group_id     INT,
-    p_started_by   INT
+    p_initiator_id  INT
 )
 RETURNS VOID AS $$
 BEGIN

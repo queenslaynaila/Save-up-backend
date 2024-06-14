@@ -26,8 +26,13 @@ BEGIN
     FROM group_users
     WHERE group_id = v_entity_id;
 
-    INSERT INTO group_administrators(group_id, user_id)
-    VALUES (v_entity_id, p_creator_id);
+    INSERT INTO group_administrators (group_id, xid, user_id)
+    SELECT 
+           v_entity_id, 
+           COALESCE(MAX(xid), 0) + 1,
+           p_creator_id
+    FROM group_admnistrators
+    WHERE group_id = v_entity_id;
 
     INSERT INTO pockets (
         entity_id, 
@@ -55,8 +60,8 @@ BEGIN
       groups.id,
       groups.name, 
       groups.created_at 
-      FROM groups 
-      WHERE groups.id = v_entity_id;
+    FROM groups 
+    WHERE groups.id = v_entity_id;
 END;
 $$ LANGUAGE plpgsql;
 
