@@ -4,7 +4,7 @@ CREATE OR REPLACE FUNCTION start_election(
 )
 RETURNS VOID AS $$
 BEGIN
-    UPDATE nominated_administrators
+    UPDATE nominations
     SET revoked_at = NOW()
     WHERE group_id = p_group_id;
 
