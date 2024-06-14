@@ -6,13 +6,13 @@ import {z} from 'zod'
 
 const group = z.object({
   group_id:z.number(),
-  started_by:z.number()
+  initiator_id:z.number()
 })
 
 type GroupInterface = z.infer<typeof group>
 
 const SQL_NOMINATE_GROUP_ADMIN = sql<GroupInterface, Record<string,never>>(`
-  SELECT start_election(:group_id, :started_by)
+  SELECT start_election(:group_id, :initiator_id)
 `);
 
 export default (router: Router) => {
@@ -20,8 +20,8 @@ export default (router: Router) => {
     '/',
     authMiddleware(),
     async (req, res) => {
-      const started_by = req.user!.id
-      await SQL_NOMINATE_GROUP_ADMIN({ ...req.body, started_by}).exec();
+      const initiator_id= req.user!.id
+      await SQL_NOMINATE_GROUP_ADMIN({ ...req.body, initiator_id}).exec();
       res.sendStatus(201);
     }
   );
