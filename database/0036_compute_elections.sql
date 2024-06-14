@@ -6,6 +6,10 @@ DECLARE
     v_winner_id INT;
     v_winner_vote_count INT;
 BEGIN
+    UPDATE group_administrators
+    SET revoked_at = NOW()
+    WHERE group_id = p_group_id;
+
     SELECT nominee_id, COUNT(*) INTO v_winner_id, v_winner_vote_count
     FROM nomination_approvals
     WHERE group_id = p_group_id 
@@ -15,10 +19,6 @@ BEGIN
     ORDER BY COUNT(*) DESC
     LIMIT 1;
     
-    UPDATE nominated_administrators
-    SET revoked_at = NOW()
-    WHERE group_id = p_group_id;
-
     UPDATE nomination_approvals
     SET revoked_at = NOW()
     WHERE group_id = p_group_id 
