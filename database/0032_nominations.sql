@@ -14,7 +14,6 @@ CREATE TABLE IF NOT EXISTS nominations (
 );
 
 SELECT create_distributed_table('nominations', 'group_id');
-
 -- Ensures only one valid set of nominations per group and election combination at a time.
 -- AS when a new group election starts, all previous nominations for the group and election are revoked.
 CREATE UNIQUE INDEX nominations_group_id_nominee_id_key 
