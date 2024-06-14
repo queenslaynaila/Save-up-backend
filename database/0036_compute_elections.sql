@@ -1,31 +1,38 @@
 CREATE OR REPLACE FUNCTION compute_election_results(
-    p_group_id INT,
-    p_election_id INT
-) RETURNS VOID AS $$
+    p_group_id          INT, 
+    p_election_id       INT
+)
+RETURNS VOID AS $$
 DECLARE
-    v_winner_id INT;
-    v_winner_vote_count INT;
+    top_nominee RECORD;
 BEGIN
-    UPDATE group_administrators
-    SET revoked_at = NOW()
-    WHERE group_id = p_group_id;
-
-    SELECT nominee_id, COUNT(*) INTO v_winner_id, v_winner_vote_count
-    FROM nomination_approvals
+    UPDATE group_administrators 
+    SET revoked_at = NOW() 
     WHERE group_id = p_group_id 
-    AND election_id = p_election_id
-    AND vote = true
-    GROUP BY nominee_id
-    ORDER BY COUNT(*) DESC
-    LIMIT 1;
-    
-    UPDATE nomination_approvals
-    SET revoked_at = NOW()
-    WHERE group_id = p_group_id 
-    AND election_id = p_election_id;
+    AND revoked_at IS NULL;
 
-    INSERT INTO group_administrators (group_id, user_id, created_at)
-    VALUES (p_group_id, v_winner_id, NOW());
+    FOR top_nominee IN
+        SELECT nominee_id
+        FROM (
+            SELECT nominee_id, COUNT(*) AS nominations_count
+            FROM nominations
+            WHERE group_id = p_group_id
+            AND election_id = p_election_id
+            AND revoked_at IS NULL
+            GROUP BY nominee_id
+            ORDER BY nominations_count DESC
+            LIMIT 3
+        ) AS top_nominees
+    LOOP
+        INSERT INTO group_administrators (group_id, xid, user_id, created_at)
+        SELECT
+            p_group_id,
+            COALESCE(MAX(xid), 0) + 1,
+            top_nominee.nominee_id,
+            NOW()
+        FROM group_administrators 
+        WHERE group_id = p_group_id;
+    END LOOP;
 END;
 $$ LANGUAGE plpgsql;
 
