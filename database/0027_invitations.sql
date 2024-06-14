@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS invitations (
 );
 SELECT create_distributed_table('invitations', 'group_id');
 
+-- If a user already has pending invitation for grp no need to send another one
 CREATE UNIQUE INDEX invitations_group_id_receiver_id_key 
 ON invitations(group_id, receiver_id) 
 WHERE deleted_at IS NULL;

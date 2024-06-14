@@ -8,7 +8,8 @@ BEGIN
     UPDATE invitations
     SET status = p_status
     WHERE receiver_id = p_receiver_id 
-    AND group_id = p_group_id;
+    AND group_id = p_group_id
+    AND deleted_at is NULL;
 
     IF p_status = 'Accept'::enum_invite THEN
         INSERT INTO group_users (group_id, xid, user_id)
