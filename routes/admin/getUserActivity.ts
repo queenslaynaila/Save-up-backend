@@ -7,7 +7,7 @@ import { BaseTransaction,
   baseTransactionSchema 
 } from '../transactions/types';
 import { validateRequest } from '../../middleware/validationMiddleware';
-import {   GetByPhoneInterface,  GetByIdInterface  } from '../../globalTypes/index';
+import { UserRole,  GetByPhoneInterface,  GetByIdInterface  } from '../../globalTypes/index';
 import { HttpError } from '../../middleware/errorMiddleware';
 
 const SQL_GET_USER = sql<GetByPhoneInterface,  GetByIdInterface>(`
@@ -31,7 +31,7 @@ export default (router: Router) => {
   router.get<Record<string,never>,  BaseTransaction[], { phone_number: string }, TransactionQueryParams>(
     '/transactions', 
     validateRequest(baseTransactionSchema),
-    authMiddleware(),
+    authMiddleware({ roles: [UserRole.ADMIN] }),
     async (req, res) => {
       const phone_number = req.body.phone_number;
       const { transaction_type, from_date, to_date } = req.query;
