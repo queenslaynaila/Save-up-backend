@@ -40,7 +40,7 @@ BEGIN
         p_entity_id,
         p_pocket_id,
         v_transaction_id,
-        'External Saving'::enum_transaction_type,
+        'ExternalSaving'::enum_transaction_type,
         p_amount,
         v_reference_no,
         v_new_balance
