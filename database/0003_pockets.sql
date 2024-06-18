@@ -69,7 +69,7 @@ CREATE TABLE IF NOT EXISTS external_savings (
   pocket_id             INT NOT NULL, --the pocket itself      
   donor_id              INT NOT NULL, -- the donor depositing the cash as some sort of contibution or donation,                                                                                                                                                     
   amount                NUMERIC(30, 2) NOT NULL CHECK (amount > 0),
-  show_details          BOOLEAN NOT NULL DEFAULT TRUE,
+  show_details          BOOLEAN NOT NULL DEFAULT TRUE, ---whether the donor wants his personal details visible to pocket owner
   created_at            TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   PRIMARY KEY           (entity_id, xid),
   FOREIGN KEY           (entity_id, pocket_id) REFERENCES pockets (entity_id, xid)
