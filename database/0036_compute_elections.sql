@@ -4,12 +4,22 @@ CREATE OR REPLACE FUNCTION compute_election_results(
 )
 RETURNS VOID AS $$
 DECLARE
-    top_nominee RECORD;
+    top_nominee   RECORD;
+    v_deadline    TIMESTAMP WITH TIME ZONE;
 BEGIN
+    SELECT end_at INTO v_deadline
+    FROM elections
+    WHERE group_id = p_group_id
+    AND xid = p_election_id;
+
+    IF v_deadline > NOW() THEN
+        RAISE EXCEPTION 'Election  has not ended';
+    END IF;
+
     UPDATE group_administrators 
-    SET revoked_at = NOW() 
+    SET  term_ends = NOW() 
     WHERE group_id = p_group_id 
-    AND revoked_at IS NULL;
+    AND  term_ends IS NULL;
 
     FOR top_nominee IN
         SELECT nominee_id
@@ -33,6 +43,11 @@ BEGIN
         FROM group_administrators 
         WHERE group_id = p_group_id;
     END LOOP;
+
+    UPDATE nominations
+    SET revoked_at = NOW()
+    WHERE group_id = p_group_id
+    AND  revoked_at IS NULL;
 END;
 $$ LANGUAGE plpgsql;
 
