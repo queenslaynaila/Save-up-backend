@@ -37,7 +37,7 @@ export default (router: Router) => {
       if (targetUser === 'me') {
         filterArgs.loggedInUserId = req.user!.id;
         filters.push(`users.id = :loggedInUserId`);
-      } else if (isStandardUser(req.user!.role)) {
+      } else if (!isStandardUser(req.user!.role)) {
         if (/^\+254\d{9}$/.test(targetUser)) {
           filterArgs.phoneNumber = targetUser;
           filters.push(`user_contact_details.phone_number = :phoneNumber`);
