@@ -1,8 +1,8 @@
 -- A member can leave a group and join again
 CREATE TABLE IF NOT EXISTS group_users (
   group_id      INT NOT NULL,
-  xid           INT NOT NULL,
   user_id       INT NOT NULL,
+  xid           INT NOT NULL,
   created_at    TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   left_at       TIMESTAMP WITH TIME ZONE,
   PRIMARY KEY   (group_id, xid),
