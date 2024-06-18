@@ -1,10 +1,10 @@
 CREATE TYPE enum_transaction_status AS ENUM ('Succesful', 'Pending');
 CREATE TYPE enum_transaction_type AS ENUM (
   'Saving', 
-  'External Saving', 
+  'ExternalSaving', 
   'Withdrawal', 
-  'Transfer In', 
-  'Transfer Out', 
+  'TransferIn', 
+  'TransferOut', 
   'Interest'
 );
 

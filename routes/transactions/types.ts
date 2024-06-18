@@ -2,10 +2,10 @@ import { z } from 'zod';
 
 export const transactionType = {
   SAVING: 'Saving',
-  EXTERNAL_SAVING: 'External Saving',
+  EXTERNAL_SAVING: 'ExternalSaving',
   WITHDRAWAL: 'Withdrawal',
-  TRANSFER_IN: 'Transfer In',
-  TRANSFER_OUT: 'Transfer Out'
+  TRANSFER_IN: 'TransferIn',
+  TRANSFER_OUT: 'TransferOut'
 };
 
 export const getByEntitySchema = z.object({
