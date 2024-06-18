@@ -10,6 +10,7 @@ const SQL_GET_EXPENSE_BY_ID = sql<XidEntityInterface,  BaseExpenseInterface>(`
   FROM expenses 
   WHERE xid = :xid 
   AND entity_id = :entity_id
+  AND deleted_at IS NULL
 `);
 
 export default (router: Router) => {

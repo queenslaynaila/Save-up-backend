@@ -14,6 +14,7 @@ const SQL_GET_EXPENSES = sql<Record<string, string>, BaseExpenseInterface>(`
   FROM expenses 
   WHERE deleted_at IS NULL
   AND entity_id = :entity_id
+  AND deleted_at IS NULL
 `);
 
 export default (router: Router) => {
