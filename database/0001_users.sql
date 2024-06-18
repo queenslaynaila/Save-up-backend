@@ -1,6 +1,6 @@
 CREATE TYPE enum_entity_type AS ENUM ('User', 'Group', 'Donor');
 CREATE TYPE enum_id_type AS ENUM ('National ID', 'Passport ID');
-CREATE TYPE enum_user_role AS ENUM ('Admin', 'User', 'Moderator');
+CREATE TYPE enum_user_role AS ENUM ('Admin', 'Standard', 'Moderator');
 CREATE TYPE enum_gender AS ENUM ('Male', 'Female');
 
 CREATE TABLE IF NOT EXISTS entities (
@@ -25,7 +25,7 @@ GRANT INSERT, SELECT, UPDATE ON user_contact_details TO app_user;
 CREATE TABLE IF NOT EXISTS users (
   id              INT PRIMARY KEY,  
   full_name       TEXT NOT NULL,
-  role            enum_user_role NOT NULL DEFAULT 'User',
+  role            enum_user_role NOT NULL DEFAULT 'Standard',
   gender          enum_gender,
   pin             TEXT NOT NULL,
   created_at      TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
