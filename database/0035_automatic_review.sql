@@ -1,12 +1,12 @@
 CREATE TABLE IF NOT EXISTS admin_feedback (
-    group_id            INT NOT NULL,
-    xid                 INT NOT NULL,
-    administrator_id    INT NOT NULL,
-    reviewer_id         INT NOT NULL,
-    is_satisfied        BOOLEAN NOT NULL,
-    created_at          TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    PRIMARY KEY         (group_id, xid),
-    FOREIGN KEY         (group_id) REFERENCES groups(id)
+  group_id            INT NOT NULL,
+  xid                 INT NOT NULL,
+  administrator_id    INT NOT NULL,
+  reviewer_id         INT NOT NULL,
+  is_satisfied        BOOLEAN NOT NULL,
+  created_at          TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  PRIMARY KEY         (group_id, xid),
+  FOREIGN KEY         (group_id) REFERENCES groups(id)
 );
 
 
@@ -48,6 +48,14 @@ BEGIN
             WHERE group_id = v_administrator_record.group_id
             AND user_id = v_administrator_record.user_id
             AND term_ends IS NULL;
+
+            INSERT INTO elections (group_id, xid, initiator_id )
+            SELECT 
+                 v_administrator_record.group_id,
+                 COALESCE(MAX(xid), 0) + 1,
+                 1
+            FROM elections
+            WHERE group_id =  v_administrator_record.group_id;
 
             PERFORM initiate_election(v_administrator_record.group_id);
         END IF;
