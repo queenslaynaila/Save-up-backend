@@ -3,6 +3,7 @@ import { UserRole } from '../../globalTypes/index';
 
 export const baseUserSchema = z.object({
   id: z.number(),
+  
   id_type: z.enum(['National ID', 'Passport']),
   id_number: z.string().refine(value => /^[0-9]+$/.test(value)),    
   full_name: z.string(),
@@ -25,6 +26,8 @@ export const userCreationSchema = baseUserSchema.pick({
   full_name: true,
   gender: true,
   pin: true
+}).extend({
+  account_type: z.enum(['Admin', 'User', 'Moderator'])
 });
 
 export type UserCreationType = z.infer<typeof userCreationSchema>;
