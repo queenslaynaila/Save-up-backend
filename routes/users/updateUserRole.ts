@@ -6,8 +6,6 @@ import { convertToTitleCase } from '../../middleware/caseNormalization';
 import { UserRoleUpdateType, UserRoleParamType } from './types';
 import { UserRole, StatusCodeInterface } from '../../globalTypes/index';
 
-const VALID_ROLES = ['Admin', 'User', 'Moderator'];
-
 const SQL_UPDATE_ROLE = sql<UserRoleUpdateType, Record<string,never>>(`
   UPDATE users 
   SET role = :role 
@@ -21,7 +19,7 @@ export default (router: Router) => {
     async (req, res) => {
       const  role  =  convertToTitleCase(req.params.role);
       const  id  = req.params.id;
-      if (!VALID_ROLES.includes(role)) {
+      if (!(role in UserRole)) {
         throw new HttpError(400, 'Invalid role.');
       }
       await SQL_UPDATE_ROLE({ role, id }).exec();

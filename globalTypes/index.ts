@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 //USER ROLES
 
-export const enum UserRole {
+export enum UserRole {
   ADMIN = 'Admin',
   USER = 'Standard',
   MODERATOR = 'Moderator'
