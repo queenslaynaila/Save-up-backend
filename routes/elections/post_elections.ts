@@ -12,7 +12,13 @@ const group = z.object({
 type GroupInterface = z.infer<typeof group>
 
 const SQL_NOMINATE_GROUP_ADMIN = sql<GroupInterface, Record<string,never>>(`
-  SELECT start_election(:group_id, :initiator_id)
+  INSERT INTO elections (group_id, xid, initiator_id )
+  SELECT 
+      :group_id,
+      COALESCE(MAX(xid), 0) + 1,
+      :initiator_id
+  FROM elections
+  WHERE group_id = :group_id;
 `);
 
 export default (router: Router) => {
