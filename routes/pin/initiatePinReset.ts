@@ -1,6 +1,7 @@
 import { Router  } from 'express';
 import bcrypt from 'bcrypt';
 import jwt, { Secret } from 'jsonwebtoken';
+import { resetPasswordLimiter } from '../../services/rateLimit';
 import { sql } from '../../db';
 import { generateResetPin } from '../../middleware/generateResetPin';
 import sendSms from '../../services/twilio';
@@ -26,6 +27,7 @@ const SQL_SAVE_TOKEN = sql<InitiatePasswordResetInterface, TokenInterface>(`
 export default  (router: Router) => {
   router.post<Record<string,never>, StatusCodeInterface, GetByPhoneInterface, Record<string,never>>(
     '/',
+    resetPasswordLimiter,
     async (req, res) => {
       const { phone_number } = req.body;
       const user = await SQL_GET_USER({ phone_number })
