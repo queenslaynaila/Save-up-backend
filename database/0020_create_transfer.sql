@@ -44,7 +44,7 @@ BEGIN
     p_entity_id,
     p_source_pocket_id,
     v_source_transaction_id,
-    'Transfer Out'::enum_transaction_type,
+    'TransferOut'::enum_transaction_type,
     p_amount,
     v_reference_no,
     v_new_source_balance 
@@ -54,7 +54,7 @@ BEGIN
     p_entity_id,
     p_destination_pocket_id,
     v_destination_transaction_id,
-    'Transfer In'::enum_transaction_type,
+    'TransferIn'::enum_transaction_type,
     p_amount,
     v_reference_no,
     v_new_destination_balance
