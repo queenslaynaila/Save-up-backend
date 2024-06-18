@@ -26,10 +26,7 @@ export const userCreationSchema = baseUserSchema.pick({
   full_name: true,
   gender: true,
   pin: true
-}).extend({
-  account_type: z.enum(['Admin', 'Standard', 'Moderator'])
-});
-
+})
 export type UserCreationType = z.infer<typeof userCreationSchema>;
 
 export const loginSchema = baseUserSchema.pick({

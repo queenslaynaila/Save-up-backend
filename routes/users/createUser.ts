@@ -6,7 +6,7 @@ import { UserCreationType, userCreationSchema } from './types';
 import { StatusCodeInterface } from '../../globalTypes/index';
 
 const SQL_CREATE_USER = sql<UserCreationType, Record<string,never>>(`
-  SELECT create_user(:account_type, :id_type, :id_number, :phone_number, :role, :full_name, :gender, :pin)
+  SELECT create_user(:id_type, :id_number, :phone_number, :role, :full_name, :gender, :pin)
 `);
 
 export default (router: Router) => { 
