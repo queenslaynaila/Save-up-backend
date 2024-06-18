@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS group_administrators (
 
 CREATE UNIQUE INDEX group_administrators_group_id_user_id_key 
 ON group_administrators(group_id, user_id) 
-WHERE revoked_at IS NULL;
+WHERE term_ends  IS NULL;
 
 SELECT create_distributed_table('group_administrators', 'group_id');
 
