@@ -5,7 +5,7 @@ CREATE TABLE elections (
   start_at         TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   end_at           TIMESTAMP WITH TIME ZONE DEFAULT NOW() + INTERVAL '24 hours',
   PRIMARY KEY      (group_id, xid),
-  FOREIGN KEY       (group_id) REFERENCES groups(id)
+  FOREIGN KEY      (group_id) REFERENCES groups(id)
 );
 
 --- A group can only have one active election
