@@ -3,8 +3,10 @@ CREATE TABLE IF NOT EXISTS group_administrators (
   group_id      INT NOT NULL,
   user_id       INT NOT NULL,
   xid           INT NOT NULL,
-  term_starts    TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-  term_ends    TIMESTAMP WITH TIME ZONE,
+  term_starts   TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  term_ends     TIMESTAMP WITH TIME ZONE,
+  last_review   TIMESTAMP WITH TIME ZONE,
+  next_review   TIMESTAMP WITH TIME ZONE,
   PRIMARY KEY   (group_id, xid),
   FOREIGN KEY   (group_id) REFERENCES groups(id)
 );

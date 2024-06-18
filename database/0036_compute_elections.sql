@@ -34,12 +34,14 @@ BEGIN
             LIMIT 3
         ) AS top_nominees
     LOOP
-        INSERT INTO group_administrators (group_id, xid, user_id, created_at)
+        INSERT INTO group_administrators (group_id, xid, user_id, term_starts, last_review, next_review)
         SELECT
             p_group_id,
             COALESCE(MAX(xid), 0) + 1,
             top_nominee.nominee_id,
-            NOW()
+            NOW(),
+            NOW(),
+            NOW() + INTERVAL '90 days'
         FROM group_administrators 
         WHERE group_id = p_group_id;
     END LOOP;
