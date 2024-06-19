@@ -14,7 +14,9 @@ module.exports = {
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "ecmaVersion": "latest",
-    "sourceType": "module"
+    "sourceType": "module",
+    "project": "./tsconfig.json",
+    "extraFileExtensions": [".ts"]
   },
   "plugins": [
     "@typescript-eslint"
@@ -23,18 +25,5 @@ module.exports = {
     "@typescript-eslint/indent": ["error", 2],
     "@typescript-eslint/no-unused-vars": "error",
     "@typescript-eslint/no-explicit-any": "error"
-  },
-  "overrides": [
-    {
-      "env": {
-        "node": true
-      },
-      "files": [
-        ".eslintrc.{js,cjs}"
-      ],
-      "parserOptions": {
-        "sourceType": "script"
-      }
-    }
-  ]
+  }
 };
