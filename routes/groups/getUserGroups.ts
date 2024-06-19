@@ -11,7 +11,7 @@ const SQL_FETCH_USER_GROUPS = sql<GroupsByUserInterface ,  BaseGroupInterface >(
   FROM groups 
   LEFT JOIN group_members 
   ON groups.id = group_members.group_id
-  WHERE group_members.user_id = :receiver_id
+  WHERE group_members.user_id = :user_id
   AND group_members.left_at IS NULL;
 `);
 
