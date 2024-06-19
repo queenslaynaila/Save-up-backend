@@ -14,7 +14,8 @@ const SQL_GET_COMMON_GROUPS = sql<SharedGroupInterface, BaseGroupInterface>(`
   WHERE gm1.user_id = :logged_in_user_id 
   AND gm2.user_id = :user_id
   AND gm1.is_active = TRUE
-  AND gm2.is_active = TRUE;
+  AND gm2.is_active = TRUE
+  AND groups.deleted_at IS NULL;
 `);
 
 export default (router: Router) => {
