@@ -22,6 +22,7 @@ BEGIN
     UPDATE groups
     SET name = p_new_name
     WHERE id = p_group_id
+    AND deleted_at IS NULL;
     RETURNING name;
 END;
 $$ LANGUAGE plpgsql;
