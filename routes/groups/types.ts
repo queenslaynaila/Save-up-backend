@@ -61,7 +61,13 @@ export enum ExitReason {
 export const groupExitSchema = baseGroupSchema.pick({
   id: true
 }).extend({
-  user_id:z.number()
+  user_id:z.number(),
+  reason:z.enum([
+    ExitReason.SELFREMOVAL, 
+    ExitReason.ADMINREMOVAL,
+    ExitReason.RULEVIOLATION, 
+    ExitReason.OTHER
+  ])
 })
 
 export type GroupExitInterface = z.infer<typeof groupExitSchema>;
