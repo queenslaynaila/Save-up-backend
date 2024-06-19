@@ -12,11 +12,11 @@ BEGIN
     AND deleted_at is NULL;
 
     IF p_status = 'Accept'::enum_invite THEN
-        INSERT INTO group_users (group_id, xid, user_id)
+        INSERT INTO group_members (group_id, xid, user_id)
         SELECT p_group_id, 
                COALESCE(MAX(xid), 0) + 1,
                p_receiver_id
-        FROM group_users
+        FROM group_members
         WHERE group_id = p_group_id;
     END IF;
 
