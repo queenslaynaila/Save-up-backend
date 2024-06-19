@@ -6,10 +6,7 @@ import { GroupUpdateInterface, validateGroupUpdateSchema} from './types';
 import { IdParamInterface } from '../../globalTypes/index';
 
 const SQL_UPDATE_GROUP = sql<GroupUpdateInterface, GroupUpdateInterface>(`
-  UPDATE groups
-  SET name = :name
-  WHERE id = :id
-  RETURNING name;
+   SELECT * FROM update_group_details(:id, :name)
 `);
 
 export default (router: Router) => {
