@@ -1,5 +1,4 @@
 import { z } from 'zod';
-
 export const baseGroupSchema = z.object({
   id: z.number(),
   name: z.string(),
@@ -51,6 +50,13 @@ export type GroupUpdateInterface = z.infer<typeof groupUpdateSchema>;
 export const validateGroupUpdateSchema = groupUpdateSchema.omit({
   id:true
 })
+
+export enum ExitReason {
+  SELFREMOVAL = 'Self removal',
+  ADMINREMOVAL = 'Admin removal',
+  RULEVIOLATION = 'Rule violation',
+  OTHER = 'Other'
+}
 
 export const groupExitSchema = baseGroupSchema.pick({
   id: true
