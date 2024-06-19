@@ -17,7 +17,7 @@ const SQL_GET_TRANSACTIONS = sql<TransactionInput,  BaseTransaction>(`
          reference_no, 
          cumulative_amount, 
          created_at AS transaction_date
-  FROM transaction_logs 
+  FROM transactions 
   WHERE entity_id = :entity_id
   AND pocket_id = :pocket_id
 `);

@@ -9,7 +9,7 @@ CREATE OR REPLACE FUNCTION insert_transaction_log(
 )
 RETURNS VOID AS $$
 BEGIN 
-    INSERT INTO transaction_logs (
+    INSERT INTO transactions (
         entity_id, 
         xid, 
         pocket_id, 

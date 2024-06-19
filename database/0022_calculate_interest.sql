@@ -20,7 +20,7 @@ BEGIN
     FOR pocket IN
         SELECT p.id AS pocket_id, p.pocket_type, p.entity_id
         FROM pockets p
-        LEFT JOIN transaction_logs tl ON p.id = tl.pocket_id
+        LEFT JOIN transactions tl ON p.id = tl.pocket_id
         GROUP BY p.id, p.pocket_type, p.entity_id
         HAVING COUNT(tl.pocket_id) > 0  -- Exclude pockets with no financial transaction at all in the app
     LOOP
@@ -33,14 +33,14 @@ BEGIN
 
         -- Compute balance for the given pocket
         SELECT COALESCE(cumulative_amount, 0) INTO STRICT current_balance
-        FROM transaction_logs
+        FROM transactions
         WHERE pocket_id = pocket.pocket_id
         ORDER BY transaction_id DESC
         LIMIT 1;
 
         -- Fetch the timestamp of the last interest calculation
         SELECT MAX(created_at) INTO STRICT last_interest_calculation
-        FROM transaction_logs
+        FROM transactions
         WHERE pocket_id = pocket.pocket_id AND transaction_type = 'Interest Earned';
 
         IF last_interest_calculation IS NOT NULL THEN
@@ -55,10 +55,10 @@ BEGIN
         IF interest_earned > 0 THEN
             new_cumulative = current_balance + interest_earned;
             new_reference_no =  substr(md5(random()::text), 1, 5);
-            INSERT INTO transaction_logs (
+            INSERT INTO transactions (
                 xid, pocket_id, entity_id, transaction_type, amount, cumulative_amount, reference_no, created_at
             ) VALUES (
-                COALESCE((SELECT MAX(transaction_id) + 1 FROM transaction_logs WHERE pocket_id = pocket.pocket_id), 1),
+                COALESCE((SELECT MAX(transaction_id) + 1 FROM transactions WHERE pocket_id = pocket.pocket_id), 1),
                 pocket.pocket_id,
                 pocket.entity_id,
                 'Interest Earned',
