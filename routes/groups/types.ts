@@ -8,11 +8,11 @@ export const baseGroupSchema = z.object({
 
 export type BaseGroupInterface = z.infer<typeof baseGroupSchema>;
 
-export const groupsByReceiverSchema = z.object({
-  receiver_id:z.number()
+export const groupsByUserSchema = z.object({
+  user_id:z.number()
 })
 
-export type GroupsByReceiverInterface = z.infer<typeof groupsByReceiverSchema>;
+export type GroupsByUserInterface = z.infer<typeof groupsByUserSchema>;
 
 export const groupCreationSchema = baseGroupSchema.pick({
   name: true
