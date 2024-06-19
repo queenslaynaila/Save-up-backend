@@ -18,20 +18,15 @@ BEGIN
     INSERT INTO groups (id, name, creator_id)
     VALUES (v_entity_id, p_name, p_creator_id);
 
-    INSERT INTO group_users (group_id, xid, user_id)
-    SELECT 
-           v_entity_id, 
-           COALESCE(MAX(xid), 0) + 1,
-           p_creator_id
-    FROM group_users
-    WHERE group_id = v_entity_id;
+    INSERT INTO group_members (group_id, user_id, is_active)
+    VALUES (v_entity_id, p_creator_id, TRUE);
 
-    INSERT INTO group_administrators (group_id, xid, user_id)
+    INSERT INTO group_joins (group_id, user_id, xid)
     SELECT 
            v_entity_id, 
+           p_creator_id,
            COALESCE(MAX(xid), 0) + 1,
-           p_creator_id
-    FROM group_admnistrators
+    FROM group_joins
     WHERE group_id = v_entity_id;
 
     INSERT INTO pockets (
