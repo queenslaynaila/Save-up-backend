@@ -1,4 +1,3 @@
-CREATE TYPE enum_transaction_status AS ENUM ('Succesful', 'Pending');
 CREATE TYPE enum_transaction_type AS ENUM (
   'Saving', 
   'ExternalSaving', 
@@ -8,19 +7,25 @@ CREATE TYPE enum_transaction_type AS ENUM (
   'Interest'
 );
 
-CREATE TABLE IF NOT EXISTS transaction_logs (
+CREATE TABLE IF NOT EXISTS transaction_types (
+  id          SERIAL PRIMARY KEY,
+  slug        enum_transaction_type NOT NULL,
+  created_at  TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+); 
+
+CREATE TABLE IF NOT EXISTS transactions (
   entity_id               INT NOT NULL, 
   xid                     INT NOT NULL,
   pocket_id               INT NOT NULL,
-  transaction_type        enum_transaction_type NOT NULL,
-  amount                  NUMERIC(30, 2) NOT NULL CHECK (amount > 0),
-  current_balance         NUMERIC(30, 2) NOT NULL CHECK (current_balance >= 0), 
-  reference_no            TEXT NOT NULL,
-  status                  enum_transaction_status  NOT NULL DEFAULT 'Pending',
+  type_id                 INT NOT NULL,
+  reference_id            INT NOT NULL,
+  delta                   NUMERIC(30, 2) NOT NULL CHECK (delta > 0),
+  balance                 NUMERIC(30, 2) NOT NULL CHECK (balance >= 0), 
   created_at              TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   PRIMARY KEY             (entity_id, xid),
-  FOREIGN KEY             (entity_id, pocket_id) REFERENCES pockets (entity_id, xid)
+  FOREIGN KEY             (entity_id, pocket_id) REFERENCES pockets (entity_id, xid),
+  FOREIGN KEY             (type_id) REFERENCES transaction_types(id)
 );
 
-GRANT INSERT, SELECT ON transaction_logs TO app_user;
-SELECT create_distributed_table('transaction_logs', 'entity_id');
+GRANT INSERT, SELECT ON tramsactions TO app_user;
+SELECT create_distributed_table('tramsactions', 'entity_id');
