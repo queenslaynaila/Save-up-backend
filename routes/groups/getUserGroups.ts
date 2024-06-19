@@ -6,10 +6,10 @@ import {  BaseGroupInterface, GroupsByReceiverInterface   } from './types';
 const SQL_FETCH_USER_GROUPS = sql<GroupsByReceiverInterface ,  BaseGroupInterface >(`
   SELECT groups.id, groups.name, groups.created_at
   FROM groups 
-  LEFT JOIN group_users 
-  ON groups.id = group_users.group_id
-  WHERE group_users.user_id = :receiver_id
-  AND group_users.left_at IS NULL;
+  LEFT JOIN group_members 
+  ON groups.id = group_members.group_id
+  WHERE group_members.user_id = :receiver_id
+  AND group_members.left_at IS NULL;
 `);
 
 export default (router: Router) => {
