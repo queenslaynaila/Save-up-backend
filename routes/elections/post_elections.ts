@@ -2,27 +2,21 @@ import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import {  StatusCodeInterface } from '../../globalTypes/index';
-import {z} from 'zod'
+import { ElectionInterface } from './types';
 
-const group = z.object({
-  group_id:z.number(),
-  initiator_id:z.number()
-})
-
-type GroupInterface = z.infer<typeof group>
-
-const SQL_NOMINATE_GROUP_ADMIN = sql<GroupInterface, Record<string,never>>(`
-  INSERT INTO elections (group_id, xid, initiator_id )
+const SQL_NOMINATE_GROUP_ADMIN = sql<ElectionInterface , Record<string,never>>(`
+  INSERT INTO elections (group_id, xid, initiator_id, type)
   SELECT 
       :group_id,
       COALESCE(MAX(xid), 0) + 1,
       :initiator_id
+      :type
   FROM elections
   WHERE group_id = :group_id;
 `);
 
 export default (router: Router) => {
-  router.post<Record<string,never>, StatusCodeInterface, GroupInterface, Record<string,never>, Record<string,never>>(
+  router.post<Record<string,never>, StatusCodeInterface, ElectionInterface , Record<string,never>, Record<string,never>>(
     '/',
     authMiddleware(),
     async (req, res) => {
