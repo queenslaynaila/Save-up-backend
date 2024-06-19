@@ -25,6 +25,7 @@ import withdrawalRoutes from './routes/withdrawals/index';
 import transferRoutes from './routes/transfers/index';
 import transactionRoutes from './routes/transactions/index';
 import createExSaving from './routes/externalSaving/index';
+import ratificationRoutes from './routes/ratifications/index'
 import cron from 'node-cron';
 import remindStaleGoals from './cronJobs/overdueGoalsReminder'
 import creditInterest from './cronJobs/creditInterest';
@@ -98,6 +99,7 @@ passwordRoutes(app);
 categoriesRoutes(app);
 AdminRoutes(app);
 candidateRoutes(app);
+ratificationRoutes(app);
 securityQuestionsRoutes(app);
 securityAnswerRoutes(app);
 cumulativesRoutes(app);
