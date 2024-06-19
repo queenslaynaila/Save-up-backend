@@ -4,7 +4,10 @@ import authMiddleware from '../../middleware/authorization';
 import {  BaseGroupInterface, GroupsByReceiverInterface   } from './types';
 
 const SQL_FETCH_USER_GROUPS = sql<GroupsByReceiverInterface ,  BaseGroupInterface >(`
-  SELECT groups.id, groups.name, groups.created_at
+  SELECT 
+    groups.id, 
+    groups.name, 
+    groups.created_at
   FROM groups 
   LEFT JOIN group_members 
   ON groups.id = group_members.group_id
