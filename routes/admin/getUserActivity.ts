@@ -8,7 +8,7 @@ import { BaseTransaction,
 } from '../transactions/types';
 import { validateRequest } from '../../middleware/validationMiddleware';
 import { UserRole,  GetByPhoneInterface,  GetByIdInterface  } from '../../globalTypes/index';
-import { HttpError } from '../../middleware/errorMiddleware';
+import { HttpError } from '../../middleware/errorMiddleware'; 
 
 const SQL_GET_USER = sql<GetByPhoneInterface,  GetByIdInterface>(`
   SELECT id 
@@ -23,7 +23,7 @@ const SQL_GET_TRANSACTIONS = sql<TransactionByEntity,  BaseTransaction>(`
          reference_no, 
          cumulative_amount, 
          created_at AS transaction_date
-  FROM transaction_logs 
+  FROM tramsactions 
   WHERE entity_id = :entity_id
 `);
 
