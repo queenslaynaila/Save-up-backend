@@ -12,7 +12,8 @@ const SQL_FETCH_USER_GROUPS = sql<GroupsByUserInterface ,  BaseGroupInterface >(
   LEFT JOIN group_members 
   ON groups.id = group_members.group_id
   WHERE group_members.user_id = :user_id
-  AND group_members.left_at IS NULL;
+  AND group_members.is_active = TRUE 
+  AND groups.deleted_at IS NULL;
 `);
 
 export default (router: Router) => {
