@@ -9,12 +9,12 @@ const SQL_GET_COMMON_GROUPS = sql<SharedGroupInterface, BaseGroupInterface>(`
          groups.name, 
          groups.created_at
   FROM groups
-  LEFT JOIN group_users AS ug1 ON groups.id = ug1.group_id  
-  LEFT JOIN group_users AS ug2 ON groups.id = ug2.group_id  
-  WHERE ug1.user_id = :logged_in_user_id 
-  AND ug2.user_id = :user_id
-  AND ug1.left_at IS NULL 
-  AND ug2.left_at IS NULL;
+  LEFT JOIN group_members gm1 ON groups.id = gm1.group_id  
+  LEFT JOIN group_members gm2 ON groups.id = gm2.group_id  
+  WHERE gm1.user_id = :logged_in_user_id 
+  AND gm2.user_id = :user_id
+  AND gm1.is_active = TRUE
+  AND gm2.is_active = TRUE;
 `);
 
 export default (router: Router) => {
