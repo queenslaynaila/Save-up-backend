@@ -33,9 +33,7 @@ export type SharedGroupInterface = z.infer<typeof sharedGRoupSchema>;
 
 export const groupMemberSchema = z.object({
   user_id: z.number(),
-  id: z.number(),
-  full_name: z.string(),
-  joined_at: z.date()
+  full_name: z.string()
 })
 
 export type GroupMemberInterface = z.infer<typeof groupMemberSchema>;
