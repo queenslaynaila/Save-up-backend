@@ -18,8 +18,8 @@ BEGIN
     INSERT INTO groups (id, name, creator_id)
     VALUES (v_entity_id, p_name, p_creator_id);
 
-    INSERT INTO group_members (group_id, user_id, is_active)
-    VALUES (v_entity_id, p_creator_id, TRUE);
+    INSERT INTO group_members (group_id, user_id)
+    VALUES (v_entity_id, p_creator_id);
 
     INSERT INTO group_joins (group_id, user_id, xid)
     SELECT 
