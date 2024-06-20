@@ -46,7 +46,6 @@ BEGIN
         closed_at = NOW()
     WHERE group_id = p_group_id 
     AND xid = p_election_id;
-
 END;
 $$ LANGUAGE plpgsql;
 
