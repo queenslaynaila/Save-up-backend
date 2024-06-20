@@ -18,6 +18,8 @@ CREATE TABLE IF NOT EXISTS group_joins (
   PRIMARY KEY   (group_id, user_id, xid),
   FOREIGN KEY   (group_id, user_id) REFERENCES group_members(group_id, user_id)
 );
+SELECT create_distributed_table('group_joins', 'group_id');
+GRANT INSERT, SELECT ON group_joins TO app_user;
 
 CREATE TABLE IF NOT EXISTS group_lefts(
   group_id      INT NOT NULL,
@@ -28,3 +30,5 @@ CREATE TABLE IF NOT EXISTS group_lefts(
   PRIMARY KEY   (group_id, user_id, xid),
   FOREIGN KEY   (group_id, user_id) REFERENCES group_members(group_id, user_id)
 );
+SELECT create_distributed_table('group_lefts', 'group_id');
+GRANT INSERT, SELECT ON group_lefts TO app_user;

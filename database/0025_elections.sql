@@ -1,6 +1,6 @@
 CREATE TYPE enum_election_type AS ENUM ('Ballot', 'Ratification');
 CREATE TYPE enum_election_status AS ENUM ('Open', 'Closed', 'Cancelled');
-CREATE TABLE election (
+CREATE TABLE elections (
   group_id       INT NOT NULL,
   xid            INT NOT NULL,
   initiator_id   INT NOT NULL,
@@ -12,6 +12,8 @@ CREATE TABLE election (
   FOREIGN KEY    (group_id) REFERENCES groups(id) ON DELETE RESTRICT ON UPDATE RESTRICT,
   FOREIGN KEY    (group_id, initiator_id) REFERENCES group_members(group_id,user_id)
 );
+SELECT create_distributed_table('elections', 'group_id');
+GRANT INSERT, SELECT, UPDATE ON elections TO app_user;
 
 CREATE TABLE ratifications (
   group_id       INT NOT NULL,
@@ -25,6 +27,8 @@ CREATE TABLE ratifications (
   FOREIGN KEY    (group_id, election_id) REFERENCES election(group_id,xid)
     ON DELETE RESTRICT ON UPDATE RESTRICT
 );
+SELECT create_distributed_table('ratifications', 'group_id');
+GRANT INSERT, SELECT ON ratifications TO app_user;
 
 CREATE TABLE candidates (
   group_id       INT NOT NULL,
@@ -37,6 +41,8 @@ CREATE TABLE candidates (
   FOREIGN KEY    (group_id, election_id) REFERENCES election(group_id,xid) 
     ON DELETE RESTRICT ON UPDATE RESTRICT
 );
+SELECT create_distributed_table('candidates', 'group_id');
+GRANT INSERT, SELECT ON candidates TO app_user;
 
 CREATE TABLE ballots (
   group_id       INT NOT NULL,
@@ -48,3 +54,5 @@ CREATE TABLE ballots (
   FOREIGN KEY    (group_id, election_id, candidate_id) REFERENCES candidates(group_id, election_id, candidate_id),
   FOREIGN KEY    (group_id, user_id) REFERENCES group_members(group_id,user_id)
 );
+SELECT create_distributed_table('ballots', 'group_id');
+GRANT INSERT, SELECT ON ballots TO app_user;

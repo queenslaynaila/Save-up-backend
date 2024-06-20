@@ -6,5 +6,5 @@ CREATE TABLE IF NOT EXISTS group_admins (
   FOREIGN KEY   (group_id, election_id, user_id) REFERENCES candidates (group_id, election_id, candidate_id)
 );
 
-SELECT create_distributed_table('group_administrators', 'group_id');
-GRANT INSERT, SELECT, UPDATE ON group_administrators TO app_user;
+SELECT create_distributed_table('group_admins', 'group_id');
+GRANT INSERT, SELECT ON group_admins TO app_user;
