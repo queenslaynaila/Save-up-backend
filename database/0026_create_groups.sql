@@ -25,7 +25,7 @@ BEGIN
     SELECT 
            v_entity_id, 
            p_creator_id,
-           COALESCE(MAX(xid), 0) + 1,
+           COALESCE(MAX(xid), 0) + 1
     FROM group_joins
     WHERE group_id = v_entity_id;
 
