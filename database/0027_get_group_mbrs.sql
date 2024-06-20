@@ -23,7 +23,6 @@ END;
 $$ LANGUAGE plpgsql
 
 GRANT EXECUTE ON FUNCTION get_group_members(INT) TO app_user;
-
 SELECT create_distributed_function(
   'get_group_members(INT)', 'p_group_id'
 );
