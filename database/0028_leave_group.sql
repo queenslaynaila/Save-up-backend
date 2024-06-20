@@ -31,3 +31,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+GRANT EXECUTE ON FUNCTION leave_group(INT, INT, enum_exit_reason) TO app_user;
+SELECT create_distributed_function(
+  'leave_group(INT, INT, enum_exit_reason)', 'p_group_id'
+);
