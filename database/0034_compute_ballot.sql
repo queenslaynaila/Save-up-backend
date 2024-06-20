@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION compute_election_results(
+CREATE OR REPLACE FUNCTION compute_ballot_results(
     p_group_id          INT, 
     p_election_id       INT
 )
