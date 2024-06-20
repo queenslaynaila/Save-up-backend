@@ -26,6 +26,7 @@ import transferRoutes from './routes/transfers/index';
 import transactionRoutes from './routes/transactions/index';
 import createExSaving from './routes/externalSaving/index';
 import ratificationRoutes from './routes/ratifications/index'
+import ballotRoutes from './routes/ballots/index'
 import cron from 'node-cron';
 import remindStaleGoals from './cronJobs/overdueGoalsReminder'
 import creditInterest from './cronJobs/creditInterest';
@@ -102,6 +103,7 @@ candidateRoutes(app);
 ratificationRoutes(app);
 securityQuestionsRoutes(app);
 securityAnswerRoutes(app);
+ballotRoutes(app);
 cumulativesRoutes(app);
 groupRoutes(app);
 inviteRoutes(app);
