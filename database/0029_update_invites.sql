@@ -12,12 +12,7 @@ BEGIN
     AND deleted_at is NULL;
 
     IF p_status = 'Accept'::enum_invite THEN
-        INSERT INTO group_members (group_id, xid, user_id)
-        SELECT p_group_id, 
-               COALESCE(MAX(xid), 0) + 1,
-               p_receiver_id
-        FROM group_members
-        WHERE group_id = p_group_id;
+        PERFORM insert_into_group_members_and_joins( p_group_id, p_receiver_id );
     END IF;
 
     IF p_status = 'Decline'::enum_invite THEN

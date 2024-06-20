@@ -18,16 +18,7 @@ BEGIN
     INSERT INTO groups (id, name, creator_id)
     VALUES (v_entity_id, p_name, p_creator_id);
 
-    INSERT INTO group_members (group_id, user_id)
-    VALUES (v_entity_id, p_creator_id);
-
-    INSERT INTO group_joins (group_id, user_id, xid)
-    SELECT 
-           v_entity_id, 
-           p_creator_id,
-           COALESCE(MAX(xid), 0) + 1
-    FROM group_joins
-    WHERE group_id = v_entity_id;
+    PERFORM insert_into_group_members_and_joins(v_entity_id, p_creator_id);
 
     INSERT INTO pockets (
         entity_id, 
