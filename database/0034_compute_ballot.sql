@@ -37,8 +37,10 @@ BEGIN
         INSERT INTO group_admins (group_id, election_id, user_id)
         VALUES (p_group_id, p_election_id, candidate_counts.candidate_id);
 
-        RETURN QUERY SELECT full_name FROM users
-        WHERE id = candidate_counts.candidate_id;
+        RETURN QUERY 
+        SELECT users.full_name 
+        FROM users
+        WHERE users.id = candidate_counts.candidate_id;
     END LOOP;
 
     UPDATE elections
