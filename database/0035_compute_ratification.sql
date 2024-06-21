@@ -7,16 +7,16 @@ RETURNS TABLE (
     ratification_status  BOOLEAN
 ) AS $$
 DECLARE
-    v_total_members             INT;
+    v_total_active_members             INT;
     v_required_approval_count   INT;
     v_approval_count            RECORD;
 BEGIN
-    SELECT COUNT(*) INTO v_total_members 
+    SELECT COUNT(*) INTO v_total_active_members 
     FROM group_members 
     WHERE group_id = p_group_id 
     AND is_active = TRUE;
 
-    v_required_approval_count := v_total_members / 2 + 1;  ---shld be more than 50%
+    v_required_approval_count := v_total_active_members / 2 + 1;  ---shld be more than 50%
 
     FOR approval_counts IN
         SELECT COUNT(*) INTO STRICT v_approval_count 
