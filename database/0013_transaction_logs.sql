@@ -16,8 +16,8 @@ CREATE TABLE IF NOT EXISTS transaction_types (
 CREATE TABLE IF NOT EXISTS transactions (
   entity_id               INT NOT NULL, 
   xid                     INT NOT NULL,
-  pocket_id               INT NOT NULL,
   type_id                 INT NOT NULL,
+  pocket_id               INT NOT NULL,
   reference_id            INT NOT NULL,
   delta                   NUMERIC(30, 2) NOT NULL CHECK (delta > 0),
   balance                 NUMERIC(30, 2) NOT NULL CHECK (balance >= 0), 
