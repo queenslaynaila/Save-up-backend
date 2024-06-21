@@ -34,6 +34,29 @@ CREATE TABLE IF NOT EXISTS users (
 SELECT create_distributed_table('users', 'id');
 GRANT INSERT, SELECT, UPDATE ON users TO app_user;
 
+CREATE TABLE IF NOT EXISTS user_phone_history(
+    user_id          INT NOT NULL,
+    xid              INT NOT NULL,
+    phone_number     TEXT NOT NULL,
+    created_at       TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    PRIMARY KEY      (user_id, xid),
+    FOREIGN KEY      (user_id) REFERENCES user_contact_details(id)
+);
+SELECT create_distributed_table('user_phone_history', 'user_id');
+GRANT INSERT, SELECT ON user_phone_history TO app_user;
+
+CREATE TABLE IF NOT EXISTS user_id_history(
+    user_id          INT NOT NULL,
+    xid              INT NOT NULL,
+    id_type          enum_id_type NOT NULL DEFAULT 'National ID',
+    id_number        TEXT NOT NULL CHECK (id_number ~ '^[0-9]+$'),
+    created_at       TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    PRIMARY KEY      (user_id, xid),
+    FOREIGN KEY      (user_id) REFERENCES user_contact_details(id)
+);
+SELECT create_distributed_table('user_id_history', 'user_id');
+GRANT INSERT, SELECT ON user_id_history TO app_user;
+
 CREATE TABLE IF NOT EXISTS donors (
   id                   INT NOT NULL PRIMARY KEY,
   full_name            TEXT NOT NULL,
