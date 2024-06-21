@@ -12,9 +12,7 @@ const SQL_GET_USER_PIN = sql<{ id: number }, { pin: string }>(`
 `);
 
 const SQL_UPDATE_PHONE = sql<{ phone_number: string; id: number }, Record<string,never>>(`
-   UPDATE user_contact_details
-   SET phone_number = :phone_number 
-   WHERE id = :id
+   SELECT update_user_phone_number(:id, :phone_number)
 `);
 
 export default (router: Router) => {
@@ -23,7 +21,7 @@ export default (router: Router) => {
     authMiddleware(), 
     validateRequest(loginSchema),
     async (req, res) => {
-      const id= req.user!.id;
+      const id= 20;
       const userPassword = await SQL_GET_USER_PIN({ id}).one(
         new HttpError(400, 'User not found')
       );
