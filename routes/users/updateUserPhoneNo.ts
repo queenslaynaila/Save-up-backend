@@ -21,7 +21,7 @@ export default (router: Router) => {
     authMiddleware(), 
     validateRequest(loginSchema),
     async (req, res) => {
-      const id= 20;
+      const id = req.user!.id
       const userPassword = await SQL_GET_USER_PIN({ id}).one(
         new HttpError(400, 'User not found')
       );
