@@ -63,3 +63,17 @@ export const phoneNoUpdateSchema = baseUserSchema.pick({
 })
 
 export type PhoneNoUpdateType = z.infer<typeof phoneNoUpdateSchema>;
+
+export const userIdDetailsSchema = z.object({
+  id: z.number(),
+  id_type: z.string(),
+  id_number: z.string(),
+});
+
+export type UserIdDetails = z.infer<typeof userIdDetailsSchema>;
+
+export const updateIdDetailsSchema = userIdDetailsSchema.omit({
+  id: true
+})
+
+export type UpdateIdDetails = z.infer<typeof updateIdDetailsSchema>;
