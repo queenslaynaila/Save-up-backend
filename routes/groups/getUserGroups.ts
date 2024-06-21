@@ -18,7 +18,7 @@ const SQL_FETCH_USER_GROUPS = sql<GroupsByUserInterface ,  BaseGroupInterface >(
 
 export default (router: Router) => {
   router.get<Record<string,never>,  BaseGroupInterface [], GroupsByUserInterface, Record<string,never>>(
-    '/me/',
+    '/',
     authMiddleware(),
     async (req, res) => {
       const groups = await SQL_FETCH_USER_GROUPS({ user_id: req.user!.id}).many();
