@@ -18,7 +18,6 @@ CREATE TABLE IF NOT EXISTS pockets (
   target_at               TIMESTAMP WITH TIME ZONE,
   completed_at            TIMESTAMP WITH TIME ZONE, 
   created_at              TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-  updated_at              TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   deleted_at              TIMESTAMP WITH TIME ZONE,
   PRIMARY KEY             (entity_id, xid), 
   FOREIGN KEY             (entity_id) REFERENCES entities(id),
