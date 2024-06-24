@@ -3,7 +3,7 @@ CREATE OR REPLACE FUNCTION update_user_contact_id(
     p_new_id_type       enum_id_type,
     p_new_id_number     TEXT
 ) RETURNS TABLE (
-    id_number  TEXT
+    new_id_number  TEXT
 ) AS $$
 DECLARE
     v_old_id_type       enum_id_type;
@@ -27,7 +27,9 @@ BEGIN
     SET id_type = p_new_id_type, 
         id_number = p_new_id_number
     WHERE id = p_user_id
-    RETURNING id_number INTO STRICT phone_number;
+    RETURNING id_number INTO STRICT new_id_number;
+
+    RETURN NEXT;
 END;
 $$ LANGUAGE plpgsql;
 

@@ -2,7 +2,7 @@ CREATE OR REPLACE FUNCTION update_user_phone_number(
     p_user_id           INT,
     p_phone_number      TEXT
 ) RETURNS TABLE (
-    phone_number  TEXT
+    updated_phone_number  TEXT
 ) AS $$
 DECLARE
     v_old_phone_number TEXT;
@@ -22,7 +22,9 @@ BEGIN
     UPDATE user_contact_details
     SET phone_number = p_phone_number
     WHERE id = p_user_id
-    RETURNING phone_number INTO STRICT phone_number; 
+    RETURNING phone_number INTO STRICT  updated_phone_number; 
+
+    RETURN NEXT;
 END;
 $$ LANGUAGE plpgsql;
 
