@@ -22,7 +22,7 @@ BEGIN
     UPDATE user_contact_details
     SET phone_number = p_phone_number
     WHERE id = p_user_id
-    RETURNING phone_number INTO STRICT  updated_phone_number; 
+    RETURNING phone_number INTO STRICT updated_phone_number; 
 
     RETURN NEXT;
 END;
