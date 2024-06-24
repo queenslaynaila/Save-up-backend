@@ -1,4 +1,3 @@
-
 CREATE TABLE IF NOT EXISTS user_deposits (
   user_id               INT NOT NULL, 
   deposit_id            INT NOT NULL,

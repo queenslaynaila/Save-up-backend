@@ -31,7 +31,7 @@ BEGIN
           'Intermediate'::enum_priority, 
           'Standard'::enum_pocket_type
   )
-  RETURNING  pockets.xid INTO STRICT v_pocket_id;
+  RETURNING pockets.xid INTO STRICT v_pocket_id;
 
   INSERT INTO default_pockets (entity_id, pocket_id)
   VALUES (v_entity_id, v_pocket_id);
