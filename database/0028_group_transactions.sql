@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS group_deposits (
   deposit_id            INT NOT NULL,
   user_id               INT NOT NULL,
   PRIMARY KEY           (user_id, deposit_id),
-  FOREIGN KEY           (user_id, deposit_id), REFERENCES transactions (entity_id, xid)
+  FOREIGN KEY           (user_id, deposit_id) REFERENCES transactions (entity_id, xid)
 );
 GRANT INSERT, SELECT ON group_deposits TO app_user;
 SELECT create_distributed_table('group_deposits', 'group_id');
