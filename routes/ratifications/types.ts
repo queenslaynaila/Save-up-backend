@@ -7,4 +7,18 @@ export const ratificationSchema = z.object({
   is_ratified: z.boolean()
 })
 
-export type RatificationInterface = z.infer<typeof ratificationSchema >
+export type RatificationInterface = z.infer<typeof ratificationSchema>
+
+export const computeRatification = ratificationSchema.pick({
+  group_id: true,
+  election_id: true
+})
+
+export type ComputeRatificationInterface = z.infer<typeof computeRatification>
+
+export const ratificationResults = z.object({
+  full_name: z.string(),
+  ratification_status: z.boolean()
+})
+
+export type RatificationResultsInterface = z.infer<typeof ratificationResults>
