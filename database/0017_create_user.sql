@@ -31,7 +31,7 @@ BEGIN
           'Intermediate'::enum_priority, 
           'Standard'::enum_pocket_type
   )
-  RETURNING  pockets.xid INTO STRICT v_pocket_id;
+  RETURNING pockets.xid INTO STRICT v_pocket_id;
 
   INSERT INTO default_pockets (entity_id, pocket_id)
   VALUES (v_entity_id, v_pocket_id);
@@ -41,7 +41,16 @@ EXCEPTION
 END;
 $$ LANGUAGE plpgsql;
 
-GRANT EXECUTE ON FUNCTION create_user(enum_entity_type, enum_id_type, TEXT, TEXT, enum_user_role, TEXT, enum_gender, TEXT) TO app_user;
+GRANT EXECUTE ON FUNCTION create_user(enum_entity_type, 
+  enum_id_type, 
+  TEXT, 
+  TEXT, 
+  enum_user_role, 
+  TEXT, 
+  enum_gender, 
+  TEXT
+) TO app_user;
+
 SELECT create_distributed_function(
   'create_user(enum_entity_type, enum_id_type, TEXT, TEXT, enum_user_role, TEXT, enum_gender, TEXT)'
 );

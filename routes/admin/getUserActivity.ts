@@ -23,7 +23,7 @@ const SQL_GET_TRANSACTIONS = sql<TransactionByEntity,  BaseTransaction>(`
          reference_no, 
          cumulative_amount, 
          created_at AS transaction_date
-  FROM tramsactions 
+  FROM transactions 
   WHERE entity_id = :entity_id
 `);
 

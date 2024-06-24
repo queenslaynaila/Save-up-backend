@@ -6,8 +6,8 @@ import {  StatusCodeInterface } from '../../globalTypes/index';
 import { RatificationInterface, ratificationSchema } from './types';
 
 const SQL_CREATE_RATIFICATIONS = sql<RatificationInterface , Record<string,never>>(`
-  INSERT INTO ratifications (group_id, election_id, candidate_id, user_id)
-  VALUES (:group_id, :election_id, :candidate_id, :user_id); 
+  INSERT INTO ratifications (group_id, election_id, user_id, :is_ratified)
+  VALUES (:group_id, :election_id, :user_id, :is_ratified); 
 `);
 
 export default (router: Router) => {

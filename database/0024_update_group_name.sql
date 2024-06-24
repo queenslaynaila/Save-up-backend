@@ -25,7 +25,7 @@ BEGIN
     AND deleted_at IS NULL
     RETURNING name INTO STRICT new_name;
 
-    RETURN QUERY SELECT new_name;
+    RETURN NEXT;
 END;
 $$ LANGUAGE plpgsql;
 
