@@ -27,5 +27,5 @@ CREATE TABLE IF NOT EXISTS transactions (
   FOREIGN KEY             (type_id) REFERENCES transaction_types(id)
 );
 
-GRANT INSERT, SELECT ON tramsactions TO app_user;
-SELECT create_distributed_table('tramsactions', 'entity_id');
+GRANT INSERT, SELECT ON transactions TO app_user;
+SELECT create_distributed_table('transactions', 'entity_id');
