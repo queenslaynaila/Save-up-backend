@@ -3,14 +3,18 @@ import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { validateRequest } from '../../middleware/validationMiddleware';
 import {  StatusCodeInterface } from '../../globalTypes/index';
-import {  BallotComputeInterface, BallotBodyRequestInterface, ballotBodyRequest } from './types';
+import {  BallotComputeInterface, 
+  BallotBodyRequestInterface,
+  ballotBodyRequest, 
+  BallotResultInterface 
+} from './types';
 
-const SQL_CREATE_BALLOT = sql<BallotComputeInterface , Record<string,never>>(`
+const SQL_CREATE_BALLOT = sql<BallotComputeInterface ,  BallotResultInterface>(`
   SELECT compute_ballot_results(:group_id, :election_id)
 `);
 
 export default (router: Router) => {
-  router.post<{ id: string }, StatusCodeInterface, BallotBodyRequestInterface, Record<string,never>, Record<string,never>>(
+  router.post<{ id: string }, StatusCodeInterface, BallotBodyRequestInterface,  BallotResultInterface, Record<string,never>>(
     '/:id',
     validateRequest(ballotBodyRequest),
     authMiddleware(),
