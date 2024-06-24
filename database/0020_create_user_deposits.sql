@@ -31,7 +31,7 @@ BEGIN
     v_reference_id := floor(random() * 1000000 + 1)::INT;
 
     PERFORM insert_transaction_log(
-        p_entity_id,
+        p_user_id,
         p_type_id,
         p_pocket_id,
         v_reference_id,
