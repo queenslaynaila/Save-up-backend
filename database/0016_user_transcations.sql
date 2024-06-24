@@ -3,7 +3,6 @@ CREATE TABLE IF NOT EXISTS user_deposits (
   deposit_id            INT NOT NULL,
   status                TEXT NOT NULL,
   PRIMARY KEY           (user_id, deposit_id),
-  FOREIGN KEY           (user_id) REFERENCES users (id),
   FOREIGN KEY           (user_id, deposit_id) REFERENCES transactions (entity_id, xid)
 );
 GRANT INSERT, SELECT ON user_deposits TO app_user;
@@ -14,8 +13,7 @@ CREATE TABLE IF NOT EXISTS user_withdrawals (
   withdrawal_id         INT NOT NULL,
   status                TEXT NOT NULL,
   PRIMARY KEY           (user_id, withdrawal_id),
-  FOREIGN KEY           (user_id) REFERENCES users (id),
-  FOREIGN KEY           (user_id, withdrawal_id), REFERENCES transactions (entity_id, xid)
+  FOREIGN KEY           (user_id, withdrawal_id) REFERENCES transactions (entity_id, xid)
 );
 GRANT INSERT, SELECT ON  user_withdrawals TO app_user;
 SELECT create_distributed_table('user_withdrawals', 'user_id');
