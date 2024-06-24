@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS transaction_types (
   slug        enum_transaction_type NOT NULL,
   created_at  TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 ); 
+SELECT create_reference_table('transaction_types');
 
 CREATE TABLE IF NOT EXISTS transactions (
   entity_id               INT NOT NULL, 
@@ -23,9 +24,12 @@ CREATE TABLE IF NOT EXISTS transactions (
   balance                 NUMERIC(30, 2) NOT NULL CHECK (balance >= 0), 
   created_at              TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   PRIMARY KEY             (entity_id, xid),
-  FOREIGN KEY             (entity_id, pocket_id) REFERENCES pockets (entity_id, xid),
   FOREIGN KEY             (type_id) REFERENCES transaction_types(id)
 );
+
+ALTER TABLE transactions
+ADD CONSTRAINT transactions_pocket_id_fkey  
+FOREIGN KEY  (entity_id, pocket_id) REFERENCES pockets (entity_id, xid);
 
 GRANT INSERT, SELECT ON transactions TO app_user;
 SELECT create_distributed_table('transactions', 'entity_id');
