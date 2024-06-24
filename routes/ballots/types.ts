@@ -33,3 +33,9 @@ export const ballotBodyRequest = ballotBodySchema.pick({
 })
 
 export type BallotBodyRequestInterface = z.infer<typeof ballotBodyRequest>
+
+export const ballotResultSchema = z.object({
+  full_name: z.string()
+})
+
+export type BallotResultInterface = z.infer<typeof ballotResultSchema>
