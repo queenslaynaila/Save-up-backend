@@ -77,3 +77,9 @@ export const updateIdDetailsSchema = userIdDetailsSchema.omit({
 })
 
 export type UpdateIdDetails = z.infer<typeof updateIdDetailsSchema>;
+
+export const userQuerySchema = baseUserSchema.pick({
+  full_name: true
+})
+
+export type UserQueryParams = z.infer<typeof userQuerySchema>;

@@ -3,7 +3,7 @@ import { sql } from '../../db';
 import { HttpError } from '../../middleware/errorMiddleware';
 import authMiddleware from '../../middleware/authorization';
 import isStandardUser from '../../middleware/isStandardUser';
-import {  UserType, UserByEntityType } from './types';
+import {  UserType, UserByEntityType, UserQueryParams  } from './types';
 
 const SQL_GET_USER_BY_CRITERIA = sql<Record<string,never>,  UserType>(`
   SELECT 
@@ -22,11 +22,13 @@ const SQL_GET_USER_BY_CRITERIA = sql<Record<string,never>,  UserType>(`
 `);
 
 export default (router: Router) => {
-  router.get<string, UserByEntityType,  UserType[], Record<string,never>,Record<string,never>>(
+  router.get<string, UserByEntityType,  UserType[], Record<string,never>, UserQueryParams>(
     '/:entity', 
     authMiddleware(), 
     async (req, res) => {
       const  targetUser = req.params.entity;
+      const { full_name } = req.query;  
+
       const filters: string[] = [];
       const filterArgs: Record<string, string | number> = {};
 
@@ -47,6 +49,11 @@ export default (router: Router) => {
         }
       } else {
         throw new HttpError(403, 'Forbidden');
+      }
+
+      if (full_name) {
+        filterArgs.fullName = full_name;
+        filters.push(`users.full_name = :fullName`);
       }
     
       const query = SQL_GET_USER_BY_CRITERIA({});
