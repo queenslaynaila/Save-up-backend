@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION update_user_contact_id(
+CREATE OR REPLACE FUNCTION update_user_id(
     p_user_id           INT,
     p_new_id_type       enum_id_type,
     p_new_id_number     TEXT
