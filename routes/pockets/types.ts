@@ -11,7 +11,6 @@ const basePocketSchema = z.object({
   target_amount: z.number(),
   target_at: z.string(),
   created_at: z.string(),
-  updated_at: z.string(),
   completed_at: z.string(),
 });
 

@@ -26,7 +26,6 @@ const SQL_CREATE_POCKET = sql<PocketCreateType, BasePocketType>(`
             target_amount,  
             target_at, 
             created_at, 
-            updated_at, 
             completed_at
 `);
 
