@@ -8,6 +8,8 @@ export const nextOfKinCreationSchema = z.object({
     .string()
     .refine((value) => /^\+254\d{9}$/.test(value)),
 });
+
+export const nextOfKinValidation = nextOfKinCreationSchema.omit({ user_id: true })
   
 export type NextOfKinCreationInterface = z.infer<typeof nextOfKinCreationSchema>;
   

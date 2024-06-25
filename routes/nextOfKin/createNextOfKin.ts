@@ -3,7 +3,7 @@ import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { validateRequest } from '../../middleware/validationMiddleware';
-import { NextOfKinCreationInterface, NextOfKinInterface, nextOfKinCreationSchema } from './types'; 
+import { NextOfKinCreationInterface, NextOfKinInterface, nextOfKinValidation } from './types'; 
 
 const SQL_CREATE_KIN = sql<NextOfKinCreationInterface, NextOfKinInterface>(`
   INSERT INTO next_of_kins (
@@ -28,7 +28,7 @@ export default (router: Router) => {
   router.post<Record<string,never>, NextOfKinInterface, NextOfKinCreationInterface, Record<string,never>, Record<string,never>>(
     '/', 
     authMiddleware(), 
-    validateRequest(nextOfKinCreationSchema),
+    validateRequest(nextOfKinValidation),
     async (req, res) => {
       const { full_name, relationship, phone_number } = req.body;
       const user_id = req.user!.id
