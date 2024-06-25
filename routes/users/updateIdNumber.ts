@@ -7,7 +7,7 @@ import { StatusCodeInterface } from '../../globalTypes/index';
 
 
 const SQL_UPDATE_ID_NUMBER = sql<UserIdDetails, Record<string,never>>(`
-   SELECT update_user_id_details(:id, id_type, :phone_number)
+   SELECT * FROM update_user_contact_id(:id, id_type, :id_number)
 `);
 
 export default (router: Router) => {
