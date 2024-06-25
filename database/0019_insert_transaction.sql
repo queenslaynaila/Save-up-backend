@@ -6,7 +6,9 @@ CREATE OR REPLACE FUNCTION insert_transaction_log(
     p_amount                NUMERIC,
     p_current_balance       NUMERIC
 )
-RETURNS VOID AS $$
+RETURNS INT AS $$
+DECLARE
+    v_transaction_id INT;
 BEGIN 
     INSERT INTO transactions (
         entity_id, 
@@ -25,6 +27,8 @@ BEGIN
            p_amount, 
            p_current_balance
     WHERE entity_id = p_entity_id;
+
+    RETURN v_transaction_id;
 END;
 $$ LANGUAGE plpgsql;
 
