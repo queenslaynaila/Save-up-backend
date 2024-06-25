@@ -13,11 +13,11 @@ const SQL_UPDATE_ROLE = sql<UserRoleUpdateType, Record<string,never>>(`
 export default (router: Router) => {
   router.patch<UserRoleParamType, StatusCodeInterface, Record<string,never>, Record<string,never>>(
     '/:id/:role',
-    authMiddleware({ roles: [UserRole.ADMIN] }),
+    authMiddleware(),
     async (req, res) => {
       const  role  =  convertToTitleCase(req.params.role);
       const  id  = req.params.id;
-      if (!(role in UserRole)) {
+      if (!Object.values(UserRole).includes(role as UserRole)) {
         throw new HttpError(400, 'Invalid role.');
       }
       await SQL_UPDATE_ROLE({ role, id }).exec();
