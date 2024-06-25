@@ -5,9 +5,8 @@ import  { validateRequest } from '../../middleware/validationMiddleware';
 import { UserIdDetails,UpdateIdDetails, updateIdDetailsSchema } from './types';
 import { StatusCodeInterface } from '../../globalTypes/index';
 
-
 const SQL_UPDATE_ID_NUMBER = sql<UserIdDetails, Record<string,never>>(`
-   SELECT * FROM update_user_contact_id(:id, id_type, :id_number)
+   SELECT * FROM update_user_contact_id(:id, :id_type, :id_number)
 `);
 
 export default (router: Router) => {
