@@ -1,14 +1,11 @@
 import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import { convertToTitleCase, isValidValue } from '../../middleware/caseNormalization';
+import { convertToTitleCase } from '../../middleware/caseNormalization';
 import { BasePocketType, 
   PocketQueryParamsType, 
   PocketByEntityType 
 } from './types';
-
-const ACCEPTED_STATUS_VALUES = ['In Progress', 'Dormant', 'Completed'];
-const ACCEPTED_PRIORITY_VALUES = ['High', 'Intermediate', 'Low'];
 
 const SQL_GET_POCKETS = sql<{entity_id: number}, BasePocketType>(`
   SELECT pockets.xid, 
@@ -30,7 +27,7 @@ export default (router: Router) => {
     '/me/', 
     authMiddleware(), 
     async (req, res) => {
-      const entity_id = req.body.entity_id ?? req.user!.id; // either grp or user
+      const entity_id = req.body.entity_id ?? req.user!.id; 
       const { category_id, priority, status, start_date, end_date, is_default } = req.query;
       
       const filters: string[] = [];
@@ -59,16 +56,13 @@ export default (router: Router) => {
         }
       }
 
-      const convertedStatus = status ? convertToTitleCase(status) : undefined;
-      const convertedPriority = priority ? convertToTitleCase(priority) : undefined;
-
-      if (convertedPriority && isValidValue(convertedPriority, ACCEPTED_PRIORITY_VALUES)) {
-        filterArgs.priority = convertedPriority;
+      if (priority) {
+        filterArgs.priority =  convertToTitleCase(priority)
         filters.push(`priority = :priority`);
       }
 
-      if (convertedStatus && isValidValue(convertedStatus, ACCEPTED_STATUS_VALUES)) {
-        filterArgs.status = convertedStatus;
+      if (status) {
+        filterArgs.status =  convertToTitleCase(status)
         filters.push(`status = :status`);
       }
 
