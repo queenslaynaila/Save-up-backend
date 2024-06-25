@@ -8,11 +8,12 @@ CREATE OR REPLACE FUNCTION update_user_role(
 DECLARE
     v_old_role       enum_user_role;
 BEGIN
-    SELECT u.full_name, u.role INTO STRICT full_name, v_old_role
-    FROM users u
-    WHERE u.id = p_user_id;
+    SELECT users.full_name, users.role 
+    INTO STRICT full_name, v_old_role
+    FROM users 
+    WHERE users.id = p_user_id;
 
-    INSERT INTO user_role_history (user_id, xid, role)
+    INSERT INTO user_role_history(user_id, xid, role)
     SELECT 
         p_user_id, 
         COALESCE(MAX(xid), 0) + 1, 
