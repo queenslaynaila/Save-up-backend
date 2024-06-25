@@ -16,7 +16,6 @@ const SQL_GET_POCKET_BY_ID = sql<XidEntityInterface, BasePocketType>(`
          target_amount,  
          target_at, 
          created_at, 
-         updated_at, 
          completed_at
   FROM pockets  
   WHERE  entity_id = :entity_id
