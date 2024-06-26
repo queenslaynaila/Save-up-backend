@@ -38,12 +38,12 @@ SELECT create_distributed_table('sessions', 'user_id');
 GRANT INSERT, SELECT ON sessions TO app_user;
 
 CREATE TABLE IF NOT EXISTS user_role_history(
-    user_id          INT NOT NULL,
-    xid              INT NOT NULL,
-    role             enum_user_role NOT NULL,
-    created_at       TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-    PRIMARY KEY      (user_id, xid),
-    FOREIGN KEY      (user_id) REFERENCES users(id)
+  user_id          INT NOT NULL,
+  xid              INT NOT NULL,
+  role             enum_user_role NOT NULL,
+  created_at       TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  PRIMARY KEY      (user_id, xid),
+  FOREIGN KEY      (user_id) REFERENCES users(id)
 );
 SELECT create_distributed_table('user_role_history', 'user_id');
 GRANT INSERT, SELECT ON user_role_history TO app_user;
