@@ -14,3 +14,19 @@ export const candidateRequestBody = candidateSchema.omit({
 });
   
 export type CandidateRequestBody = z.infer<typeof candidateRequestBody>;
+
+export const candidateParamSchema = z.object({
+  group_id: z.string(),
+  election_id: z.string()
+})
+
+export type CandidateParam = z.infer<typeof candidateParamSchema>
+
+export const candidateResSchema = candidateSchema.omit({
+  chosen_by: true
+}).extend({
+  candidate_name: z.string(),
+  created_at: z.string()
+});
+
+export type CandidateRes = z.infer<typeof candidateResSchema>;
