@@ -13,6 +13,8 @@ export const baseUserSchema = z.object({
     .string()
     .refine((value) => /^\+254\d{9}$/.test(value)),
   pin: z.string().refine((value) => /^\d{4}$/.test(value)),
+  is_locked: z.boolean(),
+  failed_attempts: z.number(),
   created_at: z.string()
 });
 
