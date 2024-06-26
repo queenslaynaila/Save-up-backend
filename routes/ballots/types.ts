@@ -16,8 +16,9 @@ export const ballotBodySchema = ballotSchema.omit({
 export type BallotBodyInterface = z.infer<typeof ballotBodySchema>
 
 export const computeBallot = ballotBodySchema.omit({
-  user_id:true,
   candidate_id:true
+}).extend({
+  user_id: z.number()
 })
 
 export type BallotComputeInterface = z.infer<typeof computeBallot>
