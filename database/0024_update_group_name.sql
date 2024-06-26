@@ -1,12 +1,23 @@
 CREATE OR REPLACE FUNCTION update_group_name(
-    p_group_id INT,
-    p_new_name TEXT
+    p_group_id   INT,
+    p_user_id    INT,
+    p_new_name   TEXT
 ) RETURNS TABLE (
     new_name    TEXT
 ) AS $$
 DECLARE
     v_old_name TEXT;
 BEGIN
+    IF NOT EXISTS (
+        SELECT 1
+        FROM group_members
+        WHERE group_id = p_group_id
+        AND user_id = p_user_id
+        AND is_active = TRUE
+    ) THEN
+        RAISE EXCEPTION 'User is not a group member.';
+    END IF;
+
     SELECT name INTO STRICT v_old_name
     FROM groups
     WHERE id = p_group_id;

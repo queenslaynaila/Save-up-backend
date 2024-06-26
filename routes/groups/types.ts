@@ -41,12 +41,15 @@ export type GroupMemberInterface = z.infer<typeof groupMemberSchema>;
 export const groupUpdateSchema = baseGroupSchema.pick({
   id: true,
   name: true
+}).extend({
+  user_id:z.number()
 })
 
 export type GroupUpdateInterface = z.infer<typeof groupUpdateSchema>;
 
 export const validateGroupUpdateSchema = groupUpdateSchema.omit({
-  id:true
+  id:true,
+  user_id:true
 })
 
 export enum ExitReason {

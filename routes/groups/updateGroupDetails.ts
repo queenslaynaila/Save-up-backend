@@ -6,7 +6,7 @@ import { GroupUpdateInterface, validateGroupUpdateSchema} from './types';
 import { IdParamInterface } from '../../globalTypes/index';
 
 const SQL_UPDATE_GROUP = sql<GroupUpdateInterface, GroupUpdateInterface>(`
-   SELECT * FROM update_group_name(:id, :name)
+   SELECT * FROM update_group_name(:id, :user_id, :name)
 `);
 
 export default (router: Router) => {
@@ -15,7 +15,9 @@ export default (router: Router) => {
     authMiddleware(),
     validateRequest(validateGroupUpdateSchema),
     async (req, res) => {
-      const updatedGroup = await SQL_UPDATE_GROUP({ ...req.body, id: parseInt(req.params.id)}).one();
+      const updatedGroup =  await SQL_UPDATE_GROUP(
+        { ...req.body, id:parseInt(req.params.id), user_id:req.user!.id}
+      ).one();
       res.json(updatedGroup);
     }
   );
