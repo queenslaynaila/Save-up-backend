@@ -1,4 +1,4 @@
-CREATE TYPE enum_token_reason AS ENUM ('PasswordReset', 'SecurityUpdate');
+CREATE TYPE enum_token_reason AS ENUM ('PasswordReset', 'SecurityUpdate', 'AccountUnlock');
 
 CREATE TABLE IF NOT EXISTS reset_tokens (
   user_id       INT NOT NULL,
