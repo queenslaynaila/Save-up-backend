@@ -30,8 +30,8 @@ GRANT INSERT, SELECT, UPDATE ON users TO app_user;
 CREATE TABLE IF NOT EXISTS sessions (
   user_id        INT NOT NULL,
   xid            INT NOT NULL,
-  login_time     TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-  logout_time    TIMESTAMP WITH TIME ZONE,
+  created_at     TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  exited_at      TIMESTAMP WITH TIME ZONE,
   FOREIGN KEY    (user_id) REFERENCES users(id)
 );
 SELECT create_distributed_table('sessions', 'user_id');
