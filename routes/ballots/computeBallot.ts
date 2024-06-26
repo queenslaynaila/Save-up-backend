@@ -9,8 +9,8 @@ import {  BallotComputeInterface,
   BallotResultInterface 
 } from './types';
 
-const SQL_CREATE_BALLOT = sql<BallotComputeInterface ,  BallotResultInterface>(`
-  SELECT compute_ballot_results(:group_id, :election_id)
+const SQL_CREATE_BALLOT = sql<BallotComputeInterface,  BallotResultInterface>(`
+  SELECT compute_ballot_results(:group_id, :election_id, :user_id)
 `);
 
 export default (router: Router) => {
@@ -19,7 +19,7 @@ export default (router: Router) => {
     validateRequest(ballotBodyRequest),
     authMiddleware(),
     async (req, res) => {
-      await SQL_CREATE_BALLOT({ ...req.body, group_id: parseInt(req.params.id)}).exec();
+      await SQL_CREATE_BALLOT({ ...req.body, user_id: req.user!.id, group_id: parseInt(req.params.id)}).exec();
       res.sendStatus(201);
     }
   );
