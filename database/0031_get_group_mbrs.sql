@@ -1,5 +1,6 @@
 CREATE OR REPLACE FUNCTION get_group_members(
-    p_group_id   INT
+    p_group_id   INT,
+    p_user_id    INT
 )
 RETURNS TABLE(
     user_id      INT, 
@@ -8,21 +9,32 @@ RETURNS TABLE(
 DECLARE
     rec_user RECORD;
 BEGIN
-    FOR rec_user IN
-        SELECT group_members.user_id
-        FROM group_members
-        WHERE group_members.group_id = p_group_id 
-        AND group_members.is_active = TRUE
-    LOOP
-        RETURN QUERY
-        SELECT users.id AS user_id, users.full_name
+     IF EXISTS (
+        SELECT 1
         FROM users
-        WHERE users.id = rec_user.user_id;
-    END LOOP;
+        WHERE id = p_user_id
+        AND role = 'Admin'
+    ) THEN
+        RETURN QUERY
+        SELECT * FROM get_active_group_members(p_group_id);
+    END IF;
+
+    IF NOT EXISTS (
+        SELECT 1
+        FROM group_members
+        WHERE user_id = p_user_id
+        AND group_id = p_group_id
+        AND is_active = TRUE;
+    ) THEN
+        RAISE EXCEPTION 'User is not a member of the group.';
+    END IF;
+
+    RETURN QUERY
+    SELECT * FROM get_active_group_members(p_group_id);
 END;
 $$ LANGUAGE plpgsql
 
-GRANT EXECUTE ON FUNCTION get_group_members(INT) TO app_user;
+GRANT EXECUTE ON FUNCTION get_group_members(INT, INT) TO app_user;
 SELECT create_distributed_function(
-  'get_group_members(INT)', 'p_group_id'
+  'get_group_members(INT, INT)', 'p_group_id'
 );
