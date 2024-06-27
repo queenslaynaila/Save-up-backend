@@ -13,7 +13,8 @@ BEGIN
     FROM users
     WHERE id = p_user_id;
 
-    IF v_user_role != 'Admin' THEN
+--Admin user can view grp members regardless of not being a member
+    IF v_user_role != 'Admin' THEN 
         IF IF NOT EXISTS (
             SELECT 1
             FROM group_members
