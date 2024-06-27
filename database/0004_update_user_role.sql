@@ -1,6 +1,7 @@
 CREATE OR REPLACE FUNCTION update_user_role(
+    p_new_role          enum_user_role,
     p_user_id           INT,
-    p_new_role          enum_user_role
+    p_admin_id          INT
 ) RETURNS TABLE (
     full_name     TEXT,
     new_role      enum_user_role
@@ -8,6 +9,15 @@ CREATE OR REPLACE FUNCTION update_user_role(
 DECLARE
     v_old_role       enum_user_role;
 BEGIN
+    IF NOT EXISTS (
+       SELECT 1
+       FROM users
+       WHERE id = p_admin_id 
+       AND role = 'Admin'
+    ) THEN
+        RAISE EXCEPTION 'Only admins can update user roles';
+    END IF;
+
     SELECT users.full_name, users.role 
     INTO STRICT full_name, v_old_role
     FROM users 
