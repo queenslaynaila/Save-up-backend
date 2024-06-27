@@ -46,13 +46,13 @@ export default (router: Router) => {
       );
 
       if (user.is_locked) {
-        throw new HttpError(423, 'Account is locked.');
+        throw new HttpError(423, 'The  account has been locked.');
       }
 
       if (!await bcrypt.compare(req.body.pin, pin)) {
         const { increment_attempts: attempts_left } = await SQL_INCREMENT_FAILED_ATTEMPTS({ id: user.id }).one();
         if (attempts_left <= 0) {
-          throw new HttpError(423, `Account is locked. You have exhausted the maximum number of login attempts.`);
+          throw new HttpError(423, `Account is locked.You have exhausted the maximum number of login attempts.`);
         }
         throw new HttpError(400, `Invalid phone number or password combination. You have ${attempts_left} attempts left.`);
       }
