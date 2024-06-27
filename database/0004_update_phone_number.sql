@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION update_user_phone_number(
+CREATE OR REPLACE FUNCTION update_phone_number(
     p_user_id           INT,
     p_phone_number      TEXT
 ) RETURNS TABLE (
@@ -28,7 +28,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-GRANT EXECUTE ON FUNCTION update_user_phone_number(INT, TEXT) TO app_user;
+GRANT EXECUTE ON FUNCTION update_phone_number(INT, TEXT) TO app_user;
 SELECT create_distributed_function(
-  'update_user_phone_number(INT, TEXT)', 'p_user_id'
+  'update_phone_number(INT, TEXT)', 'p_user_id'
 );
