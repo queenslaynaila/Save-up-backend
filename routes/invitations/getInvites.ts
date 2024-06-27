@@ -4,7 +4,7 @@ import authMiddleware from '../../middleware/authorization';
 import { baseInviteInterface, InviteByReceiverInterface } from './types';
 
 const SQL_FIND_INVITATIONS_FOR_USER = sql<InviteByReceiverInterface, baseInviteInterface>(`
-  SELECT * FROM get_invitations_for_user(:receiver_id)
+  SELECT * FROM get_user_invites(:receiver_id)
 `);
 
 export default (router: Router) => {

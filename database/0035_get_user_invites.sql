@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION get_invitations_for_user(
+CREATE OR REPLACE FUNCTION get_user_invites(
     p_receiver_id  INT
 )
 RETURNS TABLE (
@@ -42,7 +42,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-GRANT EXECUTE ON FUNCTION get_invitations_for_user(INT) TO app_user;
+GRANT EXECUTE ON FUNCTION get_user_invites(INT) TO app_user;
 SELECT create_distributed_function(
-    'get_invitations_for_user(INT)', 'p_receiver_id'
+    'get_user_invites(INT)', 'p_receiver_id'
 );
