@@ -4,7 +4,7 @@ import authMiddleware from '../../middleware/authorization';
 import {  StatusCodeInterface } from '../../globalTypes/index';
 import { ElectionInterface } from './types';
 
-const SQL_NOMINATE_GROUP_ADMIN = sql<ElectionInterface , Record<string,never>>(`
+const SQL_CALL_ELECTION = sql<ElectionInterface , Record<string,never>>(`
   INSERT INTO elections (group_id, xid, initiator_id, type)
   SELECT 
       :group_id,
@@ -21,7 +21,7 @@ export default (router: Router) => {
     authMiddleware(),
     async (req, res) => {
       const initiator_id= req.user!.id
-      await SQL_NOMINATE_GROUP_ADMIN({ ...req.body, initiator_id}).exec();
+      await SQL_CALL_ELECTION({ ...req.body, initiator_id}).exec();
       res.sendStatus(201);
     }
   );
