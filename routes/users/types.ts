@@ -46,7 +46,7 @@ export type UserByEntityType = z.infer<typeof userByEntitySchema>;
 
 export const userRoleUpdateSchema = z.object({
   targetUserId: z.string(),
-  role: z.string(),
+  role: z.enum([UserRole.ADMIN, UserRole.USER, UserRole.MODERATOR]),
   adminId: z.number()
 });
 
