@@ -12,13 +12,13 @@ import { IdParamInterface } from '../../globalTypes/index';
 
 const SQL_GET_TRANSACTIONS = sql<TransactionInput,  BaseTransaction>(`
   SELECT xid AS transaction_id, 
-         transaction_type, 
-         amount, 
-         reference_no, 
-         cumulative_amount, 
+         type_id AS transaction_type, 
+         reference_id, 
+         delta,
+         balance, 
          created_at AS transaction_date
   FROM transactions 
-  WHERE entity_id = :entity_id
+  WHERE entity_id = :user_id
   AND pocket_id = :pocket_id
 `);
 
@@ -28,7 +28,6 @@ export default (router: Router) => {
     validateRequest(baseTransactionSchema),
     authMiddleware(),
     async (req, res) => {
-      const entity_id = req.body.entity_id ?? req.user!.id;
       const { transaction_type, from_date, to_date } = req.query;
       const filters: string[] = [];
       const filterArgs: Record<string, string  > = {};
@@ -52,7 +51,7 @@ export default (router: Router) => {
         }
       }
       
-      const query = SQL_GET_TRANSACTIONS({ pocket_id:req.params.id, entity_id });
+      const query = SQL_GET_TRANSACTIONS({ pocket_id:req.params.id, user_id:req.user!.id });
       if (filters.length > 0) query.extend(`AND ${filters.join(' AND ')}`, filterArgs);
       query.extend('LIMIT 15', {});
       return res.json(await query.many());

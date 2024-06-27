@@ -32,11 +32,10 @@ export const baseTransactionSchema = z.object({
 export type BaseTransaction = z.infer<typeof baseTransactionSchema>;
 
 
-export const getTransactionsInputSchema = getByEntitySchema
-  .required()
-  .extend({
-    pocket_id: z.string()
-  })
+export const getTransactionsInputSchema =z.object({
+  user_id: z.number(),
+  pocket_id: z.string()
+})
 
 export type TransactionInput = z.infer<typeof getTransactionsInputSchema>;
 

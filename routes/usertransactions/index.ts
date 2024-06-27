@@ -6,6 +6,6 @@ export default (baseRouter: Router) => {
 
   getTransactions(router)
   
-  baseRouter.use('/transactions', router);
+  baseRouter.use('/user-transactions', router);
 };
 
