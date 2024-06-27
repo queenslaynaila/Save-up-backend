@@ -6,7 +6,7 @@ import { SavingCreateType ,  savingPostRequestSchema } from './types';
 import { StatusCodeInterface } from '../../globalTypes/index';
 
 const SQL_CREATE_SAVING = sql<SavingCreateType, Record<string,never>>(`
-  SELECT create_saving(:entity_id, :user_id, :pocket_id, :amount, )
+  SELECT create_saving(:user_id, :pocket_id, :amount, )
 `);
 
 export default (router: Router) => {
@@ -15,8 +15,7 @@ export default (router: Router) => {
     authMiddleware(), 
     validateRequest(savingPostRequestSchema),
     async (req, res) => {
-      const entity_id = req.body.entity_id ?? req.user!.id; //either logged in user or group
-      await SQL_CREATE_SAVING({ ...req.body, user_id:req.user!.id, entity_id})
+      await SQL_CREATE_SAVING({ ...req.body, user_id:req.user!.id})
         .exec();
       res.sendStatus(201);
     });

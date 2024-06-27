@@ -6,7 +6,7 @@ import { WithdrawalCreation, withdrawalValidationSchema  } from './types';
 import { StatusCodeInterface } from '../../globalTypes/index';
 
 const SQL_CREATE_WITHDRAWAL = sql<WithdrawalCreation, Record<string, never>>(`
-  SELECT create_withdrawal(:entity_id, :pocket_id, :user_id, :amount);
+  SELECT create_withdrawal(:user_id, :pocket_id, :amount);
 `); 
 
 export default (router: Router) => {
@@ -15,8 +15,7 @@ export default (router: Router) => {
     validateRequest(withdrawalValidationSchema),
     authMiddleware(),
     async (req, res) => {
-      const user_id = req.user!.id
-      await SQL_CREATE_WITHDRAWAL({...req.body, entity_id: user_id, user_id }).exec();
+      await SQL_CREATE_WITHDRAWAL({...req.body,user_id:req.user!.id}).exec();
       res.sendStatus(201);   
     });
 };

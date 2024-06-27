@@ -12,7 +12,6 @@ export const baseSavingSchema = z.object({
 export type BaseSavingType = z.infer<typeof baseSavingSchema>;
 
 export const savingCreateSchema = baseSavingSchema.pick({
-  entity_id: true,
   user_id: true,
   pocket_id: true,
   amount: true
@@ -23,8 +22,7 @@ export type SavingCreateType = z.infer<typeof savingCreateSchema>;
 export const savingPostRequestSchema =  baseSavingSchema.pick({
   amount: true
 }).extend({
-  pocket_id: z.number(),
-  entity_id: z.number().optional()
+  pocket_id: z.number()
 })
 
 export const savingsQueryParamSchema = z.object({
