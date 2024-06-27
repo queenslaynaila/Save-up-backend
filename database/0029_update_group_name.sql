@@ -8,15 +8,7 @@ CREATE OR REPLACE FUNCTION update_group_name(
 DECLARE
     v_old_name TEXT;
 BEGIN
-    IF NOT EXISTS (
-        SELECT 1
-        FROM group_members
-        WHERE group_id = p_group_id
-        AND user_id = p_user_id
-        AND is_active = TRUE
-    ) THEN
-        RAISE EXCEPTION 'User is not a group member.';
-    END IF;
+    PERFORM check_user_group_membership(p_user_id, p_group_id);
 
     SELECT name INTO STRICT v_old_name
     FROM groups
