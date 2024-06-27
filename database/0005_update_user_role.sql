@@ -1,7 +1,7 @@
 CREATE OR REPLACE FUNCTION update_user_role(
     p_new_role          enum_user_role,
-    p_user_id           INT,
-    p_admin_id          INT
+    p_target_user_id    INT,
+    p_admin_id          INT 
 ) RETURNS TABLE (
     full_name     TEXT,
     new_role      enum_user_role
