@@ -5,7 +5,7 @@ import { BaseTransaction,
   TransactionQueryParams,
   TransactionByEntity,
   baseTransactionSchema 
-} from '../transactions/types';
+} from '../usertransactions/types';
 import { validateRequest } from '../../middleware/validationMiddleware';
 import { UserRole,  GetByPhoneInterface,  GetByIdInterface  } from '../../globalTypes/index';
 import { HttpError } from '../../middleware/errorMiddleware'; 
