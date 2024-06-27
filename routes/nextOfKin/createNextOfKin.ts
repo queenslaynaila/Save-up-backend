@@ -30,14 +30,8 @@ export default (router: Router) => {
     authMiddleware(), 
     validateRequest(nextOfKinValidation),
     async (req, res) => {
-      const { full_name, relationship, phone_number } = req.body;
-      const user_id = req.user!.id
-      const nextOfKin = await SQL_CREATE_KIN({
-        user_id,
-        full_name,
-        relationship,
-        phone_number
-      }).one(new HttpError(400, 'You already have an existing next of kin.'));
+      const nextOfKin = await SQL_CREATE_KIN({...req.body, user_id:req.user!.id})
+        .one(new HttpError(400, 'You already have an existing next of kin.'));
       return res.json(nextOfKin);
     });
 };
