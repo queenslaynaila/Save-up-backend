@@ -3,7 +3,7 @@ import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { baseInviteInterface, InviteByReceiverInterface } from './types';
 
-const SQL_FIND_INVITATIONS_FOR_USER = sql<InviteByReceiverInterface, baseInviteInterface>(`
+const SQL_GET_PENDING_INVITATIONS = sql<InviteByReceiverInterface, baseInviteInterface>(`
   SELECT * FROM get_user_invites(:receiver_id)
 `);
 
@@ -12,7 +12,7 @@ export default (router: Router) => {
     '/', 
     authMiddleware(),
     async (req, res) => {
-      const invitations = await SQL_FIND_INVITATIONS_FOR_USER({ receiver_id: req.user!.id }).many();
+      const invitations = await  SQL_GET_PENDING_INVITATIONS({ receiver_id: req.user!.id }).many();
       return res.json(invitations);     
     }
   );

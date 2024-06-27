@@ -20,6 +20,7 @@ BEGIN
             i.created_at
         FROM invitations i
         WHERE i.receiver_id = p_receiver_id
+        AND i.status = 'Pending'
     LOOP
         SELECT u.full_name
         INTO v_sender_name
