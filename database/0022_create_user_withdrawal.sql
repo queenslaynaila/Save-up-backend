@@ -1,7 +1,6 @@
 CREATE OR REPLACE FUNCTION create_user_withdrawal(
     p_user_id      INT, 
     p_pocket_id    INT, 
-    p_type_id      INT,
     p_amount       NUMERIC
 )
 RETURNS VOID AS $$
@@ -34,7 +33,7 @@ BEGIN
 
     PERFORM insert_transaction_log(
         p_user_id,
-        p_type_id,
+        3,
         p_pocket_id,
         v_reference_id,
         p_amount,

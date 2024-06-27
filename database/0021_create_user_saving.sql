@@ -1,7 +1,6 @@
-CREATE OR REPLACE FUNCTION create_user_deposit(
+CREATE OR REPLACE FUNCTION create_saving(
     p_user_id      INT, 
     p_pocket_id    INT, 
-    p_type_id      INT,
     p_amount       NUMERIC
 )
 RETURNS VOID AS $$
@@ -32,15 +31,12 @@ BEGIN
 
     PERFORM insert_transaction_log(
         p_user_id,
-        p_type_id,
+        1,
         p_pocket_id,
         v_reference_id,
         p_amount,
         v_new_balance
     );
-
-    INSERT INTO user_deposits (user_id, deposit_id, status)
-    VALUES (p_user_id, v_transaction_id, 'Completed');
 END;
 $$ LANGUAGE plpgsql;
 
