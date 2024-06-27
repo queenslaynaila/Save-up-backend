@@ -16,7 +16,7 @@ export default (router: Router) => {
     validateRequest(ratificationSchema),
     authMiddleware(),
     async (req, res) => {
-      await SQL_CREATE_RATIFICATIONS({ ...req.body}).exec();
+      await SQL_CREATE_RATIFICATIONS({ ...req.body, user_id: req.user!.id}).exec();
       res.sendStatus(201);
     }
   );
