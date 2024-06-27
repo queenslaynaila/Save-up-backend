@@ -1,6 +1,7 @@
 CREATE OR REPLACE FUNCTION compute_ratification_results(
     p_group_id       INT, 
-    p_election_id    INT
+    p_election_id    INT,
+    p_user_id        INT
 )
 RETURNS TABLE (
     full_name            TEXT,
@@ -11,6 +12,8 @@ DECLARE
     v_required_approval_count   INT;
     v_approval_count            RECORD;
 BEGIN
+    PERFORM check_user_group_membership(p_user_id, p_group_id);
+
     SELECT COUNT(*) INTO v_total_active_members 
     FROM group_members 
     WHERE group_id = p_group_id 
