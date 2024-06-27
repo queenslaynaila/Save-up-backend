@@ -19,7 +19,9 @@ export default (router: Router) => {
     validateRequest(ballotBodyRequest),
     authMiddleware(),
     async (req, res) => {
-      await SQL_CREATE_BALLOT({ ...req.body, user_id: req.user!.id, group_id: parseInt(req.params.id)}).exec();
+      await SQL_CREATE_BALLOT({
+        ...req.body, user_id: req.user!.id, group_id: parseInt(req.params.id)
+      }).exec();
       res.sendStatus(201);
     }
   );
