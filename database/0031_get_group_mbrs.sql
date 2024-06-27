@@ -9,11 +9,20 @@ RETURNS TABLE(
 DECLARE
     v_user_role   enum_user_role;
 BEGIN
+    IF NOT EXISTS (
+        SELECT 1
+        FROM groups
+        WHERE id = p_group_id
+        AND deleted_at IS NULL
+    ) THEN
+        RAISE EXCEPTION 'The group is not active.';
+    END IF;
+
     SELECT role INTO STRICT v_user_role
     FROM users
     WHERE id = p_user_id;
 
---Admin user can view grp members regardless of not being a member
+    --Admin user can view grp members regardless of not being a member
     IF v_user_role != 'Admin' THEN 
         IF IF NOT EXISTS (
             SELECT 1
@@ -27,7 +36,8 @@ BEGIN
     END IF;
 
     RETURN QUERY
-    SELECT * FROM get_active_group_members(p_group_id);
+    SELECT user_id, full_name
+    FROM get_active_group_members(p_group_id);
 END;
 $$ LANGUAGE plpgsql
 
