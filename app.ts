@@ -22,7 +22,7 @@ import electionRoutes from './routes/elections/index'
 import inviteRoutes from './routes/invitations/index';
 import withdrawalRoutes from './routes/withdrawals/index';
 import transferRoutes from './routes/transfers/index';
-import transactionRoutes from './routes/transactions/index';
+import transactionRoutes from './routes/usertransactions/index';
 import createExSaving from './routes/externalSaving/index';
 import ratificationRoutes from './routes/ratifications/index'
 import ballotRoutes from './routes/ballots/index'
