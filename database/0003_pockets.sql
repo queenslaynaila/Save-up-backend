@@ -73,4 +73,4 @@ CREATE TABLE IF NOT EXISTS external_savings (
 );
 
 GRANT INSERT, SELECT ON external_savings TO app_user;
-SELECT create_distributed_table('external_savings', 'entity_id');
+SELECT create_distributed_table('external_savings', 'entity_id')

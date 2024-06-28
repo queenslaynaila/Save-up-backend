@@ -1,0 +1,1 @@
+---Get full names amount of  members who have not deposited for a grp pocket 

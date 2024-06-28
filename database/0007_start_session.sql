@@ -3,9 +3,7 @@ CREATE OR REPLACE FUNCTION start_session(
 )
 RETURNS VOID AS $$
 BEGIN
-    UPDATE users
-    SET failed_attempts = 0
-    WHERE id = p_user_id;
+    PERFORM record_login_attempt
 
     INSERT INTO sessions (user_id, xid)
     SELECT
