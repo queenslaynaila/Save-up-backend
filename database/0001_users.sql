@@ -19,13 +19,27 @@ CREATE TABLE IF NOT EXISTS users (
   role            enum_user_role NOT NULL DEFAULT 'Standard',
   gender          enum_gender,
   pin             TEXT NOT NULL,
-  failed_attempts INT NOT NULL DEFAULT 0,
   is_locked       BOOLEAN NOT NULL DEFAULT FALSE,
   created_at      TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   FOREIGN KEY     (id) REFERENCES user_contact_details(id)
 );
 SELECT create_distributed_table('users', 'id');
 GRANT INSERT, SELECT, UPDATE ON users TO app_user;
+
+CREATE TABLE IF NOT EXISTS login_attempts (
+  user_id         INT NOT NULL,
+  xid             INT NOT NULL,
+  ip_address      TEXT,
+  browser_info    TEXT,
+  location        TEXT,
+  success         BOOLEAN NOT NULL,
+  reason          TEXT,
+  created_at      TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  PRIMARY KEY     (user_id, xid),
+  FOREIGN KEY     (user_id) REFERENCES users(id)
+);
+GRANT INSERT, SELECT ON login_attempts TO app_user;
+SELECT create_distributed_table('login_attempts', 'user_id');
 
 CREATE TABLE IF NOT EXISTS sessions (
   user_id        INT NOT NULL,
@@ -34,7 +48,6 @@ CREATE TABLE IF NOT EXISTS sessions (
   exited_at      TIMESTAMP WITH TIME ZONE,
   FOREIGN KEY    (user_id) REFERENCES users(id)
 );
-SELECT create_distributed_table('sessions', 'user_id');
 GRANT INSERT, SELECT ON sessions TO app_user;
 
 CREATE TABLE IF NOT EXISTS user_role_history(
