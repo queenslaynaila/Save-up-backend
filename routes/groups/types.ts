@@ -74,3 +74,32 @@ export const removeMember = z.object({
 })
 
 export type RemoveMemberInterface = z.infer<typeof removeMember>;
+
+const Recipient = z.object({
+  recipient_id: z.number(),
+  amount: z.number()
+});
+
+
+export const withdrawalRequest = z.object({
+  group_id:z.number(),
+  pocket_id:z.number(),
+  election_id:z.number(),
+  initiator_id:z.number(),
+  amount:z.number(),
+  reason:z.string(),
+  recipients:z.array(Recipient)
+})
+
+export type WithdrawalRequest = z.infer<typeof withdrawalRequest>;
+
+export const approveWithdrawalSchema = z.object({
+  group_id: z.number(),
+  admin_id: z.number(),
+  election_id: z.number(),
+  withdrawal_id: z.number(),
+  status: z.enum(['REJECT', 'ACCEPT', 'PENDING']),
+  reason: z.string(),
+});
+
+export type ApproveWithdrawal = z.infer<typeof approveWithdrawalSchema>;
