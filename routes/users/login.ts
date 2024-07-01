@@ -41,12 +41,16 @@ const SQL_RECORD_LOGIN = sql<LoginAttempt, Record<string, never>>(`
 
 const SQL_COUNT_LAST_FAILED_ATTEMPTS = sql<{id: number},{failed_count: number}>(`
   SELECT COUNT(*) AS failed_count
-  FROM login_attempts
-  WHERE user_id = :user_id
-  AND success = FALSE
-  ORDER BY created_at DESC
-  LIMIT 3;
+  FROM (
+    SELECT 1
+    FROM login_attempts
+    WHERE user_id = :id
+    AND success = FALSE
+    ORDER BY created_at DESC
+    LIMIT 3
+  );
 `);
+
 
 export default (router: Router) => {
   router.post<Record<string, never>, UserWithoutPin, LoginType, Record<string, never>>(
@@ -57,8 +61,7 @@ export default (router: Router) => {
         new HttpError(400, 'User not found. Register')
       );
 
-      const { failed_count } = await SQL_COUNT_LAST_FAILED_ATTEMPTS({ id: user.id }).one();
-      
+      const { failed_count } = await SQL_COUNT_LAST_FAILED_ATTEMPTS({ id: user.id }).one();  
       if (failed_count >= 3) {
         await SQL_RECORD_LOGIN({
           id:user.id, 
@@ -79,7 +82,9 @@ export default (router: Router) => {
           reason: 'Incorrect pin'
         }).exec();
         const remainingAttempts = 3 - (failed_count + 1); 
-        throw new HttpError(400, `Invalid phone number or password combination. You have ${remainingAttempts} attempts left.`);
+        throw new HttpError(
+          400, `Invalid phone number or password combination. You have ${remainingAttempts} attempts left.`
+        );
       }
 
       await SQL_RECORD_LOGIN({
