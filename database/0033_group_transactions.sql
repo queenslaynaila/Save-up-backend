@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS group_withdrawal_requests (
   pocket_id             INT NOT NULL,
   amount                NUMERIC(30, 2) NOT NULL CHECK (amount > 0),
   reason                enum_withdrawal_reason NOT NULL,
-  PRIMARY KEY           (group_id, withdrawal_id),
+  PRIMARY KEY           (group_id, xid),
   FOREIGN KEY           (group_id, election_id, initiator_id) REFERENCES group_admins (group_id, election_id, user_id)
 );
 GRANT INSERT, SELECT ON  group_withdrawal_requests TO app_user;
