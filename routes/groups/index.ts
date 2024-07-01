@@ -1,6 +1,6 @@
 import express from 'express';
 import createGroup from './createGroups';
-import UpdateGroupDetails from './updateGroupDetails';
+import UpdateGroup from './updateGroup';
 import getUserGroups from './getUserGroups';
 import getGroupMembers from './getGroupMembers';
 import getCommonGroups from './getCommonGroups';
@@ -13,7 +13,7 @@ export default (baseRouter: express.Router) => {
   createGroup(router);
   getUserGroups(router);
   getGroupMembers(router);
-  UpdateGroupDetails(router);
+  UpdateGroup(router);
   getCommonGroups(router);
   leaveGroup(router);
   removeMember(router);
