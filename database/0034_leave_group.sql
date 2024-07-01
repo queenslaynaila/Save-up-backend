@@ -8,13 +8,25 @@ DECLARE
 BEGIN
     IF NOT EXISTS (
         SELECT 1
-        FROM group_members
-        WHERE group_id = p_group_id 
-        AND user_id = p_user_id
-        AND is_active = TRUE
+        FROM groups
+        WHERE id = p_group_id
+        AND deleted_at IS NULL
     ) THEN
-        RAISE EXCEPTION 'User is not a member of the group.';
+        RAISE EXCEPTION 'The group is not active.';
     END IF;
+
+    SELECT check_grp_membership(p_user_id, p_group_id);
+
+    SELECT COUNT(*) INTO STRICT v_member_count
+    FROM group_members
+    WHERE group_id = p_group_id
+    AND is_active = TRUE;
+
+    IF v_member_count = 1 THEN
+        UPDATE groups
+        SET deleted_at = NOW()
+        WHERE id = p_group_id;
+    END IF;  
 
     UPDATE group_members
     SET is_active = FALSE
@@ -29,17 +41,6 @@ BEGIN
         'Self removal'
     FROM group_lefts
     WHERE group_id = p_group_id;
-
-    SELECT COUNT(*) INTO STRICT v_member_count
-    FROM group_members
-    WHERE group_id = p_group_id
-    AND is_active = TRUE;
-
-    IF v_member_count = 1 THEN
-        UPDATE groups
-        SET deleted_at = NOW()
-        WHERE id = p_group_id;
-    END IF;  
 END;
 $$ LANGUAGE plpgsql;
 
