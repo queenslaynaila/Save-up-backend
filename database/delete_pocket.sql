@@ -7,15 +7,8 @@ BEGIN
     SELECT * FROM get_transaction_info(pocket_id, p_entity_id) 
     INTO STRICT v_current_balance;
 
-    SELECT EXISTS (
-        SELECT 1
-        FROM pocket_transactions
-        WHERE pocket_id = p_pocket_id
-        AND entity_id = p_entity_id
-    ) INTO v_has_funds;
-
-     IF v_current_balance <> 0 THEN
-        RAISE EXCEPTION 'Cannot delete pocket because has funds';
+     IF v_current_balance > 0 THEN
+        RAISE EXCEPTION 'Cannot delete pocket because it has funds';
     END IF;
 
     UPDATE pockets
