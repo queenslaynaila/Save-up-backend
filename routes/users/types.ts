@@ -3,7 +3,6 @@ import { UserRole } from '../../globalTypes/index';
 
 export const baseUserSchema = z.object({
   id: z.number(),
-  
   id_type: z.enum(['National ID', 'Passport']),
   id_number: z.string().refine(value => /^[0-9]+$/.test(value)),    
   full_name: z.string(),
@@ -13,8 +12,6 @@ export const baseUserSchema = z.object({
     .string()
     .refine((value) => /^\+254\d{9}$/.test(value)),
   pin: z.string().refine((value) => /^\d{4}$/.test(value)),
-  is_locked: z.boolean(),
-  failed_attempts: z.number(),
   created_at: z.string()
 });
 
@@ -86,3 +83,13 @@ export const userQuerySchema = baseUserSchema.pick({
 })
 
 export type UserQueryParams = z.infer<typeof userQuerySchema>;
+
+export const loginAttemptSchema = z.object({
+  id: z.number().int(),
+  ip_address: z.string(),
+  user_agent: z.string(),
+  success: z.boolean(),
+  reason: z.string()
+});
+
+export type LoginAttempt = z.infer<typeof loginAttemptSchema>
