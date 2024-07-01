@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION create_withdrawal_request(
+CREATE OR REPLACE FUNCTION initiate_grp_withdrawal(
   p_group_id             INT,
   p_pocket_id            INT,
   p_election_id          INT,
@@ -47,7 +47,9 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-GRANT EXECUTE ON FUNCTION create_withdrawal_request(INT, INT, INT, INT, NUMERIC, enum_withdrawal_reason, JSON) TO app_user;
+GRANT EXECUTE ON FUNCTION initiate_grp_withdrawal(
+  INT, INT, INT, INT, NUMERIC, enum_withdrawal_reason, JSON
+) TO app_user;
 SELECT create_distributed_function(
-  'create_withdrawal_request(INT, INT, INT, INT, NUMERIC, enum_withdrawal_reason, JSON)', 'p_group_id'
+  'initiate_grp_withdrawal(INT, INT, INT, INT, NUMERIC, enum_withdrawal_reason, JSON)', 'p_group_id'
 );
