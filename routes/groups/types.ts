@@ -66,3 +66,11 @@ export const groupExitSchema = baseGroupSchema.pick({
 })
 
 export type GroupExitInterface = z.infer<typeof groupExitSchema>;
+
+export const removeMember = z.object({
+  user_id:z.number(), 
+  admin_id:z.number(),
+  id:z.number()
+})
+
+export type RemoveMemberInterface = z.infer<typeof removeMember>;

@@ -5,6 +5,7 @@ import getUserGroups from './getUserGroups';
 import getGroupMembers from './getGroupMembers';
 import getCommonGroups from './getCommonGroups';
 import leaveGroup from './leaveGroup';
+import removeMember from './removeMember';
 
 export default (baseRouter: express.Router) => {
   const router = express.Router();
@@ -15,6 +16,7 @@ export default (baseRouter: express.Router) => {
   UpdateGroupDetails(router);
   getCommonGroups(router);
   leaveGroup(router);
+  removeMember(router);
 
   baseRouter.use('/groups', router);
 };
