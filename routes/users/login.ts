@@ -4,7 +4,7 @@ import { sql } from '../../db';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { generateToken } from '../../middleware/generatetoken';
 import { validateRequest } from '../../middleware/validationMiddleware';
-import { loginSchema, LoginType,  UserType } from './types';
+import { loginSchema, LoginType,  UserType, LoginAttempt } from './types';
 
 type UserWithoutPin = Omit<UserType, 'pin'>;
 
@@ -18,8 +18,6 @@ const SQL_GET_USER = sql<{ phone_number: string }, UserType>(`
     users.role, 
     users.gender, 
     users.pin,
-    users.failed_attempts,
-    users.is_locked,
     users.created_at
   FROM 
     users
@@ -28,12 +26,26 @@ const SQL_GET_USER = sql<{ phone_number: string }, UserType>(`
   WHERE user_contact_details.phone_number = :phone_number
 `);
 
-const SQL_START_SESSION = sql<{ id: number }, Record<string,never>>(`
-  SELECT start_session(:id);
+const SQL_RECORD_LOGIN = sql<LoginAttempt, Record<string, never>>(`
+  INSERT INTO login_attempts (user_id, xid, ip_address, browser_info, success, reason)
+  SELECT 
+      :id, 
+      COALESCE(MAX(xid), 0) + 1, 
+      :ip_address, 
+      :user_agent, 
+      :success, 
+      :reason
+  FROM login_attempts
+  WHERE user_id = :id
 `);
 
-const SQL_INCREMENT_FAILED_ATTEMPTS = sql<{ id: number }, { increment_attempts: number }>(`
-  SELECT * FROM increment_attempts(:id)
+const SQL_COUNT_LAST_FAILED_ATTEMPTS = sql<{id: number},{failed_count: number}>(`
+  SELECT COUNT(*) AS failed_count
+  FROM login_attempts
+  WHERE user_id = :user_id
+  AND success = FALSE
+  ORDER BY created_at DESC
+  LIMIT 3;
 `);
 
 export default (router: Router) => {
@@ -45,19 +57,39 @@ export default (router: Router) => {
         new HttpError(400, 'User not found. Register')
       );
 
-      if (user.is_locked) {
-        throw new HttpError(423, 'The  account has been locked.');
+      const { failed_count } = await SQL_COUNT_LAST_FAILED_ATTEMPTS({ id: user.id }).one();
+      
+      if (failed_count >= 3) {
+        await SQL_RECORD_LOGIN({
+          id:user.id, 
+          ip_address: req.ip || 'unknown',
+          user_agent: req.get('User-Agent') || 'unknown',
+          success: false, 
+          reason: 'Account locked'
+        }).exec();
+        throw new HttpError(423, 'Account is locked. Please unlock your account.');
       }
 
       if (!await bcrypt.compare(req.body.pin, pin)) {
-        const { increment_attempts: attempts_left } = await SQL_INCREMENT_FAILED_ATTEMPTS({ id: user.id }).one();
-        if (attempts_left <= 0) {
-          throw new HttpError(423, `Account is locked.You have exhausted the maximum number of login attempts.`);
-        }
-        throw new HttpError(400, `Invalid phone number or password combination. You have ${attempts_left} attempts left.`);
+        await SQL_RECORD_LOGIN({
+          id:user.id, 
+          ip_address: req.ip || 'unknown',
+          user_agent: req.get('User-Agent') || 'unknown',
+          success: false, 
+          reason: 'Incorrect pin'
+        }).exec();
+        const remainingAttempts = 3 - (failed_count + 1); 
+        throw new HttpError(400, `Invalid phone number or password combination. You have ${remainingAttempts} attempts left.`);
       }
 
-      await SQL_START_SESSION({ id: user.id }).exec();
+      await SQL_RECORD_LOGIN({
+        id:user.id, 
+        ip_address: req.ip || 'unknown',
+        user_agent: req.get('User-Agent') || 'unknown',
+        success: true, 
+        reason: 'Details correct'
+      }).exec();
+
       const accessToken = generateToken(user.id, user.role, '1d');
       const refreshToken = generateToken(user.id, user.role, '7d');
       res

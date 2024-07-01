@@ -19,11 +19,10 @@ CREATE TABLE IF NOT EXISTS users (
   role            enum_user_role NOT NULL DEFAULT 'Standard',
   gender          enum_gender,
   pin             TEXT NOT NULL,
-  is_locked       BOOLEAN NOT NULL DEFAULT FALSE,
   created_at      TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   FOREIGN KEY     (id) REFERENCES user_contact_details(id)
 );
-SELECT create_distributed_table('users', 'id');
+SELECT create_distributed_table('users', 'id');  
 GRANT INSERT, SELECT, UPDATE ON users TO app_user;
 
 CREATE TABLE IF NOT EXISTS login_attempts (
