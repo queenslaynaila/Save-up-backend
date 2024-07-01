@@ -8,7 +8,16 @@ CREATE OR REPLACE FUNCTION update_group_name(
 DECLARE
     v_old_name TEXT;
 BEGIN
-   SELECT check_grp_membership(p_user_id, p_group_id);
+    IF NOT EXISTS (
+        SELECT 1
+        FROM groups
+        WHERE id = p_group_id
+        AND deleted_at IS NULL
+    ) THEN
+        RAISE EXCEPTION 'The group is not active.';
+    END IF;
+
+    SELECT check_grp_membership(p_user_id, p_group_id);
 
     SELECT name INTO STRICT v_old_name
     FROM groups
@@ -32,7 +41,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-GRANT EXECUTE ON FUNCTION update_group_name(INT, TEXT) TO app_user;
+GRANT EXECUTE ON FUNCTION update_group_name(INT, INT, TEXT) TO app_user;
 SELECT create_distributed_function(
-  'update_group_name(INT, TEXT)', 'p_group_id'
+  'update_group_name(INT, INT, TEXT)', 'p_group_id'
 );
