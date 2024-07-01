@@ -30,7 +30,7 @@ BEGIN
     FROM transactions
     WHERE entity_id = p_group_id
     AND pocket_id = p_pocket_id
-    RETURNING xid INTO v_transaction_id;
+    RETURNING xid INTO STRICT v_transaction_id;
 
     INSERT INTO group_deposits(group_id, deposit_id, user_id)
     VALUES(p_group_id, v_transaction_id, p_user_id);
