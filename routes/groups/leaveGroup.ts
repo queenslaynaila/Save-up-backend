@@ -5,7 +5,7 @@ import { GroupExitInterface } from './types';
 import { StatusCodeInterface, IdParamInterface } from '../../globalTypes/index';
 
 const SQL_EXIT_GROUP = sql<GroupExitInterface , Record<string,never>>(`
-  SELECT leave_group (:user_id, :id, :reason);
+  SELECT leave_group (:user_id, :id);
 `);
 
 export default (router: Router) => {
@@ -13,9 +13,10 @@ export default (router: Router) => {
     '/:id',
     authMiddleware(),
     async (req, res) => {
-      const user_id = req.user!.id;
-      const  id  = parseInt(req.params.id); 
-      await SQL_EXIT_GROUP({...req.body, user_id, id }).exec();
+      await SQL_EXIT_GROUP({
+        user_id: req.user!.id, 
+        id: parseInt(req.params.id) 
+      }).exec();
       res.sendStatus(204);
     }
   );
