@@ -24,7 +24,9 @@ BEGIN
         RAISE EXCEPTION 'Insufficient balance in pocket for withdrawal.';
     END IF;
 
-    INSERT INTO group_withdrawal_requests (group_id, xid, election_id, initiator_id, pocket_id, amount, reason)
+    INSERT INTO group_withdrawal_requests (
+      group_id, xid, election_id, initiator_id, pocket_id, amount, reason
+    )
     SELECT 
         p_group_id, 
         COALESCE(MAX(xid), 0) + 1, 
