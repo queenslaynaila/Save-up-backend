@@ -51,7 +51,6 @@ const SQL_COUNT_LAST_FAILED_ATTEMPTS = sql<{id: number},{failed_count: number}>(
   );
 `);
 
-
 export default (router: Router) => {
   router.post<Record<string, never>, UserWithoutPin, LoginType, Record<string, never>>(
     '/login',
