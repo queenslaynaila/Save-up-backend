@@ -30,8 +30,8 @@ CREATE TABLE IF NOT EXISTS group_withdrawal_requests (
   PRIMARY KEY           (group_id, withdrawal_id),
   FOREIGN KEY           (group_id, election_id, initiator_id) REFERENCES group_admins (group_id, election_id, user_id)
 );
-GRANT INSERT, SELECT ON group_withdrawals TO app_user;
-SELECT create_distributed_table('group_withdrawals', 'group_id');
+GRANT INSERT, SELECT ON  group_withdrawal_requests TO app_user;
+SELECT create_distributed_table(' group_withdrawal_requests', 'group_id');
 
 CREATE TABLE IF NOT EXISTS group_withdrawals_recipients (
   group_id              INT NOT NULL, 
@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS group_withdrawals_recipients (
   amount                NUMERIC(30, 2) NOT NULL CHECK (amount > 0),
   PRIMARY KEY           (group_id, withdrawal_id, user_id),
   FOREIGN KEY           (group_id, user_id) REFERENCES group_members (group_id, user_id),
-  FOREIGN KEY           (group_id, withdrawal_id) REFERENCES group_withdrawals (group_id, xid)
+  FOREIGN KEY           (group_id, withdrawal_id) REFERENCES  group_withdrawal_requests (group_id, xid)
 );
 GRANT INSERT, SELECT ON group_withdrawals_recipients TO app_user;
 SELECT create_distributed_table('group_withdrawals_recipients', 'group_id');
@@ -55,7 +55,7 @@ CREATE TABLE IF NOT EXISTS group_withdrawals_approvals (
   created_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   PRIMARY KEY           (group_id, withdrawal_id, admin_id),
   FOREIGN KEY           (group_id, election_id, admin_id) REFERENCES group_admins (group_id, election_id, user_id),
-  FOREIGN KEY           (group_id, withdrawal_id) REFERENCES group_withdrawals (group_id, withdrawal_id)
+  FOREIGN KEY           (group_id, withdrawal_id) REFERENCES  group_withdrawal_requests (group_id, xid)
 );
 GRANT INSERT, SELECT ON  group_withdrawals_approvals TO app_user;
 SELECT create_distributed_table('group_withdrawals_approvals', 'group_id');
