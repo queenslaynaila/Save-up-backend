@@ -18,7 +18,7 @@ BEGIN
     v_reference_id := floor(random() * 1000000 + 1)::INT;
     v_new_balance := v_current_balance + p_amount;
 
-    INSERT INTO transactions(entity_id, xid, type_id, pocket_id, reference_id, delta, balance, created_at)
+    INSERT INTO transactions(entity_id, xid, type_id, pocket_id, reference_id, delta, balance)
     SELECT
         p_group_id,
         COALESCE(MAX(xid), 0) + 1,
@@ -27,7 +27,6 @@ BEGIN
         v_reference_id,
         p_amount,
         v_new_balance,
-        NOW()
     FROM transactions
     WHERE entity_id = p_group_id
     AND pocket_id = p_pocket_id
