@@ -12,7 +12,7 @@ BEGIN
     AND deleted_at is NULL;
 
     IF p_status = 'Accept'::enum_invite THEN
-        PERFORM insert_into_group_members_and_joins( p_group_id, p_receiver_id );
+        PERFORM join_group( p_group_id, p_receiver_id );
     END IF;
 
     IF p_status = 'Decline'::enum_invite THEN

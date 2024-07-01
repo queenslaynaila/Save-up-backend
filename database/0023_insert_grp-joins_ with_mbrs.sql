@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION insert_into_group_members_and_joins(
+CREATE OR REPLACE FUNCTION join_group(
     p_group_id      INT,
     p_user_id       INT
 )
