@@ -13,6 +13,17 @@ DECLARE
   v_withdrawal_id      INT;
   v_recipient_record   JSON;
 BEGIN
+    IF NOT EXISTS (
+      SELECT 1
+      FROM groups
+      WHERE id = p_group_id
+      AND deleted_at IS NULL
+    )THEN
+        RAISE EXCEPTION 'The group is not active.';
+    END IF;
+
+    SELECT check_grp_membership(p_initiator_id, p_group_id);
+
     SELECT balance INTO STRICT v_pocket_balance
     FROM transactions
     WHERE pocket_id = p_pocket_id
@@ -21,7 +32,7 @@ BEGIN
     LIMIT 1;
 
     IF v_pocket_balance < p_amount THEN
-        RAISE EXCEPTION 'Insufficient balance in pocket for withdrawal.';
+        RAISE EXCEPTION 'Insufficient balance for withdrawal.';
     END IF;
 
     INSERT INTO group_withdrawal_requests (
@@ -40,8 +51,8 @@ BEGIN
     RETURNING xid INTO STRICT v_withdrawal_id;
 
     FOR v_recipient_record IN (SELECT * FROM JSON_ARRAY_ELEMENTS(p_recipient_object)) LOOP
-        v_recipient_id := (v_recipient_record ->> 'recipient_id')::INT;
-        v_amount := (v_recipient_record ->> 'amount')::NUMERIC;
+        v_recipient_id = (v_recipient_record ->> 'recipient_id')::INT;
+        v_amount = (v_recipient_record ->> 'amount')::NUMERIC;
 
         INSERT INTO group_withdrawals_recipients (group_id, withdrawal_id, user_id, amount)
         VALUES (p_group_id, v_withdrawal_id, v_recipient_id, v_amount);
