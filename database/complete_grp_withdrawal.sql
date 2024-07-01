@@ -37,3 +37,6 @@ BEGIN
     END IF;
 END;
 $$ LANGUAGE plpgsql;
+
+GRANT EXECUTE ON FUNCTION complete_group_withdrawal(INT, INT, INT) TO app_user;
+SELECT create_distributed_function('complete_group_withdrawal(INT, INT, INT)', 'group_id');

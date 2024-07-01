@@ -43,6 +43,8 @@ BEGIN
         p_status, 
         p_reason
     );
+
+    SELECT complete_group_withdrawal ( p_withdrawal_id, p_group_id, p_election_id );
 END
 $$ LANGUAGE plpgsql;
 
