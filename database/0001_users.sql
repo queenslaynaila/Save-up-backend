@@ -31,7 +31,6 @@ CREATE TABLE IF NOT EXISTS login_attempts (
   xid             INT NOT NULL,
   ip_address      TEXT,
   browser_info    TEXT,
-  location        TEXT,
   success         BOOLEAN NOT NULL,
   reason          TEXT,
   created_at      TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
@@ -40,15 +39,6 @@ CREATE TABLE IF NOT EXISTS login_attempts (
 );
 GRANT INSERT, SELECT ON login_attempts TO app_user;
 SELECT create_distributed_table('login_attempts', 'user_id');
-
-CREATE TABLE IF NOT EXISTS sessions (
-  user_id        INT NOT NULL,
-  xid            INT NOT NULL,
-  created_at     TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-  exited_at      TIMESTAMP WITH TIME ZONE,
-  FOREIGN KEY    (user_id) REFERENCES users(id)
-);
-GRANT INSERT, SELECT ON sessions TO app_user;
 
 CREATE TABLE IF NOT EXISTS user_role_history(
   user_id          INT NOT NULL,
