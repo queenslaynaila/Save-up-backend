@@ -10,15 +10,6 @@ RETURNS VOID AS $$
 DECLARE
     v_latest_election_id   INT;
 BEGIN 
-    IF NOT EXISTS (
-        SELECT 1
-        FROM groups
-        WHERE id = p_group_id
-        AND deleted_at IS NULL
-    )THEN
-        RAISE EXCEPTION 'The group is not active.';
-    END IF;
-
     SELECT check_grp_membership(p_user_id, p_group_id);
     
     SELECT MAX(xid)
