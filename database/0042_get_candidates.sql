@@ -19,7 +19,7 @@ BEGIN
     WHERE id = p_user_id;
 
     IF v_user_role != 'Admin' THEN
-        PERFORM check_user_group_membership(p_user_id, p_group_id);
+        PERFORM check_grp_membership(p_user_id, p_group_id);
     END IF;
 
     FOR candidate_record IN

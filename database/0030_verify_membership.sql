@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION check_user_group_membership(
+CREATE OR REPLACE FUNCTION check_grp_membership(
     p_user_id INT,
     p_group_id INT
 )
@@ -16,7 +16,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-GRANT EXECUTE ON FUNCTION check_user_group_membership(INT, INT) TO app_user;
+GRANT EXECUTE ON FUNCTION check_grp_membership(INT, INT) TO app_user;
 SELECT create_distributed_function(
-  'check_user_group_membership(INT, INT)', 'p_group_id'
+  'check_grp_membership(INT, INT)', 'p_group_id'
 );
