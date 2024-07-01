@@ -1,7 +1,7 @@
 CREATE OR REPLACE FUNCTION complete_group_withdrawal(
-    withdrawal_id INT,
-    group_id INT,
-    election_id INT
+    withdrawal_id       INT,
+    group_id            INT,
+    election_id         INT
 ) RETURNS VOID AS $$
 DECLARE
     total_admins INT;
