@@ -1,10 +1,10 @@
 CREATE OR REPLACE FUNCTION approve_group_withdrawal(
-    p_group_id     INT,
-    p_admin_id      INT, 
-    p_election_id  INT,
-    p_withdrawal_id INT,
-    p_status       TEXT,
-    p_reason       TEXT
+    p_group_id           INT,
+    p_admin_id           INT, 
+    p_election_id        INT,
+    p_withdrawal_id      INT,
+    p_status             TEXT,
+    p_reason             TEXT
 )
 RETURNS VOID AS $$
 DECLARE
@@ -18,6 +18,8 @@ BEGIN
     )THEN
         RAISE EXCEPTION 'The group is not active.';
     END IF;
+
+    SELECT check_grp_membership(p_user_id, p_group_id);
     
     SELECT MAX(xid)
     INTO STRICT v_latest_election_id
@@ -44,7 +46,7 @@ BEGIN
         p_reason
     );
 
-    SELECT complete_group_withdrawal ( p_withdrawal_id, p_group_id, p_election_id );
+    SELECT complete_group_withdrawal (p_withdrawal_id, p_group_id, p_election_id );
 END
 $$ LANGUAGE plpgsql;
 
