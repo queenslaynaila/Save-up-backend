@@ -21,7 +21,10 @@ BEGIN
 
         RETURN NEXT;
     END LOOP;
-    
-    RETURN;
 END;
 $$ LANGUAGE plpgsql;
+
+GRANT EXECUTE ON FUNCTION get_active_group_members(INT) TO app_user;
+SELECT create_distributed_function(
+  'get_active_group_members(INT)', 'p_group_id'
+);
