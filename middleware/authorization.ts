@@ -26,7 +26,7 @@ function authMiddleware(options: AuthMiddlewareOptions = {}) {
     const refreshToken = req.headers['refresh-token'] as string;
 
     if (!accessToken || !refreshToken) {
-      throw new HttpError(401, 'Access Denied.Log in.');
+      throw new HttpError(401, 'UNAUTHORIZED');
     }
 
     if (accessToken) {
@@ -42,7 +42,7 @@ function authMiddleware(options: AuthMiddlewareOptions = {}) {
         res.setHeader('authorization-token', newAccessToken);
         res.setHeader('refresh-token', newRefreshToken);
         if (roles.length && !roles.includes(user.role)) {
-          throw new HttpError(403, 'Forbidden');
+          throw new HttpError(403, 'FORBIDDEN');
         }
         req.user = user;
         return next();
@@ -52,7 +52,7 @@ function authMiddleware(options: AuthMiddlewareOptions = {}) {
       const user = decodedAccessToken as User;
 
       if (roles.length && !roles.includes(user.role)) {
-        throw new HttpError(403, 'You do not have permission to access this resource');
+        throw new HttpError(403, 'FORBIDDEN');
       }
       req.user = user;
       return next();
