@@ -11,7 +11,7 @@ BEGIN
         AND group_id = p_group_id
         AND is_active = TRUE
     ) THEN
-        RAISE EXCEPTION 'User is not a group member';
+        RAISE EXCEPTION 'ERR_NOT_GROUP_MEMBER';
     END IF;
 END;
 $$ LANGUAGE plpgsql;

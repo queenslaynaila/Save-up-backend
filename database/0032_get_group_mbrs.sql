@@ -15,7 +15,7 @@ BEGIN
         WHERE id = p_group_id
         AND deleted_at IS NULL
     ) THEN
-        RAISE EXCEPTION 'The group is not active.';
+        RAISE EXCEPTION 'GROUP_NOT_ACTIVE';
     END IF;
 
     SELECT role INTO STRICT v_user_role

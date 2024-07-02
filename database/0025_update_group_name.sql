@@ -14,10 +14,10 @@ BEGIN
         WHERE id = p_group_id
         AND deleted_at IS NULL
     ) THEN
-        RAISE EXCEPTION 'The group is not active.';
+        RAISE EXCEPTION 'ERR_INACTIVE_GROUP';
     END IF;
 
-    SELECT check_grp_membership(p_user_id, p_group_id);
+    PERFORM check_grp_membership(p_user_id, p_group_id);
 
     SELECT name INTO STRICT v_old_name
     FROM groups
