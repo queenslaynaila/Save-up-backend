@@ -47,4 +47,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-
+GRANT EXECUTE ON FUNCTION get_open_election_for_group(INT, INT) TO app_user;
+SELECT create_distributed_function(
+  'get_open_election_for_group(INT, INT)', 'p_group_id'
+);
