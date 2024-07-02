@@ -12,3 +12,7 @@ export const election = z.object({
 })
 
 export type ElectionInterface = z.infer<typeof election>
+
+export const electionValidation = election.omit({
+  initiator_id:true
+})
