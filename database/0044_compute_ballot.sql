@@ -12,7 +12,7 @@ DECLARE
     ballots_cast      INT;
     candidate_counts  RECORD;
 BEGIN
-  SELECT check_grp_membership(p_user_id, p_group_id);
+  PERFORM check_grp_membership(p_user_id, p_group_id);
     
     SELECT COUNT(*) INTO total_members 
     FROM group_members 

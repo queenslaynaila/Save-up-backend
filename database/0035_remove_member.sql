@@ -15,7 +15,7 @@ BEGIN
         RAISE EXCEPTION 'The group is not active.';
     END IF;
 
-    SELECT check_grp_membership(p_user_id, p_group_id);
+    PERFORM check_grp_membership(p_user_id, p_group_id);
 
     IF EXISTS (
         SELECT 1 FROM group_deposits

@@ -10,7 +10,7 @@ RETURNS VOID AS $$
 DECLARE
     v_latest_election_id   INT;
 BEGIN 
-    SELECT check_grp_membership(p_user_id, p_group_id);
+    PERFORM check_grp_membership(p_user_id, p_group_id);
     
     SELECT MAX(xid)
     INTO STRICT v_latest_election_id
