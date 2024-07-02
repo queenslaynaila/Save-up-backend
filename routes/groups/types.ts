@@ -103,3 +103,12 @@ export const approveWithdrawalSchema = z.object({
 });
 
 export type ApproveWithdrawal = z.infer<typeof approveWithdrawalSchema>;
+
+export const initiateGroupWithdrawalSchema = withdrawalRequest.pick({
+  pocket_id: true,
+  election_id: true,
+  amount: true,
+  recipients: true
+})
+
+export type InitiateGroupWithdrawal = z.infer<typeof initiateGroupWithdrawalSchema>;

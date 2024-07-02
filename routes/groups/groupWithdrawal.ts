@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { validateRequest } from '../../middleware/validationMiddleware';
-import { groupCreationValidation, WithdrawalRequest } from './types';
+import { initiateGroupWithdrawalSchema , WithdrawalRequest } from './types';
 import { IdParamInterface, StatusCodeInterface } from '../../globalTypes/index';
 
 const SQL_INITIATE_GRP_WITHDRAWAL = sql<WithdrawalRequest, Record<string, never>>(`
@@ -15,7 +15,7 @@ export default (router: Router) => {
   router.post<IdParamInterface, StatusCodeInterface, WithdrawalRequest, Record<string, never>, Record<string, never>>(
     '/withdrawal/:id', 
     authMiddleware(),
-    validateRequest(groupCreationValidation),
+    validateRequest(initiateGroupWithdrawalSchema ),
     async (req, res) => {
       await SQL_INITIATE_GRP_WITHDRAWAL({
         ...req.body,
