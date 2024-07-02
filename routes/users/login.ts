@@ -57,7 +57,7 @@ export default (router: Router) => {
     validateRequest(loginSchema),
     async (req, res) => {
       const { pin, ...user } = await SQL_GET_USER({ phone_number: req.body.phone_number }).one(
-        new HttpError(404, 'INVALID_USER')
+        new HttpError(404, 'USER_NOT_FOUND')
       );
 
       const { failed_count } = await SQL_COUNT_LAST_FAILED_ATTEMPTS({ id: user.id }).one();  
@@ -67,7 +67,7 @@ export default (router: Router) => {
           ip_address: req.ip || 'unknown',
           user_agent: req.get('User-Agent') || 'unknown',
           success: false, 
-          reason: 'Account locked'
+          reason: 'Locked'
         }).exec();
         throw new HttpError(423, 'ACCOUNT_LOCKED');
       }
@@ -82,7 +82,7 @@ export default (router: Router) => {
         }).exec();
         const remainingAttempts = 3 - (failed_count + 1); 
         throw new HttpError(
-          400, 
+          401, 
           'INVALID_CREDENTIALS', 
           { remainingAttempts }
         );
@@ -93,7 +93,7 @@ export default (router: Router) => {
         ip_address: req.ip || 'unknown',
         user_agent: req.get('User-Agent') || 'unknown',
         success: true, 
-        reason: 'Details correct'
+        reason: 'Success'
       }).exec();
       const accessToken = generateToken(user.id, user.role, '1d');
       const refreshToken = generateToken(user.id, user.role, '7d');
