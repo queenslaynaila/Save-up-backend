@@ -36,6 +36,5 @@ export const inviteResponseSchema = z.object({
 export type InviteResponseInterface = z.infer<typeof inviteResponseSchema>;
 
 export const inviteValidationSchema = inviteResponseSchema.pick({
-  group_id: true,
   status: true
 })

@@ -10,3 +10,8 @@ export const convertToTitleCase = (str: string): UserRole => {
 export const isValidValue = (value: string | undefined, acceptedValues: string[]): boolean => {
   return value !== undefined && acceptedValues.includes(value);
 };
+
+export const toTitleCase = (str: string): string => {
+  const titleCased = str.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());
+  return titleCased;
+};
