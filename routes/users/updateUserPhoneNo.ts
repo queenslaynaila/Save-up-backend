@@ -26,7 +26,10 @@ export default (router: Router) => {
         new HttpError(400, 'User not found')
       );
       if (!await bcrypt.compare(req.body.pin, userPassword.pin)) {
-        throw new HttpError(401, 'Invalid password');
+        throw new HttpError(
+          401, 
+          'INVALID_CREDENTIALS'
+        );
       }
       await SQL_UPDATE_PHONE({ phone_number:req.body.phone_number, id}).exec();
       res.sendStatus(204);
