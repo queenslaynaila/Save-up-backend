@@ -7,7 +7,11 @@ export function validateRequest  (schema:ZodSchema)  {
     const validationResult = schema.safeParse(req.body);
     if (!validationResult.success) {
       console.log(validationResult.error);
-      throw new HttpError(422, 'Invalid data');
+      throw new HttpError(
+        422, 
+        'INVALID_INPUT', 
+        { field: validationResult.error.errors[0].path[0]}
+      );
     }
     next(); 
   };
