@@ -12,53 +12,56 @@ DECLARE
   v_pocket_balance     NUMERIC;
   v_withdrawal_id      INT;
   v_recipient_record   JSON;
+  v_recipient_id       INT;
+  v_amount             NUMERIC; 
 BEGIN
-    IF NOT EXISTS (
-      SELECT 1
-      FROM groups
-      WHERE id = p_group_id
-      AND deleted_at IS NULL
-    )THEN
-        RAISE EXCEPTION 'The group is not active.';
-    END IF;
+  IF NOT EXISTS (
+    SELECT 1
+    FROM groups
+    WHERE id = p_group_id
+    AND deleted_at IS NULL
+  ) THEN
+    RAISE EXCEPTION 'ERR_GROUP_NOT_ACTIVE';
+  END IF;
 
-    SELECT check_grp_membership(p_initiator_id, p_group_id);
+  PERFORM check_grp_membership(p_initiator_id, p_group_id);
 
-    SELECT balance INTO STRICT v_pocket_balance
-    FROM transactions
-    WHERE pocket_id = p_pocket_id
-    AND entity_id = p_group_id
-    ORDER BY xid DESC
-    LIMIT 1;
+  SELECT balance INTO STRICT v_pocket_balance
+  FROM transactions
+  WHERE pocket_id = p_pocket_id
+  AND entity_id = p_group_id
+  ORDER BY xid DESC
+  LIMIT 1;
 
-    IF v_pocket_balance < p_amount THEN
-        RAISE EXCEPTION 'Insufficient balance for withdrawal.';
-    END IF;
+  IF v_pocket_balance < p_amount THEN
+    RAISE EXCEPTION 'ERR_INSUFICIENT_BALANCE';
+  END IF;
 
-    INSERT INTO group_withdrawal_requests (
-      group_id, xid, election_id, initiator_id, pocket_id, amount, reason
-    )
-    SELECT 
-        p_group_id, 
-        COALESCE(MAX(xid), 0) + 1, 
-        p_election_id, 
-        p_initiator_id, 
-        p_pocket_id,
-        p_amount, 
-        p_reason
-    FROM group_withdrawal_requests        
-    WHERE group_id = p_group_id
-    RETURNING xid INTO STRICT v_withdrawal_id;
+  INSERT INTO group_withdrawal_requests (
+    group_id, xid, election_id, initiator_id, pocket_id, amount, reason
+  )
+  SELECT 
+    p_group_id, 
+    COALESCE(MAX(xid), 0) + 1, 
+    p_election_id, 
+    p_initiator_id, 
+    p_pocket_id,
+    p_amount, 
+    p_reason
+  FROM group_withdrawal_requests        
+  WHERE group_id = p_group_id
+  RETURNING xid INTO STRICT v_withdrawal_id;
 
-    FOR v_recipient_record IN (SELECT * FROM JSON_ARRAY_ELEMENTS(p_recipient_object)) LOOP
-        v_recipient_id = (v_recipient_record ->> 'recipient_id')::INT;
-        v_amount = (v_recipient_record ->> 'amount')::NUMERIC;
+  FOR v_recipient_record IN (SELECT * FROM JSON_ARRAY_ELEMENTS(p_recipient_object)) LOOP
+    v_recipient_id := (v_recipient_record ->> 'recipient_id')::INT;
+    v_amount := (v_recipient_record ->> 'amount')::NUMERIC;
 
-        INSERT INTO group_withdrawals_recipients (group_id, withdrawal_id, user_id, amount)
-        VALUES (p_group_id, v_withdrawal_id, v_recipient_id, v_amount);
-    END LOOP;
+    INSERT INTO group_withdrawals_recipients (group_id, withdrawal_id, user_id, amount)
+    VALUES (p_group_id, v_withdrawal_id, v_recipient_id, v_amount);
+  END LOOP;
 END;
 $$ LANGUAGE plpgsql;
+
 
 GRANT EXECUTE ON FUNCTION initiate_grp_withdrawal(
   INT, INT, INT, INT, NUMERIC, enum_withdrawal_reason, JSON
