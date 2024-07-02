@@ -129,7 +129,10 @@ app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
       errorData: error.errorData
     });
   } else {
-    return res.status(500);
+    return res.status(500).json({
+      errorType: 'INTERNAL_SERVER_ERROR',
+      errorData: {}
+    });
   }
 });
 
