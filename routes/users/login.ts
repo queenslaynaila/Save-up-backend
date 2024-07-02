@@ -57,7 +57,7 @@ export default (router: Router) => {
     validateRequest(loginSchema),
     async (req, res) => {
       const { pin, ...user } = await SQL_GET_USER({ phone_number: req.body.phone_number }).one(
-        new HttpError(400, 'User not found. Register')
+        new HttpError(404, 'INVALID_USER')
       );
 
       const { failed_count } = await SQL_COUNT_LAST_FAILED_ATTEMPTS({ id: user.id }).one();  
@@ -69,7 +69,7 @@ export default (router: Router) => {
           success: false, 
           reason: 'Account locked'
         }).exec();
-        throw new HttpError(423, 'Account is locked. Please unlock your account.');
+        throw new HttpError(423, 'ACCOUNT_LOCKED');
       }
 
       if (!await bcrypt.compare(req.body.pin, pin)) {
@@ -82,7 +82,9 @@ export default (router: Router) => {
         }).exec();
         const remainingAttempts = 3 - (failed_count + 1); 
         throw new HttpError(
-          400, `Invalid phone number or password combination. You have ${remainingAttempts} attempts left.`
+          400, 
+          'INVALID_CREDENTIALS', 
+          { remainingAttempts }
         );
       }
 
@@ -93,7 +95,6 @@ export default (router: Router) => {
         success: true, 
         reason: 'Details correct'
       }).exec();
-
       const accessToken = generateToken(user.id, user.role, '1d');
       const refreshToken = generateToken(user.id, user.role, '7d');
       res

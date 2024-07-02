@@ -122,13 +122,15 @@ app.use(() => {
 // Global error handler
 /* eslint-disable @typescript-eslint/no-unused-vars */
 app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
-  console.log(`this is error ${error}`)
+  console.error('Error caught by middleware:', error);
   if (error instanceof HttpError) {
-    console.log('http errror starts here:', error);  
-    return res.status(error.statusCode).json({ error: error.message });
+    return res.status(error.statusCode).json({
+      errorType: error.errorType,
+      errorData: error.errorData
+    });
+  } else {
+    return res.status(500);
   }
-  return res.status(500).json({ error: 'Internal Server error' });
 });
-
 
 export default app;
