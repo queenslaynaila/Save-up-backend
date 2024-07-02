@@ -17,5 +17,5 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-GRANT EXECUTE ON FUNCTION insert_into_group_members_and_join(INT, INT) TO app_user;
-SELECT create_distributed_function('insert_into_group_members_and_join(INT, INT)', 'p_group_id');
+GRANT EXECUTE ON FUNCTION join_group(INT, INT) TO app_user;
+SELECT create_distributed_function('join_group(INT, INT)', 'p_group_id');
