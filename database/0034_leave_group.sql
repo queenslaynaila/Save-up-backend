@@ -22,7 +22,7 @@ BEGIN
     WHERE group_id = p_group_id
     AND is_active = TRUE;
 
-    IF v_member_count = 1 THEN
+    IF v_member_count = 0 THEN
         UPDATE groups
         SET deleted_at = NOW()
         WHERE id = p_group_id;
