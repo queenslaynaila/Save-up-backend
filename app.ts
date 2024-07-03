@@ -27,6 +27,7 @@ import createExSaving from './routes/externalSaving/index';
 import ratificationRoutes from './routes/ratifications/index'
 import ballotRoutes from './routes/ballots/index'
 import groupDepositRoutes from './routes/groupDeposits';
+import groupWithdrawalRoutes from './routes/groupWithdrawal';
 import cron from 'node-cron';
 import remindStaleGoals from './cronJobs/overdueGoalsReminder'
 import creditInterest from './cronJobs/creditInterest';
@@ -110,6 +111,7 @@ inviteRoutes(app);
 electionRoutes(app);
 withdrawalRoutes(app);
 groupDepositRoutes(app);
+groupWithdrawalRoutes(app);
 transferRoutes(app);
 transactionRoutes(app);
 createExSaving(app);
@@ -122,7 +124,7 @@ app.use(() => {
 // Global error handler
 /* eslint-disable @typescript-eslint/no-unused-vars */
 app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
-  console.error('Error caught by middleware:', error);
+  console.error('Error caught by middleware:', error.message);
   if (error instanceof HttpError) {
     return res.status(error.statusCode).json({
       errorType: error.errorType,
