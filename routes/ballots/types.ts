@@ -30,7 +30,8 @@ export const ballotParamsSchema = ballotBodySchema.pick({
 export type BallotParamsInterface = z.infer<typeof ballotParamsSchema>
 
 export const ballotBodyRequest = ballotBodySchema.pick({
-  election_id: true
+  election_id: true,
+  group_id: true
 })
 
 export type BallotBodyRequestInterface = z.infer<typeof ballotBodyRequest>
