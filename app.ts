@@ -116,7 +116,7 @@ createExSaving(app);
 
 // 404 handler
 app.use(() => {
-  throw new HttpError(404, 'Route Not found');
+  throw new HttpError(404, 'ROUTE_NOT_FOUND');
 });
 
 // Global error handler
