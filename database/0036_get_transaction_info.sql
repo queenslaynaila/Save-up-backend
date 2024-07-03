@@ -7,17 +7,14 @@ RETURNS TABLE (
 ) AS $$
 BEGIN
     SELECT 
-        COALESCE((SELECT current_balance
+        COALESCE((SELECT balance
                 FROM transactions
                 WHERE pocket_id = p_pocket_id
                 AND entity_id = p_entity_id
                 ORDER BY xid DESC
-                LIMIT 1), 0) AS v_current_balance
-    INTO STRICT v_current_balance
-    FROM transactions
-    WHERE pocket_id = p_pocket_id
-    AND entity_id = p_entity_id;
-   
+                LIMIT 1), 0)
+    INTO STRICT v_current_balance;
+
     RETURN QUERY SELECT v_current_balance;
 END;
 $$ LANGUAGE plpgsql;
