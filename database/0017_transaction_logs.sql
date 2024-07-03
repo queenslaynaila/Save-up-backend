@@ -27,9 +27,9 @@ CREATE TABLE IF NOT EXISTS transactions (
   FOREIGN KEY             (type_id) REFERENCES transaction_types(id)
 );
 
+GRANT INSERT, SELECT ON transactions TO app_user;
+SELECT create_distributed_table('transactions', 'entity_id');
+
 ALTER TABLE transactions
 ADD CONSTRAINT transactions_pocket_id_fkey  
 FOREIGN KEY  (entity_id, pocket_id) REFERENCES pockets (entity_id, xid);
-
-GRANT INSERT, SELECT ON transactions TO app_user;
-SELECT create_distributed_table('transactions', 'entity_id');
