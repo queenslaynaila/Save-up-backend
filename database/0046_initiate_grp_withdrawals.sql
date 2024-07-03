@@ -5,15 +5,15 @@ CREATE OR REPLACE FUNCTION initiate_grp_withdrawal(
   p_initiator_id         INT,
   p_amount               NUMERIC,
   p_reason               enum_withdrawal_reason,
-  p_recipient_object     JSON
+  p_recipient_object     JSON[]
 )
 RETURNS VOID AS $$
 DECLARE
-  v_pocket_balance     NUMERIC;
-  v_withdrawal_id      INT;
-  v_recipient_record   JSON;
-  v_recipient_id       INT;
-  v_amount             NUMERIC; 
+  v_current_balance     NUMERIC;
+  v_withdrawal_id       INT;
+  v_recipient_record    JSON;
+  v_recipient_id        INT;
+  v_amount              NUMERIC; 
 BEGIN
   IF NOT EXISTS (
     SELECT 1
@@ -26,14 +26,10 @@ BEGIN
 
   PERFORM check_grp_membership(p_initiator_id, p_group_id);
 
-  SELECT balance INTO STRICT v_pocket_balance
-  FROM transactions
-  WHERE pocket_id = p_pocket_id
-  AND entity_id = p_group_id
-  ORDER BY xid DESC
-  LIMIT 1;
+  SELECT * FROM get_transaction_info(p_pocket_id, p_group_id) 
+  INTO STRICT v_current_balance;
 
-  IF v_pocket_balance < p_amount THEN
+  IF v_current_balance < p_amount THEN
     RAISE EXCEPTION 'ERR_INSUFICIENT_BALANCE';
   END IF;
 
@@ -52,7 +48,7 @@ BEGIN
   WHERE group_id = p_group_id
   RETURNING xid INTO STRICT v_withdrawal_id;
 
-  FOR v_recipient_record IN (SELECT * FROM JSON_ARRAY_ELEMENTS(p_recipient_object)) LOOP
+  FOREACH v_recipient_record IN ARRAY p_recipient_object LOOP
     v_recipient_id := (v_recipient_record ->> 'recipient_id')::INT;
     v_amount := (v_recipient_record ->> 'amount')::NUMERIC;
 
@@ -61,7 +57,6 @@ BEGIN
   END LOOP;
 END;
 $$ LANGUAGE plpgsql;
-
 
 GRANT EXECUTE ON FUNCTION initiate_grp_withdrawal(
   INT, INT, INT, INT, NUMERIC, enum_withdrawal_reason, JSON
