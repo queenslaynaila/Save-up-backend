@@ -19,18 +19,20 @@ BEGIN
         delta, 
         balance
     )
-    SELECT p_entity_id,
-           COALESCE(MAX(xid), 0) + 1,
-           p_type_id,
-           p_pocket_id,
-           p_reference_id,
-           p_amount, 
-           p_current_balance
-    WHERE entity_id = p_entity_id;
+    SELECT 
+        p_entity_id,
+        COALESCE((SELECT MAX(xid) FROM transactions WHERE entity_id = p_entity_id), 0) + 1,
+        p_type_id,
+        p_pocket_id,
+        p_reference_id,
+        p_amount, 
+        p_current_balance
+    RETURNING xid INTO v_transaction_id;
 
     RETURN v_transaction_id;
 END;
 $$ LANGUAGE plpgsql;
+
 
 GRANT EXECUTE ON FUNCTION insert_transaction_log(INT, INT, INT, INT, NUMERIC, NUMERIC) TO app_user;
 SELECT create_distributed_function(
