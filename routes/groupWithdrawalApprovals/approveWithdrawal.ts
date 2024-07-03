@@ -7,7 +7,7 @@ import { StatusCodeInterface } from '../../globalTypes/index';
 
 const SQL_APPROVE_GRP_WITHDRAWAL = sql<ApproveWithdrawal, Record<string, never>>(`
     SELECT approve_group_withdrawal(
-       :group_id, :admin_id, :election_id, :withdrawapproveWithdrawalValidational_id, :status, :reason
+       :group_id, :admin_id, :withdrawal_id, :status, :reason
     )
 `);
 

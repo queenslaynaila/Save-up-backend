@@ -1,7 +1,6 @@
 CREATE OR REPLACE FUNCTION approve_group_withdrawal(
     p_group_id           INT,
     p_admin_id           INT, 
-    p_election_id        INT,
     p_withdrawal_id      INT,
     p_status             TEXT,
     p_reason             TEXT
@@ -24,7 +23,7 @@ BEGIN
         AND election_id = v_latest_election_id
         AND user_id = p_admin_id
     ) THEN
-        RAISE EXCEPTION 'Only current admins can approve withdrawals.';
+        RAISE EXCEPTION 'ERR_NOT_GROUP_ADMIN';
     END IF;
 
     INSERT INTO group_withdrawal_approvals
@@ -32,16 +31,16 @@ BEGIN
         p_group_id, 
         p_withdrawal_id,
         p_admin_id,
-        p_election_id,
+        v_latest_election_id,
         p_status, 
         p_reason
     );
 
-    SELECT complete_group_withdrawal (p_withdrawal_id, p_group_id, p_election_id );
+    SELECT complete_group_withdrawal (p_withdrawal_id, p_group_id,v_latest_election_id );
 END
 $$ LANGUAGE plpgsql;
 
-GRANT EXECUTE ON FUNCTION approve_group_withdrawal(INT, INT, INT, INT, INT, TEXT, TEXT) TO app_user;
+GRANT EXECUTE ON FUNCTION approve_group_withdrawal(INT, INT, INT, INT TEXT, TEXT) TO app_user;
 SELECT create_distributed_function(
-  'approve_group_withdrawal(INT, INT, INT, INT, INT, TEXT, TEXT)', 'p_group_id'
+  'approve_group_withdrawal(INT, INT, INT, INT, TEXT, TEXT)', 'p_group_id'
 )
