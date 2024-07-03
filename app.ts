@@ -28,6 +28,7 @@ import ratificationRoutes from './routes/ratifications/index'
 import ballotRoutes from './routes/ballots/index'
 import groupDepositRoutes from './routes/groupDeposits';
 import groupWithdrawalRoutes from './routes/groupWithdrawal';
+import groupWithdrawalApprovals from './routes/groupWithdrawalApprovals';
 import cron from 'node-cron';
 import remindStaleGoals from './cronJobs/overdueGoalsReminder'
 import creditInterest from './cronJobs/creditInterest';
@@ -110,6 +111,7 @@ groupRoutes(app);
 inviteRoutes(app);
 electionRoutes(app);
 withdrawalRoutes(app);
+groupWithdrawalApprovals(app);
 groupDepositRoutes(app);
 groupWithdrawalRoutes(app);
 transferRoutes(app);
