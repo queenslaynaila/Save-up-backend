@@ -8,14 +8,24 @@ RETURNS VOID AS $$
 DECLARE
   v_ballot_count   INT;
 BEGIN 
+  IF NOT EXISTS (
+    SELECT 1
+    FROM elections
+    WHERE group_id = p_group_id
+    AND xid = p_election_id
+    AND status = 'Open'
+  ) THEN
+    RAISE EXCEPTION 'ELECTION_CLOSED';
+  END IF;
+
   SELECT COUNT(*) INTO STRICT v_ballot_count 
   FROM ballots
-  WHERE ballots.user_id = p_user_id
-  AND ballots.group_id = p_group_id
-  AND ballots.election_id = p_election_id;
+  WHERE user_id = p_user_id
+  AND group_id = p_group_id
+  AND election_id = p_election_id;
   
   IF v_ballot_count >= 3 THEN
-    RAISE EXCEPTION 'You have already cast your maximum of three votes for this group election.';
+    RAISE EXCEPTION 'MAX_VOTES_CAST';
   END IF;
   
   INSERT INTO ballots (group_id, election_id, candidate_id, user_id)
