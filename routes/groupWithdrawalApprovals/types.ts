@@ -4,7 +4,7 @@ export const approveWithdrawalSchema = z.object({
   group_id: z.number(),
   admin_id: z.number(),
   withdrawal_id: z.number(),
-  status: z.enum(['REJECT', 'ACCEPT', 'PENDING']),
+  status: z.enum(['Reject', 'Approved', 'Pending']),
   reason: z.string(),
 });
   

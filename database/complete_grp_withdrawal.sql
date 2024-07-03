@@ -1,42 +1,40 @@
 CREATE OR REPLACE FUNCTION complete_group_withdrawal(
-    withdrawal_id       INT,
-    group_id            INT,
-    election_id         INT
-) RETURNS VOID AS $$
+    p_withdrawal_id       INT,
+    p_group_id            INT
+) 
+RETURNS VOID AS $$
 DECLARE
-    total_admins INT;
-    approved_count INT;
+    v_pocket_id           INT;
+    v_amount              NUMERIC;
+    v_current_balance     NUMERIC;
+    v_new_balance         NUMERIC;
+    v_reference_id        INT;
 BEGIN
-    SELECT COUNT(*) INTO total_admins
-    FROM group_admins
-    WHERE group_id = group_id
-    AND election_id = election_id;
+    SELECT pocket_id, amount
+    INTO STRICT v_pocket_id, v_amount
+    FROM group_withdrawal_requests
+    WHERE group_id = p_group_id
+    AND xid = p_withdrawal_id;
+ 
+    SELECT * FROM get_transaction_info(v_pocket_id, p_group_id) 
+    INTO STRICT v_current_balance;
 
-    SELECT COUNT(*) INTO approved_count
-    FROM group_withdrawals_approvals
-    WHERE group_id = group_id
-    AND withdrawal_id = withdrawal_id
-    AND election_id = election_id
-    AND status = 'Approved';
-
-    IF approved_count = total_admins THEN
-        INSERT INTO transactions (entity_id, xid, type_id, pocket_id, reference_id, delta, balance)
+    v_new_balance := v_current_balance - v_amount;
+    v_reference_id := floor(random() * 1000000 + 1)::INT;
+       
+    INSERT INTO transactions (entity_id, xid, type_id, pocket_id, reference_id, delta, balance)
         SELECT
-            group_id,
+            p_group_id,
             COALESCE(MAX(xid), 0) + 1, 
             3,
-            pocket_id,
-            reference_id,
-            delta,
-            balance
-        FROM group_withdrawals
-        WHERE group_id = p_group_id
-        AND withdrawal_id = p_withdrawal_id;
-    ELSE
-        RAISE EXCEPTION 'Cannot complete withdrawal: not all admins have approved.';
-    END IF;
+            v_pocket_id,
+            v_reference_id,
+            v_amount,
+            v_new_balance
+        FROM transactions
+    WHERE entity_id = p_group_id;  
 END;
 $$ LANGUAGE plpgsql;
 
-GRANT EXECUTE ON FUNCTION complete_group_withdrawal(INT, INT, INT) TO app_user;
-SELECT create_distributed_function('complete_group_withdrawal(INT, INT, INT)', 'group_id');
+GRANT EXECUTE ON FUNCTION complete_group_withdrawal(INT, INT) TO app_user;
+SELECT create_distributed_function('complete_group_withdrawal(INT, INT)', 'group_id');
