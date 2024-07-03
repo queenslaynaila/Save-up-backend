@@ -12,7 +12,26 @@ DECLARE
     ballots_cast      INT;
     candidate_counts  RECORD;
 BEGIN
-  PERFORM check_grp_membership(p_user_id, p_group_id);
+    IF NOT EXISTS (
+        SELECT 1
+        FROM groups
+        WHERE id = p_group_id
+        AND deleted_at IS NULL
+    )THEN
+        RAISE EXCEPTION 'INACTIVE_GROUP';
+    END IF;
+
+    IF NOT EXISTS (
+        SELECT 1
+        FROM elections
+        WHERE group_id = p_group_id
+        AND xid = p_election_id
+        AND status = 'Open'
+    ) THEN
+      RAISE EXCEPTION 'ELECTION_CLOSED';
+    END IF;
+
+    PERFORM check_grp_membership(p_user_id, p_group_id);
     
     SELECT COUNT(*) INTO total_members 
     FROM group_members 
@@ -25,7 +44,7 @@ BEGIN
     AND election_id = p_election_id;
 
     IF ballots_cast < (total_members / 2.0) THEN
-        RAISE EXCEPTION 'At least 50%% of active group members must have cast their ballots.';
+        RAISE EXCEPTION 'INSUFFICIENT_VOTES';
     END IF;
 
     FOR candidate_counts IN
@@ -54,8 +73,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-GRANT EXECUTE ON FUNCTION compute_ballot_results(INT, INT) TO app_user;
-
+GRANT EXECUTE ON FUNCTION compute_ballot_results(INT, INT, INT) TO app_user;
 SELECT create_distributed_function(
   'compute_ballot_results(INT, INT)', 'p_group_id'
 );
