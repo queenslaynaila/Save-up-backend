@@ -16,6 +16,10 @@ export const withdrawalRequest = z.object({
 })
   
 export type WithdrawalRequest = z.infer<typeof withdrawalRequest>;
+
+export const withdrawalValidation = withdrawalRequest.omit({
+  initiator_id: true
+})
   
 export const approveWithdrawalSchema = z.object({
   group_id: z.number(),
