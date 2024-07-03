@@ -4,7 +4,6 @@ import UpdateGroup from './updateGroup';
 import getUserGroups from './getUserGroups';
 import getGroupMembers from './getGroupMembers';
 import getCommonGroups from './getCommonGroups';
-import groupWithdrawal from './groupWithdrawal';
 import approveWithdrawal from './approveWithdrawal';
 import leaveGroup from './leaveGroup';
 import removeMember from './removeMember';
@@ -17,7 +16,6 @@ export default (baseRouter: express.Router) => {
   getGroupMembers(router);
   UpdateGroup(router);
   getCommonGroups(router);
-  groupWithdrawal(router);
   approveWithdrawal(router);
   leaveGroup(router);
   removeMember(router);
