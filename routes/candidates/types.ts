@@ -22,11 +22,10 @@ export const candidateParamSchema = z.object({
 
 export type CandidateParam = z.infer<typeof candidateParamSchema>
 
-export const candidateResSchema = candidateSchema.omit({
-  chosen_by: true
+export const candidateResSchema = candidateSchema.pick({
+  candidate_id: true
 }).extend({
-  candidate_name: z.string(),
-  created_at: z.string()
+  full_name: z.string(),
 });
 
 export type CandidateRes = z.infer<typeof candidateResSchema>;
