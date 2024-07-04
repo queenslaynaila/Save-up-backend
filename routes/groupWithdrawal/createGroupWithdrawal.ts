@@ -12,7 +12,8 @@ const SQL_INITIATE_GRP_WITHDRAWAL = sql<WithdrawalRequest, Record<string, never>
 `);
 
 export default (router: Router) => {
-  router.post<IdParamInterface, StatusCodeInterface, WithdrawalRequest, Record<string, never>>(
+  router.post<IdParamInterface, StatusCodeInterface, WithdrawalRequest, 
+  Record<string, never>>(
     '/', 
     authMiddleware(),
     validateRequest(withdrawalValidation),

@@ -56,9 +56,9 @@ export default (router: Router) => {
     '/login',
     validateRequest(loginSchema),
     async (req, res) => {
-      const { pin, ...user } = await SQL_GET_USER({ phone_number: req.body.phone_number }).one(
-        new HttpError(404, 'USER_NOT_FOUND')
-      );
+      const { pin, ...user } = await SQL_GET_USER({ 
+        phone_number: req.body.phone_number 
+      }).one(new HttpError(404, 'USER_NOT_FOUND'));
 
       const { failed_count } = await SQL_COUNT_LAST_FAILED_ATTEMPTS({ id: user.id }).one();  
       if (failed_count >= 3) {

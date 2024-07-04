@@ -12,7 +12,8 @@ const SQL_APPROVE_GRP_WITHDRAWAL = sql<ApproveWithdrawal, Record<string, never>>
 `);
 
 export default (router: Router) => {
-  router.post<Record<string, never>, StatusCodeInterface, WithdrawalRequest, Record<string, never>>(
+  router.post<Record<string, never>, StatusCodeInterface, WithdrawalRequest, 
+  Record<string, never>>(
     '/', 
     authMiddleware(),
     validateRequest(approveValidation),

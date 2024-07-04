@@ -43,8 +43,7 @@ export default (router: Router) => {
         priority,
         target_at,
         pocket_type
-      })
-        .one(new HttpError(404, 'Not found'));
+      }).one(new HttpError(404, 'Not found'));
       return res.json(goal);
     });
 };

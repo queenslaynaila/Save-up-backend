@@ -9,7 +9,8 @@ const SQL_REMOVE_GROUP_MBR = sql<RemoveMemberInterface, Record<string,never>>(`
 `);
 
 export default (router: Router) => {
-  router.delete<IdParamInterface, StatusCodeInterface, RemoveMemberInterface, Record<string,never>, Record<string,never>>(
+  router.delete<IdParamInterface, StatusCodeInterface, RemoveMemberInterface, 
+  Record<string,never>>(
     '/remove-member/:id',
     authMiddleware(),
     async (req, res) => {

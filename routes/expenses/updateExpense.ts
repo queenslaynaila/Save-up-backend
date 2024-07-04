@@ -3,7 +3,10 @@ import { sql } from '../../db';
 import { HttpError } from '../../middleware/errorMiddleware';
 import authMiddleware from '../../middleware/authorization';
 import { validateRequest } from '../../middleware/validationMiddleware';
-import { ExpenseUpdateInterface, ExpenseUpdateRes, ExpenseUpdateValidationSchema } from './types';
+import { ExpenseUpdateInterface, 
+  ExpenseUpdateRes, 
+  ExpenseUpdateValidationSchema 
+} from './types';
 import { IdParamInterface } from '../../globalTypes/index'
 
 const SQL_UPDATE_EXPENSE= sql<ExpenseUpdateInterface, ExpenseUpdateRes>(`
@@ -19,7 +22,8 @@ const SQL_UPDATE_EXPENSE= sql<ExpenseUpdateInterface, ExpenseUpdateRes>(`
 `);
 
 export default (router: Router) => {
-  router.patch<IdParamInterface, ExpenseUpdateRes, ExpenseUpdateInterface, Record<string,never>>(
+  router.patch<IdParamInterface, ExpenseUpdateRes, ExpenseUpdateInterface, 
+  Record<string,never>>(
     '/:id', 
     authMiddleware(), 
     validateRequest(ExpenseUpdateValidationSchema),

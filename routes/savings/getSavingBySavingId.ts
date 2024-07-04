@@ -20,8 +20,8 @@ export default (router: Router) => {
       const entity_id = req.body.entity_id ?? req.user!.id;
       const result = await SQL_GET_DEPOSIT_BY_ID({ 
         xid:parseInt(req.params.id), 
-        entity_id })
-        .one(new HttpError(404, 'Not found'));
+        entity_id 
+      }).one(new HttpError(404, 'Not found'));
       return res.json(result);
     });
 };

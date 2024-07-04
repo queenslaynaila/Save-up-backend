@@ -17,7 +17,8 @@ const SQL_CALL_ELECTION = sql<ElectionInterface , Record<string,never>>(`
 `);
 
 export default (router: Router) => {
-  router.post<Record<string,never>, StatusCodeInterface, ElectionInterface , Record<string,never>, Record<string,never>>(
+  router.post<Record<string,never>, StatusCodeInterface, ElectionInterface, 
+  Record<string,never>>(
     '/',
     authMiddleware(),
     validateRequest(electionValidation),

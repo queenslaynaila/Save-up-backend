@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import {  BaseGroupInterface, GroupsByUserInterface   } from './types';
+import { BaseGroupInterface, GroupsByUserInterface } from './types';
 
 const SQL_FETCH_USER_GROUPS = sql<GroupsByUserInterface ,  BaseGroupInterface >(`
   SELECT 
@@ -17,7 +17,8 @@ const SQL_FETCH_USER_GROUPS = sql<GroupsByUserInterface ,  BaseGroupInterface >(
 `);
 
 export default (router: Router) => {
-  router.get<Record<string,never>,  BaseGroupInterface [], GroupsByUserInterface, Record<string,never>>(
+  router.get<Record<string,never>, BaseGroupInterface[], GroupsByUserInterface, 
+  Record<string,never>>(
     '/',
     authMiddleware(),
     async (req, res) => {

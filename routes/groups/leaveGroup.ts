@@ -9,7 +9,8 @@ const SQL_EXIT_GROUP = sql<GroupExitInterface , Record<string,never>>(`
 `);
 
 export default (router: Router) => {
-  router.delete<IdParamInterface, StatusCodeInterface, GroupExitInterface, Record<string,never>, Record<string,never>>(
+  router.delete<IdParamInterface, StatusCodeInterface, GroupExitInterface,
+  Record<string,never>>(
     '/:id',
     authMiddleware(),
     async (req, res) => {

@@ -9,7 +9,8 @@ const SQL_SEND_INVITATION = sql<InviteInputInterface, Record<string,never>>(`
 `);
 
 export default (router: Router) => {
-  router.post<Record<string,never>, StatusCodeInterface, InviteInputInterface, Record<string,never>, Record<string,never>>(
+  router.post<Record<string,never>, StatusCodeInterface, InviteInputInterface, 
+  Record<string,never>>(
     '/', 
     authMiddleware(),
     async (req, res) => {

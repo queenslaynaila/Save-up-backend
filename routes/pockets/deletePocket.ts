@@ -13,7 +13,10 @@ export default (router: Router) => {
     authMiddleware(), 
     async (req, res) => {
       const entity_id = req.body.entity_id ?? req.user!.id;
-      await SQL_DELETE_POCKET({ pocket_id:parseInt(req.params.id), entity_id}).exec();
+      await SQL_DELETE_POCKET({ 
+        pocket_id:parseInt(req.params.id), 
+        entity_id
+      }).exec();
       res.sendStatus(204);
     });
 };

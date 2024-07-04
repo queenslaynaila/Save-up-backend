@@ -29,8 +29,10 @@ export default (router: Router) => {
     authMiddleware(), 
     async (req, res) => {
       const entity_id = req.body.entity_id ?? req.user!.id;
-      const pocket = await SQL_GET_POCKET_BY_ID({ xid:parseInt(req.params.id), entity_id })
-        .one(new HttpError(404, 'Not found'));
+      const pocket = await SQL_GET_POCKET_BY_ID({ 
+        xid:parseInt(req.params.id), 
+        entity_id 
+      }).one(new HttpError(404, 'Not found'));
       return res.json(pocket);
     });
 };

@@ -19,13 +19,16 @@ const SQL_GET_COMMON_GROUPS = sql<SharedGroupInterface, BaseGroupInterface>(`
 `);
 
 export default (router: Router) => {
-  router.get<IdParamInterface, BaseGroupInterface[],Record<string,never>, Record<string,never>>(
+  router.get<IdParamInterface, BaseGroupInterface[],Record<string,never>, 
+  Record<string,never>>(
     '/:id/common-groups',
     authMiddleware(),
     async (req, res) => {
       const logged_in_user_id = req.user!.id;
       const user_id = parseInt(req.params.id);
-      const commonGroups = await SQL_GET_COMMON_GROUPS({ logged_in_user_id, user_id }).many();
+      const commonGroups = await SQL_GET_COMMON_GROUPS({ 
+        logged_in_user_id, user_id 
+      }).many();
       return res.json(commonGroups);
     });
 };

@@ -11,7 +11,8 @@ const SQL_CREATE_CANDIDATES = sql<CandidateInterface , Record<string,never>>(`
 `);
 
 export default (router: Router) => {
-  router.post<Record<string,never>, StatusCodeInterface, CandidateRequestBody, Record<string,never>, Record<string,never>>(
+  router.post<Record<string,never>, StatusCodeInterface, CandidateRequestBody, 
+  Record<string,never>>(
     '/',
     validateRequest(candidateRequestBody),
     authMiddleware(),

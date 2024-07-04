@@ -9,12 +9,15 @@ const SQL_CREATE_GROUP = sql<GroupCreationInterface, BaseGroupInterface>(`
 `);
 
 export default (router: Router) => {
-  router.post<Record<string,never>, BaseGroupInterface, GroupCreationInterface, Record<string,never>, Record<string,never>>(
+  router.post<Record<string,never>, BaseGroupInterface, GroupCreationInterface, 
+  Record<string,never>>(
     '/',
     authMiddleware(),
     validateRequest(groupCreationValidation),
     async (req, res) => {
-      const group = await SQL_CREATE_GROUP({ ...req.body, created_by: req.user!.id}).one();
+      const group = await SQL_CREATE_GROUP({ 
+        ...req.body, created_by: req.user!.id
+      }).one();
       res.json(group)
     }
   );

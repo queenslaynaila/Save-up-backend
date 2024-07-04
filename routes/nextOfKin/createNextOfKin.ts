@@ -25,13 +25,16 @@ const SQL_CREATE_KIN = sql<NextOfKinCreationInterface, NextOfKinInterface>(`
 `);
 
 export default (router: Router) => {
-  router.post<Record<string,never>, NextOfKinInterface, NextOfKinCreationInterface, Record<string,never>, Record<string,never>>(
+  router.post<Record<string,never>, NextOfKinInterface, NextOfKinCreationInterface, 
+  Record<string,never>>(
     '/', 
     authMiddleware(), 
     validateRequest(nextOfKinValidation),
     async (req, res) => {
-      const nextOfKin = await SQL_CREATE_KIN({...req.body, user_id:req.user!.id})
-        .one(new HttpError(400, 'You already have an existing next of kin.'));
+      const nextOfKin = await SQL_CREATE_KIN({
+        ...req.body, 
+        user_id:req.user!.id
+      }).one(new HttpError(400, 'You already have an existing next of kin.'));
       return res.json(nextOfKin);
     });
 };

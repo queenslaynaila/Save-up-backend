@@ -13,7 +13,8 @@ const SQL_GET_ELECTION_WINNERS = sql<BallotComputeInterface,  BallotResultInterf
 `);
 
 export default (router: Router) => {
-  router.get<Record<string,never>, BallotResultInterface[], BallotBodyRequestInterface, Record<string,never>>(
+  router.get<Record<string,never>, BallotResultInterface[], BallotBodyRequestInterface, 
+  Record<string,never>>(
     '/',
     validateRequest(ballotBodyRequest),
     authMiddleware(),

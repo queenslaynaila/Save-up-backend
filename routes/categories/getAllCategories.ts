@@ -10,7 +10,8 @@ const SQL_GET_ALL_CATEGORIES = sql<Record<string,never>, CategoryInterface>(`
 `);
 
 export default (router: Router) => {
-  router.get<Record<string,never>, CategoryInterface[], Record<string,never>, Record<string,never>>(
+  router.get<Record<string,never>, CategoryInterface[], Record<string,never>, 
+  Record<string,never>>(
     '/',
     authMiddleware(),
     async (_req, res) => {

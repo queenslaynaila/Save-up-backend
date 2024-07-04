@@ -18,7 +18,8 @@ const SQL_GET_EXPENSES = sql<Record<string, string>, BaseExpenseInterface>(`
 `);
 
 export default (router: Router) => {
-  router.get<Record<string,never>, BaseExpenseInterface[], Record<string,never>, ExpenseQueryInterface>(
+  router.get<Record<string,never>, BaseExpenseInterface[], Record<string,never>, 
+  ExpenseQueryInterface>(
     '/me', 
     authMiddleware(), 
     async (req, res) => {

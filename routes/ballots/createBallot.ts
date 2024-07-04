@@ -10,7 +10,8 @@ const SQL_CREATE_BALLOT = sql<BallotInterface , Record<string,never>>(`
 `);
 
 export default (router: Router) => {
-  router.post<Record<string,never>, StatusCodeInterface, BallotBodyInterface, Record<string,never>, Record<string,never>>(
+  router.post<Record<string,never>, StatusCodeInterface, BallotBodyInterface,
+  Record<string,never>>(
     '/',
     validateRequest(ballotBodySchema),
     authMiddleware(),

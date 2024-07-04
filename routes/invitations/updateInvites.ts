@@ -10,7 +10,8 @@ const SQL_RESPOND_TO_INVITE = sql<InviteResponseInterface, StatusCodeInterface>(
 `);
 
 export default (router: Router) => {
-  router.patch<{ id:string }, StatusCodeInterface, InviteResponseInterface, Record<string,never>, Record<string,never>>(
+  router.patch<{ id:string }, StatusCodeInterface, InviteResponseInterface, 
+  Record<string,never>>(
     '/:id',
     authMiddleware(),
     validateRequest(inviteValidationSchema),

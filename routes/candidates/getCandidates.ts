@@ -3,7 +3,7 @@ import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { CandidateRes, CandidateParam } from './types'
 
-const SQL_GET_CANDIDATES = sql<{ group_id: number, election_id: number, user_id:number},  CandidateRes>(`
+const SQL_GET_CANDIDATES = sql<{ group_id: number, election_id: number, user_id:number},CandidateRes>(`
   SELECT * FROM get_candidates(:group_id, :election_id, :user_id) 
 `);
 

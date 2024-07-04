@@ -10,14 +10,15 @@ const SQL_UPDATE_GROUP = sql<GroupUpdateInterface, GroupUpdateInterface>(`
 `);
 
 export default (router: Router) => {
-  router.patch<IdParamInterface, GroupUpdateInterface, GroupUpdateInterface, Record<string,never>, Record<string,never>>(
+  router.patch<IdParamInterface, GroupUpdateInterface, GroupUpdateInterface, 
+  Record<string,never>>(
     '/:id',
     authMiddleware(),
     validateRequest(validateGroupUpdateSchema),
     async (req, res) => {
-      const updatedGroup =  await SQL_UPDATE_GROUP(
-        { ...req.body, id:parseInt(req.params.id), user_id:req.user!.id}
-      ).one();
+      const updatedGroup =  await SQL_UPDATE_GROUP({ 
+        ...req.body, id:parseInt(req.params.id), user_id:req.user!.id
+      }).one();
       res.json(updatedGroup);
     }
   );

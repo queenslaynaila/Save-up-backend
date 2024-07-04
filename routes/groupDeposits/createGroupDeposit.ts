@@ -9,7 +9,8 @@ const SQL_CREATE_GROUP_DEPOSIT = sql<GroupDeposit, Record<string,never>>(`
 `);
 
 export default (router: Router) => {
-  router.post<Record<string,never>, StatusCodeInterface, GroupDeposit, Record<string,never>, Record<string,never>>(
+  router.post<Record<string,never>, StatusCodeInterface, GroupDeposit, 
+  Record<string,never>>(
     '/',
     authMiddleware(),
     async (req, res) => {

@@ -22,7 +22,9 @@ export default (router: Router) => {
     validateRequest( transferValidationSchema),
     async (req, res) => {
       const entity_id = req.body.entity_id ?? req.user!.id;
-      await SQL_CREATE_TRANSFER({  ...req.body, entity_id, user_id: req.user!.id}).exec();
+      await SQL_CREATE_TRANSFER({  
+        ...req.body, entity_id, user_id: req.user!.id
+      }).exec();
       res.sendStatus(201);
     });
 };

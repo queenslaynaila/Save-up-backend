@@ -8,7 +8,8 @@ const SQL_GET_PENDING_INVITATIONS = sql<InviteByReceiverInterface, baseInviteInt
 `);
 
 export default (router: Router) => {
-  router.get<Record<string,never>, baseInviteInterface[], InviteByReceiverInterface, Record<string,never>>(
+  router.get<Record<string,never>, baseInviteInterface[], InviteByReceiverInterface, 
+  Record<string,never>>(
     '/', 
     authMiddleware(),
     async (req, res) => {

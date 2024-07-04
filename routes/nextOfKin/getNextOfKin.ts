@@ -11,7 +11,8 @@ const SQL_GET_KIN = sql<NextOfKinInputInterface, NextOfKinInterface>(`
 `);
 
 export default (router: Router) => {
-  router.get<Record<string,never>, NextOfKinInterface, NextOfKinInputInterface, Record<string,never>, Record<string,never>>(
+  router.get<Record<string,never>, NextOfKinInterface, NextOfKinInputInterface, 
+  Record<string,never>>(
     '/', 
     authMiddleware(), 
     async (req, res) => { 
