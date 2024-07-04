@@ -6,7 +6,7 @@ import { WithdrawalCreation, withdrawalValidationSchema  } from './types';
 import { StatusCodeInterface } from '../../globalTypes/index';
 
 const SQL_CREATE_WITHDRAWAL = sql<WithdrawalCreation, Record<string, never>>(`
-  SELECT create_withdrawal(:user_id, :pocket_id, :amount);
+  SELECT create_user_withdrawal(:user_id, :pocket_id, :amount);
 `); 
 
 export default (router: Router) => {
