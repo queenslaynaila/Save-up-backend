@@ -21,7 +21,7 @@ BEGIN
             i.created_at
         FROM invitations i
         JOIN groups g ON i.group_id = g.id
-        WHERE i.receiver_id = 5
+        WHERE i.receiver_id = p_receiver_id
         AND i.status = 'Pending';
     LOOP
         SELECT u.full_name
