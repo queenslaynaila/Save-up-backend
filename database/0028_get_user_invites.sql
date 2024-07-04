@@ -10,32 +10,29 @@ RETURNS TABLE (
 ) AS $$
 DECLARE
     v_invitation_record RECORD;
-     v_sender_name TEXT;
+    v_sender_name TEXT;
     v_group_name TEXT;
 BEGIN
     FOR v_invitation_record IN
         SELECT 
-            i.group_id,
             i.sender_id,
+            i.group_id,
+            g.name,
             i.created_at
         FROM invitations i
-        WHERE i.receiver_id = p_receiver_id
-        AND i.status = 'Pending'
+        JOIN groups g ON i.group_id = g.id
+        WHERE i.receiver_id = 5
+        AND i.status = 'Pending';
     LOOP
         SELECT u.full_name
         INTO v_sender_name
         FROM users u
         WHERE u.id = v_invitation_record.sender_id;
 
-        SELECT g.name
-        INTO v_group_name
-        FROM groups g
-        WHERE g.id = v_invitation_record.group_id;
-
         sender_id = v_invitation_record.sender_id;
         sender_name = v_sender_name;
         group_id = v_invitation_record.group_id;
-        group_name = v_group_name;
+        group_name = v_invitation_record.name;
         created_at = v_invitation_record.created_at;
 
         RETURN NEXT;
