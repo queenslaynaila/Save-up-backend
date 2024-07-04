@@ -39,13 +39,10 @@ BEGIN
         p_amount,
         v_new_balance
     );
-
-    INSERT INTO user_withdrawals (user_id, withdrawal_id, status)
-    VALUES (p_user_id, v_transaction_id, 'Completed');
 END;
 $$ LANGUAGE plpgsql;
 
-GRANT EXECUTE ON FUNCTION create_user_withdrawal(INT, INT, INT, NUMERIC) TO app_user;
+GRANT EXECUTE ON FUNCTION create_user_withdrawal(INT, INT, NUMERIC) TO app_user;
 SELECT create_distributed_function(
-  'create_user_withdrawal(INT, INT, INT, NUMERIC)', 'p_user_id'
+  'create_user_withdrawal(INT, INT, NUMERIC)', 'p_user_id'
 );
