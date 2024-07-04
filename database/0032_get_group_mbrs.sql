@@ -28,8 +28,14 @@ BEGIN
     END IF;
 
     RETURN QUERY
-    SELECT *
-    FROM get_active_group_members(p_group_id);
+    SELECT u.id AS user_id, u.full_name
+    FROM users u
+    WHERE u.id IN (
+        SELECT gm.user_id
+        FROM group_members gm
+        WHERE gm.group_id = p_group_id
+        AND gm.is_active = TRUE
+    ); ---Cant join due to separate distri
 END;
 $$ LANGUAGE plpgsql
 
