@@ -18,17 +18,17 @@ import { TokenInterface,
 const SQL_GET_USER = sql<GetByPhoneInterface,  GetByIdInterface>(`
   SELECT id 
   FROM user_contact_details 
-  WHERE phone_number = :phone_number
+  WHERE phone_number = :phone_number;
 `);
 
 const SQL_SAVE_TOKEN = sql<InitiatePasswordResetInterface, TokenInterface>(`
   INSERT INTO reset_tokens (user_id, xid, token)
   SELECT :user_id,
           COALESCE(MAX(xid), 0) + 1,
-          :token
+          :token,
           :reason
   FROM reset_tokens
-  WHERE user_id = :user_id
+  WHERE user_id = :user_id;
 `);
 
 export default  (router: Router) => {
