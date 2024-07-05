@@ -7,17 +7,21 @@ import { ratificationValidation,
   ComputeRatificationInterface 
 } from './types';
 
-const  SQL_COMPUTE_RATIFICATIONS = sql<ComputeRatificationInterface ,  RatificationResultsInterface>(`
+const  SQL_COMPUTE_RATIFICATIONS = sql<ComputeRatificationInterface
+,RatificationResultsInterface>(`
   SELECT * FROM compute_ratification_results(:p_group_id, :p_election_id, :p_user_id)
 `);
 
 export default (router: Router) => {
-  router.post<Record<string,never>, RatificationResultsInterface, ComputeRatificationInterface, Record<string,never>>(
+  router.post<Record<string,never>, RatificationResultsInterface, 
+  ComputeRatificationInterface,Record<string,never>>(
     '/',
     validateRequest(ratificationValidation ),
     authMiddleware(),
     async (req, res) => {
-      await SQL_COMPUTE_RATIFICATIONS({ ...req.body, user_id: req.user!.id}).exec();
+      await SQL_COMPUTE_RATIFICATIONS({
+        ...req.body, user_id: req.user!.id
+      }).exec();
       res.sendStatus(201);
     }
   );

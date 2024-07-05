@@ -11,7 +11,8 @@ const SQL_GET_SECURITY_ANSWERS = sql<GetByUserInterface, VerifyAnswerInterface>(
 `);
 
 export default (router: Router) => {
-  router.get<Record<string,never>, StatusCodeInterface, SecurityAnswersRequestInterface, Record<string,never>>(
+  router.get<Record<string,never>, StatusCodeInterface, SecurityAnswersRequestInterface, 
+  Record<string,never>>(
     '/verify-answers',
     verifyResetToken,
     async (req, res) => {
@@ -20,7 +21,9 @@ export default (router: Router) => {
       const userSecurityAnswers = await SQL_GET_SECURITY_ANSWERS({ user_id }).many();
       const incorrectAnswers: number[] = [];
       answers.forEach(({ question_id, answer }: { question_id:number; answer: string }) => {
-        const storedAnswer = userSecurityAnswers.find((a: { question_id:number; answer: string }) => a.question_id === question_id);
+        const storedAnswer = userSecurityAnswers.find(
+          (a: { question_id:number; answer: string }) => a.question_id === question_id
+        );
         if (!storedAnswer || !bcrypt.compare(answer, storedAnswer.answer)) {
           console.log(storedAnswer)
           incorrectAnswers.push(question_id);

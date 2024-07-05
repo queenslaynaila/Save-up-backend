@@ -11,7 +11,8 @@ const SQL_RESET_PASSWORD = sql<ResetPasswordRequestInterface, Record<string,neve
 `);
 
 export default (router: Router) => {
-  router.patch<string, Record<string,never>, StatusCodeInterface, ResetPasswordInterface, Record<string,never>>(
+  router.patch<string, Record<string,never>, StatusCodeInterface, ResetPasswordInterface, 
+  Record<string,never>>(
     '/reset',
     verifyResetToken,
     async (req, res) => {

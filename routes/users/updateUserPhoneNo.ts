@@ -16,7 +16,8 @@ const SQL_UPDATE_PHONE = sql<{ phone_number: string; id: number }, Record<string
 `);
 
 export default (router: Router) => {
-  router.patch<Record<string,never>, StatusCodeInterface, PhoneNoUpdateType , Record<string,never>>(
+  router.patch<Record<string,never>, StatusCodeInterface, PhoneNoUpdateType , 
+  Record<string,never>>(
     '/me', 
     authMiddleware(), 
     validateRequest(loginSchema),

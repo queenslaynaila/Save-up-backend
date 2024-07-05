@@ -13,7 +13,8 @@ const SQL_GET_TOP_EXPENDITURE_CATEGORIES = sql<UserCumulaInterface, TopExpenseCa
 `);
 
 export default (router: Router) => {
-  router.get<Record<string,never>, TopExpenseCategoriesInterface[], Record<string,never>, Record<string,never>>(
+  router.get<Record<string,never>, TopExpenseCategoriesInterface[], 
+  Record<string,never>, Record<string,never>>(
     '/top-expenditure-categories',
     authMiddleware(),
     async (req, res) => {

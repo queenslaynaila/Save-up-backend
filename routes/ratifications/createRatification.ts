@@ -11,12 +11,15 @@ const SQL_CREATE_RATIFICATIONS = sql<RatificationInterface , Record<string,never
 `);
 
 export default (router: Router) => {
-  router.post<Record<string,never>, StatusCodeInterface, RatificationInterface, Record<string,never>, Record<string,never>>(
+  router.post<Record<string,never>, StatusCodeInterface, RatificationInterface, 
+  Record<string,never>>(
     '/',
     validateRequest(ratificationSchema),
     authMiddleware(),
     async (req, res) => {
-      await SQL_CREATE_RATIFICATIONS({ ...req.body, user_id: req.user!.id}).exec();
+      await SQL_CREATE_RATIFICATIONS({ 
+        ...req.body, user_id: req.user!.id
+      }).exec();
       res.sendStatus(201);
     }
   );

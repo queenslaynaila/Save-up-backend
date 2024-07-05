@@ -16,7 +16,8 @@ const SQL_UPDATE_SECURITY_ANSWER = sql<AnswerUpdateType, Record<string,never>>(`
 `);
 
 export default (router: Router) => {
-  router.patch<IdParamInterface, StatusCodeInterface, AnswerUpdateType, Record<string,never>>(
+  router.patch<IdParamInterface, StatusCodeInterface, AnswerUpdateType, 
+  Record<string,never>>(
     '/:id',
     authMiddleware(),
     validateRequest(answerUpdateValidationSchema),

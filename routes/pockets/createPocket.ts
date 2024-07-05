@@ -30,7 +30,8 @@ const SQL_CREATE_POCKET = sql<PocketCreateType, BasePocketType>(`
 `);
 
 export default (router: Router) => {
-  router.post<Record<string,never>, BasePocketType, PocketCreateType, Record<string,never>, Record<string,never>>(
+  router.post<Record<string,never>, BasePocketType, PocketCreateType,
+  Record<string,never>>(
     '/', 
     authMiddleware(), 
     validateRequest(pocketPostRequestSchema),

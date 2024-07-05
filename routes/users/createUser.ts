@@ -10,7 +10,8 @@ const SQL_CREATE_USER = sql<UserCreationType, Record<string,never>>(`
 `);
 
 export default (router: Router) => { 
-  router.post<Record<string,never>, StatusCodeInterface, UserCreationType, Record<string,never>>(
+  router.post<Record<string,never>, StatusCodeInterface, UserCreationType, 
+  Record<string,never>>(
     '/',
     validateRequest(userCreationSchema),
     async (req, res) => {         

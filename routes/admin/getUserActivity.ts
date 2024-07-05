@@ -7,10 +7,13 @@ import { BaseTransaction,
   baseTransactionSchema 
 } from '../usertransactions/types';
 import { validateRequest } from '../../middleware/validationMiddleware';
-import { UserRole,  GetByPhoneInterface,  GetByIdInterface  } from '../../globalTypes/index';
+import { UserRole, 
+  GetByPhoneInterface,  
+  GetByIdInterface  
+} from '../../globalTypes/index';
 import { HttpError } from '../../middleware/errorMiddleware'; 
 
-const SQL_GET_USER = sql<GetByPhoneInterface,  GetByIdInterface>(`
+const SQL_GET_USER = sql<GetByPhoneInterface, GetByIdInterface>(`
   SELECT id 
   FROM user_contact_details 
   WHERE phone_number = :phone_number
@@ -28,7 +31,8 @@ const SQL_GET_TRANSACTIONS = sql<TransactionByEntity,  BaseTransaction>(`
 `);
 
 export default (router: Router) => {
-  router.get<Record<string,never>,  BaseTransaction[], { phone_number: string }, TransactionQueryParams>(
+  router.get<Record<string,never>,  BaseTransaction[], { phone_number: string }, 
+  TransactionQueryParams>(
     '/transactions', 
     validateRequest(baseTransactionSchema),
     authMiddleware({ roles: [UserRole.ADMIN] }),

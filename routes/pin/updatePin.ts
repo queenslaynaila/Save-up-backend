@@ -4,7 +4,10 @@ import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { resetPasswordLimiter } from '../../services/rateLimit';
-import { UpdatePasswordInterface, ResetPasswordRequestInterface, ResetPinInterface  } from './types';
+import { UpdatePasswordInterface, 
+  ResetPasswordRequestInterface, 
+  ResetPinInterface  
+} from './types';
 import {  StatusCodeInterface, GetByIdInterface } from '../../globalTypes/index';
 
 const SQL_GET_PASSWORD_BY_ID = sql<GetByIdInterface, ResetPinInterface >(`
@@ -16,7 +19,8 @@ const SQL_UPDATE_PASSWORD = sql< ResetPasswordRequestInterface, Record<string,ne
 `);
 
 export default (router: Router) => {
-  router.patch<Record<string,never>, StatusCodeInterface, UpdatePasswordInterface, Record<string,never>>(
+  router.patch<Record<string,never>, StatusCodeInterface, UpdatePasswordInterface, 
+  Record<string,never>>(
     '/', 
     authMiddleware(), 
     resetPasswordLimiter,

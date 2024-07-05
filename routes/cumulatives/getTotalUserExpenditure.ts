@@ -11,7 +11,8 @@ const SQL_GET_TOTAL_EXPENSES = sql<UserCumulaInterface, TotalExpenseInterface>(`
 `);
 
 export default (router: Router) => {
-  router.get<Record<string,never>, TotalExpenseInterface, Record<string,never>, TotalExpenseQueryInterface>(
+  router.get<Record<string,never>, TotalExpenseInterface, Record<string,never>, 
+  TotalExpenseQueryInterface>(
     '/total-expenses', 
     authMiddleware(), 
     async (req, res) => {

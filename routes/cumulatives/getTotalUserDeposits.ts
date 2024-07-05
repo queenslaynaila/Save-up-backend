@@ -12,7 +12,8 @@ const SQL_GET_TOTAL_DEPOSIT_FOR_USER = sql<UserCumulaInterface, TotalDepositsInt
 `);
 
 export default (router: Router) => {
-  router.get<Record<string,never>, TotalDepositsInterface, Record<string,never>, Record<string,never>>(
+  router.get<Record<string,never>, TotalDepositsInterface, Record<string,never>, 
+  Record<string,never>>(
     '/total-deposits', 
     authMiddleware(), 
     async (req, res) => {

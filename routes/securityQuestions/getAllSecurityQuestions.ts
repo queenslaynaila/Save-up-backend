@@ -7,7 +7,8 @@ const SQL_GET_SECURITY_QUESTIONS = sql<Record<string,never>, SecurityQuestions>(
 `);
 
 export default (router: Router) => {
-  router.get<Record<string,never>, SecurityQuestions[], Record<string,never>, Record<string,never>>(
+  router.get<Record<string,never>, SecurityQuestions[], Record<string,never>, 
+  Record<string,never>>(
     '/', 
     async (_, res) => {
       const securityQuestions = await SQL_GET_SECURITY_QUESTIONS({}).many();

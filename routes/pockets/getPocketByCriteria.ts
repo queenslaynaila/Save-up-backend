@@ -10,7 +10,9 @@ import { BasePocketType,
 const SQL_GET_POCKETS = sql<{entity_id: number}, BasePocketType>(`
   SELECT pockets.xid, 
         pockets.name, 
-        (SELECT categories.name FROM categories WHERE categories.id = pockets.category_id) AS category_name, 
+        (
+        SELECT categories.name FROM categories WHERE categories.id = pockets.category_id
+        ) AS category_name, 
         pockets.target_amount, 
         pockets.priority, 
         pockets.status, 
@@ -23,7 +25,8 @@ const SQL_GET_POCKETS = sql<{entity_id: number}, BasePocketType>(`
 `);
 
 export default (router: Router) => {
-  router.get<string, Record<string, never>, BasePocketType[], PocketByEntityType , PocketQueryParamsType>(
+  router.get<string, Record<string, never>, BasePocketType[], PocketByEntityType , 
+  PocketQueryParamsType>(
     '/me/', 
     authMiddleware(), 
     async (req, res) => {

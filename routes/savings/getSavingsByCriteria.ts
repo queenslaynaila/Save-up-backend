@@ -9,7 +9,8 @@ const SQL_GET_SAVINGS = sql<{entity_id: number}, BaseSavingType>(`
 `);
 
 export default (router: Router) => {
-  router.get<string, Record<string,never>, BaseSavingType[], Record<string,never>, SavingsQueryParamType>(
+  router.get<string, Record<string,never>, BaseSavingType[], Record<string,never>, 
+  SavingsQueryParamType>(
     '/', 
     authMiddleware(), 
     async (req, res) => {

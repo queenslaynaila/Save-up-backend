@@ -10,7 +10,8 @@ const SQL_GET_TOTAL_TARGET_AMOUNT = sql<{ [key: string]: string }, TotalTargetsI
 `);
 
 export default (router: Router) => {
-  router.get<Record<string, string>, TotalTargetsInterface, Record<string, string>, TotalTargetPocketsQueryInterface>(
+  router.get<Record<string, string>, TotalTargetsInterface, Record<string, string>, 
+  TotalTargetPocketsQueryInterface>(
     '/total-target-amount', 
     authMiddleware(), 
     async (req, res) => {

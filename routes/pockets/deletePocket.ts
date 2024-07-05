@@ -8,7 +8,8 @@ const SQL_DELETE_POCKET = sql<{pocket_id: number, entity_id: number}, Record<str
 `);
 
 export default (router: Router) => {
-  router.delete<IdParamInterface, StatusCodeInterface, Record<string,never>, Record<string,never>>(
+  router.delete<IdParamInterface, StatusCodeInterface, Record<string,never>, 
+  Record<string,never>>(
     '/:id', 
     authMiddleware(), 
     async (req, res) => {

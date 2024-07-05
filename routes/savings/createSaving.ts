@@ -10,13 +10,15 @@ const SQL_CREATE_SAVING = sql<SavingCreateType, Record<string,never>>(`
 `);
 
 export default (router: Router) => {
-  router.post<Record<string,never>, StatusCodeInterface, SavingCreateType, Record<string,never>, Record<string,never>>(
+  router.post<Record<string,never>, StatusCodeInterface, SavingCreateType, 
+  Record<string,never>>(
     '/', 
     authMiddleware(), 
     validateRequest(savingPostRequestSchema),
     async (req, res) => {
-      await SQL_CREATE_SAVING({ ...req.body, user_id:req.user!.id})
-        .exec();
+      await SQL_CREATE_SAVING({
+        ...req.body, user_id:req.user!.id
+      }).exec();
       res.sendStatus(201);
     });
 };

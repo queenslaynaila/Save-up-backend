@@ -10,7 +10,7 @@ import { TransactionInput,
 import { validateRequest } from '../../middleware/validationMiddleware';
 import { IdParamInterface } from '../../globalTypes/index';
 
-const SQL_GET_TRANSACTIONS = sql<TransactionInput,  BaseTransaction>(`
+const SQL_GET_TRANSACTIONS = sql<TransactionInput, BaseTransaction>(`
   SELECT xid AS transaction_id, 
          type_id AS transaction_type, 
          reference_id, 
@@ -23,7 +23,8 @@ const SQL_GET_TRANSACTIONS = sql<TransactionInput,  BaseTransaction>(`
 `);
 
 export default (router: Router) => {
-  router.get<IdParamInterface,  BaseTransaction[], TransactionByEntity, TransactionQueryParams>(
+  router.get<IdParamInterface, BaseTransaction[], TransactionByEntity, 
+  TransactionQueryParams>(
     '/:id', 
     validateRequest(baseTransactionSchema),
     authMiddleware(),

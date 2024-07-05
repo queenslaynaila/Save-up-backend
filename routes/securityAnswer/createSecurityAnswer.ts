@@ -11,7 +11,8 @@ const SQL_CREATE_ANSWER = sql<SecurityAnswersBaseType, Record<string,never>>(`
 `); 
 
 export default (router: Router) => {
-  router.post<Record<string,never>, StatusCodeInterface, SecurityAnswersBaseType, Record<string,never>>(
+  router.post<Record<string,never>, StatusCodeInterface, SecurityAnswersBaseType, 
+  Record<string,never>>(
     '/', 
     authMiddleware(), 
     validateRequest(answerCreationValidation),

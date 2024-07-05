@@ -10,7 +10,8 @@ const SQL_UPDATE_ID_NUMBER = sql<UserIdDetails, Record<string,never>>(`
 `);
 
 export default (router: Router) => {
-  router.patch<Record<string,never>, StatusCodeInterface,  UpdateIdDetails, Record<string,never>>(
+  router.patch<Record<string,never>, StatusCodeInterface,  UpdateIdDetails, 
+  Record<string,never>>(
     '/id-details', 
     authMiddleware(), 
     validateRequest(updateIdDetailsSchema),

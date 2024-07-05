@@ -16,7 +16,8 @@ const SQL_CREATE_TRANSFER = sql<TransferInput , Record<string,never>>(`
 `);
 
 export default (router: Router) => {
-  router.post<Record<string,never>, StatusCodeInterface, TransferInput, Record<string,never>>(
+  router.post<Record<string,never>, StatusCodeInterface, TransferInput, 
+  Record<string,never>>(
     '/', 
     authMiddleware(),
     validateRequest( transferValidationSchema),

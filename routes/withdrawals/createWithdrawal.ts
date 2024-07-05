@@ -10,7 +10,8 @@ const SQL_CREATE_WITHDRAWAL = sql<WithdrawalCreation, Record<string, never>>(`
 `); 
 
 export default (router: Router) => {
-  router.post<Record<string,never>, StatusCodeInterface, WithdrawalCreation, Record<string,never>>(
+  router.post<Record<string,never>, StatusCodeInterface, WithdrawalCreation, 
+  Record<string,never>>(
     '/', 
     validateRequest(withdrawalValidationSchema),
     authMiddleware(),

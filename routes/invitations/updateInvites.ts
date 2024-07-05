@@ -18,7 +18,9 @@ export default (router: Router) => {
     async (req, res) => {
       const group_id  = parseInt(req.params.id);
       const  receiver_id = req.user!.id
-      await SQL_RESPOND_TO_INVITE({ status: req.body.status, group_id, receiver_id }).exec();
+      await SQL_RESPOND_TO_INVITE({ 
+        status: req.body.status, group_id, receiver_id 
+      }).exec();
       res.sendStatus(204);
     }
   );

@@ -6,7 +6,10 @@ import { sql } from '../../db';
 import { generateResetPin } from '../../middleware/generateResetPin';
 import sendSms from '../../services/twilio';
 import { HttpError } from '../../middleware/errorMiddleware';
-import {  StatusCodeInterface, GetByPhoneInterface,  GetByIdInterface  } from '../../globalTypes/index';
+import {  StatusCodeInterface, 
+  GetByPhoneInterface,  
+  GetByIdInterface  
+} from '../../globalTypes/index';
 import { TokenInterface, InitiatePasswordResetInterface } from './types'
 
 const SQL_GET_USER = sql<GetByPhoneInterface,  GetByIdInterface>(`
@@ -25,7 +28,8 @@ const SQL_SAVE_TOKEN = sql<InitiatePasswordResetInterface, TokenInterface>(`
 `);
 
 export default  (router: Router) => {
-  router.post<Record<string,never>, StatusCodeInterface, GetByPhoneInterface, Record<string,never>>(
+  router.post<Record<string,never>, StatusCodeInterface, GetByPhoneInterface, 
+  Record<string,never>>(
     '/',
     resetPasswordLimiter,
     async (req, res) => {
@@ -38,10 +42,14 @@ export default  (router: Router) => {
       await SQL_SAVE_TOKEN({ user_id: user.id, token:hashedResetToken }).exec();      
 
       const resetTokenPayload = { id: user.id };
-      const resetTokenHeader = jwt.sign(resetTokenPayload, process.env.JWT_SECRET as Secret, { expiresIn: '15m' });
+      const resetTokenHeader = jwt.sign(
+        resetTokenPayload, process.env.JWT_SECRET as Secret, 
+        { expiresIn: '15m' }
+      );
       sendSms(
         phone_number,
-        `Your password reset token is: ${resetToken}. It expires in 10 minutes. Do not share with anyone.`
+        `Your password reset token is: ${resetToken}. 
+        It expires in 10 minutes. Do not share with anyone.`
       );
       res.setHeader('reset-token', resetTokenHeader).sendStatus(204);
     });

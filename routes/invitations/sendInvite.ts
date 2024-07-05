@@ -14,8 +14,9 @@ export default (router: Router) => {
     '/', 
     authMiddleware(),
     async (req, res) => {
-      await SQL_SEND_INVITATION({...req.body, sender_id:req.user!.id })
-        .exec()
+      await SQL_SEND_INVITATION({
+        ...req.body, sender_id:req.user!.id 
+      }).exec()
       res.sendStatus(204);
     }
   );

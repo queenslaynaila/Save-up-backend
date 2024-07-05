@@ -13,7 +13,9 @@ export default (router: Router) => {
     '/', 
     authMiddleware(),
     async (req, res) => {
-      const invitations = await  SQL_GET_PENDING_INVITATIONS({ receiver_id: req.user!.id }).many();
+      const invitations = await  SQL_GET_PENDING_INVITATIONS({ 
+        receiver_id: req.user!.id 
+      }).many();
       return res.json(invitations);     
     }
   );

@@ -2,7 +2,11 @@ import { Router  } from 'express';
 import bcrypt from 'bcrypt';
 import { sql } from '../../db';
 import { verifyResetToken } from '../../middleware/resetTokenMIddleware'
-import { VerifyTokenInterface, SecurityQuestionInterface, SecurityQuestionArray, UpdateTokenUsageInterface  } from './types';
+import { VerifyTokenInterface, 
+  SecurityQuestionInterface, 
+  SecurityQuestionArray, 
+  UpdateTokenUsageInterface  
+} from './types';
 import {  GetByUserInterface } from '../../globalTypes/index';
 
 const SQL_GET_SECURITY_QUESTIONS = sql<GetByUserInterface, SecurityQuestionInterface>(`
@@ -20,7 +24,8 @@ const SQL_UPDATE_TOKEN_USAGE = sql<UpdateTokenUsageInterface, Record<string,neve
 `);
 
 export default(router: Router) => {
-  router.patch<Record<string,never>, SecurityQuestionArray, VerifyTokenInterface, Record<string,never>, Record<string,never>>(
+  router.patch<Record<string,never>, SecurityQuestionArray, VerifyTokenInterface, 
+  Record<string,never>>(
     '/verify-token',
     verifyResetToken,
     async (req, res) => {
