@@ -22,7 +22,7 @@ const SQL_GET_USER = sql<GetByPhoneInterface,  GetByIdInterface>(`
 `);
 
 const SQL_SAVE_TOKEN = sql<InitiatePasswordResetInterface, TokenInterface>(`
-  INSERT INTO reset_tokens (user_id, xid, token)
+  INSERT INTO reset_tokens (user_id, xid, token, reason)
   SELECT :user_id,
           COALESCE(MAX(xid), 0) + 1,
           :token,
