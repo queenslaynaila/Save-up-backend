@@ -4,9 +4,10 @@ import { UserRole } from '../globalTypes';
 import { HttpError } from './errorMiddleware';
 import { generateToken, verifyTokenExpiration } from './generatetoken';
 
-type User = {
+export type User = {
   id: number;
   role: UserRole;
+  step?: number;
 }
 declare module 'express-serve-static-core' {
   interface Request {

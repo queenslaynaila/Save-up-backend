@@ -75,10 +75,22 @@ export const resetPasswordRequest = z.object({
 
 export type ResetPasswordRequestInterface = z.infer<typeof resetPasswordRequest>
 
+const ActionEnum = z.enum([
+  "Reset", "Update", "Unlock"
+]);
+
 export const initiatePasswordResetSchema = verifyTokenSchema.pick({
   user_id: true
 }).extend({
-  token: z.string()
+  token: z.string(),
+  reason: ActionEnum
 })
 
 export type InitiatePasswordResetInterface = z.infer<typeof initiatePasswordResetSchema>
+
+export const PhoneReasonSchema = z.object({
+  phone_number: z.string(),
+  reason: ActionEnum
+});
+
+export type PhoneReason = z.infer<typeof PhoneReasonSchema>;
