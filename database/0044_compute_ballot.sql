@@ -8,16 +8,14 @@ RETURNS TABLE (
 ) AS $$
 DECLARE
     total_members     INT;
-    active_members    INT;
     ballots_cast      INT;
-    candidate_counts  RECORD;
 BEGIN
     IF NOT EXISTS (
         SELECT 1
         FROM groups
         WHERE id = p_group_id
         AND deleted_at IS NULL
-    )THEN
+    ) THEN
         RAISE EXCEPTION 'INACTIVE_GROUP';
     END IF;
 
@@ -28,7 +26,7 @@ BEGIN
         AND xid = p_election_id
         AND status = 'Open'
     ) THEN
-      RAISE EXCEPTION 'ELECTION_CLOSED';
+        RAISE EXCEPTION 'ELECTION_CLOSED';
     END IF;
 
     PERFORM check_grp_membership(p_user_id, p_group_id);
@@ -47,22 +45,22 @@ BEGIN
         RAISE EXCEPTION 'INSUFFICIENT_VOTES';
     END IF;
 
-    FOR candidate_counts IN
-        SELECT candidate_id, COUNT(*) AS vote_count
+    FOR candidate_id IN
+        SELECT candidate_id
         FROM ballots
         WHERE group_id = p_group_id 
         AND election_id = p_election_id
         GROUP BY candidate_id
-        ORDER BY vote_count DESC
+        ORDER BY COUNT(*) DESC
         LIMIT 3
     LOOP
         INSERT INTO group_admins (group_id, election_id, user_id)
-        VALUES (p_group_id, p_election_id, candidate_counts.candidate_id);
+        VALUES (p_group_id, p_election_id, candidate_id);
 
         RETURN QUERY 
-        SELECT users.full_name 
-        FROM users
-        WHERE users.id = candidate_counts.candidate_id;
+        SELECT u.full_name 
+        FROM users u
+        WHERE u.id = candidate_id;
     END LOOP;
 
     UPDATE elections
@@ -75,5 +73,5 @@ $$ LANGUAGE plpgsql;
 
 GRANT EXECUTE ON FUNCTION compute_ballot_results(INT, INT, INT) TO app_user;
 SELECT create_distributed_function(
-  'compute_ballot_results(INT, INT)', 'p_group_id'
+  'compute_ballot_results(INT, INT, INT)', 'p_group_id'
 );
