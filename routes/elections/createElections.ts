@@ -6,14 +6,7 @@ import {  StatusCodeInterface } from '../../globalTypes/index';
 import { ElectionInterface, electionValidation } from './types';
 
 const SQL_CALL_ELECTION = sql<ElectionInterface , Record<string,never>>(`
-  INSERT INTO elections (group_id, xid, initiator_id, type)
-  SELECT 
-      :group_id,
-      COALESCE(MAX(xid), 0) + 1,
-      :initiator_id,
-      :type
-  FROM elections
-  WHERE group_id = :group_id;
+  SELECT create_election(:group_id, :initiator_id, :type)
 `);
 
 export default (router: Router) => {
