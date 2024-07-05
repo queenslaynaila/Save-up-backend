@@ -126,7 +126,7 @@ app.use(() => {
 // Global error handler
 /* eslint-disable @typescript-eslint/no-unused-vars */
 app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
-  console.error('Error caught by middleware:', error.message);
+  console.error('Error caught by middleware:', error);
   if (error instanceof HttpError) {
     return res.status(error.statusCode).json({
       errorType: error.errorType,

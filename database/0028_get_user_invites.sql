@@ -2,16 +2,16 @@ CREATE OR REPLACE FUNCTION get_user_invites(
     p_receiver_id  INT
 )
 RETURNS TABLE (
-    group_id INT,
-    group_name TEXT,
-    sender_id INT,
-    sender_name TEXT,
-    created_at TIMESTAMP WITH TIME ZONE
+    group_id       INT,
+    group_name     TEXT,
+    sender_id      INT,
+    sender_name    TEXT,
+    created_at     TIMESTAMP WITH TIME ZONE
 ) AS $$
 DECLARE
-    v_invitation_record RECORD;
-    v_sender_name TEXT;
-    v_group_name TEXT;
+    v_invitation_record   RECORD;
+    v_sender_name         TEXT;
+    v_group_name          TEXT;
 BEGIN
     FOR v_invitation_record IN
         SELECT 
@@ -22,7 +22,7 @@ BEGIN
         FROM invitations i
         JOIN groups g ON i.group_id = g.id
         WHERE i.receiver_id = p_receiver_id
-        AND i.status = 'Pending';
+        AND i.status = 'Pending'
     LOOP
         SELECT u.full_name
         INTO v_sender_name

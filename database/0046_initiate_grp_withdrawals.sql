@@ -48,13 +48,13 @@ BEGIN
   WHERE group_id = p_group_id
   RETURNING xid INTO STRICT v_withdrawal_id;
 
-  FOREACH v_recipient_record IN ARRAY p_recipient_object LOOP
-    v_recipient_id := (v_recipient_record ->> 'recipient_id')::INT;
-    v_amount := (v_recipient_record ->> 'amount')::NUMERIC;
-
-    INSERT INTO group_withdrawals_recipients (group_id, withdrawal_id, user_id, amount)
-    VALUES (p_group_id, v_withdrawal_id, v_recipient_id, v_amount);
-  END LOOP;
+  INSERT INTO group_withdrawals_recipients (group_id, withdrawal_id, user_id, amount)
+  SELECT 
+    p_group_id,
+    v_withdrawal_id,
+    (recipients ->> 'recipient_id')::INT,
+    (recipients ->> 'amount')::NUMERIC
+  FROM UNNEST(p_recipient_object) AS recipients;
 END;
 $$ LANGUAGE plpgsql;
 
