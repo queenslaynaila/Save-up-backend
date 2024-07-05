@@ -12,38 +12,27 @@ RETURNS TABLE(
 ) AS $$
 DECLARE
     v_initiator_name      TEXT;
-    v_latest_election_id  INT;
-    election_rec          RECORD; 
+    v_group_id            INT;
+    v_election_id         INT;
+    v_initiator_id        INT;
+    v_type                TEXT;
+    v_created_at          TIMESTAMP WITH TIME ZONE;
 BEGIN
     PERFORM check_grp_membership(p_user_id, p_group_id);
-
-    SELECT COALESCE(MAX(e.xid), 0)
-    INTO STRICT v_latest_election_id
+    
+    SELECT e.group_id, e.xid AS election_id, e.initiator_id, e.type, e.created_at
+    INTO STRICT v_group_id, v_election_id, v_initiator_id, v_type, v_created_at
     FROM elections e
     WHERE e.group_id = p_group_id
-    AND e.status = 'Open';
+    AND e.status = 'Open'
+    ORDER BY e.xid DESC
+    LIMIT 1;
 
-    FOR election_rec IN
-        SELECT e.group_id, e.xid AS election_id, e.initiator_id, e.type, e.created_at
-        FROM elections e
-        WHERE e.group_id = p_group_id
-        AND e.xid = v_latest_election_id
-    LOOP
-        SELECT u.full_name INTO initiator_name
-        FROM users u
-        WHERE u.id = election_rec.initiator_id;
+    SELECT u.full_name INTO STRICT v_initiator_name
+    FROM users u
+    WHERE u.id = initiator_id;
 
-        group_id := election_rec.group_id;
-        election_id := election_rec.election_id;
-        initiator_id := election_rec.initiator_id;
-        type := election_rec.type;
-        created_at := election_rec.created_at;
-        RETURN NEXT;
-    END LOOP;
-    
-    IF NOT FOUND THEN
-        RAISE EXCEPTION 'NO_OPEN_ELECTION_FOUND';
-    END IF;
+    RETURN NEXT;
 END;
 $$ LANGUAGE plpgsql;
 
