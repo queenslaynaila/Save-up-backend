@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS transactions (
   delta                   NUMERIC(30, 2) NOT NULL CHECK (delta > 0),
   balance                 NUMERIC(30, 2) NOT NULL CHECK (balance >= 0), 
   created_at              TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  PRIMARY KEY             (entity_id, xid),
+  PRIMARY KEY             (entity_id, xid, type_id, pocket_id),
   FOREIGN KEY             (type_id) REFERENCES transaction_types(id)
 );
 
