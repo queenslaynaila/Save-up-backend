@@ -61,6 +61,7 @@ export default (router: Router) => {
       }).one(new HttpError(404, 'USER_NOT_FOUND'));
 
       const { failed_count } = await SQL_COUNT_LAST_FAILED_ATTEMPTS({ id: user.id }).one();  
+      
       if (failed_count >= 3) {
         await SQL_RECORD_LOGIN({
           id:user.id, 
