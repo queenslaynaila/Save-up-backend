@@ -34,6 +34,6 @@ export default (router: Router) => {
       }
       const query = SQL_GET_TOTAL_EXPENSES({user_id });
       if (filters.length > 0) query.extend(`AND ${filters.join(' AND ')}`, filterArgs);
-      res.json(await query.one( new HttpError(500, 'An error occurred while processing your request. Please try again later.')));
+      res.json(await query.one( new HttpError(500)));
     });
 };

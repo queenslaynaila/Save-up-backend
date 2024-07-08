@@ -120,23 +120,19 @@ createExSaving(app);
 
 // 404 handler
 app.use(() => {
-  throw new HttpError(404, 'ROUTE_NOT_FOUND');
+  throw new HttpError(404);
 });
 
 // Global error handler
 /* eslint-disable @typescript-eslint/no-unused-vars */
 app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
-  console.error('Error caught by middleware:', error);
+  console.log('Error caught by middleware:', error);
   if (error instanceof HttpError) {
     return res.status(error.statusCode).json({
-      errorType: error.errorType,
       errorData: error.errorData
     });
   } else {
-    return res.status(500).json({
-      errorType: 'INTERNAL_SERVER_ERROR',
-      errorData: {}
-    });
+    return res.status(500)
   }
 });
 

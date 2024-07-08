@@ -46,22 +46,22 @@ export default(router: Router) => {
     async (req, res) => {
       const step = req.user!.step;
       if (step !== 1) {
-        throw new HttpError(422, 'ERR_STEP_SKIPPED',{ required_step: 1 });
+        throw new HttpError(422, { required_step: 1 });
       }
       const { reset_token } = req.body;
       const user_id = req.user!.id;
 
       const { token } = await SQL_GET_RESET_TOKEN({
         user_id, reason: req.body.reason
-      }).one(new HttpError(404, 'ERR_TOKEN_NOT_FOUND'));
+      }).one(new HttpError(404));
       if (!await bcrypt.compare(reset_token, token)) {
-        throw new HttpError(401, 'ERR_INVALID_TOKEN');
+        throw new HttpError(401);
       }
 
       await SQL_UPDATE_TOKEN_USAGE({...req.body, user_id, reset_token:token }).exec(); 
       const securityQuestions = await SQL_GET_SECURITY_QUESTIONS({ user_id }).many();
       if (securityQuestions.length === 0) {
-        throw new HttpError(404, 'ERR_QUESTIONS_NOT_SET');
+        throw new HttpError(404);
       }
 
       const step2TokenPayload = { id: user_id, step: 2 };

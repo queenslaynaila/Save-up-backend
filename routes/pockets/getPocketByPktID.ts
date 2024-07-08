@@ -32,7 +32,7 @@ export default (router: Router) => {
       const pocket = await SQL_GET_POCKET_BY_ID({ 
         xid:parseInt(req.params.id), 
         entity_id 
-      }).one(new HttpError(404, 'Not found'));
+      }).one(new HttpError(404));
       return res.json(pocket);
     });
 };

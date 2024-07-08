@@ -27,13 +27,13 @@ export default (router: Router) => {
       const { user_id, priority, status, category_id, start_date, end_date } = req.query 
       const formattedStatus = status ? convertToTitleCase(status) : '';
       if (!ValidResourcesEnum.safeParse(resource).success) {
-        throw new HttpError(400, 'Invalid resource');
+        throw new HttpError(400);
       }
       if (!ValidOperatorsEnum.safeParse(operator).success) {
-        throw new HttpError(400, 'Invalid operator');
+        throw new HttpError(400);
       }
       if ( status && !ValidStatusEnum.safeParse(status).success) {
-        throw new HttpError(400, 'Invalid operator');
+        throw new HttpError(400);
       }
       let query = `SELECT COALESCE(${operator}(amount), 0) AS ${operator} 
       FROM ${resource} WHERE 1=1`;

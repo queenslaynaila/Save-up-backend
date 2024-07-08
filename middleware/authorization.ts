@@ -27,7 +27,7 @@ function authMiddleware(options: AuthMiddlewareOptions = {}) {
     const refreshToken = req.headers['refresh-token'] as string;
 
     if (!accessToken || !refreshToken) {
-      throw new HttpError(401, 'UNAUTHORIZED');
+      throw new HttpError(401);
     }
 
     if (accessToken) {
@@ -36,28 +36,31 @@ function authMiddleware(options: AuthMiddlewareOptions = {}) {
 
       if (isExpired && refreshToken) {
         const refreshTokenValue = refreshToken.split(' ')[1];
-        const decodedRefreshToken = jwt.verify(refreshTokenValue, process.env.JWT_SECRET as Secret);
+        const decodedRefreshToken = jwt.verify(
+          refreshTokenValue, process.env.JWT_SECRET as Secret
+        );
         const user = decodedRefreshToken as User;
         const newAccessToken = generateToken(user.id, user.role, '1d');
         const newRefreshToken = generateToken(user.id, user.role, '7d');
         res.setHeader('authorization-token', newAccessToken);
         res.setHeader('refresh-token', newRefreshToken);
         if (roles.length && !roles.includes(user.role)) {
-          throw new HttpError(403, 'FORBIDDEN');
+          throw new HttpError(403);
         }
         req.user = user;
         return next();
       }
 
-      const decodedAccessToken = jwt.verify(accessTokenValue, process.env.JWT_SECRET as Secret);
+      const decodedAccessToken = jwt.verify(
+        accessTokenValue, process.env.JWT_SECRET as Secret
+      );
       const user = decodedAccessToken as User;
 
       if (roles.length && !roles.includes(user.role)) {
-        throw new HttpError(403, 'FORBIDDEN');
+        throw new HttpError(403);
       }
       req.user = user;
       return next();
-      
     }
   };
 }

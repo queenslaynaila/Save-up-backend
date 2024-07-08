@@ -33,7 +33,7 @@ export default (router: Router) => {
       const filterArgs: Record<string, string | number> = {};
 
       if (!/^me$|^\+254\d{9}$|^[0-9]+$/.test(targetUser)) {
-        throw new HttpError(400,'BAD_REQUEST');
+        throw new HttpError(400);
       }
 
       if (targetUser === 'me') {
@@ -49,7 +49,7 @@ export default (router: Router) => {
           filters.push(`user_contact_details.id_number = :idNumber`);
         }
       } else {
-        throw new HttpError(403, 'FORBIDDEN');
+        throw new HttpError(403);
       }
 
       if (full_name) {

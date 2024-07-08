@@ -4,7 +4,7 @@ import authMiddleware from '../../middleware/authorization';
 import { GroupExitInterface } from './types';
 import { StatusCodeInterface, IdParamInterface } from '../../globalTypes/index';
 
-const SQL_EXIT_GROUP = sql<GroupExitInterface , Record<string,never>>(`
+const SQL_EXIT_GROUP = sql<GroupExitInterface, Record<string,never>>(`
   SELECT leave_group (:user_id, :id);
 `);
 

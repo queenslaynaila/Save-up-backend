@@ -20,7 +20,7 @@ export default (router: Router) => {
     async (req, res) => {
       const step = req.user!.step;
       if (step !== 3) {
-        throw new HttpError(422, 'ERR_STEP_SKIPPED');
+        throw new HttpError(422);
       }
 
       const { new_pin } = req.body;

@@ -33,7 +33,7 @@ export default (router: Router) => {
       const { pin: hashedPassword } = await SQL_GET_PASSWORD_BY_ID({ id: userId }).one();
       const isPasswordCorrect = await bcrypt.compare(old_pin, hashedPassword);
       if (!isPasswordCorrect) {
-        throw new HttpError(400, 'Incorrect pin');
+        throw new HttpError(400);
       }
 
       const hashedNewPassword = bcrypt.hashSync(new_pin, 10);

@@ -21,14 +21,14 @@ export default (router: Router) => {
     async (req, res) => {
       const step = req.user!.step;
       if (step !== 2) {
-        throw new HttpError(422, 'ERR_STEP_SKIPPED');
+        throw new HttpError(422);
       }
       const { answers } = req.body;
       const user_id = req.user!.id;
 
       const userSecurityAnswers = await SQL_GET_SECURITY_ANSWERS({ user_id }).many();
       if (userSecurityAnswers.length === 0) {
-        throw new HttpError(404, 'ERR_QUESTIONS_NOT_SET');
+        throw new HttpError(404);
       }
       
       const incorrectAnswers: number[] = [];
@@ -36,13 +36,15 @@ export default (router: Router) => {
         const storedAnswer = userSecurityAnswers.find(
           a => a.question_id === submittedAnswer.question_id
         );
-        if (!storedAnswer || !(await bcrypt.compare(submittedAnswer.answer, storedAnswer.answer))) {
+        if (!storedAnswer || !(await bcrypt.compare(
+          submittedAnswer.answer, storedAnswer.answer
+        ))) {
           incorrectAnswers.push(submittedAnswer.question_id);
         }
       }
 
       if (incorrectAnswers.length > 1) {
-        throw new HttpError(401, `ERR_INCORRECT_ANSWER`);
+        throw new HttpError(401);
       }
 
       const step3TokenPayload = { id: user_id, step: 3 };

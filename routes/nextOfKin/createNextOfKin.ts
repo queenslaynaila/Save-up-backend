@@ -3,7 +3,11 @@ import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { validateRequest } from '../../middleware/validationMiddleware';
-import { NextOfKinCreationInterface, NextOfKinInterface, nextOfKinValidation } from './types'; 
+import { 
+  NextOfKinCreationInterface, 
+  NextOfKinInterface, 
+  nextOfKinValidation 
+} from './types'; 
 
 const SQL_CREATE_KIN = sql<NextOfKinCreationInterface, NextOfKinInterface>(`
   INSERT INTO next_of_kins (
@@ -34,7 +38,7 @@ export default (router: Router) => {
       const nextOfKin = await SQL_CREATE_KIN({
         ...req.body, 
         user_id:req.user!.id
-      }).one(new HttpError(400, 'You already have an existing next of kin.'));
+      }).one(new HttpError(400));
       return res.json(nextOfKin);
     });
 };

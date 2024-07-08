@@ -35,7 +35,7 @@ export default (router: Router) => {
       const query = SQL_GET_TOTAL_TARGET_AMOUNT({});
       if (filters.length > 0) query.extend(`WHERE ${filters.join(' AND ')}`, filterArgs);
       query.extend('WHERE entity_id = :userId', values);
-      res.json(await query.one( new HttpError(500, 'An error occurred while processing your request. Please try again later.')));
+      res.json(await query.one( new HttpError(500)));
     }
   );
   

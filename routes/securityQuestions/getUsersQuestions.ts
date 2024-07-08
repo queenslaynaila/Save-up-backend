@@ -13,7 +13,8 @@ const SQL_GET_USER_SECURITY_QUESTIONS = sql<AnswerByUserType, SecurityQuestions>
 `);
 
 export default (router: Router) => {
-  router.get<Record<string,never>, SecurityQuestions[], Record<string,never>, Record<string,never>>(
+  router.get<Record<string,never>, SecurityQuestions[], Record<string,never>, 
+  Record<string,never>>(
     '/me/', 
     authMiddleware(),
     async (req, res) => {

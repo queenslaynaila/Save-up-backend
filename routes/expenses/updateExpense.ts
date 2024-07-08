@@ -33,7 +33,7 @@ export default (router: Router) => {
       const { description, category_id, amount, spent_at } = req.body;
       const result = await SQL_UPDATE_EXPENSE({
         description, category_id, amount, spent_at, entity_id, xid
-      }).one(new HttpError(404, 'Not found'));
+      }).one(new HttpError(404));
       res.json(result);
     });
 };

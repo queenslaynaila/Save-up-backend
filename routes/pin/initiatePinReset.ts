@@ -39,7 +39,7 @@ export default  (router: Router) => {
     async (req, res) => {
       const { phone_number } = req.body;
       const user = await SQL_GET_USER({ phone_number })
-        .one(new HttpError(404, 'ERR_USER_NOT_FOUND'));
+        .one(new HttpError(404));
 
       const resetToken =  generateResetPin();
       const hashedResetToken = await bcrypt.hash(resetToken, 10);

@@ -41,7 +41,7 @@ export default (router: Router) => {
       const { transaction_type, from_date, to_date } = req.query;
 
       const user = await SQL_GET_USER({ phone_number })
-        .one(new HttpError(404, 'User not found.'));
+        .one(new HttpError(404));
 
       const filters: string[] = [];
       const filterArgs: Record<string, string  > = {};

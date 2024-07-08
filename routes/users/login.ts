@@ -58,7 +58,7 @@ export default (router: Router) => {
     async (req, res) => {
       const { pin, ...user } = await SQL_GET_USER({ 
         phone_number: req.body.phone_number 
-      }).one(new HttpError(404, 'USER_NOT_FOUND'));
+      }).one(new HttpError(404));
 
       const { failed_count } = await SQL_COUNT_LAST_FAILED_ATTEMPTS({ id: user.id }).one();  
       
@@ -70,7 +70,7 @@ export default (router: Router) => {
           success: false, 
           reason: 'Locked'
         }).exec();
-        throw new HttpError(423, 'ACCOUNT_LOCKED');
+        throw new HttpError(423);
       }
 
       if (!await bcrypt.compare(req.body.pin, pin)) {
@@ -84,7 +84,6 @@ export default (router: Router) => {
         const remainingAttempts = 3 - (failed_count + 1); 
         throw new HttpError(
           401, 
-          'INVALID_CREDENTIALS', 
           { remainingAttempts }
         );
       }

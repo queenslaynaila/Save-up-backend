@@ -24,12 +24,11 @@ export default (router: Router) => {
     async (req, res) => {
       const id = req.user!.id
       const userPassword = await SQL_GET_USER_PIN({ id}).one(
-        new HttpError(400, 'User not found')
+        new HttpError(400)
       );
       if (!await bcrypt.compare(req.body.pin, userPassword.pin)) {
         throw new HttpError(
-          401, 
-          'INVALID_CREDENTIALS'
+          401
         );
       }
       await SQL_UPDATE_PHONE({ phone_number:req.body.phone_number, id}).exec();

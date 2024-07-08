@@ -4,7 +4,10 @@ import authMiddleware from '../../middleware/authorization';
 import { TopExpenseCategoriesInterface, UserCumulaInterface } from './types'
 
 const SQL_GET_TOP_EXPENDITURE_CATEGORIES = sql<UserCumulaInterface, TopExpenseCategoriesInterface>(`
-  SELECT e.category_id, c.name AS category_name, COALESCE(SUM(e.amount_spent), 0) AS total_expense 
+  SELECT 
+    e.category_id, 
+    c.name AS category_name, 
+    COALESCE(SUM(e.amount_spent), 0) AS total_expense 
   FROM expenses e
   JOIN categories c ON e.category_id = c.id
   WHERE  e.entity_id = :user_id
