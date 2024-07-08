@@ -1,6 +1,6 @@
 CREATE OR REPLACE FUNCTION create_group_deposit(
-    p_group_id     INT,
-    p_user_id      INT, 
+    p_user_id      INT,
+    p_group_id     INT, 
     p_pocket_id    INT, 
     p_amount       NUMERIC
 )

@@ -1,6 +1,6 @@
 CREATE OR REPLACE FUNCTION check_grp_membership(
+    p_group_id INT,
     p_user_id INT,
-    p_group_id INT
 )
 RETURNS VOID AS $$
 BEGIN

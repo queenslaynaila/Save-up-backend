@@ -5,7 +5,7 @@ import {  InviteInputInterface } from './types';
 import { StatusCodeInterface } from '../../globalTypes/index';
 
 const SQL_SEND_INVITATION = sql<InviteInputInterface, Record<string,never>>(`
-  SELECT send_invite(:phone_number, :group_id, :sender_id)
+  SELECT send_invite( :group_id, :phone_number, :sender_id)
 `);
 
 export default (router: Router) => {

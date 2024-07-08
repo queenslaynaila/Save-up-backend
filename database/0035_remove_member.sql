@@ -1,7 +1,7 @@
 CREATE OR REPLACE FUNCTION remove_user_from_group(
+    p_group_id        INT,
     p_initiator_id    INT,
-    p_target_id       INT,
-    p_group_id        INT
+    p_target_id       INT
 ) RETURNS VOID AS $$
 DECLARE
     v_latest_election_id INT;

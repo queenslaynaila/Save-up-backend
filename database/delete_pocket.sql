@@ -1,6 +1,6 @@
 CREATE OR REPLACE FUNCTION delete_pocket(
-    p_pocket_id INT,
-    p_entity_id INT
+    p_entity_id INT,
+    p_pocket_id INT
 ) 
 RETURNS VOID AS $$
 BEGIN

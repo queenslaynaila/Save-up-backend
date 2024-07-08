@@ -6,7 +6,7 @@ import { UserRoleUpdateType, UserRoleParamType } from './types';
 import { UserRole, StatusCodeInterface } from '../../globalTypes/index';
 
 const SQL_UPDATE_ROLE = sql<UserRoleUpdateType, Record<string,never>>(`
-  SELECT * FROM update_user_role(:role, :targetUserId, :adminId);
+  SELECT * FROM update_user_role(:targetUserId,:role, :adminId);
 `);
 
 export default (router: Router) => {

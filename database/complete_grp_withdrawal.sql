@@ -1,6 +1,6 @@
 CREATE OR REPLACE FUNCTION complete_group_withdrawal(
-    p_withdrawal_id       INT,
-    p_group_id            INT
+    p_group_id            INT,
+    p_withdrawal_id       INT
 ) 
 RETURNS VOID AS $$
 DECLARE

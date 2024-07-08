@@ -1,6 +1,6 @@
 CREATE OR REPLACE FUNCTION send_invite(
-    p_phone_number        TEXT, 
     p_group_id            INT,
+    p_phone_number        TEXT, 
     p_sender_id           INT
 )
 RETURNS VOID AS $$

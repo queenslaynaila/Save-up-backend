@@ -1,6 +1,6 @@
 CREATE OR REPLACE FUNCTION update_user_role(
-    p_new_role          enum_user_role,
     p_target_user_id    INT,
+    p_new_role          enum_user_role,
     p_admin_id          INT 
 ) RETURNS TABLE (
     full_name     TEXT,
@@ -47,7 +47,7 @@ GRANT EXECUTE ON FUNCTION update_user_role(
     enum_user_role
 ) TO app_user;
 SELECT create_distributed_function(
-  'update_user_role(INT, enum_user_role)', 'p_user_id'
+  'update_user_role(INT, enum_user_role)', 'p_target_user_id'
 );
 
 

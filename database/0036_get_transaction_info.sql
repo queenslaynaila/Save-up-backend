@@ -1,6 +1,6 @@
 CREATE OR REPLACE FUNCTION get_transaction_info(
-    p_pocket_id   INT,
-    p_entity_id   INT
+    p_entity_id   INT,
+    p_pocket_id   INT
 )
 RETURNS TABLE (
     v_current_balance  NUMERIC
