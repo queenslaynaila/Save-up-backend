@@ -7,7 +7,9 @@ export const convertToTitleCase = (str: string): UserRole => {
   return titleCased as UserRole;
 };
 
-export const isValidValue = (value: string | undefined, acceptedValues: string[]): boolean => {
+export const isValidValue = (
+  value: string | undefined, acceptedValues: string[]
+): boolean => {
   return value !== undefined && acceptedValues.includes(value);
 };
 
