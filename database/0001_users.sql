@@ -4,8 +4,7 @@ CREATE TYPE enum_gender AS ENUM ('Male', 'Female');
 
 CREATE TABLE IF NOT EXISTS user_contact_details (
   id              INT PRIMARY KEY,  
-  id_type         enum_id_type NOT NULL DEFAULT 'National ID',
-  id_number       TEXT NOT NULL CHECK (id_number ~ '^[0-9]+$'),
+  full_name       TEXT NOT NULL,
   phone_number    TEXT NOT NULL UNIQUE,
   created_at      TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   FOREIGN KEY     (id) REFERENCES entities(id)
@@ -15,7 +14,8 @@ GRANT INSERT, SELECT, UPDATE ON user_contact_details TO app_user;
 
 CREATE TABLE IF NOT EXISTS users (
   id              INT PRIMARY KEY,  
-  full_name       TEXT NOT NULL,
+  id_type         enum_id_type NOT NULL DEFAULT 'National ID',
+  id_number       TEXT NOT NULL CHECK (id_number ~ '^[0-9]+$'),
   role            enum_user_role NOT NULL DEFAULT 'Standard',
   gender          enum_gender,
   pin             TEXT NOT NULL,
