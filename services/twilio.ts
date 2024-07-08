@@ -14,8 +14,8 @@ const sendSms = (phone: string, message: string): void => {
       from: twilioPhoneNumber,
       to: phone,
     })
-    .then((message) => console.log(message.sid))
-    .catch((error: Error) => console.error(error));
+    .then((message) => console.log(`Message sent: ${message.sid}`))
+    .catch((error: Error) => `This is Error: ${error.message}`);
 };
 
 export default sendSms;

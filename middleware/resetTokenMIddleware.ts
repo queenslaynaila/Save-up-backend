@@ -9,11 +9,11 @@ export const validateStepToken = (req: Request, res: Response, next: NextFunctio
     throw new HttpError(403, 'ERR_DENIED');
   }
   const resetTokenValue = token.split(' ')[1];
+
   jwt.verify(resetTokenValue, process.env.JWT_SECRET as Secret, (err, decodedResetToken) => {
     if (err) {
-      next(err); 
+      throw new HttpError(403, 'ERR_DENIED');
     } else {
-      console.log('Token decoded:', decodedResetToken);
       const user = decodedResetToken as User;
       req.user = user;
       next();

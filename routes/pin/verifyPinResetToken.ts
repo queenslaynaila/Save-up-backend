@@ -18,11 +18,24 @@ const SQL_GET_SECURITY_QUESTIONS = sql<GetByUserInterface, SecurityQuestionInter
   WHERE sa.user_id = :user_id;
 `);
 
+const SQL_GET_RESET_TOKEN = sql<{ user_id: number; reason: string;}, { token: string; }>(`
+  SELECT token
+  FROM reset_tokens 
+  WHERE user_id = :user_id
+  AND reason = :reason
+  AND used_at IS NULL 
+  AND expired_at > NOW()
+  ORDER BY xid DESC 
+  LIMIT 1;
+`);
+
 const SQL_UPDATE_TOKEN_USAGE = sql<UpdateTokenUsageInterface, Record<string,never>>(`
   UPDATE reset_tokens 
   SET used_at = NOW() 
   WHERE user_id = :user_id
   AND token = :reset_token
+  AND reason = :reason
+  AND used_at IS NULL 
 `);
 
 export default(router: Router) => {
@@ -33,22 +46,30 @@ export default(router: Router) => {
     async (req, res) => {
       const step = req.user!.step;
       if (step !== 1) {
-        throw new HttpError(422, 'ERR_STEP_SKIPPED');
+        throw new HttpError(422, 'ERR_STEP_SKIPPED',{ required_step: 1 });
       }
-
       const { reset_token } = req.body;
       const user_id = req.user!.id;
-   
-      const hashedResetToken = await bcrypt.hash(reset_token, 10); 
-      await SQL_UPDATE_TOKEN_USAGE({ user_id, reset_token: hashedResetToken }).exec(); 
+
+      const { token } = await SQL_GET_RESET_TOKEN({
+        user_id, reason: req.body.reason
+      }).one(new HttpError(404, 'ERR_TOKEN_NOT_FOUND'));
+      if (!await bcrypt.compare(reset_token, token)) {
+        throw new HttpError(401, 'ERR_INVALID_TOKEN');
+      }
+
+      await SQL_UPDATE_TOKEN_USAGE({...req.body, user_id, reset_token:token }).exec(); 
       const securityQuestions = await SQL_GET_SECURITY_QUESTIONS({ user_id }).many();
+      if (securityQuestions.length === 0) {
+        throw new HttpError(404, 'ERR_QUESTIONS_NOT_SET');
+      }
 
       const step2TokenPayload = { id: user_id, step: 2 };
       const step2TokenHeader = jwt.sign(
         step2TokenPayload, process.env.JWT_SECRET as Secret,
         { expiresIn: '15m' }
       );
-      res.setHeader('step-token', step2TokenHeader)
+      res.setHeader('reset-token', step2TokenHeader)
         .json(securityQuestions);
     }
   );

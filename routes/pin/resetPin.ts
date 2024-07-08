@@ -7,8 +7,9 @@ import { ResetPasswordInterface, ResetPasswordRequestInterface } from './types';
 import { HttpError } from '../../middleware/errorMiddleware';
 
 const SQL_RESET_PASSWORD = sql<ResetPasswordRequestInterface, Record<string,never>>(`
-  UPDATE users SET pin = :pin  
-  WHERE  user_id = :id
+  UPDATE users 
+  SET pin = :pin  
+  WHERE  user_id = :id;
 `);
 
 export default (router: Router) => {

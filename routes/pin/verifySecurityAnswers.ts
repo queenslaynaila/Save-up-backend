@@ -23,24 +23,26 @@ export default (router: Router) => {
       if (step !== 2) {
         throw new HttpError(422, 'ERR_STEP_SKIPPED');
       }
-
       const { answers } = req.body;
       const user_id = req.user!.id;
 
       const userSecurityAnswers = await SQL_GET_SECURITY_ANSWERS({ user_id }).many();
-
+      if (userSecurityAnswers.length === 0) {
+        throw new HttpError(404, 'ERR_QUESTIONS_NOT_SET');
+      }
+      
       const incorrectAnswers: number[] = [];
-      answers.forEach(({ question_id, answer }: { question_id:number; answer: string }) => {
+      for (const submittedAnswer of answers) {
         const storedAnswer = userSecurityAnswers.find(
-          (a: { question_id:number; answer: string }) => a.question_id === question_id
+          a => a.question_id === submittedAnswer.question_id
         );
-        if (!storedAnswer || !bcrypt.compare(answer, storedAnswer.answer)) {
-          console.log(storedAnswer)
-          incorrectAnswers.push(question_id);
+        if (!storedAnswer || !(await bcrypt.compare(submittedAnswer.answer, storedAnswer.answer))) {
+          incorrectAnswers.push(submittedAnswer.question_id);
         }
-      });
-      if (incorrectAnswers.length > 0) {
-        throw new HttpError(401, `Incorrect answers. Contact customer service for help.`);
+      }
+
+      if (incorrectAnswers.length > 1) {
+        throw new HttpError(401, `ERR_INCORRECT_ANSWER`);
       }
 
       const step3TokenPayload = { id: user_id, step: 3 };
@@ -48,8 +50,7 @@ export default (router: Router) => {
         step3TokenPayload, process.env.JWT_SECRET as Secret,
         { expiresIn: '15m' }
       );
-
-      res.setHeader('step-token', step3TokenHeader)
+      res.setHeader('reset-token', step3TokenHeader)
         .sendStatus(204);
     }
   );

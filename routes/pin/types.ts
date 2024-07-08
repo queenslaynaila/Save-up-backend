@@ -1,5 +1,9 @@
 import { z } from 'zod';
 
+const ActionEnum = z.enum([
+  "Reset", "Update", "Unlock"
+]);
+
 export const resetPinRequestSchema = z.object({
   pin: z.string(),
 })
@@ -30,7 +34,8 @@ export type TokenInterface = z.infer<typeof tokenSchema>
 export const verifyTokenSchema = securityAnswersRequestSchema.pick({
   user_id:true
 }).extend({
-  reset_token: z.string()
+  reset_token: z.string(),
+  reason: ActionEnum
 })
 
 export type VerifyTokenInterface = z.infer<typeof verifyTokenSchema>
@@ -56,7 +61,8 @@ export type SecurityQuestionArray = z.infer<typeof securityQuestionArray>
 export const updateTokenUsage = verifyTokenSchema.pick({
   reset_token: true
 }).extend({
-  user_id:z.number()
+  user_id:z.number(),
+  reason: ActionEnum
 })
 
 export type UpdateTokenUsageInterface = z.infer<typeof updateTokenUsage>
@@ -74,10 +80,6 @@ export const resetPasswordRequest = z.object({
 })
 
 export type ResetPasswordRequestInterface = z.infer<typeof resetPasswordRequest>
-
-const ActionEnum = z.enum([
-  "Reset", "Update", "Unlock"
-]);
 
 export const initiatePasswordResetSchema = verifyTokenSchema.pick({
   user_id: true
