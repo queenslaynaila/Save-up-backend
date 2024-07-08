@@ -11,11 +11,13 @@ import { UpdatePasswordInterface,
 import {  StatusCodeInterface, GetByIdInterface } from '../../globalTypes/index';
 
 const SQL_GET_PASSWORD_BY_ID = sql<GetByIdInterface, ResetPinInterface >(`
-  SELECT pin FROM users WHERE id = :id
+  SELECT pin FROM users 
+  WHERE id = :id
 `);
 
 const SQL_UPDATE_PASSWORD = sql< ResetPasswordRequestInterface, Record<string,never>>(`
-  UPDATE users SET pin = :pin WHERE id = :id
+  UPDATE users SET pin = :pin 
+  WHERE id = :id
 `);
 
 export default (router: Router) => {
@@ -27,14 +29,15 @@ export default (router: Router) => {
     async (req, res) => {
       const { old_pin, new_pin } = req.body;
       const userId = req.user!.id;
+
       const { pin: hashedPassword } = await SQL_GET_PASSWORD_BY_ID({ id: userId }).one();
       const isPasswordCorrect = await bcrypt.compare(old_pin, hashedPassword);
       if (!isPasswordCorrect) {
         throw new HttpError(400, 'Incorrect pin');
       }
+
       const hashedNewPassword = bcrypt.hashSync(new_pin, 10);
       await SQL_UPDATE_PASSWORD({ id: userId, pin: hashedNewPassword }).exec();
-      
       res.sendStatus(204);
     });
 };
