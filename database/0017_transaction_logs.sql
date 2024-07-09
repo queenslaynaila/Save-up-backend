@@ -4,7 +4,8 @@ CREATE TYPE enum_transaction_type AS ENUM (
   'Withdrawal', 
   'TransferIn', 
   'TransferOut', 
-  'Interest'
+  'Interest',
+  'Penalty', --when a user withdrawas locked funds before maturity
 );
 
 CREATE TABLE IF NOT EXISTS transaction_types (
