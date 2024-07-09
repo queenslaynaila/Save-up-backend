@@ -19,6 +19,12 @@ BEGIN
     SELECT * FROM get_transaction_info(v_pocket_id, p_group_id) 
     INTO STRICT v_current_balance;
 
+    IF v_current_balance < p_amount THEN
+        RAISE EXCEPTION USING
+          MESSAGE = 'ERR_INSUFFICIENT_FUNDS',
+          ERRCODE = 'P0004';
+    END IF;
+
     v_new_balance := v_current_balance - v_amount;
     v_reference_id := floor(random() * 1000000 + 1)::INT;
        

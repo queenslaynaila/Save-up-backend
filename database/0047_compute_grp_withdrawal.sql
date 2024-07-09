@@ -26,7 +26,9 @@ BEGIN
         AND election_id = v_latest_election_id
         AND user_id = p_admin_id
     ) THEN
-        RAISE EXCEPTION 'ERR_NOT_GROUP_ADMIN';
+        RAISE EXCEPTION USING 
+            MESSAGE = 'ERR_GROUP_NOT_ADMIN',
+            ERRCODE = 'P0002';
     END IF;
 
     INSERT INTO group_withdrawals_approvals

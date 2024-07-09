@@ -1,6 +1,6 @@
 CREATE OR REPLACE FUNCTION check_grp_membership(
-    p_group_id INT,
-    p_user_id INT,
+    p_group_id     INT,
+    p_user_id      INT
 )
 RETURNS VOID AS $$
 BEGIN
@@ -11,7 +11,9 @@ BEGIN
         AND group_id = p_group_id
         AND is_active = TRUE
     ) THEN
-        RAISE EXCEPTION 'ERR_NOT_GROUP_MEMBER';
+        RAISE EXCEPTION USING
+            MESSAGE = 'ERR_NOT_GROUP_MEMBER',
+            ERRCODE = 'P0001';
     END IF;
 END;
 $$ LANGUAGE plpgsql;

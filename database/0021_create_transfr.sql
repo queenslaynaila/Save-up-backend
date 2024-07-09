@@ -18,8 +18,10 @@ BEGIN
   SELECT * FROM get_transaction_info(p_source_pocket_id, p_entity_id) 
   INTO STRICT v_source_transaction_id, v_source_balance;
 
-  IF v_source_balance < p_amount THEN
-      RAISE EXCEPTION 'Insufficient funds for transfer.';
+  IF v_current_balance < p_amount THEN
+    RAISE EXCEPTION USING
+      MESSAGE = 'ERR_INSUFFICIENT_FUNDS',
+      ERRCODE = 'P0004';
   END IF;
 
   SELECT * FROM get_transaction_info(p_destination_pocket_id, p_entity_id) 

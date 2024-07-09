@@ -8,15 +8,6 @@ CREATE OR REPLACE FUNCTION update_group_name(
 DECLARE
     v_old_name TEXT;
 BEGIN
-    IF NOT EXISTS (
-        SELECT 1
-        FROM groups
-        WHERE id = p_group_id
-        AND deleted_at IS NULL
-    ) THEN
-        RAISE EXCEPTION 'ERR_INACTIVE_GROUP';
-    END IF;
-
     PERFORM check_grp_membership(p_user_id, p_group_id);
 
     SELECT name INTO STRICT v_old_name

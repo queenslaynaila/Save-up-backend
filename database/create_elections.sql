@@ -11,7 +11,9 @@ BEGIN
         WHERE group_id = p_group_id
         AND status = 'Open'
     ) THEN
-        RAISE EXCEPTION 'ERR_ONGOING_ELECTION_EXISTS';
+        RAISE EXCEPTION USING
+          MESSAGE = 'ERR_ONGOING_ELECTION_EXISTS',
+          ERRCODE = 'P0007';
     END IF;
 
     INSERT INTO elections (group_id, xid, initiator_id, type)

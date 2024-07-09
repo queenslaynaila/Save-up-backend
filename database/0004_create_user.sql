@@ -24,20 +24,23 @@ BEGIN
   
   INSERT INTO pockets (entity_id, xid, category_id, name, priority, pocket_type)
   VALUES (
-          v_entity_id, 
-          1, 
-          12,  
-          'Wallet',  
-          'Intermediate'::enum_priority, 
-          'Standard'::enum_pocket_type
+    v_entity_id, 
+    1, 
+    12,  
+    'Wallet',  
+    'Intermediate'::enum_priority, 
+    'Standard'::enum_pocket_type
   )
   RETURNING pockets.xid INTO STRICT v_pocket_id;
 
   INSERT INTO default_pockets (entity_id, pocket_id)
   VALUES (v_entity_id, v_pocket_id);
+
 EXCEPTION 
   WHEN unique_violation THEN
-    RAISE EXCEPTION 'User with that phone number already exists.';
+    RAISE EXCEPTION USING
+      MESSAGE = 'ERR_PHONE_NO_EXISTS',
+      ERRCODE = '23505';
 END;
 $$ LANGUAGE plpgsql;
 

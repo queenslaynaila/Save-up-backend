@@ -37,7 +37,8 @@ BEGIN
   VALUES (v_entity_id, v_pocket_id);
 EXCEPTION 
   WHEN unique_violation THEN
-    RAISE EXCEPTION 'User with that phone number already exists.';
+    RAISE EXCEPTION USING 
+      MESSAGE = 'ERR_PHONE_NUMBER_ALREADY_EXISTS'; --use psg default code for unique violation
 END;
 $$ LANGUAGE plpgsql;
 

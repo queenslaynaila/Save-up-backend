@@ -15,7 +15,9 @@ BEGIN
     INTO STRICT v_current_balance;
 
     IF v_current_balance < p_amount THEN
-        RAISE EXCEPTION 'Insufficient funds for withdrawal.';
+        RAISE EXCEPTION USING
+          MESSAGE = 'ERR_INSUFFICIENT_FUNDS',
+          ERRCODE = 'P0004';
     END IF;
 
     SELECT pocket_type, target_at
@@ -25,7 +27,9 @@ BEGIN
     AND pockets.entity_id = p_user_id;
 
     IF v_pocket_type = 'Locked' AND v_target_at <= NOW() THEN
-        RAISE EXCEPTION 'Target date not reached for withdrawal.';
+        RAISE EXCEPTION USING 
+            MESSAGE = 'ERR_FUNDS_LOCKED'
+            ERRCODE = 'P0005';
     END IF;
 
     v_new_balance = v_current_balance - p_amount;

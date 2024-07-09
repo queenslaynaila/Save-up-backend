@@ -15,7 +15,9 @@ BEGIN
        WHERE id = p_admin_id 
        AND role = 'Admin'
     ) THEN
-        RAISE EXCEPTION 'Only admins can update user roles';
+        RAISE EXCEPTION USING 
+            MESSAGE = 'ERR_NOT_ADMIN',
+            ERRCODE = 'P0002';
     END IF;
 
     SELECT users.full_name, users.role 

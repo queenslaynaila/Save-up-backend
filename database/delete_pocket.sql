@@ -7,8 +7,10 @@ BEGIN
     SELECT * FROM get_transaction_info(pocket_id, p_entity_id) 
     INTO STRICT v_current_balance;
 
-     IF v_current_balance > 0 THEN
-        RAISE EXCEPTION 'Cannot delete pocket because it has funds';
+    IF v_current_balance > 0 THEN
+        RAISE EXCEPTION USING
+            MESSAGE = 'ERR_CANT_DELETE_PKT_WITH_DEPOSITS',
+            ERRCODE = 'P0006';
     END IF;
 
     UPDATE pockets

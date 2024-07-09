@@ -12,9 +12,11 @@ BEGIN
   WHERE security_answers.user_id = p_user_id;
   
   IF v_answer_count >= 3 THEN
-     RAISE EXCEPTION 'User cannot have more than 3 security answers.';
+    RAISE EXCEPTION USING 
+        MESSAGE = 'ERR_MAX_ANSWERS_EXCEEDED',
+        ERRCODE = 'P0003';
   END IF;
-  
+
   INSERT INTO security_answers (user_id, question_id, answer) 
   VALUES (p_user_id, p_question_id, p_answer);
 END;

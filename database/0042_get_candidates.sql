@@ -20,14 +20,11 @@ BEGIN
     END IF;
     
     RETURN QUERY
-    SELECT u.id AS candidate_id, u.full_name
-    FROM users u
-    WHERE u.id IN (
-      SELECT c.candidate_id
-      FROM candidates c
-      WHERE c.group_id =  p_group_id  
-      AND c.election_id = p_election_id 
-    );
+    SELECT ucd.id AS candidate_id, ucd.full_name
+    FROM candidates c
+    JOIN user_contact_details ucd ON ucd.id = c.candidate_id
+    WHERE c.group_id = p_group_id  
+    AND c.election_id = p_election_id;
 END;
 $$ LANGUAGE plpgsql;
 

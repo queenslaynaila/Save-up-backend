@@ -12,21 +12,14 @@ DECLARE
 BEGIN
     IF NOT EXISTS (
         SELECT 1
-        FROM groups
-        WHERE id = p_group_id
-        AND deleted_at IS NULL
-    ) THEN
-        RAISE EXCEPTION 'INACTIVE_GROUP';
-    END IF;
-
-    IF NOT EXISTS (
-        SELECT 1
         FROM elections
         WHERE group_id = p_group_id
         AND xid = p_election_id
         AND status = 'Open'
     ) THEN
-        RAISE EXCEPTION 'ELECTION_CLOSED';
+        RAISE EXCEPTION USING 
+            MESSAGE = 'ERR_ELECTION_CLOSED',
+            ERRCODE = 'P0005';
     END IF;
 
     PERFORM check_grp_membership(p_user_id, p_group_id);
@@ -42,7 +35,9 @@ BEGIN
     AND election_id = p_election_id;
 
     IF ballots_cast < (total_members / 2.0) THEN
-        RAISE EXCEPTION 'INSUFFICIENT_VOTES';
+         RAISE EXCEPTION USING 
+            MESSAGE = 'ERR_INSUFFICIENT_VOTES',
+            ERRCODE = 'P0004';
     END IF;
 
     FOR candidate_id IN

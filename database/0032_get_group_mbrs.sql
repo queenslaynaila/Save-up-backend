@@ -9,15 +9,6 @@ RETURNS TABLE(
 DECLARE
     v_user_role   enum_user_role;
 BEGIN
-    IF NOT EXISTS (
-        SELECT 1
-        FROM groups
-        WHERE id = p_group_id
-        AND deleted_at IS NULL
-    ) THEN
-        RAISE EXCEPTION 'GROUP_NOT_ACTIVE';
-    END IF;
-
     SELECT role INTO STRICT v_user_role
     FROM users
     WHERE id = p_user_id;
@@ -29,13 +20,10 @@ BEGIN
 
     RETURN QUERY
     SELECT u.id AS user_id, u.full_name
-    FROM users u
-    WHERE u.id IN (
-        SELECT gm.user_id
-        FROM group_members gm
-        WHERE gm.group_id = p_group_id
-        AND gm.is_active = TRUE
-    ); ---Cant join due to separate distri
+    FROM user_contact_details u
+    JOIN group_members gm ON u.id = gm.user_id
+    WHERE gm.group_id = p_group_id
+    AND gm.is_active = TRUE;
 END;
 $$ LANGUAGE plpgsql
 

@@ -15,22 +15,15 @@ DECLARE
   v_recipient_id        INT;
   v_amount              NUMERIC; 
 BEGIN
-  IF NOT EXISTS (
-    SELECT 1
-    FROM groups
-    WHERE id = p_group_id
-    AND deleted_at IS NULL
-  ) THEN
-    RAISE EXCEPTION 'ERR_GROUP_NOT_ACTIVE';
-  END IF;
-
   PERFORM check_grp_membership(p_initiator_id, p_group_id);
 
   SELECT * FROM get_transaction_info(p_pocket_id, p_group_id) 
   INTO STRICT v_current_balance;
 
   IF v_current_balance < p_amount THEN
-    RAISE EXCEPTION 'ERR_INSUFICIENT_BALANCE';
+    RAISE EXCEPTION USING
+          MESSAGE = 'ERR_INSUFFICIENT_FUNDS',
+          ERRCODE = 'P0004';
   END IF;
 
   INSERT INTO group_withdrawal_requests (
@@ -62,5 +55,13 @@ GRANT EXECUTE ON FUNCTION initiate_grp_withdrawal(
   INT, INT, INT, INT, NUMERIC, enum_withdrawal_reason, JSON
 ) TO app_user;
 SELECT create_distributed_function(
-  'initiate_grp_withdrawal(INT, INT, INT, INT, NUMERIC, enum_withdrawal_reason, JSON)', 'p_group_id'
+  'initiate_grp_withdrawal(
+    INT, 
+    INT, 
+    INT, 
+    INT, 
+    NUMERIC, 
+    enum_withdrawal_reason, 
+    JSON[]
+  )', 'p_group_id'
 );

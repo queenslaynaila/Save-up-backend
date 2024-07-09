@@ -15,7 +15,9 @@ BEGIN
     AND xid = p_election_id
     AND status = 'Open'
   ) THEN
-    RAISE EXCEPTION 'ELECTION_CLOSED';
+    RAISE EXCEPTION USING 
+      MESSAGE = 'ERR_ELECTION_CLOSED',
+      ERRCODE = 'P0005';
   END IF;
 
   SELECT COUNT(*) INTO STRICT v_ballot_count 
@@ -25,7 +27,9 @@ BEGIN
   AND election_id = p_election_id;
   
   IF v_ballot_count >= 3 THEN
-    RAISE EXCEPTION 'MAX_VOTES_CAST';
+    RAISE EXCEPTION USING 
+        MESSAGE = 'ERR_MAX_VOTE_CAST',
+        ERRCODE = 'P0003';
   END IF;
   
   INSERT INTO ballots (group_id, election_id, candidate_id, user_id)
