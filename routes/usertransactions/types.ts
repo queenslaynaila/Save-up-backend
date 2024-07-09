@@ -1,5 +1,18 @@
 import { z } from 'zod';
 
+export const transactionByUser = z.object({
+  user_id: z.number(),
+  pocket_id: z.string()
+})
+
+export type TransactionByUser = z.infer<typeof transactionByUser>;
+
+export const transactionBody = transactionByUser.omit({
+  user_id: true
+})
+
+export type TransactionBody = z.infer<typeof transactionBody>;
+
 export const transactionType = {
   SAVING: 'Saving',
   EXTERNAL_SAVING: 'ExternalSaving',
@@ -8,13 +21,7 @@ export const transactionType = {
   TRANSFER_OUT: 'TransferOut'
 };
 
-export const getByEntitySchema = z.object({
-  entity_id: z.number().optional()
-})
-
-export type TransactionByEntity = z.infer<typeof getByEntitySchema>;
-
-export const baseTransactionSchema = z.object({
+export const baseTransaction = z.object({
   transaction_id: z.number().positive(),
   transaction_type: z.enum([
     transactionType.SAVING,
@@ -23,28 +30,18 @@ export const baseTransactionSchema = z.object({
     transactionType.TRANSFER_IN,
     transactionType.TRANSFER_OUT
   ]),
-  reference_no: z.string(),
   amount: z.number(),
   current_balance: z.number().positive(),
   transaction_date: z.date()
 })
 
-export type BaseTransaction = z.infer<typeof baseTransactionSchema>;
+export type BaseTransaction = z.infer<typeof baseTransaction>;
 
-
-export const getTransactionsInputSchema =z.object({
-  user_id: z.number(),
-  pocket_id: z.string()
-})
-
-export type TransactionInput = z.infer<typeof getTransactionsInputSchema>;
-
-export const transactionQueryParams = baseTransactionSchema.pick({
-  transaction_type: true,
+export const transactionQueryParams = baseTransaction.pick({
+  transaction_type: true
 }).extend({
-  pocket_id: z.string(),
   from_date:z.string(),
   to_date:z.string()
 }) 
 
-export type  TransactionQueryParams = z.infer<typeof transactionQueryParams>;
+export type TransactionQueryParams = z.infer<typeof transactionQueryParams>;

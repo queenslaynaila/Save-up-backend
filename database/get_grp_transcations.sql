@@ -1,14 +1,13 @@
 CREATE OR REPLACE FUNCTION get_group_transactions(
-    p_group_id INT,
-    p_user_id INT,
-    p_pocket_id INT
+    p_group_id        INT,
+    p_user_id         INT,
+    p_pocket_id       INT
 ) RETURNS TABLE (
-    transaction_id INT,
-    transaction_type INT,
-    reference_id INT,
-    delta NUMERIC,
-    balance NUMERIC,
-    transaction_date TIMESTAMP WITH TIME ZONE
+    transaction_id     INT,
+    transaction_type   INT,
+    delta              NUMERIC,
+    balance            NUMERIC,
+    transaction_date   TIMESTAMP WITH TIME ZONE
 ) AS $$
 DECLARE
     v_user_role enum_user_role;
@@ -33,7 +32,6 @@ BEGIN
     SELECT
         t.xid AS transaction_id,
         t.type_id AS transaction_type,
-        t.reference_id,
         t.delta,
         t.balance,
         t.created_at AS transaction_date

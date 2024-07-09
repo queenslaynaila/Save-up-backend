@@ -14,7 +14,8 @@ CREATE TABLE IF NOT EXISTS group_deposits (
   deposit_id            INT NOT NULL,
   user_id               INT NOT NULL,
   PRIMARY KEY           (group_id, deposit_id),
-  FOREIGN KEY           (group_id, deposit_id) REFERENCES transactions (entity_id, xid)
+  FOREIGN KEY           (group_id, deposit_id) REFERENCES transactions (entity_id, xid),
+  FOREIGN KEY           (group_id, user_id) REFERENCES group_members (group_id, user_id)
 );
 GRANT INSERT, SELECT ON group_deposits TO app_user;
 SELECT create_distributed_table('group_deposits', 'group_id');
@@ -59,3 +60,14 @@ CREATE TABLE IF NOT EXISTS group_withdrawals_approvals (
 );
 GRANT INSERT, SELECT ON  group_withdrawals_approvals TO app_user;
 SELECT create_distributed_table('group_withdrawals_approvals', 'group_id');
+
+CREATE TABLE IF NOT EXISTS group_withdrawals(
+  group_id              INT NOT NULL, 
+  withdrawal_id         INT NOT NULL,
+  user_id               INT NOT NULL,
+  PRIMARY KEY           (group_id, withdrawal_id),
+  FOREIGN KEY           (group_id, withdrawal_id) REFERENCES transactions (entity_id, xid),
+  FOREIGN KEY           (group_id, user_id) REFERENCES group_members (group_id, user_id)
+);
+GRANT INSERT, SELECT ON group_withdrawals TO app_user;
+SELECT create_distributed_table('group_withdrawals', 'group_id');

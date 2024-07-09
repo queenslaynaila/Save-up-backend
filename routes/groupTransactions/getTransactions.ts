@@ -1,39 +1,23 @@
 import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import { 
-  TransactionByUser,
+import { TransactionByGroup, 
   BaseTransaction,
-  TransactionBody,
-  TransactionQueryParams,
-  transactionBody
+  TransactionInput,
+  transactionInput,
 } from './types';
+import { TransactionQueryParams } from '../usertransactions/types';
 import { validateRequest } from '../../middleware/validationMiddleware';
 
-const SQL_GET_TRANSACTIONS = sql<TransactionByUser, BaseTransaction>(`
-  SELECT 
-    transactions.xid AS transaction_id, 
-    transaction_types.slug AS transaction_type,
-    transactions.delta,
-    transactions.balance,
-    transactions.created_at AS transaction_date
-  FROM 
-    transactions
-  JOIN 
-    transaction_types ON transactions.type_id = transaction_types.id
-  WHERE 
-    transactions.entity_id = :user_id
-  AND transactions.pocket_id = :pocket_id;
-  ORDER BY 
-    transactions.created_at DESC;
-  LIMIT 10;
+const SQL_GROUP_TRANSACTIONS = sql<TransactionByGroup, BaseTransaction>(`
+ SELECT * FROM get_group_transactions(:pocket_id, :user_id, :group_id);
 `);
 
 export default (router: Router) => {
-  router.get<Record<string,never>, BaseTransaction[], TransactionBody, 
+  router.get<Record<string,never>, BaseTransaction[], TransactionInput, 
   TransactionQueryParams>(
     '/', 
-    validateRequest(transactionBody),
+    validateRequest(transactionInput),
     authMiddleware(),
     async (req, res) => {
       const { transaction_type, from_date, to_date } = req.query;
@@ -59,13 +43,14 @@ export default (router: Router) => {
         }
       }
       
-      const query = SQL_GET_TRANSACTIONS({ 
+      const query = SQL_GROUP_TRANSACTIONS({ 
         pocket_id:req.body.pocket_id, 
-        user_id:req.user!.id 
+        user_id:req.user!.id,
+        group_id: req.body.group_id 
       });
+
       if (filters.length > 0) query.extend(`AND ${filters.join(' AND ')}`, filterArgs);
       query.extend('LIMIT 15', {});
-      
       return res.json(await query.many());
     });
 };
