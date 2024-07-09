@@ -1,9 +1,5 @@
 ## Getting Started
-This guide will assist you in setting up and exploring the SaveUp Backend API. 
-SaveUp is a mobile application designed to empower users to save money effectively and efficiently. 
-This backend API serves as the foundation for the SaveUp app, enabling users to save, track expenses, and withdraw their savings.
-
-To understand the custom error codes used in our PostgreSQL functions & procedures, refer to the 
+To understand the custom error codes used in PostgreSQL functions & procedures, refer to the 
 [Custom PostgreSQL Error Codes Documentation](./error-codes.md) for detailed descriptions and usage examples.
 
 ## Technology Stack
