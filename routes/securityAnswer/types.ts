@@ -13,6 +13,8 @@ export const answerCreationValidation = securityAnswersBaseSchema.pick({
   answer: true
 })
 
+export type AnswerCreationType = z.infer<typeof answerCreationValidation>;
+
 export const answerByUserSchema = securityAnswersBaseSchema.pick({
   user_id: true
 })
