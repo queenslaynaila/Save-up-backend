@@ -1,6 +1,15 @@
+CREATE TYPE enum_entity_type AS ENUM ('User', 'Group', 'Donor');
 CREATE TYPE enum_id_type AS ENUM ('National ID', 'Passport ID');
 CREATE TYPE enum_user_role AS ENUM ('Admin', 'Standard', 'Moderator');
 CREATE TYPE enum_gender AS ENUM ('Male', 'Female');
+
+CREATE TABLE IF NOT EXISTS entities (
+  id              SERIAL PRIMARY KEY,
+  entity_type     enum_entity_type NOT NULL, 
+  created_at      TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+);
+SELECT create_reference_table('entities');
+GRANT INSERT, SELECT ON entities TO app_user;  
 
 CREATE TABLE IF NOT EXISTS user_contact_details (
   id              INT PRIMARY KEY,  
