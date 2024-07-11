@@ -6,9 +6,11 @@ import {
   BaseTransaction,
   TransactionBody,
   TransactionQueryParams,
-  transactionBody
+  transactionBody,
+  transactionQueryParams
 } from './types';
-import { validateRequest } from '../../middleware/validationMiddleware';
+import validateRequest from '../../middleware/validationMiddleware';
+import { headersSchema } from '../../globalTypes';
 
 const SQL_GET_TRANSACTIONS = sql<TransactionByUser, BaseTransaction>(`
   SELECT 
@@ -33,7 +35,11 @@ export default (router: Router) => {
   router.get<Record<string,never>, BaseTransaction[], TransactionBody, 
   TransactionQueryParams>(
     '/', 
-    validateRequest(transactionBody),
+    validateRequest({ 
+      headers: headersSchema, 
+      body:transactionBody, 
+      query:transactionQueryParams 
+    }),
     authMiddleware(),
     async (req, res) => {
       const { transaction_type, from_date, to_date } = req.query;
