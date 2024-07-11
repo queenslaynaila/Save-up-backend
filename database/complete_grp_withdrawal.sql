@@ -28,7 +28,9 @@ BEGIN
     v_new_balance := v_current_balance - v_amount;
     v_reference_id := floor(random() * 1000000 + 1)::INT;
        
-    INSERT INTO transactions (entity_id, xid, type_id, pocket_id, reference_id, delta, balance)
+    INSERT INTO transactions (
+        entity_id, xid, type_id, pocket_id, reference_id, delta, balance
+    )
         SELECT
             p_group_id,
             COALESCE(MAX(xid), 0) + 1, 

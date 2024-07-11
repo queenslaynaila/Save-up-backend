@@ -61,7 +61,9 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-GRANT EXECUTE ON FUNCTION approve_group_withdrawal(INT, INT, INT, enum_approval_status, TEXT) TO app_user;
+GRANT EXECUTE ON FUNCTION approve_group_withdrawal(
+    INT, INT, INT, enum_approval_status, TEXT
+) TO app_user;
 SELECT create_distributed_function(
   'approve_group_withdrawal(INT, INT, INT, enum_approval_status, TEXT)', 'p_group_id'
 )

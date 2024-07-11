@@ -18,7 +18,9 @@ BEGIN
     v_reference_id := floor(random() * 1000000 + 1)::INT;
     v_new_balance := v_current_balance + p_amount;
 
-    INSERT INTO transactions(entity_id, xid, type_id, pocket_id, reference_id, delta, balance)
+    INSERT INTO transactions(
+        entity_id, xid, type_id, pocket_id, reference_id, delta, balance
+    )
     SELECT
         p_group_id,
         COALESCE(MAX(xid), 0) + 1,
@@ -38,4 +40,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 GRANT EXECUTE ON FUNCTION create_group_deposit(INT, INT, INT, NUMERIC) TO app_user;
-SELECT create_distributed_function('create_group_deposit(INT, INT, INT, NUMERIC)', 'p_group_id');
+SELECT create_distributed_function(
+    'create_group_deposit(INT, INT, INT, NUMERIC)', 
+    'p_group_id'
+);
