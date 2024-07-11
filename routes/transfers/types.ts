@@ -7,6 +7,8 @@ export const transferValidationSchema = z.object({
   amount: z.number().gte(0),
 });
 
+export type TransferValidation = z.infer<typeof transferValidationSchema>;
+
 export const transferCreationSchema = transferValidationSchema.extend({
   user_id: z.number().positive(),
 });
