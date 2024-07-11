@@ -1,8 +1,10 @@
 import { Router } from 'express';
 import { sql } from '../../db';
+import validateRequest from '../../middleware/validationMiddleware';
 import authMiddleware from '../../middleware/authorization';
 import { SecurityQuestions } from './types';
 import { AnswerByUserType } from '../securityAnswer/types';
+import { headersSchema } from '../../globalTypes';
 
 const SQL_GET_USER_SECURITY_QUESTIONS = sql<AnswerByUserType, SecurityQuestions>(`
   SELECT security_questions.id, security_questions.question 
@@ -16,6 +18,7 @@ export default (router: Router) => {
   router.get<Record<string,never>, SecurityQuestions[], Record<string,never>, 
   Record<string,never>>(
     '/me/', 
+    validateRequest({ headers: headersSchema }),
     authMiddleware(),
     async (req, res) => {
       const securityQuestions = await SQL_GET_USER_SECURITY_QUESTIONS({
