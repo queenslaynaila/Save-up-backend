@@ -1,11 +1,14 @@
 import z from 'zod' 
 
-export const withdrawalValidationSchema = z.object({
+export const withdrawalBodySchema = z.object({
   pocket_id: z.number().positive(),
   amount: z.number().gte(0),
 })
 
-export const withdrawalCreationSchema = withdrawalValidationSchema.extend({
+export type WithdrawalBody = z.infer<typeof withdrawalBodySchema>
+
+
+export const withdrawalCreationSchema = withdrawalBodySchema.extend({
   user_id: z.number().positive(),
 });
 
