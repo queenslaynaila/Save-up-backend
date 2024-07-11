@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import bcrypt from 'bcrypt';
 import { sql } from '../../db';
-import { validateRequest } from '../../middleware/validationMiddleware';
+import validateRequest from '../../middleware/validationMiddleware';
 import { UserCreationType, userCreationSchema } from './types';
 import { StatusCodeInterface } from '../../globalTypes/index';
 
@@ -13,7 +13,7 @@ export default (router: Router) => {
   router.post<Record<string,never>, StatusCodeInterface, UserCreationType, 
   Record<string,never>>(
     '/',
-    validateRequest(userCreationSchema),
+    validateRequest({ body: userCreationSchema }),
     async (req, res) => {         
       const pinHash = bcrypt.hashSync(req.body.pin, 12);
       await SQL_CREATE_USER({ ...req.body, pin: pinHash })

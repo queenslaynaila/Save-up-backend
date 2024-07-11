@@ -3,7 +3,7 @@ import bcrypt from 'bcrypt';
 import { sql } from '../../db';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { generateToken } from '../../middleware/generatetoken';
-import { validateRequest } from '../../middleware/validationMiddleware';
+import validateRequest from '../../middleware/validationMiddleware';
 import { loginSchema, LoginType,  UserType, LoginAttempt } from './types';
 
 type UserWithoutPin = Omit<UserType, 'pin'>;
@@ -54,7 +54,7 @@ const SQL_COUNT_LAST_FAILED_ATTEMPTS = sql<{id: number},{failed_count: number}>(
 export default (router: Router) => {
   router.post<Record<string, never>, UserWithoutPin, LoginType, Record<string, never>>(
     '/login',
-    validateRequest(loginSchema),
+    validateRequest({ body: loginSchema }),
     async (req, res) => {
       const { pin, ...user } = await SQL_GET_USER({ 
         phone_number: req.body.phone_number 

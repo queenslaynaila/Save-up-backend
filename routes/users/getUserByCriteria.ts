@@ -1,9 +1,16 @@
 import { Router } from 'express';
 import { sql } from '../../db';
+import validateRequest from '../../middleware/validationMiddleware';
 import { HttpError } from '../../middleware/errorMiddleware';
 import authMiddleware from '../../middleware/authorization';
 import isStandardUser from '../../middleware/isStandardUser';
-import {  UserType, UserByEntityType, UserQueryParams  } from './types';
+import {  UserType, 
+  UserByEntityType, 
+  UserQueryParams, 
+  userQuerySchema, 
+  userByEntitySchema  
+} from './types';
+import { headersSchema } from '../../globalTypes';
 
 const SQL_GET_USER_BY_CRITERIA = sql<Record<string,never>,  UserType>(`
   SELECT 
@@ -24,6 +31,9 @@ const SQL_GET_USER_BY_CRITERIA = sql<Record<string,never>,  UserType>(`
 export default (router: Router) => {
   router.get<string, UserByEntityType,  UserType[], Record<string,never>, UserQueryParams>(
     '/:entity', 
+    validateRequest({ 
+      headers:headersSchema, params:userByEntitySchema, query: userQuerySchema 
+    }),
     authMiddleware(), 
     async (req, res) => {
       const  targetUser = req.params.entity;

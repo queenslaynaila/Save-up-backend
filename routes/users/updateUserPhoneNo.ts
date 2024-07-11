@@ -3,9 +3,9 @@ import bcrypt from 'bcrypt';
 import { sql } from '../../db';
 import { HttpError } from '../../middleware/errorMiddleware';
 import authMiddleware from '../../middleware/authorization';
-import  { validateRequest } from '../../middleware/validationMiddleware';
+import  validateRequest from '../../middleware/validationMiddleware';
 import { loginSchema, PhoneNoUpdateType } from './types';
-import { StatusCodeInterface } from '../../globalTypes/index';
+import { headersSchema, StatusCodeInterface } from '../../globalTypes/index';
 
 const SQL_GET_USER_PIN = sql<{ id: number }, { pin: string }>(`
   SELECT pin FROM users WHERE id = :id
@@ -19,8 +19,8 @@ export default (router: Router) => {
   router.patch<Record<string,never>, StatusCodeInterface, PhoneNoUpdateType , 
   Record<string,never>>(
     '/me', 
+    validateRequest({ headers: headersSchema, body:loginSchema }),
     authMiddleware(), 
-    validateRequest(loginSchema),
     async (req, res) => {
       const id = req.user!.id
       const userPassword = await SQL_GET_USER_PIN({ id}).one(
