@@ -3,7 +3,8 @@ import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import validateRequest from '../../middleware/validationMiddleware';  
 import {  headersSchema, 
-  StatusCodeInterface } from '../../globalTypes/index';
+  StatusCodeInterface 
+} from '../../globalTypes/index';
 import { ElectionInterface, 
   ElectionValidation, 
   electionValidation } from './types';

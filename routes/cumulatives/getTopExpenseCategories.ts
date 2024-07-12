@@ -5,7 +5,9 @@ import { TopExpenseCategoriesInterface, UserCumulaInterface } from './types'
 import validateRequest from '../../middleware/validationMiddleware';
 import { headersSchema } from '../../globalTypes';
 
-const SQL_GET_TOP_EXPENDITURE_CATEGORIES = sql<UserCumulaInterface, TopExpenseCategoriesInterface>(`
+const SQL_GET_TOP_EXPENDITURE_CATEGORIES = sql<
+UserCumulaInterface, TopExpenseCategoriesInterface
+>(`
   SELECT 
     e.category_id, 
     c.name AS category_name, 

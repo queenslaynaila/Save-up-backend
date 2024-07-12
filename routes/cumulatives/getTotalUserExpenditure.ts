@@ -2,7 +2,10 @@ import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { HttpError } from '../../middleware/errorMiddleware';
-import { TotalExpenseInterface, TotalExpenseQueryInterface, UserCumulaInterface } from './types'
+import { TotalExpenseInterface, 
+  TotalExpenseQueryInterface, 
+  UserCumulaInterface 
+} from './types'
 import { headersSchema } from '../../globalTypes';
 import validateRequest from '../../middleware/validationMiddleware';
 
