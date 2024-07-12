@@ -1,36 +1,42 @@
 import { Router } from 'express';
 import { sql } from '../../db';
-import { HttpError } from '../../middleware/errorMiddleware';
+import { headersSchema, UserRole } from '../../globalTypes/index';
 import authMiddleware from '../../middleware/authorization';
 import { convertToTitleCase } from '../../middleware/caseNormalization';
-import { headersSchema, UserRole } from '../../globalTypes/index';
-import { StatsQueryInterface, 
-  StatsParamInterface,
-  FinancialStatsInterface, 
-  ValidOperatorsEnum, 
-  ValidResourcesEnum, 
-  ValidStatusEnum,  
-  statsParamSchema
-} from './types';
+import { HttpError } from '../../middleware/errorMiddleware';
 import validateRequest from '../../middleware/validationMiddleware';
+import {
+  FinancialStatsInterface,
+  StatsParamInterface,
+  statsParamSchema,
+  StatsQueryInterface,
+  ValidOperatorsEnum,
+  ValidResourcesEnum,
+  ValidStatusEnum,
+} from './types';
 
-const SQL_GET_CUMULATIVES = (query: string) =>sql<{ operator: string; resource: string }, 
-FinancialStatsInterface>(query);
+const SQL_GET_CUMULATIVES = (query: string) =>
+  sql<{ operator: string; resource: string }, FinancialStatsInterface>(query);
 
 export default (router: Router) => {
-  router.get<StatsParamInterface, FinancialStatsInterface, Record<string,never>, 
-  StatsQueryInterface>(
+  router.get<
+  StatsParamInterface,
+  FinancialStatsInterface,
+  Record<string, never>,
+  StatsQueryInterface
+  >(
     '/:resource/:operator',
     validateRequest({
       headers: headersSchema,
-      params:statsParamSchema
+      params: statsParamSchema,
     }),
     authMiddleware({ roles: [UserRole.ADMIN] }),
     async (req, res) => {
       req.params.resource = req.params.resource.toLowerCase();
       req.params.operator = req.params.operator.toUpperCase();
       const { resource, operator } = req.params;
-      const { user_id, priority, status, category_id, start_date, end_date } = req.query 
+      const { user_id, priority, status, category_id, start_date, end_date } =
+        req.query;
       const formattedStatus = status ? convertToTitleCase(status) : '';
       if (!ValidResourcesEnum.safeParse(resource).success) {
         throw new HttpError(400);
@@ -38,10 +44,10 @@ export default (router: Router) => {
       if (!ValidOperatorsEnum.safeParse(operator).success) {
         throw new HttpError(400);
       }
-      if ( status && !ValidStatusEnum.safeParse(status).success) {
+      if (status && !ValidStatusEnum.safeParse(status).success) {
         throw new HttpError(400);
       }
-      let query = `SELECT COALESCE(${operator}(amount), 0) AS ${operator} 
+      let query = `SELECT COALESCE(${operator}(amount), 0) AS ${operator}
       FROM ${resource} WHERE 1=1`;
       if (['savings', 'expenses'].includes(resource)) {
         if (user_id) query += ` AND user_id = '${user_id}'`;
@@ -53,7 +59,10 @@ export default (router: Router) => {
       if (resource === 'savings' && status) {
         query += ` AND status = '${formattedStatus}'`;
       }
-      const values: { operator: string; resource: string } = { operator, resource };
+      const values: { operator: string; resource: string } = {
+        operator,
+        resource,
+      };
       const result = await SQL_GET_CUMULATIVES(query)(values).one();
       res.json(result);
     }

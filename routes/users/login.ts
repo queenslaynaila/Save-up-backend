@@ -60,7 +60,9 @@ export default (router: Router) => {
         phone_number: req.body.phone_number 
       }).one(new HttpError(401));
 
-      const { failed_count } = await SQL_COUNT_LAST_FAILED_ATTEMPTS({ id: user.id }).one();  
+      const { failed_count } = await SQL_COUNT_LAST_FAILED_ATTEMPTS({ 
+        id: user.id 
+      }).one();  
       
       if (failed_count >= 3) {
         await SQL_RECORD_LOGIN({
