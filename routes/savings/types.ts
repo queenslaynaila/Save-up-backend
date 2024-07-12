@@ -25,6 +25,8 @@ export const savingPostRequestSchema =  baseSavingSchema.pick({
   pocket_id: z.number()
 })
 
+export type SavingPostRequestType = z.infer<typeof savingPostRequestSchema>; 
+
 export const savingsQueryParamSchema = z.object({
   pocket_id:z.string(),
   start_date: z.string(),

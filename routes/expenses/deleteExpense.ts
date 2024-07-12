@@ -4,8 +4,13 @@ import authMiddleware from '../../middleware/authorization';
 import { 
   IdParamInterface, 
   XidEntityInterface, 
-  StatusCodeInterface 
+  StatusCodeInterface, 
+  headersSchema,
+  idParamSchema,
+  entitySchema,
+  EntityInterface
 } from '../../globalTypes/index'
+import validateRequest from '../../middleware/validationMiddleware';
 
 const SQL_DELETE_EXPENSE = sql<XidEntityInterface, Record<string,never>>(`
   UPDATE expenses
@@ -16,12 +21,17 @@ const SQL_DELETE_EXPENSE = sql<XidEntityInterface, Record<string,never>>(`
 `);
 
 export default (router: Router) => {
-  router.delete<IdParamInterface, StatusCodeInterface , XidEntityInterface, 
+  router.delete<IdParamInterface, StatusCodeInterface, EntityInterface, 
   Record<string,never>>(
     '/:id', 
+    validateRequest({
+      headers: headersSchema, 
+      params: idParamSchema,
+      body:entitySchema
+    }),
     authMiddleware(), 
     async (req, res) => {
-      const entity_id =  req.body.entity_id ?? req.user!.id;
+      const entity_id =  req.body?.entity_id ?? req.user!.id;
       await SQL_DELETE_EXPENSE({
         xid: parseInt(req.params.id), entity_id
       }).exec();

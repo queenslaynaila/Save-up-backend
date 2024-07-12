@@ -3,21 +3,29 @@ import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { TransactionByGroup, 
   BaseTransaction,
-  TransactionInput,
-  transactionInput,
+  TransactionByPkt,
+  transactionByPkt,
 } from './types';
-import { TransactionQueryParams } from '../usertransactions/types';
-import { validateRequest } from '../../middleware/validationMiddleware';
+import { 
+  transactionQueryParams, 
+  TransactionQueryParams 
+} from '../usertransactions/types';
+import validateRequest from '../../middleware/validationMiddleware';
+import { headersSchema } from '../../globalTypes';
 
 const SQL_GROUP_TRANSACTIONS = sql<TransactionByGroup, BaseTransaction>(`
  SELECT * FROM get_group_transactions(:pocket_id, :user_id, :group_id);
 `);
 
 export default (router: Router) => {
-  router.get<Record<string,never>, BaseTransaction[], TransactionInput, 
+  router.get<Record<string,never>, BaseTransaction[], TransactionByPkt, 
   TransactionQueryParams>(
     '/', 
-    validateRequest(transactionInput),
+    validateRequest({
+      headers: headersSchema, 
+      body:transactionByPkt,
+      query:transactionQueryParams
+    }),
     authMiddleware(),
     async (req, res) => {
       const { transaction_type, from_date, to_date } = req.query;
@@ -44,9 +52,8 @@ export default (router: Router) => {
       }
       
       const query = SQL_GROUP_TRANSACTIONS({ 
-        pocket_id:req.body.pocket_id, 
+        ...req.body,
         user_id:req.user!.id,
-        group_id: req.body.group_id 
       });
 
       if (filters.length > 0) query.extend(`AND ${filters.join(' AND ')}`, filterArgs);

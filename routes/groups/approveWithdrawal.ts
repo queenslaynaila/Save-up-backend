@@ -1,9 +1,16 @@
 import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import { validateRequest } from '../../middleware/validationMiddleware';
-import { groupCreationValidation,  ApproveWithdrawal } from './types';
-import { IdParamInterface, StatusCodeInterface } from '../../globalTypes/index';
+import  validateRequest  from '../../middleware/validationMiddleware';
+import { ApproveWithdrawal, 
+  withdrawal, 
+  Withdrawal 
+} from './types';
+import { headersSchema, 
+  IdParamInterface, 
+  idParamSchema, 
+  StatusCodeInterface 
+} from '../../globalTypes/index';
 
 const SQL_APPROVE_GRP_WITHDRAWAL = sql<ApproveWithdrawal, Record<string, never>>(`
     SELECT approve_group_withdrawal(
@@ -12,11 +19,15 @@ const SQL_APPROVE_GRP_WITHDRAWAL = sql<ApproveWithdrawal, Record<string, never>>
 `);
 
 export default (router: Router) => {
-  router.post<IdParamInterface, StatusCodeInterface, ApproveWithdrawal, 
+  router.post<IdParamInterface, StatusCodeInterface, Withdrawal, 
   Record<string, never>>(
     '/approve-withdrawal/:id', 
+    validateRequest({
+      headers: headersSchema, 
+      params: idParamSchema,
+      body: withdrawal
+    }),
     authMiddleware(),
-    validateRequest(groupCreationValidation),
     async (req, res) => {
       await SQL_APPROVE_GRP_WITHDRAWAL({
         ...req.body,
@@ -27,5 +38,3 @@ export default (router: Router) => {
     }
   );
 };
-
-

@@ -3,6 +3,8 @@ import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { TotalExpenseInterface, TotalExpenseQueryInterface, UserCumulaInterface } from './types'
+import { headersSchema } from '../../globalTypes';
+import validateRequest from '../../middleware/validationMiddleware';
 
 const SQL_GET_TOTAL_EXPENSES = sql<UserCumulaInterface, TotalExpenseInterface>(`
   SELECT COALESCE(SUM(amount_spent), 0) AS total_expenses
@@ -14,6 +16,9 @@ export default (router: Router) => {
   router.get<Record<string,never>, TotalExpenseInterface, Record<string,never>, 
   TotalExpenseQueryInterface>(
     '/total-expenses', 
+    validateRequest({
+      headers: headersSchema
+    }), 
     authMiddleware(), 
     async (req, res) => {
       const user_id = req.user!.id;

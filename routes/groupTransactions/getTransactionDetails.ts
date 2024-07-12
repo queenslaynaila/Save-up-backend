@@ -6,7 +6,12 @@ import { TransactionRecipients,
   TransactionInput,
   transactionInput,
 } from './types';
-import { validateRequest } from '../../middleware/validationMiddleware';
+import validateRequest from '../../middleware/validationMiddleware';
+import { 
+  headersSchema, 
+  IdParamInterface, 
+  idParamSchema 
+} from '../../globalTypes';
 
 const SQL_GROUP_TRANSACTIONS = sql<TransactionRecipients, TransactionDetails >(`
   SELECT * FROM get_group_transaction_details(
@@ -15,16 +20,20 @@ const SQL_GROUP_TRANSACTIONS = sql<TransactionRecipients, TransactionDetails >(`
 `);
 
 export default (router: Router) => {
-  router.get<Record<string,never>, TransactionDetails[], TransactionInput, 
+  router.get<IdParamInterface, TransactionDetails[], TransactionInput, 
   Record<string,never>>(
-    '/:transaction_id', 
-    validateRequest(transactionInput),
+    '/:id', 
+    validateRequest({
+      headers: headersSchema, 
+      params:idParamSchema, 
+      body:transactionInput
+    }),
     authMiddleware(),
     async (req, res) => {
       const members = await SQL_GROUP_TRANSACTIONS({ 
         user_id: req.user!.id, 
         group_id: req.body.group_id, 
-        transaction_id: req.params.transaction_id
+        transaction_id: parseInt(req.params.id)
       }).many();  
       return res.json(members);
     });

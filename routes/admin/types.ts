@@ -34,3 +34,9 @@ export const userRoleUpdateSchema = z.object({
 });
 
 export type UserRoleUpdateInterface = z.infer<typeof userRoleUpdateSchema>;
+
+export const phoneNumber = z.object({
+  phone_number: z.string()
+});
+
+export type PhoneNumberInterface = z.infer<typeof phoneNumber>;

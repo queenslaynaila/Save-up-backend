@@ -24,6 +24,8 @@ export type GroupCreationInterface = z.infer<typeof groupCreationSchema>;
 
 export const groupCreationValidation = groupCreationSchema.omit({created_by:true})
 
+export type GroupCreationValidation = z.infer<typeof groupCreationValidation>;
+
 export const sharedGRoupSchema = z.object({
   logged_in_user_id: z.number(), 
   user_id: z.number() 
@@ -85,3 +87,10 @@ export const approveWithdrawalSchema = z.object({
 });
 
 export type ApproveWithdrawal = z.infer<typeof approveWithdrawalSchema>;
+
+export const withdrawal = approveWithdrawalSchema.omit({
+  admin_id: true,
+  group_id: true
+})
+
+export type Withdrawal = z.infer<typeof withdrawal>;

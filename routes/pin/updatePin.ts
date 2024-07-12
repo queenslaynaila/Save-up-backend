@@ -4,11 +4,18 @@ import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { resetPasswordLimiter } from '../../services/rateLimit';
-import { UpdatePasswordInterface, 
+import { 
+  UpdatePasswordInterface, 
   ResetPasswordRequestInterface, 
-  ResetPinInterface  
+  ResetPinInterface,  
+  updatePasswordSchema
 } from './types';
-import {  StatusCodeInterface, GetByIdInterface } from '../../globalTypes/index';
+import {  
+  StatusCodeInterface, 
+  GetByIdInterface, 
+  headersSchema 
+} from '../../globalTypes/index';
+import validateRequest from '../../middleware/validationMiddleware';
 
 const SQL_GET_PASSWORD_BY_ID = sql<GetByIdInterface, ResetPinInterface >(`
   SELECT pin FROM users 
@@ -23,7 +30,11 @@ const SQL_UPDATE_PASSWORD = sql< ResetPasswordRequestInterface, Record<string,ne
 export default (router: Router) => {
   router.patch<Record<string,never>, StatusCodeInterface, UpdatePasswordInterface, 
   Record<string,never>>(
-    '/', 
+    '/',
+    validateRequest({ 
+      headers: headersSchema, 
+      body: updatePasswordSchema
+    }), 
     authMiddleware(), 
     resetPasswordLimiter,
     async (req, res) => {

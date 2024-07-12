@@ -1,20 +1,30 @@
 import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import { BaseSavingType, SavingsQueryParamType } from './types';
+import { BaseSavingType, 
+  savingsQueryParamSchema, 
+  SavingsQueryParamType 
+} from './types';
+import validateRequest from '../../middleware/validationMiddleware';
+import { EntityInterface, entitySchema, headersSchema } from '../../globalTypes';
  
-const SQL_GET_SAVINGS = sql<{entity_id: number}, BaseSavingType>(`
+const SQL_GET_SAVINGS = sql< {entity_id: number }, BaseSavingType>(`
   SELECT * FROM savings
   WHERE entity_id = :entity_id
 `);
 
 export default (router: Router) => {
-  router.get<string, Record<string,never>, BaseSavingType[], Record<string,never>, 
+  router.get<string, Record<string,never>, BaseSavingType[], EntityInterface, 
   SavingsQueryParamType>(
     '/', 
+    validateRequest({ 
+      headers: headersSchema,
+      body: entitySchema,
+      query:savingsQueryParamSchema
+    }),
     authMiddleware(), 
     async (req, res) => {
-      const entity_id = req.body.entity_id ?? req.user!.id; // either grp or user
+      const entity_id = req.body?.entity_id ?? req.user!.id; // either grp or user
       const { pocket_id, start_date, end_date } = req.query;
 
       const filterArgs: Record<string, string> = {};

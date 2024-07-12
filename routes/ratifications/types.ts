@@ -25,5 +25,14 @@ export const ratificationResults = z.object({
 export type RatificationResultsInterface = z.infer<typeof ratificationResults>
 
 export const ratificationValidation = ratificationSchema.omit({
+  user_id: true,
+  is_ratified: true
+})
+
+export type RatificationValidationInterface = z.infer<typeof ratificationValidation>
+
+export const computeStatus = ratificationSchema.omit({
   user_id: true
 })
+
+export type ComputeStatusInterface = z.infer<typeof computeStatus>

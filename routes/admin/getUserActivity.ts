@@ -2,16 +2,16 @@ import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { BaseTransaction,
-  TransactionQueryParams,
-  TransactionByEntity,
-  baseTransactionSchema 
+  TransactionQueryParams
 } from '../usertransactions/types';
-import { validateRequest } from '../../middleware/validationMiddleware';
+import validateRequest from '../../middleware/validationMiddleware';
 import { UserRole, 
   GetByPhoneInterface,  
-  GetByIdInterface  
+  GetByIdInterface,  
+  headersSchema
 } from '../../globalTypes/index';
 import { HttpError } from '../../middleware/errorMiddleware'; 
+import { phoneNumber, PhoneNumberInterface } from './types';
 
 const SQL_GET_USER = sql<GetByPhoneInterface, GetByIdInterface>(`
   SELECT id 
@@ -19,7 +19,7 @@ const SQL_GET_USER = sql<GetByPhoneInterface, GetByIdInterface>(`
   WHERE phone_number = :phone_number
 `);
 
-const SQL_GET_TRANSACTIONS = sql<TransactionByEntity,  BaseTransaction>(`
+const SQL_GET_TRANSACTIONS = sql<{ entity_id:number },  BaseTransaction>(`
   SELECT xid AS transaction_id, 
          transaction_type, 
          amount, 
@@ -31,10 +31,13 @@ const SQL_GET_TRANSACTIONS = sql<TransactionByEntity,  BaseTransaction>(`
 `);
 
 export default (router: Router) => {
-  router.get<Record<string,never>,  BaseTransaction[], { phone_number: string }, 
+  router.get<Record<string,never>, BaseTransaction[], PhoneNumberInterface, 
   TransactionQueryParams>(
     '/transactions', 
-    validateRequest(baseTransactionSchema),
+    validateRequest({
+      headers: headersSchema,
+      body:phoneNumber
+    }),
     authMiddleware({ roles: [UserRole.ADMIN] }),
     async (req, res) => {
       const phone_number = req.body.phone_number;

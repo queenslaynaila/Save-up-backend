@@ -3,7 +3,15 @@ import { sql } from '../../db';
 import { HttpError } from '../../middleware/errorMiddleware';
 import authMiddleware from '../../middleware/authorization';
 import { BaseExpenseInterface } from './types';
-import { IdParamInterface, XidEntityInterface } from '../../globalTypes/index'
+import { 
+  EntityInterface,
+  entitySchema,
+  headersSchema, 
+  IdParamInterface, 
+  idParamSchema, 
+  XidEntityInterface 
+} from '../../globalTypes/index'
+import validateRequest from '../../middleware/validationMiddleware';
 
 const SQL_GET_EXPENSE_BY_ID = sql<XidEntityInterface,  BaseExpenseInterface>(`
   SELECT xid, entity_id, category_id, description, amount, spent_at, created_at
@@ -14,12 +22,17 @@ const SQL_GET_EXPENSE_BY_ID = sql<XidEntityInterface,  BaseExpenseInterface>(`
 `);
 
 export default (router: Router) => {
-  router.get<IdParamInterface, BaseExpenseInterface, Record<string,never>, 
+  router.get<IdParamInterface, BaseExpenseInterface, EntityInterface, 
   Record<string,never>>(
     '/me/:id', 
+    validateRequest({
+      headers: headersSchema, 
+      params: idParamSchema,
+      body:entitySchema
+    }),
     authMiddleware(), 
     async (req, res) => {
-      const entity_id = req.body.entity_id ?? req.user!.id;
+      const entity_id = req.body?.entity_id ?? req.user!.id;
       const result = await SQL_GET_EXPENSE_BY_ID({ xid:parseInt(req.params.id), entity_id })
         .one(new HttpError(404));
       return res.json(result);

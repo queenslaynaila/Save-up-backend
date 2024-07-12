@@ -27,6 +27,13 @@ export const AnswerUpdateSchema = securityAnswersBaseSchema.extend({
 
 export type AnswerUpdateType = z.infer<typeof AnswerUpdateSchema>;
 
+export const answerbodySchema = AnswerUpdateSchema.omit({ 
+  user_id: true,
+  question_id: true
+})
+
+export type AnswerBodyType = z.infer<typeof answerbodySchema>;
+
 export const answerTokenSchema =  AnswerUpdateSchema.pick({
   user_id: true
 }).extend({

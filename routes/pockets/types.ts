@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
-const basePocketSchema = z.object({
-  entity_id: z.number(),
+export const basePocketSchema = z.object({
+  entity_id: z.number().optional(),
   xid: z.number(),
   category_id: z.number(),
   name: z.string(),
@@ -24,7 +24,7 @@ const pocketCreateSchema = basePocketSchema.pick({
   pocket_type: true,
   target_amount: true,
   target_at: true,
-});
+}).required();
 
 export type PocketCreateType = z.infer<typeof pocketCreateSchema>;
 
@@ -60,15 +60,16 @@ export const PocketUpdateSchema = basePocketSchema.pick({
   target_at: true,
   pocket_type: true
 }).partial().extend({
-  entity_id: z.number(),
+  entity_id: z.number().optional(),
   xid: z.number(),
 });
 
 export type PocketUpdateType = z.infer<typeof PocketUpdateSchema>;
 
 export const pocketPatchRequestSchema = PocketUpdateSchema.omit({
-  entity_id: true,
   xid: true
+}).extend({
+  entity_id: z.number().optional()
 });
 
 export type PocketPatchType = z.infer<typeof pocketPatchRequestSchema>;

@@ -1,9 +1,12 @@
 import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import { validateRequest } from '../../middleware/validationMiddleware';
-import {  StatusCodeInterface } from '../../globalTypes/index';
-import { CandidateInterface, CandidateRequestBody, candidateRequestBody } from './types';
+import  validateRequest from '../../middleware/validationMiddleware';
+import {  headersSchema, StatusCodeInterface } from '../../globalTypes/index';
+import { CandidateInterface, 
+  CandidateRequestBody, 
+  candidateRequestBody 
+} from './types';
 
 const SQL_CREATE_CANDIDATES = sql<CandidateInterface , Record<string,never>>(`
   INSERT INTO CANDIDATES (group_id, election_id, candidate_id, chosen_by)
@@ -14,7 +17,10 @@ export default (router: Router) => {
   router.post<Record<string,never>, StatusCodeInterface, CandidateRequestBody, 
   Record<string,never>>(
     '/',
-    validateRequest(candidateRequestBody),
+    validateRequest({
+      headers: headersSchema,
+      body:candidateRequestBody
+    }), 
     authMiddleware(),
     async (req, res) => {
       const chosen_by = req.user!.id

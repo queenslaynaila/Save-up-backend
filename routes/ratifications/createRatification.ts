@@ -1,9 +1,9 @@
 import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import { validateRequest } from '../../middleware/validationMiddleware';
-import {  StatusCodeInterface } from '../../globalTypes/index';
-import { RatificationInterface, ratificationSchema } from './types';
+import validateRequest from '../../middleware/validationMiddleware';
+import {  headersSchema, StatusCodeInterface } from '../../globalTypes/index';
+import { computeStatus, ComputeStatusInterface, RatificationInterface } from './types';
 
 const SQL_CREATE_RATIFICATIONS = sql<RatificationInterface , Record<string,never>>(`
   INSERT INTO ratifications (group_id, election_id, user_id, :is_ratified)
@@ -11,10 +11,10 @@ const SQL_CREATE_RATIFICATIONS = sql<RatificationInterface , Record<string,never
 `);
 
 export default (router: Router) => {
-  router.post<Record<string,never>, StatusCodeInterface, RatificationInterface, 
+  router.post<Record<string,never>, StatusCodeInterface, ComputeStatusInterface, 
   Record<string,never>>(
     '/',
-    validateRequest(ratificationSchema),
+    validateRequest({ headers: headersSchema, body:computeStatus }),
     authMiddleware(),
     async (req, res) => {
       await SQL_CREATE_RATIFICATIONS({ 

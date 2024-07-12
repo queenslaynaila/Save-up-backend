@@ -1,11 +1,13 @@
 import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import { validateRequest } from '../../middleware/validationMiddleware';
+import validateRequest from '../../middleware/validationMiddleware';
 import { ratificationValidation,  
   RatificationResultsInterface, 
-  ComputeRatificationInterface 
+  ComputeRatificationInterface, 
+  RatificationValidationInterface
 } from './types';
+import { headersSchema } from '../../globalTypes';
 
 const  SQL_COMPUTE_RATIFICATIONS = sql<ComputeRatificationInterface
 ,RatificationResultsInterface>(`
@@ -14,9 +16,12 @@ const  SQL_COMPUTE_RATIFICATIONS = sql<ComputeRatificationInterface
 
 export default (router: Router) => {
   router.post<Record<string,never>, RatificationResultsInterface, 
-  ComputeRatificationInterface,Record<string,never>>(
+  RatificationValidationInterface,Record<string,never>>(
     '/',
-    validateRequest(ratificationValidation ),
+    validateRequest({ 
+      headers: headersSchema, 
+      body:ratificationValidation 
+    }),
     authMiddleware(),
     async (req, res) => {
       await SQL_COMPUTE_RATIFICATIONS({

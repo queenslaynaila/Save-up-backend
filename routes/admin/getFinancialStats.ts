@@ -3,14 +3,16 @@ import { sql } from '../../db';
 import { HttpError } from '../../middleware/errorMiddleware';
 import authMiddleware from '../../middleware/authorization';
 import { convertToTitleCase } from '../../middleware/caseNormalization';
-import { UserRole } from '../../globalTypes/index';
+import { headersSchema, UserRole } from '../../globalTypes/index';
 import { StatsQueryInterface, 
   StatsParamInterface,
   FinancialStatsInterface, 
   ValidOperatorsEnum, 
   ValidResourcesEnum, 
-  ValidStatusEnum  
+  ValidStatusEnum,  
+  statsParamSchema
 } from './types';
+import validateRequest from '../../middleware/validationMiddleware';
 
 const SQL_GET_CUMULATIVES = (query: string) =>sql<{ operator: string; resource: string }, 
 FinancialStatsInterface>(query);
@@ -19,6 +21,10 @@ export default (router: Router) => {
   router.get<StatsParamInterface, FinancialStatsInterface, Record<string,never>, 
   StatsQueryInterface>(
     '/:resource/:operator',
+    validateRequest({
+      headers: headersSchema,
+      params:statsParamSchema
+    }),
     authMiddleware({ roles: [UserRole.ADMIN] }),
     async (req, res) => {
       req.params.resource = req.params.resource.toLowerCase();

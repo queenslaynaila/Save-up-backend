@@ -1,9 +1,17 @@
 import { Router} from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import { BaseExpenseInterface, ExpenseQueryInterface } from './types';
+import { BaseExpenseInterface, 
+  ExpenseQueryInterface, 
+  expenseQuerySchema 
+} from './types';
+import validateRequest from '../../middleware/validationMiddleware';
+import { EntityInterface, 
+  entitySchema, 
+  headersSchema 
+} from '../../globalTypes';
 
-const SQL_GET_EXPENSES = sql<Record<string, string>, BaseExpenseInterface>(`
+const SQL_GET_EXPENSES = sql<{ entity_id:number }, BaseExpenseInterface>(`
   SELECT entity_id, 
          xid, 
          category_id, 
@@ -18,12 +26,17 @@ const SQL_GET_EXPENSES = sql<Record<string, string>, BaseExpenseInterface>(`
 `);
 
 export default (router: Router) => {
-  router.get<Record<string,never>, BaseExpenseInterface[], Record<string,never>, 
+  router.get<Record<string,never>, BaseExpenseInterface[], EntityInterface, 
   ExpenseQueryInterface>(
-    '/me', 
+    '/me',
+    validateRequest({
+      headers: headersSchema, 
+      body:entitySchema,
+      query: expenseQuerySchema
+    }), 
     authMiddleware(), 
     async (req, res) => {
-      const entity_id = req.body.entity_id ?? req.user!.id;
+      const entity_id = req.body?.entity_id ?? req.user!.id;
       const { category_id, start_date, end_date } = req.query;
 
       const filterArgs: Record<string, string> = {};

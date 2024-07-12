@@ -3,6 +3,8 @@ import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { TotalDepositsInterface, UserCumulaInterface } from './types';
+import { headersSchema } from '../../globalTypes';
+import validateRequest from '../../middleware/validationMiddleware';
 
 const SQL_GET_TOTAL_DEPOSIT_FOR_USER = sql<UserCumulaInterface, TotalDepositsInterface>(`
   SELECT COALESCE(SUM(s.amount), 0) AS total_contributed_amount
@@ -14,7 +16,10 @@ const SQL_GET_TOTAL_DEPOSIT_FOR_USER = sql<UserCumulaInterface, TotalDepositsInt
 export default (router: Router) => {
   router.get<Record<string,never>, TotalDepositsInterface, Record<string,never>, 
   Record<string,never>>(
-    '/total-deposits', 
+    '/total-deposits',
+    validateRequest({
+      headers: headersSchema
+    }),  
     authMiddleware(), 
     async (req, res) => {
       const user_id = req.user!.id;

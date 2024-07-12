@@ -26,11 +26,17 @@ export const baseTransaction = z.object({
 export type BaseTransaction = z.infer<typeof baseTransaction>
 
 export const transactionInput = transactionByGroup.pick({
-  pocket_id: true,
   group_id: true
 })
 
 export type TransactionInput = z.infer<typeof transactionInput>
+
+export const transactionByPkt = transactionByGroup.pick({
+  pocket_id: true,
+  group_id: true
+})
+
+export type TransactionByPkt = z.infer<typeof transactionByPkt>
 
 export const transactionDetails = z.object({
   member_name: z.string()

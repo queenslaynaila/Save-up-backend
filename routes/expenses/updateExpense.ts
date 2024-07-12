@@ -2,12 +2,13 @@ import { Router } from 'express';
 import { sql } from '../../db';
 import { HttpError } from '../../middleware/errorMiddleware';
 import authMiddleware from '../../middleware/authorization';
-import { validateRequest } from '../../middleware/validationMiddleware';
-import { ExpenseUpdateInterface, 
-  ExpenseUpdateRes, 
-  ExpenseUpdateValidationSchema 
+import validateRequest from '../../middleware/validationMiddleware';
+import { ExpenseBodyInterface, 
+  expenseBodySchema, 
+  ExpenseUpdateInterface, 
+  ExpenseUpdateRes
 } from './types';
-import { IdParamInterface } from '../../globalTypes/index'
+import { headersSchema, IdParamInterface, idParamSchema } from '../../globalTypes/index'
 
 const SQL_UPDATE_EXPENSE= sql<ExpenseUpdateInterface, ExpenseUpdateRes>(`
   UPDATE expenses
@@ -22,11 +23,15 @@ const SQL_UPDATE_EXPENSE= sql<ExpenseUpdateInterface, ExpenseUpdateRes>(`
 `);
 
 export default (router: Router) => {
-  router.patch<IdParamInterface, ExpenseUpdateRes, ExpenseUpdateInterface, 
+  router.patch<IdParamInterface, ExpenseUpdateRes, ExpenseBodyInterface, 
   Record<string,never>>(
     '/:id', 
+    validateRequest({
+      headers: headersSchema, 
+      params: idParamSchema,
+      body: expenseBodySchema
+    }), 
     authMiddleware(), 
-    validateRequest(ExpenseUpdateValidationSchema),
     async (req, res) => {
       const entity_id = req.body.entity_id ?? req.user!.id;
       const xid = parseInt(req.params.id);

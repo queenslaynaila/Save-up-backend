@@ -1,11 +1,14 @@
 import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
+import validateRequest from '../../middleware/validationMiddleware';
 import { convertToTitleCase } from '../../middleware/caseNormalization';
 import { BasePocketType, 
   PocketQueryParamsType, 
-  PocketByEntityType 
+  PocketByEntityType, 
+  PocketQueryParamsSchema
 } from './types';
+import { entitySchema, headersSchema } from '../../globalTypes';
 
 const SQL_GET_POCKETS = sql<{entity_id: number}, BasePocketType>(`
   SELECT pockets.xid, 
@@ -28,6 +31,11 @@ export default (router: Router) => {
   router.get<string, Record<string, never>, BasePocketType[], PocketByEntityType , 
   PocketQueryParamsType>(
     '/me/', 
+    validateRequest({ 
+      headers: headersSchema, 
+      body: entitySchema,  
+      query: PocketQueryParamsSchema
+    }),
     authMiddleware(), 
     async (req, res) => {
       const entity_id = req.body.entity_id ?? req.user!.id; 

@@ -1,11 +1,12 @@
 import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import  { validateRequest } from '../../middleware/validationMiddleware';
+import  validateRequest from '../../middleware/validationMiddleware';
 import { ExpenseCreationInterface, 
   BaseExpenseInterface,  
   expenseCreationSchema 
 } from './types';
+import { headersSchema } from '../../globalTypes';
 
 const SQL_CREATE_EXPENSES = sql<ExpenseCreationInterface, BaseExpenseInterface>(`
   INSERT INTO expenses (entity_id, xid, category_id, description, amount, spent_at)
@@ -25,8 +26,11 @@ export default (router: Router) => {
   router.post<Record<string,never>, BaseExpenseInterface, ExpenseCreationInterface,
   Record<string,never>>(
     '/', 
+    validateRequest({
+      headers: headersSchema, 
+      body:expenseCreationSchema 
+    }),
     authMiddleware(), 
-    validateRequest(expenseCreationSchema),
     async (req, res) => {
       const entity_id = req.body.entity_id ?? req.user!.id;
       const expense = await SQL_CREATE_EXPENSES({

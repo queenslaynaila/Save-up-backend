@@ -2,9 +2,16 @@ import { Router } from 'express';
 import authMiddleware from '../../middleware/authorization';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { sql } from '../../db';
-import { PocketUpdateType, pocketPatchRequestSchema, BasePocketType} from './types';
-import { IdParamInterface } from '../../globalTypes/index';
-import { validateRequest } from '../../middleware/validationMiddleware';
+import { PocketUpdateType, 
+  BasePocketType, 
+  PocketPatchType
+} from './types';
+import { entitySchema, 
+  headersSchema, 
+  IdParamInterface, 
+  idParamSchema 
+} from '../../globalTypes/index';
+import  validateRequest  from '../../middleware/validationMiddleware';
 
 const SQL_UPDATE_POCKET = sql<PocketUpdateType, BasePocketType>(`
   UPDATE pockets
@@ -27,10 +34,14 @@ const SQL_UPDATE_POCKET = sql<PocketUpdateType, BasePocketType>(`
 `);
 
 export default (router: Router) => {
-  router.patch<IdParamInterface, BasePocketType, PocketUpdateType, Record<string,never>>(
+  router.patch<IdParamInterface, BasePocketType, PocketPatchType, Record<string,never>>(
     '/:id', 
+    validateRequest({ 
+      headers: headersSchema, 
+      params:  idParamSchema,
+      body: entitySchema
+    }),
     authMiddleware(), 
-    validateRequest(pocketPatchRequestSchema),
     async (req, res) => {
       const entity_id = req.body.entity_id ?? req.user!.id;
       const { name, category_id, target_amount, priority, target_at, pocket_type } = req.body;      

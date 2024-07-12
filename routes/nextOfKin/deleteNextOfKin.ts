@@ -2,7 +2,8 @@ import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import {NextOfKinDeletionInterface } from './types';
-import { IdParamInterface, StatusCodeInterface } from '../../globalTypes/index';
+import { headersSchema, IdParamInterface, idParamSchema, StatusCodeInterface } from '../../globalTypes/index';
+import validateRequest from '../../middleware/validationMiddleware';
 
 const SQL_DELETE_KIN = sql<NextOfKinDeletionInterface, Record<string,never>>(`
   UPDATE next_of_kins  
@@ -16,6 +17,10 @@ export default (router: Router) => {
   router.delete<IdParamInterface, StatusCodeInterface, Record<string,never>, 
   Record<string,never>>(
     '/:id', 
+    validateRequest({ 
+      headers: headersSchema, 
+      params: idParamSchema
+    }),
     authMiddleware(), 
     async (req, res) => {
       const user_id = req.user!.id;

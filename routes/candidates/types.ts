@@ -12,7 +12,7 @@ export type CandidateInterface = z.infer<typeof candidateSchema>;
 export const candidateRequestBody = candidateSchema.omit({
   chosen_by: true
 });
-  
+
 export type CandidateRequestBody = z.infer<typeof candidateRequestBody>;
 
 export const candidateParamSchema = z.object({
@@ -21,6 +21,12 @@ export const candidateParamSchema = z.object({
 })
 
 export type CandidateParam = z.infer<typeof candidateParamSchema>
+
+export const candidateReqSchema = candidateParamSchema.extend({
+  user_id: z.number()
+});
+
+export type CandidateReq = z.infer<typeof candidateReqSchema>;
 
 export const candidateResSchema = candidateSchema.pick({
   candidate_id: true

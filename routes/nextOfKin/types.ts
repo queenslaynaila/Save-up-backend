@@ -10,6 +10,8 @@ export const nextOfKinCreationSchema = z.object({
 });
 
 export const nextOfKinValidation = nextOfKinCreationSchema.omit({ user_id: true })
+
+export type NextOfKinValidation = z.infer<typeof nextOfKinValidation>;
   
 export type NextOfKinCreationInterface = z.infer<typeof nextOfKinCreationSchema>;
   

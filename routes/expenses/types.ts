@@ -46,6 +46,12 @@ export const expenseUpdateSchema = baseExpenseSchem.pick({
 
 export type ExpenseUpdateInterface = z.infer<typeof expenseUpdateSchema>;
 
+export const expenseBodySchema =expenseUpdateSchema.omit({
+  xid: true
+})
+
+export type ExpenseBodyInterface = z.infer<typeof expenseBodySchema>;
+
 export const expenseUpdateRes = baseExpenseSchem.pick({
   category_id: true,
   description: true,

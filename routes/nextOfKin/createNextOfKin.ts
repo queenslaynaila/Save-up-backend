@@ -2,12 +2,14 @@ import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { HttpError } from '../../middleware/errorMiddleware';
-import { validateRequest } from '../../middleware/validationMiddleware';
+import validateRequest  from '../../middleware/validationMiddleware';
 import { 
   NextOfKinCreationInterface, 
-  NextOfKinInterface, 
-  nextOfKinValidation 
+  NextOfKinInterface,
+  NextOfKinValidation,
+  nextOfKinValidation, 
 } from './types'; 
+import { headersSchema } from '../../globalTypes';
 
 const SQL_CREATE_KIN = sql<NextOfKinCreationInterface, NextOfKinInterface>(`
   INSERT INTO next_of_kins (
@@ -29,11 +31,14 @@ const SQL_CREATE_KIN = sql<NextOfKinCreationInterface, NextOfKinInterface>(`
 `);
 
 export default (router: Router) => {
-  router.post<Record<string,never>, NextOfKinInterface, NextOfKinCreationInterface, 
+  router.post<Record<string,never>, NextOfKinInterface, NextOfKinValidation, 
   Record<string,never>>(
     '/', 
+    validateRequest({ 
+      headers: headersSchema, 
+      body: nextOfKinValidation
+    }),
     authMiddleware(), 
-    validateRequest(nextOfKinValidation),
     async (req, res) => {
       const nextOfKin = await SQL_CREATE_KIN({
         ...req.body, 

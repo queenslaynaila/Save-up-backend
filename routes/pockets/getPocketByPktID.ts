@@ -1,9 +1,15 @@
 import { Router } from 'express';
 import { sql } from '../../db';
+import validateRequest from '../../middleware/validationMiddleware';
 import authMiddleware from '../../middleware/authorization';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { BasePocketType} from './types';
-import { IdParamInterface, XidEntityInterface } from '../../globalTypes/index';
+import { headersSchema, 
+  IdParamInterface, 
+  XidEntityInterface,
+  entitySchema,
+  idParamSchema 
+} from '../../globalTypes/index';
 
 const SQL_GET_POCKET_BY_ID = sql<XidEntityInterface, BasePocketType>(`
   SELECT entity_id, 
@@ -26,9 +32,14 @@ const SQL_GET_POCKET_BY_ID = sql<XidEntityInterface, BasePocketType>(`
 export default (router: Router) => {
   router.get<IdParamInterface, BasePocketType, Record<string,never>, Record<string,never>>(
     '/:id', 
+    validateRequest({ 
+      headers: headersSchema, 
+      params:  idParamSchema,
+      body: entitySchema
+    }),
     authMiddleware(), 
     async (req, res) => {
-      const entity_id = req.body.entity_id ?? req.user!.id;
+      const entity_id = req.body?.entity_id ?? req.user!.id;
       const pocket = await SQL_GET_POCKET_BY_ID({ 
         xid:parseInt(req.params.id), 
         entity_id 
