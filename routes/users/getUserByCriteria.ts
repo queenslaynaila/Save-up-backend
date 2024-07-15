@@ -15,9 +15,9 @@ import { headersSchema } from '../../globalTypes';
 const SQL_GET_USER_BY_CRITERIA = sql<Record<string,never>,  UserType>(`
   SELECT 
     users.id, 
-    user_contact_details.id_type, 
-    user_contact_details.id_number,
-    users.full_name, 
+    users.id_type, 
+    users.id_number,
+    user_contact_details.full_name, 
     users.role, 
     users.gender, 
     user_contact_details.phone_number,  

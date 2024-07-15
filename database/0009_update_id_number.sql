@@ -11,7 +11,7 @@ DECLARE
 BEGIN
     SELECT id_type, id_number 
     INTO STRICT v_old_id_type, v_old_id_number
-    FROM user_contact_details
+    FROM users
     WHERE id = p_user_id;
 
     INSERT INTO user_id_history (user_id, xid, id_type, id_number)
@@ -23,7 +23,7 @@ BEGIN
     FROM user_id_history
     WHERE user_id = p_user_id;
 
-    UPDATE user_contact_details
+    UPDATE users
     SET id_type = p_new_id_type, 
         id_number = p_new_id_number
     WHERE id = p_user_id

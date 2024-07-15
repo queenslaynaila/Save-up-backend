@@ -11,10 +11,10 @@ type UserWithoutPin = Omit<UserType, 'pin'>;
 const SQL_GET_USER = sql<{ phone_number: string }, UserType>(`
   SELECT 
     users.id, 
-    user_contact_details.id_type, 
-    user_contact_details.id_number, 
+    users.id_type, 
+    user.id_number, 
     user_contact_details.phone_number, 
-    users.full_name, 
+    user_contact_details.full_name, 
     users.role, 
     users.gender, 
     users.pin,
