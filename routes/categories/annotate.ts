@@ -55,7 +55,7 @@ function generateDocumentationSchema(annotations: RouteAnnotation[]) {
         acc[status.toString()] = zodToJsonSchema(schema);
       }
       return acc;
-    }, {} as Record<string, Record<string, any>>), // Specify a more specific type here
+    }, {} as Record<string, Record<string, any>>), 
   }));
 }
 

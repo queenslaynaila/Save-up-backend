@@ -1,8 +1,7 @@
 import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import { HttpError } from '../../middleware/errorMiddleware';
-import {  Totals } from './types';
+import {  QueryParams, Totals } from './types';
 import { GetByUserInterface } from '../../globalTypes';
 
 const  SQL_GET_TOTAL_SAVINGS = sql<GetByUserInterface, Totals>(`
@@ -17,13 +16,28 @@ const  SQL_GET_TOTAL_SAVINGS = sql<GetByUserInterface, Totals>(`
 
 export default (router: Router) => {
   router.get<Record<string,never>, Totals, Record<string,never>, 
-  Record<string,never>>(
+  QueryParams>(
     '/totals', 
     authMiddleware(), 
     async (req, res) => {
-      const result = await SQL_GET_TOTAL_SAVINGS({ 
-        user_id:req.user!.id
-      }).one(new HttpError(404));
-      return res.json(result);
+      const filters: string[] = [];
+      const filterArgs: Record<string, string> = {};
+
+      const { start_date, end_date } = req.query;
+
+      if ( start_date && end_date) {
+        filterArgs.start_date = start_date;
+        filterArgs.end_date = end_date;
+        filters.push(`DATE(created_at) BETWEEN :start_date AND :end_date`);
+      }
+
+      const query = SQL_GET_TOTAL_SAVINGS({ 
+        user_id:req.user!.id 
+      });
+
+      if (filters.length > 0) query.extend(`AND ${filters.join(' AND ')}`, filterArgs);
+      query.extend('LIMIT 15', {});
+
+      res.json(await query.one());
     });
 };

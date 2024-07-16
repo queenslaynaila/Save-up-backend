@@ -2,8 +2,6 @@ import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { TopExpenseCategoriesInterface, UserCumulaInterface } from './types'
-import validateRequest from '../../middleware/validationMiddleware';
-import { headersSchema } from '../../globalTypes';
 
 const SQL_GET_TOP_EXPENDITURE_CATEGORIES = sql<
 UserCumulaInterface, TopExpenseCategoriesInterface
@@ -23,9 +21,6 @@ export default (router: Router) => {
   router.get<Record<string,never>, TopExpenseCategoriesInterface[], 
   Record<string,never>, Record<string,never>>(
     '/top-expenditure-categories',
-    validateRequest({
-      headers: headersSchema
-    }), 
     authMiddleware(),
     async (req, res) => {
       const user_id = req.user!.id;
