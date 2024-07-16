@@ -23,7 +23,6 @@ CREATE TABLE IF NOT EXISTS pockets (
   FOREIGN KEY             (entity_id) REFERENCES entities(id),
   FOREIGN KEY             (category_id) REFERENCES categories(id)
 );
-
 SELECT create_distributed_table('pockets', 'entity_id');
 GRANT INSERT, SELECT, UPDATE ON pockets TO app_user;
 
@@ -44,11 +43,11 @@ CREATE TABLE IF NOT EXISTS default_pockets (
   pocket_id               INT NOT NULL,
   FOREIGN KEY             (entity_id, pocket_id) REFERENCES pockets(entity_id, xid)
 );
-
-GRANT INSERT, SELECT ON default_pockets TO app_user;
 SELECT create_distributed_table('default_pockets', 'entity_id');
+GRANT INSERT, SELECT ON default_pockets TO app_user;
 
--- Leave as a local table due to its rarity in being accessed and since access is only for admin users
+-- Leave as a local table due to its rarity in being accessed and 
+--since access is only for admin users
 CREATE TABLE IF NOT EXISTS pocket_reminders ( 
   entity_id               INT NOT NULL, 
   xid                     INT NOT NULL,
@@ -64,13 +63,12 @@ CREATE TABLE IF NOT EXISTS external_savings (
   entity_id             INT NOT NULL,-- owner of the pocket
   xid                   INT NOT NULL,
   pocket_id             INT NOT NULL, --the pocket itself      
-  donor_id              INT NOT NULL, -- the donor depositing the cash as some sort of contibution or donation,                                                                                                                                                     
+  donor_id              INT NOT NULL, -- the donor depositing the cash as some sort of donation,                                                                                                                                                     
   amount                NUMERIC(30, 2) NOT NULL CHECK (amount > 0),
-  show_details          BOOLEAN NOT NULL DEFAULT TRUE, ---whether the donor wants his personal details visible to pocket owner
+  show_details          BOOLEAN NOT NULL DEFAULT TRUE, 
   created_at            TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   PRIMARY KEY           (entity_id, xid),
   FOREIGN KEY           (entity_id, pocket_id) REFERENCES pockets (entity_id, xid)
 );
-
+SELECT create_distributed_table('external_savings', 'entity_id');
 GRANT INSERT, SELECT ON external_savings TO app_user;
-SELECT create_distributed_table('external_savings', 'entity_id')
