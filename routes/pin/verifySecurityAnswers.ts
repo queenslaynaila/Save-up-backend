@@ -49,7 +49,8 @@ export default (router: Router) => {
 
       const step3TokenPayload = { id: user_id, step: 3 };
       const step3TokenHeader = jwt.sign(
-        step3TokenPayload, process.env.JWT_SECRET as Secret,
+        step3TokenPayload, 
+        process.env.JWT_SECRET as Secret,
         { expiresIn: '15m' }
       );
       res.setHeader('reset-token', step3TokenHeader)

@@ -66,7 +66,8 @@ export default(router: Router) => {
 
       const step2TokenPayload = { id: user_id, step: 2 };
       const step2TokenHeader = jwt.sign(
-        step2TokenPayload, process.env.JWT_SECRET as Secret,
+        step2TokenPayload, 
+        process.env.JWT_SECRET as Secret,
         { expiresIn: '15m' }
       );
       res.setHeader('reset-token', step2TokenHeader)
