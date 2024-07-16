@@ -49,9 +49,10 @@ export default  (router: Router) => {
         reason:req.body.reason
       }).exec();      
 
-      const resetTokenPayload = { id: user.id, step:1 };
+      const step1TokenPayload = { id: user.id, step:1 };
       const resetTokenHeader = jwt.sign(
-        resetTokenPayload, process.env.JWT_SECRET as Secret, 
+        step1TokenPayload,
+        process.env.JWT_SECRET as Secret, 
         { expiresIn: '15m' }
       );
 
