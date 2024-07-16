@@ -45,8 +45,8 @@ CREATE TABLE IF NOT EXISTS login_attempts (
   PRIMARY KEY     (user_id, xid),
   FOREIGN KEY     (user_id) REFERENCES users(id)
 );
-GRANT INSERT, SELECT ON login_attempts TO app_user;
 SELECT create_distributed_table('login_attempts', 'user_id');
+GRANT INSERT, SELECT ON login_attempts TO app_user;
 
 CREATE TABLE IF NOT EXISTS user_role_history(
   user_id          INT NOT NULL,
