@@ -35,7 +35,6 @@ BEGIN
 
   INSERT INTO default_pockets (entity_id, pocket_id)
   VALUES (v_entity_id, v_pocket_id);
-
 EXCEPTION 
   WHEN unique_violation THEN
     RAISE EXCEPTION USING
