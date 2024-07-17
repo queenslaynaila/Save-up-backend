@@ -2,8 +2,6 @@ import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { BaseGroupInterface, GroupsByUserInterface } from './types';
-import { headersSchema } from '../../globalTypes';
-import validateRequest from '../../middleware/validationMiddleware';
 
 const SQL_FETCH_USER_GROUPS = sql<GroupsByUserInterface, BaseGroupInterface >(`
   SELECT 
@@ -22,9 +20,6 @@ export default (router: Router) => {
   router.get<Record<string,never>, BaseGroupInterface[], Record<string,never>, 
   Record<string,never>>(
     '/',
-    validateRequest({
-      headers: headersSchema, 
-    }),
     authMiddleware(),
     async (req, res) => {
       const groups = await SQL_FETCH_USER_GROUPS({ user_id: req.user!.id}).many();

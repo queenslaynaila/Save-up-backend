@@ -5,7 +5,7 @@ import { depositByGroup,
   DepositByGroup, 
   GroupDeposit 
 } from './types';
-import { headersSchema, StatusCodeInterface } from '../../globalTypes';
+import { StatusCodeInterface } from '../../globalTypes';
 import validateRequest from '../../middleware/validationMiddleware';
 
 const SQL_CREATE_GROUP_DEPOSIT = sql<GroupDeposit, Record<string,never>>(`
@@ -17,7 +17,6 @@ export default (router: Router) => {
   Record<string,never>>(
     '/',
     validateRequest({
-      headers: headersSchema, 
       body:  depositByGroup
     }),
     authMiddleware(),

@@ -7,7 +7,6 @@ import {
   ElectionRetrieval, 
   electionBodySchema 
 } from './types';
-import { headersSchema } from '../../globalTypes';
 
 const SQL_GET_ONGOING_ELECTION = sql< ElectionRequest, ElectionRetrieval>(`
   SELECT * FROM get_open_election_for_group(:group_id, :user_id)
@@ -18,7 +17,6 @@ export default (router: Router) => {
   Record<string,never>>(
     '/',
     validateRequest({
-      headers: headersSchema, 
       body: electionBodySchema
     }), 
     authMiddleware(),

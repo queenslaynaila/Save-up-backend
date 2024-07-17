@@ -5,10 +5,10 @@ import { BaseTransaction,
   TransactionQueryParams
 } from '../usertransactions/types';
 import validateRequest from '../../middleware/validationMiddleware';
-import { UserRole, 
+import { 
+  UserRole, 
   GetByPhoneInterface,  
-  GetByIdInterface,  
-  headersSchema
+  GetByIdInterface
 } from '../../globalTypes/index';
 import { HttpError } from '../../middleware/errorMiddleware'; 
 import { phoneNumber, PhoneNumberInterface } from './types';
@@ -35,7 +35,6 @@ export default (router: Router) => {
   TransactionQueryParams>(
     '/transactions', 
     validateRequest({
-      headers: headersSchema,
       body:phoneNumber
     }),
     authMiddleware({ roles: [UserRole.ADMIN] }),

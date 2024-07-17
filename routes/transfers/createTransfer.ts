@@ -3,7 +3,7 @@ import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import validateRequest from '../../middleware/validationMiddleware';
 import { TransferInput ,  TransferValidation,  transferValidationSchema } from './types'
-import { headersSchema, StatusCodeInterface } from '../../globalTypes/index'
+import { StatusCodeInterface } from '../../globalTypes/index'
 
 const SQL_CREATE_TRANSFER = sql<TransferInput , Record<string,never>>(`
   SELECT create_transfer(
@@ -20,7 +20,6 @@ export default (router: Router) => {
   Record<string,never>>(
     '/', 
     validateRequest({ 
-      headers: headersSchema, 
       body:transferValidationSchema
     }),
     authMiddleware(),

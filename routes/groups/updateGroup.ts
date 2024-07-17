@@ -6,7 +6,7 @@ import { groupCreationValidation,
   GroupCreationValidation, 
   GroupUpdateInterface 
 } from './types';
-import { headersSchema, IdParamInterface, idParamSchema } from '../../globalTypes/index';
+import { IdParamInterface, idParamSchema } from '../../globalTypes/index';
 
 const SQL_UPDATE_GROUP = sql<GroupUpdateInterface, GroupUpdateInterface>(`
    SELECT * FROM update_group_name(:id, :user_id, :name)
@@ -17,7 +17,6 @@ export default (router: Router) => {
   Record<string,never>>(
     '/:id',
     validateRequest({
-      headers: headersSchema, 
       params: idParamSchema,
       body:  groupCreationValidation
     }),

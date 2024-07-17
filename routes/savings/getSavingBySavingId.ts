@@ -3,7 +3,9 @@ import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { BaseSavingType } from './types';
-import { EntityInterface, entitySchema, headersSchema, 
+import { 
+  EntityInterface, 
+  entitySchema, 
   IdParamInterface,  
   idParamSchema,  
   XidEntityInterface 
@@ -21,7 +23,6 @@ export default (router: Router) => {
   router.get<IdParamInterface, BaseSavingType, EntityInterface, Record<string,never>>(
     '/:id', 
     validateRequest({ 
-      headers: headersSchema,
       params: idParamSchema,
       body: entitySchema
     }),

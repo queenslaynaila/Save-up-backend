@@ -7,7 +7,6 @@ import {  BallotComputeInterface,
   ballotBodyRequest, 
   BallotResultInterface 
 } from './types';
-import { headersSchema } from '../../globalTypes';
 
 const SQL_GET_ELECTION_WINNERS = sql<BallotComputeInterface,  BallotResultInterface>(`
   SELECT * FROM compute_ballot_results(:group_id, :election_id, :user_id)
@@ -18,7 +17,6 @@ export default (router: Router) => {
   Record<string,never>>(
     '/',
     validateRequest({
-      headers: headersSchema,
       body:ballotBodyRequest 
     }),
     authMiddleware(),

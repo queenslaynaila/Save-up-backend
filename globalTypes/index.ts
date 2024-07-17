@@ -70,8 +70,3 @@ export const entitySchema = xidEntitySchema.pick({
 }).partial();
 
 export type EntityInterface = z.infer<typeof entitySchema>;
-
-export const headersSchema = z.object({
-  'refresh-token': z.string(),
-  'authorization-token': z.string()
-});

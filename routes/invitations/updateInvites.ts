@@ -4,7 +4,6 @@ import authMiddleware from '../../middleware/authorization';
 import  validateRequest from '../../middleware/validationMiddleware';
 import { InviteResponseInterface, inviteValidationSchema } from './types';
 import { 
-  headersSchema, 
   IdParamInterface, 
   idParamSchema, 
   StatusCodeInterface 
@@ -19,7 +18,6 @@ export default (router: Router) => {
   Record<string,never>>(
     '/:id',
     validateRequest({
-      headers: headersSchema,  
       params: idParamSchema,
       body:inviteValidationSchema
     }),

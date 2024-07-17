@@ -7,11 +7,7 @@ import { TransactionRecipients,
   transactionInput,
 } from './types';
 import validateRequest from '../../middleware/validationMiddleware';
-import { 
-  headersSchema, 
-  IdParamInterface, 
-  idParamSchema 
-} from '../../globalTypes';
+import { IdParamInterface, idParamSchema } from '../../globalTypes';
 
 const SQL_GROUP_TRANSACTIONS = sql<TransactionRecipients, TransactionDetails >(`
   SELECT * FROM get_group_transaction_details(
@@ -24,7 +20,6 @@ export default (router: Router) => {
   Record<string,never>>(
     '/:id', 
     validateRequest({
-      headers: headersSchema, 
       params:idParamSchema, 
       body:transactionInput
     }),

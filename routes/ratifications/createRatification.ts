@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import validateRequest from '../../middleware/validationMiddleware';
-import {  headersSchema, StatusCodeInterface } from '../../globalTypes/index';
+import { StatusCodeInterface } from '../../globalTypes/index';
 import { computeStatus, ComputeStatusInterface, RatificationInterface } from './types';
 
 const SQL_CREATE_RATIFICATIONS = sql<RatificationInterface , Record<string,never>>(`
@@ -14,7 +14,7 @@ export default (router: Router) => {
   router.post<Record<string,never>, StatusCodeInterface, ComputeStatusInterface, 
   Record<string,never>>(
     '/',
-    validateRequest({ headers: headersSchema, body:computeStatus }),
+    validateRequest({ body:computeStatus }),
     authMiddleware(),
     async (req, res) => {
       await SQL_CREATE_RATIFICATIONS({ 

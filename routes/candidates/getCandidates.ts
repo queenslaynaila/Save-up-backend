@@ -7,7 +7,6 @@ import { CandidateRes,
   candidateReqSchema 
 } from './types'
 import validateRequest from '../../middleware/validationMiddleware';
-import { headersSchema } from '../../globalTypes';
 
 const SQL_GET_CANDIDATES = sql<CandidateReq,CandidateRes>(`
   SELECT * FROM get_candidates(:group_id, :election_id, :user_id) 
@@ -18,7 +17,6 @@ export default (router: Router) => {
   Record<string,never>>(
     '/',
     validateRequest({
-      headers: headersSchema,
       body:candidateReqSchema
     }),
     authMiddleware(),

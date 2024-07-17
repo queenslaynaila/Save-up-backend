@@ -6,7 +6,7 @@ import { BaseSavingType,
   SavingsQueryParamType 
 } from './types';
 import validateRequest from '../../middleware/validationMiddleware';
-import { EntityInterface, entitySchema, headersSchema } from '../../globalTypes';
+import { EntityInterface, entitySchema } from '../../globalTypes';
  
 const SQL_GET_SAVINGS = sql< {entity_id: number }, BaseSavingType>(`
   SELECT * FROM savings
@@ -18,7 +18,6 @@ export default (router: Router) => {
   SavingsQueryParamType>(
     '/', 
     validateRequest({ 
-      headers: headersSchema,
       body: entitySchema,
       query:savingsQueryParamSchema
     }),

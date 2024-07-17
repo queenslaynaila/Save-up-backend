@@ -4,7 +4,7 @@ import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import validateRequest from '../../middleware/validationMiddleware';
 import { AnswerCreationType, SecurityAnswersBaseType, answerCreationValidation } from './types'
-import {  headersSchema, StatusCodeInterface } from '../../globalTypes/index';
+import {  StatusCodeInterface } from '../../globalTypes/index';
 
 const SQL_CREATE_ANSWER = sql<SecurityAnswersBaseType, Record<string,never>>(`
   SELECT create_answer (:user_id, :question_id, :answer)
@@ -14,7 +14,7 @@ export default (router: Router) => {
   router.post<Record<string,never>, StatusCodeInterface, AnswerCreationType, 
   Record<string,never>>(
     '/', 
-    validateRequest({ headers: headersSchema, body:answerCreationValidation }),
+    validateRequest({ body:answerCreationValidation }),
     authMiddleware(), 
     async (req, res) => {
       const hashedAnswer = await bcrypt.hash(req.body.answer, 12);

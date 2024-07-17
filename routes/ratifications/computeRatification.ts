@@ -7,7 +7,6 @@ import { ratificationValidation,
   ComputeRatificationInterface, 
   RatificationValidationInterface
 } from './types';
-import { headersSchema } from '../../globalTypes';
 
 const  SQL_COMPUTE_RATIFICATIONS = sql<ComputeRatificationInterface
 ,RatificationResultsInterface>(`
@@ -19,7 +18,6 @@ export default (router: Router) => {
   RatificationValidationInterface,Record<string,never>>(
     '/',
     validateRequest({ 
-      headers: headersSchema, 
       body:ratificationValidation 
     }),
     authMiddleware(),

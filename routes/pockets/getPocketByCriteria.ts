@@ -8,7 +8,7 @@ import { BasePocketType,
   PocketByEntityType, 
   PocketQueryParamsSchema
 } from './types';
-import { entitySchema, headersSchema } from '../../globalTypes';
+import { entitySchema } from '../../globalTypes';
 
 const SQL_GET_POCKETS = sql<{entity_id: number}, BasePocketType>(`
   SELECT pockets.xid, 
@@ -32,7 +32,6 @@ export default (router: Router) => {
   PocketQueryParamsType>(
     '/me/', 
     validateRequest({ 
-      headers: headersSchema, 
       body: entitySchema,  
       query: PocketQueryParamsSchema
     }),

@@ -3,7 +3,6 @@ import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import validateRequest from '../../middleware/validationMiddleware';
 import { PocketCreateType, BasePocketType, basePocketSchema   } from './types';
-import { headersSchema } from '../../globalTypes';
 
 const SQL_CREATE_POCKET = sql<PocketCreateType, BasePocketType>(`
   INSERT INTO pockets (entity_id, xid, category_id, name, priority, pocket_type, target_amount, target_at)
@@ -34,7 +33,7 @@ export default (router: Router) => {
   router.post<Record<string,never>, BasePocketType, BasePocketType,
   Record<string,never>>(
     '/', 
-    validateRequest({ headers: headersSchema, body: basePocketSchema }),
+    validateRequest({ body: basePocketSchema }),
     authMiddleware(), 
     async (req, res) => {
       const entity_id = req.body?.entity_id ?? req.user!.id;

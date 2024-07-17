@@ -13,7 +13,6 @@ import {
 import {  
   StatusCodeInterface, 
   GetByIdInterface, 
-  headersSchema 
 } from '../../globalTypes/index';
 import validateRequest from '../../middleware/validationMiddleware';
 
@@ -32,7 +31,6 @@ export default (router: Router) => {
   Record<string,never>>(
     '/',
     validateRequest({ 
-      headers: headersSchema, 
       body: updatePasswordSchema
     }), 
     authMiddleware(), 

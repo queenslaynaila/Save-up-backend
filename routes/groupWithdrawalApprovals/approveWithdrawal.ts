@@ -7,7 +7,7 @@ import {
   ApproveWithdrawal, 
   WithdrawalRequest 
 } from './types';
-import { headersSchema, StatusCodeInterface } from '../../globalTypes/index';
+import { StatusCodeInterface } from '../../globalTypes/index';
 
 const SQL_APPROVE_GRP_WITHDRAWAL = sql<ApproveWithdrawal, Record<string, never>>(`
     SELECT approve_group_withdrawal(
@@ -19,8 +19,7 @@ export default (router: Router) => {
   router.post<Record<string, never>, StatusCodeInterface, WithdrawalRequest, 
   Record<string, never>>(
     '/', 
-    validateRequest({
-      headers: headersSchema,  
+    validateRequest({ 
       body:approveValidation
     }),
     authMiddleware(),

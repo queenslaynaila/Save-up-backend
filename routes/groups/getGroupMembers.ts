@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import { headersSchema, IdParamInterface, idParamSchema } from '../../globalTypes/index';
+import {  IdParamInterface, idParamSchema } from '../../globalTypes/index';
 import { GroupMemberInterface } from './types';
 import validateRequest from '../../middleware/validationMiddleware';
 
@@ -13,8 +13,7 @@ export default (router: Router) => {
   router.get<IdParamInterface, GroupMemberInterface[], Record<string,never>, 
   Record<string,never>>(
     '/:id',
-    validateRequest({
-      headers: headersSchema, 
+    validateRequest({ 
       params: idParamSchema
     }),
     authMiddleware(),

@@ -7,7 +7,6 @@ import { PocketUpdateType,
   PocketPatchType
 } from './types';
 import { entitySchema, 
-  headersSchema, 
   IdParamInterface, 
   idParamSchema 
 } from '../../globalTypes/index';
@@ -37,7 +36,6 @@ export default (router: Router) => {
   router.patch<IdParamInterface, BasePocketType, PocketPatchType, Record<string,never>>(
     '/:id', 
     validateRequest({ 
-      headers: headersSchema, 
       params:  idParamSchema,
       body: entitySchema
     }),

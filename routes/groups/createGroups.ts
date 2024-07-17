@@ -8,7 +8,6 @@ import {
   BaseGroupInterface,
   GroupCreationValidation
 } from './types';
-import { headersSchema } from '../../globalTypes';
 
 const SQL_CREATE_GROUP = sql<GroupCreationInterface, BaseGroupInterface>(`
     SELECT * FROM create_group(:name, :created_by )
@@ -19,7 +18,6 @@ export default (router: Router) => {
   Record<string,never>>(
     '/',
     validateRequest({
-      headers: headersSchema, 
       body: groupCreationValidation
     }),
     authMiddleware(),

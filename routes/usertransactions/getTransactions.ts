@@ -10,7 +10,6 @@ import {
   transactionQueryParams
 } from './types';
 import validateRequest from '../../middleware/validationMiddleware';
-import { headersSchema } from '../../globalTypes';
 
 const SQL_GET_TRANSACTIONS = sql<TransactionByUser, BaseTransaction>(`
   SELECT 
@@ -36,7 +35,6 @@ export default (router: Router) => {
   TransactionQueryParams>(
     '/', 
     validateRequest({ 
-      headers: headersSchema, 
       body:transactionBody, 
       query:transactionQueryParams 
     }),

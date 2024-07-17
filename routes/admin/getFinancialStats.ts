@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { sql } from '../../db';
-import { headersSchema, UserRole } from '../../globalTypes/index';
+import { UserRole } from '../../globalTypes/index';
 import authMiddleware from '../../middleware/authorization';
 import { convertToTitleCase } from '../../middleware/caseNormalization';
 import { HttpError } from '../../middleware/errorMiddleware';
@@ -27,7 +27,6 @@ export default (router: Router) => {
   >(
     '/:resource/:operator',
     validateRequest({
-      headers: headersSchema,
       params: statsParamSchema,
     }),
     authMiddleware({ roles: [UserRole.ADMIN] }),

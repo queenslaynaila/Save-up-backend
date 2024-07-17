@@ -7,7 +7,7 @@ import {
   savingPostRequestSchema, 
   SavingPostRequestType 
 } from './types';
-import { headersSchema, StatusCodeInterface } from '../../globalTypes/index';
+import { StatusCodeInterface } from '../../globalTypes/index';
 
 const SQL_CREATE_SAVING = sql<SavingCreateType, Record<string,never>>(`
   SELECT create_saving(:user_id, :pocket_id, :amount)
@@ -17,7 +17,7 @@ export default (router: Router) => {
   router.post<Record<string,never>, StatusCodeInterface, SavingPostRequestType, 
   Record<string,never>>(
     '/', 
-    validateRequest({ headers: headersSchema, body:savingPostRequestSchema }),
+    validateRequest({ body:savingPostRequestSchema }),
     authMiddleware(), 
     async (req, res) => {
       await SQL_CREATE_SAVING({

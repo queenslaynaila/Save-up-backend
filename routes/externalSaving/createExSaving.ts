@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { sql } from '../../db';
 import validateRequest from '../../middleware/validationMiddleware';
 import {  ExternalSavingInterface, externalSavingSchema} from './types';
-import { headersSchema, StatusCodeInterface } from '../../globalTypes';
+import { StatusCodeInterface } from '../../globalTypes';
 
 const SQL_CREATE_SAVING = sql<ExternalSavingInterface, Record<string,never>>(`
   SELECT create_external_savings( 
@@ -19,7 +19,6 @@ export default (router: Router) => {
   Record<string,never>>(
     '/', 
     validateRequest({
-      headers: headersSchema, 
       body: externalSavingSchema
     }),
     async (req, res) => {

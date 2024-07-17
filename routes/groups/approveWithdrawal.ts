@@ -6,7 +6,7 @@ import { ApproveWithdrawal,
   withdrawal, 
   Withdrawal 
 } from './types';
-import { headersSchema, 
+import { 
   IdParamInterface, 
   idParamSchema, 
   StatusCodeInterface 
@@ -23,7 +23,6 @@ export default (router: Router) => {
   Record<string, never>>(
     '/approve-withdrawal/:id', 
     validateRequest({
-      headers: headersSchema, 
       params: idParamSchema,
       body: withdrawal
     }),

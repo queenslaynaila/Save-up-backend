@@ -4,7 +4,7 @@ import validateRequest from '../../middleware/validationMiddleware';
 import authMiddleware from '../../middleware/authorization';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { BasePocketType} from './types';
-import { headersSchema, 
+import { 
   IdParamInterface, 
   XidEntityInterface,
   entitySchema,
@@ -33,7 +33,6 @@ export default (router: Router) => {
   router.get<IdParamInterface, BasePocketType, Record<string,never>, Record<string,never>>(
     '/:id', 
     validateRequest({ 
-      headers: headersSchema, 
       params:  idParamSchema,
       body: entitySchema
     }),

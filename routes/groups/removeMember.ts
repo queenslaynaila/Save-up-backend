@@ -1,14 +1,12 @@
 import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import { GroupsByUserInterface, 
+import { 
+  GroupsByUserInterface, 
   groupsByUserSchema, 
   RemoveMemberInterface 
 } from './types';
-import { StatusCodeInterface, 
-  IdParamInterface, 
-  headersSchema 
-} from '../../globalTypes/index';
+import { StatusCodeInterface, IdParamInterface, } from '../../globalTypes/index';
 import validateRequest from '../../middleware/validationMiddleware';
 
 const SQL_REMOVE_GROUP_MBR = sql<RemoveMemberInterface, Record<string,never>>(`
@@ -20,7 +18,6 @@ export default (router: Router) => {
   Record<string,never>>(
     '/remove-member/:id',
     validateRequest({
-      headers: headersSchema, 
       body: groupsByUserSchema
     }),
     authMiddleware(),

@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import { headersSchema, IdParamInterface, idParamSchema } from '../../globalTypes/index';
+import { IdParamInterface, idParamSchema } from '../../globalTypes/index';
 import { BaseGroupInterface, SharedGroupInterface  } from './types';
 import validateRequest from '../../middleware/validationMiddleware';
 
@@ -24,7 +24,6 @@ export default (router: Router) => {
   Record<string,never>>(
     '/:id/common-groups',
     validateRequest({
-      headers: headersSchema, 
       params: idParamSchema
     }),
     authMiddleware(),

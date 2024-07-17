@@ -6,7 +6,7 @@ import {
   UserInviteInterface, 
   userInviteSchema 
 } from './types';
-import { headersSchema, StatusCodeInterface } from '../../globalTypes/index';
+import { StatusCodeInterface } from '../../globalTypes/index';
 import validateRequest from '../../middleware/validationMiddleware';
 
 const SQL_SEND_INVITATION = sql<InviteInputInterface, Record<string,never>>(`
@@ -18,7 +18,6 @@ export default (router: Router) => {
   Record<string,never>>(
     '/', 
     validateRequest({ 
-      headers: headersSchema, 
       body:userInviteSchema
     }),
     authMiddleware(),

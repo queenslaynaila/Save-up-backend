@@ -6,7 +6,6 @@ import validateRequest  from '../../middleware/validationMiddleware';
 import { AnswerUpdateType, AnswerBodyType, answerbodySchema } from './types'
 import { StatusCodeInterface, 
   IdParamInterface, 
-  headersSchema, 
   idParamSchema 
 } from '../../globalTypes/index'; 
 
@@ -24,7 +23,7 @@ export default (router: Router) => {
   Record<string,never>>(
     '/:id',
     validateRequest({ 
-      headers: headersSchema, params:idParamSchema, body:answerbodySchema
+      params:idParamSchema, body:answerbodySchema
     }),
     authMiddleware(),
     async (req, res) => {

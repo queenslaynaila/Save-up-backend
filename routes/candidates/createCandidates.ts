@@ -2,8 +2,9 @@ import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import  validateRequest from '../../middleware/validationMiddleware';
-import {  headersSchema, StatusCodeInterface } from '../../globalTypes/index';
-import { CandidateInterface, 
+import { StatusCodeInterface } from '../../globalTypes/index';
+import { 
+  CandidateInterface, 
   CandidateRequestBody, 
   candidateRequestBody 
 } from './types';
@@ -18,7 +19,6 @@ export default (router: Router) => {
   Record<string,never>>(
     '/',
     validateRequest({
-      headers: headersSchema,
       body:candidateRequestBody
     }), 
     authMiddleware(),

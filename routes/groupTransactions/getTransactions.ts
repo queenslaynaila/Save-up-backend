@@ -11,7 +11,6 @@ import {
   TransactionQueryParams 
 } from '../usertransactions/types';
 import validateRequest from '../../middleware/validationMiddleware';
-import { headersSchema } from '../../globalTypes';
 
 const SQL_GROUP_TRANSACTIONS = sql<TransactionByGroup, BaseTransaction>(`
  SELECT * FROM get_group_transactions(:pocket_id, :user_id, :group_id);
@@ -22,7 +21,6 @@ export default (router: Router) => {
   TransactionQueryParams>(
     '/', 
     validateRequest({
-      headers: headersSchema, 
       body:transactionByPkt,
       query:transactionQueryParams
     }),
