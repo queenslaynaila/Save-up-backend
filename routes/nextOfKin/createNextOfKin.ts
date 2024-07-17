@@ -9,7 +9,6 @@ import {
   NextOfKinValidation,
   nextOfKinValidation, 
 } from './types'; 
-import { headersSchema } from '../../globalTypes';
 
 const SQL_CREATE_KIN = sql<NextOfKinCreationInterface, NextOfKinInterface>(`
   INSERT INTO next_of_kins (
@@ -35,7 +34,6 @@ export default (router: Router) => {
   Record<string,never>>(
     '/', 
     validateRequest({ 
-      headers: headersSchema, 
       body: nextOfKinValidation
     }),
     authMiddleware(), 
