@@ -1,13 +1,15 @@
 CREATE OR REPLACE FUNCTION update_phone_number(
     p_user_id           INT,
     p_phone_number      TEXT
-) RETURNS TABLE (
+) 
+RETURNS TABLE (
     updated_phone_number  TEXT
 ) AS $$
 DECLARE
     v_old_phone_number TEXT;
 BEGIN
-    SELECT phone_number INTO STRICT v_old_phone_number
+    SELECT phone_number 
+    INTO STRICT v_old_phone_number
     FROM user_contact_details
     WHERE id = p_user_id;
 

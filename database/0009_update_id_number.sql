@@ -2,7 +2,8 @@ CREATE OR REPLACE FUNCTION update_id_number(
     p_user_id           INT,
     p_new_id_type       enum_id_type,
     p_new_id_number     TEXT
-) RETURNS TABLE (
+) 
+RETURNS TABLE (
     new_id_number  TEXT
 ) AS $$
 DECLARE
