@@ -43,7 +43,7 @@ EXCEPTION
 END;
 $$ LANGUAGE plpgsql;
 
-GRANT EXECUTE ON FUNCTION create_user(
+GRANT EXECUTE ON FUNCTION create_user( 
   enum_id_type, 
   TEXT, 
   TEXT, 
