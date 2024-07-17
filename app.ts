@@ -16,7 +16,7 @@ import candidateRoutes from './routes/candidates/index';
 import passwordRoutes from './routes/pin/index';
 import securityQuestionsRoutes from './routes/securityQuestions';
 import securityAnswerRoutes from './routes/securityAnswer/index';
-import cumulativesRoutes from './routes/cumulatives/index';
+import cumulativesRoutes from './routes/userCumulatives/index';
 import groupRoutes from './routes/groups/index';
 import electionRoutes from './routes/elections/index'
 import inviteRoutes from './routes/invitations/index';
