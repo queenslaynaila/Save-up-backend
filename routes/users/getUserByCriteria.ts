@@ -10,7 +10,6 @@ import {  UserType,
   userQuerySchema, 
   userByEntitySchema  
 } from './types';
-import { headersSchema } from '../../globalTypes';
 
 const SQL_GET_USER_BY_CRITERIA = sql<Record<string,never>,  UserType>(`
   SELECT 
@@ -32,12 +31,12 @@ export default (router: Router) => {
   router.get<string, UserByEntityType,  UserType[], Record<string,never>, UserQueryParams>(
     '/:entity', 
     validateRequest({ 
-      headers:headersSchema, params:userByEntitySchema, query: userQuerySchema 
+      params:userByEntitySchema, query: userQuerySchema 
     }),
     authMiddleware(), 
     async (req, res) => {
       const  targetUser = req.params.entity;
-      const { full_name } = req.query;  
+      const { full_name, phone_number } = req.query;  
 
       const filters: string[] = [];
       const filterArgs: Record<string, string | number> = {};
@@ -56,7 +55,7 @@ export default (router: Router) => {
           filters.push(`user_contact_details.phone_number = :phoneNumber`);
         } else if (/^[0-9]+$/.test(targetUser)) {
           filterArgs.idNumber = targetUser;
-          filters.push(`user_contact_details.id_number = :idNumber`);
+          filters.push(`users.id_number = :idNumber`);
         }
       } else {
         throw new HttpError(403);
@@ -64,7 +63,12 @@ export default (router: Router) => {
 
       if (full_name) {
         filterArgs.fullName = full_name;
-        filters.push(`users.full_name = :fullName`);
+        filters.push(`user_contact_details.full_name = :fullName`);
+      }
+
+      if (phone_number) {
+        filterArgs.phoneNumber = phone_number;
+        filters.push(`user_contact_details.phone_Number = :phoneNumber`);
       }
     
       const query = SQL_GET_USER_BY_CRITERIA({});
