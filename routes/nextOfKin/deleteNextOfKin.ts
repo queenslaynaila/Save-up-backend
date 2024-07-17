@@ -2,7 +2,11 @@ import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import {NextOfKinDeletionInterface } from './types';
-import { headersSchema, IdParamInterface, idParamSchema, StatusCodeInterface } from '../../globalTypes/index';
+import { 
+  IdParamInterface, 
+  idParamSchema, 
+  StatusCodeInterface 
+} from '../../globalTypes/index';
 import validateRequest from '../../middleware/validationMiddleware';
 
 const SQL_DELETE_KIN = sql<NextOfKinDeletionInterface, Record<string,never>>(`
@@ -18,14 +22,14 @@ export default (router: Router) => {
   Record<string,never>>(
     '/:id', 
     validateRequest({ 
-      headers: headersSchema, 
       params: idParamSchema
     }),
     authMiddleware(), 
     async (req, res) => {
-      const user_id = req.user!.id;
-      const xid = parseInt(req.params.id);
-      await SQL_DELETE_KIN({user_id, xid }).exec();
+      await SQL_DELETE_KIN({
+        user_id:req.user!.id, 
+        xid:parseInt(req.params.id) 
+      }).exec();
       res.sendStatus(204);
     }
   );
