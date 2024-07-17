@@ -8,7 +8,7 @@ import { ExpenseBodyInterface,
   ExpenseUpdateInterface, 
   ExpenseUpdateRes
 } from './types';
-import { headersSchema, IdParamInterface, idParamSchema } from '../../globalTypes/index'
+import { IdParamInterface, idParamSchema } from '../../globalTypes/index'
 
 const SQL_UPDATE_EXPENSE= sql<ExpenseUpdateInterface, ExpenseUpdateRes>(`
   UPDATE expenses
@@ -27,7 +27,6 @@ export default (router: Router) => {
   Record<string,never>>(
     '/:id', 
     validateRequest({
-      headers: headersSchema, 
       params: idParamSchema,
       body: expenseBodySchema
     }), 
