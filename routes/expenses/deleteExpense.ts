@@ -5,7 +5,6 @@ import {
   IdParamInterface, 
   XidEntityInterface, 
   StatusCodeInterface, 
-  headersSchema,
   idParamSchema,
   entitySchema,
   EntityInterface
@@ -25,7 +24,6 @@ export default (router: Router) => {
   Record<string,never>>(
     '/:id', 
     validateRequest({
-      headers: headersSchema, 
       params: idParamSchema,
       body:entitySchema
     }),
