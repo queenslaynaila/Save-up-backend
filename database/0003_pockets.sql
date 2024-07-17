@@ -2,7 +2,7 @@ CREATE TYPE enum_pocket_type AS ENUM ('Standard', 'Locked');
 CREATE TYPE enum_priority AS ENUM ('High', 'Intermediate', 'Low');
 CREATE TYPE enum_status AS ENUM ('In Progress', 'Completed');
 -- As pockets references the reference table categories create it 
--- and all tables referrencing it in one single transaction 
+-- and all tables referencing it in one single transaction
 -- as when there is a foreign key to a reference table, Citus 
 -- needs to perform all operations over a single connection to ensure consistency
 
