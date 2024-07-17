@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import authMiddleware from '../../middleware/authorization';
-import { StatusCodeInterface } from '../../globalTypes/index';
+import { StatusCodeInterface } from '../../globalTypes';
 
 export default (router: Router) => {
   router.delete<Record<string,never>, StatusCodeInterface, Record<string,never>, 

@@ -6,7 +6,7 @@ import {
   IdParamInterface, 
   idParamSchema, 
   StatusCodeInterface 
-} from '../../globalTypes/index';
+} from '../../globalTypes';
 import validateRequest from '../../middleware/validationMiddleware';
 
 const SQL_DELETE_KIN = sql<NextOfKinDeletionInterface, Record<string,never>>(`

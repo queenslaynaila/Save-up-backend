@@ -2,7 +2,7 @@ import { Router  } from 'express';
 import bcrypt from 'bcrypt';
 import { sql } from '../../db';
 import { validateStepToken } from '../../middleware/resetTokenMIddleware'
-import { StatusCodeInterface } from '../../globalTypes/index';
+import { StatusCodeInterface } from '../../globalTypes';
 import { ResetPasswordInterface, ResetPasswordRequestInterface } from './types';
 import { HttpError } from '../../middleware/errorMiddleware';
 

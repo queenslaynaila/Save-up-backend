@@ -1,5 +1,5 @@
 import jwt, { Secret } from 'jsonwebtoken';
-import { UserRole } from '../globalTypes/index';
+import { UserRole } from '../globalTypes';
 
 export const generateToken = (id: number, role: UserRole, expiresIn: string): string => {
   return jwt.sign({ id, role }, process.env.JWT_SECRET as Secret, { expiresIn });

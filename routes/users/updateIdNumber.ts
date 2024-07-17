@@ -3,7 +3,7 @@ import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import validateRequest from '../../middleware/validationMiddleware';
 import { UserIdDetails,UpdateIdDetails, updateIdDetailsSchema } from './types';
-import { StatusCodeInterface } from '../../globalTypes/index';
+import { StatusCodeInterface } from '../../globalTypes';
 
 const SQL_UPDATE_ID_NUMBER = sql<UserIdDetails, Record<string,never>>(`
    SELECT * FROM update_id_number(:id, :id_type, :id_number)

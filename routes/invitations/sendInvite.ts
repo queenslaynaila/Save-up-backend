@@ -6,7 +6,7 @@ import {
   UserInviteInterface, 
   userInviteSchema 
 } from './types';
-import { StatusCodeInterface } from '../../globalTypes/index';
+import { StatusCodeInterface } from '../../globalTypes';
 import validateRequest from '../../middleware/validationMiddleware';
 
 const SQL_SEND_INVITATION = sql<InviteInputInterface, Record<string,never>>(`

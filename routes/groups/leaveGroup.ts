@@ -3,7 +3,7 @@ import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { GroupExitInterface } from './types';
 import { StatusCodeInterface, 
-  IdParamInterface } from '../../globalTypes/index';
+  IdParamInterface } from '../../globalTypes';
 
 const SQL_EXIT_GROUP = sql<GroupExitInterface, Record<string,never>>(`
   SELECT leave_group (:user_id, :id);

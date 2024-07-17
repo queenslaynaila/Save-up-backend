@@ -9,7 +9,7 @@ import {
   XidEntityInterface,
   entitySchema,
   idParamSchema 
-} from '../../globalTypes/index';
+} from '../../globalTypes';
 
 const SQL_GET_POCKET_BY_ID = sql<XidEntityInterface, BasePocketType>(`
   SELECT entity_id, 

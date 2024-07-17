@@ -7,7 +7,7 @@ import {
   savingPostRequestSchema, 
   SavingPostRequestType 
 } from './types';
-import { StatusCodeInterface } from '../../globalTypes/index';
+import { StatusCodeInterface } from '../../globalTypes';
 
 const SQL_CREATE_SAVING = sql<SavingCreateType, Record<string,never>>(`
   SELECT create_saving(:user_id, :pocket_id, :amount)

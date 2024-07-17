@@ -7,7 +7,7 @@ import { AnswerUpdateType, AnswerBodyType, answerbodySchema } from './types'
 import { StatusCodeInterface, 
   IdParamInterface, 
   idParamSchema 
-} from '../../globalTypes/index'; 
+} from '../../globalTypes';
 
 const SQL_UPDATE_SECURITY_ANSWER = sql<AnswerUpdateType, Record<string,never>>(`
   UPDATE security_answers 

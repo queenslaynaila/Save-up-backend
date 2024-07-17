@@ -7,7 +7,7 @@ import {
   ApproveWithdrawal, 
   WithdrawalRequest 
 } from './types';
-import { StatusCodeInterface } from '../../globalTypes/index';
+import { StatusCodeInterface } from '../../globalTypes';
 
 const SQL_APPROVE_GRP_WITHDRAWAL = sql<ApproveWithdrawal, Record<string, never>>(`
     SELECT approve_group_withdrawal(
