@@ -11,9 +11,7 @@ RETURNS VOID AS $$
 DECLARE
   v_current_balance     NUMERIC;
   v_withdrawal_id       INT;
-  v_recipient_record    JSON;
-  v_recipient_id        INT;
-  v_amount              NUMERIC; 
+ 
 BEGIN
   PERFORM check_grp_membership(p_initiator_id, p_group_id);
 
