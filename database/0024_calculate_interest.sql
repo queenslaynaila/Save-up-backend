@@ -14,8 +14,13 @@ DECLARE
     new_reference_no TEXT;
 BEGIN
     -- Fetch interest rates for each pocket type once
-    SELECT rate INTO STRICT interest_rate_standard FROM interest_rates WHERE pocket_type = 'Standard Pocket';
-    SELECT rate INTO STRICT interest_rate_locked FROM interest_rates WHERE pocket_type = 'Locked Pocket';
+    SELECT rate INTO STRICT interest_rate_standard
+    FROM interest_rates
+    WHERE pocket_type = 'Standard Pocket';
+
+    SELECT rate INTO STRICT interest_rate_locked
+    FROM interest_rates
+    WHERE pocket_type = 'Locked Pocket';
 
     FOR pocket IN
         SELECT p.id AS pocket_id, p.pocket_type, p.entity_id
