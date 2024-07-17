@@ -5,7 +5,7 @@ import { HttpError } from '../../middleware/errorMiddleware';
 import authMiddleware from '../../middleware/authorization';
 import  validateRequest from '../../middleware/validationMiddleware';
 import { loginSchema, PhoneNoUpdateType } from './types';
-import { headersSchema, StatusCodeInterface } from '../../globalTypes/index';
+import { StatusCodeInterface } from '../../globalTypes/index';
 
 const SQL_GET_USER_PIN = sql<{ id: number }, { pin: string }>(`
   SELECT pin FROM users WHERE id = :id
@@ -18,8 +18,8 @@ const SQL_UPDATE_PHONE = sql<{ phone_number: string; id: number }, Record<string
 export default (router: Router) => {
   router.patch<Record<string,never>, StatusCodeInterface, PhoneNoUpdateType , 
   Record<string,never>>(
-    '/me', 
-    validateRequest({ headers: headersSchema, body:loginSchema }),
+    '/phone-number', 
+    validateRequest({ body:loginSchema }),
     authMiddleware(), 
     async (req, res) => {
       const id = req.user!.id
