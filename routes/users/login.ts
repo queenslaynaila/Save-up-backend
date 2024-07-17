@@ -12,7 +12,7 @@ const SQL_GET_USER = sql<{ phone_number: string }, UserType>(`
   SELECT 
     users.id, 
     users.id_type, 
-    user.id_number, 
+    users.id_number,
     user_contact_details.phone_number, 
     user_contact_details.full_name, 
     users.role, 
@@ -39,7 +39,7 @@ const SQL_RECORD_LOGIN = sql<LoginAttempt, Record<string, never>>(`
   WHERE user_id = :id
 `);
 
-const SQL_COUNT_LAST_FAILED_ATTEMPTS = sql<{id: number},{failed_count: number}>(`
+const SQL_COUNT_LAST_FAILED_ATTEMPTS = sql< { id: number }, { failed_count: number }>(`
   SELECT COUNT(*) AS failed_count
   FROM (
     SELECT 1
