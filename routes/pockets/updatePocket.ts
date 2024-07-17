@@ -2,7 +2,8 @@ import { Router } from 'express';
 import authMiddleware from '../../middleware/authorization';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { sql } from '../../db';
-import { PocketUpdateType, 
+import {
+  PocketUpdateType,
   BasePocketType, 
   PocketPatchType
 } from './types';

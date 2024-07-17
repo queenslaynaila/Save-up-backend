@@ -9,7 +9,7 @@ import {
   UserRole, 
   GetByPhoneInterface,  
   GetByIdInterface
-} from '../../globalTypes/index';
+} from '../../globalTypes';
 import { HttpError } from '../../middleware/errorMiddleware'; 
 import { phoneNumber, PhoneNumberInterface } from './types';
 

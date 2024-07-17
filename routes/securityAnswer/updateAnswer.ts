@@ -3,8 +3,13 @@ import bcrypt from 'bcrypt';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import validateRequest  from '../../middleware/validationMiddleware';
-import { AnswerUpdateType, AnswerBodyType, answerbodySchema } from './types'
-import { StatusCodeInterface, 
+import {
+  AnswerUpdateType,
+  AnswerBodyType,
+  answerbodySchema
+} from './types'
+import {
+  StatusCodeInterface,
   IdParamInterface, 
   idParamSchema 
 } from '../../globalTypes';

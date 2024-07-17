@@ -2,7 +2,8 @@ import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import validateRequest from '../../middleware/validationMiddleware';
-import { ratificationValidation,  
+import {
+  ratificationValidation,
   RatificationResultsInterface, 
   ComputeRatificationInterface, 
   RatificationValidationInterface

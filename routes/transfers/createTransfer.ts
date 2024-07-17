@@ -2,7 +2,11 @@ import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import validateRequest from '../../middleware/validationMiddleware';
-import { TransferInput ,  TransferValidation,  transferValidationSchema } from './types'
+import {
+  TransferInput ,
+  TransferValidation,
+  transferValidationSchema
+} from './types'
 import { StatusCodeInterface } from '../../globalTypes'
 
 const SQL_CREATE_TRANSFER = sql<TransferInput , Record<string,never>>(`

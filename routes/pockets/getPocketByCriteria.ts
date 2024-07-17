@@ -3,7 +3,8 @@ import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import validateRequest from '../../middleware/validationMiddleware';
 import { convertToTitleCase } from '../../middleware/caseNormalization';
-import { BasePocketType, 
+import {
+  BasePocketType,
   PocketQueryParamsType, 
   PocketByEntityType, 
   PocketQueryParamsSchema

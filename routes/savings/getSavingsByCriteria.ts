@@ -1,7 +1,8 @@
 import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import { BaseSavingType, 
+import {
+  BaseSavingType,
   savingsQueryParamSchema, 
   SavingsQueryParamType 
 } from './types';
