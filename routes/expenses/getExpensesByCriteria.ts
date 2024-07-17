@@ -6,9 +6,9 @@ import { BaseExpenseInterface,
   expenseQuerySchema 
 } from './types';
 import validateRequest from '../../middleware/validationMiddleware';
-import { EntityInterface, 
-  entitySchema, 
-  headersSchema 
+import { 
+  EntityInterface, 
+  entitySchema
 } from '../../globalTypes';
 
 const SQL_GET_EXPENSES = sql<{ entity_id:number }, BaseExpenseInterface>(`
@@ -28,9 +28,8 @@ const SQL_GET_EXPENSES = sql<{ entity_id:number }, BaseExpenseInterface>(`
 export default (router: Router) => {
   router.get<Record<string,never>, BaseExpenseInterface[], EntityInterface, 
   ExpenseQueryInterface>(
-    '/me',
+    '/',
     validateRequest({
-      headers: headersSchema, 
       body:entitySchema,
       query: expenseQuerySchema
     }), 
