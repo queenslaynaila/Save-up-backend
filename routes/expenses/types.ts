@@ -6,7 +6,7 @@ export const baseExpenseSchem = z.object({
   category_id: z.number(),
   description: z.string(),
   amount: z.number(),
-  spent_at: z.string(),
+  spent_at: z.string().date().optional(),
   created_at: z.string()
 });
 
