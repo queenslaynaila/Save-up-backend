@@ -20,4 +20,3 @@ export default (baseRouter: Router) => {
   
   baseRouter.use('/users', router);
 };
-

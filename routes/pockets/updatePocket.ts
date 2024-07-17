@@ -7,7 +7,8 @@ import {
   BasePocketType, 
   PocketPatchType
 } from './types';
-import { entitySchema, 
+import { 
+  entitySchema, 
   IdParamInterface, 
   idParamSchema 
 } from '../../globalTypes';

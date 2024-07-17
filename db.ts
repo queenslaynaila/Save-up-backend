@@ -11,4 +11,3 @@ export const {sql, shutdown: closeDbConnection} = createBasicSQL({
   disablePooling:Boolean(process.env.DB_BOUNCER_ENABLED) || true,
   max: 60,
 });
-

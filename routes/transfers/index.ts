@@ -8,4 +8,3 @@ export default (baseRouter: Router) => {
   
   baseRouter.use('/transfers', router);
 };
-

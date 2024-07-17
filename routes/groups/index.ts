@@ -22,4 +22,3 @@ export default (baseRouter: express.Router) => {
 
   baseRouter.use('/groups', router);
 };
-

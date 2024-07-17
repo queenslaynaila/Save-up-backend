@@ -6,11 +6,13 @@ import { sql } from '../../db';
 import { generateResetPin } from '../../middleware/generateResetPin';
 import sendSms from '../../services/twilio';
 import { HttpError } from '../../middleware/errorMiddleware';
-import { StatusCodeInterface, 
+import { 
+  StatusCodeInterface, 
   GetByPhoneInterface,  
   GetByIdInterface  
 } from '../../globalTypes';
-import { TokenInterface, 
+import { 
+  TokenInterface, 
   InitiatePasswordResetInterface, 
   PhoneReason 
 } from './types'

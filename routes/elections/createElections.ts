@@ -3,9 +3,11 @@ import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import validateRequest from '../../middleware/validationMiddleware';  
 import {  StatusCodeInterface } from '../../globalTypes';
-import { ElectionInterface, 
+import { 
+  ElectionInterface, 
   ElectionValidation, 
-  electionValidation } from './types';
+  electionValidation 
+} from './types';
 
 const SQL_CALL_ELECTION = sql<ElectionInterface , Record<string,never>>(`
   SELECT create_election(:group_id, :initiator_id, :type)

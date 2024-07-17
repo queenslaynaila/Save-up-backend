@@ -2,7 +2,8 @@ import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import  validateRequest from '../../middleware/validationMiddleware';
-import {  BallotComputeInterface, 
+import {  
+  BallotComputeInterface, 
   BallotBodyRequestInterface,
   ballotBodyRequest, 
   BallotResultInterface 

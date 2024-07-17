@@ -7,4 +7,3 @@ const resetRequestsLimit = {
 };
   
 export const resetPasswordLimiter = rateLimit(resetRequestsLimit);
-

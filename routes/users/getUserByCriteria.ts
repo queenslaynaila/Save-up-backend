@@ -4,7 +4,8 @@ import validateRequest from '../../middleware/validationMiddleware';
 import { HttpError } from '../../middleware/errorMiddleware';
 import authMiddleware from '../../middleware/authorization';
 import isStandardUser from '../../middleware/isStandardUser';
-import {  UserType, 
+import {  
+  UserType, 
   UserByEntityType, 
   UserQueryParams, 
   userQuerySchema, 

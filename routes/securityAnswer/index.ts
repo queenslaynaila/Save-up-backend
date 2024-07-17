@@ -10,4 +10,3 @@ export default (baseRouter: Router) => {
   
   baseRouter.use('/security-answers', router);
 };
-

@@ -3,7 +3,8 @@ import bcrypt from 'bcrypt';
 import jwt, { Secret } from 'jsonwebtoken';
 import { sql } from '../../db';
 import { validateStepToken } from '../../middleware/resetTokenMIddleware'
-import { VerifyTokenInterface, 
+import { 
+  VerifyTokenInterface, 
   SecurityQuestionInterface, 
   SecurityQuestionArray, 
   UpdateTokenUsageInterface  
@@ -75,4 +76,3 @@ export default(router: Router) => {
     }
   );
 };
-  
