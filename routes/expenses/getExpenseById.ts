@@ -6,7 +6,6 @@ import { BaseExpenseInterface } from './types';
 import { 
   EntityInterface,
   entitySchema,
-  headersSchema, 
   IdParamInterface, 
   idParamSchema, 
   XidEntityInterface 
@@ -24,9 +23,8 @@ const SQL_GET_EXPENSE_BY_ID = sql<XidEntityInterface,  BaseExpenseInterface>(`
 export default (router: Router) => {
   router.get<IdParamInterface, BaseExpenseInterface, EntityInterface, 
   Record<string,never>>(
-    '/me/:id', 
+    '/:id', 
     validateRequest({
-      headers: headersSchema, 
       params: idParamSchema,
       body:entitySchema
     }),
