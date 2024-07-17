@@ -1,11 +1,11 @@
 ## Getting Started
-To understand the custom error codes used in PostgreSQL functions & procedures, refer to the 
-[Custom PostgreSQL Error Codes Documentation](./error-codes.md) for detailed descriptions and usage examples.
+To understand the custom error codes used in PostgresSQL functions & procedures, refer to the 
+[Custom PostgresSQL Error Codes Documentation](./error-codes.md) for detailed descriptions and usage examples.
 
 ## Technology Stack
 
 - **Backend:** Express with TypeScript for type safety.
-- **Database:** PostgreSQL with Citus extension for distributed database functionality.
+- **Database:** PostgresSQL with Citus extension for distributed database functionality.
 - **Authentication:** JSON Web Tokens (JWT) for secure user authentication.
 - **Password Hashing:** Bcrypt for secure password hashing.
 - **Scheduled Tasks:** Node-Cron for running cron jobs.
@@ -23,7 +23,7 @@ Execute the following to generate the API documentation:
 npm run swagger
 ```
 This creates an OpenAPI (Swagger) specification file called swagger.yml in each route subfolder. 
-The specification details the API's endpoints, requests, responses, and error formats along with samples.
+The specification details the AP's endpoints, requests, responses, and error formats along with samples.
 
 #### For Windows Users
 Use the following command to generate the Swagger specification for Windows:
