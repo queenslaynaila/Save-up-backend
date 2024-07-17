@@ -1,6 +1,6 @@
 CREATE OR REPLACE FUNCTION create_user_withdrawal(
-    p_user_id      INT, 
-    p_pocket_id    INT, 
+    p_user_id      INT,
+    p_pocket_id    INT,
     p_amount       NUMERIC
 )
 RETURNS VOID AS $$
@@ -10,14 +10,15 @@ DECLARE
     v_target_at            TIMESTAMP WITH TIME ZONE;
     v_new_balance          NUMERIC(30, 2);
     v_reference_id         TEXT;
-BEGIN 
-    SELECT * FROM get_transaction_info(p_pocket_id, p_user_id) 
-    INTO STRICT v_current_balance;
+BEGIN
+    SELECT current_balance
+    INTO STRICT v_current_balance
+    FROM get_transaction_info(p_pocket_id, p_user_id);
 
     IF v_current_balance < p_amount THEN
         RAISE EXCEPTION USING
-          MESSAGE = 'ERR_INSUFFICIENT_FUNDS',
-          ERRCODE = 'P0004';
+            MESSAGE = 'ERR_INSUFFICIENT_FUNDS',
+            ERRCODE = 'P0004';
     END IF;
 
     SELECT pocket_type, target_at
@@ -26,9 +27,9 @@ BEGIN
     WHERE pockets.xid = p_pocket_id
     AND pockets.entity_id = p_user_id;
 
-    IF v_pocket_type = 'Locked' AND v_target_at <= NOW() THEN
-        RAISE EXCEPTION USING 
-            MESSAGE = 'ERR_FUNDS_LOCKED'
+    IF v_pocket_type = 'Locked' AND v_target_at > NOW() THEN
+        RAISE EXCEPTION USING
+            MESSAGE = 'ERR_FUNDS_LOCKED',
             ERRCODE = 'P0005';
     END IF;
 
