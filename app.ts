@@ -132,7 +132,7 @@ app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
       errorData: error.errorData
     });
   } else {
-    return res.status(500)
+    return res.sendStatus(500)
   }
 });
 
