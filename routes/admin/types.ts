@@ -5,13 +5,13 @@ export const ValidResourcesEnum = z.enum(['goals', 'savings', 'expenses']);
 export const ValidStatusEnum = z.enum(['Completed', 'In Progress']);
 
 export const statsQuerySchema = z.object({
-  user_id: z.string().optional(),
-  priority: z.string().optional(),
-  status: z.string().optional(),
-  category_id: z.string().optional(),
-  start_date: z.string().optional(),
-  end_date: z.string().optional(),
-});
+  user_id: z.string(),
+  priority: z.string(),
+  status: z.string(),
+  category_id: z.string(),
+  start_date: z.string(),
+  end_date: z.string()
+}).partial();
 
 export type StatsQueryInterface = z.infer<typeof statsQuerySchema>;
 

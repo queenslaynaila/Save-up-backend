@@ -48,8 +48,8 @@ export const availableSavings = z.object({
 export type Balance = z.infer<typeof availableSavings>;
 
 export const queryParams = z.object({
-  start_date: z.string().optional(),
-  end_date: z.string().optional()
-});
+  start_date: z.string(),
+  end_date: z.string()
+}).partial();
 
 export type QueryParams = z.infer<typeof queryParams>;

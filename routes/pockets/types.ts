@@ -43,12 +43,12 @@ export const pocketPostRequestSchema = pocketCreateSchema.omit({
 export const PocketQueryParamsSchema = basePocketSchema.pick({
   priority: true,
   status: true
-}).partial().extend({
-  category_id: z.string().optional(),
-  start_date: z.string().optional(),
-  end_date: z.string().optional(),
-  is_default: z.string().optional()
-});
+}).extend({
+  category_id: z.string(),
+  start_date: z.string(),
+  end_date: z.string(),
+  is_default: z.string()
+}).partial();
 
 export type PocketQueryParamsType = z.infer<typeof PocketQueryParamsSchema>;
 

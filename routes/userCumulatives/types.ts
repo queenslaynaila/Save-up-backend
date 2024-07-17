@@ -16,10 +16,10 @@ export const topExpenseCategoriesSchema = z.array(
 export type TopExpenseCategoriesInterface = z.infer<typeof topExpenseCategoriesSchema>;
   
 export const totalExpensesQuerySchema = z.object({
-  start_date: z.string().optional(),
-  end_date: z.string().optional(),
-  category_id: z.string().optional()
-});
+  start_date: z.string(),
+  end_date: z.string(),
+  category_id: z.string()
+}).partial();
 
 export type TotalExpenseQueryInterface = z.infer<typeof totalExpensesQuerySchema>;
   
@@ -42,10 +42,10 @@ export const totalTargetsSchema = z.object({
 export type TotalTargetsInterface = z.infer<typeof totalTargetsSchema>;
   
 export const totalTargetPocketsQuerySchema = z.object({
-  priority: z.string().optional(),
-  status: z.string().optional(),
-  category_id: z.string().optional()
-});
+  priority: z.string(),
+  status: z.string(),
+  category_id: z.string()
+}).partial();
 
 export const totalSavingsResultSchema = z.object({
   total_deposits: z.number()

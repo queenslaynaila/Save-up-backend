@@ -67,7 +67,7 @@ export type XidEntityInterface = z.infer<typeof xidEntitySchema>
 
 export const entitySchema = xidEntitySchema.pick({  
   entity_id: true
-}).optional();
+}).partial();
 
 export type EntityInterface = z.infer<typeof entitySchema>;
 

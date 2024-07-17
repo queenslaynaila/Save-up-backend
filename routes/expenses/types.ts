@@ -27,10 +27,10 @@ export const ExpenseUpdateValidationSchema = expenseCreationSchema.omit({
 }).partial()
 
 export const expenseQuerySchema = z.object({
-  category_id: z.string().optional(),
-  start_date: z.string().optional(),
-  end_date: z.string().optional(),
-});
+  category_id: z.string(),
+  start_date: z.string(),
+  end_date: z.string()
+}).partial();
   
 export type ExpenseQueryInterface = z.infer<typeof expenseQuerySchema>;
 
