@@ -8,7 +8,7 @@ import {
   idParamSchema,
   entitySchema,
   EntityInterface
-} from '../../globalTypes/index'
+} from '../../globalTypes'
 import validateRequest from '../../middleware/validationMiddleware';
 
 const SQL_DELETE_EXPENSE = sql<XidEntityInterface, Record<string,never>>(`

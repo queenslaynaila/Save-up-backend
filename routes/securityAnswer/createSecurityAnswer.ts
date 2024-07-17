@@ -4,7 +4,7 @@ import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import validateRequest from '../../middleware/validationMiddleware';
 import { AnswerCreationType, SecurityAnswersBaseType, answerCreationValidation } from './types'
-import {  StatusCodeInterface } from '../../globalTypes/index';
+import {  StatusCodeInterface } from '../../globalTypes';
 
 const SQL_CREATE_ANSWER = sql<SecurityAnswersBaseType, Record<string,never>>(`
   SELECT create_answer (:user_id, :question_id, :answer)

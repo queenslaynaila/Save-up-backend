@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import { IdParamInterface, idParamSchema } from '../../globalTypes/index';
+import { IdParamInterface, idParamSchema } from '../../globalTypes';
 import { BaseGroupInterface, SharedGroupInterface  } from './types';
 import validateRequest from '../../middleware/validationMiddleware';
 

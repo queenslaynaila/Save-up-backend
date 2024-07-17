@@ -6,7 +6,7 @@ import { WithdrawalBody,
   withdrawalBodySchema, 
   WithdrawalCreation 
 } from './types';
-import {  StatusCodeInterface } from '../../globalTypes/index';
+import {  StatusCodeInterface } from '../../globalTypes';
 
 const SQL_CREATE_WITHDRAWAL = sql<WithdrawalCreation, Record<string, never>>(`
   SELECT create_user_withdrawal(:user_id, :pocket_id, :amount);

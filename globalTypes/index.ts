@@ -17,7 +17,7 @@ export enum Method {
   DELETE = 'delete',
 }
 
-//PARAMS SCHEEMAS
+//PARAMS SCHEMAS
 
 export const idParamSchema = z.object({
   id: z.string()
@@ -43,7 +43,7 @@ export const getById = z.object({
 
 export type GetByIdInterface = z.infer<typeof getById>;
 
-//MESSAGE RESPONSESCHEMA
+//MESSAGE RESPONSE SCHEMA
 
 export const statusCodeSchema = z.object({
   statusCode: z.number()

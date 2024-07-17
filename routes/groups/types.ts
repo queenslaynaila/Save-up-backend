@@ -26,12 +26,12 @@ export const groupCreationValidation = groupCreationSchema.omit({created_by:true
 
 export type GroupCreationValidation = z.infer<typeof groupCreationValidation>;
 
-export const sharedGRoupSchema = z.object({
+export const sharedGroupSchema = z.object({
   logged_in_user_id: z.number(), 
   user_id: z.number() 
 })
 
-export type SharedGroupInterface = z.infer<typeof sharedGRoupSchema>;
+export type SharedGroupInterface = z.infer<typeof sharedGroupSchema>;
 
 export const groupMemberSchema = z.object({
   user_id: z.number(),

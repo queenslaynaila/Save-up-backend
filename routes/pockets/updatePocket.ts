@@ -9,7 +9,7 @@ import { PocketUpdateType,
 import { entitySchema, 
   IdParamInterface, 
   idParamSchema 
-} from '../../globalTypes/index';
+} from '../../globalTypes';
 import  validateRequest  from '../../middleware/validationMiddleware';
 
 const SQL_UPDATE_POCKET = sql<PocketUpdateType, BasePocketType>(`

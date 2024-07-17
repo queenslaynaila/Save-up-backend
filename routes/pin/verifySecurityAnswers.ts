@@ -4,7 +4,7 @@ import jwt, { Secret } from 'jsonwebtoken';
 import { sql } from '../../db';
 import {  validateStepToken } from '../../middleware/resetTokenMIddleware'
 import { HttpError } from '../../middleware/errorMiddleware';
-import { StatusCodeInterface, GetByUserInterface } from '../../globalTypes/index';
+import { StatusCodeInterface, GetByUserInterface } from '../../globalTypes';
 import { VerifyAnswerInterface, SecurityAnswersRequestInterface } from './types'
 
 const SQL_GET_SECURITY_ANSWERS = sql<GetByUserInterface, VerifyAnswerInterface>(`

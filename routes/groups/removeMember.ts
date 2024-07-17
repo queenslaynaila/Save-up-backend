@@ -6,7 +6,7 @@ import {
   groupsByUserSchema, 
   RemoveMemberInterface 
 } from './types';
-import { StatusCodeInterface, IdParamInterface, } from '../../globalTypes/index';
+import { StatusCodeInterface, IdParamInterface, } from '../../globalTypes';
 import validateRequest from '../../middleware/validationMiddleware';
 
 const SQL_REMOVE_GROUP_MBR = sql<RemoveMemberInterface, Record<string,never>>(`

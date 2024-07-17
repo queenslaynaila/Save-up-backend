@@ -9,7 +9,7 @@ DECLARE
     v_pocket_type          TEXT;
     v_target_at            TIMESTAMP WITH TIME ZONE;
     v_new_balance          NUMERIC(30, 2);
-    v_reference_no         TEXT;
+    v_reference_id         TEXT;
 BEGIN 
     SELECT * FROM get_transaction_info(p_pocket_id, p_user_id) 
     INTO STRICT v_current_balance;

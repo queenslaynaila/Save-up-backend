@@ -9,7 +9,7 @@ import {
   IdParamInterface, 
   idParamSchema, 
   XidEntityInterface 
-} from '../../globalTypes/index'
+} from '../../globalTypes'
 import validateRequest from '../../middleware/validationMiddleware';
 
 const SQL_GET_EXPENSE_BY_ID = sql<XidEntityInterface,  BaseExpenseInterface>(`

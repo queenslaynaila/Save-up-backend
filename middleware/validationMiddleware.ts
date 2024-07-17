@@ -1,4 +1,4 @@
-import { HttpError } from '../middleware/errorMiddleware';
+import { HttpError } from './errorMiddleware';
 import { NextFunction, Request, Response } from 'express';
 import { ZodSchema } from 'zod';
 

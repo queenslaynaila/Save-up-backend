@@ -1,4 +1,4 @@
-import { sql } from '.././db';
+import { sql } from '../db';
 
 const SQL_CREDIT_INTEREST = sql<Record<string, never>, Record<string, never>>(`
   CALL calculate_interest()

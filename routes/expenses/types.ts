@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const baseExpenseSchem = z.object({
+export const baseExpenseSchema = z.object({
   entity_id: z.number(),
   xid: z.number(),
   category_id: z.number(),
@@ -10,10 +10,10 @@ export const baseExpenseSchem = z.object({
   created_at: z.string()
 });
 
-export type BaseExpenseInterface = z.infer<typeof baseExpenseSchem>;
+export type BaseExpenseInterface = z.infer<typeof baseExpenseSchema>;
 
 
-export const expenseCreationSchema = baseExpenseSchem.extend({
+export const expenseCreationSchema = baseExpenseSchema.extend({
   entity_id: z.number().optional()
 }).omit({
   xid: true,
@@ -34,7 +34,7 @@ export const expenseQuerySchema = z.object({
   
 export type ExpenseQueryInterface = z.infer<typeof expenseQuerySchema>;
 
-export const expenseUpdateSchema = baseExpenseSchem.pick({
+export const expenseUpdateSchema = baseExpenseSchema.pick({
   category_id: true,
   description: true,
   amount: true,
@@ -52,7 +52,7 @@ export const expenseBodySchema =expenseUpdateSchema.omit({
 
 export type ExpenseBodyInterface = z.infer<typeof expenseBodySchema>;
 
-export const expenseUpdateRes = baseExpenseSchem.pick({
+export const expenseUpdateRes = baseExpenseSchema.pick({
   category_id: true,
   description: true,
   amount: true,

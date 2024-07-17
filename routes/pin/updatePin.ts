@@ -13,7 +13,7 @@ import {
 import {  
   StatusCodeInterface, 
   GetByIdInterface, 
-} from '../../globalTypes/index';
+} from '../../globalTypes';
 import validateRequest from '../../middleware/validationMiddleware';
 
 const SQL_GET_PASSWORD_BY_ID = sql<GetByIdInterface, ResetPinInterface >(`

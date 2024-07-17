@@ -11,7 +11,7 @@ import {
   IdParamInterface, 
   idParamSchema, 
   StatusCodeInterface
-} from '../../globalTypes/index';
+} from '../../globalTypes';
 
 const SQL_INITIATE_GRP_WITHDRAWAL = sql<WithdrawalRequest, Record<string, never>>(`
   SELECT initiate_grp_withdrawal(

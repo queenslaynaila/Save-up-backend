@@ -1,5 +1,5 @@
-# Custom PostgreSQL Error Codes
-These custom error codes are used within PostgreSQL functions to handle various exceptional conditions.
+# Custom PostgresSQL Error Codes
+These custom error codes are used within PostgresSQL functions to handle various exceptional conditions.
 
 ## P0001: Not Found Errors
 Used for all "not found" errors when raising exceptions. Examples include:
@@ -36,4 +36,4 @@ Used when an action cannot proceed due to another ongoing process. Examples incl
 - Cannot create a new election because there is an ongoing election
   
 Except for this all other exceptions eg unique_violation, foreign constraints are
-handled by psg predefined errcodes
+handled by psg predefined error codes

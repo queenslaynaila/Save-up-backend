@@ -9,7 +9,6 @@ RETURNS TABLE(
 ) AS $$
 DECLARE
     v_user_role   enum_user_role;
-    candidate_record    RECORD;
 BEGIN
     SELECT role INTO STRICT v_user_role
     FROM users

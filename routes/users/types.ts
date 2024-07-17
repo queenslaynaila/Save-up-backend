@@ -1,5 +1,5 @@
 import z from 'zod'
-import { UserRole } from '../../globalTypes/index';
+import { UserRole } from '../../globalTypes';
 
 export const baseUserSchema = z.object({
   id: z.number(),

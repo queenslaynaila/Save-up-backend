@@ -7,7 +7,7 @@ import {
   IdParamInterface, 
   idParamSchema, 
   StatusCodeInterface 
-} from '../../globalTypes/index';
+} from '../../globalTypes';
 
 const SQL_RESPOND_TO_INVITE = sql<InviteResponseInterface, StatusCodeInterface>(`
    SELECT update_invite(:group_id, :receiver_id, :status)

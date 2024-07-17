@@ -9,7 +9,7 @@ import {
   userRoleParamSchema,
   UpdatedUser
 } from './types';
-import { UserRole } from '../../globalTypes/index';
+import { UserRole } from '../../globalTypes';
 
 const SQL_UPDATE_ROLE = sql<UserRoleUpdateType, UpdatedUser>(`
   SELECT * FROM update_user_role(:targetUserId,:role, :adminId);

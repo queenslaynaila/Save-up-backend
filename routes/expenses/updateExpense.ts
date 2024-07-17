@@ -8,7 +8,7 @@ import { ExpenseBodyInterface,
   ExpenseUpdateInterface, 
   ExpenseUpdateRes
 } from './types';
-import { IdParamInterface, idParamSchema } from '../../globalTypes/index'
+import { IdParamInterface, idParamSchema } from '../../globalTypes'
 
 const SQL_UPDATE_EXPENSE= sql<ExpenseUpdateInterface, ExpenseUpdateRes>(`
   UPDATE expenses

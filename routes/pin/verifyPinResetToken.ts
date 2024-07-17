@@ -8,7 +8,7 @@ import { VerifyTokenInterface,
   SecurityQuestionArray, 
   UpdateTokenUsageInterface  
 } from './types';
-import { GetByUserInterface } from '../../globalTypes/index';
+import { GetByUserInterface } from '../../globalTypes';
 import { HttpError } from '../../middleware/errorMiddleware';
 
 const SQL_GET_SECURITY_QUESTIONS = sql<GetByUserInterface, SecurityQuestionInterface>(`

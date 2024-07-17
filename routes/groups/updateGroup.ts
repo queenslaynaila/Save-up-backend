@@ -6,7 +6,7 @@ import { groupCreationValidation,
   GroupCreationValidation, 
   GroupUpdateInterface 
 } from './types';
-import { IdParamInterface, idParamSchema } from '../../globalTypes/index';
+import { IdParamInterface, idParamSchema } from '../../globalTypes';
 
 const SQL_UPDATE_GROUP = sql<GroupUpdateInterface, GroupUpdateInterface>(`
    SELECT * FROM update_group_name(:id, :user_id, :name)
