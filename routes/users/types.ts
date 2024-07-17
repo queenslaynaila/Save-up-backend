@@ -49,6 +49,14 @@ export const userRoleUpdateSchema = z.object({
 
 export type UserRoleUpdateType = z.infer<typeof userRoleUpdateSchema>;
 
+export const updatedUserSchema = baseUserSchema.pick({
+  full_name: true
+}).extend({
+  new_role: z.enum([UserRole.ADMIN, UserRole.USER, UserRole.MODERATOR])
+})
+
+export type UpdatedUser = z.infer<typeof updatedUserSchema>;
+
 export const userRoleParamSchema = z.object({
   id: z.string(),
   role: z.enum([UserRole.ADMIN, UserRole.USER, UserRole.MODERATOR])
@@ -79,8 +87,9 @@ export const updateIdDetailsSchema = userIdDetailsSchema.omit({
 export type UpdateIdDetails = z.infer<typeof updateIdDetailsSchema>;
 
 export const userQuerySchema = baseUserSchema.pick({
-  full_name: true
-})
+  full_name: true,
+  phone_number: true
+}).partial();
 
 export type UserQueryParams = z.infer<typeof userQuerySchema>;
 
