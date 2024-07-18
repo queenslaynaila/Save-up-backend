@@ -4,7 +4,17 @@ import authMiddleware from '../../middleware/authorization';
 import { baseInviteInterface, InviteByReceiverInterface } from './types';
 
 const SQL_GET_PENDING_INVITATIONS = sql<InviteByReceiverInterface, baseInviteInterface>(`
-  SELECT * FROM get_user_invites(:receiver_id)
+  SELECT 
+    i.sender_id,
+    i.group_id,
+    u.full_name AS sender_name,
+    g.name AS group_name,
+    i.created_at
+  FROM invitations i
+  JOIN groups g ON i.group_id = g.id
+  JOIN user_contact_details u ON i.sender_id = u.id
+  WHERE i.receiver_id = :receiver_id
+  AND i.status = 'Pending';
 `);
 
 export default (router: Router) => {
