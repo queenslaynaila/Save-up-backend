@@ -22,7 +22,9 @@ export default (router: Router) => {
     '/',
     authMiddleware(),
     async (req, res) => {
-      const groups = await SQL_FETCH_USER_GROUPS({ user_id: req.user!.id}).many();
+      const groups = await SQL_FETCH_USER_GROUPS({ 
+        user_id: req.user!.id
+      }).many();
       return res.json(groups);
     }
   );
