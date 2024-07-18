@@ -24,7 +24,9 @@ export default (router: Router) => {
     authMiddleware(),
     async (req, res) => {
       const updatedGroup =  await SQL_UPDATE_GROUP({ 
-        ...req.body, id:parseInt(req.params.id), user_id:req.user!.id
+        ...req.body, 
+        id:parseInt(req.params.id), 
+        user_id:req.user!.id
       }).one();
       res.json(updatedGroup);
     }
