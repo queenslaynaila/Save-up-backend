@@ -128,6 +128,7 @@ app.use(() => {
 app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
   console.log('Error caught by middleware:', error);
   if (error instanceof HttpError) {
+    console.log('Error caught by middleware:', error);
     return res.status(error.statusCode).json({
       errorData: error.errorData
     });

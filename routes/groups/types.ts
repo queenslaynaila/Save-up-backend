@@ -94,3 +94,16 @@ export const withdrawal = approveWithdrawalSchema.omit({
 })
 
 export type Withdrawal = z.infer<typeof withdrawal>;
+
+export const removedMemberSchema = z.object({
+  initiator_name: z.string(),
+  target_name: z.string()
+})
+
+export type RemovedMember = z.infer<typeof removedMemberSchema>;
+
+export const userLeftSchema = z.object({
+  name: z.string()
+});
+
+export type UserLeft = z.infer<typeof userLeftSchema>;
