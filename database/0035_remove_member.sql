@@ -2,14 +2,18 @@ CREATE OR REPLACE FUNCTION remove_user_from_group(
     p_group_id        INT,
     p_initiator_id    INT,
     p_target_id       INT
-) RETURNS VOID AS $$
+) RETURNS TABLE (
+    initiator_name TEXT,
+    target_name TEXT
+) AS $$
 DECLARE
     v_latest_election_id INT;
 BEGIN
-    PERFORM check_grp_membership(p_group_id, p_user_id);
+    PERFORM check_grp_membership(p_group_id, p_initiator_id);
 
     IF EXISTS (
-        SELECT 1 FROM group_deposits
+        SELECT 1 
+        FROM group_deposits
         WHERE group_id = p_group_id 
         AND user_id = p_target_id
     ) THEN
@@ -45,11 +49,25 @@ BEGIN
         p_group_id, 
         p_target_id,
         COALESCE(MAX(xid), 0) + 1, 
-        'Admin Removal'
+        'Admin Removal'::enum_exit_reason
     FROM group_lefts      
-    WHERE group_id = p_group_id
+    WHERE group_id = p_group_id;
+
+    SELECT full_name 
+    INTO STRICT initiator_name 
+    FROM user_contact_details 
+    WHERE id = p_initiator_id;
+
+    SELECT full_name 
+    INTO STRICT target_name 
+    FROM user_contact_details 
+    WHERE id = p_target_id;
+    
+    RETURN QUERY SELECT initiator_name, target_name;
 END;
 $$ LANGUAGE plpgsql;
 
 GRANT EXECUTE ON FUNCTION remove_user_from_group(INT, INT, INT) TO app_user;
-SELECT create_distributed_function('remove_user_from_group(INT, INT, INT)', 'p_group_id');
+SELECT create_distributed_function(
+  'remove_user_from_group(INT, INT, INT)', 'p_group_id'
+);
