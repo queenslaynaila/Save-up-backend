@@ -4,17 +4,18 @@ import authMiddleware from '../../middleware/authorization';
 import { 
   GroupsByUserInterface, 
   groupsByUserSchema, 
+  RemovedMember, 
   RemoveMemberInterface 
 } from './types';
-import { StatusCodeInterface, IdParamInterface, } from '../../globalTypes';
+import { IdParamInterface, } from '../../globalTypes';
 import validateRequest from '../../middleware/validationMiddleware';
 
-const SQL_REMOVE_GROUP_MBR = sql<RemoveMemberInterface, Record<string,never>>(`
-  SELECT remove_user_from_group (:admin_id, :user_id, :id);
+const SQL_REMOVE_GROUP_MBR = sql<RemoveMemberInterface, RemovedMember>(`
+  SELECT * FROM remove_user_from_group (:id, :admin_id, :user_id);
 `);
 
 export default (router: Router) => {
-  router.delete<IdParamInterface, StatusCodeInterface, GroupsByUserInterface, 
+  router.delete<IdParamInterface, RemovedMember, GroupsByUserInterface, 
   Record<string,never>>(
     '/remove-member/:id',
     validateRequest({
@@ -22,12 +23,12 @@ export default (router: Router) => {
     }),
     authMiddleware(),
     async (req, res) => {
-      await SQL_REMOVE_GROUP_MBR({
+      const response = await SQL_REMOVE_GROUP_MBR({
         admin_id: req.user!.id, 
         user_id: req.body.user_id,
         id: parseInt(req.params.id) 
-      }).exec();
-      res.sendStatus(204);
+      }).one();
+      res.json(response);
     }
   );
 };
