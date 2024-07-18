@@ -1,5 +1,5 @@
 CREATE TYPE enum_exit_reason AS ENUM ('
- Self removal', 
+  Self removal', 
  'Admin removal', 
  'Rule violation', 
  'Other'
