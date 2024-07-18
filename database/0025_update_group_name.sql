@@ -8,7 +8,7 @@ CREATE OR REPLACE FUNCTION update_group_name(
 DECLARE
     v_old_name TEXT;
 BEGIN
-    PERFORM check_grp_membership(p_user_id, p_group_id);
+    PERFORM check_grp_membership(p_group_id, p_user_id);
 
     SELECT name INTO STRICT v_old_name
     FROM groups

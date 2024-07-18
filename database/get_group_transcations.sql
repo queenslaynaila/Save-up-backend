@@ -11,7 +11,7 @@ RETURNS TABLE (
     created_at         TIMESTAMP WITH TIME ZONE
 ) AS $$
 BEGIN
-    PERFORM check_grp_membership(p_user_id, p_group_id);
+    PERFORM check_grp_membership(p_group_id, p_user_id);
 
     RETURN QUERY
     SELECT

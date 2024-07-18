@@ -15,7 +15,7 @@ BEGIN
 
     --Admin user can view grp members regardless of not being a member
     IF v_user_role != 'Admin' THEN 
-      PERFORM check_grp_membership(p_user_id, p_group_id);
+      PERFORM check_grp_membership(p_group_id, p_user_id);
     END IF;
 
     RETURN QUERY

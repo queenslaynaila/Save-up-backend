@@ -18,7 +18,7 @@ DECLARE
     v_type                TEXT;
     v_created_at          TIMESTAMP WITH TIME ZONE;
 BEGIN
-    PERFORM check_grp_membership(p_user_id, p_group_id);
+    PERFORM check_grp_membership(p_group_id, p_user_id);
     
     SELECT e.group_id, e.xid AS election_id, e.initiator_id, e.type, e.created_at
     INTO STRICT v_group_id, v_election_id, v_initiator_id, v_type, v_created_at

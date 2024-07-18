@@ -12,7 +12,7 @@ DECLARE
     v_required_approval_count    INT;
     v_approval_count             INT;
 BEGIN
-    PERFORM check_grp_membership(p_user_id, p_group_id);
+    PERFORM check_grp_membership(p_group_id, p_user_id);
 
     SELECT COUNT(*) INTO STRICT v_total_active_members 
     FROM group_members 

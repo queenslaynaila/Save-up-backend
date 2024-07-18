@@ -22,7 +22,7 @@ BEGIN
             ERRCODE = 'P0005';
     END IF;
 
-    PERFORM check_grp_membership(p_user_id, p_group_id);
+    PERFORM check_grp_membership(p_group_id, p_user_id);
     
     SELECT COUNT(*) INTO total_members 
     FROM group_members 

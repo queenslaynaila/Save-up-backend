@@ -9,7 +9,7 @@ RETURNS TABLE (
 DECLARE
     v_type_id      INT;
 BEGIN
-    PERFORM check_grp_membership(p_user_id, p_group_id);
+    PERFORM check_grp_membership(p_group_id, p_user_id);
 
     SELECT type_id INTO STRICT v_type_id
     FROM transactions

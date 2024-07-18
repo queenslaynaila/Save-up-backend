@@ -9,7 +9,7 @@ RETURNS TABLE(
     approvals            JSON[], --admin name approval stats and reason 4 approval stats
 ) AS $$
 BEGIN
-    PERFORM check_grp_membership(p_user_id, p_group_id);
+    PERFORM check_grp_membership(p_group_id, p_user_id);
 
     SELECT xid, amount, reason
     FROM group_withdrawal_requests

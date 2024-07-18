@@ -6,7 +6,7 @@ RETURNS VOID AS $$
 DECLARE
   v_member_count INT;
 BEGIN
-    PERFORM check_grp_membership(p_user_id, p_group_id);
+    PERFORM check_grp_membership(p_group_id, p_user_id);
 
     SELECT COUNT(*) INTO STRICT v_member_count
     FROM group_members

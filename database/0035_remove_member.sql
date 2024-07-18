@@ -6,7 +6,7 @@ CREATE OR REPLACE FUNCTION remove_user_from_group(
 DECLARE
     v_latest_election_id INT;
 BEGIN
-    PERFORM check_grp_membership(p_user_id, p_group_id);
+    PERFORM check_grp_membership(p_group_id, p_user_id);
 
     IF EXISTS (
         SELECT 1 FROM group_deposits
