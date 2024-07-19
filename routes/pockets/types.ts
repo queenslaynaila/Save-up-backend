@@ -16,15 +16,17 @@ export const basePocketSchema = z.object({
 
 export type BasePocketType = z.infer<typeof basePocketSchema>;
 
-const pocketCreateSchema = basePocketSchema.pick({
-  entity_id: true,
+export const pocketCreateSchema = basePocketSchema.pick({
   category_id: true,
   name: true,
   priority: true,
   pocket_type: true,
   target_amount: true,
   target_at: true,
-}).required();
+}).required()
+  .extend({
+    entity_id: z.number().optional()
+  });
 
 export type PocketCreateType = z.infer<typeof pocketCreateSchema>;
 

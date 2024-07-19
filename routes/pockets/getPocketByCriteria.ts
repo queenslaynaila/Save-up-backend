@@ -31,7 +31,7 @@ const SQL_GET_POCKETS = sql<{entity_id: number}, BasePocketType>(`
 export default (router: Router) => {
   router.get<string, Record<string, never>, BasePocketType[], PocketByEntityType , 
   PocketQueryParamsType>(
-    '/me/', 
+    '/', 
     validateRequest({ 
       body: entitySchema,  
       query: PocketQueryParamsSchema
