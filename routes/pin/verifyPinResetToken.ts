@@ -49,12 +49,15 @@ export default(router: Router) => {
       if (step !== 1) {
         throw new HttpError(422, { required_step: 1 });
       }
-      const { reset_token } = req.body;
+
+      const { reset_token, reason } = req.body;
       const user_id = req.user!.id;
 
       const { token } = await SQL_GET_RESET_TOKEN({
-        user_id, reason: req.body.reason
+        user_id, reason
       }).one(new HttpError(404));
+
+  
       if (!await bcrypt.compare(reset_token, token)) {
         throw new HttpError(401);
       }

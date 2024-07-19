@@ -4,7 +4,6 @@ import jwt, { Secret } from 'jsonwebtoken';
 import { resetPasswordLimiter } from '../../services/rateLimit';
 import { sql } from '../../db';
 import { generateResetPin } from '../../middleware/generateResetPin';
-import sendSms from '../../services/twilio';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { 
   StatusCodeInterface, 
@@ -56,12 +55,6 @@ export default  (router: Router) => {
         step1TokenPayload,
         process.env.JWT_SECRET as Secret, 
         { expiresIn: '15m' }
-      );
-
-      sendSms(
-        phone_number,
-        `Your password reset token is: ${resetToken}. 
-        It expires in 10 minutes. Do not share with anyone.`
       );
 
       res.setHeader('reset-token', resetTokenHeader)

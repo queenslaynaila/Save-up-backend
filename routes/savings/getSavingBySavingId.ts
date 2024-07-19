@@ -13,9 +13,9 @@ import {
 import validateRequest from '../../middleware/validationMiddleware';
 
 const  SQL_GET_DEPOSIT_BY_ID = sql<XidEntityInterface, BaseSavingType>(`
-  SELECT pocket_id, amount 
-  FROM savings 
-  WHERE xid = :id 
+  SELECT pocket_id, delta AS amount, created_at 
+  FROM transactions
+  WHERE xid = :xid 
   AND entity_id = :entity_id
 `);
 
