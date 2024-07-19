@@ -10,7 +10,7 @@ import { StatusCodeInterface } from '../../globalTypes';
 import validateRequest from '../../middleware/validationMiddleware';
 
 const SQL_CREATE_GROUP_DEPOSIT = sql<GroupDeposit, Record<string,never>>(`
-    SELECT * FROM create_group_deposit(:group_id, :user_id, :pocket_id, :amount)
+    SELECT * FROM create_group_deposit(:user_id, :group_id, :pocket_id, :amount)
 `);
 
 export default (router: Router) => {
