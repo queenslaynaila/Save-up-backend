@@ -16,7 +16,8 @@ BEGIN
     v_new_balance = v_current_balance + p_amount;
     v_reference_id := floor(random() * 1000000 + 1)::INT;
 
-    SELECT pockets.target_amount INTO STRICT v_target_amount  
+    SELECT pockets.target_amount 
+    INTO STRICT v_target_amount  
     FROM pockets 
     WHERE entity_id = p_user_id 
     AND xid = p_pocket_id;
