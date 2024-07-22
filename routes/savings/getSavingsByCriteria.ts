@@ -9,9 +9,10 @@ import {
 import validateRequest from '../../middleware/validationMiddleware';
 import { EntityInterface, entitySchema } from '../../globalTypes';
  
-const SQL_GET_SAVINGS = sql< {entity_id: number }, BaseSavingType>(`
-  SELECT * FROM savings
-  WHERE entity_id = :entity_id
+const SQL_GET_SAVINGS = sql< {entity_id: number, type_id:number }, BaseSavingType>(`
+  SELECT * FROM transactions
+  WHERE type_id = :type_id
+  AND entity_id = :entity_id
 `);
 
 export default (router: Router) => {
@@ -49,7 +50,7 @@ export default (router: Router) => {
         }
       }
      
-      const query = SQL_GET_SAVINGS({ entity_id });
+      const query = SQL_GET_SAVINGS({ entity_id, type_id:1 });
       if (filters.length > 0) query.extend(`AND ${filters.join(' AND ')}`, filterArgs);
       query.extend('LIMIT 15', {});
       const savings = await query.many();
