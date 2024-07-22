@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { sql } from '../../db';
-import { UserRole } from '../../globalTypes/index';
+import { UserRole } from '../../globalTypes';
 import authMiddleware from '../../middleware/authorization';
 import { convertToTitleCase } from '../../middleware/caseNormalization';
 import { HttpError } from '../../middleware/errorMiddleware';
