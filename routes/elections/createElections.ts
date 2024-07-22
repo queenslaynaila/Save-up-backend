@@ -22,7 +22,10 @@ export default (router: Router) => {
     }), 
     authMiddleware(),
     async (req, res) => {
-      await SQL_CALL_ELECTION({ ...req.body, initiator_id:req.user!.id}).exec();
+      await SQL_CALL_ELECTION({ 
+        ...req.body, 
+        initiator_id:req.user!.id
+      }).exec();
       res.sendStatus(201);
     }
   );
