@@ -1,7 +1,7 @@
 import express from 'express';
 import createSaving from './createSaving';
 import getSavingsByCriteria from './getSavingsByCriteria';
-import getSavingBySavingId from './getSavingBySavingId';
+import getSavingBySavingId from './getSavingByTransactionId';
 import totalSavings from './totalSavings';
 import availableSavings from './availableSavings';
 
