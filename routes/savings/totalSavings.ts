@@ -2,16 +2,16 @@ import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import {  QueryParams, Totals } from './types';
-import { GetByUserInterface } from '../../globalTypes';
+//All Savings made by user since he joined the app
 
-const  SQL_GET_TOTAL_SAVINGS = sql<GetByUserInterface, Totals>(`
+const  SQL_GET_TOTAL_SAVINGS = sql<{user_id:number, type_id:number}, Totals>(`
   SELECT 
     SUM(delta) AS total_savings
   FROM 
     transactions
   WHERE 
     entity_id = :user_id
-    AND type_id = 1;
+    AND type_id = :type_id;
 `);
 
 export default (router: Router) => {
@@ -32,7 +32,8 @@ export default (router: Router) => {
       }
 
       const query = SQL_GET_TOTAL_SAVINGS({ 
-        user_id:req.user!.id 
+        user_id:req.user!.id,
+        type_id:1 
       });
 
       if (filters.length > 0) query.extend(`AND ${filters.join(' AND ')}`, filterArgs);
