@@ -2,12 +2,13 @@ CREATE OR REPLACE FUNCTION get_group_transactions(
     p_group_id        INT,
     p_user_id         INT,
     p_pocket_id       INT
-) RETURNS TABLE (
-    transaction_id     INT,
-    transaction_type   INT,
-    delta              NUMERIC,
-    balance            NUMERIC,
-    transaction_date   TIMESTAMP WITH TIME ZONE
+)
+RETURNS TABLE (
+  transaction_id     INT,
+  transaction_type   enum_transaction_type,
+  delta              NUMERIC,
+  balance            NUMERIC,
+  transaction_date   TIMESTAMP WITH TIME ZONE
 ) AS $$
 DECLARE
     v_user_role enum_user_role;
@@ -30,14 +31,16 @@ BEGIN
 
     RETURN QUERY
     SELECT
-        t.xid AS transaction_id,
-        t.type_id AS transaction_type,
-        t.delta,
-        t.balance,
-        t.created_at AS transaction_date
-    FROM transactions t
-    WHERE t.entity_id = p_group_id
-    AND t.pocket_id = p_pocket_id;  
+        transactions.xid AS transaction_id,
+        transaction_types.slug AS transaction_type, 
+        transactions.delta,
+        transactions.balance,
+        transactions.created_at AS transaction_date
+    FROM transactions
+    JOIN transaction_types ON transactions.type_id = transaction_types.id
+    WHERE transactions.entity_id = p_group_id
+    AND transactions.pocket_id = p_pocket_id
+    ORDER BY transactions.created_at DESC;
 END;
 $$ LANGUAGE plpgsql;
 
