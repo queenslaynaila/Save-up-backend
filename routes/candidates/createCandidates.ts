@@ -24,7 +24,10 @@ export default (router: Router) => {
     authMiddleware(),
     async (req, res) => {
       const chosen_by = req.user!.id
-      await SQL_CREATE_CANDIDATES({ ...req.body, chosen_by}).exec();
+      await SQL_CREATE_CANDIDATES({ 
+        ...req.body, 
+        chosen_by
+      }).exec();
       res.sendStatus(201);
     }
   );
