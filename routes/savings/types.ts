@@ -11,6 +11,21 @@ export const baseSavingSchema = z.object({
 
 export type BaseSavingType = z.infer<typeof baseSavingSchema>;
 
+export const savingSchema = baseSavingSchema.omit({
+  entity_id: true,
+  xid: true
+});
+
+export type SavingType = z.infer<typeof savingSchema>;
+
+export const userSavingSchema = baseSavingSchema.pick({
+  entity_id: true
+}).extend({
+  type_id: z.number()
+})
+
+export type UserSavingType = z.infer<typeof userSavingSchema>;
+
 export const savingCreateSchema = baseSavingSchema.pick({
   user_id: true,
   pocket_id: true,
@@ -41,8 +56,23 @@ export const totalSavings = z.object({
 
 export type Totals = z.infer<typeof totalSavings>;
 
+export const totalSavingsSchema = z.object({
+  type_id: z.number(),
+  entity_id: z.number()
+})
+
+export type TotalsInterface = z.infer<typeof totalSavingsSchema>;
+
+export const totalsBody = totalSavingsSchema.pick({
+  entity_id: true
+}).partial();
+
+export type TotalsBody = z.infer<typeof totalsBody>;
+
+export type TotalSavings = z.infer<typeof totalSavings>;
+
 export const availableSavings = z.object({
-  available_savings: z.number()
+  delta: z.number()
 });
 
 export type Balance = z.infer<typeof availableSavings>;

@@ -42,6 +42,6 @@ export const transactionQueryParams = baseTransaction.pick({
 }).extend({
   from_date:z.string(),
   to_date:z.string()
-}) 
+}).partial(); 
 
 export type TransactionQueryParams = z.infer<typeof transactionQueryParams>;
