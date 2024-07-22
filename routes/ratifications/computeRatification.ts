@@ -24,7 +24,8 @@ export default (router: Router) => {
     authMiddleware(),
     async (req, res) => {
       await SQL_COMPUTE_RATIFICATIONS({
-        ...req.body, user_id: req.user!.id
+        ...req.body,
+        user_id: req.user!.id
       }).exec();
       res.sendStatus(201);
     }

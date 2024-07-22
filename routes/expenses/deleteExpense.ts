@@ -31,7 +31,8 @@ export default (router: Router) => {
     async (req, res) => {
       const entity_id =  req.body?.entity_id ?? req.user!.id;
       await SQL_DELETE_EXPENSE({
-        xid: parseInt(req.params.id), entity_id
+        xid: parseInt(req.params.id),
+        entity_id
       }).exec();
       res.sendStatus(204);
     });
