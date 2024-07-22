@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 export const transactionByUser = z.object({
   user_id: z.number(),
-  pocket_id: z.string()
+  pocket_id: z.number()
 })
 
 export type TransactionByUser = z.infer<typeof transactionByUser>;
