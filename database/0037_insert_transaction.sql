@@ -27,12 +27,11 @@ BEGIN
         p_reference_id,
         p_amount, 
         p_current_balance
-    RETURNING xid INTO v_transaction_id;
+    RETURNING xid INTO STRICT v_transaction_id;
 
     RETURN v_transaction_id;
 END;
 $$ LANGUAGE plpgsql;
-
 
 GRANT EXECUTE ON FUNCTION insert_transaction_log(INT, INT, INT, INT, NUMERIC, NUMERIC) TO app_user;
 SELECT create_distributed_function(

@@ -11,8 +11,9 @@ DECLARE
     v_new_balance          NUMERIC(30, 2);
     v_reference_id         TEXT;
 BEGIN 
-    SELECT * FROM get_transaction_info(p_pocket_id, p_user_id) 
-    INTO STRICT v_current_balance;
+    SELECT get_transaction_info.v_current_balance 
+    INTO STRICT v_current_balance 
+    FROM get_transaction_info(p_user_id, p_pocket_id);
 
     IF v_current_balance < p_amount THEN
         RAISE EXCEPTION USING

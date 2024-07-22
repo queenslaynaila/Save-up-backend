@@ -4,8 +4,9 @@ CREATE OR REPLACE FUNCTION delete_pocket(
 ) 
 RETURNS VOID AS $$
 BEGIN
-    SELECT * FROM get_transaction_info(pocket_id, p_entity_id) 
-    INTO STRICT v_current_balance;
+    SELECT get_transaction_info.v_current_balance 
+    INTO STRICT v_current_balance 
+    FROM get_transaction_info(p_entity_id, p_pocket_id);
 
     IF v_current_balance > 0 THEN
         RAISE EXCEPTION USING

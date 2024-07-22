@@ -15,8 +15,9 @@ DECLARE
   v_new_destination_balance       NUMERIC(30, 2);
   v_reference_id                  INT;
 BEGIN 
-  SELECT * FROM get_transaction_info(p_source_pocket_id, p_entity_id) 
-  INTO STRICT v_source_transaction_id, v_source_balance;
+  SELECT get_transaction_info.v_current_balance 
+  INTO STRICT v_current_balance 
+  FROM get_transaction_info(p_entity_id, p_source_pocket_id);
 
   IF v_current_balance < p_amount THEN
     RAISE EXCEPTION USING
@@ -24,8 +25,9 @@ BEGIN
       ERRCODE = 'P0004';
   END IF;
 
-  SELECT * FROM get_transaction_info(p_destination_pocket_id, p_entity_id) 
-  INTO STRICT v_destination_transaction_id, v_destination_balance;
+  SELECT get_transaction_info.v_current_balance 
+  INTO STRICT v_destination_balance
+  FROM get_transaction_info( p_entity_id, p_destination_pocket_id);
 
   v_new_source_balance =  v_source_balance - p_amount;
   v_new_destination_balance = v_destination_balance + p_amount;

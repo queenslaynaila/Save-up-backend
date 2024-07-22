@@ -15,8 +15,9 @@ DECLARE
 BEGIN
   PERFORM check_grp_membership(p_initiator_id, p_group_id);
 
-  SELECT * FROM get_transaction_info(p_pocket_id, p_group_id) 
-  INTO STRICT v_current_balance;
+  SELECT get_transaction_info.v_current_balance 
+  INTO STRICT v_current_balance 
+  FROM get_transaction_info(p_group_id, p_pocket_id);
 
   IF v_current_balance < p_amount THEN
     RAISE EXCEPTION USING

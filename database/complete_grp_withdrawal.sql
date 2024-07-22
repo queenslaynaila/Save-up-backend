@@ -15,10 +15,11 @@ BEGIN
     FROM group_withdrawal_requests
     WHERE group_id = p_group_id
     AND xid = p_withdrawal_id;
- 
-    SELECT * FROM get_transaction_info(v_pocket_id, p_group_id) 
-    INTO STRICT v_current_balance;
 
+    SELECT get_transaction_info.v_current_balance 
+    INTO STRICT v_current_balance 
+    FROM get_transaction_info(p_group_id, v_pocket_id);
+ 
     IF v_current_balance < p_amount THEN
         RAISE EXCEPTION USING
           MESSAGE = 'ERR_INSUFFICIENT_FUNDS',
