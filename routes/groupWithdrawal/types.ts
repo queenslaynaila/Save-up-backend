@@ -8,7 +8,6 @@ const Recipient = z.object({
 export const withdrawalRequest = z.object({
   group_id:z.number(),
   pocket_id:z.number(),
-  election_id:z.number(),
   initiator_id:z.number(),
   amount:z.number(),
   reason:z.string(),
@@ -36,9 +35,10 @@ export type ApproveWithdrawal = z.infer<typeof approveWithdrawalSchema>;
   
 export const initiateGroupWithdrawalSchema = withdrawalRequest.pick({
   pocket_id: true,
-  election_id: true,
   amount: true,
   recipients: true
+}).extend({
+  election_id: z.number()
 })
   
 export type InitiateGroupWithdrawal = z.infer<typeof initiateGroupWithdrawalSchema>;

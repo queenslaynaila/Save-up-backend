@@ -1,7 +1,6 @@
 CREATE OR REPLACE FUNCTION initiate_grp_withdrawal(
   p_group_id             INT,
   p_pocket_id            INT,
-  p_election_id          INT,
   p_initiator_id         INT,
   p_amount               NUMERIC,
   p_reason               enum_withdrawal_reason,
@@ -11,18 +10,32 @@ RETURNS VOID AS $$
 DECLARE
   v_current_balance     NUMERIC;
   v_withdrawal_id       INT;
- 
+  v_latest_election_id  INT;
 BEGIN
-  PERFORM check_grp_membership(p_initiator_id, p_group_id);
+  SELECT MAX(xid)
+  INTO STRICT v_latest_election_id
+  FROM elections
+  WHERE group_id = p_group_id
+  AND status = 'Closed';
+
+  IF NOT EXISTS (
+      SELECT 1
+      FROM group_admins
+      WHERE user_id = p_initiator_id
+      AND group_id = p_group_id
+      AND election_id = v_latest_election_id
+    ) THEN
+        RAISE EXCEPTION USING
+          MESSAGE = 'ERR_NOT_ADMIN',
+          ERRCODE = 'P0001';
+  END IF;
 
   SELECT get_transaction_info.v_current_balance 
   INTO STRICT v_current_balance 
   FROM get_transaction_info(p_group_id, p_pocket_id);
 
   IF v_current_balance < p_amount THEN
-    RAISE EXCEPTION USING
-          MESSAGE = 'ERR_INSUFFICIENT_FUNDS',
-          ERRCODE = 'P0004';
+   RAISE EXCEPTION 'ERR_INSUFFICIENT_FUNDS: Current balance: %, Requested amount: %', v_current_balance, p_amount;
   END IF;
 
   INSERT INTO group_withdrawal_requests (
@@ -51,11 +64,10 @@ END;
 $$ LANGUAGE plpgsql;
 
 GRANT EXECUTE ON FUNCTION initiate_grp_withdrawal(
-  INT, INT, INT, INT, NUMERIC, enum_withdrawal_reason, JSON
+  INT, INT,  INT, NUMERIC, enum_withdrawal_reason, JSON
 ) TO app_user;
 SELECT create_distributed_function(
   'initiate_grp_withdrawal(
-    INT, 
     INT, 
     INT, 
     INT, 

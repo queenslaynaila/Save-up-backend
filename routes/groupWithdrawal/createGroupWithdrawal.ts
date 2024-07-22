@@ -7,28 +7,24 @@ import {
   WithdrawalValidation, 
   withdrawalValidation 
 } from './types';
-import { 
-  IdParamInterface, 
-  idParamSchema, 
-  StatusCodeInterface
-} from '../../globalTypes';
+import { StatusCodeInterface } from '../../globalTypes';
 
 const SQL_INITIATE_GRP_WITHDRAWAL = sql<WithdrawalRequest, Record<string, never>>(`
   SELECT initiate_grp_withdrawal(
-    :group_id, :pocket_id, :election_id, :initiator_id, :amount, :reason, :recipients
+    :group_id, :pocket_id, :initiator_id, :amount, :reason, :recipients
   )
 `);
 
 export default (router: Router) => {
-  router.post<IdParamInterface, StatusCodeInterface,  WithdrawalValidation, 
+  router.post<Record<string, never>, StatusCodeInterface,  WithdrawalValidation, 
   Record<string, never>>(
     '/', 
     validateRequest({
-      params:idParamSchema, 
       body:withdrawalValidation
     }),
     authMiddleware(),
     async (req, res) => {
+      console.log(`loggedin ${req.user!.id}, pocket_id ${req.body.pocket_id}, group_id ${req.body.group_id}, amount ${req.body.amount}`);
       await SQL_INITIATE_GRP_WITHDRAWAL({
         ...req.body,
         initiator_id: req.user!.id,
