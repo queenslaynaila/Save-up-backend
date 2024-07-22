@@ -5,11 +5,11 @@ import {
   CandidateRes, 
   CandidateParam, 
   CandidateReq, 
-  candidateReqSchema 
+  candidateParamSchema
 } from './types'
 import validateRequest from '../../middleware/validationMiddleware';
 
-const SQL_GET_CANDIDATES = sql<CandidateReq,CandidateRes>(`
+const SQL_GET_CANDIDATES = sql<CandidateReq, CandidateRes>(`
   SELECT * FROM get_candidates(:group_id, :election_id, :user_id) 
 `);
 
@@ -18,7 +18,7 @@ export default (router: Router) => {
   Record<string,never>>(
     '/',
     validateRequest({
-      body:candidateReqSchema
+      body:candidateParamSchema
     }),
     authMiddleware(),
     async (req, res) => {
