@@ -9,7 +9,7 @@ import {
 } from './types';
 
 const SQL_GET_ONGOING_ELECTION = sql< ElectionRequest, ElectionRetrieval>(`
-  SELECT * FROM get_open_election_for_group(:group_id, :user_id)
+  SELECT * FROM  get_ongoing_election(:group_id, :user_id)
 `);
 
 export default (router: Router) => {
