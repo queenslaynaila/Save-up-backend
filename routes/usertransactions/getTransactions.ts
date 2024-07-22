@@ -24,11 +24,11 @@ const SQL_GET_TRANSACTIONS = sql<TransactionByUser, BaseTransaction>(`
     transaction_types ON transactions.type_id = transaction_types.id
   WHERE 
     transactions.entity_id = :user_id
-  AND transactions.pocket_id = :pocket_id;
+    AND transactions.pocket_id = :pocket_id
   ORDER BY 
-    transactions.created_at DESC;
-  LIMIT 10;
+    transactions.created_at DESC
 `);
+
 
 export default (router: Router) => {
   router.get<Record<string,never>, BaseTransaction[], TransactionBody, 
