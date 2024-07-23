@@ -25,3 +25,5 @@ db.ts
 
 /approach.notes
 /middleware/oc.ts
+/.idea
+/.vscode
