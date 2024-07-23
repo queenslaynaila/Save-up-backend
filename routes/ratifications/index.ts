@@ -6,5 +6,5 @@ export default (baseRouter: Router) => {
 
   createRatification(router)
   
-  baseRouter.use('/ratification', router);
+  baseRouter.use('/ratifications', router);
 };
