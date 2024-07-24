@@ -22,7 +22,7 @@ BEGIN
           AND election_id = v_latest_election_id
           AND user_id = p_admin_id
     ) THEN
-        RAISE EXCEPTION 'ERR_GROUP_NOT_ADMIN: Admin is not part of the group or not in the latest election',
+        RAISE EXCEPTION 'ERR_GROUP_NOT_ADMIN',
             'P0002';
     END IF;
 
