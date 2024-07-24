@@ -30,6 +30,9 @@ import groupDepositRoutes from './routes/groupDeposits';
 import groupWithdrawalRoutes from './routes/groupWithdrawal';
 import groupWithdrawalApprovals from './routes/groupWithdrawalApprovals';
 import groupTransactions from './routes/groupTransactions';
+import loanRequestRoutes from './routes/loans';
+import loanGuaranteeRoutes from './routes/loanGuarantees';
+import loanAdminApprovalRoutes from './routes/loanApprovals'
 import cron from 'node-cron';
 import remindStaleGoals from './cronJobs/overdueGoalsReminder'
 import creditInterest from './cronJobs/creditInterest';
@@ -118,6 +121,9 @@ groupWithdrawalRoutes(app);
 groupTransactions(app);
 transferRoutes(app);
 transactionRoutes(app);
+loanRequestRoutes(app);
+loanGuaranteeRoutes(app);
+loanAdminApprovalRoutes(app)
 createExSaving(app);
 
 // 404 handler
