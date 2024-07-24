@@ -21,18 +21,19 @@ export default (router: Router) => {
     validateRequest({ body:loginSchema }),
     authMiddleware(), 
     async (req, res) => {
-      const id = req.user!.id
-      const userPassword = await SQL_GET_USER_PIN({ id}).one(
-        new HttpError(400)
-      );
+      const id = req.user!.id;
+      const userPassword = await SQL_GET_USER_PIN({ 
+        id 
+      }).one( new HttpError(400));
+      
       if (!await bcrypt.compare(req.body.pin, userPassword.pin)) {
-        throw new HttpError(
-          401
-        );
+        throw new HttpError(401);
       }
+
       const phone = await SQL_UPDATE_PHONE({
         phone_number:req.body.phone_number,
-        id}).one();
+        id
+      }).one();
       res.json(phone);
     });
 };
