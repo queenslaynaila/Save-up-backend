@@ -16,8 +16,10 @@ export default (router: Router) => {
     validateRequest({ body: userCreationSchema }),
     async (req, res) => {         
       const pinHash = bcrypt.hashSync(req.body.pin, 12);
-      await SQL_CREATE_USER({ ...req.body, pin: pinHash })
-        .exec();
+      await SQL_CREATE_USER({
+        ...req.body,
+        pin: pinHash
+      }).exec();
       res.sendStatus(201);
     });
 };
