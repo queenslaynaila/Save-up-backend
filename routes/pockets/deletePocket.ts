@@ -7,7 +7,7 @@ import {
   IdParamInterface, 
   idParamSchema, 
   StatusCodeInterface 
-} from '../../globalTypes'
+} from '../../globalTypes';
 import validateRequest from '../../middleware/validationMiddleware';
 
 const SQL_DELETE_POCKET = sql<{pocket_id: number, entity_id: number}, Record<string,never>>(`
