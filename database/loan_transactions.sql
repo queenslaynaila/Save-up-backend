@@ -35,6 +35,7 @@ CREATE TABLE IF NOT EXISTS loan_admin_approvals (
     group_id              INT NOT NULL,
     request_id            INT NOT NULL,
     admin_id              INT NOT NULL,
+    election_id           INT NOT NULL,
     status                enum_approval_status NOT NULL DEFAULT 'Pending',
     reason                TEXT NOT NULL,
     created_at            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
