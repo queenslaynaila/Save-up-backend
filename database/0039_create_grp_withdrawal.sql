@@ -10,11 +10,8 @@ DECLARE
     v_target_at            TIMESTAMP WITH TIME ZONE;
     v_new_balance          NUMERIC(30, 2);
     v_reference_id         TEXT;
-BEGIN 
-    SELECT get_transaction_info.v_current_balance 
-    INTO STRICT v_current_balance 
-    FROM get_transaction_info(p_user_id, p_pocket_id);
-
+BEGIN
+    v_current_balance := get_transaction_info(p_user_id, p_pocket_id);
     IF v_current_balance < p_amount THEN
         RAISE EXCEPTION USING
           MESSAGE = 'ERR_INSUFFICIENT_FUNDS',
@@ -29,7 +26,7 @@ BEGIN
 
     IF v_pocket_type = 'Locked' AND v_target_at <= NOW() THEN
         RAISE EXCEPTION USING 
-            MESSAGE = 'ERR_FUNDS_LOCKED'
+            MESSAGE = 'ERR_FUNDS_LOCKED',
             ERRCODE = 'P0005';
     END IF;
 

@@ -30,12 +30,11 @@ BEGIN
           ERRCODE = 'P0001';
   END IF;
 
-  SELECT get_transaction_info.v_current_balance 
-  INTO STRICT v_current_balance 
-  FROM get_transaction_info(p_group_id, p_pocket_id);
-
+  v_current_balance := get_transaction_info(p_group_id, p_pocket_id);
   IF v_current_balance < p_amount THEN
-   RAISE EXCEPTION 'ERR_INSUFFICIENT_FUNDS: Current balance: %, Requested amount: %', v_current_balance, p_amount;
+   RAISE EXCEPTION USING
+       MESSAGE = 'ERR_INSUFFICIENT_FUNDS',
+       ERRCODE = 'P0004';
   END IF;
 
   INSERT INTO group_withdrawal_requests (
@@ -43,8 +42,8 @@ BEGIN
   )
   SELECT 
     p_group_id, 
-    COALESCE(MAX(xid), 0) + 1, 
-    p_election_id, 
+    COALESCE(MAX(xid), 0) + 1,
+    v_latest_election_id,
     p_initiator_id, 
     p_pocket_id,
     p_amount, 

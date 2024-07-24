@@ -11,10 +11,7 @@ DECLARE
     v_transaction_id    INT;
     v_new_balance       NUMERIC(30, 2);
 BEGIN
-    SELECT get_transaction_info.v_current_balance 
-    INTO STRICT v_current_balance 
-    FROM get_transaction_info(p_group_id, p_pocket_id);
-    
+    v_current_balance := get_transaction_info(p_group_id, p_pocket_id);
     v_reference_id := floor(random() * 1000000 + 1)::INT;
     v_new_balance := v_current_balance + p_amount;
 

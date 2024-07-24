@@ -3,11 +3,10 @@ CREATE OR REPLACE FUNCTION delete_pocket(
     p_pocket_id INT
 ) 
 RETURNS VOID AS $$
+DECLARE
+    v_current_balance NUMERIC;
 BEGIN
-    SELECT get_transaction_info.v_current_balance 
-    INTO STRICT v_current_balance 
-    FROM get_transaction_info(p_entity_id, p_pocket_id);
-
+    v_current_balance := get_transaction_info(p_entity_id, p_pocket_id);
     IF v_current_balance > 0 THEN
         RAISE EXCEPTION USING
             MESSAGE = 'ERR_CANT_DELETE_PKT_WITH_DEPOSITS',
