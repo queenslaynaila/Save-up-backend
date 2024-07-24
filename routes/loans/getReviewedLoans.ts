@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import validateRequest from '../../middleware/validationMiddleware';
-import { ReviewedLoan, ReviewedLoansParams } from './type';
+import { ReviewedLoan, ReviewedLoansParams } from './types';
 import { GetByGroupIdInterface,  getByGroupId } from '../../globalTypes';
 
 const SQL_GET_REVIEWED_LOANS = sql<ReviewedLoansParams, ReviewedLoan>(`
