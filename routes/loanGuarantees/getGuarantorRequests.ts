@@ -27,7 +27,8 @@ const SQL_GET_UNGARANTEED_LOAN_REQUESTS = sql<GetByUserInterface, LoanRequest>(`
 `);
 
 export default (router: Router) => {
-  router.get<Record<string, never>, LoanRequest[], Record<string, never>, Record<string, never>>(
+  router.get<Record<string, never>, LoanRequest[], Record<string, never>, 
+  Record<string, never>>(
     '/',
     authMiddleware(),
     async (req, res) => {
