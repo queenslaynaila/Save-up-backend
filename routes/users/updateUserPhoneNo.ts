@@ -5,18 +5,17 @@ import { HttpError } from '../../middleware/errorMiddleware';
 import authMiddleware from '../../middleware/authorization';
 import  validateRequest from '../../middleware/validationMiddleware';
 import { loginSchema, PhoneNoUpdateType } from './types';
-import { StatusCodeInterface } from '../../globalTypes';
 
 const SQL_GET_USER_PIN = sql<{ id: number }, { pin: string }>(`
   SELECT pin FROM users WHERE id = :id
 `);
 
-const SQL_UPDATE_PHONE = sql<{ phone_number: string; id: number }, Record<string,never>>(`
-   SELECT * FROM update_phone_number(:id, :phone_number)
+const SQL_UPDATE_PHONE = sql<{ phone_number: string; id: number }, {updated_phone_number:string}>(`
+   SELECT  update_phone_number(:id, :phone_number)
 `);
 
 export default (router: Router) => {
-  router.patch<Record<string,never>, StatusCodeInterface, PhoneNoUpdateType , 
+  router.patch<Record<string,never>, {updated_phone_number:string}, PhoneNoUpdateType ,
   Record<string,never>>(
     '/phone-number', 
     validateRequest({ body:loginSchema }),
@@ -31,7 +30,9 @@ export default (router: Router) => {
           401
         );
       }
-      await SQL_UPDATE_PHONE({ phone_number:req.body.phone_number, id}).exec();
-      res.sendStatus(204);
+      const phone = await SQL_UPDATE_PHONE({
+        phone_number:req.body.phone_number,
+        id}).one();
+      res.json(phone);
     });
 };
