@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { sql } from '../../db';
-//import authMiddleware from '../../middleware/authorization';
+import authMiddleware from '../../middleware/authorization';
 import validateRequest from '../../middleware/validationMiddleware';
 import { UserIdDetails,UpdateIdDetails, updateIdDetailsSchema } from './types';
 
@@ -13,11 +13,11 @@ export default (router: Router) => {
   Record<string,never>>(
     '/id-number', 
     validateRequest({ body: updateIdDetailsSchema }),
-    //authMiddleware(), 
+    authMiddleware(), 
     async (req, res) => {
       const new_id_number = await SQL_UPDATE_ID_NUMBER({
         ...req.body,
-        id:10
+        id:req.user!.id
       }).one();
       res.json(new_id_number);
     });
