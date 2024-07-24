@@ -12,16 +12,6 @@ DECLARE
     v_current_balance           NUMERIC(30, 2);
     v_loan_limit                NUMERIC(30, 2);
 BEGIN
-    SELECT get_transaction_info.v_current_balance
-    INTO STRICT v_current_balance
-    FROM get_transaction_info(p_group_id, p_pocket_id);
-
-    IF v_current_balance < p_amount THEN
-        RAISE EXCEPTION USING
-            MESSAGE = 'INSUFFICIENT FUNDS',
-            ERRCODE = 'P0004';
-    END IF;
-
     IF NOT EXISTS (
         SELECT 1
         FROM transactions
@@ -34,10 +24,14 @@ BEGIN
             ERRCODE = 'P0005';
     END IF;
 
-    SELECT calculate_loan_limit.v_loan_limit
-    INTO STRICT v_loan_limit
-    FROM calculate_loan_limit(p_pocket_id, p_borrower_id);
+    v_current_balance := get_transaction_info(p_group_id, p_pocket_id);
+    IF v_current_balance < p_amount THEN
+        RAISE EXCEPTION USING
+            MESSAGE = 'INSUFFICIENT FUNDS',
+            ERRCODE = 'P0004';
+    END IF;
 
+    v_loan_limit := calculate_loan_limit(p_pocket_id, p_borrower_id);
     IF p_amount > v_loan_limit THEN
         RAISE EXCEPTION USING
             MESSAGE = 'ERR_EXCEEDS_LOAN_LIMIT',
