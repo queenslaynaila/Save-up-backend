@@ -21,7 +21,8 @@ export type RequestLoan = z.infer<typeof requestLoanSchema>;
 export const reviewedLoansParams = baseRequestLoanSchema.pick({
   group_id: true
 }).extend({
-  user_id: z.number().int()
+  user_id: z.number().int(),
+  approval_status: z.literal('Pending')
 });
 export type ReviewedLoansParams = z.infer<typeof reviewedLoansParams>;
 

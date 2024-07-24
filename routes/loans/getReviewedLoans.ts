@@ -15,7 +15,7 @@ const SQL_GET_REVIEWED_LOANS = sql<ReviewedLoansParams, ReviewedLoan>(`
     loan_requests.approval_status
   FROM loan_requests
   JOIN groups ON loan_requests.group_id = groups.id
-  WHERE loan_requests.approval_status != 'Pending'
+  WHERE loan_requests.approval_status != :approval_status
     AND loan_requests.group_id = :group_id
     AND loan_requests.borrower_id = :user_id
 `);
@@ -28,7 +28,8 @@ export default (router: Router) => {
     async (req, res) => {
       const loans = await SQL_GET_REVIEWED_LOANS({
         ...req.body,
-        user_id:req.user!.id
+        user_id:req.user!.id,
+        approval_status: 'Pending'
       }).many()
       return res.json(loans);
     }
