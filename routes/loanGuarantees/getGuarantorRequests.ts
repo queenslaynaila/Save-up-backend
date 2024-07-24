@@ -4,7 +4,7 @@ import authMiddleware from '../../middleware/authorization';
 import { LoanRequest } from './types';
 import { GetByUserInterface } from '../../globalTypes';
 
-const SQL_GET_UNGARANTEED_LOAN_REQUESTS = sql<GetByUserInterface, LoanRequest>(`
+const SQL_GET_UNGUARANTEED_LOAN_REQUESTS = sql<GetByUserInterface, LoanRequest>(`
     SELECT
         loan_requests.xid AS request_id,
         loan_requests.group_id,
@@ -19,20 +19,22 @@ const SQL_GET_UNGARANTEED_LOAN_REQUESTS = sql<GetByUserInterface, LoanRequest>(`
         ON loan_requests.borrower_id = user_contact_details.id
     JOIN groups
         ON loan_requests.group_id = groups.id
-    LEFT JOIN loan_guarantor_approvals
-        ON loan_requests.group_id = loan_guarantor_approvals.group_id
-        AND loan_requests.xid = loan_guarantor_approvals.request_id
     WHERE loan_requests.guarantor_id = :user_id
-    AND loan_guarantor_approvals.request_id IS NULL;
+    AND NOT EXISTS (
+        SELECT 1
+        FROM loan_guarantor_approvals
+        WHERE loan_guarantor_approvals.group_id = loan_requests.group_id
+        AND loan_guarantor_approvals.request_id = loan_requests.xid
+    );
 `);
 
 export default (router: Router) => {
-  router.get<Record<string, never>, LoanRequest[], Record<string, never>, 
+  router.get<Record<string, never>, LoanRequest[], Record<string, never>,
   Record<string, never>>(
     '/',
     authMiddleware(),
     async (req, res) => {
-      const loan_requests = await SQL_GET_UNGARANTEED_LOAN_REQUESTS({
+      const loan_requests = await SQL_GET_UNGUARANTEED_LOAN_REQUESTS({
         user_id: req.user!.id
       }).many();
       res.json(loan_requests);
