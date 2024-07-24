@@ -3,19 +3,19 @@ import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import validateRequest from '../../middleware/validationMiddleware';
 import { StatusCodeInterface } from '../../globalTypes';
-import { AdminLoanApproval, LoanApproval, loanApprovalSchema } from './types';
+import {  FinalnApproval, finalApprovalBody, FinalApprovalBody } from './types';
 
-const SQL_APPROVE_LOAN = sql<{request_id:number, admin_id:number, group_id:number}, Record<string, never>>(`
-  PERFORM approve_loan (:group_id, :request_id, :admin_id, :status, :reason);
+const SQL_COMPUTE_APPROVALS = sql< FinalnApproval, Record<string, never>>(`
+  PERFORM compute_loan_approvals(:group_id, :request_id, :admin_id );
 `);
 
 export default (router: Router) => {
-  router.post<Record<string, never>, StatusCodeInterface, LoanApproval, Record<string, never>>(
+  router.post<Record<string, never>, StatusCodeInterface,  FinalApprovalBody, Record<string, never>>(
     '/',
-    validateRequest({ body: loanApprovalSchema }),
+    validateRequest({ body: finalApprovalBody }),
     authMiddleware(),
     async (req, res) => {
-      await SQL_APPROVE_LOAN({
+      await SQL_COMPUTE_APPROVALS({
         ...req.body,
         admin_id: req.user!.id
       }).exec();

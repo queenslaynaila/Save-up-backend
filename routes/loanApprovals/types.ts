@@ -17,3 +17,15 @@ export const loanApprovalSchema = adminLoanApprovalSchema.omit({
 
 export type LoanApproval = z.infer<typeof loanApprovalSchema>;
 
+export const finalApprovalSchema = adminLoanApprovalSchema.omit({
+  status: true,
+  reason: true
+});
+
+export type FinalnApproval = z.infer<typeof finalApprovalSchema>;
+
+export const finalApprovalBody = finalApprovalSchema.omit({
+  admin_id: true
+})
+
+export type FinalApprovalBody = z.infer<typeof finalApprovalBody>;
