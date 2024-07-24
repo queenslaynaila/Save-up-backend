@@ -10,14 +10,14 @@ DECLARE
     v_loan_limit         NUMERIC(30, 2);
 BEGIN
     SELECT COALESCE(SUM(delta), 0)
-    INTO STRICT v_total_contribution
+    INTO v_total_contribution
     FROM transactions
     WHERE entity_id = p_user_id
       AND pocket_id = p_pocket_id
       AND type_id = 1;
 
     SELECT COALESCE(SUM(delta), 0)
-    INTO STRICT v_total_withdrawal
+    INTO v_total_withdrawal
     FROM transactions
     WHERE entity_id = p_user_id
       AND pocket_id = p_pocket_id
@@ -30,7 +30,6 @@ BEGIN
     END IF;
 
     v_net_contribution = v_total_contribution - v_total_withdrawal;
-
     IF v_net_contribution > 0 THEN
         v_loan_limit = 0.80 * v_net_contribution;
     ELSE
