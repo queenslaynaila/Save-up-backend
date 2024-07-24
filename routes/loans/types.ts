@@ -26,7 +26,7 @@ export const reviewedLoansParams = baseRequestLoanSchema.pick({
 });
 export type ReviewedLoansParams = z.infer<typeof reviewedLoansParams>;
 
-const ApprovalStatusEnum = z.enum([
+export const ApprovalStatusEnum = z.enum([
   'Pending', 'Completed', 'Denied'
 ]);
 
