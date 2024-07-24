@@ -43,6 +43,12 @@ export const getById = z.object({
 
 export type GetByIdInterface = z.infer<typeof getById>;
 
+export const getByGroupId = z.object({
+  group_id: z.number()
+})
+
+export type GetByGroupIdInterface = z.infer<typeof getByGroupId>;
+
 //MESSAGE RESPONSE SCHEMA
 
 export const statusCodeSchema = z.object({
