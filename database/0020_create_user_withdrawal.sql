@@ -11,9 +11,7 @@ DECLARE
     v_new_balance          NUMERIC(30, 2);
     v_reference_id         INT;
 BEGIN
-    SELECT get_transaction_info.v_current_balance
-    INTO STRICT v_current_balance
-    FROM get_transaction_info(p_user_id, p_pocket_id);
+    v_current_balance := get_transaction_info(p_user_id, p_pocket_id);
 
     IF  v_current_balance < p_amount THEN
         RAISE EXCEPTION USING
@@ -38,7 +36,7 @@ BEGIN
 
     PERFORM insert_transaction_log(
         p_user_id,
-        3,
+        4,
         p_pocket_id,
         v_reference_id,
         p_amount,
