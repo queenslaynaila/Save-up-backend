@@ -53,7 +53,9 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-GRANT EXECUTE ON FUNCTION request_loan(INT, INT, INT, INT, NUMERIC, TEXT, INTERVAL) TO app_user;
+GRANT EXECUTE ON FUNCTION request_loan(
+    INT, INT, INT, INT, NUMERIC, TEXT, INTERVAL
+) TO app_user;
 SELECT create_distributed_function(
     'request_loan(INT, INT, INT, INT, NUMERIC, TEXT, INTERVAL)', 'p_group_id'
 );
