@@ -35,9 +35,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 GRANT EXECUTE ON FUNCTION update_id_number(
-    INT, 
-    enum_id_type, 
-    TEXT
+    INT, enum_id_type, TEXT
 ) TO app_user;
 SELECT create_distributed_function(
   'update_id_number(INT, enum_id_type, TEXT)', 'p_user_id'
