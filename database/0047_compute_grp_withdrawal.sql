@@ -10,9 +10,7 @@ DECLARE
     v_latest_election_id   INT;
     v_total_admins         INT;
     v_approved_count       INT;
-BEGIN 
-    PERFORM check_grp_membership(p_admin_id, p_group_id);
-
+BEGIN
     SELECT MAX(xid)
     INTO STRICT v_latest_election_id
     FROM elections
@@ -51,7 +49,7 @@ BEGIN
     WHERE group_id = p_group_id
     AND withdrawal_id = p_withdrawal_id
     AND election_id = v_latest_election_id
-    AND status = 'Approved';
+    AND status = 'Approved'::enum_approval_status;
 
     IF v_approved_count < v_total_admins THEN
         RETURN;
