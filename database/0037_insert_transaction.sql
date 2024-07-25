@@ -33,7 +33,9 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-GRANT EXECUTE ON FUNCTION insert_transaction_log(INT, INT, INT, INT, NUMERIC, NUMERIC) TO app_user;
+GRANT EXECUTE ON FUNCTION insert_transaction_log(
+    INT, INT, INT, INT, NUMERIC, NUMERIC
+) TO app_user;
 SELECT create_distributed_function(
   'insert_transaction_log(INT, INT, INT, INT, NUMERIC, NUMERIC)', 
   'p_entity_id'

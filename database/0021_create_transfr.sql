@@ -53,7 +53,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-GRANT EXECUTE ON FUNCTION log_transfer_transaction(INT, INT, INT, NUMERIC, INT) TO app_user;
+GRANT EXECUTE ON FUNCTION create_transfer(INT, INT, INT, NUMERIC, INT) TO app_user;
 SELECT create_distributed_function(
   'create_transfer(INT, INT, INT, NUMERIC, INT)', 'p_source_pocket_id'
 );

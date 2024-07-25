@@ -40,7 +40,9 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-GRANT EXECUTE ON FUNCTION compute_ratification_results(INT, INT) TO app_user;
+GRANT EXECUTE ON FUNCTION compute_ratification_results(
+    INT, INT, INT
+) TO app_user;
 SELECT create_distributed_function(
-  'compute_ratification_results(INT, INT)', 'p_group_id'
+  'compute_ratification_results(INT, INT, INT)', 'p_group_id'
 );

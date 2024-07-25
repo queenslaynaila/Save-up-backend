@@ -18,4 +18,6 @@ END;
 $$ LANGUAGE plpgsql;
 
 GRANT EXECUTE ON FUNCTION join_group(INT, INT) TO app_user;
-SELECT create_distributed_function('join_group(INT, INT)', 'p_group_id');
+SELECT create_distributed_function(
+    'join_group(INT, INT)', 'p_group_id'
+);

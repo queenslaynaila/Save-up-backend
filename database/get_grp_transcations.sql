@@ -44,5 +44,9 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-GRANT EXECUTE ON FUNCTION get_group_transactions(INT, INT) TO app_user;
-SELECT create_distributed_function('get_group_transactions(INT, INT)', 'p_group_id');
+GRANT EXECUTE ON FUNCTION get_group_transactions(
+    INT, INT, INT
+) TO app_user;
+SELECT create_distributed_function(
+    'get_group_transactions(INT, INT, INT)', 'p_group_id'
+);

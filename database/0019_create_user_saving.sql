@@ -40,7 +40,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-GRANT EXECUTE ON FUNCTION create_user_deposit(INT, INT, NUMERIC) TO app_user;
+GRANT EXECUTE ON FUNCTION create_saving(INT, INT, NUMERIC) TO app_user;
 SELECT create_distributed_function(
-  'create_user_deposit(INT, INT, NUMERIC)', 'p_user_id'
+  'create_saving(INT, INT, NUMERIC)', 'p_user_id'
 );

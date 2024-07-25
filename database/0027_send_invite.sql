@@ -23,7 +23,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-GRANT EXECUTE ON FUNCTION send_invite(TEXT, INT, INT) TO app_user;
+GRANT EXECUTE ON FUNCTION send_invite(INT, TEXT, INT) TO app_user;
 SELECT create_distributed_function(
-    'send_invite(TEXT, INT, INT)', 'p_group_id'
+    'send_invite(INT, TEXT, INT)', 'p_group_id'
 );
