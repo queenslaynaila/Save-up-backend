@@ -9,8 +9,6 @@ CREATE OR REPLACE FUNCTION remove_user_from_group(
 DECLARE
     v_latest_election_id INT;
 BEGIN
-    PERFORM check_grp_membership(p_group_id, p_initiator_id);
-
     IF EXISTS (
         SELECT 1 
         FROM group_deposits
@@ -49,7 +47,7 @@ BEGIN
         p_group_id, 
         p_target_id,
         COALESCE(MAX(xid), 0) + 1, 
-        'Admin Removal'::enum_exit_reason
+        'Admin removal'::enum_exit_reason
     FROM group_lefts      
     WHERE group_id = p_group_id;
 
