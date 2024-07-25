@@ -16,11 +16,8 @@ BEGIN
     WHERE group_id = p_group_id
     AND xid = p_withdrawal_id;
 
-    SELECT get_transaction_info.v_current_balance 
-    INTO STRICT v_current_balance 
-    FROM get_transaction_info(p_group_id, v_pocket_id);
- 
-    IF v_current_balance < p_amount THEN
+    v_current_balance := get_transaction_info(p_group_id, v_pocket_id);
+    IF v_current_balance < v_amount THEN
         RAISE EXCEPTION USING
           MESSAGE = 'ERR_INSUFFICIENT_FUNDS',
           ERRCODE = 'P0004';
@@ -28,20 +25,14 @@ BEGIN
 
     v_new_balance := v_current_balance - v_amount;
     v_reference_id := floor(random() * 1000000 + 1)::INT;
-       
-    INSERT INTO transactions (
-        entity_id, xid, type_id, pocket_id, reference_id, delta, balance
-    )
-        SELECT
-            p_group_id,
-            COALESCE(MAX(xid), 0) + 1, 
-            3,
-            v_pocket_id,
-            v_reference_id,
-            v_amount,
-            v_new_balance
-        FROM transactions
-    WHERE entity_id = p_group_id;  
+    PERFORM insert_transaction_log(
+         p_group_id,
+         4,
+         v_pocket_id,
+         v_reference_id,
+         v_amount,
+         v_new_balance
+    );
 END;
 $$ LANGUAGE plpgsql;
 
