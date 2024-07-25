@@ -51,6 +51,7 @@ CREATE TABLE IF NOT EXISTS loan_admin_approvals (
 GRANT INSERT, SELECT ON loan_admin_approvals TO app_user;
 SELECT create_distributed_table('loan_admin_approvals', 'group_id');
 
+--Tie processed loan request to a transaction via disbursement and repayment.
 CREATE TABLE IF NOT EXISTS loan_disbursements (
     group_id              INT NOT NULL,
     transaction_id        INT NOT NULL,
