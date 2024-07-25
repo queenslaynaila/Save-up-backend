@@ -63,11 +63,12 @@ SELECT create_distributed_table('group_withdrawals_approvals', 'group_id');
 
 CREATE TABLE IF NOT EXISTS group_withdrawals(
   group_id              INT NOT NULL, 
-  withdrawal_id         INT NOT NULL,
+  transaction_id        INT NOT NULL,
   user_id               INT NOT NULL,
-  PRIMARY KEY           (group_id, withdrawal_id),
-  FOREIGN KEY           (group_id, withdrawal_id) REFERENCES transactions (entity_id, xid),
-  FOREIGN KEY           (group_id, user_id) REFERENCES group_members (group_id, user_id)
+  request_id            INT NOT NULL,
+  PRIMARY KEY           (group_id, transaction_id),
+  FOREIGN KEY           (user_id, transaction_id) REFERENCES transactions (entity_id, xid),
+  FOREIGN KEY           (group_id, request_id) REFERENCES group_withdrawal_requests (group_id, xid)
 );
 GRANT INSERT, SELECT ON group_withdrawals TO app_user;
 SELECT create_distributed_table('group_withdrawals', 'group_id');
