@@ -77,7 +77,7 @@ CREATE TABLE IF NOT EXISTS user_id_history(
     id_number        TEXT NOT NULL CHECK (id_number ~ '^[0-9]+$'),
     created_at       TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
     PRIMARY KEY      (user_id, xid),
-    FOREIGN KEY      (user_id) REFERENCES user_contact_details(id)
+    FOREIGN KEY      (user_id) REFERENCES users(id)
 );
 SELECT create_distributed_table('user_id_history', 'user_id');
 GRANT INSERT, SELECT ON user_id_history TO app_user;
