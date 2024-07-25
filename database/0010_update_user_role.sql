@@ -48,11 +48,8 @@ END;
 $$ LANGUAGE plpgsql;
 
 GRANT EXECUTE ON FUNCTION update_user_role(
-    INT, 
-    enum_user_role
+    INT, enum_user_role, INT
 ) TO app_user;
 SELECT create_distributed_function(
-  'update_user_role(INT, enum_user_role)', 'p_target_user_id'
+  'update_user_role(INT, enum_user_role, INT)', 'p_target_user_id'
 );
-
-
