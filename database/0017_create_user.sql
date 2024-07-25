@@ -16,11 +16,11 @@ BEGIN
   VALUES ('User')
   RETURNING entities.id INTO STRICT v_entity_id;
 
-  INSERT INTO user_contact_details (id, id_type, id_number, phone_number)
-  VALUES (v_entity_id, p_id_type, p_id_number, p_phone_number);
+  INSERT INTO user_contact_details (id, full_name, phone_number)
+  VALUES (v_entity_id, p_full_name, p_phone_number);
 
-  INSERT INTO users (id, full_name, role, gender, pin)
-  VALUES (v_entity_id, p_full_name, p_role::enum_user_role, p_gender, p_pin);
+  INSERT INTO users (id, id_type, id_number, role, gender, pin)
+  VALUES (v_entity_id, p_id_type, p_id_number, p_role::enum_user_role, p_gender, p_pin);
   
   INSERT INTO pockets (entity_id, xid, category_id, name, priority, pocket_type)
   VALUES (
@@ -43,13 +43,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 GRANT EXECUTE ON FUNCTION create_user(
-  enum_id_type, 
-  TEXT, 
-  TEXT, 
-  enum_user_role, 
-  TEXT, 
-  enum_gender, 
-  TEXT
+  enum_id_type, TEXT, TEXT, enum_user_role, TEXT, enum_gender, TEXT
 ) TO app_user;
 
 SELECT create_distributed_function(
