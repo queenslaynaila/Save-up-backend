@@ -1,8 +1,5 @@
 CREATE TYPE enum_exit_reason AS ENUM (
- 'Self removal', 
- 'Admin removal', 
- 'Rule violation', 
- 'Other'
+ 'Self removal', 'Admin removal'
 );
 
 CREATE TABLE IF NOT EXISTS groups (
