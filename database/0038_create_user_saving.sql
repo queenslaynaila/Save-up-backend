@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION create_saving(
+CREATE OR REPLACE FUNCTION create_user_saving(
     p_user_id      INT, 
     p_pocket_id    INT, 
     p_amount       NUMERIC
@@ -32,7 +32,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-GRANT EXECUTE ON FUNCTION create_saving(INT, INT, NUMERIC) TO app_user;
+GRANT EXECUTE ON FUNCTION create_user_saving(INT, INT, NUMERIC) TO app_user;
 SELECT create_distributed_function(
-  'create_saving(INT, INT, NUMERIC)', 'p_user_id'
+  'create_user_saving(INT, INT, NUMERIC)', 'p_user_id'
 );

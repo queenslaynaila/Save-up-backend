@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION create_transfer(
+CREATE OR REPLACE FUNCTION create_user_transfer(
     p_source_pocket_id        INT, 
     p_destination_pocket_id   INT, 
     p_user_id                 INT, -- The group member or a standard user doing the transfer
@@ -45,7 +45,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-GRANT EXECUTE ON FUNCTION create_transfer(INT, INT, INT, NUMERIC, INT) TO app_user;
+GRANT EXECUTE ON FUNCTION create_user_transfer(INT, INT, INT, NUMERIC, INT) TO app_user;
 SELECT create_distributed_function(
-  'create_transfer(INT, INT, INT, NUMERIC, INT)', 'p_source_pocket_id'
+  'create_user_transfer(INT, INT, INT, NUMERIC, INT)', 'p_source_pocket_id'
 );

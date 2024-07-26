@@ -25,7 +25,7 @@ BEGIN
     WHERE gm.group_id = p_group_id
     AND gm.is_active = TRUE;
 END;
-$$ LANGUAGE plpgsql
+$$ LANGUAGE plpgsql;
 
 GRANT EXECUTE ON FUNCTION get_group_members(INT, INT) TO app_user;
 SELECT create_distributed_function(
