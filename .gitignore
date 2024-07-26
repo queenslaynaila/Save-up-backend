@@ -9,6 +9,9 @@
 
 #dev
 /generate_schema.js
+/notes
+/database1
+
 
 .env
 .vscode
