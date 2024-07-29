@@ -37,14 +37,15 @@ BEGIN
        ERRCODE = 'P0004';
   END IF;
 
-  INSERT INTO group_withdrawal_requests (
-    group_id, xid, election_id, initiator_id, pocket_id, amount, reason
+  INSERT INTO debit_requests (
+    group_id, xid, election_id, requestor_id, type_id,  pocket_id, amount, reason
   )
   SELECT 
     p_group_id, 
     COALESCE(MAX(xid), 0) + 1,
     v_latest_election_id,
-    p_initiator_id, 
+    p_initiator_id,
+    2,
     p_pocket_id,
     p_amount, 
     p_reason
@@ -52,7 +53,7 @@ BEGIN
   WHERE group_id = p_group_id
   RETURNING xid INTO STRICT v_withdrawal_id;
 
-  INSERT INTO group_withdrawals_recipients (group_id, withdrawal_id, user_id, amount)
+  INSERT INTO debit_recipients (group_id, request_id, user_id, amount)
   SELECT 
     p_group_id,
     v_withdrawal_id,

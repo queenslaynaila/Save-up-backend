@@ -24,7 +24,6 @@ export default (router: Router) => {
     }),
     authMiddleware(),
     async (req, res) => {
-      console.log(`loggedin ${req.user!.id}, pocket_id ${req.body.pocket_id}, group_id ${req.body.group_id}, amount ${req.body.amount}`);
       await SQL_INITIATE_GRP_WITHDRAWAL({
         ...req.body,
         initiator_id: req.user!.id,
