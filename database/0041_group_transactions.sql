@@ -15,7 +15,10 @@ CREATE TABLE IF NOT EXISTS request_types (
     id               SERIAL PRIMARY KEY,
     type             TEXT NOT NULL UNIQUE
 );
-INSERT INTO request_types (type) VALUES ('Loan'), ('Withdrawal');
+
+INSERT INTO request_types (type)
+VALUES ('Loan'), ('Withdrawal');
+
 GRANT SELECT ON request_types TO app_user;
 SELECT create_reference_table('request_types');
 
