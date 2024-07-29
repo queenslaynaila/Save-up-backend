@@ -15,8 +15,9 @@ BEGIN
         SELECT 1
         FROM elections
         WHERE group_id = p_group_id
-        AND xid = p_election_id
-        AND status = 'Open'
+            AND xid = p_election_id
+            AND status = 'Open'
+            AND closed_at IS NULL
     ) THEN
         RAISE EXCEPTION USING 
             MESSAGE = 'ERR_ELECTION_CLOSED',
@@ -28,14 +29,14 @@ BEGIN
     SELECT COUNT(*) 
     INTO STRICT v_total_members 
     FROM group_members 
-    WHERE group_id = p_group_id 
-    AND is_active = TRUE;
+    WHERE group_id = p_group_id
+        AND is_active = TRUE;
 
     SELECT COUNT(DISTINCT user_id) 
     INTO STRICT v_ballots_cast 
     FROM ballots 
     WHERE group_id = p_group_id 
-    AND election_id = p_election_id;
+        AND election_id = p_election_id;
 
     IF v_ballots_cast < (v_total_members / 2.0) THEN
         RAISE EXCEPTION USING 
@@ -47,7 +48,7 @@ BEGIN
         SELECT candidate_id
         FROM ballots
         WHERE group_id = p_group_id 
-        AND election_id = p_election_id
+            AND election_id = p_election_id
         GROUP BY candidate_id
         ORDER BY COUNT(*) DESC
         LIMIT 3
@@ -65,7 +66,7 @@ BEGIN
     SET status = 'Closed', 
         closed_at = NOW()
     WHERE group_id = p_group_id 
-    AND xid = p_election_id;
+        AND xid = p_election_id;
 END;
 $$ LANGUAGE plpgsql;
 
