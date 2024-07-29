@@ -31,6 +31,7 @@ CREATE TABLE IF NOT EXISTS group_withdrawal_requests (
   PRIMARY KEY           (group_id, xid),
   FOREIGN KEY           (group_id, election_id, initiator_id) REFERENCES group_admins (group_id, election_id, user_id)
 );
+
 GRANT INSERT, SELECT ON  group_withdrawal_requests TO app_user;
 SELECT create_distributed_table(' group_withdrawal_requests', 'group_id');
 

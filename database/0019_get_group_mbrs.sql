@@ -19,11 +19,13 @@ BEGIN
     END IF;
 
     RETURN QUERY
-    SELECT u.id AS user_id, u.full_name
-    FROM user_contact_details u
-    JOIN group_members gm ON u.id = gm.user_id
-    WHERE gm.group_id = p_group_id
-    AND gm.is_active = TRUE;
+    SELECT user_contact_details.id AS user_id,
+           user_contact_details.full_name
+    FROM user_contact_details
+    JOIN group_members
+        ON user_contact_details.id = group_members.user_id
+    WHERE group_members.group_id = p_group_id
+    AND group_members.is_active = TRUE;
 END;
 $$ LANGUAGE plpgsql;
 
