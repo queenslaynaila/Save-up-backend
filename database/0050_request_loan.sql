@@ -11,6 +11,8 @@ RETURNS VOID AS $$
 DECLARE
     v_current_balance           NUMERIC(30, 2);
     v_loan_limit                NUMERIC(30, 2);
+    v_latest_election_id        INT;
+    v_request_id                INT;
 BEGIN
     IF NOT EXISTS (
         SELECT 1
@@ -38,24 +40,27 @@ BEGIN
             ERRCODE = 'P0007';
     END IF;
 
-    INSERT INTO loan_requests(group_id, xid, borrower_id, guarantor_id, pocket_id, amount, purpose, repayment_period)
+    SELECT MAX(xid)
+    INTO STRICT v_latest_election_id
+    FROM elections
+    WHERE group_id = p_group_id
+      AND status = 'Closed';
+
+    INSERT INTO debit_requests(group_id, xid, election_id, requestor_id, type_id, pocket_id, amount, reason)
     SELECT
         p_group_id,
         COALESCE(MAX(xid), 0) + 1,
+        v_latest_election_id,
         p_borrower_id,
-        p_guarantor_id,
+        1,
         p_pocket_id,
         p_amount,
-        p_reason,
-        p_repayment_period
-    FROM loan_requests
-    WHERE group_id = p_group_id;
+        p_reason
+    FROM debit_requests
+    WHERE group_id = p_group_id
+    RETURNING xid INTO STRICT v_request_id;
+
+    INSERT INTO loan_details(group_id, request_id, guarantor_id, repayment_period)
+    VALUES (p_group_id, v_request_id, p_guarantor_id, p_repayment_period);
 END;
 $$ LANGUAGE plpgsql;
-
-GRANT EXECUTE ON FUNCTION request_loan(
-    INT, INT, INT, INT, NUMERIC, TEXT, INTERVAL
-) TO app_user;
-SELECT create_distributed_function(
-    'request_loan(INT, INT, INT, INT, NUMERIC, TEXT, INTERVAL)', 'p_group_id'
-);
