@@ -10,7 +10,7 @@ import {
 import { StatusCodeInterface } from '../../globalTypes';
 
 const SQL_CREATE_SAVING = sql<SavingCreateType, Record<string,never>>(`
-  SELECT create_saving(:user_id, :pocket_id, :amount)
+  SELECT create_user_saving(:user_id, :pocket_id, :amount)
 `);
 
 export default (router: Router) => {
