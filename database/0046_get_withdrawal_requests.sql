@@ -6,7 +6,7 @@ RETURNS TABLE(
     withdrawal_id        INT,
     amount               NUMERIC(30, 2),
     reason               enum_withdrawal_reason, 
-    approvals            JSON[], --admin name approval stats and reason 4 approval stats
+    approvals            JSON[]--admin name approval stats and reason 4 approval stats
 ) AS $$
 BEGIN
     PERFORM check_grp_membership(p_group_id, p_user_id);
