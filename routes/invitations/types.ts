@@ -44,3 +44,4 @@ export type InviteResponseInterface = z.infer<typeof inviteResponseSchema>;
 export const inviteValidationSchema = inviteResponseSchema.omit({
   receiver_id: true
 })
+export type InviteValidationInterface = z.infer<typeof inviteValidationSchema>;
