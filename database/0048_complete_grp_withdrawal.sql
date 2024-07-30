@@ -30,7 +30,7 @@ BEGIN
          4,
          v_pocket_id,
          v_reference_id,
-         v_amount,
+         v_amount * -1,
          v_new_balance
     );
 END;
