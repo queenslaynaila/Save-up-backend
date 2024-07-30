@@ -7,7 +7,6 @@ CREATE OR REPLACE FUNCTION create_group_deposit(
 RETURNS VOID AS $$
 DECLARE
     v_current_balance  NUMERIC;
-    v_target_amount    NUMERIC;
     v_new_balance      NUMERIC;
     v_reference_id     INT;
     v_transaction_id   INT;
