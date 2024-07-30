@@ -5,7 +5,7 @@ import validateRequest from '../../middleware/validationMiddleware';
 import { BaseRequestLoan, RequestLoan, requestLoanSchema } from './types';
 
 const SQL_REQUEST_LOAN = sql<BaseRequestLoan, Record<string, never>>(`
-  PERFORM request_loan(:group_id, :pocket_id, :borrower_id, :guarantor_id, :amount, :reason, :period)
+  SELECT request_loan(:group_id, :pocket_id, :borrower_id, :guarantor_id, :amount, :reason, :period)
 `);
 
 export default (router: Router) => {
