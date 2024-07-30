@@ -23,7 +23,8 @@ export default (router: Router) => {
     authMiddleware(),
     async (req, res) => {
       const group = await SQL_CREATE_GROUP({ 
-        ...req.body, created_by: req.user!.id
+        ...req.body,
+        created_by: req.user!.id
       }).one();
       res.json(group)
     }
