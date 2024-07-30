@@ -37,7 +37,6 @@ export default (router: Router) => {
       });
 
       if (filters.length > 0) query.extend(`AND ${filters.join(' AND ')}`, filterArgs);
-      query.extend('LIMIT 15', {});
 
       res.json(await query.one());
     });
