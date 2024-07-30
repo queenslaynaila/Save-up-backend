@@ -6,26 +6,27 @@ import { GetByUserInterface } from '../../globalTypes';
 
 const SQL_GET_UNGUARANTEED_LOAN_REQUESTS = sql<GetByUserInterface, LoanRequest>(`
     SELECT
-        loan_requests.xid AS request_id,
-        loan_requests.group_id,
+        debit_requests.xid AS request_id,
+        debit_requests.group_id,
         groups.name AS group_name,
-        loan_requests.borrower_id,
         user_contact_details.full_name AS borrower_name,
-        loan_requests.amount,
-        loan_requests.purpose,
-        loan_requests.repayment_period
-    FROM loan_requests
-    JOIN user_contact_details
-        ON loan_requests.borrower_id = user_contact_details.id
-    JOIN groups
-        ON loan_requests.group_id = groups.id
-    WHERE loan_requests.guarantor_id = :user_id
-    AND NOT EXISTS (
-        SELECT 1
-        FROM loan_guarantor_approvals
-        WHERE loan_guarantor_approvals.group_id = loan_requests.group_id
-        AND loan_guarantor_approvals.request_id = loan_requests.xid
-    );
+        debit_requests.amount,
+        debit_requests.reason,
+        loan_details.repayment_period
+    FROM  debit_requests
+    JOIN  groups 
+        ON debit_requests.group_id = groups.id
+    JOIN  user_contact_details 
+        ON debit_requests.requestor_id = user_contact_details.id
+    JOIN  loan_details 
+        ON debit_requests.group_id = loan_details.group_id 
+               AND debit_requests.xid = loan_details.request_id
+    LEFT JOIN guarantor_approvals 
+        ON debit_requests.group_id = guarantor_approvals.group_id 
+               AND debit_requests.xid = guarantor_approvals.request_id 
+               AND guarantor_approvals.guarantor_id = :user_id
+    WHERE loan_details.guarantor_id = :user_id
+        AND guarantor_approvals.approval IS NULL;
 `);
 
 export default (router: Router) => {
