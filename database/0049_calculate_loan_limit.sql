@@ -1,5 +1,6 @@
 CREATE OR REPLACE FUNCTION calculate_loan_limit (
     p_pocket_id        INT,
+    p_group_id         INT,
     p_user_id          INT
 )
 RETURNS NUMERIC(30, 2) AS $$
@@ -14,14 +15,24 @@ BEGIN
     FROM transactions
     WHERE entity_id = p_user_id
       AND pocket_id = p_pocket_id
-      AND type_id = 1;
+      AND type_id = 1
+      AND EXISTS (
+        SELECT 1
+        FROM group_deposits
+        WHERE group_id = p_group_id
+          AND deposit_id = transactions.xid
+          AND user_id = p_user_id
+    );
 
-    SELECT COALESCE(SUM(delta), 0)
+    SELECT COALESCE(SUM(transactions.delta), 0)
     INTO v_total_withdrawal
     FROM transactions
-    WHERE entity_id = p_user_id
-      AND pocket_id = p_pocket_id
-      AND type_id = 3;
+    WHERE transactions.xid IN (
+        SELECT transaction_id
+        FROM disbursements
+        WHERE group_id = p_group_id
+          AND user_id = p_user_id
+    );
 
     IF v_total_withdrawal > v_total_contribution THEN
         RAISE EXCEPTION USING
@@ -30,6 +41,7 @@ BEGIN
     END IF;
 
     v_net_contribution = v_total_contribution - v_total_withdrawal;
+
     IF v_net_contribution > 0 THEN
         v_loan_limit = 0.80 * v_net_contribution;
     ELSE
@@ -40,7 +52,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-GRANT EXECUTE ON FUNCTION calculate_loan_limit(INT, INT) TO app_user;
+GRANT EXECUTE ON FUNCTION calculate_loan_limit(INT, INT, INT) TO app_user;
 SELECT create_distributed_function(
-    'calculate_loan_limit(INT, INT)', 'p_pocket_id'
+    'calculate_loan_limit(INT, INT, INT)', 'p_pocket_id'
 );
