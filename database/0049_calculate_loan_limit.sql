@@ -13,7 +13,7 @@ BEGIN
     SELECT COALESCE(SUM(delta), 0)
     INTO v_total_contribution
     FROM transactions
-    WHERE entity_id = p_user_id
+    WHERE entity_id = p_group_id
       AND pocket_id = p_pocket_id
       AND type_id = 1
       AND EXISTS (
@@ -27,7 +27,9 @@ BEGIN
     SELECT COALESCE(SUM(transactions.delta), 0)
     INTO v_total_withdrawal
     FROM transactions
-    WHERE transactions.xid IN (
+    WHERE entity_id = p_group_id
+      AND pocket_id = p_pocket_id
+      AND transactions.xid IN (
         SELECT transaction_id
         FROM disbursements
         WHERE group_id = p_group_id
