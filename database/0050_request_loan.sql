@@ -16,10 +16,9 @@ DECLARE
 BEGIN
     IF NOT EXISTS (
         SELECT 1
-        FROM transactions
-        WHERE entity_id = p_guarantor_id
-          AND pocket_id = p_pocket_id
-          AND type_id = 1
+        FROM group_deposits
+        WHERE group_id = p_group_id
+          AND user_id = p_borrower_id
     ) THEN
         RAISE EXCEPTION USING
             MESSAGE = 'GUARANTOR_NO_CONTRIBUTION',
@@ -44,7 +43,8 @@ BEGIN
     INTO STRICT v_latest_election_id
     FROM elections
     WHERE group_id = p_group_id
-      AND status = 'Closed';
+      AND status = 'Closed'
+      AND closed_at IS NOT NULL;
 
     INSERT INTO debit_requests(group_id, xid, election_id, requestor_id, type_id, pocket_id, amount, reason)
     SELECT
@@ -64,3 +64,10 @@ BEGIN
     VALUES (p_group_id, v_request_id, p_guarantor_id, p_repayment_period);
 END;
 $$ LANGUAGE plpgsql;
+
+GRANT EXECUTE ON FUNCTION request_loan(
+    INT, INT, INT, INT, NUMERIC, TEXT, INTERVAL
+) TO app_user;
+SELECT create_distributed_function(
+    'request_loan(INT, INT, INT, INT, NUMERIC, TEXT, INTERVAL)', 'p_group_id'
+);
