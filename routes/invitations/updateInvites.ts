@@ -2,19 +2,22 @@ import { sql } from '../../db';
 import { Router } from 'express';
 import authMiddleware from '../../middleware/authorization';
 import  validateRequest from '../../middleware/validationMiddleware';
-import { InviteResponseInterface, inviteValidationSchema } from './types';
+import { InviteResponseInterface, InviteValidationInterface, inviteValidationSchema } from './types';
 import { 
   IdParamInterface, 
   idParamSchema, 
   StatusCodeInterface 
 } from '../../globalTypes';
 
-const SQL_RESPOND_TO_INVITE = sql<InviteResponseInterface, StatusCodeInterface>(`
-   SELECT update_invite(:group_id, :receiver_id, :status)
+export interface ExtendedInviteResponseInterface extends InviteResponseInterface {
+  xid: number;
+}
+const SQL_RESPOND_TO_INVITE = sql<ExtendedInviteResponseInterface, StatusCodeInterface>(`
+   SELECT update_invite(:xid, :group_id, :receiver_id, :status)
 `);
 
 export default (router: Router) => {
-  router.patch<IdParamInterface, StatusCodeInterface, InviteResponseInterface, 
+  router.patch<IdParamInterface, StatusCodeInterface, InviteValidationInterface, 
   Record<string,never>>(
     '/:id',
     validateRequest({
@@ -23,10 +26,12 @@ export default (router: Router) => {
     }),
     authMiddleware(),
     async (req, res) => {
-      const group_id  = parseInt(req.params.id);
+      const xid  = parseInt(req.params.id);
       const  receiver_id = req.user!.id
       await SQL_RESPOND_TO_INVITE({ 
-        status: req.body.status, group_id, receiver_id 
+        ...req.body, 
+        xid, 
+        receiver_id 
       }).exec();
       res.sendStatus(204);
     }
