@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { transactionByUser } from '../usertransactions/types';
 
 export const basePocketSchema = z.object({
   entity_id: z.number().optional(),
@@ -49,7 +50,8 @@ export const PocketQueryParamsSchema = basePocketSchema.pick({
   category_id: z.string(),
   start_date: z.string(),
   end_date: z.string(),
-  is_default: z.string()
+  is_default: z.string(),
+  xid: z.string()
 }).partial();
 
 export type PocketQueryParamsType = z.infer<typeof PocketQueryParamsSchema>;
@@ -75,3 +77,9 @@ export const pocketPatchRequestSchema = PocketUpdateSchema.omit({
 });
 
 export type PocketPatchType = z.infer<typeof pocketPatchRequestSchema>;
+
+export const transactionBody = z.object({
+  pocket_id:z.string()
+})
+
+export type TransactionBody = z.infer<typeof transactionBody>;
