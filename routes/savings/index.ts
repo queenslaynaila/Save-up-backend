@@ -1,7 +1,6 @@
 import express from 'express';
 import createSaving from './createSaving';
 import getSavingsByCriteria from './getSavingsByCriteria';
-import getSavingBySavingId from './getSavingByTransactionId';
 import totalSavings from './totalSavings';
 import availableSavings from './availableSavings';
 
@@ -10,7 +9,6 @@ export default (baseRouter: express.Router) => {
   
   createSaving(router);
   getSavingsByCriteria(router);
-  getSavingBySavingId(router);
   totalSavings(router);
   availableSavings(router);
 
