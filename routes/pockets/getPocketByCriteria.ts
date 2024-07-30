@@ -39,7 +39,7 @@ export default (router: Router) => {
     authMiddleware(), 
     async (req, res) => {
       const entity_id = req.body.entity_id ?? req.user!.id; 
-      const { category_id, priority, status, start_date, end_date, is_default } = req.query;
+      const {xid,  category_id, priority, status, start_date, end_date, is_default } = req.query;
       
       const filters: string[] = [];
       const filterArgs: Record<string, string> = {};
@@ -51,6 +51,10 @@ export default (router: Router) => {
       if (category_id) {
         filterArgs.category_id = category_id;
         filters.push(`category_id = :category_id`);
+      }
+      if (xid) {
+        filterArgs.xid = xid;
+        filters.push(`xid = :xid`);
       }
       if (start_date && end_date) {
         filterArgs.start_date = start_date;
