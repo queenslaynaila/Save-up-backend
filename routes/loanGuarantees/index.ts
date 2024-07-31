@@ -8,5 +8,5 @@ export default (baseRouter: express.Router) => {
   guaranteeLoan(router);
   getGuarantorRequests(router);
 
-  baseRouter.use('/guarantee-loan', router);
+  baseRouter.use('/guarantors', router);
 };

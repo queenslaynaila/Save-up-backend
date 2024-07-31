@@ -32,7 +32,7 @@ const SQL_GET_UNGUARANTEED_LOAN_REQUESTS = sql<GetByUserInterface, LoanRequest>(
 export default (router: Router) => {
   router.get<Record<string, never>, LoanRequest[], Record<string, never>,
   Record<string, never>>(
-    '/',
+    '/:guarantor_id/requests',
     authMiddleware(),
     async (req, res) => {
       const loan_requests = await SQL_GET_UNGUARANTEED_LOAN_REQUESTS({
