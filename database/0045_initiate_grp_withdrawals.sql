@@ -40,7 +40,7 @@ BEGIN
   END IF;
 
   INSERT INTO debit_requests (
-    group_id, xid, election_id, requestor_id, type_id, pocket_id, amount, reason
+    group_id, xid, election_id, initiator_id, type_id, pocket_id, amount, reason
   )
   SELECT
     p_group_id,
@@ -55,7 +55,7 @@ BEGIN
   WHERE group_id = p_group_id
   RETURNING xid INTO STRICT v_withdrawal_id;
 
-  INSERT INTO debit_recipients (group_id, request_id, user_id, amount)
+  INSERT INTO debit_recipients (group_id, request_id, recipient_id, amount)
   SELECT
     p_group_id,
     v_withdrawal_id,
