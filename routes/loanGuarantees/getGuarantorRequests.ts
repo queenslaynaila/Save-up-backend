@@ -9,24 +9,31 @@ const SQL_GET_UNGUARANTEED_LOAN_REQUESTS = sql<GetByUserInterface, LoanRequest>(
         debit_requests.xid AS request_id,
         debit_requests.group_id,
         groups.name AS group_name,
-        user_contact_details.full_name AS borrower_name,
+        debit_requests.initiator_id,
+        initiator_details.full_name AS initiator_name,
         debit_requests.amount,
         debit_requests.reason,
-        loan_details.repayment_period
-    FROM  debit_requests
-    JOIN  groups 
-        ON debit_requests.group_id = groups.id
-    JOIN  user_contact_details 
-        ON debit_requests.requestor_id = user_contact_details.id
-    JOIN  loan_details 
-        ON debit_requests.group_id = loan_details.group_id 
-               AND debit_requests.xid = loan_details.request_id
-    LEFT JOIN guarantor_approvals 
-        ON debit_requests.group_id = guarantor_approvals.group_id 
-               AND debit_requests.xid = guarantor_approvals.request_id 
-               AND guarantor_approvals.guarantor_id = :user_id
+        debit_requests.status,
+        debit_requests.created_at,
+        loan_details.guarantor_id,
+        loan_details.repayment_period,
+        guarantor_approvals.approval
+    FROM debit_requests
+             JOIN groups
+                  ON debit_requests.group_id = groups.id
+             JOIN user_contact_details AS initiator_details
+                  ON debit_requests.initiator_id = initiator_details.id
+             JOIN loan_details
+                  ON debit_requests.group_id = loan_details.group_id
+                      AND debit_requests.xid = loan_details.request_id
+             JOIN user_contact_details AS guarantor_details
+                  ON loan_details.guarantor_id = guarantor_details.id
+             LEFT JOIN guarantor_approvals
+                       ON debit_requests.group_id = guarantor_approvals.group_id
+                           AND debit_requests.xid = guarantor_approvals.request_id
+                           AND loan_details.guarantor_id = guarantor_approvals.guarantor_id
     WHERE loan_details.guarantor_id = :user_id
-        AND guarantor_approvals.approval IS NULL;
+      AND debit_requests.type_id = 1;
 `);
 
 export default (router: Router) => {
