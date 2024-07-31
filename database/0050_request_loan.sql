@@ -10,7 +10,6 @@ CREATE OR REPLACE FUNCTION request_loan (
 RETURNS VOID AS $$
 DECLARE
     v_current_balance           NUMERIC(30, 2);
-    v_loan_limit                NUMERIC(30, 2);
     v_latest_election_id        INT;
     v_request_id                INT;
 BEGIN
@@ -31,12 +30,11 @@ BEGIN
             MESSAGE = 'INSUFFICIENT FUNDS',
             ERRCODE = 'P0004';
     END IF;
-
-    v_loan_limit := calculate_loan_limit(p_pocket_id, p_borrower_id);
-    IF p_amount > v_loan_limit THEN
+    -- Loan cant exceed 25% of the current balance
+    IF p_amount > v_current_balance * 0.25 THEN
         RAISE EXCEPTION USING
-            MESSAGE = 'ERR_EXCEEDS_LOAN_LIMIT',
-            ERRCODE = 'P0007';
+            MESSAGE = 'ERR_LOAN_AMOUNT_EXCEEDS_LIMIT',
+            ERRCODE = 'P0005';
     END IF;
 
     SELECT MAX(xid)
@@ -46,7 +44,7 @@ BEGIN
       AND status = 'Closed'
       AND closed_at IS NOT NULL;
 
-    INSERT INTO debit_requests(group_id, xid, election_id, requestor_id, type_id, pocket_id, amount, reason)
+    INSERT INTO debit_requests(group_id, xid, election_id, initiator_id, type_id, pocket_id, amount, reason)
     SELECT
         p_group_id,
         COALESCE(MAX(xid), 0) + 1,

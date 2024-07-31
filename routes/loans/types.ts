@@ -22,7 +22,7 @@ export const reviewedLoansParams = baseRequestLoanSchema.pick({
   group_id: true
 }).extend({
   user_id: z.number().int(),
-  approval_status: z.literal('Pending')
+  type_id: z.number().int()
 });
 export type ReviewedLoansParams = z.infer<typeof reviewedLoansParams>;
 
@@ -32,11 +32,14 @@ export const ApprovalStatusEnum = z.enum([
 
 export const reviewedLoanSchema = z.object({
   request_id: z.number().int().positive(),
+  initiator_id: z.number().int().positive(),
+  borrower_name: z.string(),
   group_id: z.number().int().positive(),
   group_name: z.string(),
   pocket_id: z.number().int().positive(),
   amount: z.number().positive(),
-  approval_status:ApprovalStatusEnum
+  reason: z.string(),
+  status: ApprovalStatusEnum
 });
 
 export type ReviewedLoan = z.infer<typeof reviewedLoanSchema>;
