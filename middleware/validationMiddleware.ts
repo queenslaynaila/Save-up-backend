@@ -1,20 +1,22 @@
-import { HttpError } from './errorMiddleware';
 import { NextFunction, Request, Response } from 'express';
 import { ZodSchema } from 'zod';
+import { HttpError } from './errorMiddleware';
 
 type Schemas = {
-  [key in 'body' | 'query' | 'params' ]?: ZodSchema;
-}; 
+  [key in 'body' | 'query' | 'params']?: ZodSchema;
+};
 
 const validateSchema = (schema: ZodSchema, data: unknown, part: string) => {
   const validationResult = schema.safeParse(data);
   if (!validationResult.success) {
-    const validation = validationResult.error.errors.map((err) => ({
-      in: part,
-      field: err.path.join('.'),
-      message: err.message
+    const errors = validationResult.error.errors.map((err) => ({
+      location: part,
+      path: err.path.join('.'),
+      msg: err.message,
+      code: err.code,
     }));
-    throw new HttpError(422, { validation }); 
+
+    throw new HttpError(400, errors);
   }
 };
 
@@ -26,4 +28,3 @@ export default function validateRequest(schemas: Schemas) {
     next();
   };
 }
-
