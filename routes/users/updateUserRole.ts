@@ -19,10 +19,10 @@ export default (router: Router) => {
   router.patch<UserRoleParamType, UpdatedUser, Record<string, never>, 
   Record<string, never>>(
     '/:id/:role',
+    authMiddleware({ roles: [UserRole.ADMIN] }),
     validateRequest({ 
       params:userRoleParamSchema
     }),
-    authMiddleware({ roles: [UserRole.ADMIN] }),
     async (req, res) => {
       const role = convertToTitleCase(req.params.role);
       const targetUserId = req.params.id;

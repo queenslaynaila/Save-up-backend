@@ -18,8 +18,8 @@ export default (router: Router) => {
   router.patch<Record<string,never>, {updated_phone_number:string}, PhoneNoUpdateType ,
   Record<string,never>>(
     '/phone-number', 
-    validateRequest({ body:loginSchema }),
-    authMiddleware(), 
+    authMiddleware(),
+    validateRequest({ body:loginSchema }), 
     async (req, res) => {
       const id = req.user!.id;
       const userPassword = await SQL_GET_USER_PIN({ 

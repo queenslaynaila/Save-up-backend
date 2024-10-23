@@ -12,8 +12,8 @@ export default (router: Router) => {
   router.patch<Record<string,never>, { new_id_number:string },  UpdateIdDetails, 
   Record<string,never>>(
     '/id-number', 
-    validateRequest({ body: updateIdDetailsSchema }),
     authMiddleware(), 
+    validateRequest({ body: updateIdDetailsSchema }),
     async (req, res) => {
       const new_id_number = await SQL_UPDATE_ID_NUMBER({
         ...req.body,
