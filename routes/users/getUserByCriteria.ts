@@ -1,18 +1,15 @@
 import { Router } from 'express';
+import { z } from 'zod';
 import { sql } from '../../db';
 import validateRequest from '../../middleware/validationMiddleware';
 import { HttpError } from '../../middleware/errorMiddleware';
 import authMiddleware from '../../middleware/authorization';
 import isStandardUser from '../../middleware/isStandardUser';
-import {  
-  UserType, 
-  UserByEntityType, 
-  UserQueryParams, 
-  userQuerySchema, 
-  userByEntitySchema  
-} from './types';
+import { User } from './login';
+import { userContactDetailsSchema } from './schema';
 
-const SQL_GET_USER_BY_CRITERIA = sql<Record<string,never>,  UserType>(`
+type UserWithoutPin = Omit<User, 'pin'>;
+const SQL_GET_USER_BY_CRITERIA = sql<Record<string,never>,  UserWithoutPin>(`
   SELECT 
     users.id, 
     users.id_type, 
@@ -32,12 +29,17 @@ const PHONE_REGEX = /^\+254\d{9}$/;
 const ID_REGEX = /^\d{6,13}$/;
 const PASSPORT_REGEX = /^[A-Za-z0-9]{9,16}$/i; 
 
+const userQuerySchema =  userContactDetailsSchema.pick({
+  full_name: true,
+  phone_number: true,
+}).partial();
+type UserQueryParams = z.infer<typeof userQuerySchema>;
+
 export default (router: Router) => {
-  router.get<UserByEntityType, UserType[], Record<string, never>, UserQueryParams>(
+  router.get<{ entity: string }, UserWithoutPin[], Record<string, never>, UserQueryParams>(
     '/:entity',
     authMiddleware(),
     validateRequest({
-      params: userByEntitySchema,
       query: userQuerySchema,
     }),
     async (req, res) => {

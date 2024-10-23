@@ -1,20 +1,33 @@
 import { Router } from 'express';
 import bcrypt from 'bcrypt';
+import { z } from 'zod';
 import { sql } from '../../db';
 import validateRequest from '../../middleware/validationMiddleware';
-import { UserCreationType, userCreationSchema } from './types';
 import { StatusCodeInterface } from '../../globalTypes';
+import { userContactDetailsSchema, userSchema } from './schema';
 
-const SQL_CREATE_USER = sql<UserCreationType, Record<string,never>>(`
+const userCreationSchema = userSchema.pick({
+  pin: true,
+  id_type: true,
+  id_number: true,
+  role: true,
+  gender: true
+}).merge(userContactDetailsSchema.pick({
+  full_name: true,
+  phone_number: true
+})) 
+ 
+type UserCreation = z.infer<typeof userCreationSchema>; 
+
+const SQL_CREATE_USER = sql<UserCreation, Record<string,never>>(`
   SELECT create_user(:id_type, :id_number, :phone_number, :role, :full_name, :gender, :pin)
 `);
 
 export default (router: Router) => { 
-  router.post<Record<string,never>, StatusCodeInterface, UserCreationType, 
-  Record<string,never>>(
+  router.post<Record<string,never>, StatusCodeInterface, UserCreation,Record<string,never>>(
     '/',
     validateRequest({ body: userCreationSchema }),
-    async (req, res) => {         
+    async (req, res) => {       
       const pinHash = bcrypt.hashSync(req.body.pin, 12);
       await SQL_CREATE_USER({
         ...req.body,

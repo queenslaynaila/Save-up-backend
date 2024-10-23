@@ -1,14 +1,20 @@
 import { Router, Request } from 'express';
 import bcrypt from 'bcrypt';
+import { z } from 'zod';
 import { sql } from '../../db';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { generateToken } from '../../middleware/generatetoken';
 import validateRequest from '../../middleware/validationMiddleware';
-import { loginSchema, LoginType, UserType, LoginAttempt } from './types';
+import { loginAttemptSchema, userContactDetailsSchema, userSchema } from './schema';
 
-type UserWithoutPin = Omit<UserType, 'pin'>;
+const user = userSchema.extend({
+  phone_number:userContactDetailsSchema.shape.phone_number,
+  full_name:userContactDetailsSchema.shape.full_name,
+});
+export type User = z.infer<typeof user>;
 
-const SQL_GET_USER = sql<{ phone_number: string }, UserType>(`
+
+const SQL_GET_USER = sql<{ phone_number: string }, User>(`
   SELECT 
     users.id, 
     users.id_type, 
@@ -26,13 +32,22 @@ const SQL_GET_USER = sql<{ phone_number: string }, UserType>(`
   WHERE user_contact_details.phone_number = :phone_number
 `);
 
+const loginSchema = loginAttemptSchema.pick({
+  user_id: true,
+  ip_address: true,
+  browser_info: true,
+  success: true,
+  reason: true
+});
+type LoginAttempt = z.infer<typeof loginSchema>;
+
 const SQL_RECORD_LOGIN = sql<LoginAttempt, Record<string, never>>(`
   INSERT INTO login_attempts (user_id, xid, ip_address, browser_info, success, reason)
   SELECT 
       :id, 
       COALESCE(MAX(xid), 0) + 1, 
       :ip_address, 
-      :user_agent, 
+      :browser_info, 
       :success, 
       :reason
   FROM login_attempts
@@ -58,9 +73,9 @@ const recordLoginAttempt = async (
   success: boolean, 
   reason: string) => {
   await SQL_RECORD_LOGIN({
-    id: userId,
+    user_id: userId,
     ip_address: ipAddress,
-    user_agent: userAgent,
+    browser_info: userAgent,
     success,
     reason,
   }).exec();
@@ -71,8 +86,17 @@ const getRequestInfo = (req: Request) => ({
   userAgent: req.get('User-Agent') || 'unknown',
 });
 
+type UserWithoutPin = Omit<User, 'pin'>;
+
+const authSchema = z.object({
+  phone_number: userContactDetailsSchema.shape.phone_number,
+  pin: userSchema.shape.pin
+})
+
+type Authorization = z.infer<typeof authSchema>;
+
 export default (router: Router) => {
-  router.post<Record<string, never>, UserWithoutPin, LoginType, Record<string, never>>(
+  router.post<Record<string, never>, UserWithoutPin, Authorization, Record<string, never>>(
     '/login',
     validateRequest({ body: loginSchema }),
     async (req, res) => {
