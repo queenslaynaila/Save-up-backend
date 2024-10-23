@@ -28,38 +28,43 @@ const SQL_GET_USER_BY_CRITERIA = sql<Record<string,never>,  UserType>(`
     user_contact_details ON users.id = user_contact_details.id
 `);
 
+const PHONE_REGEX = /^\+254\d{9}$/;
+const ID_REGEX = /^[0-9]+$/;
+const PASSPORT_REGEX = /^[0-9]{16}$/;
+
 export default (router: Router) => {
-  router.get<string, UserByEntityType,  UserType[], Record<string,never>, UserQueryParams>(
-    '/:entity', 
-    validateRequest({ 
-      params:userByEntitySchema, query: userQuerySchema 
+  router.get<string, UserByEntityType, UserType[], Record<string, never>, UserQueryParams>(
+    '/:entity',
+    authMiddleware(),
+    validateRequest({
+      params: userByEntitySchema,
+      query: userQuerySchema,
     }),
-    authMiddleware(), 
     async (req, res) => {
-      const  targetUser = req.params.entity;
-      const { full_name, phone_number } = req.query;  
+      const targetUser = req.params.entity;
+      const { full_name, phone_number } = req.query;
 
       const filters: string[] = [];
       const filterArgs: Record<string, string | number> = {};
 
-      if (!/^me$|^\+254\d{9}$|^[0-9]+$/.test(targetUser)) {
-        throw new HttpError(400);
+      if (targetUser !== 'me' && isStandardUser(req.user!.role)) {
+        throw new HttpError(403);
       }
 
       if (targetUser === 'me') {
         filterArgs.loggedInUserId = req.user!.id;
         filters.push(`users.id = :loggedInUserId`);
-      } else if (!isStandardUser(req.user!.role)) { 
-        //restrict search by phone no and id number to admin users only
-        if (/^\+254\d{9}$/.test(targetUser)) {
-          filterArgs.phoneNumber = targetUser;
-          filters.push(`user_contact_details.phone_number = :phoneNumber`);
-        } else if (/^[0-9]+$/.test(targetUser)) {
-          filterArgs.idNumber = targetUser;
-          filters.push(`users.id_number = :idNumber`);
-        }
-      } else {
-        throw new HttpError(403);
+      } else if(ID_REGEX.test(targetUser)) {
+        filterArgs.idNumber = targetUser;
+        filters.push(`users.id_number = :idNumber`);
+      } else if (PHONE_REGEX.test(targetUser)) {
+        filterArgs.phoneNumber = targetUser;
+        filters.push(`user_contact_details.phone_number = :phoneNumber`);
+      } else if (PASSPORT_REGEX.test(targetUser)) {
+        filterArgs.idNumber = targetUser;
+        filters.push(`users.id_number = :idNumber`);
+      } else { 
+        throw new HttpError(400);
       }
 
       if (full_name) {
@@ -69,14 +74,15 @@ export default (router: Router) => {
 
       if (phone_number) {
         filterArgs.phoneNumber = phone_number;
-        filters.push(`user_contact_details.phone_Number = :phoneNumber`);
+        filters.push(`user_contact_details.phone_number = :phoneNumber`);
       }
-    
+
       const query = SQL_GET_USER_BY_CRITERIA({});
-      
+
       if (filters.length > 0) query.extend(`WHERE ${filters.join(' AND ')}`, filterArgs);
       query.extend('LIMIT 15', {});
       const users = await query.many();
       res.json(users);
-    });
+    }
+  );
 };
