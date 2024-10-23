@@ -8,8 +8,8 @@ import { loginSchema, LoginType, UserType, LoginAttempt } from './types';
 
 type UserWithoutPin = Omit<UserType, 'pin'>;
 
-const SQL_GET_USER = sql<{ phone_number: string }, UserType>(
-  `SELECT 
+const SQL_GET_USER = sql<{ phone_number: string }, UserType>(`
+  SELECT 
     users.id, 
     users.id_type, 
     users.id_number,
@@ -23,11 +23,11 @@ const SQL_GET_USER = sql<{ phone_number: string }, UserType>(
     users
   LEFT JOIN 
     user_contact_details ON users.id = user_contact_details.id
-  WHERE user_contact_details.phone_number = :phone_number`
-);
+  WHERE user_contact_details.phone_number = :phone_number
+`);
 
-const SQL_RECORD_LOGIN = sql<LoginAttempt, Record<string, never>>(
-  `INSERT INTO login_attempts (user_id, xid, ip_address, browser_info, success, reason)
+const SQL_RECORD_LOGIN = sql<LoginAttempt, Record<string, never>>(`
+  INSERT INTO login_attempts (user_id, xid, ip_address, browser_info, success, reason)
   SELECT 
       :id, 
       COALESCE(MAX(xid), 0) + 1, 
@@ -36,11 +36,11 @@ const SQL_RECORD_LOGIN = sql<LoginAttempt, Record<string, never>>(
       :success, 
       :reason
   FROM login_attempts
-  WHERE user_id = :id`
-);
+  WHERE user_id = :id
+`);
 
-const SQL_COUNT_LAST_FAILED_ATTEMPTS = sql<{ id: number }, { failed_count: number }>(
-  `SELECT COUNT(*) AS failed_count
+const SQL_COUNT_LAST_FAILED_ATTEMPTS = sql<{ id: number }, { failed_count: number }>(`
+  SELECT COUNT(*) AS failed_count
   FROM (
     SELECT 1
     FROM login_attempts
@@ -48,8 +48,8 @@ const SQL_COUNT_LAST_FAILED_ATTEMPTS = sql<{ id: number }, { failed_count: numbe
     AND success = FALSE
     ORDER BY created_at DESC
     LIMIT 3
-  ) AS subquery`
-);
+  ) AS subquery
+`);
 
 const recordLoginAttempt = async (userId: number, ipAddress: string, userAgent: string, success: boolean, reason: string) => {
   await SQL_RECORD_LOGIN({
