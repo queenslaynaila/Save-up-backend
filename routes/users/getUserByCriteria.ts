@@ -29,11 +29,11 @@ const SQL_GET_USER_BY_CRITERIA = sql<Record<string,never>,  UserType>(`
 `);
 
 const PHONE_REGEX = /^\+254\d{9}$/;
-const ID_REGEX = /^[0-9]+$/;
-const PASSPORT_REGEX = /^[0-9]{16}$/;
+const ID_REGEX = /^\d{6,13}$/;
+const PASSPORT_REGEX = /^[A-Za-z0-9]{9,16}$/i; 
 
 export default (router: Router) => {
-  router.get<string, UserByEntityType, UserType[], Record<string, never>, UserQueryParams>(
+  router.get<UserByEntityType, UserType[], Record<string, never>, UserQueryParams>(
     '/:entity',
     authMiddleware(),
     validateRequest({
