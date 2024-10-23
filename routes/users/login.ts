@@ -51,7 +51,12 @@ const SQL_COUNT_LAST_FAILED_ATTEMPTS = sql<{ id: number }, { failed_count: numbe
   ) AS subquery
 `);
 
-const recordLoginAttempt = async (userId: number, ipAddress: string, userAgent: string, success: boolean, reason: string) => {
+const recordLoginAttempt = async (
+  userId: number, 
+  ipAddress: string, 
+  userAgent: string, 
+  success: boolean, 
+  reason: string) => {
   await SQL_RECORD_LOGIN({
     id: userId,
     ip_address: ipAddress,
