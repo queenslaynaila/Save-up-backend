@@ -1,15 +1,16 @@
-module.exports = {
+{
   "env": {
     "browser": true,
     "es2021": true
   },
   "extends": [
     "eslint:recommended",
+    "airbnb-base/legacy",
     "plugin:@typescript-eslint/recommended"
   ],
   "ignorePatterns": [
-    "dist",
-    ".eslintrc.cjs"
+    "lib",
+    ".eslintrc.json"
   ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
@@ -24,6 +25,11 @@ module.exports = {
   "rules": {
     "@typescript-eslint/indent": ["error", 2],
     "@typescript-eslint/no-unused-vars": "error",
-    "@typescript-eslint/no-explicit-any": "error"
+    "@typescript-eslint/no-explicit-any": "error",
+    "eol-last":"off",
+    "object-curly-newline":"off",
+    "camelcase":"off",
+    "no-shadow": "off",
+    "@typescript-eslint/no-shadow": "error"
   }
-};
+}
