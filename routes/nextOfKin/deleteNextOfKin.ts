@@ -1,7 +1,6 @@
 import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import { NextOfKinDeletionInterface } from './types';
 import {
   IdParamInterface,
   idParamSchema,
@@ -9,7 +8,7 @@ import {
 } from '../../globalTypes';
 import validateRequest from '../../middleware/validationMiddleware';
 
-const SQL_DELETE_KIN = sql<NextOfKinDeletionInterface, Record<string, never>>(`
+const SQL_DELETE_KIN = sql<{user_id: number, xid: number;}, Record<string, never>>(`
   UPDATE next_of_kins  
   SET deleted_at = NOW()
   WHERE user_id = :user_id

@@ -1,9 +1,9 @@
 import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import { NextOfKinInterface, NextOfKinInputInterface } from './types';
+import { NextOfKin } from './createNextOfKin';
 
-const SQL_GET_KIN = sql<NextOfKinInputInterface, NextOfKinInterface>(`
+const SQL_GET_KIN = sql<{user_id:number}, NextOfKin>(`
   SELECT xid, full_name, relationship, phone_number, created_at
   FROM next_of_kins 
   WHERE user_id = :user_id
@@ -11,8 +11,7 @@ const SQL_GET_KIN = sql<NextOfKinInputInterface, NextOfKinInterface>(`
 `);
 
 export default (router: Router) => {
-  router.get<Record<string, never>, NextOfKinInterface, Record<string, never>,
-  Record<string, never>>(
+  router.get<Record<string, never>, NextOfKin, Record<string, never>, Record<string, never>>(
     '/',
     authMiddleware(),
     async (req, res) => {

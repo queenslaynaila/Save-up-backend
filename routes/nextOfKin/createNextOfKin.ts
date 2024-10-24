@@ -1,23 +1,31 @@
 import { Router } from 'express';
+import { z } from 'zod';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { HttpError } from '../../middleware/errorMiddleware';
 import validateRequest from '../../middleware/validationMiddleware';
-import {
-  NextOfKinCreationInterface,
-  NextOfKinInterface,
-  NextOfKinValidation,
-  nextOfKinValidation
-} from './types';
+import { baseNextOfKinSchema } from './schema';
 
-const SQL_CREATE_KIN = sql<NextOfKinCreationInterface, NextOfKinInterface>(`
-  INSERT INTO next_of_kins (
-    user_id,
-    xid,
-    full_name,
-    relationship,
-    phone_number
-  )
+const kinCreationSchema = baseNextOfKinSchema.pick({
+  full_name: true,
+  relationship: true,
+  phone_number: true
+});
+
+type NextOfKinCreation = z.infer<typeof kinCreationSchema>;
+
+const nextOfKinSchema = baseNextOfKinSchema.pick({
+  xid: true,
+  full_name: true,
+  relationship: true,
+  phone_number: true,
+  created_at: true
+});
+
+export type NextOfKin = z.infer<typeof nextOfKinSchema>;
+
+const SQL_CREATE_KIN = sql<NextOfKinCreation & { user_id: number }, NextOfKin>(`
+  INSERT INTO next_of_kins (user_id, xid, full_name, relationship, phone_number)
   SELECT 
     :user_id,
     COALESCE(MAX(xid) + 1, 1),
@@ -30,11 +38,10 @@ const SQL_CREATE_KIN = sql<NextOfKinCreationInterface, NextOfKinInterface>(`
 `);
 
 export default (router: Router) => {
-  router.post<Record<string, never>, NextOfKinInterface, NextOfKinValidation,
-  Record<string, never>>(
+  router.post<Record<string, never>, NextOfKin, NextOfKinCreation, Record<string, never>>(
     '/',
     validateRequest({
-      body: nextOfKinValidation
+      body: kinCreationSchema
     }),
     authMiddleware(),
     async (req, res) => {
