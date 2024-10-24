@@ -6,7 +6,7 @@ import { StatusCodeInterface } from '../../globalTypes';
 import { AdminLoanApproval, LoanApproval, loanApprovalSchema } from './types';
 
 const SQL_APPROVE_LOAN = sql<AdminLoanApproval, Record<string, never>>(`
-  PERFORM approve_loan (:group_id, :request_id, :admin_id, :status, :reason);
+  SELECT approve_loan (:group_id, :request_id, :admin_id, :status, :reason);
 `);
 
 export default (router: Router) => {

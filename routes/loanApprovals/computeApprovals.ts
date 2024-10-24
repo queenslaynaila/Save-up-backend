@@ -6,7 +6,7 @@ import { StatusCodeInterface } from '../../globalTypes';
 import {  FinalnApproval, finalApprovalBody, FinalApprovalBody } from './types';
 
 const SQL_COMPUTE_APPROVALS = sql< FinalnApproval, Record<string, never>>(`
-  PERFORM compute_loan_approvals(:group_id, :request_id, :admin_id );
+  SELECT compute_loan_approvals(:group_id, :request_id, :admin_id );
 `);
 
 export default (router: Router) => {

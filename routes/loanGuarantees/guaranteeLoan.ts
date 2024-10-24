@@ -5,7 +5,7 @@ import { StatusCodeInterface } from '../../globalTypes';
 import { BaseGuarantee, GuaranteeLoanBody, guaranteeLoanBodySchema } from './types';
 
 const SQL_GUARANTEE_LOAN = sql<BaseGuarantee, Record<string,never>>(`
-  INSERT INTO loan_guarantor_approvals (group_id, request_id, user_id, approval) 
+  INSERT INTO  guarantor_approvals (group_id, request_id, guarantor_id, approval) 
   VALUES (:group_id, :request_id, :user_id, :approval);
 `);
 
