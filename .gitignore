@@ -2,31 +2,12 @@
 
 # dependencies
 /node_modules
-
 /dist
-# testing
-/coverage
+
 
 #dev
-/generate_schema.js
-/notes
-/database1
-
-
 .env
-.vscode
-/concerns.notes
-/try.ts
-routes/**/swagger.yml
-/routes/**/swagger.yml
-//routes/**/swagger.yaml
-/build
-.notes
-db.ts
-/sql.notes.ts
-/docker-compose.yml
-
-/approach.notes
-/middleware/oc.ts
+ 
+# IDE 
 /.idea
 /.vscode
