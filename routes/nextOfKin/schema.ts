@@ -17,6 +17,5 @@ export const baseNextOfKinSchema = z.object({
   relationship: RELATIONSHIP_ENUM,
   phone_number: z.string(),
   created_at: z.string(),
-  deleted_at: z.string().nullable().optional(),
-  m: z.number().int().optional()
+  deleted_at: z.string().nullable().optional()
 });
