@@ -13,7 +13,6 @@ const user = userSchema.extend({
 });
 export type User = z.infer<typeof user>;
 
-
 const SQL_GET_USER = sql<{ phone_number: string }, User>(`
   SELECT 
     users.id, 
