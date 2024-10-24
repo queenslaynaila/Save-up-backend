@@ -1,5 +1,5 @@
 CREATE TYPE enum_entity_type AS ENUM ('User', 'Group', 'Donor');
-CREATE TYPE enum_id_type AS ENUM ('National ID', 'Passport ID');
+CREATE TYPE enum_id_type AS ENUM ('National', 'Passport');
 CREATE TYPE enum_user_role AS ENUM ('Admin', 'Standard', 'Moderator');
 CREATE TYPE enum_gender AS ENUM ('Male', 'Female');
 
@@ -23,7 +23,7 @@ GRANT INSERT, SELECT, UPDATE ON user_contact_details TO app_user;
 
 CREATE TABLE IF NOT EXISTS users (
   id              INT PRIMARY KEY,  
-  id_type         enum_id_type NOT NULL DEFAULT 'National ID',
+  id_type         enum_id_type NOT NULL DEFAULT 'National',
   id_number       TEXT NOT NULL CHECK (id_number ~ '^[0-9]+$'),
   role            enum_user_role NOT NULL DEFAULT 'Standard',
   gender          enum_gender,
@@ -73,7 +73,7 @@ GRANT INSERT, SELECT ON user_phone_history TO app_user;
 CREATE TABLE IF NOT EXISTS user_id_history(
     user_id          INT NOT NULL,
     xid              INT NOT NULL,
-    id_type          enum_id_type NOT NULL DEFAULT 'National ID',
+    id_type          enum_id_type NOT NULL DEFAULT 'National',
     id_number        TEXT NOT NULL CHECK (id_number ~ '^[0-9]+$'),
     created_at       TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
     PRIMARY KEY      (user_id, xid),

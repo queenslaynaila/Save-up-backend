@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { UserRole } from '../../globalTypes';
 
 export const ENTITY_TYPE_ENUM = z.enum(['User', 'Group', 'Donor']);
-export const ID_TYPE_ENUM = z.enum(['National ID', 'Passport']);
+export const ID_TYPE_ENUM = z.enum(['National', 'Passport']);
 export const USER_ROLE_ENUM = z.enum(['Admin', 'Standard', 'Moderator']);
 export const GENDER_ENUM = z.enum(['Male', 'Female']);
 
@@ -23,7 +23,7 @@ export type UserContactDetails = z.infer<typeof userContactDetailsSchema>;
 
 export const userSchema = z.object({
   id: z.number().int(),
-  id_type: ID_TYPE_ENUM.default('National ID'),
+  id_type: ID_TYPE_ENUM.default('National'),
   id_number: z.string().regex(/^[0-9]+$/),
   role: z.nativeEnum(UserRole),
   gender: GENDER_ENUM.optional(),
@@ -62,7 +62,7 @@ export type UserPhoneHistory = z.infer<typeof userPhoneHistorySchema>;
 export const userIdHistorySchema = z.object({
   user_id: z.number().int(),
   xid: z.number().int(),
-  id_type: ID_TYPE_ENUM.default('National ID'),
+  id_type: ID_TYPE_ENUM.default('National'),
   id_number: z.string().regex(/^[0-9]+$/),
   created_at: z.string().datetime(),
 });
