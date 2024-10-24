@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION approve_loan(
+CREATE OR REPLACE FUNCTION approve_debit(
     p_group_id      INT,
     p_request_id    INT,
     p_admin_id      INT,
@@ -29,11 +29,11 @@ BEGIN
     INSERT INTO debit_approvals (group_id, request_id, admin_id, election_id, status, reason)
     VALUES (p_group_id, p_request_id, p_admin_id, v_latest_election_id, p_status, p_reason);
 
-    PERFORM compute_loan_approvals(p_group_id, p_withdrawal_id, p_admin_id);
+    PERFORM compute_loan_approvals(p_group_id, p_request_id, p_admin_id);
 END;
 $$ LANGUAGE plpgsql;
 
-GRANT EXECUTE ON FUNCTION approve_loan( INT, INT, INT, enum_approval_status, TEXT ) TO app_user;
+GRANT EXECUTE ON FUNCTION approve_debit( INT, INT, INT, enum_approval_status, TEXT ) TO app_user;
 SELECT create_distributed_function(
-'approve_loan(INT, INT, INT, enum_approval_status, TEXT)', 'p_group_id'
+               'approve_debit(INT, INT, INT, enum_approval_status, TEXT)', 'p_group_id'
 );

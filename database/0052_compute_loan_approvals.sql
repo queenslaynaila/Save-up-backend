@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION compute_loan_approvals (
+CREATE OR REPLACE FUNCTION compute_approvals (
     p_group_id           INT,
     p_request_id         INT,
     p_admin_id           INT
@@ -6,8 +6,10 @@ CREATE OR REPLACE FUNCTION compute_loan_approvals (
 RETURNS VOID AS $$
 DECLARE
     v_latest_election_id    INT;
-    v_total_admins         INT;
-    v_approved_count       INT;
+    v_total_admins          INT;
+    v_approved_count        INT;
+    v_initiator_id          INT;
+    v_transaction_id        INT;
 BEGIN
     SELECT MAX(xid)
     INTO STRICT v_latest_election_id
@@ -33,26 +35,36 @@ BEGIN
       AND election_id = v_latest_election_id;
 
     SELECT COUNT(*) INTO STRICT v_approved_count
-    FROM loan_admin_approvals
+    FROM debit_approvals
     WHERE group_id = p_group_id
       AND request_id = p_request_id
       AND status = 'Approved';
 
     IF v_approved_count < v_total_admins THEN
-        UPDATE loan_requests
-        SET approval_status = 'Denied'
+        UPDATE debit_requests
+        SET status = 'Denied'
+        WHERE group_id = p_group_id
+          AND xid = p_request_id;
+    ELSE
+        UPDATE debit_requests
+        SET status = 'Approved'
         WHERE group_id = p_group_id
           AND xid = p_request_id;
     END IF;
 
-    UPDATE loan_requests
-    SET approval_status = 'Complete'
+    v_transaction_id := complete_group_withdrawal(p_group_id, p_request_id);
+
+    SELECT initiator_id INTO STRICT v_initiator_id
+    FROM debit_requests
     WHERE group_id = p_group_id
       AND xid = p_request_id;
+
+    INSERT INTO disbursements (group_id, transaction_id, request_id, user_id)
+    VALUES (p_group_id, v_transaction_id, p_request_id, v_initiator_id);
 END;
 $$ LANGUAGE plpgsql;
 
 SELECT create_distributed_function(
-    'compute_loan_approvals(INT, INT, INT)', 'p_group_id'
+    'compute_approvals(INT, INT, INT)', 'p_group_id'
 );
-GRANT EXECUTE ON FUNCTION compute_loan_approvals(INT, INT, INT) TO app_user;
+GRANT EXECUTE ON FUNCTION compute_approvals(INT, INT, INT) TO app_user;
