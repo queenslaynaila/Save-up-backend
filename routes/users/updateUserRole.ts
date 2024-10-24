@@ -4,8 +4,8 @@ import { sql } from '../../db';
 import validateRequest from '../../middleware/validationMiddleware';
 import authMiddleware from '../../middleware/authorization';
 import { convertToTitleCase } from '../../middleware/caseNormalization';
+import { userContactDetailsSchema, UserId } from './schema';
 import { UserRole } from '../../globalTypes';
-import { userContactDetailsSchema } from './schema';
 
 export const updatedUserSchema = userContactDetailsSchema.pick({
   full_name: true
@@ -15,7 +15,7 @@ export const updatedUserSchema = userContactDetailsSchema.pick({
 
 export type UpdatedUser = z.infer<typeof updatedUserSchema>;
 
-const SQL_UPDATE_ROLE = sql<{ targetUserId: string, role: UserRole, adminId: number }, UpdatedUser>(`
+const SQL_UPDATE_ROLE = sql<{ targetUserId: string, role:UserRole, adminId: number }, UpdatedUser>(`
   SELECT * FROM update_user_role(:targetUserId, :role, :adminId);
 `);
 
@@ -26,7 +26,7 @@ const userRoleBodySchema = z.object({
 type UserRoleBodyType = z.infer<typeof userRoleBodySchema>;
 
 export default (router: Router) => {
-  router.patch<{ user_id: string }, UpdatedUser, UserRoleBodyType, Record<string, never>>(
+  router.patch<UserId, UpdatedUser, UserRoleBodyType, Record<string, never>>(
     '/:user_id/role',
     authMiddleware({ roles: [UserRole.ADMIN] }),
     validateRequest({ body: userRoleBodySchema }),
