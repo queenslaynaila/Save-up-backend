@@ -19,21 +19,21 @@ const SQL_UPDATE_ROLE = sql<{ targetUserId: string, role: UserRole, adminId: num
   SELECT * FROM update_user_role(:targetUserId, :role, :adminId);
 `);
 
-
-const userRoleParamSchema = z.object({
-  id: z.string(),
+const userRoleBodySchema = z.object({
   role: z.nativeEnum(UserRole)
 });
 
+type UserRoleBodyType = z.infer<typeof userRoleBodySchema>;
+
 export default (router: Router) => {
-  router.patch<{ role: UserRole, id: string }, UpdatedUser, Record<string, never>, Record<string, never>>(
-    '/:id/:role',
+  router.patch<{ user_id: string }, UpdatedUser, UserRoleBodyType, Record<string, never>>(
+    '/:user_id/role',
     authMiddleware({ roles: [UserRole.ADMIN] }),
-    validateRequest({ params: userRoleParamSchema }),
+    validateRequest({ body: userRoleBodySchema }),
     async (req, res) => {
-      const role = convertToTitleCase(req.params.role);
-      const targetUserId = req.params.id;
-      
+      const targetUserId = req.params.user_id;
+      const role = convertToTitleCase(req.body.role);
+
       const user = await SQL_UPDATE_ROLE({
         role,
         targetUserId,
