@@ -18,7 +18,7 @@ export type CandidateRequestBody = z.infer<typeof candidateRequestBody>;
 export const candidateParamSchema = z.object({
   group_id: z.number(),
   election_id: z.number()
-})
+});
 
 export type CandidateParam = z.infer<typeof candidateParamSchema>
 
@@ -31,7 +31,7 @@ export type CandidateReq = z.infer<typeof candidateReqSchema>;
 export const candidateResSchema = candidateSchema.pick({
   candidate_id: true
 }).extend({
-  full_name: z.string(),
+  full_name: z.string()
 });
 
 export type CandidateRes = z.infer<typeof candidateResSchema>;

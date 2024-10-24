@@ -5,6 +5,6 @@ export const categorySchema = z.object({
   name: z.string(),
   description: z.string(),
   image_url: z.string()
-})
-  
+});
+
 export type CategoryInterface = z.infer<typeof categorySchema>;

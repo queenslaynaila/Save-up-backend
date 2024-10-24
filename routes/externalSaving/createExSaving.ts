@@ -1,10 +1,10 @@
 import { Router } from 'express';
 import { sql } from '../../db';
 import validateRequest from '../../middleware/validationMiddleware';
-import {  ExternalSavingInterface, externalSavingSchema} from './types';
+import { ExternalSavingInterface, externalSavingSchema } from './types';
 import { StatusCodeInterface } from '../../globalTypes';
 
-const SQL_CREATE_SAVING = sql<ExternalSavingInterface, Record<string,never>>(`
+const SQL_CREATE_SAVING = sql<ExternalSavingInterface, Record<string, never>>(`
   SELECT create_external_savings( 
     :entity_id,
     :pocket_id, 
@@ -15,14 +15,15 @@ const SQL_CREATE_SAVING = sql<ExternalSavingInterface, Record<string,never>>(`
 `);
 
 export default (router: Router) => {
-  router.post<Record<string,never>, StatusCodeInterface, ExternalSavingInterface, 
-  Record<string,never>>(
-    '/', 
+  router.post<Record<string, never>, StatusCodeInterface, ExternalSavingInterface,
+  Record<string, never>>(
+    '/',
     validateRequest({
       body: externalSavingSchema
     }),
     async (req, res) => {
-      await SQL_CREATE_SAVING({...req.body }).exec();
+      await SQL_CREATE_SAVING({ ...req.body }).exec();
       res.sendStatus(201);
-    });
+    }
+  );
 };

@@ -9,6 +9,6 @@ export default (baseRouter: express.Router) => {
   createNextOfKin(router);
   getNextOfKin(router);
   deleteNextOfKin(router);
-  
+
   baseRouter.use('/next-of-kin', router);
 };

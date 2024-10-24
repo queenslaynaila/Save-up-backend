@@ -1,6 +1,6 @@
 import express from 'express';
-import approveLoan from './createApproval'
-import getUnapprovedLoans from './getUnnaprovedLoans'
+import approveLoan from './createApproval';
+import getUnapprovedLoans from './getUnnaprovedLoans';
 
 export default (baseRouter: express.Router) => {
   const router = express.Router();

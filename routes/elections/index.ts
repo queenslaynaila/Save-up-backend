@@ -7,6 +7,6 @@ export default (baseRouter: Router) => {
 
   createElections(router);
   getElections(router);
-  
-  baseRouter.use('/elections', router)
+
+  baseRouter.use('/elections', router);
 };

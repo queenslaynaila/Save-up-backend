@@ -1,13 +1,13 @@
 import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import { 
-  GroupsByUserInterface, 
-  groupsByUserSchema, 
-  RemovedMember, 
-  RemoveMemberInterface 
+import {
+  GroupsByUserInterface,
+  groupsByUserSchema,
+  RemovedMember,
+  RemoveMemberInterface
 } from './types';
-import { IdParamInterface, } from '../../globalTypes';
+import { IdParamInterface } from '../../globalTypes';
 import validateRequest from '../../middleware/validationMiddleware';
 
 const SQL_REMOVE_GROUP_MBR = sql<RemoveMemberInterface, RemovedMember>(`
@@ -15,8 +15,8 @@ const SQL_REMOVE_GROUP_MBR = sql<RemoveMemberInterface, RemovedMember>(`
 `);
 
 export default (router: Router) => {
-  router.delete<IdParamInterface, RemovedMember, GroupsByUserInterface, 
-  Record<string,never>>(
+  router.delete<IdParamInterface, RemovedMember, GroupsByUserInterface,
+  Record<string, never>>(
     '/remove-member/:id',
     validateRequest({
       body: groupsByUserSchema
@@ -24,9 +24,9 @@ export default (router: Router) => {
     authMiddleware(),
     async (req, res) => {
       const response = await SQL_REMOVE_GROUP_MBR({
-        admin_id: req.user!.id, 
+        admin_id: req.user!.id,
         user_id: req.body.user_id,
-        id: parseInt(req.params.id) 
+        id: Number(req.params.id)
       }).one();
       res.json(response);
     }

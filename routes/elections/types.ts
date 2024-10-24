@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { z } from 'zod';
 
 export enum ElectionType {
   BALLOT = 'Ballot',
@@ -6,16 +6,16 @@ export enum ElectionType {
 }
 
 export const election = z.object({
-  group_id:z.number(),
-  initiator_id:z.number(),
+  group_id: z.number(),
+  initiator_id: z.number(),
   type: z.enum([ElectionType.BALLOT, ElectionType.RATIFICATION])
-})
+});
 
 export type ElectionInterface = z.infer<typeof election>
 
 export const electionValidation = election.omit({
-  initiator_id:true
-})
+  initiator_id: true
+});
 
 export type ElectionValidation = z.infer<typeof electionValidation>
 

@@ -9,16 +9,16 @@ const SQL_REQUEST_LOAN = sql<BaseRequestLoan, Record<string, never>>(`
 `);
 
 export default (router: Router) => {
-  router.post<Record<string,never>, Record<string,never>, RequestLoan,
-  Record<string,never>>(
+  router.post<Record<string, never>, Record<string, never>, RequestLoan,
+  Record<string, never>>(
     '/',
-    validateRequest({ body:requestLoanSchema }),
+    validateRequest({ body: requestLoanSchema }),
     authMiddleware(),
     async (req, res) => {
       await SQL_REQUEST_LOAN({
         ...req.body,
-        borrower_id:req.user!.id
-      }).exec()
+        borrower_id: req.user!.id
+      }).exec();
       return res.sendStatus(204);
     }
   );

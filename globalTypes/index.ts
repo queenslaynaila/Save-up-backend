@@ -1,14 +1,14 @@
 import { z } from 'zod';
 
-//USER ROLES
+// USER ROLES
 
 export enum UserRole {
   ADMIN = 'Admin',
   USER = 'Standard',
   MODERATOR = 'Moderator'
 }
-  
-//METHOD ENUM
+
+// METHOD ENUM
 export enum Method {
   GET = 'get',
   POST = 'post',
@@ -17,47 +17,47 @@ export enum Method {
   DELETE = 'delete',
 }
 
-//PARAMS SCHEMAS
+// PARAMS SCHEMAS
 
 export const idParamSchema = z.object({
   id: z.string()
-})
+});
 
 export type IdParamInterface = z.infer<typeof idParamSchema>;
 
 export const getByuserSchema = z.object({
   user_id: z.number()
-})
+});
 
 export type GetByUserInterface = z.infer<typeof getByuserSchema>
 
 export const getByPhone = z.object({
   phone_number: z.string()
-})
+});
 
 export type GetByPhoneInterface = z.infer<typeof getByPhone>;
 
 export const getById = z.object({
   id: z.number()
-})
+});
 
 export type GetByIdInterface = z.infer<typeof getById>;
 
 export const getByGroupId = z.object({
   group_id: z.number()
-})
+});
 
 export type GetByGroupIdInterface = z.infer<typeof getByGroupId>;
 
-//MESSAGE RESPONSE SCHEMA
+// MESSAGE RESPONSE SCHEMA
 
 export const statusCodeSchema = z.object({
   statusCode: z.number()
-})
+});
 
 export type StatusCodeInterface = z.infer<typeof statusCodeSchema>;
 
-//ID SCHEMA
+// ID SCHEMA
 
 export const idSchema = z.object({
   xid: z.number()
@@ -71,7 +71,7 @@ export const xidEntitySchema = idSchema.extend({
 
 export type XidEntityInterface = z.infer<typeof xidEntitySchema>
 
-export const entitySchema = xidEntitySchema.pick({  
+export const entitySchema = xidEntitySchema.pick({
   entity_id: true
 }).partial();
 

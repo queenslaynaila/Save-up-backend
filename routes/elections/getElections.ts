@@ -3,9 +3,9 @@ import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import validateRequest from '../../middleware/validationMiddleware';
 import {
-  ElectionRequest, 
-  ElectionRetrieval, 
-  electionBodySchema 
+  ElectionRequest,
+  ElectionRetrieval,
+  electionBodySchema
 } from './types';
 
 const SQL_GET_ONGOING_ELECTION = sql< ElectionRequest, ElectionRetrieval>(`
@@ -13,17 +13,17 @@ const SQL_GET_ONGOING_ELECTION = sql< ElectionRequest, ElectionRetrieval>(`
 `);
 
 export default (router: Router) => {
-  router.get<Record<string,never>, ElectionRetrieval, ElectionRequest,
-  Record<string,never>>(
+  router.get<Record<string, never>, ElectionRetrieval, ElectionRequest,
+  Record<string, never>>(
     '/',
     validateRequest({
       body: electionBodySchema
-    }), 
+    }),
     authMiddleware(),
     async (req, res) => {
-      const election = await SQL_GET_ONGOING_ELECTION({ 
-        ...req.body, 
-        user_id:req.user!.id
+      const election = await SQL_GET_ONGOING_ELECTION({
+        ...req.body,
+        user_id: req.user!.id
       }).one();
       res.json(election);
     }

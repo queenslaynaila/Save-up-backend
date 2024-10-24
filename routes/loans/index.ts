@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import createLoanRequest from './createLoanRequest';
-import getLoans from './getReviewedLoans'
+import getLoans from './getReviewedLoans';
 
 export default (baseRouter: Router) => {
   const router = Router();

@@ -3,7 +3,7 @@ import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import validateRequest from '../../middleware/validationMiddleware';
 import { ReviewedLoan, ReviewedLoansParams } from './types';
-import { GetByGroupIdInterface,  getByGroupId } from '../../globalTypes';
+import { GetByGroupIdInterface, getByGroupId } from '../../globalTypes';
 
 const SQL_GET_APPLIED_LOANS = sql<ReviewedLoansParams, ReviewedLoan>(`
     SELECT
@@ -34,16 +34,16 @@ const SQL_GET_APPLIED_LOANS = sql<ReviewedLoansParams, ReviewedLoan>(`
 `);
 
 export default (router: Router) => {
-  router.get<Record<string,never>, ReviewedLoan[], GetByGroupIdInterface, Record<string,never>>(
+  router.get<Record<string, never>, ReviewedLoan[], GetByGroupIdInterface, Record<string, never>>(
     '/',
     validateRequest({ body: getByGroupId }),
     authMiddleware(),
     async (req, res) => {
       const loans = await SQL_GET_APPLIED_LOANS({
         ...req.body,
-        user_id:req.user!.id,
+        user_id: req.user!.id,
         type_id: 1
-      }).many()
+      }).many();
       return res.json(loans);
     }
   );

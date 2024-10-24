@@ -12,26 +12,25 @@ export const baseExpenseSchema = z.object({
 
 export type BaseExpenseInterface = z.infer<typeof baseExpenseSchema>;
 
-
 export const expenseCreationSchema = baseExpenseSchema.extend({
   entity_id: z.number().optional()
 }).omit({
   xid: true,
   created_at: true
-})
+});
 
 export type ExpenseCreationInterface = z.infer<typeof expenseCreationSchema>;
 
 export const ExpenseUpdateValidationSchema = expenseCreationSchema.omit({
   entity_id: true
-}).partial()
+}).partial();
 
 export const expenseQuerySchema = z.object({
   category_id: z.string(),
   start_date: z.string(),
   end_date: z.string()
 }).partial();
-  
+
 export type ExpenseQueryInterface = z.infer<typeof expenseQuerySchema>;
 
 export const expenseUpdateSchema = baseExpenseSchema.pick({
@@ -42,13 +41,13 @@ export const expenseUpdateSchema = baseExpenseSchema.pick({
   entity_id: true
 }).partial().extend({
   xid: z.number()
-})
+});
 
 export type ExpenseUpdateInterface = z.infer<typeof expenseUpdateSchema>;
 
-export const expenseBodySchema =expenseUpdateSchema.omit({
+export const expenseBodySchema = expenseUpdateSchema.omit({
   xid: true
-})
+});
 
 export type ExpenseBodyInterface = z.infer<typeof expenseBodySchema>;
 
@@ -57,6 +56,6 @@ export const expenseUpdateRes = baseExpenseSchema.pick({
   description: true,
   amount: true,
   spent_at: true
-})
+});
 
 export type ExpenseUpdateRes = z.infer<typeof expenseUpdateRes>;

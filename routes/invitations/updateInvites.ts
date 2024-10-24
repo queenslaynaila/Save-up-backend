@@ -1,12 +1,12 @@
 import { sql } from '../../db';
 import { Router } from 'express';
 import authMiddleware from '../../middleware/authorization';
-import  validateRequest from '../../middleware/validationMiddleware';
+import validateRequest from '../../middleware/validationMiddleware';
 import { InviteResponseInterface, InviteValidationInterface, inviteValidationSchema } from './types';
-import { 
-  IdParamInterface, 
-  idParamSchema, 
-  StatusCodeInterface 
+import {
+  IdParamInterface,
+  idParamSchema,
+  StatusCodeInterface
 } from '../../globalTypes';
 
 export interface ExtendedInviteResponseInterface extends InviteResponseInterface {
@@ -17,21 +17,21 @@ const SQL_RESPOND_TO_INVITE = sql<ExtendedInviteResponseInterface, StatusCodeInt
 `);
 
 export default (router: Router) => {
-  router.patch<IdParamInterface, StatusCodeInterface, InviteValidationInterface, 
-  Record<string,never>>(
+  router.patch<IdParamInterface, StatusCodeInterface, InviteValidationInterface,
+  Record<string, never>>(
     '/:id',
     validateRequest({
       params: idParamSchema,
-      body:inviteValidationSchema
+      body: inviteValidationSchema
     }),
     authMiddleware(),
     async (req, res) => {
-      const xid  = parseInt(req.params.id);
-      const  receiver_id = req.user!.id
-      await SQL_RESPOND_TO_INVITE({ 
-        ...req.body, 
-        xid, 
-        receiver_id 
+      const xid = Number(req.params.id);
+      const receiver_id = req.user!.id;
+      await SQL_RESPOND_TO_INVITE({
+        ...req.body,
+        xid,
+        receiver_id
       }).exec();
       res.sendStatus(204);
     }

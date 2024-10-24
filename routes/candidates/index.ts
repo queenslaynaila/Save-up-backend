@@ -7,6 +7,6 @@ export default (baseRouter: express.Router) => {
 
   createCandidates(router);
   getCandidates(router);
-  
+
   baseRouter.use('/candidates', router);
 };

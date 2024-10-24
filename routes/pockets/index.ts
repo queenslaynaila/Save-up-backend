@@ -7,7 +7,7 @@ import updatePocket from './updatePocket';
 
 export default (baseRouter: express.Router) => {
   const router = express.Router();
-  
+
   createPocket(router);
   deletePocket(router);
   getPocketByCriteria(router);

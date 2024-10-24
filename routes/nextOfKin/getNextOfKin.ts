@@ -11,14 +11,15 @@ const SQL_GET_KIN = sql<NextOfKinInputInterface, NextOfKinInterface>(`
 `);
 
 export default (router: Router) => {
-  router.get<Record<string,never>, NextOfKinInterface, Record<string,never>, 
-  Record<string,never>>(
+  router.get<Record<string, never>, NextOfKinInterface, Record<string, never>,
+  Record<string, never>>(
     '/',
-    authMiddleware(), 
-    async (req, res) => { 
+    authMiddleware(),
+    async (req, res) => {
       const nextOfKin = await SQL_GET_KIN({
         user_id: req.user!.id
-      }).oneOrNull()
+      }).oneOrNull();
       return res.json(nextOfKin);
-    });
+    }
+  );
 };

@@ -4,7 +4,7 @@ import createRatification from './createRatification';
 export default (baseRouter: Router) => {
   const router = Router();
 
-  createRatification(router)
-  
+  createRatification(router);
+
   baseRouter.use('/ratifications', router);
 };

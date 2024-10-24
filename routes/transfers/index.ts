@@ -4,7 +4,7 @@ import createTransfer from './createTransfer';
 export default (baseRouter: Router) => {
   const router = Router();
 
-  createTransfer(router)
-  
+  createTransfer(router);
+
   baseRouter.use('/transfers', router);
 };

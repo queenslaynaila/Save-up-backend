@@ -5,9 +5,9 @@ import {
   TransactionByGroup,
   BaseTransaction,
   TransactionByPkt,
-  transactionByPkt,
+  transactionByPkt
 } from './types';
-import { 
+import {
   transactionQueryParams
 } from '../usertransactions/types';
 import validateRequest from '../../middleware/validationMiddleware';
@@ -17,19 +17,20 @@ const SQL_GROUP_TRANSACTIONS = sql<TransactionByGroup, BaseTransaction>(`
 `);
 
 export default (router: Router) => {
-  router.get<Record<string,never>, BaseTransaction[], TransactionByPkt, 
-  Record<string,never>>(
-    '/', 
+  router.get<Record<string, never>, BaseTransaction[], TransactionByPkt,
+  Record<string, never>>(
+    '/',
     validateRequest({
-      body:transactionByPkt,
-      query:transactionQueryParams
+      body: transactionByPkt,
+      query: transactionQueryParams
     }),
     authMiddleware(),
     async (req, res) => {
-      const transactions = await SQL_GROUP_TRANSACTIONS({ 
+      const transactions = await SQL_GROUP_TRANSACTIONS({
         ...req.body,
         user_id: req.user!.id
       }).many();
       return res.json(transactions);
-    });
+    }
+  );
 };

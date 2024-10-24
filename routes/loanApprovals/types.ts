@@ -26,6 +26,6 @@ export type FinalnApproval = z.infer<typeof finalApprovalSchema>;
 
 export const finalApprovalBody = finalApprovalSchema.omit({
   admin_id: true
-})
+});
 
 export type FinalApprovalBody = z.infer<typeof finalApprovalBody>;

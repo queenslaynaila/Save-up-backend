@@ -12,11 +12,12 @@ import {
   StatsQueryInterface,
   ValidOperatorsEnum,
   ValidResourcesEnum,
-  ValidStatusEnum,
+  ValidStatusEnum
 } from './types';
 
-const SQL_GET_CUMULATIVES = (query: string) =>
-  sql<{ operator: string; resource: string }, FinancialStatsInterface>(query);
+const SQL_GET_CUMULATIVES = (query: string) => sql<
+{ operator: string; resource: string },
+FinancialStatsInterface>(query);
 
 export default (router: Router) => {
   router.get<
@@ -27,15 +28,14 @@ export default (router: Router) => {
   >(
     '/:resource/:operator',
     validateRequest({
-      params: statsParamSchema,
+      params: statsParamSchema
     }),
     authMiddleware({ roles: [UserRole.ADMIN] }),
     async (req, res) => {
       req.params.resource = req.params.resource.toLowerCase();
       req.params.operator = req.params.operator.toUpperCase();
       const { resource, operator } = req.params;
-      const { user_id, priority, status, category_id, start_date, end_date } =
-        req.query;
+      const { user_id, priority, status, category_id, start_date, end_date } = req.query;
       const formattedStatus = status ? convertToTitleCase(status) : '';
       if (!ValidResourcesEnum.safeParse(resource).success) {
         throw new HttpError(400);
@@ -60,7 +60,7 @@ export default (router: Router) => {
       }
       const values: { operator: string; resource: string } = {
         operator,
-        resource,
+        resource
       };
       const result = await SQL_GET_CUMULATIVES(query)(values).one();
       res.json(result);

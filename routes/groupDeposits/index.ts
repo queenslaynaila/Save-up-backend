@@ -5,6 +5,6 @@ export default (baseRouter: express.Router) => {
   const router = express.Router();
 
   createGroupDeposit(router);
-  
+
   baseRouter.use('/group-deposits', router);
 };

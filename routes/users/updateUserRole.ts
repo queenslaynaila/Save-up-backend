@@ -37,7 +37,7 @@ export default (router: Router) => {
       const user = await SQL_UPDATE_ROLE({
         role,
         targetUserId,
-        adminId: req.user!.id 
+        adminId: req.user!.id
       }).one();
 
       res.json(user);

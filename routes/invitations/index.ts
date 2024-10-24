@@ -9,6 +9,6 @@ export default (baseRouter: express.Router) => {
   sendInvite(router);
   getInvites(router);
   updateInvites(router);
-  
+
   baseRouter.use('/invitations', router);
 };

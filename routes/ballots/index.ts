@@ -7,6 +7,6 @@ export default (baseRouter: express.Router) => {
 
   createBallot(router);
   getBallots(router);
-  
+
   baseRouter.use('/ballots', router);
 };

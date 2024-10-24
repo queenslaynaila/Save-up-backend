@@ -3,14 +3,14 @@ import { sql } from '../../db';
 import { HttpError } from '../../middleware/errorMiddleware';
 import authMiddleware from '../../middleware/authorization';
 import validateRequest from '../../middleware/validationMiddleware';
-import { ExpenseBodyInterface, 
-  expenseBodySchema, 
-  ExpenseUpdateInterface, 
+import { ExpenseBodyInterface,
+  expenseBodySchema,
+  ExpenseUpdateInterface,
   ExpenseUpdateRes
 } from './types';
-import { IdParamInterface, idParamSchema } from '../../globalTypes'
+import { IdParamInterface, idParamSchema } from '../../globalTypes';
 
-const SQL_UPDATE_EXPENSE= sql<ExpenseUpdateInterface, ExpenseUpdateRes>(`
+const SQL_UPDATE_EXPENSE = sql<ExpenseUpdateInterface, ExpenseUpdateRes>(`
   UPDATE expenses
   SET description = COALESCE(:description, expenses.description),
       category_id = COALESCE(:category_id, expenses.category_id),
@@ -23,21 +23,22 @@ const SQL_UPDATE_EXPENSE= sql<ExpenseUpdateInterface, ExpenseUpdateRes>(`
 `);
 
 export default (router: Router) => {
-  router.patch<IdParamInterface, ExpenseUpdateRes, ExpenseBodyInterface, 
-  Record<string,never>>(
-    '/:id', 
+  router.patch<IdParamInterface, ExpenseUpdateRes, ExpenseBodyInterface,
+  Record<string, never>>(
+    '/:id',
     validateRequest({
       params: idParamSchema,
       body: expenseBodySchema
-    }), 
-    authMiddleware(), 
+    }),
+    authMiddleware(),
     async (req, res) => {
       const entity_id = req.body.entity_id ?? req.user!.id;
-      const xid = parseInt(req.params.id);
+      const xid = Number(req.params.id);
       const { description, category_id, amount, spent_at } = req.body;
       const result = await SQL_UPDATE_EXPENSE({
         description, category_id, amount, spent_at, entity_id, xid
       }).one(new HttpError(404));
       res.json(result);
-    });
+    }
+  );
 };

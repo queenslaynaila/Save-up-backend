@@ -5,6 +5,6 @@ export default (baseRouter: Router) => {
   const router = Router();
 
   createWithdrawal(router);
-  
+
   baseRouter.use('/group-withdrawals', router);
 };

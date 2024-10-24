@@ -1,16 +1,16 @@
 import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import  validateRequest  from '../../middleware/validationMiddleware';
+import validateRequest from '../../middleware/validationMiddleware';
 import {
   ApproveWithdrawal,
-  withdrawal, 
-  Withdrawal 
+  withdrawal,
+  Withdrawal
 } from './types';
-import { 
-  IdParamInterface, 
-  idParamSchema, 
-  StatusCodeInterface 
+import {
+  IdParamInterface,
+  idParamSchema,
+  StatusCodeInterface
 } from '../../globalTypes';
 
 const SQL_APPROVE_GRP_WITHDRAWAL = sql<ApproveWithdrawal, Record<string, never>>(`
@@ -20,9 +20,9 @@ const SQL_APPROVE_GRP_WITHDRAWAL = sql<ApproveWithdrawal, Record<string, never>>
 `);
 
 export default (router: Router) => {
-  router.post<IdParamInterface, StatusCodeInterface, Withdrawal, 
+  router.post<IdParamInterface, StatusCodeInterface, Withdrawal,
   Record<string, never>>(
-    '/approve-withdrawal/:id', 
+    '/approve-withdrawal/:id',
     validateRequest({
       params: idParamSchema,
       body: withdrawal
@@ -31,9 +31,9 @@ export default (router: Router) => {
     async (req, res) => {
       await SQL_APPROVE_GRP_WITHDRAWAL({
         ...req.body,
-        group_id: parseInt(req.params.id),
-        admin_id: req.user!.id,
-      }).exec()
+        group_id: Number(req.params.id),
+        admin_id: req.user!.id
+      }).exec();
       res.sendStatus(201);
     }
   );

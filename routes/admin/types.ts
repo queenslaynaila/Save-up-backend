@@ -17,20 +17,20 @@ export type StatsQueryInterface = z.infer<typeof statsQuerySchema>;
 
 export const statsParamSchema = z.object({
   resource: z.string(),
-  operator: z.string(),
+  operator: z.string()
 });
 
 export type StatsParamInterface = z.infer<typeof statsParamSchema>;
 
 export const financialStatsSchema = z.object({
   totals: z.number()
-})
+});
 
 export type FinancialStatsInterface = z.infer<typeof financialStatsSchema>;
 
 export const userRoleUpdateSchema = z.object({
   role: z.string(),
-  id: z.string(),
+  id: z.string()
 });
 
 export type UserRoleUpdateInterface = z.infer<typeof userRoleUpdateSchema>;

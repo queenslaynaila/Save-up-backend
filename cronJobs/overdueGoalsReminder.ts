@@ -1,3 +1,5 @@
+/* eslint-disable no-await-in-loop */
+/* eslint-disable no-restricted-syntax */
 import { z } from 'zod';
 import { sql } from '../db';
 import sendSms from '../services/twilio';
@@ -9,15 +11,15 @@ const pocketSchema = z.object({
   amount: z.number(),
   reminder_count: z.number(),
   last_reminder_sent_at: z.date(),
-  name: z.string(),
+  name: z.string()
 });
 
 type Pocket = z.infer<typeof pocketSchema>;
 
-const UpdatePocketReminderSchema = pocketSchema.pick({ 
-  pocket_id: true, 
-  last_reminder_sent_at: true, 
-  reminder_count: true 
+const UpdatePocketReminderSchema = pocketSchema.pick({
+  pocket_id: true,
+  last_reminder_sent_at: true,
+  reminder_count: true
 });
 
 type UpdatePocketReminder = z.infer<typeof UpdatePocketReminderSchema>;
@@ -44,26 +46,24 @@ const SQL_UPDATE_POCKET_REMINDER = sql<UpdatePocketReminder, Record<string, neve
 `);
 
 export default async function remindStalePockets() {
-  console.log('Checking for stale pockets...');
-
   const currentTime = new Date();
   const overduePockets = await SQL_GET_OVERDUE_POCKETS({}).many();
- 
+
   for (const pocket of overduePockets) {
-    const { pocket_id, entity_id, amount, target_at,reminder_count , last_reminder_sent_at,name } = pocket;
+    const {
+      pocket_id, entity_id, amount, target_at, reminder_count, last_reminder_sent_at, name
+    } = pocket;
     const timeDifference = currentTime.getTime() - last_reminder_sent_at.getTime();
     const daysDifference = timeDifference / (1000 * 3600 * 24);
 
-    if(reminder_count < 3 && daysDifference >= 7){
+    if (reminder_count < 3 && daysDifference >= 7) {
       const { phone_number } = await SQL_GET_PHONE_NUMBER({ entity_id }).one();
       const message = `Hi! A gentle reminder that your saving pocket ${name} of ${amount} is overdue by 30 days. 
                        Consider taking action to reach your saving pocket by ${target_at}.`;
       sendSms(phone_number, message);
-      await SQL_UPDATE_POCKET_REMINDER({ pocket_id, last_reminder_sent_at: currentTime, reminder_count: 1 }).exec();
+      await SQL_UPDATE_POCKET_REMINDER({
+        pocket_id, last_reminder_sent_at: currentTime, reminder_count: 1
+      }).exec();
     }
   }
-  console.log('Stale pockets reminders sent');
 }
-
-
-

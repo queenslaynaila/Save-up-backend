@@ -50,7 +50,9 @@ export default (router: Router) => {
           id_number: new_id_number
         }).one();
         return res.json({ updated_attribute: updated_id });
-      } else if ('new_phone_number' in req.body && 'pin' in req.body) {
+      }
+
+      if ('new_phone_number' in req.body && 'pin' in req.body) {
         const { new_phone_number, pin } = req.body;
         const userPassword = await SQL_GET_USER_PIN({ id }).one(new HttpError(400));
         if (!await bcrypt.compare(pin, userPassword.pin)) {
@@ -58,13 +60,12 @@ export default (router: Router) => {
         }
         const { updated_phone_number } = await SQL_UPDATE_PHONE({
           phone_number: new_phone_number,
-          id,
+          id
         }).one();
         return res.json({ updated_attribute: updated_phone_number });
-      } else {
-        throw new HttpError(400);
       }
-      
+
+      throw new HttpError(400);
     }
   );
 };

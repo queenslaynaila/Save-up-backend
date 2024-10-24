@@ -9,7 +9,7 @@ import { User } from './login';
 import { userContactDetailsSchema } from './schema';
 
 type UserWithoutPin = Omit<User, 'pin'>;
-const SQL_GET_USER_BY_CRITERIA = sql<Record<string,never>,  UserWithoutPin>(`
+const SQL_GET_USER_BY_CRITERIA = sql<Record<string, never>, UserWithoutPin>(`
   SELECT 
     users.id, 
     users.id_type, 
@@ -27,11 +27,11 @@ const SQL_GET_USER_BY_CRITERIA = sql<Record<string,never>,  UserWithoutPin>(`
 
 const PHONE_REGEX = /^\+254\d{9}$/;
 const ID_REGEX = /^\d{6,13}$/;
-const PASSPORT_REGEX = /^[A-Za-z0-9]{9,16}$/i; 
+const PASSPORT_REGEX = /^[A-Za-z0-9]{9,16}$/i;
 
-const userQuerySchema =  userContactDetailsSchema.pick({
+const userQuerySchema = userContactDetailsSchema.pick({
   full_name: true,
-  phone_number: true,
+  phone_number: true
 }).partial();
 type UserQueryParams = z.infer<typeof userQuerySchema>;
 
@@ -40,7 +40,7 @@ export default (router: Router) => {
     '/:entity',
     authMiddleware(),
     validateRequest({
-      query: userQuerySchema,
+      query: userQuerySchema
     }),
     async (req, res) => {
       const targetUser = req.params.entity;
@@ -55,28 +55,28 @@ export default (router: Router) => {
 
       if (targetUser === 'me') {
         filterArgs.loggedInUserId = req.user!.id;
-        filters.push(`users.id = :loggedInUserId`);
-      } else if(ID_REGEX.test(targetUser)) {
+        filters.push('users.id = :loggedInUserId');
+      } else if (ID_REGEX.test(targetUser)) {
         filterArgs.idNumber = targetUser;
-        filters.push(`users.id_number = :idNumber`);
+        filters.push('users.id_number = :idNumber');
       } else if (PHONE_REGEX.test(targetUser)) {
         filterArgs.phoneNumber = targetUser;
-        filters.push(`user_contact_details.phone_number = :phoneNumber`);
+        filters.push('user_contact_details.phone_number = :phoneNumber');
       } else if (PASSPORT_REGEX.test(targetUser)) {
         filterArgs.idNumber = targetUser;
-        filters.push(`users.id_number = :idNumber`);
-      } else { 
+        filters.push('users.id_number = :idNumber');
+      } else {
         throw new HttpError(400);
       }
 
       if (full_name) {
         filterArgs.fullName = full_name;
-        filters.push(`user_contact_details.full_name = :fullName`);
+        filters.push('user_contact_details.full_name = :fullName');
       }
 
       if (phone_number) {
         filterArgs.phoneNumber = phone_number;
-        filters.push(`user_contact_details.phone_number = :phoneNumber`);
+        filters.push('user_contact_details.phone_number = :phoneNumber');
       }
 
       const query = SQL_GET_USER_BY_CRITERIA({});

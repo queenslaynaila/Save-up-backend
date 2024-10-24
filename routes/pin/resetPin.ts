@@ -1,20 +1,20 @@
-import { Router  } from 'express';
+import { Router } from 'express';
 import bcrypt from 'bcrypt';
 import { sql } from '../../db';
-import { validateStepToken } from '../../middleware/resetTokenMIddleware'
+import { validateStepToken } from '../../middleware/resetTokenMIddleware';
 import { StatusCodeInterface } from '../../globalTypes';
 import { ResetPasswordInterface, ResetPasswordRequestInterface } from './types';
 import { HttpError } from '../../middleware/errorMiddleware';
 
-const SQL_RESET_PASSWORD = sql<ResetPasswordRequestInterface, Record<string,never>>(`
+const SQL_RESET_PASSWORD = sql<ResetPasswordRequestInterface, Record<string, never>>(`
   UPDATE users 
   SET pin = :pin  
   WHERE  id = :id;
 `);
 
 export default (router: Router) => {
-  router.patch<string, Record<string,never>, StatusCodeInterface, ResetPasswordInterface, 
-  Record<string,never>>(
+  router.patch<string, Record<string, never>, StatusCodeInterface, ResetPasswordInterface,
+  Record<string, never>>(
     '/reset',
     validateStepToken,
     async (req, res) => {
@@ -29,5 +29,6 @@ export default (router: Router) => {
       const hashPassword = bcrypt.hashSync(new_pin, 10);
       await SQL_RESET_PASSWORD({ id: user_id, pin: hashPassword }).exec();
       res.sendStatus(204);
-    });
+    }
+  );
 };

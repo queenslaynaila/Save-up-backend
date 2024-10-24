@@ -7,11 +7,11 @@ import { generateToken } from '../../middleware/generatetoken';
 import validateRequest from '../../middleware/validationMiddleware';
 import { loginAttemptSchema, userContactDetailsSchema, userSchema } from './schema';
 
-const user = userSchema.extend({
-  phone_number:userContactDetailsSchema.shape.phone_number,
-  full_name:userContactDetailsSchema.shape.full_name,
+const loggedInUserSchema = userSchema.extend({
+  phone_number: userContactDetailsSchema.shape.phone_number,
+  full_name: userContactDetailsSchema.shape.full_name
 });
-export type User = z.infer<typeof user>;
+export type User = z.infer<typeof loggedInUserSchema>;
 
 const SQL_GET_USER = sql<{ phone_number: string }, User>(`
   SELECT 
@@ -66,23 +66,24 @@ const SQL_COUNT_LAST_FAILED_ATTEMPTS = sql<{ id: number }, { failed_count: numbe
 `);
 
 const recordLoginAttempt = async (
-  userId: number, 
-  ipAddress: string, 
-  userAgent: string, 
-  success: boolean, 
-  reason: string) => {
+  userId: number,
+  ipAddress: string,
+  userAgent: string,
+  success: boolean,
+  reason: string
+) => {
   await SQL_RECORD_LOGIN({
     user_id: userId,
     ip_address: ipAddress,
     browser_info: userAgent,
     success,
-    reason,
+    reason
   }).exec();
 };
 
 const getRequestInfo = (req: Request) => ({
   ipAddress: req.ip || 'unknown',
-  userAgent: req.get('User-Agent') || 'unknown',
+  userAgent: req.get('User-Agent') || 'unknown'
 });
 
 type UserWithoutPin = Omit<User, 'pin'>;
@@ -90,7 +91,7 @@ type UserWithoutPin = Omit<User, 'pin'>;
 const authSchema = z.object({
   phone_number: userContactDetailsSchema.shape.phone_number,
   pin: userSchema.shape.pin
-})
+});
 
 type Authorization = z.infer<typeof authSchema>;
 
@@ -99,14 +100,14 @@ export default (router: Router) => {
     '/login',
     validateRequest({ body: loginSchema }),
     async (req, res) => {
-      const { pin, ...user } = await SQL_GET_USER({ 
-        phone_number: req.body.phone_number 
+      const { pin, ...user } = await SQL_GET_USER({
+        phone_number: req.body.phone_number
       }).one(new HttpError(401));
 
-      const { failed_count } = await SQL_COUNT_LAST_FAILED_ATTEMPTS({ 
-        id: user.id 
-      }).one();  
-      
+      const { failed_count } = await SQL_COUNT_LAST_FAILED_ATTEMPTS({
+        id: user.id
+      }).one();
+
       const { ipAddress, userAgent } = getRequestInfo(req);
 
       if (failed_count >= 3) {
@@ -116,7 +117,7 @@ export default (router: Router) => {
 
       if (!await bcrypt.compare(req.body.pin, pin)) {
         await recordLoginAttempt(user.id, ipAddress, userAgent, false, 'Incorrect pin');
-        const remaining_attempts = 3 - (failed_count + 1); 
+        const remaining_attempts = 3 - (failed_count + 1);
         throw new HttpError(401, { remaining_attempts });
       }
 

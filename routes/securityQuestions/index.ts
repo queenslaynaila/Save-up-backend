@@ -7,6 +7,6 @@ export default (baseRouter: Router) => {
 
   getAllSecurityQuestions(router);
   getUsersQuestions(router);
-  
-  baseRouter.use('/security-questions', router)
+
+  baseRouter.use('/security-questions', router);
 };

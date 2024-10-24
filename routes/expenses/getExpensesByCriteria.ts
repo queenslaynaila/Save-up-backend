@@ -1,14 +1,14 @@
-import { Router} from 'express';
+import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import { 
-  BaseExpenseInterface, 
-  ExpenseQueryInterface, 
-  expenseQuerySchema 
+import {
+  BaseExpenseInterface,
+  ExpenseQueryInterface,
+  expenseQuerySchema
 } from './types';
 import validateRequest from '../../middleware/validationMiddleware';
-import { 
-  EntityInterface, 
+import {
+  EntityInterface,
   entitySchema
 } from '../../globalTypes';
 
@@ -27,14 +27,14 @@ const SQL_GET_EXPENSES = sql<{ entity_id:number }, BaseExpenseInterface>(`
 `);
 
 export default (router: Router) => {
-  router.get<Record<string,never>, BaseExpenseInterface[], EntityInterface, 
+  router.get<Record<string, never>, BaseExpenseInterface[], EntityInterface,
   ExpenseQueryInterface>(
     '/',
     validateRequest({
-      body:entitySchema,
+      body: entitySchema,
       query: expenseQuerySchema
-    }), 
-    authMiddleware(), 
+    }),
+    authMiddleware(),
     async (req, res) => {
       const entity_id = req.body?.entity_id ?? req.user!.id;
       const { category_id, start_date, end_date } = req.query;
@@ -44,20 +44,20 @@ export default (router: Router) => {
 
       if (category_id) {
         filterArgs.category_id = category_id;
-        filters.push(`category_id = :category_id`);
+        filters.push('category_id = :category_id');
       }
       if (start_date && end_date) {
         filterArgs.start_date = start_date;
         filterArgs.end_date = end_date;
-        filters.push(`DATE(created_at) BETWEEN :start_date AND :end_date`);
+        filters.push('DATE(created_at) BETWEEN :start_date AND :end_date');
       } else {
         if (start_date) {
           filterArgs.start_date = start_date;
-          filters.push(`DATE(created_at) >= :start_date`);
+          filters.push('DATE(created_at) >= :start_date');
         }
         if (end_date) {
           filterArgs.end_date = end_date;
-          filters.push(`DATE(created_at) <= :end_date`);
+          filters.push('DATE(created_at) <= :end_date');
         }
       }
 
@@ -66,5 +66,6 @@ export default (router: Router) => {
       query.extend('LIMIT 15', {});
       const expenses = await query.many();
       res.json(expenses);
-    });
+    }
+  );
 };

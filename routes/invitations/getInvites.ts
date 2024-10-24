@@ -18,15 +18,15 @@ const SQL_GET_PENDING_INVITATIONS = sql<InviteByReceiverInterface, baseInviteInt
 `);
 
 export default (router: Router) => {
-  router.get<Record<string,never>, baseInviteInterface[], Record<string,never>, 
-  Record<string,never>>(
-    '/', 
+  router.get<Record<string, never>, baseInviteInterface[], Record<string, never>,
+  Record<string, never>>(
+    '/',
     authMiddleware(),
     async (req, res) => {
-      const invitations = await  SQL_GET_PENDING_INVITATIONS({ 
-        receiver_id: req.user!.id 
+      const invitations = await SQL_GET_PENDING_INVITATIONS({
+        receiver_id: req.user!.id
       }).many();
-      return res.json(invitations);     
+      return res.json(invitations);
     }
   );
 };

@@ -1,11 +1,11 @@
 import { Router } from 'express';
 import { sql } from '../../db';
-import  authMiddleware from '../../middleware/authorization';
+import authMiddleware from '../../middleware/authorization';
 import validateRequest from '../../middleware/validationMiddleware';
 import {
   groupCreationValidation,
-  GroupCreationValidation, 
-  GroupUpdateInterface 
+  GroupCreationValidation,
+  GroupUpdateInterface
 } from './types';
 import { IdParamInterface, idParamSchema } from '../../globalTypes';
 
@@ -14,19 +14,19 @@ const SQL_UPDATE_GROUP = sql<GroupUpdateInterface, GroupUpdateInterface>(`
 `);
 
 export default (router: Router) => {
-  router.patch<IdParamInterface, GroupUpdateInterface, GroupCreationValidation, 
-  Record<string,never>>(
+  router.patch<IdParamInterface, GroupUpdateInterface, GroupCreationValidation,
+  Record<string, never>>(
     '/:id',
     validateRequest({
       params: idParamSchema,
-      body:  groupCreationValidation
+      body: groupCreationValidation
     }),
     authMiddleware(),
     async (req, res) => {
-      const updatedGroup =  await SQL_UPDATE_GROUP({ 
-        ...req.body, 
-        id:parseInt(req.params.id), 
-        user_id:req.user!.id
+      const updatedGroup = await SQL_UPDATE_GROUP({
+        ...req.body,
+        id: Number(req.params.id),
+        user_id: req.user!.id
       }).one();
       res.json(updatedGroup);
     }

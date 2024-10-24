@@ -13,7 +13,7 @@ const validateSchema = (schema: ZodSchema, data: unknown, part: string) => {
       location: part,
       path: err.path.join('.'),
       msg: err.message,
-      code: err.code,
+      code: err.code
     }));
 
     throw new HttpError(400, errors);

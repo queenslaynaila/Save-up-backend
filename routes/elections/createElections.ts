@@ -1,30 +1,30 @@
 import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import validateRequest from '../../middleware/validationMiddleware';  
-import {  StatusCodeInterface } from '../../globalTypes';
-import { 
-  ElectionInterface, 
-  ElectionValidation, 
-  electionValidation 
+import validateRequest from '../../middleware/validationMiddleware';
+import { StatusCodeInterface } from '../../globalTypes';
+import {
+  ElectionInterface,
+  ElectionValidation,
+  electionValidation
 } from './types';
 
-const SQL_CALL_ELECTION = sql<ElectionInterface , Record<string,never>>(`
+const SQL_CALL_ELECTION = sql<ElectionInterface, Record<string, never>>(`
   SELECT create_election(:group_id, :initiator_id, :type)
 `);
 
 export default (router: Router) => {
-  router.post<Record<string,never>, StatusCodeInterface, ElectionValidation, 
-  Record<string,never>>(
+  router.post<Record<string, never>, StatusCodeInterface, ElectionValidation,
+  Record<string, never>>(
     '/',
     validateRequest({
       body: electionValidation
-    }), 
+    }),
     authMiddleware(),
     async (req, res) => {
-      await SQL_CALL_ELECTION({ 
-        ...req.body, 
-        initiator_id:req.user!.id
+      await SQL_CALL_ELECTION({
+        ...req.body,
+        initiator_id: req.user!.id
       }).exec();
       res.sendStatus(201);
     }

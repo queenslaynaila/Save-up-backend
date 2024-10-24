@@ -10,13 +10,13 @@ const SQL_EXIT_GROUP = sql<GroupExitInterface, UserLeft >(`
 
 export default (router: Router) => {
   router.delete<IdParamInterface, UserLeft, GroupExitInterface,
-  Record<string,never>>(
+  Record<string, never>>(
     '/:id',
     authMiddleware(),
     async (req, res) => {
       const name = await SQL_EXIT_GROUP({
-        user_id: req.user!.id, 
-        id: parseInt(req.params.id) 
+        user_id: req.user!.id,
+        id: Number(req.params.id)
       }).one();
       res.json(name);
     }

@@ -12,9 +12,9 @@ const sendSms = (phone: string, message: string): void => {
     .create({
       body: message,
       from: twilioPhoneNumber,
-      to: phone,
+      to: phone
     })
-    .then((message) => console.log(`Message sent: ${message.sid}`))
+    .then((msg) => console.log(`Message sent: ${msg.sid}`))
     .catch((error: Error) => `This is Error: ${error.message}`);
 };
 

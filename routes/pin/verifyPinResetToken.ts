@@ -1,13 +1,13 @@
-import { Router  } from 'express';
+import { Router } from 'express';
 import bcrypt from 'bcrypt';
 import jwt, { Secret } from 'jsonwebtoken';
 import { sql } from '../../db';
-import { validateStepToken } from '../../middleware/resetTokenMIddleware'
-import { 
-  VerifyTokenInterface, 
-  SecurityQuestionInterface, 
-  SecurityQuestionArray, 
-  UpdateTokenUsageInterface  
+import { validateStepToken } from '../../middleware/resetTokenMIddleware';
+import {
+  VerifyTokenInterface,
+  SecurityQuestionInterface,
+  SecurityQuestionArray,
+  UpdateTokenUsageInterface
 } from './types';
 import { GetByUserInterface } from '../../globalTypes';
 import { HttpError } from '../../middleware/errorMiddleware';
@@ -30,7 +30,7 @@ const SQL_GET_RESET_TOKEN = sql<{ user_id: number; reason: string;}, { token: st
   LIMIT 1;
 `);
 
-const SQL_UPDATE_TOKEN_USAGE = sql<UpdateTokenUsageInterface, Record<string,never>>(`
+const SQL_UPDATE_TOKEN_USAGE = sql<UpdateTokenUsageInterface, Record<string, never>>(`
   UPDATE reset_tokens 
   SET used_at = NOW() 
   WHERE user_id = :user_id
@@ -39,9 +39,9 @@ const SQL_UPDATE_TOKEN_USAGE = sql<UpdateTokenUsageInterface, Record<string,neve
   AND used_at IS NULL 
 `);
 
-export default(router: Router) => {
-  router.patch<Record<string,never>, SecurityQuestionArray, VerifyTokenInterface, 
-  Record<string,never>>(
+export default (router: Router) => {
+  router.patch<Record<string, never>, SecurityQuestionArray, VerifyTokenInterface,
+  Record<string, never>>(
     '/verify-token',
     validateStepToken,
     async (req, res) => {
@@ -57,12 +57,11 @@ export default(router: Router) => {
         user_id, reason
       }).one(new HttpError(404));
 
-  
       if (!await bcrypt.compare(reset_token, token)) {
         throw new HttpError(401);
       }
 
-      await SQL_UPDATE_TOKEN_USAGE({...req.body, user_id, reset_token:token }).exec(); 
+      await SQL_UPDATE_TOKEN_USAGE({ ...req.body, user_id, reset_token: token }).exec();
       const securityQuestions = await SQL_GET_SECURITY_QUESTIONS({ user_id }).many();
       if (securityQuestions.length === 0) {
         throw new HttpError(404);
@@ -70,7 +69,7 @@ export default(router: Router) => {
 
       const step2TokenPayload = { id: user_id, step: 2 };
       const step2TokenHeader = jwt.sign(
-        step2TokenPayload, 
+        step2TokenPayload,
         process.env.JWT_SECRET as Secret,
         { expiresIn: '15m' }
       );

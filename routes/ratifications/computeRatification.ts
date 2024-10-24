@@ -4,22 +4,22 @@ import authMiddleware from '../../middleware/authorization';
 import validateRequest from '../../middleware/validationMiddleware';
 import {
   ratificationValidation,
-  RatificationResultsInterface, 
-  ComputeRatificationInterface, 
+  RatificationResultsInterface,
+  ComputeRatificationInterface,
   RatificationValidationInterface
 } from './types';
 
-const  SQL_COMPUTE_RATIFICATIONS = sql<ComputeRatificationInterface
-,RatificationResultsInterface>(`
+const SQL_COMPUTE_RATIFICATIONS = sql<ComputeRatificationInterface
+, RatificationResultsInterface>(`
   SELECT * FROM compute_ratification_results(:p_group_id, :p_election_id, :p_user_id)
 `);
 
 export default (router: Router) => {
-  router.post<Record<string,never>, RatificationResultsInterface, 
-  RatificationValidationInterface,Record<string,never>>(
+  router.post<Record<string, never>, RatificationResultsInterface,
+  RatificationValidationInterface, Record<string, never>>(
     '/',
-    validateRequest({ 
-      body:ratificationValidation 
+    validateRequest({
+      body: ratificationValidation
     }),
     authMiddleware(),
     async (req, res) => {

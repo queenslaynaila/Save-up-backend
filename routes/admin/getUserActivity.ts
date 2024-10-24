@@ -1,17 +1,17 @@
 import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import { 
+import {
   BaseTransaction,
   TransactionQueryParams
 } from '../usertransactions/types';
 import validateRequest from '../../middleware/validationMiddleware';
-import { 
-  UserRole, 
-  GetByPhoneInterface,  
+import {
+  UserRole,
+  GetByPhoneInterface,
   GetByIdInterface
 } from '../../globalTypes';
-import { HttpError } from '../../middleware/errorMiddleware'; 
+import { HttpError } from '../../middleware/errorMiddleware';
 import { phoneNumber, PhoneNumberInterface } from './types';
 
 const SQL_GET_USER = sql<GetByPhoneInterface, GetByIdInterface>(`
@@ -20,7 +20,7 @@ const SQL_GET_USER = sql<GetByPhoneInterface, GetByIdInterface>(`
   WHERE phone_number = :phone_number
 `);
 
-const SQL_GET_TRANSACTIONS = sql<{ entity_id:number },  BaseTransaction>(`
+const SQL_GET_TRANSACTIONS = sql<{ entity_id:number }, BaseTransaction>(`
   SELECT xid AS transaction_id, 
          transaction_type, 
          amount, 
@@ -32,11 +32,11 @@ const SQL_GET_TRANSACTIONS = sql<{ entity_id:number },  BaseTransaction>(`
 `);
 
 export default (router: Router) => {
-  router.get<Record<string,never>, BaseTransaction[], PhoneNumberInterface, 
+  router.get<Record<string, never>, BaseTransaction[], PhoneNumberInterface,
   TransactionQueryParams>(
-    '/transactions', 
+    '/transactions',
     validateRequest({
-      body:phoneNumber
+      body: phoneNumber
     }),
     authMiddleware({ roles: [UserRole.ADMIN] }),
     async (req, res) => {
@@ -47,30 +47,31 @@ export default (router: Router) => {
         .one(new HttpError(404));
 
       const filters: string[] = [];
-      const filterArgs: Record<string, string  > = {};
+      const filterArgs: Record<string, string > = {};
 
       if (transaction_type) {
         filterArgs.transaction_type = transaction_type;
-        filters.push(`transaction_type = :transaction_type`);
+        filters.push('transaction_type = :transaction_type');
       }
       if (from_date && to_date) {
         filterArgs.from_date = from_date;
         filterArgs.to_date = to_date;
-        filters.push(`transaction_date BETWEEN :from_date AND :to_date`);
+        filters.push('transaction_date BETWEEN :from_date AND :to_date');
       } else {
         if (from_date) {
           filterArgs.from_date = from_date;
-          filters.push(`transaction_date >= :from_date`);
+          filters.push('transaction_date >= :from_date');
         }
         if (to_date) {
           filterArgs.to_date = to_date;
-          filters.push(`transaction_date <= :to_date`);
+          filters.push('transaction_date <= :to_date');
         }
       }
-      
+
       const query = SQL_GET_TRANSACTIONS({ entity_id: user.id });
       if (filters.length > 0) query.extend(`${filters.join(' AND ')}`, filterArgs);
       query.extend('LIMIT 15', {});
       return res.json(await query.many());
-    });
+    }
+  );
 };

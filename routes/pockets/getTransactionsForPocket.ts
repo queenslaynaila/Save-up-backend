@@ -28,47 +28,47 @@ const SQL_GET_TRANSACTIONS = sql<TransactionByUser, BaseTransaction>(`
     transactions.created_at DESC
 `);
 
-
 export default (router: Router) => {
-  router.get<TransactionBody, BaseTransaction[], Record<string,never>,
+  router.get<TransactionBody, BaseTransaction[], Record<string, never>,
   TransactionQueryParams>(
     '/:pocket_id/transactions',
     validateRequest({
-      params:transactionBody,
-      query:transactionQueryParams
+      params: transactionBody,
+      query: transactionQueryParams
     }),
     authMiddleware(),
     async (req, res) => {
       const { transaction_type, from_date, to_date } = req.query;
       const filters: string[] = [];
-      const filterArgs: Record<string, string  > = {};
+      const filterArgs: Record<string, string > = {};
 
       if (transaction_type) {
         filterArgs.transaction_type = transaction_type;
-        filters.push(`transaction_type = :transaction_type`);
+        filters.push('transaction_type = :transaction_type');
       }
       if (from_date && to_date) {
         filterArgs.from_date = from_date;
         filterArgs.to_date = to_date;
-        filters.push(`transaction_date BETWEEN :from_date AND :to_date`);
+        filters.push('transaction_date BETWEEN :from_date AND :to_date');
       } else {
         if (from_date) {
           filterArgs.from_date = from_date;
-          filters.push(`transaction_date >= :from_date`);
+          filters.push('transaction_date >= :from_date');
         }
         if (to_date) {
           filterArgs.to_date = to_date;
-          filters.push(`transaction_date <= :to_date`);
+          filters.push('transaction_date <= :to_date');
         }
       }
 
       const query = SQL_GET_TRANSACTIONS({
-        pocket_id:parseInt(req.params.pocket_id),
-        user_id:req.user!.id
+        pocket_id: Number(req.params.pocket_id),
+        user_id: req.user!.id
       });
       if (filters.length > 0) query.extend(`AND ${filters.join(' AND ')}`, filterArgs);
       query.extend('LIMIT 15', {});
 
       return res.json(await query.many());
-    });
+    }
+  );
 };

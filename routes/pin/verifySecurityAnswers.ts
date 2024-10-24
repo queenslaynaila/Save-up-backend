@@ -1,11 +1,11 @@
-import { Router  } from 'express';
+import { Router } from 'express';
 import bcrypt from 'bcrypt';
 import jwt, { Secret } from 'jsonwebtoken';
 import { sql } from '../../db';
-import {  validateStepToken } from '../../middleware/resetTokenMIddleware'
+import { validateStepToken } from '../../middleware/resetTokenMIddleware';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { StatusCodeInterface, GetByUserInterface } from '../../globalTypes';
-import { VerifyAnswerInterface, SecurityAnswersRequestInterface } from './types'
+import { VerifyAnswerInterface, SecurityAnswersRequestInterface } from './types';
 
 const SQL_GET_SECURITY_ANSWERS = sql<GetByUserInterface, VerifyAnswerInterface>(`
   SELECT question_id, answer 
@@ -14,8 +14,8 @@ const SQL_GET_SECURITY_ANSWERS = sql<GetByUserInterface, VerifyAnswerInterface>(
 `);
 
 export default (router: Router) => {
-  router.get<Record<string,never>, StatusCodeInterface, SecurityAnswersRequestInterface, 
-  Record<string,never>>(
+  router.get<Record<string, never>, StatusCodeInterface, SecurityAnswersRequestInterface,
+  Record<string, never>>(
     '/verify-answers',
     validateStepToken,
     async (req, res) => {
@@ -30,15 +30,13 @@ export default (router: Router) => {
       if (userSecurityAnswers.length === 0) {
         throw new HttpError(404);
       }
-      
+
       const incorrectAnswers: number[] = [];
       for (const submittedAnswer of answers) {
         const storedAnswer = userSecurityAnswers.find(
           a => a.question_id === submittedAnswer.question_id
         );
-        if (!storedAnswer || !(await bcrypt.compare(
-          submittedAnswer.answer, storedAnswer.answer
-        ))) {
+        if (!storedAnswer || !(await bcrypt.compare(submittedAnswer.answer, storedAnswer.answer))) {
           incorrectAnswers.push(submittedAnswer.question_id);
         }
       }
@@ -49,7 +47,7 @@ export default (router: Router) => {
 
       const step3TokenPayload = { id: user_id, step: 3 };
       const step3TokenHeader = jwt.sign(
-        step3TokenPayload, 
+        step3TokenPayload,
         process.env.JWT_SECRET as Secret,
         { expiresIn: '15m' }
       );

@@ -25,13 +25,6 @@ npm run swagger
 This creates an OpenAPI (Swagger) specification file called swagger.yml in each route subfolder. 
 The specification details the AP's endpoints, requests, responses, and error formats along with samples.
 
-#### For Windows Users
-Use the following command to generate the Swagger specification for Windows:
-
-```bash
-npm run swaggerwindows
-```
-
 ### Access API Documentation
 Once the server starts, navigate to [http://localhost:3001/api-docs](http://localhost:3001/api-docs) in  
 web browser to access the interactive API documentation. 

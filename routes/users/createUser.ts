@@ -15,24 +15,25 @@ const userCreationSchema = userSchema.pick({
 }).merge(userContactDetailsSchema.pick({
   full_name: true,
   phone_number: true
-})) 
- 
-type UserCreation = z.infer<typeof userCreationSchema>; 
+}));
 
-const SQL_CREATE_USER = sql<UserCreation, Record<string,never>>(`
+type UserCreation = z.infer<typeof userCreationSchema>;
+
+const SQL_CREATE_USER = sql<UserCreation, Record<string, never>>(`
   SELECT create_user(:id_type, :id_number, :phone_number, :role, :full_name, :gender, :pin)
 `);
 
-export default (router: Router) => { 
-  router.post<Record<string,never>, StatusCodeInterface, UserCreation,Record<string,never>>(
+export default (router: Router) => {
+  router.post<Record<string, never>, StatusCodeInterface, UserCreation, Record<string, never>>(
     '/',
     validateRequest({ body: userCreationSchema }),
-    async (req, res) => {       
+    async (req, res) => {
       const pinHash = bcrypt.hashSync(req.body.pin, 12);
       await SQL_CREATE_USER({
         ...req.body,
         pin: pinHash
       }).exec();
       res.sendStatus(201);
-    });
+    }
+  );
 };

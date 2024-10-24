@@ -10,7 +10,7 @@ import removeMember from './removeMember';
 
 export default (baseRouter: express.Router) => {
   const router = express.Router();
-  
+
   createGroup(router);
   getUserGroups(router);
   getGroupMembers(router);

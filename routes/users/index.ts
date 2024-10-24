@@ -15,6 +15,6 @@ export default (baseRouter: Router) => {
   updateUserRole(router);
   updateUserAttributes(router);
   logout(router);
-  
+
   baseRouter.use('/users', router);
 };

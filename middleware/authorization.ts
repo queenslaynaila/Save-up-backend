@@ -36,9 +36,7 @@ function authMiddleware(options: AuthMiddlewareOptions = {}) {
 
       if (isExpired && refreshToken) {
         const refreshTokenValue = refreshToken.split(' ')[1];
-        const decodedRefreshToken = jwt.verify(
-          refreshTokenValue, process.env.JWT_SECRET as Secret
-        );
+        const decodedRefreshToken = jwt.verify(refreshTokenValue, process.env.JWT_SECRET as Secret);
         const user = decodedRefreshToken as User;
         const newAccessToken = generateToken(user.id, user.role, '1d');
         const newRefreshToken = generateToken(user.id, user.role, '7d');
@@ -51,9 +49,7 @@ function authMiddleware(options: AuthMiddlewareOptions = {}) {
         return next();
       }
 
-      const decodedAccessToken = jwt.verify(
-        accessTokenValue, process.env.JWT_SECRET as Secret
-      );
+      const decodedAccessToken = jwt.verify(accessTokenValue, process.env.JWT_SECRET as Secret);
       const user = decodedAccessToken as User;
 
       if (roles.length && !roles.includes(user.role)) {

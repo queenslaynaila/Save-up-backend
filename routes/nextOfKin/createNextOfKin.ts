@@ -2,13 +2,13 @@ import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { HttpError } from '../../middleware/errorMiddleware';
-import validateRequest  from '../../middleware/validationMiddleware';
-import { 
-  NextOfKinCreationInterface, 
+import validateRequest from '../../middleware/validationMiddleware';
+import {
+  NextOfKinCreationInterface,
   NextOfKinInterface,
   NextOfKinValidation,
-  nextOfKinValidation, 
-} from './types'; 
+  nextOfKinValidation
+} from './types';
 
 const SQL_CREATE_KIN = sql<NextOfKinCreationInterface, NextOfKinInterface>(`
   INSERT INTO next_of_kins (
@@ -30,18 +30,19 @@ const SQL_CREATE_KIN = sql<NextOfKinCreationInterface, NextOfKinInterface>(`
 `);
 
 export default (router: Router) => {
-  router.post<Record<string,never>, NextOfKinInterface, NextOfKinValidation, 
-  Record<string,never>>(
-    '/', 
-    validateRequest({ 
+  router.post<Record<string, never>, NextOfKinInterface, NextOfKinValidation,
+  Record<string, never>>(
+    '/',
+    validateRequest({
       body: nextOfKinValidation
     }),
-    authMiddleware(), 
+    authMiddleware(),
     async (req, res) => {
       const nextOfKin = await SQL_CREATE_KIN({
-        ...req.body, 
-        user_id:req.user!.id
+        ...req.body,
+        user_id: req.user!.id
       }).one(new HttpError(400));
       return res.json(nextOfKin);
-    });
+    }
+  );
 };

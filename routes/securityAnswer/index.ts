@@ -7,6 +7,6 @@ export default (baseRouter: Router) => {
 
   createSecurityAnswer(router);
   updateSecurityAnswer(router);
-  
+
   baseRouter.use('/security-answers', router);
 };

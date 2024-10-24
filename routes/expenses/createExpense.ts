@@ -1,11 +1,11 @@
 import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import  validateRequest from '../../middleware/validationMiddleware';
-import { 
-  ExpenseCreationInterface, 
-  BaseExpenseInterface,  
-  expenseCreationSchema 
+import validateRequest from '../../middleware/validationMiddleware';
+import {
+  ExpenseCreationInterface,
+  BaseExpenseInterface,
+  expenseCreationSchema
 } from './types';
 
 const SQL_CREATE_EXPENSES = sql<ExpenseCreationInterface, BaseExpenseInterface>(`
@@ -23,13 +23,13 @@ const SQL_CREATE_EXPENSES = sql<ExpenseCreationInterface, BaseExpenseInterface>(
 `);
 
 export default (router: Router) => {
-  router.post<Record<string,never>, BaseExpenseInterface, ExpenseCreationInterface,
-  Record<string,never>>(
-    '/', 
+  router.post<Record<string, never>, BaseExpenseInterface, ExpenseCreationInterface,
+  Record<string, never>>(
+    '/',
     validateRequest({
-      body:expenseCreationSchema 
+      body: expenseCreationSchema
     }),
-    authMiddleware(), 
+    authMiddleware(),
     async (req, res) => {
       const entity_id = req.body.entity_id ?? req.user!.id;
       const { category_id, description, amount, spent_at } = req.body;
@@ -41,5 +41,6 @@ export default (router: Router) => {
         entity_id
       }).one();
       return res.json(expense);
-    });
-}
+    }
+  );
+};
