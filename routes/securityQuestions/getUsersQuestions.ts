@@ -1,11 +1,12 @@
 import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import { SecurityQuestions } from './types';
-import { AnswerByUserType } from '../securityAnswer/types';
+import { SecurityQuestions } from './getAllSecurityQuestions';
 
-const SQL_GET_USER_SECURITY_QUESTIONS = sql<AnswerByUserType, SecurityQuestions>(`
-  SELECT security_questions.id, security_questions.question 
+const SQL_GET_USER_SECURITY_QUESTIONS = sql<{user_id:number}, SecurityQuestions>(`
+  SELECT 
+    security_questions.id, 
+    security_questions.question 
   FROM security_questions
   LEFT JOIN security_answers 
   ON security_questions.id = security_answers.question_id
