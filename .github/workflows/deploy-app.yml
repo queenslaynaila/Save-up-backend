@@ -1,0 +1,22 @@
+name: Update App
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy-app:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy Express App
+        uses: appleboy/ssh-action@v0.1.2
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          key: ${{ secrets.SSH_KEY }}
+          username: ${{ secrets.SSH_USERNAME }}
+          script: |
+            cd mpot/Save-up-backend/
+            git pull
+            npm install
+            pm2 restart app
