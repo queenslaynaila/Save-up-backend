@@ -20,4 +20,4 @@ jobs:
 
       - name: Deploy to Server
         run: |
-          ssh -o StrictHostKeyChecking=no queenslay@143.110.177.208 "cd /mpot/Save-up-backend && git pull origin main && npm install && pm2 restart Save-up-backend"
+          ssh -o StrictHostKeyChecking=no queenslay@143.110.177.208 "cd mpot/Save-up-backend && git pull origin main && npm install && pm2 restart Save-up-backend"
