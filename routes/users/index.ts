@@ -11,12 +11,12 @@ export default (baseRouter: Router) => {
   const router = Router();
 
   createUser(router);
+  test(router);
   login(router);
   getUserByCriteria(router);
   updateUserRole(router);
   updateUserAttributes(router);
   logout(router);
-  test(router);
 
   baseRouter.use('/users', router);
 };
