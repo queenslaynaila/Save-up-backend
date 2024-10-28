@@ -20,10 +20,6 @@ jobs:
 
       - name: Deploy to Server
         run: |
-          ssh -o StrictHostKeyChecking=no queenslay@143.110.177.208 << 'EOF'
-          cd mpot/Save-up-backend
-          git fetch origin
-          git reset --hard origin/main
-          pm2 restart Save-up-backend 
-          EOF
+          set -e
+          ssh -o StrictHostKeyChecking=no queenslay@143.110.177.208 "cd mpot/Save-up-backend && git fetch origin && git reset --hard origin/main && npm install && pm2 restart Save-up-backend" 2>&1 | tee deployment_log.txt
 
