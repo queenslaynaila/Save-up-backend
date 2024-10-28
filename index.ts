@@ -89,6 +89,7 @@ app.use(() => {
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
+  console.log(error);
   if (error instanceof HttpError) {
     return res.status(error.status).json({
       errors: error.errors
