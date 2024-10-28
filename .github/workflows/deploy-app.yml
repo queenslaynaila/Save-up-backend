@@ -21,4 +21,4 @@ jobs:
       - name: Deploy to Server
         run: |
           set -e
-          ssh -o StrictHostKeyChecking=no queenslay@143.110.177.208 "cd mpot/Save-up-backend && git fetch origin && git reset --hard origin/main && npm install && pm2 restart Save-up-backend" 2>&1 | tee deployment_log.txt
+          ssh -o StrictHostKeyChecking=no queenslay@143.110.177.208 "cd mpot/Save-up-backend && git fetch origin && git reset --hard origin/main && npm install && npm run build && pm2 restart Save-up-backend" 2>&1 | tee deployment_log.txt
