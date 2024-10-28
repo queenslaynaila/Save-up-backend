@@ -24,7 +24,6 @@ jobs:
           cd mpot/Save-up-backend
           git fetch origin
           git reset --hard origin/main
-          npm install
           pm2 restart Save-up-backend 
           EOF
 
