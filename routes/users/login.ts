@@ -43,6 +43,7 @@ type LoginAttempt = z.infer<typeof loginSchema>;
 const SQL_RECORD_LOGIN = sql<LoginAttempt, Record<string, never>>(`
   INSERT INTO login_attempts (user_id, xid, ip_address, browser_info, success, reason)
   SELECT 
+      :user_id,
       COALESCE(MAX(xid), 0) + 1, 
       :ip_address, 
       :browser_info, 
