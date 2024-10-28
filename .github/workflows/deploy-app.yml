@@ -25,7 +25,6 @@ jobs:
           git fetch origin
           git reset --hard origin/main
           npm install
-          npm run build
           pm2 restart Save-up-backend 
           EOF
 
