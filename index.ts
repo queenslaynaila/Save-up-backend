@@ -3,8 +3,6 @@ import 'express-async-errors';
 import morgan from 'morgan';
 import cors from 'cors';
 import { HttpError } from './middleware/errorMiddleware';
-// import swaggerUI from 'swagger-ui-express';
-// import swaggerJsDoc from 'swagger-jsdoc';
 import usersRoutes from './routes/users/index';
 import nextOfKinRoutes from './routes/nextOfKin/index';
 import categoriesRoutes from './routes/categories/index';
@@ -42,49 +40,7 @@ dotenv.config();
 cron.schedule('0 10 */14 * *', remindStaleGoals);
 cron.schedule('0 2 */7 * *', creditInterest);
 
-// // Swagger docs
-// const options = {
-//   definition: {
-//     openapi: '3.0.0',
-//     info: {
-//       title: 'Saveup API',
-//       version: '1.0.0',
-//       description: 'API DOC FOR SAVEUP'
-//     },
-//     servers: [
-//       {
-//         url: 'http://localhost:3001'
-//       }
-//     ],
-//     security: [{
-//       AuthorizationToken: [],
-//       RefreshToken: []
-//     }],
-//     components: {
-//       securitySchemes: {
-//         AuthorizationToken: {
-//           type: 'apiKey',
-//           name: 'Authorization-Token',
-//           in: 'header',
-//           description: 'The access token for authentication'
-//         },
-//         RefreshToken: {
-//           type: 'apiKey',
-//           name: 'Refresh-token',
-//           in: 'header',
-//           description: 'The refresh token for authentication'
-//         }
-//       }
-//     }
-//   },
-//   apis: ['./routes/**/swagger.yml']
-// };
-
-// const specs = swaggerJsDoc(options);
-
-// Middleware
 const app = express();
-// app.use('/api', swaggerUI.serve, swaggerUI.setup(specs));
 app.use(express.urlencoded({ extended: false, limit: '10mb' }));
 app.use(express.json());
 app.use(morgan('dev'));
