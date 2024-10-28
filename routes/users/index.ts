@@ -5,6 +5,7 @@ import getUserByCriteria from './getUserByCriteria';
 import updateUserAttributes from './updateId';
 import updateUserRole from './updateUserRole';
 import logout from './logout';
+import test from './test';
 
 export default (baseRouter: Router) => {
   const router = Router();
@@ -15,6 +16,7 @@ export default (baseRouter: Router) => {
   updateUserRole(router);
   updateUserAttributes(router);
   logout(router);
+  test(router);
 
   baseRouter.use('/users', router);
 };
