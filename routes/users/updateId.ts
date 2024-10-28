@@ -4,7 +4,7 @@ import { z } from 'zod';
 import { sql } from '../../db';
 import { HttpError } from '../../middleware/errorMiddleware';
 import authMiddleware from '../../middleware/authorization';
-import validateRequest from '../../middleware/validationMiddleware';
+// import validateRequest from '../../middleware/validationMiddleware';
 import { UserId } from './schema';
 
 const updateIdSchema = z.object({
@@ -37,7 +37,6 @@ export default (router: Router) => {
   router.patch<UserId, { updated_attribute: string }, UpdateDetailsType, Record<string, never>>(
     '/:user_id',
     authMiddleware(),
-    validateRequest({ body: updateDetailsSchema }),
     async (req, res) => {
       const userIdParam = req.params.user_id;
       const id = userIdParam === 'me' ? req.user!.id : Number(userIdParam);

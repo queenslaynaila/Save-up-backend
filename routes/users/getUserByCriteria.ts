@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { sql } from '../../db';
-import validateRequest from '../../middleware/validationMiddleware';
+// import validateRequest from '../../middleware/validationMiddleware';
 import { HttpError } from '../../middleware/errorMiddleware';
 import authMiddleware from '../../middleware/authorization';
 import isStandardUser from '../../middleware/isStandardUser';
@@ -39,9 +39,6 @@ export default (router: Router) => {
   router.get<{ entity: string }, UserWithoutPin[], Record<string, never>, UserQueryParams>(
     '/:entity',
     authMiddleware(),
-    validateRequest({
-      query: userQuerySchema
-    }),
     async (req, res) => {
       const targetUser = req.params.entity;
       const { full_name, phone_number } = req.query;
