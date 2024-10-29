@@ -6,6 +6,7 @@ import { HttpError } from '../../middleware/errorMiddleware';
 import { generateToken } from '../../middleware/generatetoken';
 // import validateRequest from '../../middleware/validationMiddleware';
 import { loginAttemptSchema, userContactDetailsSchema, userSchema } from './schema';
+import validateRequest from '../../middleware/validationMiddleware';
 
 const loggedInUserSchema = userSchema.extend({
   phone_number: userContactDetailsSchema.shape.phone_number,
@@ -98,6 +99,7 @@ type Authorization = z.infer<typeof authSchema>;
 export default (router: Router) => {
   router.post<Record<string, never>, UserWithoutPin, Authorization, Record<string, never>>(
     '/login',
+    validateRequest({ body: authSchema }),
     async (req, res) => {
       const { pin, ...user } = await SQL_GET_USER({
         phone_number: req.body.phone_number
