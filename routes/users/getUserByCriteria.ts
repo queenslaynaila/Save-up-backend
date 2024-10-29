@@ -1,7 +1,6 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { sql } from '../../db';
-// import validateRequest from '../../middleware/validationMiddleware';
 import { HttpError } from '../../middleware/errorMiddleware';
 import authMiddleware from '../../middleware/authorization';
 import isStandardUser from '../../middleware/isStandardUser';
