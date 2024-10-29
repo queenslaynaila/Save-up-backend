@@ -5,6 +5,7 @@ import { sql } from '../../db';
 import validateRequest from '../../middleware/validationMiddleware';
 import { StatusCodeInterface } from '../../globalTypes';
 import { userContactDetailsSchema, userSchema } from './schema';
+import { HttpError } from '../../middleware/errorMiddleware';
 
 const userCreationSchema = userSchema.pick({
   pin: true,
@@ -33,7 +34,11 @@ export default (router: Router) => {
       await SQL_CREATE_USER({
         ...req.body,
         pin: pinHash
-      }).exec();
+      }).exec().catch((err) => {
+        if (err.code === '23505') {
+          throw new HttpError(409, { message: 'ERR_PHONE_NO_EXISTS' });
+        }
+      });
       res.sendStatus(201);
     }
   );
