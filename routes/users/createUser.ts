@@ -24,12 +24,18 @@ const SQL_CREATE_USER = sql<UserCreation, Record<string, never>>(`
   SELECT create_user(:id_type, :id_number, :phone_number, :role, :full_name, :gender, :pin)
 `);
 
+const userCreationSchemaWithPinAsNumber = userCreationSchema.extend({
+  pin: z.number()
+});
+type UserCreationWithPinAsNumber = z.infer<typeof userCreationSchemaWithPinAsNumber>;
+
 export default (router: Router) => {
-  router.post<Record<string, never>, StatusCodeInterface, UserCreation, Record<string, never>>(
+  router.post<Record<string, never>, StatusCodeInterface, UserCreationWithPinAsNumber,
+  Record<string, never>>(
     '/',
     validateRequest({ body: userCreationSchema }),
     async (req, res) => {
-      const pinHash = bcrypt.hashSync(req.body.pin, 12);
+      const pinHash = bcrypt.hashSync(String(req.body.pin), 12);
 
       await SQL_CREATE_USER({
         ...req.body,
