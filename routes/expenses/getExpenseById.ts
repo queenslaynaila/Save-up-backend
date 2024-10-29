@@ -24,11 +24,11 @@ export default (router: Router) => {
   router.get<IdParamInterface, BaseExpenseInterface, EntityInterface,
   Record<string, never>>(
     '/:id',
+    authMiddleware(),
     validateRequest({
       params: idParamSchema,
       body: entitySchema
     }),
-    authMiddleware(),
     async (req, res) => {
       const entity_id = req.body?.entity_id ?? req.user!.id;
       const result = await SQL_GET_EXPENSE_BY_ID({

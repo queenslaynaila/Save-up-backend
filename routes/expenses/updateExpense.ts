@@ -26,11 +26,11 @@ export default (router: Router) => {
   router.patch<IdParamInterface, ExpenseUpdateRes, ExpenseBodyInterface,
   Record<string, never>>(
     '/:id',
+    authMiddleware(),
     validateRequest({
       params: idParamSchema,
       body: expenseBodySchema
     }),
-    authMiddleware(),
     async (req, res) => {
       const entity_id = req.body.entity_id ?? req.user!.id;
       const xid = Number(req.params.id);

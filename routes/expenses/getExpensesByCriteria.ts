@@ -30,11 +30,11 @@ export default (router: Router) => {
   router.get<Record<string, never>, BaseExpenseInterface[], EntityInterface,
   ExpenseQueryInterface>(
     '/',
+    authMiddleware(),
     validateRequest({
       body: entitySchema,
       query: expenseQuerySchema
     }),
-    authMiddleware(),
     async (req, res) => {
       const entity_id = req.body?.entity_id ?? req.user!.id;
       const { category_id, start_date, end_date } = req.query;

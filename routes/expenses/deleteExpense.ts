@@ -23,11 +23,11 @@ export default (router: Router) => {
   router.delete<IdParamInterface, StatusCodeInterface, EntityInterface,
   Record<string, never>>(
     '/:id',
+    authMiddleware(),
     validateRequest({
       params: idParamSchema,
       body: entitySchema
     }),
-    authMiddleware(),
     async (req, res) => {
       const entity_id = req.body?.entity_id ?? req.user!.id;
       await SQL_DELETE_EXPENSE({
