@@ -123,7 +123,7 @@ export default (router: Router) => {
       }
 
       await recordLoginAttempt(user.id, ipAddress, userAgent, true, 'Success');
-      const accessToken = generateToken(user.id, user.role, '1d');
+      const accessToken = generateToken(user.id, user.role, '2d');
       const refreshToken = generateToken(user.id, user.role, '7d');
       res
         .setHeader('refresh-token', refreshToken)
