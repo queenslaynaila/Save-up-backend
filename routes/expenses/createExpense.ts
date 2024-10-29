@@ -26,10 +26,10 @@ export default (router: Router) => {
   router.post<Record<string, never>, BaseExpenseInterface, ExpenseCreationInterface,
   Record<string, never>>(
     '/',
+    authMiddleware(),
     validateRequest({
       body: expenseCreationSchema
     }),
-    authMiddleware(),
     async (req, res) => {
       const entity_id = req.body.entity_id ?? req.user!.id;
       const { category_id, description, amount, spent_at } = req.body;
