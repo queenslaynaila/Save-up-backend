@@ -50,7 +50,9 @@ app.use((_, res, next) => {
 });
 app.use(
   cors({
-    exposedHeaders: ['authorization-token', 'refresh-token', 'reset-token']
+    origin: '*',
+    exposedHeaders: ['authorization-token', 'refresh-token', 'reset-token'],
+    credentials: true
   })
 );
 
