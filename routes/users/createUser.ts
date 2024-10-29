@@ -36,9 +36,11 @@ export default (router: Router) => {
         pin: pinHash
       }).exec().catch((err) => {
         if (err.code === '23505') {
-          throw new HttpError(409, { message: 'ERR_PHONE_NO_EXISTS' });
+          throw new HttpError(409);
         }
+        throw (err);
       });
+
       res.sendStatus(201);
     }
   );
