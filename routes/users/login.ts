@@ -4,7 +4,6 @@ import { z } from 'zod';
 import { sql } from '../../db';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { generateToken } from '../../middleware/generatetoken';
-// import validateRequest from '../../middleware/validationMiddleware';
 import { loginAttemptSchema, userContactDetailsSchema, userSchema } from './schema';
 import validateRequest from '../../middleware/validationMiddleware';
 
@@ -54,16 +53,12 @@ const SQL_RECORD_LOGIN = sql<LoginAttempt, Record<string, never>>(`
   WHERE user_id = :user_id
 `);
 
-const SQL_COUNT_LAST_FAILED_ATTEMPTS = sql<{ id: number }, { failed_count: number }>(`
-  SELECT COUNT(*) AS failed_count
-  FROM (
-    SELECT 1
-    FROM login_attempts
-    WHERE user_id = :id
-    AND success = FALSE
-    ORDER BY created_at DESC
-    LIMIT 3
-  ) AS subquery
+const SQL_GET_LAST_THREE_ATTEMPTS = sql<{ id: number }, { success: boolean, reason:string }>(`
+  SELECT success
+  FROM login_attempts
+  WHERE user_id = :id
+  ORDER BY xid DESC
+  LIMIT 3
 `);
 
 const recordLoginAttempt = async (
@@ -96,6 +91,18 @@ const authSchema = z.object({
 
 type Authorization = z.infer<typeof authSchema>;
 
+const calculateRemainingAttempts = (lastThreeAttempts: { success: boolean, reason: string }[]) => {
+  if (lastThreeAttempts.length === 0 || lastThreeAttempts[0].success) {
+    return 3;
+  }
+
+  if (lastThreeAttempts[0].reason === 'Locked') {
+    throw new HttpError(423);
+  }
+
+  return 3 - lastThreeAttempts.filter((a) => !a.success).length;
+};
+
 export default (router: Router) => {
   router.post<Record<string, never>, UserWithoutPin, Authorization, Record<string, never>>(
     '/login',
@@ -105,21 +112,23 @@ export default (router: Router) => {
         phone_number: req.body.phone_number
       }).one(new HttpError(401));
 
-      const { failed_count } = await SQL_COUNT_LAST_FAILED_ATTEMPTS({
+      const lastThreeAttempts: { success: boolean, reason: string }[] = await
+      SQL_GET_LAST_THREE_ATTEMPTS({
         id: user.id
-      }).one();
+      }).many();
+
+      const remainingAttempts = calculateRemainingAttempts(lastThreeAttempts);
 
       const { ipAddress, userAgent } = getRequestInfo(req);
 
-      if (failed_count >= 3) {
+      if (remainingAttempts === 0) {
         await recordLoginAttempt(user.id, ipAddress, userAgent, false, 'Locked');
         throw new HttpError(423);
       }
 
       if (!await bcrypt.compare(req.body.pin, pin)) {
         await recordLoginAttempt(user.id, ipAddress, userAgent, false, 'Incorrect pin');
-        const remaining_attempts = 3 - (failed_count + 1);
-        throw new HttpError(401, { remaining_attempts });
+        throw new HttpError(401, { remaining_attempts: remainingAttempts - 1 });
       }
 
       await recordLoginAttempt(user.id, ipAddress, userAgent, true, 'Success');
