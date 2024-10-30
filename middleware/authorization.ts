@@ -27,7 +27,7 @@ function authMiddleware(options: AuthMiddlewareOptions = {}) {
     const accessToken = req.headers['authorization-token'] as string;
     const refreshToken = req.headers['refresh-token'] as string;
 
-    if (!accessToken || !refreshToken) {
+    if (!accessToken) {
       throw new HttpError(401);
     }
 
