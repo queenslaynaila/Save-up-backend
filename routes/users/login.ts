@@ -82,15 +82,6 @@ const getRequestInfo = (req: Request) => ({
   userAgent: req.get('User-Agent') || 'unknown'
 });
 
-type UserWithoutPin = Omit<User, 'pin'>;
-
-const authSchema = z.object({
-  phone_number: userContactDetailsSchema.shape.phone_number,
-  pin: userSchema.shape.pin
-});
-
-type Authorization = z.infer<typeof authSchema>;
-
 const calculateRemainingAttempts = (lastThreeAttempts: { success: boolean, reason: string }[]) => {
   if (lastThreeAttempts.length === 0 || lastThreeAttempts[0].success) {
     return 3;
@@ -102,6 +93,15 @@ const calculateRemainingAttempts = (lastThreeAttempts: { success: boolean, reaso
 
   return 3 - lastThreeAttempts.filter((a) => !a.success).length;
 };
+
+type UserWithoutPin = Omit<User, 'pin'>;
+
+const authSchema = z.object({
+  phone_number: userContactDetailsSchema.shape.phone_number,
+  pin: userSchema.shape.pin
+});
+
+type Authorization = z.infer<typeof authSchema>;
 
 export default (router: Router) => {
   router.post<Record<string, never>, UserWithoutPin, Authorization, Record<string, never>>(
@@ -118,7 +118,6 @@ export default (router: Router) => {
       }).many();
 
       const remainingAttempts = calculateRemainingAttempts(lastThreeAttempts);
-
       const { ipAddress, userAgent } = getRequestInfo(req);
 
       if (remainingAttempts === 0) {
