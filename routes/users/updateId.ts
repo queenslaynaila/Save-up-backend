@@ -5,7 +5,6 @@ import { sql } from '../../db';
 import { HttpError } from '../../middleware/errorMiddleware';
 import authMiddleware from '../../middleware/authorization';
 import validateRequest from '../../middleware/validationMiddleware';
-import { UserId } from './schema';
 
 const updateIdSchema = z.object({
   id_type: z.string(),
@@ -34,7 +33,8 @@ const SQL_UPDATE_ID_NUMBER = sql<{ id: number; id_type: string; id_number: strin
 `);
 
 export default (router: Router) => {
-  router.patch<UserId, { updated_attribute: string }, UpdateDetailsType, Record<string, never>>(
+  router.patch<{ user_id:string }, { updated_attribute: string }, UpdateDetailsType,
+  Record<string, never>>(
     '/:user_id',
     authMiddleware(),
     validateRequest({ body: updateDetailsSchema }),
