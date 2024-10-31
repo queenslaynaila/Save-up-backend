@@ -30,10 +30,11 @@ BEGIN
     ON users.id = user_contact_details.id
     WHERE users.id = p_target_user_id;
 
-    INSERT INTO user_role_history(user_id, xid, role)
+    INSERT INTO user_role_history(user_id, xid, admin_id, role)
     SELECT 
         p_target_user_id , 
-        COALESCE(MAX(xid), 0) + 1, 
+        COALESCE(MAX(xid), 0) + 1,
+        p_admin_id, 
         v_old_role
     FROM user_role_history
     WHERE user_id = p_target_user_id ;
