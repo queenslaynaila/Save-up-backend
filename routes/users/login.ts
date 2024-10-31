@@ -4,14 +4,22 @@ import { z } from 'zod';
 import { sql } from '../../db';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { generateToken } from '../../middleware/generatetoken';
-import { loginAttemptSchema, userContactDetailsSchema, userSchema } from './schema';
 import validateRequest from '../../middleware/validationMiddleware';
+import { userSchema, loginAttemptSchema, userContactDetailsSchema } from './types';
 
-const loggedInUserSchema = userSchema.extend({
-  phone_number: userContactDetailsSchema.shape.phone_number,
-  full_name: userContactDetailsSchema.shape.full_name
+const loggedInUser = userSchema.pick({
+  id: true,
+  id_type: true,
+  id_number: true,
+  role: true,
+  gender: true,
+  pin: true,
+  created_at: true
+}).extend({
+  full_name: userContactDetailsSchema.shape.full_name,
+  phone_number: userContactDetailsSchema.shape.phone_number
 });
-export type User = z.infer<typeof loggedInUserSchema>;
+export type User = z.infer<typeof loggedInUser>;
 
 const SQL_GET_USER = sql<{ phone_number: string }, User>(`
   SELECT 
@@ -53,7 +61,13 @@ const SQL_RECORD_LOGIN = sql<LoginAttempt, Record<string, never>>(`
   WHERE user_id = :user_id
 `);
 
-const SQL_GET_LAST_THREE_ATTEMPTS = sql<{ id: number }, { success: boolean, reason:string }>(`
+const loginResultSchema = loginSchema.pick({
+  success: true,
+  reason: true
+});
+type LoginResult = z.infer<typeof loginResultSchema>;
+
+const SQL_GET_LAST_THREE_ATTEMPTS = sql<{ id: number }, LoginResult>(`
   SELECT success
   FROM login_attempts
   WHERE user_id = :id
@@ -82,16 +96,16 @@ const getRequestInfo = (req: Request) => ({
   userAgent: req.get('User-Agent') || 'unknown'
 });
 
-const calculateRemainingAttempts = (lastThreeAttempts: { success: boolean, reason: string }[]) => {
+const calculateRemainingAttempts = (lastThreeAttempts: LoginResult[]) => {
   if (lastThreeAttempts.length === 0 || lastThreeAttempts[0].success) {
     return 3;
   }
-
   if (lastThreeAttempts[0].reason === 'Locked') {
     throw new HttpError(423);
   }
-
-  return 3 - lastThreeAttempts.filter((a) => !a.success).length;
+  const failedAttempts = lastThreeAttempts
+    .reduce((count, attempt)=> count + (!attempt.success ? 1 : 0), 0);
+  return 3 - failedAttempts;
 };
 
 type UserWithoutPin = Omit<User, 'pin'>;
@@ -112,8 +126,7 @@ export default (router: Router) => {
         phone_number: req.body.phone_number
       }).one(new HttpError(401));
 
-      const lastThreeAttempts: { success: boolean, reason: string }[] = await
-      SQL_GET_LAST_THREE_ATTEMPTS({
+      const lastThreeAttempts = await SQL_GET_LAST_THREE_ATTEMPTS({
         id: user.id
       }).many();
 
