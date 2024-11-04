@@ -1,8 +1,8 @@
+/* eslint-disable consistent-return */
 import { NextFunction, Request, Response } from 'express';
 import jwt, { JwtPayload, Secret, VerifyErrors } from 'jsonwebtoken';
 import { UserRole } from '../globalTypes';
 import { HttpError } from './errorMiddleware';
-import { ISSUER } from './generatetoken';
 
 export type User = {
   id: number;
@@ -19,6 +19,8 @@ declare module 'express-serve-static-core' {
 interface AuthMiddlewareOptions {
   roles?: UserRole[] | UserRole;
 }
+
+const ISSUER = 'saveup';
 
 function authMiddleware(options: AuthMiddlewareOptions = {}) {
   const roles = options.roles || [];
@@ -48,14 +50,15 @@ function authMiddleware(options: AuthMiddlewareOptions = {}) {
           throw new HttpError(401);
         }
 
-        const { user, exp } = decoded as { user: User, exp: number };
+        const { id, role, exp } = decoded as { id: number; role: UserRole; exp: number };
 
         if (typeof exp === 'number' && exp * 1000 <= Date.now()) {
-          return next(new HttpError(401));
+          throw new HttpError(401);
         }
 
-        if (roles.length && !roles.includes(user.role)) {
-          throw new HttpError(403);
+        const user: User = { id, role };
+        if (roles.length > 0 && !roles.includes(user.role)) {
+          return next(new HttpError(403));
         }
 
         req.user = user;
