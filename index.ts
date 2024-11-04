@@ -50,7 +50,7 @@ app.use(
   cors({
     origin: ['http://localhost:5173'],
     credentials: true,
-    exposedHeaders: ['authorization-token', 'refresh-token', 'reset-token']
+    exposedHeaders: ['authorization-token', 'reset-token']
   })
 );
 
@@ -97,8 +97,8 @@ app.use(() => {
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
-  res.locals.errorMessage = error;
   console.log(error);
+  res.locals.errorMessage = error;
   if (error instanceof HttpError) {
     return res.status(error.status).json({
       errors: error.errors
