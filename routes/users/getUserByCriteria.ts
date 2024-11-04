@@ -5,11 +5,10 @@ import validateRequest from '../../middleware/validationMiddleware';
 import { HttpError } from '../../middleware/errorMiddleware';
 import authMiddleware from '../../middleware/authorization';
 import isStandardUser from '../../middleware/isStandardUser';
-import { User } from './login';
-import { userContactDetailsSchema } from './schema';
+import { UserSafe } from './login';
+import { userContactDetailsSchema } from './types';
 
-type UserWithoutPin = Omit<User, 'pin'>;
-const SQL_GET_USER_BY_CRITERIA = sql<Record<string, never>, UserWithoutPin>(`
+const SQL_GET_USER_BY_CRITERIA = sql<Record<string, never>, UserSafe>(`
   SELECT 
     users.id, 
     users.id_type, 
@@ -33,10 +32,10 @@ const userQuerySchema = userContactDetailsSchema.pick({
   full_name: true,
   phone_number: true
 }).partial();
-type UserQueryParams = z.infer<typeof userQuerySchema>;
+type UserSearchParams = z.infer<typeof userQuerySchema>;
 
 export default (router: Router) => {
-  router.get<{ entity: string }, UserWithoutPin[], Record<string, never>, UserQueryParams>(
+  router.get<{ entity: string }, UserSafe[], Record<string, never>, UserSearchParams>(
     '/:entity',
     authMiddleware(),
     validateRequest({ query: userQuerySchema }),

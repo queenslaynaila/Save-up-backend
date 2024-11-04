@@ -47,7 +47,6 @@ const loginSchema = loginAttemptSchema.pick({
   reason: true
 });
 type LoginAttempt = z.infer<typeof loginSchema>;
-
 const SQL_RECORD_LOGIN = sql<LoginAttempt, Record<string, never>>(`
   INSERT INTO login_attempts (user_id, xid, ip_address, browser_info, success, reason)
   SELECT 
@@ -66,7 +65,6 @@ const loginResultSchema = loginSchema.pick({
   reason: true
 });
 type LoginResult = z.infer<typeof loginResultSchema>;
-
 const SQL_GET_LAST_THREE_ATTEMPTS = sql<{ id: number }, LoginResult>(`
   SELECT success
   FROM login_attempts
@@ -108,17 +106,15 @@ const calculateRemainingAttempts = (lastThreeAttempts: LoginResult[]) => {
   return 3 - failedAttempts;
 };
 
-type UserWithoutPin = Omit<User, 'pin'>;
-
 const authSchema = z.object({
   phone_number: userContactDetailsSchema.shape.phone_number,
   pin: userSchema.shape.pin
 });
-
 type Authorization = z.infer<typeof authSchema>;
+export type UserSafe = Omit<User, 'pin'>;
 
 export default (router: Router) => {
-  router.post<Record<string, never>, UserWithoutPin, Authorization, Record<string, never>>(
+  router.post<Record<string, never>, UserSafe, Authorization, Record<string, never>>(
     '/login',
     validateRequest({ body: authSchema }),
     async (req, res) => {

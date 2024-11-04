@@ -5,14 +5,16 @@ import { sql } from '../../db';
 import { HttpError } from '../../middleware/errorMiddleware';
 import authMiddleware from '../../middleware/authorization';
 import validateRequest from '../../middleware/validationMiddleware';
+import { userIdHistorySchema, userPhoneHistorySchema } from './types';
 
-const updateIdSchema = z.object({
-  id_type: z.string(),
-  new_id_number: z.string()
+const updateIdSchema = userIdHistorySchema.pick({
+  id_type: true,
+  id_number: true
 });
 
-const updatePhoneSchema = z.object({
-  new_phone_number: z.string(),
+const updatePhoneSchema = userPhoneHistorySchema.pick({
+  phone_number: true
+}).extend({
   pin: z.string()
 });
 
@@ -42,24 +44,24 @@ export default (router: Router) => {
       const userIdParam = req.params.user_id;
       const id = userIdParam === 'me' ? req.user!.id : Number(userIdParam);
 
-      if ('new_id_number' in req.body && 'id_type' in req.body) {
-        const { id_type, new_id_number } = req.body;
-        const { new_id_number: id_number } = await SQL_UPDATE_ID_NUMBER({
+      if ('id_number' in req.body && 'id_type' in req.body) {
+        const { id_type, id_number } = req.body;
+        const { new_id_number } = await SQL_UPDATE_ID_NUMBER({
           id,
           id_type,
-          id_number: new_id_number
+          id_number: id_number
         }).one();
-        return res.json({ updated_attribute: id_number });
+        return res.json({ updated_attribute: new_id_number });
       }
 
-      if ('new_phone_number' in req.body && 'pin' in req.body) {
-        const { new_phone_number, pin } = req.body;
+      if ('phone_number' in req.body && 'pin' in req.body) {
+        const { phone_number, pin } = req.body;
         const userPassword = await SQL_GET_USER_PIN({ id }).one(new HttpError(400));
         if (!await bcrypt.compare(pin, userPassword.pin)) {
           throw new HttpError(401);
         }
         const { updated_phone_number } = await SQL_UPDATE_PHONE({
-          phone_number: new_phone_number,
+          phone_number: phone_number,
           id
         }).one();
         return res.json({ updated_attribute: updated_phone_number });

@@ -1,11 +1,10 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { sql } from '../../db';
-// import validateRequest from '../../middleware/validationMiddleware';
+import validateRequest from '../../middleware/validationMiddleware';
 import authMiddleware from '../../middleware/authorization';
 import { convertToTitleCase } from '../../middleware/caseNormalization';
-import { userContactDetailsSchema, UserId } from './schema';
-import { UserRole } from '../../globalTypes';
+import { userContactDetailsSchema, UserRole } from './types';
 
 export const updatedUserSchema = userContactDetailsSchema.pick({
   full_name: true
@@ -19,23 +18,21 @@ const SQL_UPDATE_ROLE = sql<{ targetUserId: string, role:UserRole, adminId: numb
   SELECT * FROM update_user_role(:targetUserId, :role, :adminId);
 `);
 
-const userRoleBodySchema = z.object({
-  role: z.nativeEnum(UserRole)
-});
-
-type UserRoleBodyType = z.infer<typeof userRoleBodySchema>;
+const roleSchema = z.object({ role: z.nativeEnum(UserRole) });
+type RoleParams = z.infer<typeof roleSchema>;
 
 export default (router: Router) => {
-  router.patch<UserId, UpdatedUser, UserRoleBodyType, Record<string, never>>(
+  router.patch<{ user_id:string }, UpdatedUser, RoleParams, Record<string, never>>(
     '/:user_id/role',
     authMiddleware({ roles: [UserRole.ADMIN] }),
+    validateRequest({ body: roleSchema }),
     async (req, res) => {
-      const targetUserId = req.params.user_id;
+      const userId = req.params.user_id;
       const role = convertToTitleCase(req.body.role);
 
       const user = await SQL_UPDATE_ROLE({
         role,
-        targetUserId,
+        targetUserId: userId,
         adminId: req.user!.id
       }).one();
 
