@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import jwt, { JwtPayload, Secret, VerifyErrors } from 'jsonwebtoken';
 import { UserRole } from '../globalTypes';
 import { HttpError } from './errorMiddleware';
-import { verifyTokenExpiration } from './generatetoken';
+import { ISSUER } from './generatetoken';
 
 export type User = {
   id: number;
@@ -35,13 +35,8 @@ function authMiddleware(options: AuthMiddlewareOptions = {}) {
       throw new HttpError(401);
     }
 
-    const isExpired = verifyTokenExpiration(accessTokenValue);
-    if (isExpired) {
-      throw new HttpError(401);
-    }
-
     const verifyOptions: jwt.VerifyOptions = {
-      issuer: 'saveup'
+      issuer: ISSUER
     };
 
     jwt.verify(
@@ -53,7 +48,12 @@ function authMiddleware(options: AuthMiddlewareOptions = {}) {
           throw new HttpError(401);
         }
 
-        const user = decoded as User;
+        const { user, exp } = decoded as { user: User, exp: number };
+
+        if (typeof exp === 'number' && exp * 1000 <= Date.now()) {
+          return next(new HttpError(401));
+        }
+
         if (roles.length && !roles.includes(user.role)) {
           throw new HttpError(403);
         }
