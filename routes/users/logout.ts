@@ -9,7 +9,6 @@ export default (router: Router) => {
     authMiddleware(),
     async (_req, res) => {
       res.removeHeader('authorization-token');
-      res.removeHeader('refresh-token');
       res.sendStatus(204);
     }
   );
