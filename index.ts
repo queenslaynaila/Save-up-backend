@@ -34,7 +34,6 @@ import cron from 'node-cron';
 import remindStaleGoals from './cronJobs/overdueGoalsReminder';
 import creditInterest from './cronJobs/creditInterest';
 import dotenv from 'dotenv';
-
 dotenv.config();
 
 cron.schedule('0 10 */14 * *', remindStaleGoals);
@@ -43,7 +42,6 @@ cron.schedule('0 2 */7 * *', creditInterest);
 const app = express();
 app.use(express.urlencoded({ extended: false, limit: '10mb' }));
 app.use(express.json());
-app.use(morgan('dev'));
 app.use((_, res, next) => {
   res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
   next();
@@ -56,7 +54,15 @@ app.use(
   })
 );
 
-// Routes
+morgan.token('error', (req: Request, res: Response) => {
+  return res.locals.errorMessage || '';
+});
+const errorFormat = ':method :url :status :response-time ms - :res[content-length] - error: :error';
+app.use((req, res, next) => {
+  const logFormat = res.statusCode < 400 ? 'dev' : errorFormat;
+  morgan(logFormat)(req, res, next);
+});
+
 usersRoutes(app);
 nextOfKinRoutes(app);
 pocketRoutes(app);
@@ -91,7 +97,7 @@ app.use(() => {
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
-  console.log(error);
+  res.locals.errorMessage = error.message;
   if (error instanceof HttpError) {
     return res.status(error.status).json({
       errors: error.errors
