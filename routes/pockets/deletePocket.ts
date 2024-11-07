@@ -11,7 +11,7 @@ import {
 import validateRequest from '../../middleware/validationMiddleware';
 
 const SQL_DELETE_POCKET = sql<{pocket_id: number, entity_id: number}, Record<string, never>>(`
-  SELECT delete_pocket(:pocket_id, :entity_id)
+  SELECT delete_pocket(:entity_id, :pocket_id)
 `);
 
 export default (router: Router) => {
