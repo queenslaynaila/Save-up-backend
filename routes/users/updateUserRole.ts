@@ -5,6 +5,7 @@ import validateRequest from '../../middleware/validationMiddleware';
 import authMiddleware from '../../middleware/authorization';
 import { convertToTitleCase } from '../../middleware/caseNormalization';
 import { userContactDetailsSchema, UserRole } from './types';
+import { HttpError } from '../../middleware/errorMiddleware';
 
 export const updatedUserSchema = userContactDetailsSchema.pick({
   full_name: true
@@ -34,7 +35,12 @@ export default (router: Router) => {
         role,
         targetUserId: userId,
         adminId: req.user!.id
-      }).one();
+      }).one().catch(err => {
+        if (err.code === 'P0002') {
+          throw new HttpError(403);
+        }
+        throw err;
+      });
 
       res.json(user);
     }
