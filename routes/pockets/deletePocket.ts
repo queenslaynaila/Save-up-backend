@@ -26,8 +26,8 @@ export default (router: Router) => {
     async (req, res) => {
       const entity_id = req.body?.entity_id ?? req.user!.id;
       await SQL_DELETE_POCKET({
-        pocket_id: Number(req.params.id),
-        entity_id
+        entity_id,
+        pocket_id: Number(req.params.id)
       }).exec();
       res.sendStatus(204);
     }
