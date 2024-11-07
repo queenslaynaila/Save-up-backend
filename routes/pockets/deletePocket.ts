@@ -9,6 +9,7 @@ import {
   StatusCodeInterface
 } from '../../globalTypes';
 import validateRequest from '../../middleware/validationMiddleware';
+import { HttpError } from '../../middleware/errorMiddleware';
 
 const SQL_DELETE_POCKET = sql<{pocket_id: number, entity_id: number}, Record<string, never>>(`
   SELECT delete_pocket(:entity_id, :pocket_id)
@@ -28,7 +29,11 @@ export default (router: Router) => {
       await SQL_DELETE_POCKET({
         entity_id,
         pocket_id: Number(req.params.id)
-      }).exec();
+      }).exec().catch(err => {
+        if (err.code === 'P0006') {
+          throw new HttpError(409);
+        }
+      });
       res.sendStatus(204);
     }
   );
