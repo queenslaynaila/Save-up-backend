@@ -8,6 +8,7 @@ import {
   transferValidationSchema
 } from './types';
 import { StatusCodeInterface } from '../../globalTypes';
+import { HttpError } from '../../middleware/errorMiddleware';
 
 const SQL_CREATE_TRANSFER = sql<TransferInput, Record<string, never>>(`
   SELECT create_transfer(
@@ -31,7 +32,11 @@ export default (router: Router) => {
       const entity_id = req.body.entity_id ?? req.user!.id;
       await SQL_CREATE_TRANSFER({
         ...req.body, entity_id, user_id: req.user!.id
-      }).exec();
+      }).exec().catch((err) => {
+        if (err.code === 'P0004') {
+          throw new HttpError(400, { message: 'ERR_INSUFFICIENT_FUNDS' });
+        }
+      });
       res.sendStatus(201);
     }
   );
