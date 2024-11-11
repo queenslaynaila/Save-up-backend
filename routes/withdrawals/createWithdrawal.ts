@@ -8,6 +8,7 @@ import {
   WithdrawalCreation
 } from './types';
 import { StatusCodeInterface } from '../../globalTypes';
+import { HttpError } from '../../middleware/errorMiddleware';
 
 const SQL_CREATE_WITHDRAWAL = sql<WithdrawalCreation, Record<string, never>>(`
   SELECT create_user_withdrawal(:user_id, :pocket_id, :amount);
@@ -23,7 +24,11 @@ export default (router: Router) => {
       await SQL_CREATE_WITHDRAWAL({
         ...req.body,
         user_id: req.user!.id
-      }).exec();
+      }).exec().catch((err) => {
+        if (err.code === 'P0005') {
+          throw new HttpError(400, { message: 'ERR_FUNDS_LOCKED' });
+        }
+      });
       res.sendStatus(201);
     }
   );
