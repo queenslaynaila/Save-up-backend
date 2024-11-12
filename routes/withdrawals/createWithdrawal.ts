@@ -25,6 +25,9 @@ export default (router: Router) => {
         ...req.body,
         user_id: req.user!.id
       }).exec().catch((err) => {
+        if (err.code === 'P0004') {
+          throw new HttpError(400, { message: 'ERR_INSUFFICIENT_FUNDS' });
+        }
         if (err.code === 'P0005') {
           throw new HttpError(400, { message: 'ERR_FUNDS_LOCKED' });
         }
