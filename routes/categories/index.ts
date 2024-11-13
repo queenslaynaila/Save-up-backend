@@ -1,10 +1,8 @@
-import express from 'express';
 import getAllCategories from './getAllCategories';
+import Router from '../../router';
 
-export default (baseRouter: express.Router) => {
-  const router = express.Router();
+const router = new Router('/categories', 'Categories');
 
-  getAllCategories(router);
+getAllCategories(router);
 
-  baseRouter.use('/categories', router);
-};
+export default getAllCategories;
