@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Router as ExpressRouter, Request, Response, NextFunction } from 'express';
 import { AnyZodObject, ZodSchema } from 'zod';
-import { OpenAPIRegistry } from '@asteasolutions/zod-to-openapi';
+import { OpenApiGeneratorV3, OpenAPIRegistry } from '@asteasolutions/zod-to-openapi';
 import fastJson from 'fast-json-stringify';
 import zodToJsonSchema from 'zod-to-json-schema';
 import Ajv, { ErrorObject } from 'ajv';
@@ -100,6 +100,8 @@ class Router {
       }
     });
 
+    console.log(`Registering ${method.toUpperCase()} ${this.prefix}${path}`);
+
     if (responseSchema) {
       const jsonResponseSchema: any = zodToJsonSchema(responseSchema, { target: 'openApi3' });
       const stringify = fastJson(jsonResponseSchema);
@@ -116,9 +118,34 @@ class Router {
     this.router[method](path, ...middlewares, handler);
   }
 
-  public getRouter() {
+  public getRouter(): ExpressRouter {
     return this.router;
   }
 }
+
+registry.registerComponent(
+  'securitySchemes',
+  'authorization-token',
+  {
+    name: 'authorization-token',
+    type: 'apiKey',
+    scheme: 'Bearer',
+    bearerFormat: 'JWT',
+    in: 'header',
+    description: 'JWT authorizatiion using the bearer scheme'
+  }
+);
+
+export const generateOpenApiSpec = () => {
+  const generator = new OpenApiGeneratorV3(registry.definitions);
+  return generator.generateDocument({
+    openapi: '3.0.0',
+    info: {
+      title: 'API Documentation for Saveup',
+      version: '1.0.0',
+      description: 'This is the API documentation for Saveup. Saveup is a platform that helps users manage their savings and financial goals'
+    }
+  });
+};
 
 export default Router;
