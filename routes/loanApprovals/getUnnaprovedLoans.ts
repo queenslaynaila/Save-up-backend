@@ -1,9 +1,9 @@
-import { Router } from 'express';
+import Router from '../../router';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import validateRequest from '../../middleware/validationMiddleware';
-import { getByGroupId, GetByGroupIdInterface } from '../../globalTypes';
-import { LoanRequest } from '../loanGuarantees/types';
+import { GetByGroupIdInterface } from '../../globalTypes';
+import { LoanRequest, loanRequestSchema } from '../loanGuarantees/types';
+import { z } from 'zod';
 
 interface ExtendedGetByGroupIdInterface extends GetByGroupIdInterface {
   approval_status:'Pending';
@@ -33,17 +33,28 @@ const SQL_GET_UNAPPROVED_LOAN = sql<ExtendedGetByGroupIdInterface, LoanRequest>(
     AND loan_admin_approvals.admin_id IS NULL
 `);
 
-export default (router: Router) => {
-  router.get<Record<string, never>, LoanRequest[], GetByGroupIdInterface, Record<string, never>>(
-    '/',
-    validateRequest({ body: getByGroupId }), // Ensure this matches the expected request body schema
-    authMiddleware(),
-    async (req, res) => {
+const getUnapprovedLoans = (router: Router) => {
+  router.route({
+    method: 'get',
+    path: '/',
+    summary: 'Get list of unapproved loans',
+    schema: {
+      body: z.object({
+        group_id: z.number()
+      })
+    },
+    response: {
+      schema: loanRequestSchema.array()
+    },
+    middlewares: [authMiddleware()],
+    handler: async (req, res) => {
       const loans = await SQL_GET_UNAPPROVED_LOAN({
         group_id: req.body.group_id,
         approval_status: 'Pending'
       }).many();
-      return res.json(loans);
+      res.json(loans);
     }
-  );
+  });
 };
+
+export default getUnapprovedLoans;

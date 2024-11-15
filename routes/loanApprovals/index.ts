@@ -1,12 +1,12 @@
-import express from 'express';
+import Router from '../../router';
 import approveLoan from './createApproval';
 import getUnapprovedLoans from './getUnnaprovedLoans';
+import computeApprovals from './computeApprovals';
 
-export default (baseRouter: express.Router) => {
-  const router = express.Router();
+const router = Router.getInstance('/approved-loans', 'Approved Loans');
 
-  approveLoan(router);
-  getUnapprovedLoans(router);
+approveLoan(router);
+getUnapprovedLoans(router);
+computeApprovals(router);
 
-  baseRouter.use('/approved-loans', router);
-};
+export default router;

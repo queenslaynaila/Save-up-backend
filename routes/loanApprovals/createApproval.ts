@@ -1,25 +1,32 @@
-import { Router } from 'express';
+import Router from '../../router';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import validateRequest from '../../middleware/validationMiddleware';
-import { StatusCodeInterface } from '../../globalTypes';
-import { AdminLoanApproval, LoanApproval, loanApprovalSchema } from './types';
+import { AdminLoanApproval, loanApprovalSchema } from './types';
 
 const SQL_APPROVE_LOAN = sql<AdminLoanApproval, Record<string, never>>(`
   SELECT approve_loan (:group_id, :request_id, :admin_id, :status, :reason);
 `);
 
-export default (router: Router) => {
-  router.post<Record<string, never>, StatusCodeInterface, LoanApproval, Record<string, never>>(
-    '/',
-    validateRequest({ body: loanApprovalSchema }),
-    authMiddleware(),
-    async (req, res) => {
+const createApproval = (router: Router) => {
+  router.route({
+    method: 'post',
+    path: '/',
+    summary: 'Approve loan',
+    schema: {
+      body: loanApprovalSchema
+    },
+    response: {
+      statusCode: 204
+    },
+    middlewares: [authMiddleware()],
+    handler: async (req, res) => {
       await SQL_APPROVE_LOAN({
         ...req.body,
         admin_id: req.user!.id
       }).exec();
-      return res.sendStatus(204);
+      res.sendStatus(204);
     }
-  );
+  });
 };
+
+export default createApproval;

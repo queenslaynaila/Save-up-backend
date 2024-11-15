@@ -1,25 +1,32 @@
-import { Router } from 'express';
+import Router from '../../router';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import validateRequest from '../../middleware/validationMiddleware';
-import { StatusCodeInterface } from '../../globalTypes';
-import { FinalnApproval, finalApprovalBody, FinalApprovalBody } from './types';
+import { FinalnApproval, finalApprovalBody } from './types';
 
 const SQL_COMPUTE_APPROVALS = sql< FinalnApproval, Record<string, never>>(`
   SELECT compute_loan_approvals(:group_id, :request_id, :admin_id );
 `);
 
-export default (router: Router) => {
-  router.post<Record<string, never>, StatusCodeInterface, FinalApprovalBody, Record<string, never>>(
-    '/',
-    validateRequest({ body: finalApprovalBody }),
-    authMiddleware(),
-    async (req, res) => {
+const computeApprovals = (router: Router) => {
+  router.route({
+    method: 'post',
+    path: '/',
+    summary: 'Compute loan approvals',
+    schema: {
+      body: finalApprovalBody
+    },
+    response: {
+      statusCode: 204
+    },
+    middlewares: [authMiddleware()],
+    handler: async (req, res) => {
       await SQL_COMPUTE_APPROVALS({
         ...req.body,
         admin_id: req.user!.id
       }).exec();
-      return res.sendStatus(204);
+      res.sendStatus(204);
     }
-  );
+  });
 };
+
+export default computeApprovals;
