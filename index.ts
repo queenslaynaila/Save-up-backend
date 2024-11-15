@@ -10,6 +10,7 @@ import './routes/users/index';
 import './routes/withdrawals/index';
 import './routes/userCumulatives/index';
 import './routes/transfers/index';
+import './routes/securityAnswer/index';
 
 const app = Router.getInstance('/').app;
 

@@ -60,7 +60,7 @@ interface RouterOptions {
 const registry = new OpenAPIRegistry();
 
 class Router {
-  private static INSTANCE: Router;
+  private static instances: Map<string, Router> = new Map();
 
   public app: Application;
 
@@ -80,14 +80,16 @@ class Router {
   }
 
   public static getInstance(prefix: string, tag?: string): Router {
-    if (!Router.INSTANCE) {
-      Router.INSTANCE = new Router(prefix, tag);
+    if (!Router.instances.has(prefix)) {
+      Router.instances.set(prefix, new Router(prefix, tag));
     }
-    return Router.INSTANCE;
+    return Router.instances.get(prefix)!;
   }
 
   public route(options: RouterOptions) {
     const { method, path, schema, response, middlewares = [], handler } = options;
+
+    console.log(`Registering route ${method.toUpperCase()} ${this.prefix}${path}`);
 
     if (schema) {
       middlewares.push(validateRequest(schema));
@@ -115,7 +117,6 @@ class Router {
         }
       }
     });
-    console.log(`Registered ${method.toUpperCase()} ${this.prefix}${path}`);
 
     if (responseSchema) {
       const jsonResponseSchema: any = zodToJsonSchema(responseSchema, { target: 'openApi3' });
