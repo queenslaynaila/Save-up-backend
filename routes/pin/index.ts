@@ -1,18 +1,16 @@
-import express from 'express';
+import Router from '../../router';
 import updatePin from './updatePin';
 import initiatePinReset from './initiatePinReset';
 import verifyPinResetToken from './verifyPinResetToken';
 import verifySecurityAnswers from './verifySecurityAnswers';
 import resetPin from './resetPin';
 
-export default (baseRouter: express.Router) => {
-  const router = express.Router();
+const router = Router.getInstance('/pin-reset', 'Pin Reset');
 
-  updatePin(router);
-  initiatePinReset(router);
-  verifyPinResetToken(router);
-  verifySecurityAnswers(router);
-  resetPin(router);
+updatePin(router);
+initiatePinReset(router);
+verifyPinResetToken(router);
+verifySecurityAnswers(router);
+resetPin(router);
 
-  baseRouter.use('/pin-reset', router);
-};
+export default router;

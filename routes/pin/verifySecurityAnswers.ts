@@ -1,11 +1,13 @@
-import { Router } from 'express';
+/* eslint-disable no-restricted-syntax */
+/* eslint-disable no-await-in-loop */
+import Router from '../../router';
 import bcrypt from 'bcrypt';
 import jwt, { Secret } from 'jsonwebtoken';
 import { sql } from '../../db';
 import { validateStepToken } from '../../middleware/resetTokenMIddleware';
 import { HttpError } from '../../middleware/errorMiddleware';
-import { StatusCodeInterface, GetByUserInterface } from '../../globalTypes';
-import { VerifyAnswerInterface, SecurityAnswersRequestInterface } from './types';
+import { GetByUserInterface } from '../../globalTypes';
+import { VerifyAnswerInterface, securityAnswersRequestSchema } from './types';
 
 const SQL_GET_SECURITY_ANSWERS = sql<GetByUserInterface, VerifyAnswerInterface>(`
   SELECT question_id, answer 
@@ -13,12 +15,19 @@ const SQL_GET_SECURITY_ANSWERS = sql<GetByUserInterface, VerifyAnswerInterface>(
   WHERE user_id = :user_id
 `);
 
-export default (router: Router) => {
-  router.get<Record<string, never>, StatusCodeInterface, SecurityAnswersRequestInterface,
-  Record<string, never>>(
-    '/verify-answers',
-    validateStepToken,
-    async (req, res) => {
+const verifySecurityAnswers = (router: Router) => {
+  router.route({
+    method: 'get',
+    path: '/verify-answers',
+    summary: 'Verify security answers',
+    schema: {
+      body: securityAnswersRequestSchema
+    },
+    response: {
+      statusCode: 204
+    },
+    middlewares: [validateStepToken],
+    handler: async (req, res) => {
       const step = req.user!.step;
       if (step !== 2) {
         throw new HttpError(422);
@@ -54,5 +63,7 @@ export default (router: Router) => {
       res.setHeader('reset-token', step3TokenHeader)
         .sendStatus(204);
     }
-  );
+  });
 };
+
+export default verifySecurityAnswers;

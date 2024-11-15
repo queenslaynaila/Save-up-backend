@@ -1,13 +1,13 @@
-import { Router } from 'express';
+import Router from '../../router';
 import bcrypt from 'bcrypt';
 import jwt, { Secret } from 'jsonwebtoken';
 import { sql } from '../../db';
 import { validateStepToken } from '../../middleware/resetTokenMIddleware';
 import {
-  VerifyTokenInterface,
   SecurityQuestionInterface,
-  SecurityQuestionArray,
-  UpdateTokenUsageInterface
+  UpdateTokenUsageInterface,
+  verifyTokenSchema,
+  securityQuestionArray
 } from './types';
 import { GetByUserInterface } from '../../globalTypes';
 import { HttpError } from '../../middleware/errorMiddleware';
@@ -39,12 +39,20 @@ const SQL_UPDATE_TOKEN_USAGE = sql<UpdateTokenUsageInterface, Record<string, nev
   AND used_at IS NULL 
 `);
 
-export default (router: Router) => {
-  router.patch<Record<string, never>, SecurityQuestionArray, VerifyTokenInterface,
-  Record<string, never>>(
-    '/verify-token',
-    validateStepToken,
-    async (req, res) => {
+const verifyPinResetToken = (router: Router) => {
+  router.route({
+    method: 'patch',
+    path: '/verify-pin-reset-token',
+    summary: 'Verify PIN reset token',
+    description: 'Verify the PIN reset token provided by the user',
+    schema: {
+      body: verifyTokenSchema
+    },
+    response: {
+      schema: securityQuestionArray
+    },
+    middlewares: [validateStepToken],
+    handler: async (req, res) => {
       const step = req.user!.step;
       if (step !== 1) {
         throw new HttpError(422, { required_step: 1 });
@@ -76,5 +84,7 @@ export default (router: Router) => {
       res.setHeader('reset-token', step2TokenHeader)
         .json(securityQuestions);
     }
-  );
+  });
 };
+
+export default verifyPinResetToken;

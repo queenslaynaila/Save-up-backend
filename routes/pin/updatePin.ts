@@ -1,20 +1,16 @@
-import { Router } from 'express';
+import Router from '../../router';
 import bcrypt from 'bcrypt';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { HttpError } from '../../middleware/errorMiddleware';
-import { resetPasswordLimiter } from '../../services/rateLimit';
 import {
-  UpdatePasswordInterface,
   ResetPasswordRequestInterface,
   ResetPinInterface,
   updatePasswordSchema
 } from './types';
 import {
-  StatusCodeInterface,
   GetByIdInterface
 } from '../../globalTypes';
-import validateRequest from '../../middleware/validationMiddleware';
 
 const SQL_GET_PASSWORD_BY_ID = sql<GetByIdInterface, ResetPinInterface >(`
   SELECT pin FROM users 
@@ -26,16 +22,19 @@ const SQL_UPDATE_PASSWORD = sql< ResetPasswordRequestInterface, Record<string, n
   WHERE id = :id
 `);
 
-export default (router: Router) => {
-  router.patch<Record<string, never>, StatusCodeInterface, UpdatePasswordInterface,
-  Record<string, never>>(
-    '/',
-    validateRequest({
+const updatePin = (router: Router) => {
+  router.route({
+    method: 'patch',
+    path: '/',
+    summary: 'Update user pin',
+    schema: {
       body: updatePasswordSchema
-    }),
-    authMiddleware(),
-    resetPasswordLimiter,
-    async (req, res) => {
+    },
+    response: {
+      statusCode: 204
+    },
+    middlewares: [authMiddleware()],
+    handler: async (req, res) => {
       const { old_pin, new_pin } = req.body;
       const userId = req.user!.id;
 
@@ -49,5 +48,7 @@ export default (router: Router) => {
       await SQL_UPDATE_PASSWORD({ id: userId, pin: hashedNewPassword }).exec();
       res.sendStatus(204);
     }
-  );
+  });
 };
+
+export default updatePin;

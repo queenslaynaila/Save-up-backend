@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import Router from '../../router';
 import bcrypt from 'bcrypt';
 import jwt, { Secret } from 'jsonwebtoken';
 import { resetPasswordLimiter } from '../../services/rateLimit';
@@ -6,14 +6,13 @@ import { sql } from '../../db';
 import { generateResetPin } from '../../middleware/generateResetPin';
 import { HttpError } from '../../middleware/errorMiddleware';
 import {
-  StatusCodeInterface,
   GetByPhoneInterface,
   GetByIdInterface
 } from '../../globalTypes';
 import {
   TokenInterface,
   InitiatePasswordResetInterface,
-  PhoneReason
+  PhoneReasonSchema
 } from './types';
 
 const SQL_GET_USER = sql<GetByPhoneInterface, GetByIdInterface>(`
@@ -32,12 +31,19 @@ const SQL_SAVE_TOKEN = sql<InitiatePasswordResetInterface, TokenInterface>(`
   WHERE user_id = :user_id;
 `);
 
-export default (router: Router) => {
-  router.post<Record<string, never>, StatusCodeInterface, PhoneReason,
-  Record<string, never>>(
-    '/',
-    resetPasswordLimiter,
-    async (req, res) => {
+const initiatePinReset = (router: Router) => {
+  router.route({
+    method: 'post',
+    path: '/',
+    summary: 'Initiate password reset',
+    response: {
+      statusCode: 204
+    },
+    schema: {
+      body: PhoneReasonSchema
+    },
+    middlewares: [resetPasswordLimiter],
+    handler: async (req, res) => {
       const { phone_number } = req.body;
       const user = await SQL_GET_USER({ phone_number })
         .one(new HttpError(404));
@@ -60,5 +66,7 @@ export default (router: Router) => {
       res.setHeader('reset-token', resetTokenHeader)
         .sendStatus(204);
     }
-  );
+  });
 };
+
+export default initiatePinReset;
