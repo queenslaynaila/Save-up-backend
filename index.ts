@@ -5,6 +5,9 @@ import cors from 'cors';
 import morgan from 'morgan';
 import { HttpError } from './middleware/errorMiddleware';
 import './routes/categories/index';
+import './routes/securityQuestions/index';
+import './routes/users/index';
+import './routes/withdrawals/index';
 const app = Router.getInstance('/').app;
 
 app.use((_, res, next) => {
