@@ -1,13 +1,8 @@
-import { Router } from 'express';
+import Router from '../../router';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import {
-  InviteInputInterface,
-  UserInviteInterface,
-  userInviteSchema
-} from './types';
-import { StatusCodeInterface } from '../../globalTypes';
-import validateRequest from '../../middleware/validationMiddleware';
+  InviteInputInterface, userInviteSchema } from './types';
 
 const SQL_CHECK_USER_EXISTENCE = sql<{ phone_number: string }, { exists: boolean }>(`
   SELECT EXISTS (
@@ -20,15 +15,19 @@ const SQL_SEND_INVITATION = sql<InviteInputInterface, Record<string, never>>(`
   SELECT send_invite( :group_id, :phone_number, :sender_id)
 `);
 
-export default (router: Router) => {
-  router.post<Record<string, never>, StatusCodeInterface, UserInviteInterface,
-  Record<string, never>>(
-    '/',
-    validateRequest({
+const sendInvite = (router: Router) => {
+  router.route({
+    method: 'post',
+    path: '/',
+    summary: 'Send an invitation to a user',
+    schema: {
       body: userInviteSchema
-    }),
-    authMiddleware(),
-    async (req, res) => {
+    },
+    response: {
+      statusCode: 204
+    },
+    middlewares: [authMiddleware()],
+    handler: async (req, res) => {
       const { exists } = await SQL_CHECK_USER_EXISTENCE({
         phone_number: req.body.phone_number
       }).one();
@@ -43,5 +42,7 @@ export default (router: Router) => {
       }).exec();
       res.sendStatus(204);
     }
-  );
+  });
 };
+
+export default sendInvite;

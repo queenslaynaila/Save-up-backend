@@ -1,14 +1,12 @@
-import express from 'express';
+import Router from '../../router';
 import sendInvite from './sendInvite';
 import getInvites from './getInvites';
 import updateInvites from './updateInvites';
 
-export default (baseRouter: express.Router) => {
-  const router = express.Router();
+const router = Router.getInstance('/invitations', 'Invitations');
 
-  sendInvite(router);
-  getInvites(router);
-  updateInvites(router);
+sendInvite(router);
+getInvites(router);
+updateInvites(router);
 
-  baseRouter.use('/invitations', router);
-};
+export default router;

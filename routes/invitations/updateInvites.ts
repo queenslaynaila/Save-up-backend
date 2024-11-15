@@ -1,13 +1,8 @@
 import { sql } from '../../db';
-import { Router } from 'express';
+import Router from '../../router';
 import authMiddleware from '../../middleware/authorization';
-import validateRequest from '../../middleware/validationMiddleware';
-import { InviteResponseInterface, InviteValidationInterface, inviteValidationSchema } from './types';
-import {
-  IdParamInterface,
-  idParamSchema,
-  StatusCodeInterface
-} from '../../globalTypes';
+import { InviteResponseInterface, inviteValidationSchema } from './types';
+import { idParamSchema, StatusCodeInterface } from '../../globalTypes';
 
 export interface ExtendedInviteResponseInterface extends InviteResponseInterface {
   xid: number;
@@ -16,16 +11,20 @@ const SQL_RESPOND_TO_INVITE = sql<ExtendedInviteResponseInterface, StatusCodeInt
    SELECT update_invite(:xid, :group_id, :receiver_id, :status)
 `);
 
-export default (router: Router) => {
-  router.patch<IdParamInterface, StatusCodeInterface, InviteValidationInterface,
-  Record<string, never>>(
-    '/:id',
-    validateRequest({
+const updateInvites = (router: Router) => {
+  router.route({
+    method: 'patch',
+    path: '/:id',
+    summary: 'Update an invitation',
+    schema: {
       params: idParamSchema,
       body: inviteValidationSchema
-    }),
-    authMiddleware(),
-    async (req, res) => {
+    },
+    response: {
+      statusCode: 204
+    },
+    middlewares: [authMiddleware()],
+    handler: async (req, res) => {
       const xid = Number(req.params.id);
       const receiver_id = req.user!.id;
       await SQL_RESPOND_TO_INVITE({
@@ -35,5 +34,7 @@ export default (router: Router) => {
       }).exec();
       res.sendStatus(204);
     }
-  );
+  });
 };
+
+export default updateInvites;

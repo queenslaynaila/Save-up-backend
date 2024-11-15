@@ -1,7 +1,7 @@
-import { Router } from 'express';
+import Router from '../../router';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import { baseInviteInterface, InviteByReceiverInterface } from './types';
+import { baseInviteInterface, baseInviteSchema, InviteByReceiverInterface } from './types';
 
 const SQL_GET_PENDING_INVITATIONS = sql<InviteByReceiverInterface, baseInviteInterface>(`
   SELECT 
@@ -17,16 +17,22 @@ const SQL_GET_PENDING_INVITATIONS = sql<InviteByReceiverInterface, baseInviteInt
   AND i.status = 'Pending';
 `);
 
-export default (router: Router) => {
-  router.get<Record<string, never>, baseInviteInterface[], Record<string, never>,
-  Record<string, never>>(
-    '/',
-    authMiddleware(),
-    async (req, res) => {
+const getInvites = (router: Router) => {
+  router.route({
+    method: 'get',
+    path: '/',
+    summary: 'Get list of pending invitations',
+    response: {
+      schema: baseInviteSchema.array()
+    },
+    middlewares: [authMiddleware()],
+    handler: async (req, res) => {
       const invitations = await SQL_GET_PENDING_INVITATIONS({
         receiver_id: req.user!.id
       }).many();
-      return res.json(invitations);
+      res.json(invitations);
     }
-  );
+  });
 };
+
+export default getInvites;
