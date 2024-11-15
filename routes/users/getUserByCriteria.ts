@@ -1,12 +1,24 @@
-import { Router } from 'express';
 import { z } from 'zod';
 import { sql } from '../../db';
-import validateRequest from '../../middleware/validationMiddleware';
 import { HttpError } from '../../middleware/errorMiddleware';
 import authMiddleware from '../../middleware/authorization';
 import isStandardUser from '../../middleware/isStandardUser';
-import { UserSafe } from './login';
+// import { loggedInUser } from './login';
 import { userContactDetailsSchema } from './types';
+import Router from '../../router';
+
+export const loggedInUser = z.object({
+  id: z.string(),
+  username: z.string(),
+  email: z.string(),
+  pin: z.string() // This is the field we want to omit
+  // other fields...
+});
+
+export const safeUser = loggedInUser.omit({
+  pin: true
+});
+type UserSafe = z.infer<typeof safeUser>;
 
 const SQL_GET_USER_BY_CRITERIA = sql<Record<string, never>, UserSafe>(`
   SELECT 
@@ -32,14 +44,24 @@ const userQuerySchema = userContactDetailsSchema.pick({
   full_name: true,
   phone_number: true
 }).partial();
-type UserSearchParams = z.infer<typeof userQuerySchema>;
 
-export default (router: Router) => {
-  router.get<{ entity: string }, UserSafe[], Record<string, never>, UserSearchParams>(
-    '/:entity',
-    authMiddleware(),
-    validateRequest({ query: userQuerySchema }),
-    async (req, res) => {
+const getUserByCriteria = (router: Router) => {
+  router.route({
+    method: 'get',
+    path: '/:entity',
+    summary: 'Get a user by criteria',
+    schema: {
+      query: userQuerySchema,
+      params: z.object({
+        entity: z.string()
+      })
+    },
+    response: {
+      schema: z.array(safeUser),
+      statusCode: 200
+    },
+    middlewares: [authMiddleware()],
+    handler: async (req, res) => {
       const targetUser = req.params.entity;
       const { full_name, phone_number } = req.query;
 
@@ -67,12 +89,16 @@ export default (router: Router) => {
       }
 
       if (full_name) {
-        filterArgs.fullName = full_name;
+        filterArgs.fullName = Array.isArray(full_name)
+          ? full_name[0] as string
+          : full_name as string;
         filters.push('user_contact_details.full_name = :fullName');
       }
 
       if (phone_number) {
-        filterArgs.phoneNumber = phone_number;
+        filterArgs.phoneNumber = Array.isArray(phone_number)
+          ? phone_number[0] as string
+          : phone_number as string;
         filters.push('user_contact_details.phone_number = :phoneNumber');
       }
 
@@ -83,5 +109,7 @@ export default (router: Router) => {
       const users = await query.many();
       res.json(users);
     }
-  );
+  });
 };
+
+export default getUserByCriteria;

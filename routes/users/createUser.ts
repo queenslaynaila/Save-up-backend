@@ -1,9 +1,7 @@
-import { Router } from 'express';
 import bcrypt from 'bcrypt';
 import { z } from 'zod';
 import { sql } from '../../db';
-import validateRequest from '../../middleware/validationMiddleware';
-import { StatusCodeInterface } from '../../globalTypes';
+import Router from '../../router';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { userContactDetailsSchema, UserRole, userSchema } from './types';
 
@@ -26,18 +24,23 @@ const SQL_CREATE_USER = sql<UserCreation, Record<string, never>>(`
 const userDetails = userCreationSchema.extend({
   pin: z.number()
 });
-type UserDetails = z.infer<typeof userDetails>;
 
-export default (router: Router) => {
-  router.post<Record<string, never>, StatusCodeInterface, UserDetails, Record<string, never>>(
-    '/',
-    validateRequest({ body: userCreationSchema }),
-    async (req, res) => {
+const createUser = (router: Router) => {
+  router.route({
+    method: 'post',
+    path: '/',
+    summary: 'Create a new user',
+    schema: {
+      body: userDetails
+    },
+    response: {
+      statusCode: 201
+    },
+    handler: async (req, res) => {
       if (!req.body.role) {
         req.body.role = UserRole.USER;
       }
       const pinHash = bcrypt.hashSync(String(req.body.pin), 12);
-
       await SQL_CREATE_USER({
         ...req.body,
         pin: pinHash
@@ -47,8 +50,9 @@ export default (router: Router) => {
         }
         throw (err);
       });
-
       res.sendStatus(201);
     }
-  );
+  });
 };
+
+export default createUser;

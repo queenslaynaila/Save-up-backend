@@ -1,13 +1,14 @@
-import { Router, Request } from 'express';
+import { Request } from 'express';
 import bcrypt from 'bcrypt';
 import { z } from 'zod';
 import { sql } from '../../db';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { generateToken } from '../../middleware/generatetoken';
-import validateRequest from '../../middleware/validationMiddleware';
 import { userSchema, loginAttemptSchema, userContactDetailsSchema } from './types';
+import Router from '../../router';
+import { safeUser } from './getUserByCriteria';
 
-const loggedInUser = userSchema.pick({
+export const loggedInUser = userSchema.pick({
   id: true,
   id_type: true,
   id_number: true,
@@ -110,14 +111,21 @@ const authSchema = z.object({
   phone_number: userContactDetailsSchema.shape.phone_number,
   pin: userSchema.shape.pin
 });
-type Authorization = z.infer<typeof authSchema>;
-export type UserSafe = Omit<User, 'pin'>;
 
-export default (router: Router) => {
-  router.post<Record<string, never>, UserSafe, Authorization, Record<string, never>>(
-    '/login',
-    validateRequest({ body: authSchema }),
-    async (req, res) => {
+const login = (router: Router) => {
+  router.route({
+    method: 'post',
+    path: '/login',
+    summary: 'Let an existing user login',
+    schema: {
+      body: authSchema
+    },
+    response: {
+      description: 'All user details',
+      statusCode: 201,
+      schema: safeUser
+    },
+    handler: async (req, res) => {
       const { pin, ...user } = await SQL_GET_USER({
         phone_number: req.body.phone_number
       }).one(new HttpError(401));
@@ -145,5 +153,7 @@ export default (router: Router) => {
         .setHeader('authorization-token', accessToken)
         .json(user);
     }
-  );
+  });
 };
+
+export default login;

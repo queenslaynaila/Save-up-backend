@@ -1,15 +1,20 @@
-import { Router } from 'express';
 import authMiddleware from '../../middleware/authorization';
-import { StatusCodeInterface } from '../../globalTypes';
+import Router from '../../router';
 
-export default (router: Router) => {
-  router.delete<Record<string, never>, StatusCodeInterface, Record<string, never>,
-  Record<string, never>>(
-    '/logout',
-    authMiddleware(),
-    async (_req, res) => {
+const logout = (router: Router) => {
+  router.route({
+    method: 'delete',
+    path: '/logout',
+    summary: 'Logout a user',
+    response: {
+      statusCode: 204
+    },
+    middlewares: [authMiddleware()],
+    handler: async (req, res) => {
       res.removeHeader('authorization-token');
       res.sendStatus(204);
     }
-  );
+  });
 };
+
+export default logout;

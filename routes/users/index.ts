@@ -1,20 +1,18 @@
-import { Router } from 'express';
 import createUser from './createUser';
 import login from './login';
 import getUserByCriteria from './getUserByCriteria';
 import updateUserAttributes from './updateId';
 import updateUserRole from './updateUserRole';
 import logout from './logout';
+import Router from '../../router';
 
-export default (baseRouter: Router) => {
-  const router = Router();
+const router = Router.getInstance('/users', 'Users');
 
-  createUser(router);
-  login(router);
-  getUserByCriteria(router);
-  updateUserRole(router);
-  updateUserAttributes(router);
-  logout(router);
+createUser(router);
+login(router);
+getUserByCriteria(router);
+updateUserRole(router);
+updateUserAttributes(router);
+logout(router);
 
-  baseRouter.use('/users', router);
-};
+export default router;

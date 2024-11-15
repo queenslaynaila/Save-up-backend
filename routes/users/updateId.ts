@@ -1,11 +1,10 @@
-import { Router } from 'express';
 import bcrypt from 'bcrypt';
 import { z } from 'zod';
 import { sql } from '../../db';
 import { HttpError } from '../../middleware/errorMiddleware';
 import authMiddleware from '../../middleware/authorization';
-import validateRequest from '../../middleware/validationMiddleware';
 import { userIdHistorySchema, userPhoneHistorySchema } from './types';
+import Router from '../../router';
 
 const updateIdSchema = userIdHistorySchema.pick({
   id_type: true,
@@ -20,8 +19,6 @@ const updatePhoneSchema = userPhoneHistorySchema.pick({
 
 const updateDetailsSchema = z.union([updateIdSchema, updatePhoneSchema]);
 
-type UpdateDetailsType = z.infer<typeof updateDetailsSchema>;
-
 const SQL_GET_USER_PIN = sql<{ id: number }, { pin: string }>(`
   SELECT pin FROM users WHERE id = :id
 `);
@@ -34,13 +31,25 @@ const SQL_UPDATE_ID_NUMBER = sql<{ id: number; id_type: string; id_number: strin
   SELECT * FROM update_id_number(:id, :id_type, :id_number)
 `);
 
-export default (router: Router) => {
-  router.patch<{ user_id:string }, { updated_attribute: string }, UpdateDetailsType,
-  Record<string, never>>(
-    '/:user_id',
-    authMiddleware(),
-    validateRequest({ body: updateDetailsSchema }),
-    async (req, res) => {
+const updateId = (router: Router) => {
+  router.route({
+    method: 'patch',
+    path: '/:user_id',
+    summary: 'Update a user\'s id number or phone number',
+    schema: {
+      params: z.object({
+        user_id: z.string()
+      }),
+      body: updateDetailsSchema
+    },
+    response: {
+      statusCode: 200,
+      schema: z.object({
+        updated_attribute: z.string()
+      })
+    },
+    middlewares: [authMiddleware()],
+    handler: async (req, res) => {
       const userIdParam = req.params.user_id;
       const id = userIdParam === 'me' ? req.user!.id : Number(userIdParam);
 
@@ -66,8 +75,9 @@ export default (router: Router) => {
         }).one();
         return res.json({ updated_attribute: updated_phone_number });
       }
-
       throw new HttpError(400);
     }
-  );
+  });
 };
+
+export default updateId;

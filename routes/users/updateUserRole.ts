@@ -1,11 +1,13 @@
-import { Router } from 'express';
 import { z } from 'zod';
 import { sql } from '../../db';
-import validateRequest from '../../middleware/validationMiddleware';
 import authMiddleware from '../../middleware/authorization';
 import { convertToTitleCase } from '../../middleware/caseNormalization';
 import { userContactDetailsSchema, UserRole } from './types';
 import { HttpError } from '../../middleware/errorMiddleware';
+import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
+import Router from '../../router';
+
+extendZodWithOpenApi(z);
 
 export const updatedUserSchema = userContactDetailsSchema.pick({
   full_name: true
@@ -20,14 +22,23 @@ const SQL_UPDATE_ROLE = sql<{ targetUserId: string, role:UserRole, adminId: numb
 `);
 
 const roleSchema = z.object({ role: z.nativeEnum(UserRole) });
-type RoleParams = z.infer<typeof roleSchema>;
 
-export default (router: Router) => {
-  router.patch<{ user_id:string }, UpdatedUser, RoleParams, Record<string, never>>(
-    '/:user_id/role',
-    authMiddleware({ roles: [UserRole.ADMIN] }),
-    validateRequest({ body: roleSchema }),
-    async (req, res) => {
+const updateUserRole = (router: Router) => {
+  router.route({
+    method: 'patch',
+    path: '/:user_id/role',
+    summary: 'Update a user\'s role',
+    schema: {
+      body: roleSchema,
+      params: z.object({
+        user_id: z.string()
+      }).openapi({ description: 'User ID' })
+    },
+    response: {
+      schema: updatedUserSchema
+    },
+    middlewares: [authMiddleware()],
+    handler: async (req, res) => {
       const userId = req.params.user_id;
       const role = convertToTitleCase(req.body.role);
 
@@ -44,5 +55,7 @@ export default (router: Router) => {
 
       res.json(user);
     }
-  );
+  });
 };
+
+export default updateUserRole;
