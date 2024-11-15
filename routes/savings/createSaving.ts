@@ -1,30 +1,32 @@
-import { Router } from 'express';
+import Router from '../../router';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import validateRequest from '../../middleware/validationMiddleware';
-import {
-  SavingCreateType,
-  savingPostRequestSchema,
-  SavingPostRequestType
-} from './types';
-import { StatusCodeInterface } from '../../globalTypes';
+import { SavingCreateType, savingPostRequestSchema } from './types';
 
 const SQL_CREATE_SAVING = sql<SavingCreateType, Record<string, never>>(`
   SELECT create_user_saving(:user_id, :pocket_id, :amount)
 `);
 
-export default (router: Router) => {
-  router.post<Record<string, never>, StatusCodeInterface, SavingPostRequestType,
-  Record<string, never>>(
-    '/',
-    validateRequest({ body: savingPostRequestSchema }),
-    authMiddleware(),
-    async (req, res) => {
+const createSaving = (router: Router) => {
+  router.route({
+    method: 'post',
+    path: '/',
+    summary: 'Create a saving',
+    schema: {
+      body: savingPostRequestSchema
+    },
+    response: {
+      statusCode: 201
+    },
+    middlewares: [authMiddleware()],
+    handler: async (req, res) => {
       await SQL_CREATE_SAVING({
         ...req.body,
         user_id: req.user!.id
       }).exec();
       res.sendStatus(201);
     }
-  );
+  });
 };
+
+export default createSaving;

@@ -1,8 +1,7 @@
-import { Router } from 'express';
+import Router from '../../router';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import { QueryParams, Totals } from './types';
-// All Savings made by user since he joined the app
+import { Totals, totalSavings } from './types';
 
 const SQL_GET_TOTAL_SAVINGS = sql<{user_id:number, type_id:number}, Totals>(`
   SELECT 
@@ -14,16 +13,20 @@ const SQL_GET_TOTAL_SAVINGS = sql<{user_id:number, type_id:number}, Totals>(`
     AND type_id = :type_id;
 `);
 
-export default (router: Router) => {
-  router.get<Record<string, never>, Totals, Record<string, never>,
-  QueryParams>(
-    '/totals',
-    authMiddleware(),
-    async (req, res) => {
+const gettotalSavings = (router: Router) => {
+  router.route({
+    method: 'get',
+    path: '/totals',
+    summary: 'Get total savings',
+    response: {
+      schema: totalSavings
+    },
+    middlewares: [authMiddleware()],
+    handler: async (req, res) => {
       const filters: string[] = [];
       const filterArgs: Record<string, string> = {};
 
-      const { start_date, end_date } = req.query;
+      const { start_date, end_date } = req.query as { start_date?: string, end_date?: string };
 
       if (start_date && end_date) {
         filterArgs.start_date = start_date;
@@ -40,5 +43,7 @@ export default (router: Router) => {
 
       res.json(await query.one());
     }
-  );
+  });
 };
+
+export default gettotalSavings;

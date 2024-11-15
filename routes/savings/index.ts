@@ -1,16 +1,14 @@
-import express from 'express';
 import createSaving from './createSaving';
 import getSavingsByCriteria from './getSavingsByCriteria';
 import totalSavings from './totalSavings';
-import availableSavings from './availableSavings';
+import getAvailableSavings from './availableSavings';
+import Router from '../../router';
 
-export default (baseRouter: express.Router) => {
-  const router = express.Router();
+const router = Router.getInstance('/savings', 'Savings');
 
-  createSaving(router);
-  getSavingsByCriteria(router);
-  totalSavings(router);
-  availableSavings(router);
+createSaving(router);
+getSavingsByCriteria(router);
+totalSavings(router);
+getAvailableSavings(router);
 
-  baseRouter.use('/savings', router);
-};
+export default router;

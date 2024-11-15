@@ -11,6 +11,7 @@ import './routes/withdrawals/index';
 import './routes/userCumulatives/index';
 import './routes/transfers/index';
 import './routes/securityAnswer/index';
+import './routes/savings/index';
 
 const app = Router.getInstance('/').app;
 

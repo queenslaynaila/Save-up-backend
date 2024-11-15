@@ -1,11 +1,10 @@
-import { Router } from 'express';
+import Router from '../../router';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { HttpError } from '../../middleware/errorMiddleware';
-import { Balance } from './types';
+import { Balance, availableSavings } from './types';
 import { GetByUserInterface } from '../../globalTypes';
 
-// current balance across all pockets
 const SQL_GET_AVAILABLE_SAVINGS = sql<GetByUserInterface, Balance>(`
     SELECT COALESCE(SUM(balance), 0) AS available_savings
     FROM (
@@ -16,16 +15,22 @@ const SQL_GET_AVAILABLE_SAVINGS = sql<GetByUserInterface, Balance>(`
     ) AS current_balance_per_pocket;
 `);
 
-export default (router: Router) => {
-  router.get<Record<string, never>, Balance, Record<string, never>,
-  Record<string, never>>(
-    '/current-savings',
-    authMiddleware(),
-    async (req, res) => {
+const getAvailableSavings = (router: Router) => {
+  router.route({
+    method: 'get',
+    path: '/current-savings',
+    summary: 'Get current balance across all pockets',
+    response: {
+      schema: availableSavings
+    },
+    middlewares: [authMiddleware()],
+    handler: async (req, res) => {
       const result = await SQL_GET_AVAILABLE_SAVINGS({
         user_id: req.user!.id
       }).one(new HttpError(404));
       return res.json(result);
     }
-  );
+  });
 };
+
+export default getAvailableSavings;
