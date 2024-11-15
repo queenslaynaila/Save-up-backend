@@ -1,18 +1,16 @@
-import { Router } from 'express';
+import Router from '../../router';
 import authMiddleware from '../../middleware/authorization';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { sql } from '../../db';
 import {
   PocketUpdateType,
   BasePocketType,
-  PocketPatchType
+  pocketPatchRequestSchema
 } from './types';
 import {
   entitySchema,
-  IdParamInterface,
   idParamSchema
 } from '../../globalTypes';
-import validateRequest from '../../middleware/validationMiddleware';
 
 const SQL_UPDATE_POCKET = sql<PocketUpdateType, BasePocketType>(`
   UPDATE pockets
@@ -34,15 +32,20 @@ const SQL_UPDATE_POCKET = sql<PocketUpdateType, BasePocketType>(`
             target_at
 `);
 
-export default (router: Router) => {
-  router.patch<IdParamInterface, BasePocketType, PocketPatchType, Record<string, never>>(
-    '/:id',
-    validateRequest({
+const updatePocket = (router: Router) => {
+  router.route({
+    method: 'patch',
+    path: '/:id',
+    summary: 'Update pocket',
+    schema: {
       params: idParamSchema,
-      body: entitySchema
-    }),
-    authMiddleware(),
-    async (req, res) => {
+      body: pocketPatchRequestSchema
+    },
+    response: {
+      schema: entitySchema
+    },
+    middlewares: [authMiddleware()],
+    handler: async (req, res) => {
       const entity_id = req.body.entity_id ?? req.user!.id;
       const { name, category_id, target_amount, priority, target_at, pocket_type } = req.body;
       const goal = await SQL_UPDATE_POCKET({
@@ -57,5 +60,7 @@ export default (router: Router) => {
       }).one(new HttpError(404));
       return res.json(goal);
     }
-  );
+  });
 };
+
+export default updatePocket;

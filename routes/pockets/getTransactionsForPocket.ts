@@ -1,14 +1,16 @@
-import { Router } from 'express';
+import Router from '../../router';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import { transactionBody, TransactionBody } from './types';
+import { transactionBody } from './types';
 import {
   TransactionByUser,
   BaseTransaction,
-  TransactionQueryParams,
+  baseTransaction,
   transactionQueryParams
 } from '../usertransactions/types';
-import validateRequest from '../../middleware/validationMiddleware';
+import { z } from 'zod';
+import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
+extendZodWithOpenApi(z);
 
 const SQL_GET_TRANSACTIONS = sql<TransactionByUser, BaseTransaction>(`
   SELECT 
@@ -28,35 +30,47 @@ const SQL_GET_TRANSACTIONS = sql<TransactionByUser, BaseTransaction>(`
     transactions.created_at DESC
 `);
 
-export default (router: Router) => {
-  router.get<TransactionBody, BaseTransaction[], Record<string, never>,
-  TransactionQueryParams>(
-    '/:pocket_id/transactions',
-    validateRequest({
-      params: transactionBody,
-      query: transactionQueryParams
-    }),
-    authMiddleware(),
-    async (req, res) => {
+const getTransactionsForPocket = (router: Router) => {
+  router.route({
+    method: 'get',
+    path: '/:pocket_id/transactions',
+    summary: 'Get transactions for a pocket',
+    middlewares: [authMiddleware()],
+    schema: {
+      query: transactionQueryParams,
+      params: transactionBody
+    },
+    response: {
+      schema: z.array(baseTransaction)
+    },
+    handler: async (req, res) => {
       const { transaction_type, from_date, to_date } = req.query;
       const filters: string[] = [];
       const filterArgs: Record<string, string > = {};
 
       if (transaction_type) {
-        filterArgs.transaction_type = transaction_type;
+        filterArgs.transaction_type = Array.isArray(transaction_type)
+          ? String(transaction_type[0])
+          : String(transaction_type);
         filters.push('transaction_type = :transaction_type');
       }
       if (from_date && to_date) {
-        filterArgs.from_date = from_date;
-        filterArgs.to_date = to_date;
+        filterArgs.from_date = Array.isArray(from_date)
+          ? from_date[0] as string
+          : from_date as string;
+        filterArgs.to_date = Array.isArray(to_date) ? to_date[0] as string : to_date as string;
         filters.push('transaction_date BETWEEN :from_date AND :to_date');
       } else {
         if (from_date) {
-          filterArgs.from_date = from_date;
+          filterArgs.from_date = Array.isArray(from_date)
+            ? from_date[0] as string
+            : from_date as string;
           filters.push('transaction_date >= :from_date');
         }
         if (to_date) {
-          filterArgs.to_date = to_date;
+          filterArgs.to_date = Array.isArray(to_date)
+            ? to_date[0] as string
+            : to_date as string;
           filters.push('transaction_date <= :to_date');
         }
       }
@@ -70,5 +84,7 @@ export default (router: Router) => {
 
       return res.json(await query.many());
     }
-  );
+  });
 };
+
+export default getTransactionsForPocket;

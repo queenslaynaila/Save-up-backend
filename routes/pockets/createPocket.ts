@@ -1,8 +1,7 @@
-import { Router } from 'express';
+import Router from '../../router';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import validateRequest from '../../middleware/validationMiddleware';
-import { PocketCreateType, BasePocketType, pocketCreateSchema } from './types';
+import { PocketCreateType, BasePocketType, basePocketSchema } from './types';
 
 const SQL_CREATE_POCKET = sql<PocketCreateType, BasePocketType>(`
   INSERT INTO pockets (entity_id, xid, category_id, name, priority, pocket_type, target_amount, target_at)
@@ -29,16 +28,27 @@ const SQL_CREATE_POCKET = sql<PocketCreateType, BasePocketType>(`
             completed_at
 `);
 
-export default (router: Router) => {
-  router.post<Record<string, never>, BasePocketType, BasePocketType,
-  Record<string, never>>(
-    '/',
-    validateRequest({ body: pocketCreateSchema }),
-    authMiddleware(),
-    async (req, res) => {
+const createPocket = (router: Router) => {
+  router.route({
+    method: 'post',
+    path: '/',
+    summary: 'Create a pocket',
+    schema: {
+      body: basePocketSchema
+    },
+    response: {
+      schema: basePocketSchema
+    },
+    middlewares: [authMiddleware()],
+    handler: async (req, res) => {
       const entity_id = req.body?.entity_id ?? req.user!.id;
-      const newPocket = await SQL_CREATE_POCKET({ ...req.body, entity_id }).one();
+      const newPocket = await SQL_CREATE_POCKET({
+        ...req.body,
+        entity_id
+      }).one();
       return res.json(newPocket);
     }
-  );
+  });
 };
+
+export default createPocket;

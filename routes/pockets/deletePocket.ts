@@ -1,30 +1,27 @@
-import { Router } from 'express';
+import Router from '../../router';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import {
-  EntityInterface,
-  entitySchema,
-  IdParamInterface,
-  idParamSchema,
-  StatusCodeInterface
-} from '../../globalTypes';
-import validateRequest from '../../middleware/validationMiddleware';
+import { entitySchema, idParamSchema } from '../../globalTypes';
 import { HttpError } from '../../middleware/errorMiddleware';
 
 const SQL_DELETE_POCKET = sql<{pocket_id: number, entity_id: number}, Record<string, never>>(`
   SELECT delete_pocket(:entity_id, :pocket_id)
 `);
 
-export default (router: Router) => {
-  router.delete<IdParamInterface, StatusCodeInterface, EntityInterface,
-  Record<string, never>>(
-    '/:id',
-    validateRequest({
+const deletePocket = (router: Router) => {
+  router.route({
+    method: 'delete',
+    path: '/:id',
+    summary: 'Delete a pocket',
+    schema: {
       params: idParamSchema,
       body: entitySchema
-    }),
-    authMiddleware(),
-    async (req, res) => {
+    },
+    response: {
+      statusCode: 204
+    },
+    middlewares: [authMiddleware()],
+    handler: async (req, res) => {
       const entity_id = req.body?.entity_id ?? req.user!.id;
       await SQL_DELETE_POCKET({
         entity_id,
@@ -36,5 +33,7 @@ export default (router: Router) => {
       });
       res.sendStatus(204);
     }
-  );
+  });
 };
+
+export default deletePocket;

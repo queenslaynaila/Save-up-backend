@@ -13,6 +13,7 @@ import './routes/transfers/index';
 import './routes/securityAnswer/index';
 import './routes/savings/index';
 import './routes/ratifications/index';
+import './routes/pockets/index';
 
 const app = Router.getInstance('/').app;
 
