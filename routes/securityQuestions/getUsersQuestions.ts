@@ -1,7 +1,8 @@
-import { Router } from 'express';
+import { z } from 'zod';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import { SecurityQuestions } from './getAllSecurityQuestions';
+import Router from '../../router';
+import { SecurityQuestions, securityQuestions } from './getAllSecurityQuestions';
 
 const SQL_GET_USER_SECURITY_QUESTIONS = sql<{user_id:number}, SecurityQuestions>(`
   SELECT 
@@ -13,16 +14,22 @@ const SQL_GET_USER_SECURITY_QUESTIONS = sql<{user_id:number}, SecurityQuestions>
   WHERE security_answers.user_id = :user_id
 `);
 
-export default (router: Router) => {
-  router.get<Record<string, never>, SecurityQuestions[], Record<string, never>,
-  Record<string, never>>(
-    '/me/',
-    authMiddleware(),
-    async (req, res) => {
-      const securityQuestions = await SQL_GET_USER_SECURITY_QUESTIONS({
+const getUserSecurityQuestions = (router: Router) => {
+  router.route({
+    method: 'get',
+    path: '/me/',
+    summary: 'Get user security questions',
+    response: {
+      schema: z.array(securityQuestions)
+    },
+    middlewares: [authMiddleware()],
+    handler: async (req, res) => {
+      const questions = await SQL_GET_USER_SECURITY_QUESTIONS({
         user_id: req.user!.id
       }).many();
-      return res.json(securityQuestions);
+      return res.json(questions);
     }
-  );
+  });
 };
+
+export default getUserSecurityQuestions;

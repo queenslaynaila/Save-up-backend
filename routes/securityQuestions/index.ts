@@ -1,12 +1,10 @@
-import { Router } from 'express';
 import getAllSecurityQuestions from './getAllSecurityQuestions';
 import getUsersQuestions from './getUsersQuestions';
+import Router from '../../router';
 
-export default (baseRouter: Router) => {
-  const router = Router();
+const router = Router.getInstance('/security-questions', 'Security Questions');
 
-  getAllSecurityQuestions(router);
-  getUsersQuestions(router);
+getAllSecurityQuestions(router);
+getUsersQuestions(router);
 
-  baseRouter.use('/security-questions', router);
-};
+export default router;
