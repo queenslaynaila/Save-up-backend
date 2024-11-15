@@ -10,7 +10,7 @@ export const transactionByGroup = z.object({
 export type TransactionByGroup = z.infer<typeof transactionByGroup>
 
 export const baseTransaction = z.object({
-  transaction_id: z.number().positive(),
+  transaction_id: z.number(),
   transaction_type: z.enum([
     transactionType.SAVING,
     transactionType.EXTERNAL_SAVING,
@@ -19,7 +19,7 @@ export const baseTransaction = z.object({
     transactionType.TRANSFER_OUT
   ]),
   amount: z.number(),
-  current_balance: z.number().positive(),
+  current_balance: z.number(),
   transaction_date: z.date()
 });
 

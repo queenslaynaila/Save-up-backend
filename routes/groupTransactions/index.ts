@@ -1,12 +1,10 @@
-import express from 'express';
+import Router from '../../router';
 import getTransactions from './getTransactions';
 import getTransactionDetails from './getTransactionById';
 
-export default (baseRouter: express.Router) => {
-  const router = express.Router();
+const router = Router.getInstance('/group-transactions', 'Group Transactions');
 
-  getTransactions(router);
-  getTransactionDetails(router);
+getTransactions(router);
+getTransactionDetails(router);
 
-  baseRouter.use('/group-transactions', router);
-};
+export default router;
