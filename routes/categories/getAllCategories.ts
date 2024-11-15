@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { baseCategorySchema } from './schema';
 import { sql } from '../../db';
 import Router from '../../router';
+import authMiddleware from '../../middleware/authorization';
 
 const categorySchema = baseCategorySchema.pick({
   id: true,
@@ -22,15 +23,10 @@ const getAllCategories = (router: Router) => {
     method: 'get',
     path: '/',
     summary: 'Get list of categories',
-    description: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-
-    Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-
-    Curabitur pretium tincidunt lacus. Nulla gravida orci a odio. Nullam varius, turpis et commodo pharetra, est eros bibendum elit, nec luctus magna felis sollicitudin mauris. Integer in mauris eu nibh euismod gravida. Duis ac tellus et risus vulputate vehicula. Nulla sit amet est at nulla gravida ullamcorper. Integer velit nulla, tincidunt at velit vel, ultricies rutrum felis. Vivamus auctor mauris vitae est malesuada, sed fermentum magna venenatis.
-`,
     response: {
       schema: z.array(categorySchema)
     },
+    middlewares: [authMiddleware()],
     handler: async (req, res) => {
       const categories = await SQL_GET_ALL_CATEGORIES({}).many();
       res.json(categories);
