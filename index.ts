@@ -8,6 +8,7 @@ import './routes/categories/index';
 import './routes/securityQuestions/index';
 import './routes/users/index';
 import './routes/withdrawals/index';
+import './routes/userCumulatives/index';
 const app = Router.getInstance('/').app;
 
 app.use((_, res, next) => {

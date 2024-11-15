@@ -1,7 +1,8 @@
-import { Router } from 'express';
+import Router from '../../router';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import { TopExpenseCategoriesInterface, UserCumulaInterface } from './types';
+import { TopExpenseCategoriesInterface, topExpenseCategoriesSchema, UserCumulaInterface } from './types';
+import { z } from 'zod';
 
 const SQL_GET_TOP_EXPENDITURE_CATEGORIES = sql<
 UserCumulaInterface, TopExpenseCategoriesInterface
@@ -17,15 +18,21 @@ UserCumulaInterface, TopExpenseCategoriesInterface
   ORDER BY total_expense DESC
 `);
 
-export default (router: Router) => {
-  router.get<Record<string, never>, TopExpenseCategoriesInterface[],
-  Record<string, never>, Record<string, never>>(
-    '/top-expenditure-categories',
-    authMiddleware(),
-    async (req, res) => {
+const getTopExpenseCategories = (router: Router) => {
+  router.route({
+    method: 'get',
+    path: '/top-expenditure-categories',
+    summary: 'Get top expense categories',
+    response: {
+      schema: z.array(topExpenseCategoriesSchema)
+    },
+    middlewares: [authMiddleware()],
+    handler: async (req, res) => {
       const user_id = req.user!.id;
       const result = await SQL_GET_TOP_EXPENDITURE_CATEGORIES({ user_id }).many();
       res.json(result);
     }
-  );
+  });
 };
+
+export default getTopExpenseCategories;

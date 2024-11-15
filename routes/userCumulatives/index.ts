@@ -1,12 +1,10 @@
-import express from 'express';
 import getTotalUserExpenditure from './getTotalUserExpenditure';
 import getTopExpenseCategories from './getTopExpenseCategories';
+import Router from '../../router';
 
-export default (baseRouter: express.Router) => {
-  const router = express.Router();
+const router = Router.getInstance('/cumulatives', 'Cumulatives');
 
-  getTotalUserExpenditure(router);
-  getTopExpenseCategories(router);
+getTotalUserExpenditure(router);
+getTopExpenseCategories(router);
 
-  baseRouter.use('/cumulatives', router);
-};
+export default router;

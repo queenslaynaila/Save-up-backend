@@ -1,10 +1,11 @@
-import { Router } from 'express';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { HttpError } from '../../middleware/errorMiddleware';
+import Router from '../../router';
 import {
   TotalExpenseInterface,
-  TotalExpenseQueryInterface,
+  totalExpenseResultSchema,
+  totalExpensesQuerySchema,
   UserCumulaInterface
 } from './types';
 
@@ -14,31 +15,46 @@ const SQL_GET_TOTAL_EXPENSES = sql<UserCumulaInterface, TotalExpenseInterface>(`
   WHERE entity_id = :user_id
 `);
 
-export default (router: Router) => {
-  router.get<Record<string, never>, TotalExpenseInterface, Record<string, never>,
-  TotalExpenseQueryInterface>(
-    '/total-expenses',
-    authMiddleware(),
-    async (req, res) => {
+const getTotalUserExpenditure = (router: Router) => {
+  router.route({
+    method: 'get',
+    path: '/total-expenses',
+    summary: 'Get total user expenditure',
+    schema: {
+      query: totalExpensesQuerySchema
+    },
+    response: {
+      schema: totalExpenseResultSchema
+    },
+    middlewares: [authMiddleware()],
+    handler: async (req, res) => {
       const user_id = req.user!.id;
       const { start_date, end_date, category_id } = req.query;
       const filters: string[] = [];
       const filterArgs: Record<string, string> = {};
       if (start_date) {
-        filterArgs.start_date = start_date;
+        filterArgs.start_date = Array.isArray(start_date)
+          ? start_date[0] as string
+          : start_date as string;
         filters.push('date >= :start_date');
       }
       if (end_date) {
-        filterArgs.end_date = end_date;
+        filterArgs.end_date = Array.isArray(end_date)
+          ? end_date[0] as string
+          : end_date as string;
         filters.push('date <= :end_date');
       }
       if (category_id) {
-        filterArgs.category_id = category_id;
+        filterArgs.category_id = Array.isArray(category_id)
+          ? category_id[0] as string
+          : category_id as string;
         filters.push('category_id = :categoryId');
       }
       const query = SQL_GET_TOTAL_EXPENSES({ user_id });
       if (filters.length > 0) query.extend(`AND ${filters.join(' AND ')}`, filterArgs);
       res.json(await query.one(new HttpError(500)));
     }
-  );
+  });
 };
+
+export default getTotalUserExpenditure;
