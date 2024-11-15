@@ -31,13 +31,13 @@ export const ApprovalStatusEnum = z.enum([
 ]);
 
 export const reviewedLoanSchema = z.object({
-  request_id: z.number().int().positive(),
-  initiator_id: z.number().int().positive(),
+  request_id: z.number().int(),
+  initiator_id: z.number().int(),
   borrower_name: z.string(),
-  group_id: z.number().int().positive(),
+  group_id: z.number().int(),
   group_name: z.string(),
-  pocket_id: z.number().int().positive(),
-  amount: z.number().positive(),
+  pocket_id: z.number().int(),
+  amount: z.number(),
   reason: z.string(),
   status: ApprovalStatusEnum
 });

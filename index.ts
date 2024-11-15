@@ -16,6 +16,7 @@ import './routes/ratifications/index';
 import './routes/pockets/index';
 import './routes/pin/index';
 import './routes/nextOfKin/index';
+import './routes/loans/index';
 
 const app = Router.getInstance('/').app;
 

@@ -1,9 +1,11 @@
-import { Router } from 'express';
+import Router from '../../router';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import validateRequest from '../../middleware/validationMiddleware';
-import { ReviewedLoan, ReviewedLoansParams } from './types';
-import { GetByGroupIdInterface, getByGroupId } from '../../globalTypes';
+import { ReviewedLoan, reviewedLoanSchema, ReviewedLoansParams } from './types';
+import { z } from 'zod';
+import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
+
+extendZodWithOpenApi(z);
 
 const SQL_GET_APPLIED_LOANS = sql<ReviewedLoansParams, ReviewedLoan>(`
     SELECT
@@ -33,12 +35,21 @@ const SQL_GET_APPLIED_LOANS = sql<ReviewedLoansParams, ReviewedLoan>(`
         AND debit_requests.type_id = :type_id;
 `);
 
-export default (router: Router) => {
-  router.get<Record<string, never>, ReviewedLoan[], GetByGroupIdInterface, Record<string, never>>(
-    '/',
-    validateRequest({ body: getByGroupId }),
-    authMiddleware(),
-    async (req, res) => {
+const getReviewedLoans = (router: Router) => {
+  router.route({
+    method: 'get',
+    path: '/',
+    summary: 'Get list of reviewed loans',
+    schema: {
+      body: z.object({
+        group_id: z.number()
+      })
+    },
+    response: {
+      schema: reviewedLoanSchema.array().openapi({ description: 'List of reviewed loans' })
+    },
+    middlewares: [authMiddleware()],
+    handler: async (req, res) => {
       const loans = await SQL_GET_APPLIED_LOANS({
         ...req.body,
         user_id: req.user!.id,
@@ -46,5 +57,7 @@ export default (router: Router) => {
       }).many();
       return res.json(loans);
     }
-  );
+  });
 };
+
+export default getReviewedLoans;
