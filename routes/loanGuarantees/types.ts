@@ -1,9 +1,9 @@
 import { z } from 'zod';
 
 export const baseGuaranteeSchema = z.object({
-  group_id: z.number().int().positive(),
-  request_id: z.number().int().positive(),
-  user_id: z.number().int().positive(),
+  group_id: z.number().int(),
+  request_id: z.number().int(),
+  user_id: z.number().int(),
   approval: z.boolean()
 });
 
@@ -22,7 +22,7 @@ export const loanRequestSchema = baseGuaranteeSchema.pick({
   group_name: z.string(),
   borrower_id: z.number().int(),
   borrower_name: z.string().min(1),
-  amount: z.number().positive(),
+  amount: z.number(),
   purpose: z.string(),
   repayment_period: z.string() // Assuming INTERVAL is represented as a string in the request
 });

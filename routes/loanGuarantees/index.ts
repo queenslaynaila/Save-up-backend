@@ -1,12 +1,8 @@
-import express from 'express';
+import Router from '../../router';
 import guaranteeLoan from './guaranteeLoan';
 import getGuarantorRequests from './getGuarantorRequests';
 
-export default (baseRouter: express.Router) => {
-  const router = express.Router();
+const router = Router.getInstance('/guarantors', 'Guarantors');
 
-  guaranteeLoan(router);
-  getGuarantorRequests(router);
-
-  baseRouter.use('/guarantors', router);
-};
+guaranteeLoan(router);
+getGuarantorRequests(router);

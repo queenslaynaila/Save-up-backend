@@ -1,7 +1,7 @@
-import { Router } from 'express';
+import Router from '../../router';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import { LoanRequest } from './types';
+import { LoanRequest, loanRequestSchema } from './types';
 import { GetByUserInterface } from '../../globalTypes';
 
 interface GuarantorRequest extends GetByUserInterface {
@@ -40,17 +40,23 @@ const SQL_GET_UNGUARANTEED_LOAN_REQUESTS = sql<GuarantorRequest, LoanRequest>(`
       AND debit_requests.type_id = :type_id;
 `);
 
-export default (router: Router) => {
-  router.get<Record<string, never>, LoanRequest[], Record<string, never>,
-  Record<string, never>>(
-    '/:guarantor_id/requests',
-    authMiddleware(),
-    async (req, res) => {
+const getGuarantorRequests = (router: Router) => {
+  router.route({
+    method: 'get',
+    path: '/:guarantor_id/requests',
+    summary: 'Get list of loan requests that require guarantor approval',
+    response: {
+      schema: loanRequestSchema.array()
+    },
+    middlewares: [authMiddleware()],
+    handler: async (req, res) => {
       const loan_requests = await SQL_GET_UNGUARANTEED_LOAN_REQUESTS({
         user_id: req.user!.id,
         type_id: 1
       }).many();
       res.json(loan_requests);
     }
-  );
+  });
 };
+
+export default getGuarantorRequests;
