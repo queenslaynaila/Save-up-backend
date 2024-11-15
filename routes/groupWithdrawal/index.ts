@@ -1,10 +1,8 @@
-import { Router } from 'express';
+import Router from '../../router';
 import createWithdrawal from './createGroupWithdrawal';
 
-export default (baseRouter: Router) => {
-  const router = Router();
+const router = Router.getInstance('/group-withdrawals', 'Group Withdrawals');
 
-  createWithdrawal(router);
+createWithdrawal(router);
 
-  baseRouter.use('/group-withdrawals', router);
-};
+export default router;

@@ -1,13 +1,7 @@
-import { Router } from 'express';
+import Router from '../../router';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import validateRequest from '../../middleware/validationMiddleware';
-import {
-  WithdrawalRequest,
-  WithdrawalValidation,
-  withdrawalValidation
-} from './types';
-import { StatusCodeInterface } from '../../globalTypes';
+import { WithdrawalRequest, withdrawalValidation } from './types';
 
 const SQL_INITIATE_GRP_WITHDRAWAL = sql<WithdrawalRequest, Record<string, never>>(`
   SELECT initiate_grp_withdrawal(
@@ -15,20 +9,26 @@ const SQL_INITIATE_GRP_WITHDRAWAL = sql<WithdrawalRequest, Record<string, never>
   )
 `);
 
-export default (router: Router) => {
-  router.post<Record<string, never>, StatusCodeInterface, WithdrawalValidation,
-  Record<string, never>>(
-    '/',
-    validateRequest({
+const createGroupWithdrawal = (router: Router) => {
+  router.route({
+    method: 'post',
+    path: '/',
+    summary: 'Create a group withdrawal request',
+    response: {
+      statusCode: 201
+    },
+    schema: {
       body: withdrawalValidation
-    }),
-    authMiddleware(),
-    async (req, res) => {
+    },
+    middlewares: [authMiddleware()],
+    handler: async (req, res) => {
       await SQL_INITIATE_GRP_WITHDRAWAL({
         ...req.body,
         initiator_id: req.user!.id
       }).exec();
       res.sendStatus(201);
     }
-  );
+  });
 };
+
+export default createGroupWithdrawal;
