@@ -9,6 +9,8 @@ import './routes/securityQuestions/index';
 import './routes/users/index';
 import './routes/withdrawals/index';
 import './routes/userCumulatives/index';
+import './routes/transfers/index';
+
 const app = Router.getInstance('/').app;
 
 app.use((_, res, next) => {

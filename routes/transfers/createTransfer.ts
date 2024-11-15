@@ -1,13 +1,7 @@
-import { Router } from 'express';
+import Router from '../../router';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import validateRequest from '../../middleware/validationMiddleware';
-import {
-  TransferInput,
-  TransferValidation,
-  transferValidationSchema
-} from './types';
-import { StatusCodeInterface } from '../../globalTypes';
+import { TransferInput, transferValidationSchema } from './types';
 import { HttpError } from '../../middleware/errorMiddleware';
 
 const SQL_CREATE_TRANSFER = sql<TransferInput, Record<string, never>>(`
@@ -20,15 +14,19 @@ const SQL_CREATE_TRANSFER = sql<TransferInput, Record<string, never>>(`
   )
 `);
 
-export default (router: Router) => {
-  router.post<Record<string, never>, StatusCodeInterface, TransferValidation,
-  Record<string, never>>(
-    '/',
-    validateRequest({
+const createTransfer = (router: Router) => {
+  router.route({
+    method: 'post',
+    path: '/',
+    summary: 'Create a transfer',
+    schema: {
       body: transferValidationSchema
-    }),
-    authMiddleware(),
-    async (req, res) => {
+    },
+    response: {
+      statusCode: 201
+    },
+    middlewares: [authMiddleware()],
+    handler: async (req, res) => {
       const entity_id = req.body.entity_id ?? req.user!.id;
       await SQL_CREATE_TRANSFER({
         ...req.body, entity_id, user_id: req.user!.id
@@ -39,5 +37,7 @@ export default (router: Router) => {
       });
       res.sendStatus(201);
     }
-  );
+  });
 };
+
+export default createTransfer;

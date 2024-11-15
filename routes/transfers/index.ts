@@ -1,10 +1,8 @@
-import { Router } from 'express';
 import createTransfer from './createTransfer';
+import Router from '../../router';
 
-export default (baseRouter: Router) => {
-  const router = Router();
+const router = Router.getInstance('/transfers', 'Transfers');
 
-  createTransfer(router);
+createTransfer(router);
 
-  baseRouter.use('/transfers', router);
-};
+export default router;
