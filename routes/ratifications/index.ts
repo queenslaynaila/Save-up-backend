@@ -1,10 +1,8 @@
-import { Router } from 'express';
+import Router from '../../router';
 import createRatification from './createRatification';
 
-export default (baseRouter: Router) => {
-  const router = Router();
+const router = Router.getInstance('/ratifications', 'Ratifications');
 
-  createRatification(router);
+createRatification(router);
 
-  baseRouter.use('/ratifications', router);
-};
+export default router;
