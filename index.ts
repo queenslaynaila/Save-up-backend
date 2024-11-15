@@ -1,14 +1,12 @@
-import express, { NextFunction, Request, Response } from 'express';
-import { generateOpenApiSpec } from './router';
+import { NextFunction, Request, Response } from 'express';
+import Router, { generateOpenApiSpec } from './router';
 import swaggerUi from 'swagger-ui-express';
 import cors from 'cors';
 import morgan from 'morgan';
-import categoryRoutes from './routes/categories/index';
 import { HttpError } from './middleware/errorMiddleware';
-const app = express();
+import './routes/categories/index';
+const app = Router.getInstance('/').app;
 
-app.use(express.urlencoded({ extended: false, limit: '10mb' }));
-app.use(express.json());
 app.use((_, res, next) => {
   res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
   next();
@@ -17,11 +15,9 @@ app.use(
   cors({
     origin: ['http://localhost:5173'],
     credentials: true,
-    exposedHeaders: ['authorization-token', 'reset-token']
+    exposedHeaders: ['authorization-token']
   })
 );
-
-app.use('/categories', categoryRoutes.getRouter());
 
 morgan.token('error', (req: Request, res: Response) => {
   return res.locals.errorMessage || '';
@@ -52,7 +48,6 @@ app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
   return res.sendStatus(500);
 });
 
-// Start Express server
 app.listen(3000, () => {
   console.log('Server is running on http://localhost:3000');
 });

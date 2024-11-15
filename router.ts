@@ -1,5 +1,6 @@
+/* eslint-disable no-use-before-define */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Router as ExpressRouter, Request, Response, NextFunction } from 'express';
+import express, { Router as ExpressRouter, Request, Response, NextFunction, Application } from 'express';
 import { AnyZodObject, ZodSchema } from 'zod';
 import { OpenApiGeneratorV3, OpenAPIRegistry } from '@asteasolutions/zod-to-openapi';
 import fastJson from 'fast-json-stringify';
@@ -37,8 +38,6 @@ const validateRequest = (schema: {
   };
 };
 
-export const registry = new OpenAPIRegistry();
-
 interface RouterOptions {
   method: 'get' | 'post' | 'patch' | 'delete';
   path: string;
@@ -58,16 +57,33 @@ interface RouterOptions {
   handler: (req: Request, res: Response, next: NextFunction) => void;
 }
 
+const registry = new OpenAPIRegistry();
+
 class Router {
-  private router: ExpressRouter = ExpressRouter();
+  private static INSTANCE: Router;
+
+  public app: Application;
+
+  private router: ExpressRouter;
 
   private prefix: string;
 
   private tag?: string;
 
-  constructor(prefix: string, tag?: string) {
+  private constructor(prefix: string, tag?: string) {
+    this.app = express();
+    this.router = ExpressRouter();
     this.prefix = prefix;
     this.tag = tag;
+
+    this.app.use(this.prefix, this.router);
+  }
+
+  public static getInstance(prefix: string, tag?: string): Router {
+    if (!Router.INSTANCE) {
+      Router.INSTANCE = new Router(prefix, tag);
+    }
+    return Router.INSTANCE;
   }
 
   public route(options: RouterOptions) {
@@ -99,8 +115,7 @@ class Router {
         }
       }
     });
-
-    console.log(`Registering ${method.toUpperCase()} ${this.prefix}${path}`);
+    console.log(`Registered ${method.toUpperCase()} ${this.prefix}${path}`);
 
     if (responseSchema) {
       const jsonResponseSchema: any = zodToJsonSchema(responseSchema, { target: 'openApi3' });
@@ -117,24 +132,7 @@ class Router {
 
     this.router[method](path, ...middlewares, handler);
   }
-
-  public getRouter(): ExpressRouter {
-    return this.router;
-  }
 }
-
-registry.registerComponent(
-  'securitySchemes',
-  'authorization-token',
-  {
-    name: 'authorization-token',
-    type: 'apiKey',
-    scheme: 'Bearer',
-    bearerFormat: 'JWT',
-    in: 'header',
-    description: 'JWT authorizatiion using the bearer scheme'
-  }
-);
 
 export const generateOpenApiSpec = () => {
   const generator = new OpenApiGeneratorV3(registry.definitions);
@@ -147,5 +145,16 @@ export const generateOpenApiSpec = () => {
     }
   });
 };
+
+registry.registerComponent(
+  'securitySchemes',
+  'authorization-token',
+  {
+    type: 'apiKey',
+    name: 'authorization-token',
+    in: 'header',
+    description: 'JWT authorization using the Bearer scheme'
+  }
+);
 
 export default Router;

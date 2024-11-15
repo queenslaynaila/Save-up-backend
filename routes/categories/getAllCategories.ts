@@ -22,8 +22,12 @@ const getAllCategories = (router: Router) => {
     method: 'get',
     path: '/',
     summary: 'Get list of categories',
-    description: `Par1\n Retrieve a list of all categories available in the system. Each category includes an ID, name, description, and image URL.
-This is the second paragraph of the description.`,
+    description: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
+    Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
+    Curabitur pretium tincidunt lacus. Nulla gravida orci a odio. Nullam varius, turpis et commodo pharetra, est eros bibendum elit, nec luctus magna felis sollicitudin mauris. Integer in mauris eu nibh euismod gravida. Duis ac tellus et risus vulputate vehicula. Nulla sit amet est at nulla gravida ullamcorper. Integer velit nulla, tincidunt at velit vel, ultricies rutrum felis. Vivamus auctor mauris vitae est malesuada, sed fermentum magna venenatis.
+`,
     response: {
       schema: z.array(categorySchema)
     },
@@ -34,20 +38,4 @@ This is the second paragraph of the description.`,
   });
 };
 
-const createCategory = (router: Router) => {
-  router.route({
-    method: 'post',
-    path: '/',
-    summary: 'Get list of categories',
-    description: `Par1\n Retrieve a list of all categories available in the system. Each category includes an ID, name, description, and image URL.
-This is the second paragraph of the description.`,
-    response: {
-      schema: z.array(categorySchema)
-    },
-    handler: async (req, res) => {
-      res.json({ me: 'test' });
-    }
-  });
-};
-
-export { getAllCategories, createCategory };
+export default getAllCategories;
