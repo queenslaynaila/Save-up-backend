@@ -1,7 +1,7 @@
-import { Router } from 'express';
+import Router from '../../router';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import { NextOfKin } from './createNextOfKin';
+import { NextOfKin, nextOfKinSchema } from './createNextOfKin';
 
 const SQL_GET_KIN = sql<{user_id:number}, NextOfKin>(`
   SELECT xid, full_name, relationship, phone_number, created_at
@@ -10,15 +10,22 @@ const SQL_GET_KIN = sql<{user_id:number}, NextOfKin>(`
   AND deleted_at is null
 `);
 
-export default (router: Router) => {
-  router.get<Record<string, never>, NextOfKin, Record<string, never>, Record<string, never>>(
-    '/',
-    authMiddleware(),
-    async (req, res) => {
+const getNextOfKin = (router: Router) => {
+  router.route({
+    method: 'get',
+    path: '/',
+    summary: 'Get next of kin',
+    response: {
+      schema: nextOfKinSchema
+    },
+    middlewares: [authMiddleware()],
+    handler: async (req, res) => {
       const nextOfKin = await SQL_GET_KIN({
         user_id: req.user!.id
       }).oneOrNull();
       return res.json(nextOfKin);
     }
-  );
+  });
 };
+
+export default getNextOfKin;

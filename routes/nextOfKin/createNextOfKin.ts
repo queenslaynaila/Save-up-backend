@@ -1,9 +1,8 @@
-import { Router } from 'express';
+import Router from '../../router';
 import { z } from 'zod';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { HttpError } from '../../middleware/errorMiddleware';
-import validateRequest from '../../middleware/validationMiddleware';
 import { baseNextOfKinSchema } from './schema';
 
 const kinCreationSchema = baseNextOfKinSchema.pick({
@@ -14,7 +13,7 @@ const kinCreationSchema = baseNextOfKinSchema.pick({
 
 type NextOfKinCreation = z.infer<typeof kinCreationSchema>;
 
-const nextOfKinSchema = baseNextOfKinSchema.pick({
+export const nextOfKinSchema = baseNextOfKinSchema.pick({
   xid: true,
   full_name: true,
   relationship: true,
@@ -37,19 +36,26 @@ const SQL_CREATE_KIN = sql<NextOfKinCreation & { user_id: number }, NextOfKin>(`
   RETURNING xid, full_name, relationship, phone_number, created_at;
 `);
 
-export default (router: Router) => {
-  router.post<Record<string, never>, NextOfKin, NextOfKinCreation, Record<string, never>>(
-    '/',
-    validateRequest({
+const createNextOfKin = (router: Router) => {
+  router.route({
+    method: 'post',
+    path: '/',
+    summary: 'Create next of kin',
+    schema: {
       body: kinCreationSchema
-    }),
-    authMiddleware(),
-    async (req, res) => {
+    },
+    response: {
+      schema: nextOfKinSchema
+    },
+    middlewares: [authMiddleware()],
+    handler: async (req, res) => {
       const nextOfKin = await SQL_CREATE_KIN({
         ...req.body,
         user_id: req.user!.id
       }).one(new HttpError(400));
       return res.json(nextOfKin);
     }
-  );
+  });
 };
+
+export default createNextOfKin;

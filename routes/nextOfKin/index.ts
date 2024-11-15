@@ -1,14 +1,12 @@
-import express from 'express';
+import Router from '../../router';
 import createNextOfKin from './createNextOfKin';
 import getNextOfKin from './getNextOfKin';
 import deleteNextOfKin from './deleteNextOfKin';
 
-export default (baseRouter: express.Router) => {
-  const router = express.Router();
+const router = Router.getInstance('/next-of-kin', 'Next of Kin');
 
-  createNextOfKin(router);
-  getNextOfKin(router);
-  deleteNextOfKin(router);
+createNextOfKin(router);
+getNextOfKin(router);
+deleteNextOfKin(router);
 
-  baseRouter.use('/next-of-kin', router);
-};
+export default router;

@@ -1,12 +1,9 @@
-import { Router } from 'express';
+import Router from '../../router';
 import createLoanRequest from './createLoanRequest';
 import getLoans from './getReviewedLoans';
 
-export default (baseRouter: Router) => {
-  const router = Router();
+const router = Router.getInstance('/loans', 'Loans');
+createLoanRequest(router);
+getLoans(router);
 
-  createLoanRequest(router);
-  getLoans(router);
-
-  baseRouter.use('/loans', router);
-};
+export default router;
