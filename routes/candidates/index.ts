@@ -1,12 +1,10 @@
-import express from 'express';
 import createCandidates from './createCandidates';
 import getCandidates from './getCandidates';
+import Router from '../../router';
 
-export default (baseRouter: express.Router) => {
-  const router = express.Router();
+const router = Router.getInstance('/candidates', 'Candidates');
 
-  createCandidates(router);
-  getCandidates(router);
+createCandidates(router);
+getCandidates(router);
 
-  baseRouter.use('/candidates', router);
-};
+export default router;
