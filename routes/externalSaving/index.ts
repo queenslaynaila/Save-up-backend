@@ -1,10 +1,8 @@
-import express from 'express';
+import Router from '../../router';
 import createExternalSaving from './createExSaving';
 
-export default (baseRouter: express.Router) => {
-  const router = express.Router();
+const router = Router.getInstance('/externalSaving', 'External Saving');
 
-  createExternalSaving(router);
+createExternalSaving(router);
 
-  baseRouter.use('/donations', router);
-};
+export default router;
