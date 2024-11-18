@@ -33,7 +33,7 @@ import './routes/admin/index';
 import './routes/userCumulatives/index';
 import './routes/ratifications/index';
 
-const app = Router.getInstance('/').app;
+const app = Router.getAppInstance();
 
 app.use((_, res, next) => {
   res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');

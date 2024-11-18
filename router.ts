@@ -62,7 +62,7 @@ const registry = new OpenAPIRegistry();
 class Router {
   private static instances: Map<string, Router> = new Map();
 
-  public app: Application;
+  private static app: Application = express();
 
   private router: ExpressRouter;
 
@@ -71,12 +71,11 @@ class Router {
   private tag?: string;
 
   private constructor(prefix: string, tag?: string) {
-    this.app = express();
     this.router = ExpressRouter();
     this.prefix = prefix;
     this.tag = tag;
 
-    this.app.use(this.prefix, this.router);
+    Router.app.use(this.prefix, this.router);
   }
 
   public static getInstance(prefix: string, tag?: string): Router {
@@ -86,10 +85,12 @@ class Router {
     return Router.instances.get(prefix)!;
   }
 
+  public static getAppInstance(): Application {
+    return Router.app;
+  }
+
   public route(options: RouterOptions) {
     const { method, path, schema, response, middlewares = [], handler } = options;
-
-    console.log(`Registering route ${method.toUpperCase()} ${this.prefix}${path}`);
 
     if (schema) {
       middlewares.push(validateRequest(schema));
