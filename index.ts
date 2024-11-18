@@ -76,6 +76,6 @@ app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
   return res.sendStatus(500);
 });
 
-app.listen(3000, () => {
-  console.log('Server is running on http://localhost:3000');
+app.listen(3003, () => {
+  console.log('Server is running on http://localhost:3003');
 });
