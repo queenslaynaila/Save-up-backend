@@ -1,28 +1,34 @@
-import { Router } from 'express';
+import Router from '../../router';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import {
-  GroupsByUserInterface,
   groupsByUserSchema,
   RemovedMember,
+  removedMemberSchema,
   RemoveMemberInterface
 } from './types';
-import { IdParamInterface } from '../../globalTypes';
-import validateRequest from '../../middleware/validationMiddleware';
+import { z } from 'zod';
 
 const SQL_REMOVE_GROUP_MBR = sql<RemoveMemberInterface, RemovedMember>(`
   SELECT * FROM remove_user_from_group (:id, :admin_id, :user_id);
 `);
 
-export default (router: Router) => {
-  router.delete<IdParamInterface, RemovedMember, GroupsByUserInterface,
-  Record<string, never>>(
-    '/remove-member/:id',
-    validateRequest({
+const removeMember = (router:Router) => {
+  router.route({
+    method: 'delete',
+    path: '/remove_member/:id',
+    summary: 'Remove a group member',
+    schema: {
+      params: z.object({
+        id: z.string()
+      }),
       body: groupsByUserSchema
-    }),
-    authMiddleware(),
-    async (req, res) => {
+    },
+    response: {
+      schema: removedMemberSchema
+    },
+    middlewares: [authMiddleware()],
+    handler: async (req, res) => {
       const response = await SQL_REMOVE_GROUP_MBR({
         admin_id: req.user!.id,
         user_id: req.body.user_id,
@@ -30,5 +36,7 @@ export default (router: Router) => {
       }).one();
       res.json(response);
     }
-  );
+  });
 };
+
+export default removeMember;

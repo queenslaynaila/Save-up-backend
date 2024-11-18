@@ -1,7 +1,8 @@
-import { Router } from 'express';
+import Router from '../../router';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import { BaseGroupInterface, GroupsByUserInterface } from './types';
+import { BaseGroupInterface, baseGroupSchema, GroupsByUserInterface } from './types';
+import { z } from 'zod';
 
 const SQL_FETCH_USER_GROUPS = sql<GroupsByUserInterface, BaseGroupInterface >(`
   SELECT 
@@ -16,16 +17,22 @@ const SQL_FETCH_USER_GROUPS = sql<GroupsByUserInterface, BaseGroupInterface >(`
   AND groups.deleted_at IS NULL;
 `);
 
-export default (router: Router) => {
-  router.get<Record<string, never>, BaseGroupInterface[], Record<string, never>,
-  Record<string, never>>(
-    '/',
-    authMiddleware(),
-    async (req, res) => {
+const getUserGroups = (router:Router) => {
+  router.route({
+    method: 'get',
+    path: '/',
+    summary: 'Get groups a user belongs to',
+    response: {
+      schema: z.array(baseGroupSchema)
+    },
+    middlewares: [authMiddleware()],
+    handler: async (req, res) => {
       const groups = await SQL_FETCH_USER_GROUPS({
         user_id: req.user!.id
       }).many();
       return res.json(groups);
     }
-  );
+  });
 };
+
+export default getUserGroups;

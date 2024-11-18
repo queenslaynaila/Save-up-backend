@@ -1,28 +1,33 @@
-import { Router } from 'express';
+import Router from '../../router';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import validateRequest from '../../middleware/validationMiddleware';
 import {
   groupCreationValidation,
-  GroupCreationValidation,
-  GroupUpdateInterface
+  GroupUpdateInterface,
+  groupUpdateSchema
 } from './types';
-import { IdParamInterface, idParamSchema } from '../../globalTypes';
+import { z } from 'zod';
 
 const SQL_UPDATE_GROUP = sql<GroupUpdateInterface, GroupUpdateInterface>(`
    SELECT * FROM update_group_name(:id, :user_id, :name)
 `);
 
-export default (router: Router) => {
-  router.patch<IdParamInterface, GroupUpdateInterface, GroupCreationValidation,
-  Record<string, never>>(
-    '/:id',
-    validateRequest({
-      params: idParamSchema,
+const updateGroup = (router:Router) => {
+  router.route({
+    method: 'patch',
+    path: '/:id',
+    summary: 'Update group details',
+    schema: {
+      params: z.object({
+        id: z.string()
+      }),
       body: groupCreationValidation
-    }),
-    authMiddleware(),
-    async (req, res) => {
+    },
+    response: {
+      schema: groupUpdateSchema
+    },
+    middlewares: [authMiddleware()],
+    handler: async (req, res) => {
       const updatedGroup = await SQL_UPDATE_GROUP({
         ...req.body,
         id: Number(req.params.id),
@@ -30,5 +35,7 @@ export default (router: Router) => {
       }).one();
       res.json(updatedGroup);
     }
-  );
+  });
 };
+
+export default updateGroup;

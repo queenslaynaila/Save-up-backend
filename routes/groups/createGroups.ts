@@ -1,32 +1,42 @@
-import { Router } from 'express';
+import Router from '../../router';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import validateRequest from '../../middleware/validationMiddleware';
 import {
   GroupCreationInterface,
   groupCreationValidation,
   BaseGroupInterface,
-  GroupCreationValidation
+  baseGroupSchema
 } from './types';
+import { z } from 'zod';
 
 const SQL_CREATE_GROUP = sql<GroupCreationInterface, BaseGroupInterface>(`
     SELECT * FROM create_group(:name, :created_by )
 `);
 
-export default (router: Router) => {
-  router.post<Record<string, never>, BaseGroupInterface, GroupCreationValidation,
-  Record<string, never>>(
-    '/',
-    validateRequest({
+const createGroup = (router:Router) => {
+  router.route({
+    method: 'post',
+    path: '/',
+    summary: 'Create a group',
+    schema: {
+      params: z.object({
+        id: z.string()
+      }),
       body: groupCreationValidation
-    }),
-    authMiddleware(),
-    async (req, res) => {
+    },
+    response: {
+      schema: baseGroupSchema,
+      statusCode: 201
+    },
+    middlewares: [authMiddleware()],
+    handler: async (req, res) => {
       const group = await SQL_CREATE_GROUP({
         ...req.body,
         created_by: req.user!.id
       }).one();
       res.json(group);
     }
-  );
+  });
 };
+
+export default createGroup;

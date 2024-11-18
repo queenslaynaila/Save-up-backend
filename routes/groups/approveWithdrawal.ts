@@ -1,34 +1,31 @@
-import { Router } from 'express';
+import Router from '../../router';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import validateRequest from '../../middleware/validationMiddleware';
-import {
-  ApproveWithdrawal,
-  withdrawal,
-  Withdrawal
-} from './types';
-import {
-  IdParamInterface,
-  idParamSchema,
-  StatusCodeInterface
-} from '../../globalTypes';
+import { ApproveWithdrawal, withdrawal } from './types';
+import { z } from 'zod';
 
 const SQL_APPROVE_GRP_WITHDRAWAL = sql<ApproveWithdrawal, Record<string, never>>(`
     SELECT approve_group_withdrawal(
-       :group_id, :admin_id, :election_id, :withdrawal_id, :status, :reason
+      :group_id, :admin_id, :election_id, :withdrawal_id, :status, :reason
     )
 `);
 
-export default (router: Router) => {
-  router.post<IdParamInterface, StatusCodeInterface, Withdrawal,
-  Record<string, never>>(
-    '/approve-withdrawal/:id',
-    validateRequest({
-      params: idParamSchema,
+const approveWithdrawal = (router:Router) => {
+  router.route({
+    method: 'post',
+    path: '/approve-withdrawal/:id',
+    summary: 'Approve withdrwawal',
+    schema: {
+      params: z.object({
+        id: z.string()
+      }),
       body: withdrawal
-    }),
-    authMiddleware(),
-    async (req, res) => {
+    },
+    response: {
+      statusCode: 201
+    },
+    middlewares: [authMiddleware()],
+    handler: async (req, res) => {
       await SQL_APPROVE_GRP_WITHDRAWAL({
         ...req.body,
         group_id: Number(req.params.id),
@@ -36,5 +33,7 @@ export default (router: Router) => {
       }).exec();
       res.sendStatus(201);
     }
-  );
+  });
 };
+
+export default approveWithdrawal;

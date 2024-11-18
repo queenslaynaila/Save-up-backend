@@ -1,28 +1,35 @@
-import { Router } from 'express';
+import Router from '../../router';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import { IdParamInterface, idParamSchema } from '../../globalTypes';
-import { GroupMemberInterface } from './types';
-import validateRequest from '../../middleware/validationMiddleware';
+import { GroupMemberInterface, groupMemberSchema } from './types';
+import { z } from 'zod';
 
 const SQL_GET_GROUP_MEMBERS = sql<{ group_id: number, user_id:number}, GroupMemberInterface>(`
   SELECT * FROM get_group_members(:group_id, :user_id)
 `);
 
-export default (router: Router) => {
-  router.get<IdParamInterface, GroupMemberInterface[], Record<string, never>,
-  Record<string, never>>(
-    '/:id',
-    validateRequest({
-      params: idParamSchema
-    }),
-    authMiddleware(),
-    async (req, res) => {
+const getGroupMembers = (router:Router) => {
+  router.route({
+    method: 'get',
+    path: '/:id',
+    schema: {
+      params: z.object({
+        id: z.string()
+      })
+    },
+    response: {
+      schema: groupMemberSchema
+    },
+    summary: 'Get group members',
+    middlewares: [authMiddleware()],
+    handler: async (req, res) => {
       const group_id = Number(req.params.id);
       const members = await SQL_GET_GROUP_MEMBERS({
         group_id, user_id: req.user!.id
       }).many();
       return res.json(members);
     }
-  );
+  });
 };
+
+export default getGroupMembers;

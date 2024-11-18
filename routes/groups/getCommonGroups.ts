@@ -1,9 +1,12 @@
-import { Router } from 'express';
+import Router from '../../router';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import { IdParamInterface, idParamSchema } from '../../globalTypes';
-import { BaseGroupInterface, SharedGroupInterface } from './types';
-import validateRequest from '../../middleware/validationMiddleware';
+import {
+  BaseGroupInterface,
+  baseGroupSchema,
+  SharedGroupInterface
+} from './types';
+import { z } from 'zod';
 
 const SQL_GET_COMMON_GROUPS = sql<SharedGroupInterface, BaseGroupInterface>(`
   SELECT groups.id AS group_id, 
@@ -19,15 +22,22 @@ const SQL_GET_COMMON_GROUPS = sql<SharedGroupInterface, BaseGroupInterface>(`
   AND groups.deleted_at IS NULL;
 `);
 
-export default (router: Router) => {
-  router.get<IdParamInterface, BaseGroupInterface[], Record<string, never>,
-  Record<string, never>>(
-    '/:id/common-groups',
-    validateRequest({
-      params: idParamSchema
-    }),
-    authMiddleware(),
-    async (req, res) => {
+const getCommonGroups = (router:Router) => {
+  router.route({
+    method: 'get',
+    path: '/:id/common-groups',
+    summary: 'View common groups between two users',
+    schema: {
+      params: z.object({
+        id: z.string()
+      })
+    },
+    response: {
+      schema: baseGroupSchema,
+      statusCode: 201
+    },
+    middlewares: [authMiddleware()],
+    handler: async (req, res) => {
       const logged_in_user_id = req.user!.id;
       const user_id = Number(req.params.id);
       const commonGroups = await SQL_GET_COMMON_GROUPS({
@@ -35,5 +45,7 @@ export default (router: Router) => {
       }).many();
       return res.json(commonGroups);
     }
-  );
+  });
 };
+
+export default getCommonGroups;
