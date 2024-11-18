@@ -24,6 +24,7 @@ import './routes/groupWithdrawal/index';
 import './routes/groupTransactions/index';
 import './routes/groups/index';
 import './routes/groupDeposits/index';
+import './routes/groupDebitApprovals/index';
 
 const app = Router.getInstance('/').app;
 

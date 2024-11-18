@@ -1,10 +1,8 @@
-import { Router } from 'express';
+import Router from '../../router';
 import approveWithdrawal from './approveWithdrawal';
 
-export default (baseRouter: Router) => {
-  const router = Router();
+const router = Router.getInstance('/group-withdrawal-approvals', 'Group Withdrawal Approvals');
 
-  approveWithdrawal(router);
+approveWithdrawal(router);
 
-  baseRouter.use('/group-withdrawal-approvals', router);
-};
+export default router;
