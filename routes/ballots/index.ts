@@ -1,12 +1,10 @@
-import express from 'express';
+import Router from '../../router';
 import createBallot from './createBallot';
 import getBallots from './computeBallot';
 
-export default (baseRouter: express.Router) => {
-  const router = express.Router();
+const router = Router.getInstance('/ballots', 'Ballots');
 
-  createBallot(router);
-  getBallots(router);
+createBallot(router);
+getBallots(router);
 
-  baseRouter.use('/ballots', router);
-};
+export default router;
