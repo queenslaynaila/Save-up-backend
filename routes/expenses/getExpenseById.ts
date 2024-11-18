@@ -1,16 +1,9 @@
-import { Router } from 'express';
+import Router from '../../router';
 import { sql } from '../../db';
 import { HttpError } from '../../middleware/errorMiddleware';
 import authMiddleware from '../../middleware/authorization';
 import { BaseExpenseInterface } from './types';
-import {
-  EntityInterface,
-  entitySchema,
-  IdParamInterface,
-  idParamSchema,
-  XidEntityInterface
-} from '../../globalTypes';
-import validateRequest from '../../middleware/validationMiddleware';
+import { entitySchema, idParamSchema, XidEntityInterface } from '../../globalTypes';
 
 const SQL_GET_EXPENSE_BY_ID = sql<XidEntityInterface, BaseExpenseInterface>(`
   SELECT xid, entity_id, category_id, description, amount, spent_at, created_at
@@ -20,16 +13,20 @@ const SQL_GET_EXPENSE_BY_ID = sql<XidEntityInterface, BaseExpenseInterface>(`
   AND deleted_at IS NULL
 `);
 
-export default (router: Router) => {
-  router.get<IdParamInterface, BaseExpenseInterface, EntityInterface,
-  Record<string, never>>(
-    '/:id',
-    authMiddleware(),
-    validateRequest({
+const getExpenseById = (router: Router) => {
+  router.route({
+    method: 'get',
+    path: '/:id',
+    summary: 'Get an expense by id',
+    schema: {
       params: idParamSchema,
       body: entitySchema
-    }),
-    async (req, res) => {
+    },
+    response: {
+      schema: entitySchema
+    },
+    middlewares: [authMiddleware()],
+    handler: async (req, res) => {
       const entity_id = req.body?.entity_id ?? req.user!.id;
       const result = await SQL_GET_EXPENSE_BY_ID({
         xid: Number(req.params.id),
@@ -37,5 +34,7 @@ export default (router: Router) => {
       }).one(new HttpError(404));
       return res.json(result);
     }
-  );
+  });
 };
+
+export default getExpenseById;

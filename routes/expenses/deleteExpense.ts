@@ -1,15 +1,7 @@
-import { Router } from 'express';
+import Router from '../../router';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import {
-  IdParamInterface,
-  XidEntityInterface,
-  StatusCodeInterface,
-  idParamSchema,
-  entitySchema,
-  EntityInterface
-} from '../../globalTypes';
-import validateRequest from '../../middleware/validationMiddleware';
+import { XidEntityInterface, idParamSchema, entitySchema } from '../../globalTypes';
 
 const SQL_DELETE_EXPENSE = sql<XidEntityInterface, Record<string, never>>(`
   UPDATE expenses
@@ -19,16 +11,20 @@ const SQL_DELETE_EXPENSE = sql<XidEntityInterface, Record<string, never>>(`
   AND deleted_at IS NULL
 `);
 
-export default (router: Router) => {
-  router.delete<IdParamInterface, StatusCodeInterface, EntityInterface,
-  Record<string, never>>(
-    '/:id',
-    authMiddleware(),
-    validateRequest({
+const deleteExpense = (router: Router) => {
+  router.route({
+    method: 'delete',
+    path: '/:id',
+    summary: 'Delete an expense',
+    schema: {
       params: idParamSchema,
       body: entitySchema
-    }),
-    async (req, res) => {
+    },
+    response: {
+      statusCode: 204
+    },
+    middlewares: [authMiddleware()],
+    handler: async (req, res) => {
       const entity_id = req.body?.entity_id ?? req.user!.id;
       await SQL_DELETE_EXPENSE({
         xid: Number(req.params.id),
@@ -36,5 +32,7 @@ export default (router: Router) => {
       }).exec();
       res.sendStatus(204);
     }
-  );
+  });
 };
+
+export default deleteExpense;

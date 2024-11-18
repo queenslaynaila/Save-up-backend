@@ -1,11 +1,11 @@
-import { Router } from 'express';
+import Router from '../../router';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import validateRequest from '../../middleware/validationMiddleware';
 import {
   ExpenseCreationInterface,
   BaseExpenseInterface,
-  expenseCreationSchema
+  expenseCreationSchema,
+  baseExpenseSchema
 } from './types';
 
 const SQL_CREATE_EXPENSES = sql<ExpenseCreationInterface, BaseExpenseInterface>(`
@@ -22,15 +22,20 @@ const SQL_CREATE_EXPENSES = sql<ExpenseCreationInterface, BaseExpenseInterface>(
   RETURNING entity_id, xid, category_id, description, amount, spent_at, created_at;
 `);
 
-export default (router: Router) => {
-  router.post<Record<string, never>, BaseExpenseInterface, ExpenseCreationInterface,
-  Record<string, never>>(
-    '/',
-    authMiddleware(),
-    validateRequest({
+const createExpense = (router: Router) => {
+  router.route({
+    method: 'post',
+    path: '/',
+    summary: 'Create an expense',
+    schema: {
       body: expenseCreationSchema
-    }),
-    async (req, res) => {
+    },
+    response: {
+      schema: baseExpenseSchema,
+      statusCode: 201
+    },
+    middlewares: [authMiddleware()],
+    handler: async (req, res) => {
       const entity_id = req.body.entity_id ?? req.user!.id;
       const { category_id, description, amount, spent_at } = req.body;
       const expense = await SQL_CREATE_EXPENSES({
@@ -42,5 +47,7 @@ export default (router: Router) => {
       }).one();
       return res.json(expense);
     }
-  );
+  });
 };
+
+export default createExpense;

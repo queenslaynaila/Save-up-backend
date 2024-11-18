@@ -1,16 +1,13 @@
-import { Router } from 'express';
+import Router from '../../router';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import {
   BaseExpenseInterface,
-  ExpenseQueryInterface,
+  baseExpenseSchema,
   expenseQuerySchema
 } from './types';
-import validateRequest from '../../middleware/validationMiddleware';
-import {
-  EntityInterface,
-  entitySchema
-} from '../../globalTypes';
+import { entitySchema } from '../../globalTypes';
+import { z } from 'zod';
 
 const SQL_GET_EXPENSES = sql<{ entity_id:number }, BaseExpenseInterface>(`
   SELECT entity_id, 
@@ -26,16 +23,20 @@ const SQL_GET_EXPENSES = sql<{ entity_id:number }, BaseExpenseInterface>(`
   AND deleted_at IS NULL
 `);
 
-export default (router: Router) => {
-  router.get<Record<string, never>, BaseExpenseInterface[], EntityInterface,
-  ExpenseQueryInterface>(
-    '/',
-    authMiddleware(),
-    validateRequest({
-      body: entitySchema,
-      query: expenseQuerySchema
-    }),
-    async (req, res) => {
+export const getExpensesByCriteria = (router: Router) => {
+  router.route({
+    method: 'get',
+    path: '/',
+    summary: 'Get list of expenses by criteria',
+    schema: {
+      query: expenseQuerySchema,
+      body: entitySchema
+    },
+    response: {
+      schema: z.array(baseExpenseSchema)
+    },
+    middlewares: [authMiddleware()],
+    handler: async (req, res) => {
       const entity_id = req.body?.entity_id ?? req.user!.id;
       const { category_id, start_date, end_date } = req.query;
 
@@ -43,20 +44,30 @@ export default (router: Router) => {
       const filters: string[] = [];
 
       if (category_id) {
-        filterArgs.category_id = category_id;
+        filterArgs.category_id = Array.isArray(category_id)
+          ? String(category_id[0])
+          : String(category_id);
         filters.push('category_id = :category_id');
       }
       if (start_date && end_date) {
-        filterArgs.start_date = start_date;
-        filterArgs.end_date = end_date;
+        filterArgs.start_date = Array.isArray(start_date)
+          ? start_date[0] as string
+          : start_date as string;
+        filterArgs.end_date = Array.isArray(end_date)
+          ? end_date[0] as string
+          : end_date as string;
         filters.push('DATE(created_at) BETWEEN :start_date AND :end_date');
       } else {
         if (start_date) {
-          filterArgs.start_date = start_date;
+          filterArgs.start_date = Array.isArray(start_date)
+            ? start_date[0] as string
+            : start_date as string;
           filters.push('DATE(created_at) >= :start_date');
         }
         if (end_date) {
-          filterArgs.end_date = end_date;
+          filterArgs.end_date = Array.isArray(end_date)
+            ? end_date[0] as string
+            : end_date as string;
           filters.push('DATE(created_at) <= :end_date');
         }
       }
@@ -67,5 +78,7 @@ export default (router: Router) => {
       const expenses = await query.many();
       res.json(expenses);
     }
-  );
+  });
 };
+
+export default getExpensesByCriteria;

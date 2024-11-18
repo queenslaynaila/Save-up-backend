@@ -1,14 +1,13 @@
-import { Router } from 'express';
+import Router from '../../router';
 import { sql } from '../../db';
 import { HttpError } from '../../middleware/errorMiddleware';
 import authMiddleware from '../../middleware/authorization';
-import validateRequest from '../../middleware/validationMiddleware';
-import { ExpenseBodyInterface,
+import {
   expenseBodySchema,
   ExpenseUpdateInterface,
   ExpenseUpdateRes
 } from './types';
-import { IdParamInterface, idParamSchema } from '../../globalTypes';
+import { z } from 'zod';
 
 const SQL_UPDATE_EXPENSE = sql<ExpenseUpdateInterface, ExpenseUpdateRes>(`
   UPDATE expenses
@@ -22,16 +21,22 @@ const SQL_UPDATE_EXPENSE = sql<ExpenseUpdateInterface, ExpenseUpdateRes>(`
   RETURNING category_id, description, amount, spent_at
 `);
 
-export default (router: Router) => {
-  router.patch<IdParamInterface, ExpenseUpdateRes, ExpenseBodyInterface,
-  Record<string, never>>(
-    '/:id',
-    authMiddleware(),
-    validateRequest({
-      params: idParamSchema,
+const updateExpense = (router: Router) => {
+  router.route({
+    method: 'patch',
+    path: '/:id',
+    summary: 'Update an expense',
+    schema: {
+      params: z.object({
+        id: z.string()
+      }),
       body: expenseBodySchema
-    }),
-    async (req, res) => {
+    },
+    response: {
+      schema: expenseBodySchema
+    },
+    middlewares: [authMiddleware()],
+    handler: async (req, res) => {
       const entity_id = req.body.entity_id ?? req.user!.id;
       const xid = Number(req.params.id);
       const { description, category_id, amount, spent_at } = req.body;
@@ -40,5 +45,7 @@ export default (router: Router) => {
       }).one(new HttpError(404));
       res.json(result);
     }
-  );
+  });
 };
+
+export default updateExpense;

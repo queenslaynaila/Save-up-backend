@@ -1,18 +1,16 @@
-import express from 'express';
+import Router from '../../router';
 import createExpense from './createExpense';
 import deleteExpense from './deleteExpense';
 import getExpensesById from './getExpenseById';
 import getExpensesByCriteria from './getExpensesByCriteria';
 import updateExpense from './updateExpense';
 
-export default (baseRouter: express.Router) => {
-  const router = express.Router();
+const router = Router.getInstance('/expenses', 'Expenses');
 
-  createExpense(router);
-  deleteExpense(router);
-  getExpensesById(router);
-  getExpensesByCriteria(router);
-  updateExpense(router);
+createExpense(router);
+deleteExpense(router);
+getExpensesById(router);
+getExpensesByCriteria(router);
+updateExpense(router);
 
-  baseRouter.use('/expenses', router);
-};
+export default router;
