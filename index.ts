@@ -76,6 +76,7 @@ app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
   return res.sendStatus(500);
 });
 
-app.listen(3003, () => {
-  console.log('Server is running on http://localhost:3003');
+const port: number = parseInt(process.env.PORT as string, 10);
+app.listen(port, () => {
+  console.log(`app listening on port ${port}`);
 });
