@@ -1,12 +1,10 @@
-import { Router } from 'express';
+import Router from '../../router';
 import createElections from './createElections';
 import getElections from './getElections';
 
-export default (baseRouter: Router) => {
-  const router = Router();
+const router = Router.getInstance('/elections', 'Elections');
 
-  createElections(router);
-  getElections(router);
+createElections(router);
+getElections(router);
 
-  baseRouter.use('/elections', router);
-};
+export default router;
