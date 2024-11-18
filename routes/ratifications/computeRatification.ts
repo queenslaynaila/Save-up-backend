@@ -1,12 +1,11 @@
-import { Router } from 'express';
+import Router from '../../router';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import validateRequest from '../../middleware/validationMiddleware';
 import {
   ratificationValidation,
   RatificationResultsInterface,
   ComputeRatificationInterface,
-  RatificationValidationInterface
+  ratificationResults
 } from './types';
 
 const SQL_COMPUTE_RATIFICATIONS = sql<ComputeRatificationInterface
@@ -14,20 +13,27 @@ const SQL_COMPUTE_RATIFICATIONS = sql<ComputeRatificationInterface
   SELECT * FROM compute_ratification_results(:p_group_id, :p_election_id, :p_user_id)
 `);
 
-export default (router: Router) => {
-  router.post<Record<string, never>, RatificationResultsInterface,
-  RatificationValidationInterface, Record<string, never>>(
-    '/',
-    validateRequest({
+const computeRatification = (router: Router) => {
+  router.route({
+    method: 'post',
+    path: '/',
+    summary: 'Compute ratifications',
+    schema: {
       body: ratificationValidation
-    }),
-    authMiddleware(),
-    async (req, res) => {
+    },
+    response: {
+      schema: ratificationResults,
+      statusCode: 201
+    },
+    middlewares: [authMiddleware()],
+    handler: async (req, res) => {
       await SQL_COMPUTE_RATIFICATIONS({
         ...req.body,
         user_id: req.user!.id
       }).exec();
       res.sendStatus(201);
     }
-  );
+  });
 };
+
+export default computeRatification;

@@ -31,6 +31,7 @@ import './routes/loanGuarantees/index';
 import './routes/loanApprovals/index';
 import './routes/admin/index';
 import './routes/userCumulatives/index';
+import './routes/ratifications/index';
 
 const app = Router.getInstance('/').app;
 
