@@ -20,6 +20,10 @@ import './routes/loans/index';
 import './routes/loanGuarantees/index';
 import './routes/loanApprovals/index';
 import './routes/invitations/index';
+import './routes/groupWithdrawal/index';
+import './routes/groupTransactions/index';
+import './routes/groups/index';
+import './routes/groupDeposits/index';
 
 const app = Router.getInstance('/').app;
 

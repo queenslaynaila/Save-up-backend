@@ -1,32 +1,32 @@
-import { Router } from 'express';
+import Router from '../../router';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import {
-  depositByGroup,
-  DepositByGroup,
-  GroupDeposit
-} from './types';
-import { StatusCodeInterface } from '../../globalTypes';
-import validateRequest from '../../middleware/validationMiddleware';
+import { depositByGroup, GroupDeposit } from './types';
 
 const SQL_CREATE_GROUP_DEPOSIT = sql<GroupDeposit, Record<string, never>>(`
-    SELECT * FROM create_group_deposit(:user_id, :group_id, :pocket_id, :amount)
+  SELECT * FROM create_group_deposit(:user_id, :group_id, :pocket_id, :amount)
 `);
 
-export default (router: Router) => {
-  router.post<Record<string, never>, StatusCodeInterface, DepositByGroup,
-  Record<string, never>>(
-    '/',
-    validateRequest({
+const createGroupDeposits = (router: Router) => {
+  router.route({
+    method: 'post',
+    path: '/',
+    summary: 'Deposit money to a group',
+    schema: {
       body: depositByGroup
-    }),
-    authMiddleware(),
-    async (req, res) => {
+    },
+    response: {
+      statusCode: 201
+    },
+    middlewares: [authMiddleware()],
+    handler: async (req, res) => {
       await SQL_CREATE_GROUP_DEPOSIT({
         ...req.body,
         user_id: req.user!.id
       }).exec();
       res.sendStatus(201);
     }
-  );
+  });
 };
+
+export default createGroupDeposits;

@@ -1,10 +1,8 @@
-import express from 'express';
+import Router from '../../router';
 import createGroupDeposit from './createGroupDeposit';
 
-export default (baseRouter: express.Router) => {
-  const router = express.Router();
+const router = Router.getInstance('/group-deposits', 'Group Deposits');
 
-  createGroupDeposit(router);
+createGroupDeposit(router);
 
-  baseRouter.use('/group-deposits', router);
-};
+export default router;
