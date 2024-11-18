@@ -1,10 +1,8 @@
-import { Router } from 'express';
+import Router from '../../router';
 import getFinancialStats from './getFinancialStats';
 
-export default (baseRouter: Router) => {
-  const router = Router();
+const router = Router.getInstance('/stats', 'Stats');
 
-  getFinancialStats(router);
+getFinancialStats(router);
 
-  baseRouter.use('/stats', router);
-};
+export default router;

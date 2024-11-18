@@ -30,6 +30,7 @@ import './routes/expenses/index';
 import './routes/elections/index';
 import './routes/candidates/index';
 import './routes/ballots/index';
+import './routes/admin/index';
 
 const app = Router.getInstance('/').app;
 

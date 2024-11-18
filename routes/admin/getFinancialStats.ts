@@ -1,15 +1,12 @@
-import { Router } from 'express';
+import Router from '../../router';
 import { sql } from '../../db';
-import { UserRole } from '../../globalTypes';
 import authMiddleware from '../../middleware/authorization';
 import { convertToTitleCase } from '../../middleware/caseNormalization';
 import { HttpError } from '../../middleware/errorMiddleware';
-import validateRequest from '../../middleware/validationMiddleware';
 import {
   FinancialStatsInterface,
-  StatsParamInterface,
+  financialStatsSchema,
   statsParamSchema,
-  StatsQueryInterface,
   ValidOperatorsEnum,
   ValidResourcesEnum,
   ValidStatusEnum
@@ -19,24 +16,25 @@ const SQL_GET_CUMULATIVES = (query: string) => sql<
 { operator: string; resource: string },
 FinancialStatsInterface>(query);
 
-export default (router: Router) => {
-  router.get<
-  StatsParamInterface,
-  FinancialStatsInterface,
-  Record<string, never>,
-  StatsQueryInterface
-  >(
-    '/:resource/:operator',
-    validateRequest({
-      params: statsParamSchema
-    }),
-    authMiddleware({ roles: [UserRole.ADMIN] }),
-    async (req, res) => {
+const getFinancialStats = (router: Router) => {
+  router.route({
+    method: 'get',
+    path: '/',
+    summary: 'Get financial statistics',
+    schema: {
+      query: statsParamSchema,
+      body: statsParamSchema
+    },
+    response: {
+      schema: financialStatsSchema
+    },
+    middlewares: [authMiddleware()],
+    handler: async (req, res) => {
       req.params.resource = req.params.resource.toLowerCase();
       req.params.operator = req.params.operator.toUpperCase();
       const { resource, operator } = req.params;
       const { user_id, priority, status, category_id, start_date, end_date } = req.query;
-      const formattedStatus = status ? convertToTitleCase(status) : '';
+      const formattedStatus = typeof status === 'string' ? convertToTitleCase(status) : '';
       if (!ValidResourcesEnum.safeParse(resource).success) {
         throw new HttpError(400);
       }
@@ -65,5 +63,7 @@ export default (router: Router) => {
       const result = await SQL_GET_CUMULATIVES(query)(values).one();
       res.json(result);
     }
-  );
+  });
 };
+
+export default getFinancialStats;
