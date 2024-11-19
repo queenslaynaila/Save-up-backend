@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
+import 'express-async-errors';
 import Router, { generateOpenApiSpec } from './router';
 import swaggerUi from 'swagger-ui-express';
 import cors from 'cors';
