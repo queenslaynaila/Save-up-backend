@@ -52,6 +52,7 @@ interface RouterOptions {
   path: string;
   summary: string;
   description?: string;
+  security?: Array<{ [key: string]: string[] }>;
   schema?: {
     body?: ZodSchema;
     query?: AnyZodObject;
@@ -100,7 +101,7 @@ class Router {
   }
 
   public route(options: RouterOptions) {
-    const { method, path, schema, response, middlewares = [], handler } = options;
+    const { method, path, schema, security = [], response, middlewares = [], handler } = options;
 
     if (schema) {
       middlewares.push(validateRequest(schema));
@@ -116,6 +117,7 @@ class Router {
       path: `${this.routePrefix}${path}`,
       summary: options.summary,
       description: options.description,
+      security,
       request: {
         params: schema?.params,
         body: schema?.body ? { content: { 'application/json': { schema: schema.body } } } : undefined,
