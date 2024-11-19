@@ -6,7 +6,6 @@ import { HttpError } from '../../middleware/errorMiddleware';
 import { generateToken } from '../../middleware/generatetoken';
 import { userSchema, loginAttemptSchema, userContactDetailsSchema } from './types';
 import Router from '../../router';
-import { safeUser } from './getUserByCriteria';
 
 export const loggedInUser = userSchema.pick({
   id: true,
@@ -20,7 +19,12 @@ export const loggedInUser = userSchema.pick({
   full_name: userContactDetailsSchema.shape.full_name,
   phone_number: userContactDetailsSchema.shape.phone_number
 });
+
 export type User = z.infer<typeof loggedInUser>;
+
+export const safeUser = loggedInUser.omit({
+  pin: true
+});
 
 const SQL_GET_USER = sql<{ phone_number: string }, User>(`
   SELECT 
