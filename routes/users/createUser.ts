@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { sql } from '../../db';
 import Router from '../../router';
 import { HttpError } from '../../middleware/errorMiddleware';
-import { userContactDetailsSchema, UserRole, userSchema } from './types';
+import { userContactDetailsSchema, userSchema } from './types';
 
 export const userCreationSchema = userSchema.pick({
   pin: true,
@@ -37,9 +37,7 @@ const createUser = (router: Router) => {
       statusCode: 201
     },
     handler: async (req, res) => {
-      if (!req.body.role) {
-        req.body.role = UserRole.USER;
-      }
+      console.log(req.body);
       const pinHash = bcrypt.hashSync(String(req.body.pin), 12);
       await SQL_CREATE_USER({
         ...req.body,
