@@ -1,7 +1,7 @@
 import createTransfer from './createTransfer';
 import Router from '../../router';
 
-const router = Router.getInstance('/transfers', 'Transfers');
+const router = Router.getRouterInstance('/transfers', 'Transfers');
 
 createTransfer(router);
 

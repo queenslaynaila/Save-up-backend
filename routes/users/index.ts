@@ -6,7 +6,7 @@ import updateUserRole from './updateUserRole';
 import logout from './logout';
 import Router from '../../router';
 
-const router = Router.getInstance('/users', 'Users');
+const router = Router.getRouterInstance('/users', 'Users');
 
 createUser(router);
 login(router);

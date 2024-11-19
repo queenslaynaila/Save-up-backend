@@ -1,7 +1,7 @@
 import getAllCategories from './getAllCategories';
 import Router from '../../router';
 
-const router = Router.getInstance('/categories', 'Categories');
+const router = Router.getRouterInstance('/categories', 'Categories');
 
 getAllCategories(router);
 

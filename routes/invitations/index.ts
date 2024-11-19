@@ -3,7 +3,7 @@ import sendInvite from './sendInvite';
 import getInvites from './getInvites';
 import updateInvites from './updateInvites';
 
-const router = Router.getInstance('/invitations', 'Invitations');
+const router = Router.getRouterInstance('/invitations', 'Invitations');
 
 sendInvite(router);
 getInvites(router);

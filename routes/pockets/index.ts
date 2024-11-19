@@ -5,7 +5,7 @@ import getPocketByCriteria from './getPocketByCriteria';
 import updatePocket from './updatePocket';
 import getTransactionsForPocket from './getTransactionsForPocket';
 
-const router = Router.getInstance('/pockets', 'Pockets');
+const router = Router.getRouterInstance('/pockets', 'Pockets');
 
 createPocket(router);
 deletePocket(router);

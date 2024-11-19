@@ -8,7 +8,7 @@ import approveWithdrawal from './approveWithdrawal';
 import leaveGroup from './leaveGroup';
 import removeMember from './removeMember';
 
-const router = Router.getInstance('/groups', 'Groups');
+const router = Router.getRouterInstance('/groups', 'Groups');
 
 createGroup(router);
 getUserGroups(router);

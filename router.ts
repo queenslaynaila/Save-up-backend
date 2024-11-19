@@ -1,6 +1,12 @@
 /* eslint-disable no-use-before-define */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import express, { Router as ExpressRouter, Request, Response, NextFunction, Application } from 'express';
+import express, {
+  Router as ExpressRouter,
+  Request,
+  Response,
+  NextFunction,
+  Application
+} from 'express';
 import { AnyZodObject, ZodSchema } from 'zod';
 import { OpenApiGeneratorV3, OpenAPIRegistry } from '@asteasolutions/zod-to-openapi';
 import fastJson from 'fast-json-stringify';
@@ -60,33 +66,33 @@ interface RouterOptions {
 const registry = new OpenAPIRegistry();
 
 class Router {
-  private static instances: Map<string, Router> = new Map();
-
   private static app: Application = express();
+
+  private static routerInstances: Map<string, Router> = new Map();
 
   private router: ExpressRouter;
 
-  private prefix: string;
+  private routePrefix: string;
 
-  private tag?: string;
+  private apiTag?: string;
 
-  private constructor(prefix: string, tag?: string) {
+  private constructor(routePrefix: string, apiTag?: string) {
     this.router = ExpressRouter();
-    this.prefix = prefix;
-    this.tag = tag;
+    this.routePrefix = routePrefix;
+    this.apiTag = apiTag;
 
-    Router.app.use(this.prefix, this.router);
-  }
-
-  public static getInstance(prefix: string, tag?: string): Router {
-    if (!Router.instances.has(prefix)) {
-      Router.instances.set(prefix, new Router(prefix, tag));
-    }
-    return Router.instances.get(prefix)!;
+    Router.app.use(this.routePrefix, this.router);
   }
 
   public static getAppInstance(): Application {
     return Router.app;
+  }
+
+  public static getRouterInstance(routePrefix: string, apiTag?: string): Router {
+    if (!Router.routerInstances.has(routePrefix)) {
+      Router.routerInstances.set(routePrefix, new Router(routePrefix, apiTag));
+    }
+    return Router.routerInstances.get(routePrefix)!;
   }
 
   public route(options: RouterOptions) {
@@ -101,9 +107,9 @@ class Router {
     const description = response?.description || 'Success';
 
     registry.registerPath({
-      tags: this.tag ? [this.tag] : undefined,
+      tags: this.apiTag ? [this.apiTag] : undefined,
       method,
-      path: `${this.prefix}${path}`,
+      path: `${this.routePrefix}${path}`,
       summary: options.summary,
       description: options.description,
       request: {

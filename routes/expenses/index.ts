@@ -5,7 +5,7 @@ import getExpensesById from './getExpenseById';
 import getExpensesByCriteria from './getExpensesByCriteria';
 import updateExpense from './updateExpense';
 
-const router = Router.getInstance('/expenses', 'Expenses');
+const router = Router.getRouterInstance('/expenses', 'Expenses');
 
 createExpense(router);
 deleteExpense(router);

@@ -1,7 +1,7 @@
 import createWithdrawal from './createWithdrawal';
 import Router from '../../router';
 
-const router = Router.getInstance('/withdrawals', 'Withdrawal');
+const router = Router.getRouterInstance('/withdrawals', 'Withdrawal');
 
 createWithdrawal(router);
 

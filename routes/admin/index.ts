@@ -1,7 +1,7 @@
 import Router from '../../router';
 import getFinancialStats from './getFinancialStats';
 
-const router = Router.getInstance('/stats', 'Stats');
+const router = Router.getRouterInstance('/stats', 'Stats');
 
 getFinancialStats(router);
 
