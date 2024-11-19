@@ -25,7 +25,10 @@ const validateSchema = (schema: ZodSchema, data: unknown, section: 'body' | 'que
     const errors = validate.errors?.map((err: ErrorObject) => ({
       section,
       message: err.message,
-      params: err.params
+      params: err.params,
+      keyword: err.keyword,
+      dataPath: err.dataPath,
+      schemaPath: err.schemaPath
     }));
     throw new HttpError(400, errors);
   }
@@ -81,6 +84,7 @@ class Router {
     this.routePrefix = routePrefix;
     this.apiTag = apiTag;
 
+    Router.app.use(express.json());
     Router.app.use(this.routePrefix, this.router);
   }
 
