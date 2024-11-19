@@ -37,7 +37,6 @@ const createUser = (router: Router) => {
       statusCode: 201
     },
     handler: async (req, res) => {
-      console.log(req.body);
       const pinHash = bcrypt.hashSync(String(req.body.pin), 12);
       await SQL_CREATE_USER({
         ...req.body,
