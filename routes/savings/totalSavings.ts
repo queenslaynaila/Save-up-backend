@@ -2,6 +2,7 @@ import Router from '../../router';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { Totals, totalSavings } from './types';
+import { ParsedQs } from 'qs';
 
 const SQL_GET_TOTAL_SAVINGS = sql<{user_id:number, type_id:number}, Totals>(`
   SELECT 
@@ -13,25 +14,35 @@ const SQL_GET_TOTAL_SAVINGS = sql<{user_id:number, type_id:number}, Totals>(`
     AND type_id = :type_id;
 `);
 
-const gettotalSavings = (router: Router) => {
+const getotalSavings = (router: Router) => {
   router.route({
     method: 'get',
     path: '/totals',
     summary: 'Get total savings',
+    security: [{ 'authorization-token': [] }],
     response: {
       schema: totalSavings
     },
     middlewares: [authMiddleware()],
     handler: async (req, res) => {
       const filters: string[] = [];
-      const filterArgs: Record<string, string> = {};
+      const filterArgs: string | string [] | ParsedQs | ParsedQs[] = {};
 
-      const { start_date, end_date } = req.query as { start_date?: string, end_date?: string };
+      const { start_date, end_date } = req.query;
 
       if (start_date && end_date) {
         filterArgs.start_date = start_date;
         filterArgs.end_date = end_date;
-        filters.push('DATE(created_at) BETWEEN :start_date AND :end_date');
+        filters.push('DATE(completed_at) BETWEEN :start_date AND :end_date');
+      } else {
+        if (start_date) {
+          filterArgs.start_date = start_date;
+          filters.push('DATE(created_at) >= :start_date');
+        }
+        if (end_date) {
+          filterArgs.end_date = end_date;
+          filters.push('DATE(created_at)<= :end_date');
+        }
       }
 
       const query = SQL_GET_TOTAL_SAVINGS({
@@ -46,4 +57,4 @@ const gettotalSavings = (router: Router) => {
   });
 };
 
-export default gettotalSavings;
+export default getotalSavings;
