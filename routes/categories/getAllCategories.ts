@@ -23,6 +23,7 @@ const getAllCategories = (router: Router) => {
     method: 'get',
     path: '/',
     summary: 'Get list of categories',
+    security: [{ 'authorization-token': [] }],
     response: {
       schema: z.array(categorySchema)
     },
