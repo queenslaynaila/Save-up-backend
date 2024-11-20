@@ -15,14 +15,18 @@ const getNextOfKin = (router: Router) => {
     method: 'get',
     path: '/',
     summary: 'Get next of kin',
+    security: [{ 'authorization-token': [] }],
     response: {
-      schema: nextOfKinSchema
+      schema: nextOfKinSchema.partial()
     },
     middlewares: [authMiddleware()],
     handler: async (req, res) => {
       const nextOfKin = await SQL_GET_KIN({
         user_id: req.user!.id
       }).oneOrNull();
+      if (nextOfKin === undefined) {
+        return res.json(null);
+      }
       return res.json(nextOfKin);
     }
   });
