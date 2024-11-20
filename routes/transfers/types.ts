@@ -1,9 +1,9 @@
 import z from 'zod';
 
 export const transferValidationSchema = z.object({
-  source_pocket_id: z.number().positive(),
-  destination_pocket_id: z.number().positive(),
-  entity_id: z.number().positive().optional(),
+  source_pocket_id: z.number(),
+  destination_pocket_id: z.number(),
+  entity_id: z.number().optional(),
   amount: z.number().gte(0)
 });
 
