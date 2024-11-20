@@ -41,6 +41,7 @@ const createNextOfKin = (router: Router) => {
     method: 'post',
     path: '/',
     summary: 'Create next of kin',
+    security: [{ 'authorization-token': [] }],
     schema: {
       body: kinCreationSchema
     },
