@@ -30,8 +30,8 @@ export const baseTransaction = z.object({
     transactionType.TRANSFER_IN,
     transactionType.TRANSFER_OUT
   ]),
-  amount: z.number(),
-  current_balance: z.number(),
+  delta: z.number(),
+  balance: z.number(),
   transaction_date: z.date()
 });
 

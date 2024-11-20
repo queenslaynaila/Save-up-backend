@@ -76,6 +76,9 @@ const getTransactionsForPocket = (router: Router) => {
       if (filters.length > 0) query.extend(`AND ${filters.join(' AND ')}`, filterArgs);
       query.extend('LIMIT 15', {});
 
+      const l = await query.many();
+      console.log(l);
+
       return res.json(await query.many());
     }
   });
