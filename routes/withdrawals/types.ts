@@ -1,7 +1,7 @@
 import z from 'zod';
 
 export const withdrawalBodySchema = z.object({
-  pocket_id: z.number().positive(),
+  pocket_id: z.number(),
   amount: z.number().gte(0)
 });
 
