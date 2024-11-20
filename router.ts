@@ -7,7 +7,7 @@ import express, {
   NextFunction,
   Application
 } from 'express';
-import { AnyZodObject, ZodSchema } from 'zod';
+import { AnyZodObject, z, ZodSchema } from 'zod';
 import { OpenApiGeneratorV3, OpenAPIRegistry } from '@asteasolutions/zod-to-openapi';
 import fastJson from 'fast-json-stringify';
 import zodToJsonSchema from 'zod-to-json-schema';
@@ -135,9 +135,19 @@ class Router {
       const jsonResponseSchema: any = zodToJsonSchema(responseSchema, { target: 'openApi3' });
       const stringify = fastJson(jsonResponseSchema);
 
+      const errorSchema = z.union([
+        z.record(z.unknown()),
+        z.array(z.record(z.unknown()))
+      ]);
+      const jsonErrorSchema: any = zodToJsonSchema(errorSchema, { target: 'openApi3' });
+      const errStringify = fastJson(jsonErrorSchema);
+
       middlewares.push((_req: Request, res: Response, next: NextFunction) => {
         res.json = <T extends object>(data: T) => {
           res.setHeader('Content-Type', 'application/json');
+          if (data instanceof HttpError) {
+            return res.send(errStringify(data.errors));
+          }
           return res.send(stringify(data));
         };
         next();
