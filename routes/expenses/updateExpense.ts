@@ -26,6 +26,7 @@ const updateExpense = (router: Router) => {
     method: 'patch',
     path: '/:id',
     summary: 'Update an expense',
+    security: [{ 'authorization-token': [] }],
     schema: {
       params: z.object({
         id: z.string()

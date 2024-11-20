@@ -29,6 +29,7 @@ export const getExpensesByCriteria = (router: Router) => {
     method: 'get',
     path: '/',
     summary: 'Get list of expenses by criteria',
+    security: [{ 'authorization-token': [] }],
     schema: {
       query: expenseQuerySchema,
       body: entitySchema

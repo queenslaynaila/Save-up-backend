@@ -27,6 +27,7 @@ const createExpense = (router: Router) => {
     method: 'post',
     path: '/',
     summary: 'Create an expense',
+    security: [{ 'authorization-token': [] }],
     schema: {
       body: expenseCreationSchema
     },

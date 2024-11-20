@@ -16,6 +16,7 @@ const deleteExpense = (router: Router) => {
     method: 'delete',
     path: '/:id',
     summary: 'Delete an expense',
+    security: [{ 'authorization-token': [] }],
     schema: {
       params: idParamSchema,
       body: entitySchema

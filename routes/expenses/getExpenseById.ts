@@ -18,6 +18,7 @@ const getExpenseById = (router: Router) => {
     method: 'get',
     path: '/:id',
     summary: 'Get an expense by id',
+    security: [{ 'authorization-token': [] }],
     schema: {
       params: idParamSchema,
       body: entitySchema
