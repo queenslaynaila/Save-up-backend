@@ -2,6 +2,7 @@ import Router from '../../router';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { transactionBody } from './types';
+import { ParsedQs } from 'qs';
 import {
   TransactionByUser,
   BaseTransaction,
@@ -47,31 +48,23 @@ const getTransactionsForPocket = (router: Router) => {
     handler: async (req, res) => {
       const { transaction_type, from_date, to_date } = req.query;
       const filters: string[] = [];
-      const filterArgs: Record<string, string > = {};
+      const filterArgs: string | string [] | ParsedQs | ParsedQs[] = {};
 
       if (transaction_type) {
-        filterArgs.transaction_type = Array.isArray(transaction_type)
-          ? String(transaction_type[0])
-          : String(transaction_type);
+        filterArgs.transaction_type = transaction_type;
         filters.push('transaction_type = :transaction_type');
       }
       if (from_date && to_date) {
-        filterArgs.from_date = Array.isArray(from_date)
-          ? from_date[0] as string
-          : from_date as string;
-        filterArgs.to_date = Array.isArray(to_date) ? to_date[0] as string : to_date as string;
+        filterArgs.from_date = from_date;
+        filterArgs.to_date = to_date;
         filters.push('transaction_date BETWEEN :from_date AND :to_date');
       } else {
         if (from_date) {
-          filterArgs.from_date = Array.isArray(from_date)
-            ? from_date[0] as string
-            : from_date as string;
+          filterArgs.from_date = from_date;
           filters.push('transaction_date >= :from_date');
         }
         if (to_date) {
-          filterArgs.to_date = Array.isArray(to_date)
-            ? to_date[0] as string
-            : to_date as string;
+          filterArgs.to_date = to_date;
           filters.push('transaction_date <= :to_date');
         }
       }
