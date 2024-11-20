@@ -13,6 +13,7 @@ import fastJson from 'fast-json-stringify';
 import zodToJsonSchema from 'zod-to-json-schema';
 import Ajv, { ErrorObject } from 'ajv';
 import { HttpError } from './middleware/errorMiddleware';
+import cors from 'cors';
 
 const ajv = new Ajv();
 
@@ -85,6 +86,13 @@ class Router {
     this.routePrefix = routePrefix;
     this.apiTag = apiTag;
 
+    Router.app.use(
+      cors({
+        origin: ['http://localhost:5173'],
+        credentials: true,
+        exposedHeaders: ['authorization-token']
+      })
+    );
     Router.app.use(express.json());
     Router.app.use(this.routePrefix, this.router);
   }
