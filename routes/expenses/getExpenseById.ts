@@ -2,7 +2,7 @@ import Router from '../../router';
 import { sql } from '../../db';
 import { HttpError } from '../../middleware/errorMiddleware';
 import authMiddleware from '../../middleware/authorization';
-import { BaseExpenseInterface } from './types';
+import { BaseExpenseInterface, baseExpenseSchema } from './types';
 import { entitySchema, idParamSchema, XidEntityInterface } from '../../globalTypes';
 
 const SQL_GET_EXPENSE_BY_ID = sql<XidEntityInterface, BaseExpenseInterface>(`
@@ -23,7 +23,7 @@ const getExpenseById = (router: Router) => {
       body: entitySchema
     },
     response: {
-      schema: entitySchema
+      schema: baseExpenseSchema
     },
     middlewares: [authMiddleware()],
     handler: async (req, res) => {
