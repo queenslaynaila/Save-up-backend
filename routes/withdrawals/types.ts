@@ -2,7 +2,7 @@ import z from 'zod';
 
 export const withdrawalBodySchema = z.object({
   pocket_id: z.number(),
-  amount: z.number().gte(0)
+  amount: z.number()
 });
 
 export type WithdrawalBody = z.infer<typeof withdrawalBodySchema>
