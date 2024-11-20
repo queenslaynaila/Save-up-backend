@@ -49,7 +49,6 @@ export const PocketQueryParamsSchema = basePocketSchema.pick({
   category_id: z.string(),
   start_date: z.string(),
   end_date: z.string(),
-  is_default: z.string(),
   xid: z.string()
 }).partial();
 

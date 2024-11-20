@@ -7,10 +7,8 @@ import {
   BasePocketType,
   pocketPatchRequestSchema
 } from './types';
-import {
-  entitySchema,
-  idParamSchema
-} from '../../globalTypes';
+import { idParamSchema } from '../../globalTypes';
+import { z } from 'zod';
 
 const SQL_UPDATE_POCKET = sql<PocketUpdateType, BasePocketType>(`
   UPDATE pockets
@@ -37,12 +35,20 @@ const updatePocket = (router: Router) => {
     method: 'patch',
     path: '/:id',
     summary: 'Update pocket',
+    security: [{ 'authorization-token': [] }],
     schema: {
       params: idParamSchema,
       body: pocketPatchRequestSchema
     },
     response: {
-      schema: entitySchema
+      schema: z.object({
+        name: z.string(),
+        category_name: z.string(),
+        target_amount: z.number(),
+        priority: z.string(),
+        pocket_type: z.enum(['Standard', 'Locked']),
+        target_at: z.string()
+      })
     },
     middlewares: [authMiddleware()],
     handler: async (req, res) => {

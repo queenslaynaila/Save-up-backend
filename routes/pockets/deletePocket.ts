@@ -13,6 +13,7 @@ const deletePocket = (router: Router) => {
     method: 'delete',
     path: '/:id',
     summary: 'Delete a pocket',
+    security: [{ 'authorization-token': [] }],
     schema: {
       params: idParamSchema,
       body: entitySchema

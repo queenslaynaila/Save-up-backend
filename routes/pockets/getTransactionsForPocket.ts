@@ -35,6 +35,7 @@ const getTransactionsForPocket = (router: Router) => {
     method: 'get',
     path: '/:pocket_id/transactions',
     summary: 'Get transactions for a pocket',
+    security: [{ 'authorization-token': [] }],
     middlewares: [authMiddleware()],
     schema: {
       query: transactionQueryParams,
