@@ -8,6 +8,7 @@ import {
 } from './types';
 import { entitySchema } from '../../globalTypes';
 import { z } from 'zod';
+import { ParsedQs } from 'qs';
 
 const SQL_GET_EXPENSES = sql<{ entity_id:number }, BaseExpenseInterface>(`
   SELECT entity_id, 
@@ -40,34 +41,24 @@ export const getExpensesByCriteria = (router: Router) => {
       const entity_id = req.body?.entity_id ?? req.user!.id;
       const { category_id, start_date, end_date } = req.query;
 
-      const filterArgs: Record<string, string> = {};
       const filters: string[] = [];
+      const filterArgs: string | string [] | ParsedQs | ParsedQs[] = {};
 
       if (category_id) {
-        filterArgs.category_id = Array.isArray(category_id)
-          ? String(category_id[0])
-          : String(category_id);
+        filterArgs.category_id = category_id;
         filters.push('category_id = :category_id');
       }
       if (start_date && end_date) {
-        filterArgs.start_date = Array.isArray(start_date)
-          ? start_date[0] as string
-          : start_date as string;
-        filterArgs.end_date = Array.isArray(end_date)
-          ? end_date[0] as string
-          : end_date as string;
+        filterArgs.start_date = start_date;
+        filterArgs.end_date = end_date;
         filters.push('DATE(created_at) BETWEEN :start_date AND :end_date');
       } else {
         if (start_date) {
-          filterArgs.start_date = Array.isArray(start_date)
-            ? start_date[0] as string
-            : start_date as string;
+          filterArgs.start_date = start_date;
           filters.push('DATE(created_at) >= :start_date');
         }
         if (end_date) {
-          filterArgs.end_date = Array.isArray(end_date)
-            ? end_date[0] as string
-            : end_date as string;
+          filterArgs.end_date = end_date;
           filters.push('DATE(created_at) <= :end_date');
         }
       }
