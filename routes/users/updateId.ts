@@ -36,6 +36,7 @@ const updateId = (router: Router) => {
     method: 'patch',
     path: '/:user_id',
     summary: 'Update a user\'s id number or phone number',
+    security: [{ 'authorization-token': [] }],
     schema: {
       params: z.object({
         user_id: z.string()
@@ -43,7 +44,6 @@ const updateId = (router: Router) => {
       body: updateDetailsSchema
     },
     response: {
-      statusCode: 200,
       schema: z.object({
         updated_attribute: z.string()
       })

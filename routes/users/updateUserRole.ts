@@ -28,6 +28,7 @@ const updateUserRole = (router: Router) => {
     method: 'patch',
     path: '/:user_id/role',
     summary: 'Update a user\'s role',
+    security: [{ 'authorization-token': [] }],
     schema: {
       body: roleSchema,
       params: z.object({

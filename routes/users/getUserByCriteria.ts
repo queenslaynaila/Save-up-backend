@@ -3,21 +3,12 @@ import { sql } from '../../db';
 import { HttpError } from '../../middleware/errorMiddleware';
 import authMiddleware from '../../middleware/authorization';
 import isStandardUser from '../../middleware/isStandardUser';
-// import { loggedInUser } from './login';
-import { userContactDetailsSchema } from './types';
 import Router from '../../router';
+import { safeUser } from './login';
+import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
 
-export const loggedInUser = z.object({
-  id: z.string(),
-  username: z.string(),
-  email: z.string(),
-  pin: z.string() // This is the field we want to omit
-  // other fields...
-});
+extendZodWithOpenApi(z);
 
-export const safeUser = loggedInUser.omit({
-  pin: true
-});
 type UserSafe = z.infer<typeof safeUser>;
 
 const SQL_GET_USER_BY_CRITERIA = sql<Record<string, never>, UserSafe>(`
@@ -40,18 +31,17 @@ const PHONE_REGEX = /^\+254\d{9}$/;
 const ID_REGEX = /^\d{6,13}$/;
 const PASSPORT_REGEX = /^[A-Za-z0-9]{9,16}$/i;
 
-const userQuerySchema = userContactDetailsSchema.pick({
-  full_name: true,
-  phone_number: true
-}).partial();
-
 const getUserByCriteria = (router: Router) => {
   router.route({
     method: 'get',
     path: '/:entity',
-    summary: 'Get a user by criteria',
+    summary: 'Get a user by criteria.',
+    description: 'The entity string can be a user\'s phone number, ID number, or passport number. '
+          + 'It can also be  a string me to get the logged in user\'s details.'
+          + 'A standard user can only send the param string me, moderators '
+          + 'and admin can do all',
+    security: [{ 'authorization-token': [] }],
     schema: {
-      query: userQuerySchema,
       params: z.object({
         entity: z.string()
       })
@@ -63,10 +53,9 @@ const getUserByCriteria = (router: Router) => {
     middlewares: [authMiddleware()],
     handler: async (req, res) => {
       const targetUser = req.params.entity;
-      const { full_name, phone_number } = req.query;
 
       const filters: string[] = [];
-      const filterArgs: Record<string, string | number> = {};
+      const filterArgs: Record<string, string | number> | [string] | string = {};
 
       if (targetUser !== 'me' && isStandardUser(req.user!.role)) {
         throw new HttpError(403);
@@ -86,20 +75,6 @@ const getUserByCriteria = (router: Router) => {
         filters.push('users.id_number = :idNumber');
       } else {
         throw new HttpError(400);
-      }
-
-      if (full_name) {
-        filterArgs.fullName = Array.isArray(full_name)
-          ? full_name[0] as string
-          : full_name as string;
-        filters.push('user_contact_details.full_name = :fullName');
-      }
-
-      if (phone_number) {
-        filterArgs.phoneNumber = Array.isArray(phone_number)
-          ? phone_number[0] as string
-          : phone_number as string;
-        filters.push('user_contact_details.phone_number = :phoneNumber');
       }
 
       const query = SQL_GET_USER_BY_CRITERIA({});
