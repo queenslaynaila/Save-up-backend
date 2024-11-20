@@ -5,7 +5,7 @@ import { TransferInput, transferValidationSchema } from './types';
 import { HttpError } from '../../middleware/errorMiddleware';
 
 const SQL_CREATE_TRANSFER = sql<TransferInput, Record<string, never>>(`
-  SELECT create_transfer(
+  SELECT create_user_transfer(
     :source_pocket_id, 
     :destination_pocket_id, 
     :user_id, 
@@ -28,6 +28,7 @@ const createTransfer = (router: Router) => {
     middlewares: [authMiddleware()],
     handler: async (req, res) => {
       const entity_id = req.body.entity_id ?? req.user!.id;
+
       await SQL_CREATE_TRANSFER({
         ...req.body, entity_id, user_id: req.user!.id
       }).exec().catch((err) => {
