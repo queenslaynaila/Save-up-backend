@@ -5,6 +5,7 @@ import swaggerUi from 'swagger-ui-express';
 import cors from 'cors';
 import morgan from 'morgan';
 import { HttpError } from './middleware/errorMiddleware';
+import dotenv from 'dotenv';
 import './routes/users/index';
 import './routes/nextOfKin/index';
 import './routes/securityQuestions/index';
@@ -33,9 +34,13 @@ import './routes/loanApprovals/index';
 import './routes/admin/index';
 import './routes/userCumulatives/index';
 import './routes/ratifications/index';
+dotenv.config();
 
 const app = Router.getAppInstance();
 
+const openApiSpec = generateOpenApiSpec();
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(openApiSpec));
+app.use(morgan('dev'));
 app.use((_, res, next) => {
   res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
   next();
@@ -48,32 +53,17 @@ app.use(
   })
 );
 
-morgan.token('error', (req: Request, res: Response) => {
-  return res.locals.errorMessage || '';
-});
-const errorFormat = ':method :url :status :response-time ms - :res[content-length] - error: :error';
-
-app.use((req, res, next) => {
-  const logFormat = res.statusCode < 400 ? 'dev' : errorFormat;
-  morgan(logFormat)(req, res, next);
-});
-
-const openApiSpec = generateOpenApiSpec();
-app.use('/docs', swaggerUi.serve, swaggerUi.setup(openApiSpec));
-
 app.use(() => {
   throw new HttpError(404);
 });
 
-/* eslint-disable @typescript-eslint/no-unused-vars */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
-  res.locals.errorMessage = error;
-  console.error(error);
   if (error instanceof HttpError) {
-    return res.status(error.status).json({
-      errors: error.errors
-    });
+    console.log(error);
+    return res.status(error.status).json(error);
   }
+
   return res.sendStatus(500);
 });
 
