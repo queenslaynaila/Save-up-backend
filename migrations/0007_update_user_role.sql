@@ -23,6 +23,16 @@ BEGIN
             ERRCODE = 'P0002';
     END IF;
 
+    IF NOT EXISTS (
+        SELECT 1
+        FROM users 
+        WHERE id = p_target_user_id
+    ) THEN
+        RAISE EXCEPTION USING
+            MESSAGE = 'ERR_USER_NOT_FOUND',
+            ERRCODE = 'P0003';
+    END IF;
+
     SELECT user_contact_details.full_name, users.role 
     INTO STRICT v_full_name, v_old_role
     FROM users 

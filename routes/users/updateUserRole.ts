@@ -6,6 +6,7 @@ import { userContactDetailsSchema, UserRole } from './types';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
 import Router from '../../router';
+import logger from '../../logger';
 
 extendZodWithOpenApi(z);
 
@@ -28,6 +29,7 @@ const updateUserRole = (router: Router) => {
     method: 'patch',
     path: '/:user_id/role',
     summary: 'Update a user\'s role',
+    description: 'Accesing this endpoint requires admin privileges',
     security: [{ 'authorization-token': [] }],
     schema: {
       body: roleSchema,
@@ -38,18 +40,22 @@ const updateUserRole = (router: Router) => {
     response: {
       schema: updatedUserSchema
     },
-    middlewares: [authMiddleware()],
+    middlewares: [authMiddleware({ roles: [UserRole.ADMIN] })],
     handler: async (req, res) => {
       const userId = req.params.user_id;
+      logger.error(req.user!.role);
       const role = convertToTitleCase(req.body.role);
 
       const user = await SQL_UPDATE_ROLE({
-        role,
         targetUserId: userId,
+        role,
         adminId: req.user!.id
       }).one().catch(err => {
         if (err.code === 'P0002') {
           throw new HttpError(403);
+        }
+        if (err.code === 'P0003') {
+          throw new HttpError(400, { message: 'INVALID_USER' });
         }
         throw err;
       });
