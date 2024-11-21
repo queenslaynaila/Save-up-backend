@@ -3,9 +3,9 @@ import { z } from 'zod';
 import { sql } from '../../db';
 import Router from '../../router';
 import { HttpError } from '../../middleware/errorMiddleware';
-import { userContactDetailsSchema, userSchema } from './types';
+import { userContactDetailsSchema, userSchema } from './schema';
 
-export const userCreationSchema = userSchema.pick({
+const userCreationSchema = userSchema.pick({
   pin: true,
   id_type: true,
   id_number: true,

@@ -2,27 +2,26 @@ import { z } from 'zod';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { convertToTitleCase } from '../../middleware/caseNormalization';
-import { userContactDetailsSchema, UserRole } from './types';
+import { userContactDetailsSchema, userIdParamSchema, userRoleHistorySchema } from './schema';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
 import Router from '../../router';
 import logger from '../../logger';
+import { UserRole } from '../../globalTypes';
 
 extendZodWithOpenApi(z);
 
-export const updatedUserSchema = userContactDetailsSchema.pick({
+const updatedUserSchema = userContactDetailsSchema.pick({
   full_name: true
 }).extend({
   new_role: z.nativeEnum(UserRole)
 });
 
-export type UpdatedUser = z.infer<typeof updatedUserSchema>;
+type UpdatedUser = z.infer<typeof updatedUserSchema>;
 
 const SQL_UPDATE_ROLE = sql<{ targetUserId: string, role:UserRole, adminId: number }, UpdatedUser>(`
   SELECT * FROM update_user_role(:targetUserId, :role, :adminId);
 `);
-
-const roleSchema = z.object({ role: z.nativeEnum(UserRole) });
 
 const updateUserRole = (router: Router) => {
   router.route({
@@ -32,10 +31,8 @@ const updateUserRole = (router: Router) => {
     description: 'Accesing this endpoint requires admin privileges',
     security: [{ 'authorization-token': [] }],
     schema: {
-      body: roleSchema,
-      params: z.object({
-        user_id: z.string()
-      }).openapi({ description: 'User ID' })
+      body: userRoleHistorySchema.pick({ role: true }),
+      params: userIdParamSchema.openapi({ description: 'User ID' })
     },
     response: {
       schema: updatedUserSchema

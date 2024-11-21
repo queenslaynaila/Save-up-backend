@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { sql } from '../../db';
 import { HttpError } from '../../middleware/errorMiddleware';
 import authMiddleware from '../../middleware/authorization';
-import { userIdHistorySchema, userPhoneHistorySchema } from './types';
+import { userIdHistorySchema, userPhoneHistorySchema } from './schema';
 import Router from '../../router';
 
 const updateIdSchema = userIdHistorySchema.pick({

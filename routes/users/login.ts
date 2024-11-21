@@ -4,10 +4,10 @@ import { z } from 'zod';
 import { sql } from '../../db';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { generateToken } from '../../middleware/generatetoken';
-import { userSchema, loginAttemptSchema, userContactDetailsSchema } from './types';
+import { userSchema, loginAttemptSchema, userContactDetailsSchema } from './schema';
 import Router from '../../router';
 
-export const loggedInUser = userSchema.pick({
+const loggedInUser = userSchema.pick({
   id: true,
   id_type: true,
   id_number: true,
@@ -20,7 +20,7 @@ export const loggedInUser = userSchema.pick({
   phone_number: userContactDetailsSchema.shape.phone_number
 });
 
-export type User = z.infer<typeof loggedInUser>;
+type User = z.infer<typeof loggedInUser>;
 
 export const safeUser = loggedInUser.omit({
   pin: true
