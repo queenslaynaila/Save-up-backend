@@ -34,13 +34,23 @@ import './routes/loanApprovals/index';
 import './routes/admin/index';
 import './routes/userCumulatives/index';
 import './routes/ratifications/index';
+import logger from './logger';
 dotenv.config();
 
 const app = Router.getAppInstance();
 
 const openApiSpec = generateOpenApiSpec();
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(openApiSpec));
-app.use(morgan('dev'));
+const morganFormat = 'combined';
+
+const morganStream = {
+  write: (message: string) => {
+    logger.info(message.trim());
+  }
+};
+
+app.use(morgan(morganFormat, { stream: morganStream }));
+
 app.use((_, res, next) => {
   res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
   next();
@@ -59,9 +69,11 @@ app.use(() => {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
-  console.log(error);
+  logger.error(error);
+  logger.error(JSON.stringify(error));
   if (error instanceof HttpError) {
-    return res.status(error.status).json(error);
+    logger.error(error.errors);
+    return res.status(error.status).json(error.errors);
   }
 
   return res.sendStatus(500);
@@ -69,5 +81,5 @@ app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
 
 const port: number = parseInt(process.env.PORT as string, 10);
 app.listen(port, () => {
-  console.log(`app listening on port ${port}`);
+  logger.info(`Server running on port ${port}`);
 });
