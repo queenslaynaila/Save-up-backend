@@ -58,7 +58,7 @@ function authMiddleware(options: AuthMiddlewareOptions = {}) {
 
         const user: User = { id, role };
         if (roles.length > 0 && !roles.includes(user.role)) {
-          return next(new HttpError(403));
+          throw new HttpError(403);
         }
 
         req.user = user;
