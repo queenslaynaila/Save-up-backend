@@ -31,11 +31,12 @@ const SQL_UPDATE_ID_NUMBER = sql<{ id: number; id_type: string; id_number: strin
   SELECT * FROM update_id_number(:id, :id_type, :id_number)
 `);
 
-const updateId = (router: Router) => {
+const updateUserAttributes = (router: Router) => {
   router.route({
     method: 'patch',
     path: '/:user_id',
     summary: 'Update a user\'s id number or phone number',
+    description: 'A user can update their id number or phone number',
     security: [{ 'authorization-token': [] }],
     schema: {
       params: z.object({
@@ -50,34 +51,39 @@ const updateId = (router: Router) => {
     },
     middlewares: [authMiddleware()],
     handler: async (req, res) => {
-      const userIdParam = req.params.user_id;
-      const id = userIdParam === 'me' ? req.user!.id : Number(userIdParam);
+      const userId = req.params.user_id;
+      const id = userId === 'me' ? req.user!.id : parseInt(userId, 10);
 
-      if ('id_number' in req.body && 'id_type' in req.body) {
-        const { id_type, id_number } = req.body;
+      if (Number.isNaN(id)) {
+        throw new HttpError(400);
+      }
+
+      const { id_type, id_number, phone_number, pin } = req.body;
+
+      if (id_type && id_number) {
         const { new_id_number } = await SQL_UPDATE_ID_NUMBER({
           id,
           id_type,
-          id_number: id_number
+          id_number
         }).one();
-        return res.json({ updated_attribute: new_id_number });
+        res.json({ updated_attribute: new_id_number });
       }
 
-      if ('phone_number' in req.body && 'pin' in req.body) {
-        const { phone_number, pin } = req.body;
-        const userPassword = await SQL_GET_USER_PIN({ id }).one(new HttpError(400));
+      if (phone_number && pin) {
+        const userPassword = await SQL_GET_USER_PIN({
+          id
+        }).one(new HttpError(400));
         if (!await bcrypt.compare(pin, userPassword.pin)) {
           throw new HttpError(401);
         }
         const { updated_phone_number } = await SQL_UPDATE_PHONE({
-          phone_number: phone_number,
+          phone_number,
           id
         }).one();
-        return res.json({ updated_attribute: updated_phone_number });
+        res.json({ updated_attribute: updated_phone_number });
       }
-      throw new HttpError(400);
     }
   });
 };
 
-export default updateId;
+export default updateUserAttributes;
