@@ -2,7 +2,6 @@ import { z } from 'zod';
 import { sql } from '../../db';
 import { HttpError } from '../../middleware/errorMiddleware';
 import authMiddleware from '../../middleware/authorization';
-import isStandardUser from '../../middleware/isStandardUser';
 import Router from '../../router';
 import { safeUser } from './login';
 import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
@@ -57,7 +56,7 @@ const getUserByCriteria = (router: Router) => {
       const filters: string[] = [];
       const filterArgs: Record<string, string | number> | [string] | string = {};
 
-      if (targetUser !== 'me' && isStandardUser(req.user!.role)) {
+      if (targetUser !== 'me' && req.user!.role === 'Standard') {
         throw new HttpError(403);
       }
 
