@@ -1,5 +1,5 @@
-import { NextFunction, Request, Response } from 'express';
 import 'express-async-errors';
+import { NextFunction, Request, Response } from 'express';
 import Router, { generateOpenApiSpec } from './router';
 import swaggerUi from 'swagger-ui-express';
 import cors from 'cors';
@@ -69,11 +69,9 @@ app.use(() => {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
-  logger.error(error);
-  logger.error(JSON.stringify(error));
+  logger.error(`we are the global error handler and errors looks like: ${JSON.stringify(error)}`);
   if (error instanceof HttpError) {
-    logger.error(error.errors);
-    return res.status(error.status).json(error.errors);
+    return res.status(error.status).json(error);
   }
 
   return res.sendStatus(500);
