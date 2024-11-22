@@ -9,11 +9,11 @@ const userCreationSchema = userSchema.pick({
   pin: true,
   id_type: true,
   id_number: true,
-  role: true,
   gender: true
 }).extend({
   full_name: userContactDetailsSchema.shape.full_name,
-  phone_number: userContactDetailsSchema.shape.phone_number
+  phone_number: userContactDetailsSchema.shape.phone_number,
+  role: z.string().optional()
 });
 
 type UserCreation = z.infer<typeof userCreationSchema>;
@@ -37,6 +37,9 @@ const createUser = (router: Router) => {
       statusCode: 201
     },
     handler: async (req, res) => {
+      if (req.body.role === undefined) {
+        req.body.role = 'Standard';
+      }
       const pinHash = bcrypt.hashSync(String(req.body.pin), 12);
       await SQL_CREATE_USER({
         ...req.body,
