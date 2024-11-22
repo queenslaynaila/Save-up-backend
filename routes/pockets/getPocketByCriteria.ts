@@ -2,11 +2,21 @@ import Router from '../../router';
 import { sql } from '../../db';
 import { ParsedQs } from 'qs';
 import authMiddleware from '../../middleware/authorization';
-import { basePocketSchema, BasePocketType, PocketQueryParamsSchema } from './types';
 import { entitySchema } from '../../globalTypes';
 import { z } from 'zod';
+import { pocket } from './createPocket';
 
-const SQL_GET_POCKETS = sql<{entity_id: number}, BasePocketType>(`
+const pocketSchema = pocket.omit({
+  entity_id: true,
+  category_id: true,
+  completed_at: true
+}).extend({
+  category_name: z.string()
+});
+
+type Pocket = z.infer<typeof pocketSchema>;
+
+const SQL_GET_POCKETS = sql<{entity_id: number}, Pocket>(`
   SELECT pockets.xid, 
         pockets.name, 
         (
@@ -23,12 +33,15 @@ const SQL_GET_POCKETS = sql<{entity_id: number}, BasePocketType>(`
   AND pockets.entity_id = :entity_id
 `);
 
-const pocketSchema = basePocketSchema.omit({
-  category_id: true,
-  completed_at: true
+const pocketQueryParams = pocketSchema.pick({
+  priority: true,
+  status: true
 }).extend({
-  category_name: z.string()
-});
+  xid: z.string(),
+  category_id: z.string(),
+  start_date: z.string(),
+  end_date: z.string()
+}).partial();
 
 const getPocketByCriteria = (router: Router) => {
   router.route({
@@ -38,7 +51,7 @@ const getPocketByCriteria = (router: Router) => {
     security: [{ 'authorization-token': [] }],
     schema: {
       body: entitySchema,
-      query: PocketQueryParamsSchema
+      query: pocketQueryParams
     },
     response: {
       schema: z.array(pocketSchema)

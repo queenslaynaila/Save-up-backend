@@ -1,25 +1,27 @@
 import Router from '../../router';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import { transactionBody } from './types';
 import { ParsedQs } from 'qs';
-import {
-  TransactionByUser,
-  BaseTransaction,
-  baseTransaction,
-  transactionQueryParams
-} from '../usertransactions/types';
 import { z } from 'zod';
-import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
-extendZodWithOpenApi(z);
+import { transactionSchema, transactionTypeSchema } from './schema';
 
-const SQL_GET_TRANSACTIONS = sql<TransactionByUser, BaseTransaction>(`
+const transaction = transactionSchema.pick({
+  xid: true,
+  delta: true,
+  balance: true,
+  created_at: true
+}).extend({
+  slug: transactionTypeSchema.shape.slug
+});
+type Transaction = z.infer<typeof transaction>;
+
+const SQL_GET_TRANSACTIONS = sql<{pocket_id:number, user_id:number}, Transaction>(`
   SELECT 
-    transactions.xid AS transaction_id, 
-    transaction_types.slug AS transaction_type,
+    transactions.xid, 
+    transaction_types.slug,
     transactions.delta,
     transactions.balance,
-    transactions.created_at AS transaction_date
+    transactions.created_at
   FROM 
     transactions
   JOIN 
@@ -31,6 +33,13 @@ const SQL_GET_TRANSACTIONS = sql<TransactionByUser, BaseTransaction>(`
     transactions.created_at DESC
 `);
 
+const transactionQueryParams = z.object({
+  from_date: z.string().optional(),
+  to_date: z.string().optional()
+}).extend({
+  slug: transactionTypeSchema.shape.slug
+}).partial();
+
 const getTransactionsForPocket = (router: Router) => {
   router.route({
     method: 'get',
@@ -40,32 +49,31 @@ const getTransactionsForPocket = (router: Router) => {
     middlewares: [authMiddleware()],
     schema: {
       query: transactionQueryParams,
-      params: transactionBody
+      params: z.object({ pocket_id: z.string() })
     },
     response: {
-      schema: z.array(baseTransaction)
+      schema: z.array(transaction)
     },
     handler: async (req, res) => {
-      const { transaction_type, from_date, to_date } = req.query;
+      const { slug, from_date, to_date } = req.query;
       const filters: string[] = [];
       const filterArgs: string | string [] | ParsedQs | ParsedQs[] = {};
-
-      if (transaction_type) {
-        filterArgs.transaction_type = transaction_type;
-        filters.push('transaction_type = :transaction_type');
+      if (slug) {
+        filterArgs.slug = slug;
+        filters.push('transactions.slug = :slug');
       }
       if (from_date && to_date) {
         filterArgs.from_date = from_date;
         filterArgs.to_date = to_date;
-        filters.push('transaction_date BETWEEN :from_date AND :to_date');
+        filters.push('transactions.created_at BETWEEN :from_date AND :to_date');
       } else {
         if (from_date) {
           filterArgs.from_date = from_date;
-          filters.push('transaction_date >= :from_date');
+          filters.push('transactions.created_at >= :from_date');
         }
         if (to_date) {
           filterArgs.to_date = to_date;
-          filters.push('transaction_date <= :to_date');
+          filters.push('transactions.created_at <= :to_date');
         }
       }
 

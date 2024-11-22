@@ -2,15 +2,34 @@ import Router from '../../router';
 import authMiddleware from '../../middleware/authorization';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { sql } from '../../db';
-import {
-  PocketUpdateType,
-  BasePocketType,
-  pocketPatchRequestSchema
-} from './types';
-import { idParamSchema } from '../../globalTypes';
 import { z } from 'zod';
+import { pocketSchema } from './schema';
 
-const SQL_UPDATE_POCKET = sql<PocketUpdateType, BasePocketType>(`
+const pocketPatchParams = pocketSchema.pick({
+  xid: true,
+  entity_id: true,
+  category_id: true,
+  name: true,
+  priority: true,
+  pocket_type: true,
+  target_amount: true,
+  target_at: true
+}).partial();
+type PocketPatchParams = z.infer<typeof pocketPatchParams>;
+
+const pocket = pocketSchema.pick({
+  name: true,
+  category_id: true,
+  target_amount: true,
+  priority: true,
+  pocket_type: true,
+  target_at: true
+}).extend({
+  category_name: z.string()
+});
+type Pocket = z.infer<typeof pocket>;
+
+const SQL_UPDATE_POCKET = sql<PocketPatchParams, Pocket>(`
   UPDATE pockets
   SET name = COALESCE(:name, name),
       category_id = COALESCE(:category_id, category_id),
@@ -37,18 +56,11 @@ const updatePocket = (router: Router) => {
     summary: 'Update pocket',
     security: [{ 'authorization-token': [] }],
     schema: {
-      params: idParamSchema,
-      body: pocketPatchRequestSchema
+      params: z.object({ id: z.string() }),
+      body: pocketPatchParams.omit({ xid: true })
     },
     response: {
-      schema: z.object({
-        name: z.string(),
-        category_name: z.string(),
-        target_amount: z.number(),
-        priority: z.string(),
-        pocket_type: z.enum(['Standard', 'Locked']),
-        target_at: z.string()
-      })
+      schema: pocket
     },
     middlewares: [authMiddleware()],
     handler: async (req, res) => {

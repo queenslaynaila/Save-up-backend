@@ -1,9 +1,27 @@
 import Router from '../../router';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import { PocketCreateType, BasePocketType, basePocketSchema, pocketCreateSchema } from './types';
+import { pocketSchema } from './schema';
+import { z } from 'zod';
 
-const SQL_CREATE_POCKET = sql<PocketCreateType, BasePocketType>(`
+export const pocketCreationSchema = pocketSchema.pick({
+  category_id: true,
+  name: true,
+  priority: true,
+  pocket_type: true,
+  target_amount: true,
+  target_at: true
+}).extend({
+  entity_id: pocketSchema.shape.entity_id.optional()
+});
+type PocketCreationType = z.infer<typeof pocketCreationSchema>;
+
+export const pocket = pocketSchema.omit({
+  deleted_at: true
+});
+type Pocket = z.infer<typeof pocket>;
+
+const SQL_CREATE_POCKET = sql<PocketCreationType, Pocket>(`
   INSERT INTO pockets (entity_id, xid, category_id, name, priority, pocket_type, target_amount, target_at)
   SELECT :entity_id,
           COALESCE(MAX(xid), 0) + 1,
@@ -35,10 +53,10 @@ const createPocket = (router: Router) => {
     summary: 'Create a pocket',
     security: [{ 'authorization-token': [] }],
     schema: {
-      body: pocketCreateSchema
+      body: pocketCreationSchema
     },
     response: {
-      schema: basePocketSchema
+      schema: pocket
     },
     middlewares: [authMiddleware()],
     handler: async (req, res) => {
