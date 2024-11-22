@@ -1,10 +1,9 @@
 import Router from '../../router';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import { GroupExitInterface, groupExitSchema, UserLeft, userLeftSchema } from './types';
 import { z } from 'zod';
 
-const SQL_EXIT_GROUP = sql<GroupExitInterface, UserLeft >(`
+const SQL_EXIT_GROUP = sql<{id: number, user_id: number}, {name: string}>(`
   SELECT * FROM leave_group (:id, :user_id);
 `);
 
@@ -16,11 +15,12 @@ const leaveGroup = (router:Router) => {
     schema: {
       params: z.object({
         id: z.string()
-      }),
-      body: groupExitSchema
+      })
     },
     response: {
-      schema: userLeftSchema
+      schema: z.object({
+        name: z.string()
+      })
     },
     middlewares: [authMiddleware()],
     handler: async (req, res) => {

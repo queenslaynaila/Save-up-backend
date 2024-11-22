@@ -1,15 +1,26 @@
 import Router from '../../router';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import {
-  GroupCreationInterface,
-  groupCreationValidation,
-  BaseGroupInterface,
-  baseGroupSchema
-} from './types';
+import { groupsSchema } from './schema';
 import { z } from 'zod';
 
-const SQL_CREATE_GROUP = sql<GroupCreationInterface, BaseGroupInterface>(`
+const groupParams = groupsSchema.pick({
+  name: true
+});
+
+const groupCreationSchema = groupsSchema.extend({
+  created_by: z.number()
+});
+type GroupCreationInterface = z.infer<typeof groupCreationSchema>;
+
+export const group = groupsSchema.pick({
+  id: true,
+  name: true,
+  created_at: true
+});
+export type Group = z.infer<typeof group>;
+
+const SQL_CREATE_GROUP = sql<GroupCreationInterface, Group>(`
     SELECT * FROM create_group(:name, :created_by )
 `);
 
@@ -18,23 +29,21 @@ const createGroup = (router:Router) => {
     method: 'post',
     path: '/',
     summary: 'Create a group',
+    security: [{ 'authorization-token': [] }],
     schema: {
-      params: z.object({
-        id: z.string()
-      }),
-      body: groupCreationValidation
+      body: groupParams
     },
     response: {
-      schema: baseGroupSchema,
+      schema: group,
       statusCode: 201
     },
     middlewares: [authMiddleware()],
     handler: async (req, res) => {
-      const group = await SQL_CREATE_GROUP({
+      const createdGroup = await SQL_CREATE_GROUP({
         ...req.body,
         created_by: req.user!.id
       }).one();
-      res.json(group);
+      res.json(createdGroup);
     }
   });
 };

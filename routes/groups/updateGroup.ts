@@ -1,14 +1,13 @@
 import Router from '../../router';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import {
-  groupCreationValidation,
-  GroupUpdateInterface,
-  groupUpdateSchema
-} from './types';
 import { z } from 'zod';
 
-const SQL_UPDATE_GROUP = sql<GroupUpdateInterface, GroupUpdateInterface>(`
+const SQL_UPDATE_GROUP = sql<{
+  id: number;
+  name: string;
+  user_id: number;
+}, {new_name:string}>(`
    SELECT * FROM update_group_name(:id, :user_id, :name)
 `);
 
@@ -21,10 +20,14 @@ const updateGroup = (router:Router) => {
       params: z.object({
         id: z.string()
       }),
-      body: groupCreationValidation
+      body: z.object({
+        name: z.string()
+      })
     },
     response: {
-      schema: groupUpdateSchema
+      schema: z.object({
+        new_name: z.string()
+      })
     },
     middlewares: [authMiddleware()],
     handler: async (req, res) => {

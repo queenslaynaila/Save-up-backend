@@ -3,13 +3,18 @@ import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import {
   groupsByUserSchema,
-  RemovedMember,
-  removedMemberSchema,
-  RemoveMemberInterface
+  removedMemberSchema
 } from './types';
 import { z } from 'zod';
 
-const SQL_REMOVE_GROUP_MBR = sql<RemoveMemberInterface, RemovedMember>(`
+const SQL_REMOVE_GROUP_MBR = sql<{
+  id: number;
+  user_id: number;
+  admin_id: number;
+}, {
+  initiator_name: string;
+  target_name: string;
+}>(`
   SELECT * FROM remove_user_from_group (:id, :admin_id, :user_id);
 `);
 
