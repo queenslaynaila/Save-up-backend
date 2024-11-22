@@ -22,7 +22,7 @@ const SQL_CREATE_USER = sql<UserCreation, Record<string, never>>(`
 `);
 
 const userDetails = userCreationSchema.extend({
-  pin: z.number()
+  pin: z.string()
 });
 
 const createUser = (router: Router) => {
