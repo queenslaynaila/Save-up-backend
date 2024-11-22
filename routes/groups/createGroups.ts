@@ -43,7 +43,7 @@ const createGroup = (router:Router) => {
         ...req.body,
         created_by: req.user!.id
       }).one();
-      res.json(createdGroup);
+      res.status(201).json(createdGroup);
     }
   });
 };
