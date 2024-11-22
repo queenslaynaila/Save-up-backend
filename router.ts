@@ -88,9 +88,10 @@ class Router {
 
     Router.app.use(
       cors({
-        origin: ['http://localhost:5173', 'https://save-up-seven.vercel.app/'],
+        origin: ['http://localhost:5173', 'https://save-up-seven.vercel.app'],
         credentials: true,
-        exposedHeaders: ['authorization-token']
+        exposedHeaders: ['authorization-token'],
+        allowedHeaders: ['Content-Type', 'Authorization', 'authorization-token']
       })
     );
     Router.app.use(express.json());
