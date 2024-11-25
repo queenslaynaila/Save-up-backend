@@ -6,6 +6,9 @@ import cors from 'cors';
 import morgan from 'morgan';
 import { HttpError } from './middleware/errorMiddleware';
 import dotenv from 'dotenv';
+import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
+import { z } from 'zod';
+import logger from './logger';
 import './routes/users/index';
 import './routes/nextOfKin/index';
 import './routes/securityQuestions/index';
@@ -33,8 +36,9 @@ import './routes/loanGuarantees/index';
 import './routes/loanApprovals/index';
 import './routes/admin/index';
 import './routes/userCumulatives/index';
-import './routes/ratifications/index';
-import logger from './logger';
+
+extendZodWithOpenApi(z);
+
 dotenv.config();
 
 const app = Router.getAppInstance();
@@ -74,6 +78,7 @@ app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
   logger.info(error.name);
   logger.error(`we are the global error handler and errors looks like: ${JSON.stringify(error)}`);
   if (error instanceof HttpError) {
+    logger.info(error.errors);
     return res.status(error.status).json(error);
   }
 
