@@ -5,7 +5,7 @@ import Router from '../../router';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { userContactDetailsSchema, userSchema } from './schema';
 
-const userCreationSchema = userSchema.pick({
+const createUserParams = userSchema.pick({
   pin: true,
   id_type: true,
   id_number: true,
@@ -16,12 +16,12 @@ const userCreationSchema = userSchema.pick({
   role: z.string().optional()
 });
 
-type UserCreation = z.infer<typeof userCreationSchema>;
+type UserCreation = z.infer<typeof createUserParams>;
 const SQL_CREATE_USER = sql<UserCreation, Record<string, never>>(`
   SELECT create_user(:id_type, :id_number, :phone_number, :role, :full_name, :gender, :pin)
 `);
 
-const userDetails = userCreationSchema.extend({
+const userDetails = createUserParams.extend({
   pin: z.string()
 });
 

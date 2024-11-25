@@ -4,12 +4,9 @@ import authMiddleware from '../../middleware/authorization';
 import { convertToTitleCase } from '../../middleware/caseNormalization';
 import { userContactDetailsSchema, userIdParamSchema, userRoleHistorySchema } from './schema';
 import { HttpError } from '../../middleware/errorMiddleware';
-import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
 import Router from '../../router';
 import logger from '../../logger';
 import { UserRole } from '../../globalTypes';
-
-extendZodWithOpenApi(z);
 
 const updatedUserSchema = userContactDetailsSchema.pick({
   full_name: true
@@ -29,7 +26,6 @@ const updateUserRole = (router: Router) => {
     path: '/:user_id/role',
     summary: 'Update a user\'s role',
     description: 'Accesing this endpoint requires admin privileges',
-    security: [{ 'authorization-token': [] }],
     schema: {
       body: userRoleHistorySchema.pick({ role: true }),
       params: userIdParamSchema.openapi({ description: 'User ID' })

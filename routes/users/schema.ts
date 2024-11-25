@@ -21,7 +21,7 @@ export const userContactDetailsSchema = z.object({
 
 export const userSchema = z.object({
   id: z.number().int(),
-  id_type: ID_TYPE_ENUM.default('National'),
+  id_type: ID_TYPE_ENUM,
   id_number: z.string().regex(/^[0-9]+$/),
   role: z.nativeEnum(UserRole),
   gender: GENDER_ENUM.optional(),
@@ -56,7 +56,7 @@ export const userPhoneHistorySchema = z.object({
 export const userIdHistorySchema = z.object({
   user_id: z.number().int(),
   xid: z.number().int(),
-  id_type: ID_TYPE_ENUM.default('National'),
+  id_type: ID_TYPE_ENUM,
   id_number: z.string().regex(/^[0-9]+$/),
   created_at: z.string().datetime()
 });
