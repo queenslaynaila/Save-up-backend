@@ -19,7 +19,9 @@ const getBalanceForPocket = (router: Router) => {
     method: 'get',
     path: '/:pocket_id/balance',
     summary: 'Get the current balance for a pocket',
-    security: [{ 'authorization-token': [] }],
+    schema: {
+      params: z.object({ pocket_id: z.string() })
+    },
     response: {
       schema: z.object({ balance: z.number() })
     },

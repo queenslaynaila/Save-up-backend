@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { z } from 'zod';
 
 export const ENUM_EXIT_REASON = z.enum(['Self removal', 'Admin removal']);

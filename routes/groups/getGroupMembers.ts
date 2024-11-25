@@ -9,7 +9,7 @@ const member = z.object({
 });
 type Member = z.infer<typeof member>;
 
-const SQL_GET_GROUP_MEMBERS = sql<{ group_id: number, user_id:number}, Member[]>(`
+const SQL_GET_GROUP_MEMBERS = sql<{ group_id: number, user_id:number}, Member>(`
   SELECT * FROM get_group_members(:group_id, :user_id)
 `);
 

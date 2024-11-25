@@ -3,12 +3,12 @@ import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import {
   ExpenseCreationInterface,
-  BaseExpenseInterface,
+  Expense,
   expenseCreationSchema,
-  baseExpenseSchema
+  ExpenseSchema
 } from './types';
 
-const SQL_CREATE_EXPENSES = sql<ExpenseCreationInterface, BaseExpenseInterface>(`
+const SQL_CREATE_EXPENSES = sql<ExpenseCreationInterface, Expense>(`
   INSERT INTO expenses (entity_id, xid, category_id, description, amount, spent_at)
   SELECT 
       :entity_id,
@@ -27,12 +27,11 @@ const createExpense = (router: Router) => {
     method: 'post',
     path: '/',
     summary: 'Create an expense',
-    security: [{ 'authorization-token': [] }],
     schema: {
       body: expenseCreationSchema
     },
     response: {
-      schema: baseExpenseSchema,
+      schema: ExpenseSchema,
       statusCode: 201
     },
     middlewares: [authMiddleware()],

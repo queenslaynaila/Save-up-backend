@@ -54,7 +54,6 @@ const updatePocket = (router: Router) => {
     method: 'patch',
     path: '/:id',
     summary: 'Update pocket',
-    security: [{ 'authorization-token': [] }],
     schema: {
       params: z.object({ id: z.string() }),
       body: pocketPatchParams.omit({ xid: true })

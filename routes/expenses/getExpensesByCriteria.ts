@@ -2,15 +2,15 @@ import Router from '../../router';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import {
-  BaseExpenseInterface,
-  baseExpenseSchema,
+  Expense,
+  ExpenseSchema,
   expenseQuerySchema
 } from './types';
 import { entitySchema } from '../../globalTypes';
 import { z } from 'zod';
 import { ParsedQs } from 'qs';
 
-const SQL_GET_EXPENSES = sql<{ entity_id:number }, BaseExpenseInterface>(`
+const SQL_GET_EXPENSES = sql<{ entity_id:number }, Expense>(`
   SELECT entity_id, 
          xid, 
          category_id, 
@@ -29,13 +29,12 @@ export const getExpensesByCriteria = (router: Router) => {
     method: 'get',
     path: '/',
     summary: 'Get list of expenses by criteria',
-    security: [{ 'authorization-token': [] }],
     schema: {
       query: expenseQuerySchema,
       body: entitySchema
     },
     response: {
-      schema: z.array(baseExpenseSchema)
+      schema: z.array(ExpenseSchema)
     },
     middlewares: [authMiddleware()],
     handler: async (req, res) => {

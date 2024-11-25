@@ -8,7 +8,9 @@ const groupParams = groupsSchema.pick({
   name: true
 });
 
-const groupCreationSchema = groupsSchema.extend({
+const groupCreationSchema = groupsSchema.pick({
+  name: true
+}).extend({
   created_by: z.number()
 });
 type GroupCreationInterface = z.infer<typeof groupCreationSchema>;
@@ -29,7 +31,6 @@ const createGroup = (router:Router) => {
     method: 'post',
     path: '/',
     summary: 'Create a group',
-    security: [{ 'authorization-token': [] }],
     schema: {
       body: groupParams
     },

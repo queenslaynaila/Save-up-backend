@@ -6,7 +6,6 @@ const logout = (router: Router) => {
     method: 'delete',
     path: '/logout',
     summary: 'Logout a user',
-    security: [{ 'authorization-token': [] }],
     response: {
       statusCode: 204
     },

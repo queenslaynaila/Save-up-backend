@@ -37,7 +37,6 @@ const updateUserAttributes = (router: Router) => {
     path: '/:user_id',
     summary: 'Update a user\'s id number or phone number',
     description: 'A user can update their id number or phone number',
-    security: [{ 'authorization-token': [] }],
     schema: {
       params: z.object({
         user_id: z.string()
@@ -58,9 +57,8 @@ const updateUserAttributes = (router: Router) => {
         throw new HttpError(400);
       }
 
-      const { id_type, id_number, phone_number, pin } = req.body;
-
-      if (id_type && id_number) {
+      if ('id_type' in req.body && 'id_number' in req.body) {
+        const { id_type, id_number } = req.body;
         const { new_id_number } = await SQL_UPDATE_ID_NUMBER({
           id,
           id_type,
@@ -69,7 +67,8 @@ const updateUserAttributes = (router: Router) => {
         res.json({ updated_attribute: new_id_number });
       }
 
-      if (phone_number && pin) {
+      if ('phone_number' in req.body && 'pin' in req.body) {
+        const { phone_number, pin } = req.body;
         const userPassword = await SQL_GET_USER_PIN({
           id
         }).one(new HttpError(400));

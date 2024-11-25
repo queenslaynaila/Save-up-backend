@@ -12,7 +12,6 @@ const createSaving = (router: Router) => {
     method: 'post',
     path: '/',
     summary: 'Create a saving',
-    security: [{ 'authorization-token': [] }],
     schema: {
       body: savingPostRequestSchema
     },

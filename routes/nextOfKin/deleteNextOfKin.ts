@@ -16,7 +16,6 @@ const deleteNextOfKin = (router: Router) => {
     method: 'delete',
     path: '/:id',
     summary: 'Delete next of kin',
-    security: [{ 'authorization-token': [] }],
     schema: {
       params: idParamSchema
     },

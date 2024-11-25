@@ -48,7 +48,6 @@ const getPocketByCriteria = (router: Router) => {
     method: 'get',
     path: '/',
     summary: 'Get list of pockets',
-    security: [{ 'authorization-token': [] }],
     schema: {
       body: entitySchema,
       query: pocketQueryParams

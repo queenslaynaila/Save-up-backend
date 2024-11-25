@@ -51,7 +51,6 @@ const createPocket = (router: Router) => {
     method: 'post',
     path: '/',
     summary: 'Create a pocket',
-    security: [{ 'authorization-token': [] }],
     schema: {
       body: pocketCreationSchema
     },

@@ -4,8 +4,10 @@ import authMiddleware from '../../middleware/authorization';
 import {
   CandidateRes,
   CandidateReq,
-  candidateParamSchema
+  candidateParamSchema,
+  candidateResSchema
 } from './types';
+import { z } from 'zod';
 
 const SQL_GET_CANDIDATES = sql<CandidateReq, CandidateRes>(`
   SELECT * FROM get_candidates(:group_id, :election_id, :user_id) 
@@ -20,7 +22,7 @@ const getCandidates = (router: Router) => {
       body: candidateParamSchema
     },
     response: {
-      schema: candidateParamSchema
+      schema: z.array(candidateResSchema)
     },
     middlewares: [authMiddleware()],
     handler: async (req, res) => {

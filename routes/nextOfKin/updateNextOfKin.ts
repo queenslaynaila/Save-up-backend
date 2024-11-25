@@ -37,7 +37,6 @@ const updateNextOfKin = (router: Router) => {
     method: 'patch',
     path: '/:xid',
     summary: 'Update details of next of kin',
-    security: [{ 'authorization-token': [] }],
     schema: {
       params: z.object({ xid: z.string() }),
       body: nextOfKin

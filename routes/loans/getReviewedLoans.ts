@@ -3,9 +3,6 @@ import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { ReviewedLoan, reviewedLoanSchema, ReviewedLoansParams } from './types';
 import { z } from 'zod';
-import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
-
-extendZodWithOpenApi(z);
 
 const SQL_GET_APPLIED_LOANS = sql<ReviewedLoansParams, ReviewedLoan>(`
     SELECT
@@ -46,7 +43,7 @@ const getReviewedLoans = (router: Router) => {
       })
     },
     response: {
-      schema: reviewedLoanSchema.array().openapi({ description: 'List of reviewed loans' })
+      schema: reviewedLoanSchema.array()
     },
     middlewares: [authMiddleware()],
     handler: async (req, res) => {

@@ -2,10 +2,10 @@ import Router from '../../router';
 import { sql } from '../../db';
 import { HttpError } from '../../middleware/errorMiddleware';
 import authMiddleware from '../../middleware/authorization';
-import { BaseExpenseInterface, baseExpenseSchema } from './types';
+import { Expense, ExpenseSchema } from './types';
 import { entitySchema, idParamSchema, XidEntityInterface } from '../../globalTypes';
 
-const SQL_GET_EXPENSE_BY_ID = sql<XidEntityInterface, BaseExpenseInterface>(`
+const SQL_GET_EXPENSE_BY_ID = sql<XidEntityInterface, Expense>(`
   SELECT xid, entity_id, category_id, description, amount, spent_at, created_at
   FROM expenses 
   WHERE xid = :xid 
@@ -18,13 +18,12 @@ const getExpenseById = (router: Router) => {
     method: 'get',
     path: '/:id',
     summary: 'Get an expense by id',
-    security: [{ 'authorization-token': [] }],
     schema: {
       params: idParamSchema,
       body: entitySchema
     },
     response: {
-      schema: baseExpenseSchema
+      schema: ExpenseSchema
     },
     middlewares: [authMiddleware()],
     handler: async (req, res) => {

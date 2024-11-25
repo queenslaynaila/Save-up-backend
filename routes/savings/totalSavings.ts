@@ -3,6 +3,7 @@ import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { Totals, totalSavings } from './types';
 import { ParsedQs } from 'qs';
+import { z } from 'zod';
 
 const SQL_GET_TOTAL_SAVINGS = sql<{user_id:number, type_id:number}, Totals>(`
   SELECT 
@@ -19,7 +20,12 @@ const getotalSavings = (router: Router) => {
     method: 'get',
     path: '/totals',
     summary: 'Get total savings',
-    security: [{ 'authorization-token': [] }],
+    schema: {
+      query: z.object({
+        start_date: z.string().optional(),
+        end_date: z.string().optional()
+      })
+    },
     response: {
       schema: totalSavings
     },

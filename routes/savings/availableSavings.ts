@@ -21,9 +21,8 @@ const getAvailableSavings = (router: Router) => {
     method: 'get',
     path: '/current-savings',
     summary: 'Get current balance across all pockets',
-    security: [{ 'authorization-token': [] }],
     response: {
-      schema: z.object({ balance: z.number() })
+      schema: z.object({ delta: z.number() })
     },
     middlewares: [authMiddleware()],
     handler: async (req, res) => {

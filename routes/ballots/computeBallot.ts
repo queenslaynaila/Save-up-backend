@@ -4,7 +4,8 @@ import authMiddleware from '../../middleware/authorization';
 import {
   BallotComputeInterface,
   ballotBodyRequest,
-  BallotResultInterface
+  BallotResultInterface,
+  ballotResultSchema
 } from './types';
 import { z } from 'zod';
 
@@ -21,7 +22,7 @@ const computeBallot = (router: Router) => {
       body: ballotBodyRequest
     },
     response: {
-      schema: z.array(ballotBodyRequest)
+      schema: z.array(ballotResultSchema)
     },
     middlewares: [authMiddleware()],
     handler: async (req, res) => {

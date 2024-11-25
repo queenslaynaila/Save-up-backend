@@ -28,7 +28,7 @@ const updateUserRole = (router: Router) => {
     description: 'Accesing this endpoint requires admin privileges',
     schema: {
       body: userRoleHistorySchema.pick({ role: true }),
-      params: userIdParamSchema.openapi({ description: 'User ID' })
+      params: userIdParamSchema
     },
     response: {
       schema: updatedUserSchema

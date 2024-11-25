@@ -14,8 +14,7 @@ const group = groupsSchema.pick({
 });
 type Group = z.infer<typeof group>;
 
-const SQL_FETCH_USER_GROUPS = sql<{ user_id:number }, Group[] >(`
-  SELECT 
+const SQL_FETCH_USER_GROUPS = sql<{ user_id:number }, Group>(`
     groups.id, 
     groups.name, 
     groups.created_at,

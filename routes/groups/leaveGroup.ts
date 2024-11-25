@@ -3,19 +3,21 @@ import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { z } from 'zod';
 
-const SQL_EXIT_GROUP = sql<{id: number, user_id: number}, {name: string}>(`
-  SELECT * FROM leave_group (:id, :user_id);
+const SQL_EXIT_GROUP = sql<{group_id: number, user_id: number}, {name: string}>(`
+  SELECT * FROM leave_group (:group_id, :user_id);
 `);
+
+const groupParams = z.object({
+  group_id: z.string()
+});
 
 const leaveGroup = (router:Router) => {
   router.route({
     method: 'delete',
-    path: '/:id',
+    path: '/:group_id',
     summary: 'Exit a group',
     schema: {
-      params: z.object({
-        id: z.string()
-      })
+      params: groupParams
     },
     response: {
       schema: z.object({
@@ -24,11 +26,11 @@ const leaveGroup = (router:Router) => {
     },
     middlewares: [authMiddleware()],
     handler: async (req, res) => {
-      const name = await SQL_EXIT_GROUP({
-        user_id: req.user!.id,
-        id: Number(req.params.id)
+      const group = await SQL_EXIT_GROUP({
+        group_id: Number(req.params.group_id),
+        user_id: req.user!.id
       }).one();
-      res.json(name);
+      res.json(group);
     }
   });
 };

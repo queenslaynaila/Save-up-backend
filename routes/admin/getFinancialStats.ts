@@ -7,6 +7,7 @@ import {
   FinancialStatsInterface,
   financialStatsSchema,
   statsParamSchema,
+  statsQuerySchema,
   ValidOperatorsEnum,
   ValidResourcesEnum,
   ValidStatusEnum
@@ -22,8 +23,8 @@ const getFinancialStats = (router: Router) => {
     path: '/',
     summary: 'Get financial statistics',
     schema: {
-      query: statsParamSchema,
-      body: statsParamSchema
+      query: statsQuerySchema,
+      params: statsParamSchema
     },
     response: {
       schema: financialStatsSchema

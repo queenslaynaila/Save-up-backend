@@ -36,7 +36,6 @@ const getUserByCriteria = (router: Router) => {
           + 'It can also be  a string me to get the logged in user\'s details.'
           + 'A standard user can only send the param string me, moderators '
           + 'and admin can do all',
-    //  security: [{ 'authorization-token': [] }],
     schema: {
       params: z.object({
         entity: z.string()

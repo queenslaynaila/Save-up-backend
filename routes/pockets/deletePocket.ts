@@ -13,7 +13,6 @@ const deletePocket = (router: Router) => {
     method: 'delete',
     path: '/:id',
     summary: 'Delete a pocket',
-    security: [{ 'authorization-token': [] }],
     schema: {
       params: z.object({ id: z.string() }),
       body: z.object({ entity_id: z.number() }).partial()
