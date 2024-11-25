@@ -15,6 +15,7 @@ import zodToJsonSchema from 'zod-to-json-schema';
 import Ajv, { ErrorObject } from 'ajv';
 import { HttpError } from './middleware/errorMiddleware';
 import cors from 'cors';
+import authMiddleware from './middleware/authorization';
 
 const ajv = new Ajv();
 
@@ -61,7 +62,6 @@ interface RouterOptions<
   path: string;
   summary: string;
   description?: string;
-  security?: Array<{ [key: string]: string[] }>;
   schema?: {
     body?: ZodSchema<ReqBody>;
     query?: Query;
@@ -123,7 +123,7 @@ class Router {
     ReqBody = ZodSchema | ZodNever,
     Query extends AnyZodObject | typeof emptyObjectSchema = typeof emptyObjectSchema
   >(options: RouterOptions<Params, ResBody, ReqBody, Query>) {
-    const { method, path, schema, security = [], response, middlewares = [], handler } = options;
+    const { method, path, schema, response, middlewares = [], handler } = options;
 
     if (schema) {
       middlewares.push(validateRequest(schema));
@@ -132,6 +132,9 @@ class Router {
     const responseSchema = response?.schema;
     const statusCode = String(response?.statusCode || 200);
     const description = response?.description || 'Success';
+    const security = middlewares.some(middleware => middleware.name === authMiddleware().name)
+      ? [{ 'authorization-token': [] }]
+      : undefined;
 
     registry.registerPath({
       tags: this.apiTag ? [this.apiTag] : undefined,
