@@ -8,7 +8,7 @@ import express, {
   Application,
   RequestHandler
 } from 'express';
-import { AnyZodObject, z, ZodSchema } from 'zod';
+import { AnyZodObject, z, ZodNever, ZodSchema } from 'zod';
 import { OpenApiGeneratorV3, OpenAPIRegistry } from '@asteasolutions/zod-to-openapi';
 import fastJson from 'fast-json-stringify';
 import zodToJsonSchema from 'zod-to-json-schema';
@@ -48,12 +48,14 @@ const validateRequest = (schema: {
     next();
   };
 };
+const emptyObjectSchema = z.object({}).strict();
+type InferZodType<T> = T extends AnyZodObject ? z.infer<T> : Record<string, never>;
 
 interface RouterOptions<
-  Params extends AnyZodObject = AnyZodObject,
-  ResBody = any,
-  ReqBody = any,
-  Query extends AnyZodObject = AnyZodObject
+  Params extends AnyZodObject | ZodNever = ZodNever,
+  ResBody = ZodSchema | ZodNever,
+  ReqBody = ZodSchema | ZodNever,
+  Query extends AnyZodObject | ZodNever = ZodNever
 > {
   method: 'get' | 'post' | 'patch' | 'delete';
   path: string;
@@ -71,7 +73,7 @@ interface RouterOptions<
     schema?: ZodSchema<ResBody>;
   };
   middlewares?: Array<(req: Request, res: Response, next: NextFunction) => void>;
-  handler: RequestHandler<z.infer<Params>, ResBody, ReqBody, z.infer<Query>>;
+  handler: RequestHandler<InferZodType<Params>, ResBody, ReqBody, InferZodType<Query>>;
 }
 
 const registry = new OpenAPIRegistry();
@@ -116,10 +118,10 @@ class Router {
   }
 
   public route<
-    Params extends AnyZodObject = AnyZodObject,
-    ResBody = any,
-    ReqBody = any,
-    Query extends AnyZodObject = AnyZodObject
+    Params extends AnyZodObject | typeof emptyObjectSchema = typeof emptyObjectSchema,
+    ResBody = ZodSchema | ZodNever,
+    ReqBody = ZodSchema | ZodNever,
+    Query extends AnyZodObject | typeof emptyObjectSchema = typeof emptyObjectSchema
   >(options: RouterOptions<Params, ResBody, ReqBody, Query>) {
     const { method, path, schema, security = [], response, middlewares = [], handler } = options;
 
