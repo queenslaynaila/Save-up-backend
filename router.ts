@@ -5,7 +5,8 @@ import express, {
   Request,
   Response,
   NextFunction,
-  Application
+  Application,
+  RequestHandler
 } from 'express';
 import { AnyZodObject, z, ZodSchema } from 'zod';
 import { OpenApiGeneratorV3, OpenAPIRegistry } from '@asteasolutions/zod-to-openapi';
@@ -48,24 +49,29 @@ const validateRequest = (schema: {
   };
 };
 
-interface RouterOptions {
+interface RouterOptions<
+  Params extends AnyZodObject = AnyZodObject,
+  ResBody = any,
+  ReqBody = any,
+  Query extends AnyZodObject = AnyZodObject
+> {
   method: 'get' | 'post' | 'patch' | 'delete';
   path: string;
   summary: string;
   description?: string;
   security?: Array<{ [key: string]: string[] }>;
   schema?: {
-    body?: ZodSchema;
-    query?: AnyZodObject;
-    params?: AnyZodObject;
+    body?: ZodSchema<ReqBody>;
+    query?: Query;
+    params?: Params;
   };
   response?: {
     description?: string;
     statusCode?: number;
-    schema?: ZodSchema;
+    schema?: ZodSchema<ResBody>;
   };
   middlewares?: Array<(req: Request, res: Response, next: NextFunction) => void>;
-  handler: (req: Request, res: Response, next: NextFunction) => void;
+  handler: RequestHandler<z.infer<Params>, ResBody, ReqBody, z.infer<Query>>;
 }
 
 const registry = new OpenAPIRegistry();
@@ -109,7 +115,12 @@ class Router {
     return Router.routerInstances.get(routePrefix)!;
   }
 
-  public route(options: RouterOptions) {
+  public route<
+    Params extends AnyZodObject = AnyZodObject,
+    ResBody = any,
+    ReqBody = any,
+    Query extends AnyZodObject = AnyZodObject
+  >(options: RouterOptions<Params, ResBody, ReqBody, Query>) {
     const { method, path, schema, security = [], response, middlewares = [], handler } = options;
 
     if (schema) {
@@ -163,7 +174,7 @@ class Router {
       });
     }
 
-    this.router[method](path, ...middlewares, handler);
+    this.router[method](path, ...middlewares, handler as RequestHandler);
   }
 }
 
