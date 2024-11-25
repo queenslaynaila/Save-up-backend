@@ -1,9 +1,9 @@
 import z from 'zod';
 
-export const baseSecurityQuestionSchema = z.object({
+export const securityQuestionSchema = z.object({
   id: z.number(),
   question: z.string(),
   created_at: z.string()
 });
 
-export type SecurityQuestions = z.infer<typeof baseSecurityQuestionSchema>;
+export type SecurityQuestions = z.infer<typeof securityQuestionSchema>;

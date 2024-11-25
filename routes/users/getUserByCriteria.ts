@@ -4,9 +4,6 @@ import { HttpError } from '../../middleware/errorMiddleware';
 import authMiddleware from '../../middleware/authorization';
 import Router from '../../router';
 import { safeUser } from './login';
-import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
-
-extendZodWithOpenApi(z);
 
 type UserSafe = z.infer<typeof safeUser>;
 
@@ -39,7 +36,7 @@ const getUserByCriteria = (router: Router) => {
           + 'It can also be  a string me to get the logged in user\'s details.'
           + 'A standard user can only send the param string me, moderators '
           + 'and admin can do all',
-    security: [{ 'authorization-token': [] }],
+    //  security: [{ 'authorization-token': [] }],
     schema: {
       params: z.object({
         entity: z.string()

@@ -1,9 +1,9 @@
 import Router from '../../router';
 import { z } from 'zod';
 import { sql } from '../../db';
-import { baseSecurityQuestionSchema } from './schema';
+import { securityQuestionSchema } from './schema';
 
-export const securityQuestions = baseSecurityQuestionSchema.pick({
+export const securityQuestions = securityQuestionSchema.pick({
   id: true,
   question: true
 });
