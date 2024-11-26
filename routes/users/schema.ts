@@ -60,7 +60,3 @@ export const userIdHistorySchema = z.object({
   id_number: z.string().regex(/^[0-9]+$/),
   created_at: z.string().datetime()
 });
-
-export const userIdParamSchema = z.object({
-  user_id: z.string()
-});
