@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { convertToTitleCase } from '../../middleware/caseNormalization';
-import { userContactDetailsSchema, userIdParamSchema, userRoleHistorySchema } from './schema';
+import { userContactDetailsSchema, userRoleHistorySchema } from './schema';
 import { HttpError } from '../../middleware/errorMiddleware';
 import Router from '../../router';
 import logger from '../../logger';
@@ -28,7 +28,7 @@ const updateUserRole = (router: Router) => {
     description: 'Accesing this endpoint requires admin privileges',
     schema: {
       body: userRoleHistorySchema.pick({ role: true }),
-      params: userIdParamSchema
+      params: z.object({ user_id: z.string() })
     },
     response: {
       schema: updatedUserSchema
