@@ -25,7 +25,7 @@ const ISSUER = 'saveup';
 function authMiddleware(options: AuthMiddlewareOptions = {}) {
   const roles = options.roles || [];
 
-  return (req: Request, res: Response, next: NextFunction) => {
+  const authorize = (req: Request, res: Response, next: NextFunction) => {
     const accessToken = req.headers['authorization-token'] as string;
 
     if (!accessToken) {
@@ -66,6 +66,8 @@ function authMiddleware(options: AuthMiddlewareOptions = {}) {
       }
     );
   };
+
+  return authorize;
 }
 
 export default authMiddleware;
