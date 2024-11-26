@@ -15,7 +15,6 @@ import zodToJsonSchema from 'zod-to-json-schema';
 import Ajv, { ErrorObject } from 'ajv';
 import { HttpError } from './middleware/errorMiddleware';
 import cors from 'cors';
-import authMiddleware from './middleware/authorization';
 
 const ajv = new Ajv();
 
@@ -132,7 +131,8 @@ class Router {
     const responseSchema = response?.schema;
     const statusCode = String(response?.statusCode || 200);
     const description = response?.description || 'Success';
-    const security = middlewares.some(middleware => middleware.name === authMiddleware().name)
+
+    const security = middlewares.some(middleware => middleware.name === 'authorize')
       ? [{ 'authorization-token': [] }]
       : undefined;
 
