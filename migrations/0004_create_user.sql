@@ -2,10 +2,10 @@ CREATE OR REPLACE FUNCTION create_user(
     p_id_type       enum_id_type,
     p_id_number     TEXT,
     p_phone_number  TEXT,
-    p_role          enum_user_role,
     p_full_name     TEXT,
     p_gender        enum_gender,
-    p_pin           TEXT
+    p_pin           TEXT,
+    p_role          enum_user_role DEFAULT 'Standard' 
 )
 RETURNS VOID AS $$
 DECLARE
@@ -37,9 +37,9 @@ END;
 $$ LANGUAGE plpgsql;
 
 GRANT EXECUTE ON FUNCTION create_user(
-    enum_id_type, TEXT, TEXT, enum_user_role, TEXT, enum_gender, TEXT
+    enum_id_type, TEXT, TEXT, TEXT, enum_gender, TEXT, enum_user_role
 ) TO app_user;
 
 SELECT create_distributed_function(
-    'create_user(enum_id_type, TEXT, TEXT, enum_user_role, TEXT, enum_gender, TEXT)'
+    'create_user(enum_id_type, TEXT, TEXT, TEXT, enum_gender, TEXT, enum_user_role)'
 );
