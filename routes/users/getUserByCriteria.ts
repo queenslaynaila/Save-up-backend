@@ -28,9 +28,9 @@ const PASSPORT_REGEX = /^[A-Za-z0-9]{9,16}$/i;
 const getUserBySearchCriteria = (router: Router) => {
   router.route({
     method: 'get',
-    path: '/:entity',
+    path: '/:userIdentifier',
     summary: 'Retrieve user details based on specified criteria.',
-    description: 'This endpoint allows fetching user details based on various attributes. The "entity" parameter can represent different identifiers, including:\n'
+    description: 'This endpoint allows fetching user details based on various attributes. The "userIdentifier" parameter can represent different identifiers, including:\n'
   + '- **Phone number**: A user’s phone number (e.g., +254123456789).\n'
   + '- **ID number**: A user’s identification number (e.g., 123456 or 987654321).\n'
   + '- **Passport number**: A user’s passport number (e.g., A12345678).\n'
@@ -39,7 +39,7 @@ const getUserBySearchCriteria = (router: Router) => {
 
     schema: {
       params: z.object({
-        entity: z.string()
+        userIdentifier: z.string()
       })
     },
     response: {
@@ -48,7 +48,7 @@ const getUserBySearchCriteria = (router: Router) => {
     },
     middlewares: [authMiddleware()],
     handler: async (req, res) => {
-      const targetUser = req.params.entity;
+      const targetUser = req.params.userIdentifier;
 
       const filters: string[] = [];
       const filterArgs: Record<string, string | number> | [string] | string = {};
