@@ -29,7 +29,7 @@ const getUserBySearchCriteria = (router: Router) => {
   router.route({
     method: 'get',
     path: '/:userIdentifier',
-    summary: 'Retrieve user details based on specified criteria.',
+    summary: 'Retrieve user details based on specified identifier.',
     description: 'This endpoint allows fetching user details based on various attributes. The "userIdentifier" parameter can represent different identifiers, including:\n'
   + '- **Phone number**: A user’s phone number (e.g., +254123456789).\n'
   + '- **ID number**: A user’s identification number (e.g., 123456 or 987654321).\n'
