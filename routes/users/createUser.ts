@@ -5,7 +5,7 @@ import Router from '../../router';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { userContactDetailsSchema, userSchema } from './schema';
 
-const createUserParams = userSchema.pick({
+const createUserPayloadSchema = userSchema.pick({
   pin: true,
   id_type: true,
   id_number: true,
@@ -15,15 +15,11 @@ const createUserParams = userSchema.pick({
   phone_number: userContactDetailsSchema.shape.phone_number,
   role: z.string().optional()
 });
+type CreateUserPayload = z.infer<typeof createUserPayloadSchema>;
 
-type UserCreation = z.infer<typeof createUserParams>;
-const SQL_CREATE_USER = sql<UserCreation, Record<string, never>>(`
-  SELECT create_user(:id_type, :id_number, :phone_number, :role, :full_name, :gender, :pin)
+const SQL_CREATE_USER = sql<CreateUserPayload, Record<string, never>>(`
+  SELECT create_user(:id_type, :id_number, :phone_number, :full_name, :gender, :pin, :role)
 `);
-
-const userDetails = createUserParams.extend({
-  pin: z.string()
-});
 
 const createUser = (router: Router) => {
   router.route({
@@ -31,18 +27,16 @@ const createUser = (router: Router) => {
     path: '/',
     summary: 'Create a new user',
     schema: {
-      body: userDetails
+      body: createUserPayloadSchema
     },
     response: {
       statusCode: 201
     },
     handler: async (req, res) => {
-      if (req.body.role === undefined) {
-        req.body.role = 'Standard';
-      }
       const pinHash = bcrypt.hashSync(String(req.body.pin), 12);
       await SQL_CREATE_USER({
         ...req.body,
+        role: req.body.role || 'Standard',
         pin: pinHash
       }).exec().catch((err) => {
         if (err.code === '23505') {
