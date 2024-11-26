@@ -7,7 +7,7 @@ import { generateToken } from '../../middleware/generatetoken';
 import { userSchema, loginAttemptSchema, userContactDetailsSchema } from './schema';
 import Router from '../../router';
 
-const loggedInUser = userSchema.pick({
+const authenticatedUserSchema = userSchema.pick({
   id: true,
   id_type: true,
   id_number: true,
@@ -20,13 +20,14 @@ const loggedInUser = userSchema.pick({
   phone_number: userContactDetailsSchema.shape.phone_number
 });
 
-type User = z.infer<typeof loggedInUser>;
+type AuthenticatedUser = z.infer<typeof authenticatedUserSchema>;
 
-export const safeUser = loggedInUser.omit({
+export const publicUserSchema = authenticatedUserSchema.omit({
   pin: true
 });
+export type UserWithPublicAttributes = z.infer<typeof publicUserSchema>;
 
-const SQL_GET_USER = sql<{ phone_number: string }, User>(`
+const SQL_GET_USER = sql<{ phone_number: string }, AuthenticatedUser>(`
   SELECT 
     users.id, 
     users.id_type, 
@@ -52,7 +53,7 @@ const loginSchema = loginAttemptSchema.pick({
   reason: true
 });
 type LoginAttempt = z.infer<typeof loginSchema>;
-const SQL_RECORD_LOGIN = sql<LoginAttempt, Record<string, never>>(`
+const SQL_RECORD_LOGIN_ATTEMPT = sql<LoginAttempt, Record<string, never>>(`
   INSERT INTO login_attempts (user_id, xid, ip_address, browser_info, success, reason)
   SELECT 
       :user_id,
@@ -65,12 +66,12 @@ const SQL_RECORD_LOGIN = sql<LoginAttempt, Record<string, never>>(`
   WHERE user_id = :user_id
 `);
 
-const loginResultSchema = loginSchema.pick({
+const loginOutcomeSchema = loginSchema.pick({
   success: true,
   reason: true
 });
-type LoginResult = z.infer<typeof loginResultSchema>;
-const SQL_GET_LAST_THREE_ATTEMPTS = sql<{ id: number }, LoginResult>(`
+type LoginOutcome = z.infer<typeof loginOutcomeSchema>;
+const SQL_GET_LAST_THREE_LOGIN_ATTEMPTS = sql<{ id: number }, LoginOutcome>(`
   SELECT success
   FROM login_attempts
   WHERE user_id = :id
@@ -85,7 +86,7 @@ const recordLoginAttempt = async (
   success: boolean,
   reason: string
 ) => {
-  await SQL_RECORD_LOGIN({
+  await SQL_RECORD_LOGIN_ATTEMPT({
     user_id: userId,
     ip_address: ipAddress,
     browser_info: userAgent,
@@ -94,12 +95,12 @@ const recordLoginAttempt = async (
   }).exec();
 };
 
-const getRequestInfo = (req: Request) => ({
+const getClientInfo = (req: Request) => ({
   ipAddress: req.ip || 'unknown',
   userAgent: req.get('User-Agent') || 'unknown'
 });
 
-const calculateRemainingAttempts = (lastThreeAttempts: LoginResult[]) => {
+const calculateLoginAttemptsLeft = (lastThreeAttempts: LoginOutcome[]) => {
   if (lastThreeAttempts.length === 0 || lastThreeAttempts[0].success) {
     return 3;
   }
@@ -127,19 +128,19 @@ const login = (router: Router) => {
     response: {
       description: 'All user details',
       statusCode: 201,
-      schema: safeUser
+      schema: publicUserSchema
     },
     handler: async (req, res) => {
       const { pin, ...user } = await SQL_GET_USER({
         phone_number: req.body.phone_number
       }).one(new HttpError(401));
 
-      const lastThreeAttempts = await SQL_GET_LAST_THREE_ATTEMPTS({
+      const lastThreeAttempts = await SQL_GET_LAST_THREE_LOGIN_ATTEMPTS({
         id: user.id
       }).many();
 
-      const remainingAttempts = calculateRemainingAttempts(lastThreeAttempts);
-      const { ipAddress, userAgent } = getRequestInfo(req);
+      const remainingAttempts = calculateLoginAttemptsLeft(lastThreeAttempts);
+      const { ipAddress, userAgent } = getClientInfo(req);
 
       if (remainingAttempts === 0) {
         await recordLoginAttempt(user.id, ipAddress, userAgent, false, 'Locked');
