@@ -3,11 +3,9 @@ import { sql } from '../../db';
 import { HttpError } from '../../middleware/errorMiddleware';
 import authMiddleware from '../../middleware/authorization';
 import Router from '../../router';
-import { safeUser } from './login';
+import { publicUserSchema, UserWithPublicAttributes } from './login';
 
-type UserSafe = z.infer<typeof safeUser>;
-
-const SQL_GET_USER_BY_CRITERIA = sql<Record<string, never>, UserSafe>(`
+const SQL_GET_USER_BY_CRITERIA = sql<Record<string, never>, UserWithPublicAttributes>(`
   SELECT 
     users.id, 
     users.id_type, 
@@ -27,22 +25,25 @@ const PHONE_REGEX = /^\+254\d{9}$/;
 const ID_REGEX = /^\d{6,13}$/;
 const PASSPORT_REGEX = /^[A-Za-z0-9]{9,16}$/i;
 
-const getUserByCriteria = (router: Router) => {
+const getUserBySearchCriteria = (router: Router) => {
   router.route({
     method: 'get',
     path: '/:entity',
-    summary: 'Get a user by criteria.',
-    description: 'The entity string can be a user\'s phone number, ID number, or passport number. '
-          + 'It can also be  a string me to get the logged in user\'s details.'
-          + 'A standard user can only send the param string me, moderators '
-          + 'and admin can do all',
+    summary: 'Retrieve user details based on specified criteria.',
+    description: 'This endpoint allows fetching user details based on various attributes. The "entity" parameter can represent different identifiers, including:\n'
+  + '- **Phone number**: A user’s phone number (e.g., +254123456789).\n'
+  + '- **ID number**: A user’s identification number (e.g., 123456 or 987654321).\n'
+  + '- **Passport number**: A user’s passport number (e.g., A12345678).\n'
+  + '- **"me"**: The string "me" can be used to fetch details of the currently logged-in user.\n\n'
+  + 'Standard users can only access their own details by using "me", while moderators and admins have access to query any user using any of the above identifiers.',
+
     schema: {
       params: z.object({
         entity: z.string()
       })
     },
     response: {
-      schema: z.array(safeUser),
+      schema: z.array(publicUserSchema),
       statusCode: 200
     },
     middlewares: [authMiddleware()],
@@ -82,4 +83,4 @@ const getUserByCriteria = (router: Router) => {
   });
 };
 
-export default getUserByCriteria;
+export default getUserBySearchCriteria;
