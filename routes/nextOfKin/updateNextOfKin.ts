@@ -4,24 +4,24 @@ import authMiddleware from '../../middleware/authorization';
 import { NextOfKin } from './createNextOfKin';
 import { z } from 'zod';
 import { HttpError } from '../../middleware/errorMiddleware';
-import { baseNextOfKinSchema } from './schema';
+import { nextOfKinSchema } from './schema';
 
-const nextOfKinSchema = baseNextOfKinSchema.pick({
-  xid: true,
-  user_id: true,
-  full_name: true,
-  relationship: true,
-  phone_number: true
-}).partial();
-type NextOfKinUpdate = z.infer<typeof nextOfKinSchema>;
-
-const nextOfKin = baseNextOfKinSchema.pick({
+const nextOfKinUpdatePayload = nextOfKinSchema.pick({
   full_name: true,
   relationship: true,
   phone_number: true
 }).partial();
 
-const SQL_UPDATE_KIN = sql<NextOfKinUpdate, NextOfKin>(`
+const nextOfKinUpdateSchema = nextOfKinUpdatePayload.extend({
+  xid: nextOfKinSchema.shape.xid,
+  user_id: nextOfKinSchema.shape.user_id
+});
+type NextOfKinUpdate = z.infer<typeof nextOfKinUpdateSchema>;
+
+const SQL_UPDATE_KIN = sql<
+NextOfKinUpdate,
+Pick<NextOfKin, 'full_name' | 'relationship' | 'phone_number'
+>>(`
     UPDATE next_of_kins
     SET full_name = COALESCE(:full_name, full_name),
         relationship = COALESCE(:relationship, relationship),
@@ -39,10 +39,10 @@ const updateNextOfKin = (router: Router) => {
     summary: 'Update details of next of kin',
     schema: {
       params: z.object({ xid: z.string() }),
-      body: nextOfKin
+      body: nextOfKinUpdatePayload
     },
     response: {
-      schema: nextOfKinSchema
+      schema: nextOfKinUpdatePayload.required()
     },
     middlewares: [authMiddleware()],
     handler: async (req, res) => {

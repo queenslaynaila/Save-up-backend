@@ -4,7 +4,7 @@ import getNextOfKin from './getNextOfKin';
 import deleteNextOfKin from './deleteNextOfKin';
 import updateNextOfKin from './updateNextOfKin';
 
-const router = Router.getRouterInstance('/next-of-kin', 'Next of Kin');
+const router = Router.getRouterInstance('/next-of-kins', 'Next of Kins');
 
 createNextOfKin(router);
 getNextOfKin(router);

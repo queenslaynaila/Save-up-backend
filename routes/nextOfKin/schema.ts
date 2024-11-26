@@ -10,12 +10,12 @@ const RELATIONSHIP_ENUM = z.enum([
   'Friend'
 ]);
 
-export const baseNextOfKinSchema = z.object({
-  user_id: z.number().int(),
-  xid: z.number().int(),
+export const nextOfKinSchema = z.object({
+  user_id: z.number(),
+  xid: z.number(),
   full_name: z.string(),
   relationship: RELATIONSHIP_ENUM,
   phone_number: z.string(),
   created_at: z.string(),
-  deleted_at: z.string().nullable().optional()
+  deleted_at: z.string().optional()
 });

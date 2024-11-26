@@ -3,27 +3,26 @@ import { z } from 'zod';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { HttpError } from '../../middleware/errorMiddleware';
-import { baseNextOfKinSchema } from './schema';
+import { nextOfKinSchema } from './schema';
 
-const kinCreationSchema = baseNextOfKinSchema.pick({
+const nextOfKinCreationSchema = nextOfKinSchema.pick({
   full_name: true,
   relationship: true,
   phone_number: true
 });
+type NextOfKinCreationPayLoad = z.infer<typeof nextOfKinCreationSchema>
+& { user_id: number };
 
-type NextOfKinCreation = z.infer<typeof kinCreationSchema>;
-
-export const nextOfKinSchema = baseNextOfKinSchema.pick({
+export const nextOfKinPublicViewSchema = nextOfKinSchema.pick({
   xid: true,
   full_name: true,
   relationship: true,
   phone_number: true,
   created_at: true
 });
+export type NextOfKin = z.infer<typeof nextOfKinPublicViewSchema>;
 
-export type NextOfKin = z.infer<typeof nextOfKinSchema>;
-
-const SQL_CREATE_KIN = sql<NextOfKinCreation & { user_id: number }, NextOfKin>(`
+const SQL_CREATE_KIN = sql<NextOfKinCreationPayLoad, NextOfKin>(`
   INSERT INTO next_of_kins (user_id, xid, full_name, relationship, phone_number)
   SELECT 
     :user_id,
@@ -42,10 +41,10 @@ const createNextOfKin = (router: Router) => {
     path: '/',
     summary: 'Create next of kin',
     schema: {
-      body: kinCreationSchema
+      body: nextOfKinCreationSchema
     },
     response: {
-      schema: nextOfKinSchema
+      schema: nextOfKinPublicViewSchema
     },
     middlewares: [authMiddleware()],
     handler: async (req, res) => {

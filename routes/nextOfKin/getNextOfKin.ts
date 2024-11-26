@@ -1,7 +1,7 @@
 import Router from '../../router';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import { NextOfKin, nextOfKinSchema } from './createNextOfKin';
+import { NextOfKin, nextOfKinPublicViewSchema } from './createNextOfKin';
 
 const SQL_GET_KIN = sql<{user_id:number}, NextOfKin>(`
   SELECT xid, full_name, relationship, phone_number, created_at
@@ -16,7 +16,7 @@ const getNextOfKin = (router: Router) => {
     path: '/',
     summary: 'Get next of kin',
     response: {
-      schema: nextOfKinSchema.partial()
+      schema: nextOfKinPublicViewSchema
     },
     middlewares: [authMiddleware()],
     handler: async (req, res) => {
