@@ -1,6 +1,5 @@
 import { z } from 'zod';
 
-// Define the base schema for security_answers
 export const securityAnswerSchema = z.object({
   user_id: z.number().int(),
   question_id: z.number().int(),

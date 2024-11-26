@@ -2,13 +2,24 @@ import Router from '../../router';
 import bcrypt from 'bcrypt';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import { AnswerUpdateType, answerbodySchema } from './types';
-import { idParamSchema } from '../../globalTypes';
+import { z } from 'zod';
+import { securityAnswerSchema } from './schema';
 
-const SQL_UPDATE_SECURITY_ANSWER = sql<AnswerUpdateType, Record<string, never>>(`
+const answerUpdatePayload = securityAnswerSchema.pick({
+  answer: true
+}).extend({
+  new_question_id: z.string().optional()
+});
+
+type AnswerUpdatePayload = z.infer<typeof answerUpdatePayload> & {
+  user_id: number,
+  question_id: number
+};
+
+const SQL_UPDATE_SECURITY_ANSWER = sql<AnswerUpdatePayload, Record<string, never>>(`
   UPDATE security_answers 
   SET 
-    question_id = COALESCE(:question_id, question_id),
+    question_id = COALESCE(:new_question_id, question_id),
     answer = :answer
   WHERE user_id = :user_id 
   AND question_id = :question_id
@@ -17,11 +28,11 @@ const SQL_UPDATE_SECURITY_ANSWER = sql<AnswerUpdateType, Record<string, never>>(
 const updateSecurityAnswer = (router: Router) => {
   router.route({
     method: 'patch',
-    path: '/:id',
+    path: '/:question_id',
     summary: 'Update security answer',
     schema: {
-      params: idParamSchema,
-      body: answerbodySchema
+      params: z.object({ question_id: z.string() }),
+      body: answerUpdatePayload
     },
     response: {
       statusCode: 204
@@ -33,7 +44,7 @@ const updateSecurityAnswer = (router: Router) => {
         ...req.body,
         answer,
         user_id: req.user!.id,
-        question_id: Number(req.params.id)
+        question_id: Number(req.params.question_id)
       }).exec();
       res.sendStatus(204);
     }
