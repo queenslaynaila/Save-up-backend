@@ -45,19 +45,19 @@ const initiatePinReset = (router: Router) => {
 
       const resetToken = generateResetPin();
       const hashedResetToken = await bcrypt.hash(resetToken, 10);
+
       await SQL_SAVE_TOKEN({
         user_id: user.id,
         token: hashedResetToken,
         reason: 'Reset'
       }).exec();
-
       logger.info(`Reset token for user ${user.id} created and is ${resetToken}`);
 
       const step1TokenPayload = { id: user.id, step: 1 };
       const resetTokenHeader = jwt.sign(
         step1TokenPayload,
         process.env.JWT_SECRET as Secret,
-        { expiresIn: '15m' }
+        { expiresIn: '25m' }
       );
 
       res.setHeader('Reset', resetTokenHeader)

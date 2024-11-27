@@ -152,7 +152,7 @@ class Router {
       path: `${this.routePrefix}${path}`,
       summary: options.summary,
       description: options.description,
-      security: authMiddlewareOptions ? [{ 'Authorization': ['admin'] }] : undefined,
+      security: authMiddlewareOptions ? [{ Authorization: [] }] : undefined,
       request: {
         params: schema?.params,
         body: schema?.body ? { content: { 'application/json': { schema: schema.body } } } : undefined,

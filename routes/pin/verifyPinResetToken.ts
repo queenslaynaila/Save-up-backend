@@ -3,23 +3,23 @@ import bcrypt from 'bcrypt';
 import jwt, { Secret } from 'jsonwebtoken';
 import { sql } from '../../db';
 import { validateStepToken } from '../../middleware/resetTokenMIddleware';
-import {
-  SecurityQuestionInterface,
-  UpdateTokenUsageInterface,
-  verifyTokenSchema,
-  securityQuestionArray
-} from './types';
-import { GetByUserInterface } from '../../globalTypes';
 import { HttpError } from '../../middleware/errorMiddleware';
+import { ResetToken } from './schema';
+import { z } from 'zod';
 
-const SQL_GET_SECURITY_QUESTIONS = sql<GetByUserInterface, SecurityQuestionInterface>(`
-  SELECT sq.id AS question_id, sq.question 
-  FROM security_answers sa 
-  INNER JOIN security_questions sq ON sa.question_id = sq.id 
-  WHERE sa.user_id = :user_id;
+const SQL_GET_SECURITY_QUESTIONS = sql<{ user_id: number }, { id: number; question: string }>(`
+  SELECT 
+        security_questions.id, 
+        security_questions.question 
+  FROM security_answers 
+  INNER JOIN security_questions 
+  ON security_answers.question_id = security_questions.id 
+  WHERE security_answers.user_id = :user_id;
 `);
 
-const SQL_GET_RESET_TOKEN = sql<{ user_id: number; reason: string;}, { token: string; }>(`
+const SQL_GET_RESET_TOKEN = sql<
+Pick<ResetToken, 'reason' | 'user_id'>,
+Pick<ResetToken, 'token'>>(`
   SELECT token
   FROM reset_tokens 
   WHERE user_id = :user_id
@@ -30,26 +30,31 @@ const SQL_GET_RESET_TOKEN = sql<{ user_id: number; reason: string;}, { token: st
   LIMIT 1;
 `);
 
-const SQL_UPDATE_TOKEN_USAGE = sql<UpdateTokenUsageInterface, Record<string, never>>(`
+const SQL_UPDATE_TOKEN_USAGE = sql<Pick<ResetToken, 'reason' | 'user_id'|'token'>, Record<string, never>>(`
   UPDATE reset_tokens 
   SET used_at = NOW() 
   WHERE user_id = :user_id
-  AND token = :reset_token
+  AND token = :token
   AND reason = :reason
   AND used_at IS NULL 
 `);
 
+const questionsSchema = z.object({
+  id: z.number(),
+  question: z.string()
+});
+
 const verifyPinResetToken = (router: Router) => {
   router.route({
     method: 'patch',
-    path: '/verify-pin-reset-token',
+    path: '/verify',
     summary: 'Verify PIN reset token',
     description: 'Verify the PIN reset token provided by the user',
     schema: {
-      body: verifyTokenSchema
+      body: z.object({ reset_token: z.string() })
     },
     response: {
-      schema: securityQuestionArray
+      schema: z.array(questionsSchema)
     },
     middlewares: [validateStepToken],
     handler: async (req, res) => {
@@ -58,18 +63,23 @@ const verifyPinResetToken = (router: Router) => {
         throw new HttpError(422, { required_step: 1 });
       }
 
-      const { reset_token, reason } = req.body;
+      const { reset_token } = req.body;
       const user_id = req.user!.id;
 
       const { token } = await SQL_GET_RESET_TOKEN({
-        user_id, reason
+        user_id,
+        reason: 'Reset'
       }).one(new HttpError(404));
 
       if (!await bcrypt.compare(reset_token, token)) {
         throw new HttpError(401);
       }
 
-      await SQL_UPDATE_TOKEN_USAGE({ ...req.body, user_id, reset_token: token }).exec();
+      await SQL_UPDATE_TOKEN_USAGE({
+        reason: 'Reset',
+        user_id,
+        token
+      }).exec();
       const securityQuestions = await SQL_GET_SECURITY_QUESTIONS({ user_id }).many();
       if (securityQuestions.length === 0) {
         throw new HttpError(404);
@@ -81,7 +91,7 @@ const verifyPinResetToken = (router: Router) => {
         process.env.JWT_SECRET as Secret,
         { expiresIn: '15m' }
       );
-      res.setHeader('reset-token', step2TokenHeader)
+      res.setHeader('Reset', step2TokenHeader)
         .json(securityQuestions);
     }
   });

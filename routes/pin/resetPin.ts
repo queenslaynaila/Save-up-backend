@@ -2,10 +2,10 @@ import Router from '../../router';
 import bcrypt from 'bcrypt';
 import { sql } from '../../db';
 import { validateStepToken } from '../../middleware/resetTokenMIddleware';
-import { ResetPasswordRequestInterface, resetPasswordSchema } from './types';
 import { HttpError } from '../../middleware/errorMiddleware';
+import { z } from 'zod';
 
-const SQL_RESET_PASSWORD = sql<ResetPasswordRequestInterface, Record<string, never>>(`
+const SQL_RESET_PASSWORD = sql<{id: number; pin: string}, Record<string, never>>(`
   UPDATE users 
   SET pin = :pin  
   WHERE  id = :id;
@@ -14,10 +14,10 @@ const SQL_RESET_PASSWORD = sql<ResetPasswordRequestInterface, Record<string, nev
 const resetPin = (router: Router) => {
   router.route({
     method: 'patch',
-    path: '/reset',
+    path: '/confirm',
     summary: 'Reset pin',
     schema: {
-      body: resetPasswordSchema
+      body: z.object({ new_pin: z.string() })
     },
     response: {
       statusCode: 204
@@ -33,7 +33,10 @@ const resetPin = (router: Router) => {
       const user_id = req.user!.id;
 
       const hashPassword = bcrypt.hashSync(new_pin, 10);
-      await SQL_RESET_PASSWORD({ id: user_id, pin: hashPassword }).exec();
+      await SQL_RESET_PASSWORD({
+        id: user_id,
+        pin: hashPassword
+      }).exec();
       res.sendStatus(204);
     }
   });

@@ -6,10 +6,20 @@ import jwt, { Secret } from 'jsonwebtoken';
 import { sql } from '../../db';
 import { validateStepToken } from '../../middleware/resetTokenMIddleware';
 import { HttpError } from '../../middleware/errorMiddleware';
-import { GetByUserInterface } from '../../globalTypes';
-import { VerifyAnswerInterface, securityAnswersRequestSchema } from './types';
+import { z } from 'zod';
 
-const SQL_GET_SECURITY_ANSWERS = sql<GetByUserInterface, VerifyAnswerInterface>(`
+export const verifyAnswerSchema = z.object({
+  question_id: z.number(),
+  answer: z.string()
+});
+
+const securityAnswersRequestSchema = z.object({
+  message: z.string(),
+  user_id: z.number(),
+  answers: z.array(verifyAnswerSchema)
+});
+
+const SQL_GET_SECURITY_ANSWERS = sql<{user_id:number}, {question_id: number;answer: string;}>(`
   SELECT question_id, answer 
   FROM security_answers 
   WHERE user_id = :user_id
@@ -18,7 +28,7 @@ const SQL_GET_SECURITY_ANSWERS = sql<GetByUserInterface, VerifyAnswerInterface>(
 const verifySecurityAnswers = (router: Router) => {
   router.route({
     method: 'get',
-    path: '/verify-answers',
+    path: '/verify-security-answers',
     summary: 'Verify security answers',
     schema: {
       body: securityAnswersRequestSchema
@@ -60,7 +70,7 @@ const verifySecurityAnswers = (router: Router) => {
         process.env.JWT_SECRET as Secret,
         { expiresIn: '15m' }
       );
-      res.setHeader('reset-token', step3TokenHeader)
+      res.setHeader('Reset', step3TokenHeader)
         .sendStatus(204);
     }
   });
