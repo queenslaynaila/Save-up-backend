@@ -10,12 +10,12 @@ const pinUpdateSchema = z.object({
   new_pin: z.string()
 });
 
-const SQL_GET_PASSWORD_BY_ID = sql<{id:number}, {pin:string} >(`
+const SQL_FETCH_PIN_BY_USER_ID = sql<{id:number}, {pin:string} >(`
   SELECT pin FROM users 
   WHERE id = :id
 `);
 
-const SQL_UPDATE_PASSWORD = sql<{pin:string, id:number}, Record<string, never>>(`
+const SQL_UPDATE_PIN = sql<{pin:string, id:number}, Record<string, never>>(`
   UPDATE users 
   SET pin = :pin 
   WHERE id = :id
@@ -35,20 +35,20 @@ const updatePin = (router: Router) => {
     middlewares: [authMiddleware()],
     handler: async (req, res) => {
       const userId = req.user!.id;
-      const { pin: hashedPassword } = await SQL_GET_PASSWORD_BY_ID({
+      const { pin: hashedUserPin } = await SQL_FETCH_PIN_BY_USER_ID({
         id: userId
       }).one();
       const { old_pin, new_pin } = req.body;
 
-      const isPasswordCorrect = await bcrypt.compare(old_pin, hashedPassword);
-      if (!isPasswordCorrect) {
+      const isOldPinValid = await bcrypt.compare(old_pin, hashedUserPin);
+      if (!isOldPinValid) {
         throw new HttpError(400);
       }
 
-      const hashedNewPassword = bcrypt.hashSync(new_pin, 10);
-      await SQL_UPDATE_PASSWORD({
+      const hashedNewPin = bcrypt.hashSync(new_pin, 10);
+      await SQL_UPDATE_PIN({
         id: userId,
-        pin: hashedNewPassword
+        pin: hashedNewPin
       }).exec();
       res.sendStatus(204);
     }
