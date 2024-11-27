@@ -15,7 +15,7 @@ const deleteNextOfKin = (router: Router) => {
   router.route({
     method: 'delete',
     path: '/:xid',
-    summary: 'Delete next of kin',
+    summary: 'Delete a next of kin',
     schema: {
       params: z.object({ xid: z.string() })
     },

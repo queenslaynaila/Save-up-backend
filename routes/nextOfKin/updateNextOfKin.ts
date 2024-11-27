@@ -36,7 +36,7 @@ const updateNextOfKin = (router: Router) => {
   router.route({
     method: 'patch',
     path: '/:xid',
-    summary: 'Update details of next of kin',
+    summary: 'Update details of a next of kin',
     schema: {
       params: z.object({ xid: z.string() }),
       body: nextOfKinUpdatePayload
