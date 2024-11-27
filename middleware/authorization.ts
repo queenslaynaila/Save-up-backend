@@ -1,4 +1,3 @@
-/* eslint-disable consistent-return */
 import { NextFunction, Request, Response } from 'express';
 import jwt, { JwtPayload, Secret, VerifyErrors } from 'jsonwebtoken';
 import { UserRole } from '../globalTypes';
@@ -16,7 +15,7 @@ declare module 'express-serve-static-core' {
   }
 }
 
-interface AuthMiddlewareOptions {
+export interface AuthMiddlewareOptions {
   roles?: UserRole[] | UserRole;
 }
 
@@ -25,7 +24,7 @@ const ISSUER = 'saveup';
 function authMiddleware(options: AuthMiddlewareOptions = {}) {
   const roles = options.roles || [];
 
-  const authorize = (req: Request, res: Response, next: NextFunction) => {
+  return (req: Request, _res: Response, next: NextFunction) => {
     const accessToken = req.headers['authorization-token'] as string;
 
     if (!accessToken) {
@@ -66,8 +65,6 @@ function authMiddleware(options: AuthMiddlewareOptions = {}) {
       }
     );
   };
-
-  return authorize;
 }
 
 export default authMiddleware;
