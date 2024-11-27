@@ -13,12 +13,6 @@ export const verifyAnswerSchema = z.object({
   answer: z.string()
 });
 
-const securityAnswersRequestSchema = z.object({
-  message: z.string(),
-  user_id: z.number(),
-  answers: z.array(verifyAnswerSchema)
-});
-
 const SQL_GET_SECURITY_ANSWERS = sql<{user_id:number}, {question_id: number;answer: string;}>(`
   SELECT question_id, answer 
   FROM security_answers 
@@ -31,7 +25,7 @@ const verifySecurityAnswers = (router: Router) => {
     path: '/verify-security-answers',
     summary: 'Verify security answers',
     schema: {
-      body: securityAnswersRequestSchema
+      body: verifyAnswerSchema.array()
     },
     response: {
       statusCode: 204
@@ -42,7 +36,7 @@ const verifySecurityAnswers = (router: Router) => {
       if (step !== 2) {
         throw new HttpError(422);
       }
-      const { answers } = req.body;
+      const answers = req.body;
       const user_id = req.user!.id;
 
       const userSecurityAnswers = await SQL_GET_SECURITY_ANSWERS({ user_id }).many();
