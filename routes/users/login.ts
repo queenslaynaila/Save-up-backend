@@ -155,7 +155,7 @@ const login = (router: Router) => {
       await recordLoginAttempt(user.id, ipAddress, userAgent, true, 'Success');
       const accessToken = generateToken(user.id, user.role, '7d');
       res
-        .setHeader('authorization-token', accessToken)
+        .setHeader('Authorization', accessToken)
         .json(user);
     }
   });

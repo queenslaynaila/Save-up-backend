@@ -25,9 +25,9 @@ function authMiddleware(options: AuthMiddlewareOptions = {}) {
   const roles = options.roles || [];
 
   return (req: Request, _res: Response, next: NextFunction) => {
-    const accessToken = req.headers['authorization-token'] as string;
+    const accessToken = req.headers.Authorization;
 
-    if (!accessToken) {
+    if (!accessToken || typeof accessToken !== 'string') {
       throw new HttpError(401);
     }
 

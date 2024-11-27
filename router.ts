@@ -99,8 +99,8 @@ class Router {
       cors({
         origin: ['http://localhost:5173', 'https://save-up-seven.vercel.app'],
         credentials: true,
-        exposedHeaders: ['authorization-token'],
-        allowedHeaders: ['Content-Type', 'Authorization', 'authorization-token']
+        exposedHeaders: ['Authorization'],
+        allowedHeaders: ['Content-Type', 'Authorization', 'Authorization']
       })
     );
     Router.app.use(express.json());
@@ -152,7 +152,7 @@ class Router {
       path: `${this.routePrefix}${path}`,
       summary: options.summary,
       description: options.description,
-      security: authMiddlewareOptions ? [{ 'authorization-token': [] }] : undefined,
+      security: authMiddlewareOptions ? [{ 'Authorization': ['admin'] }] : undefined,
       request: {
         params: schema?.params,
         body: schema?.body ? { content: { 'application/json': { schema: schema.body } } } : undefined,
@@ -200,17 +200,17 @@ export const generateOpenApiSpec = () => {
     info: {
       title: 'API Documentation for Saveup',
       version: '1.0.0',
-      description: 'This is the API documentation for Saveup. Saveup is a platform that helps users manage their savings and financial goals'
+      description: 'This is the API documentation for Saveup.'
     }
   });
 };
 
 registry.registerComponent(
   'securitySchemes',
-  'authorization-token',
+  'Authorization',
   {
     type: 'apiKey',
-    name: 'authorization-token',
+    name: 'Authorization',
     in: 'header',
     description: 'JWT authorization using the Bearer scheme'
   }

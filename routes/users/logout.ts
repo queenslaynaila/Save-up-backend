@@ -11,7 +11,7 @@ const logout = (router: Router) => {
     },
     middlewares: [authMiddleware()],
     handler: async (req, res) => {
-      res.removeHeader('authorization-token');
+      res.removeHeader('Authorization');
       res.sendStatus(204);
     }
   });
