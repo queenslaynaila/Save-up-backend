@@ -15,6 +15,7 @@ import zodToJsonSchema from 'zod-to-json-schema';
 import Ajv, { ErrorObject } from 'ajv';
 import { HttpError } from './middleware/errorMiddleware';
 import cors from 'cors';
+import authMiddleware, { AuthMiddlewareOptions } from './middleware/authorization';
 
 const ajv = new Ajv();
 
@@ -71,6 +72,7 @@ interface RouterOptions<
     statusCode?: number;
     schema?: ZodSchema<ResBody>;
   };
+  authMiddlewareOptions?: AuthMiddlewareOptions;
   middlewares?: Array<(req: Request, res: Response, next: NextFunction) => void>;
   handler: RequestHandler<InferZodType<Params>, ResBody, ReqBody, InferZodType<Query>>;
 }
@@ -122,7 +124,19 @@ class Router {
     ReqBody = ZodSchema | ZodNever,
     Query extends AnyZodObject | typeof emptyObjectSchema = typeof emptyObjectSchema
   >(options: RouterOptions<Params, ResBody, ReqBody, Query>) {
-    const { method, path, schema, response, middlewares = [], handler } = options;
+    const {
+      method,
+      path,
+      schema,
+      response,
+      authMiddlewareOptions,
+      middlewares = [],
+      handler
+    } = options;
+
+    if (authMiddlewareOptions) {
+      middlewares.unshift(authMiddleware(authMiddlewareOptions));
+    }
 
     if (schema) {
       middlewares.push(validateRequest(schema));
@@ -132,17 +146,13 @@ class Router {
     const statusCode = String(response?.statusCode || 200);
     const description = response?.description || 'Success';
 
-    const security = middlewares.some(middleware => middleware.name === 'authorize')
-      ? [{ 'authorization-token': [] }]
-      : undefined;
-
     registry.registerPath({
       tags: this.apiTag ? [this.apiTag] : undefined,
       method,
       path: `${this.routePrefix}${path}`,
       summary: options.summary,
       description: options.description,
-      security,
+      security: authMiddlewareOptions ? [{ 'authorization-token': [] }] : undefined,
       request: {
         params: schema?.params,
         body: schema?.body ? { content: { 'application/json': { schema: schema.body } } } : undefined,
