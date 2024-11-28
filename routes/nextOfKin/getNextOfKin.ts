@@ -1,57 +1,58 @@
 import Router from '../../router';
 import { sql } from '../../db';
-import authMiddleware from '../../middleware/authorization';
 import { NextOfKin, nextOfKinPublicViewSchema } from './createNextOfKin';
 import { z } from 'zod';
 import { UserRole } from '../../globalTypes';
 import { HttpError } from '../../middleware/errorMiddleware';
 
-const SQL_GET_KIN = sql<{user_id:number}, NextOfKin>(`
+const SQL_GET_KIN = sql<{user_id: number}, NextOfKin>(`
   SELECT xid, full_name, relationship, phone_number, created_at
   FROM next_of_kins 
   WHERE user_id = :user_id
-  AND deleted_at is null
 `);
 
 const getNextOfKin = (router: Router) => {
   router.route({
     method: 'get',
-    path: '/:user_id',
-    summary: 'Get next of kin for a specific user',
-    description: 'Fetches the next of kin details for a specific user.\n'
-    + 'The "user_id" parameter can represent different identifiers, including:\n'
-    + '- **User ID**: The unique identifier of the user.\n'
-    + '- **"me"**: The string "me" can be used to fetch details of the currently logged-in user.\n'
-    + 'Standard users can only access their own details by using "me", while moderators and admins have access to query any users next of kin using any of the above identifiers.',
+    path: '/',
+    summary: 'Retrieve next of kin details',
+    description:
+      'Fetches the next of kin details for a user. The route supports the following scenarios:\n'
+      + '- **Active next of kin**: By default, fetches the currently active (non-deleted) next of kin for the user.\n'
+      + '- **Next-of-kin history**: By passing the `include_history=true` query parameter, all next-of-kin records (including soft-deleted ones) are retrieved. Only admins can do this otherwise its false\n'
+      + '\nThe `user_id` query parameter determines which user’s data is fetched:\n'
+      + '- **Omitted**: Fetches the details for the currently logged-in user (default behavior if no `user_id` query param. \n'
+      + '- **Specific user ID**: Fetches details for a specific user, but only admins or moderators can query kins by `user_id`.\n',
     schema: {
-      params: z.object({
-        user_id: z.string()
-      })
+      query: z.object({
+        user_id: z.string(),
+        include_history: z.boolean().default(false)
+      }).partial()
     },
     response: {
-      schema: nextOfKinPublicViewSchema
+      schema: z.array(nextOfKinPublicViewSchema)
     },
-    middlewares: [authMiddleware()],
+    authMiddlewareOptions: {},
     handler: async (req, res) => {
-      const param = req.params.user_id;
-      const user_id = param === 'me' ? req.user!.id : parseInt(param, 10);
-
-      if (Number.isNaN(user_id)) {
+      const { user_id, include_history = false } = req.query;
+      if (user_id && Number.isNaN(parseInt(user_id, 10))) {
         throw new HttpError(400);
       }
 
+      const targetUser = user_id ? parseInt(user_id, 10) : req.user!.id;
       if (
-        req.user!.role !== UserRole.ADMIN
-        && req.user!.role !== UserRole.MODERATOR
-        && req.user!.id !== user_id
+        (req.user!.role !== UserRole.USER && targetUser !== req.user!.id)
+        || (req.user!.role === UserRole.USER && include_history)
       ) {
         throw new HttpError(403);
       }
 
-      const nextOfKin = await SQL_GET_KIN({
-        user_id
-      }).oneOrNull();
-      return res.json(nextOfKin);
+      const query = SQL_GET_KIN({ user_id: targetUser });
+      if (include_history) {
+        query.extend('AND (deleted_at IS NULL)', {});
+      }
+      const nextOfKins = await query.many();
+      return res.json(nextOfKins);
     }
   });
 };

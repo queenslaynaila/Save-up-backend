@@ -46,6 +46,7 @@ const createNextOfKin = (router: Router) => {
     response: {
       schema: nextOfKinPublicViewSchema
     },
+    authMiddlewareOptions: {},
     middlewares: [authMiddleware()],
     handler: async (req, res) => {
       const nextOfKin = await SQL_CREATE_KIN({
