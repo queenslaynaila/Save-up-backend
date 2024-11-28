@@ -1,7 +1,6 @@
 import { z } from 'zod';
 import { sql } from '../../db';
 import { HttpError } from '../../middleware/errorMiddleware';
-import authMiddleware from '../../middleware/authorization';
 import Router from '../../router';
 import { publicUserSchema, UserWithPublicAttributes } from './login';
 
@@ -46,7 +45,7 @@ const getUserBySearchCriteria = (router: Router) => {
       schema: z.array(publicUserSchema),
       statusCode: 200
     },
-    middlewares: [authMiddleware()],
+    authMiddlewareOptions: {},
     handler: async (req, res) => {
       const targetUser = req.params.userIdentifier;
 

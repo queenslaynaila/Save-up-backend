@@ -1,4 +1,3 @@
-import authMiddleware from '../../middleware/authorization';
 import Router from '../../router';
 
 const logout = (router: Router) => {
@@ -9,7 +8,7 @@ const logout = (router: Router) => {
     response: {
       statusCode: 204
     },
-    middlewares: [authMiddleware()],
+    authMiddlewareOptions: {},
     handler: async (req, res) => {
       res.removeHeader('Authorization');
       res.sendStatus(204);

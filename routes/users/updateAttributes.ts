@@ -2,7 +2,6 @@ import bcrypt from 'bcrypt';
 import { z } from 'zod';
 import { sql } from '../../db';
 import { HttpError } from '../../middleware/errorMiddleware';
-import authMiddleware from '../../middleware/authorization';
 import { userIdHistorySchema, userPhoneHistorySchema, userSchema } from './schema';
 import Router from '../../router';
 import { convertToTitleCase } from '../../middleware/caseNormalization';
@@ -82,7 +81,7 @@ const updateUserAttributes = (router: Router) => {
         updated_attribute: z.string()
       })
     },
-    middlewares: [authMiddleware()],
+    authMiddlewareOptions: {},
     handler: async (req, res) => {
       const userId = req.params.user_id;
       const id = userId === 'me' ? req.user!.id : parseInt(userId, 10);
