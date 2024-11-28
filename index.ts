@@ -9,6 +9,7 @@ import dotenv from 'dotenv';
 import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
 import { z } from 'zod';
 import logger from './logger';
+import './routes/auth/index';
 import './routes/users/index';
 import './routes/nextOfKin/index';
 import './routes/securityQuestions/index';
