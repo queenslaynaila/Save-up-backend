@@ -4,7 +4,6 @@ import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { nextOfKinSchema } from './schema';
-import { UserRole } from '../../globalTypes';
 
 const nextOfKinCreationSchema = nextOfKinSchema.pick({
   full_name: true,
@@ -47,7 +46,7 @@ const createNextOfKin = (router: Router) => {
     response: {
       schema: nextOfKinPublicViewSchema
     },
-    authMiddlewareOptions: { roles: [UserRole.USER] },
+    authMiddlewareOptions: {},
     middlewares: [authMiddleware()],
     handler: async (req, res) => {
       const nextOfKin = await SQL_CREATE_KIN({
