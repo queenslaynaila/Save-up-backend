@@ -31,7 +31,8 @@ const getUsersBySearchCriteria = (router: Router) => {
       + '- **ID number**: A user’s identification number (e.g., 123456 or 987654321).\n'
       + '- **Passport number**: A user’s passport number (e.g., A12345678).\n'
       + '- **"me"**: The string "me" can be used to fetch details of the currently logged-in user.\n\n'
-      + 'Standard users can only access their own details by using "me", while moderators and admins have access to query any user using any of the above identifiers. If no limit is provided, the default is 10.',
+      + 'Standard users can only access their own details by using "me", while moderators and admins have access to query any user using any of the above identifiers.\n\n'
+      + 'If no limit is provided, the default is 10. At least one query parameter must be provided to avoid retrieving all users.',
     schema: {
       query: z.object({
         phone_number: z.string().optional(),
