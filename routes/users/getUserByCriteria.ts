@@ -35,10 +35,10 @@ const getUsersBySearchCriteria = (router: Router) => {
       + 'If no limit is provided, the default is 10. At least one query parameter must be provided to avoid retrieving all users.',
     schema: {
       query: z.object({
-        phone_number: z.string().optional(),
-        id_type: z.string().optional(),
-        id_number: z.string().optional(),
-        me: z.string().optional(),
+        phone_number: z.string(),
+        id_type: z.string(),
+        id_number: z.string(),
+        me: z.string(),
         limit: z.number().optional().default(10)
       }).partial()
     },
