@@ -3,6 +3,7 @@ import { sql } from '../../db';
 import { HttpError } from '../../middleware/errorMiddleware';
 import Router from '../../router';
 import { publicUserSchema, UserWithPublicAttributes } from '../auth/login';
+import { UserRole } from '../../globalTypes';
 
 const SQL_GET_USER_BY_CRITERIA = sql<Record<string, never>, UserWithPublicAttributes>(`
   SELECT 
@@ -20,26 +21,25 @@ const SQL_GET_USER_BY_CRITERIA = sql<Record<string, never>, UserWithPublicAttrib
     user_contact_details ON users.id = user_contact_details.id
 `);
 
-const PHONE_REGEX = /^\+254\d{9}$/;
-const ID_REGEX = /^\d{6,13}$/;
-const PASSPORT_REGEX = /^[A-Za-z0-9]{9,16}$/i;
-
-const getUserBySearchCriteria = (router: Router) => {
+const getUsersBySearchCriteria = (router: Router) => {
   router.route({
     method: 'get',
-    path: '/:userIdentifier',
-    summary: 'Retrieve user details based on specified identifier.',
-    description: 'This endpoint allows fetching user details based on various attributes. The "userIdentifier" parameter can represent different identifiers, including:\n'
-  + '- **Phone number**: A user’s phone number (e.g., +254123456789).\n'
-  + '- **ID number**: A user’s identification number (e.g., 123456 or 987654321).\n'
-  + '- **Passport number**: A user’s passport number (e.g., A12345678).\n'
-  + '- **"me"**: The string "me" can be used to fetch details of the currently logged-in user.\n\n'
-  + 'Standard users can only access their own details by using "me", while moderators and admins have access to query any user using any of the above identifiers.',
-
+    path: '/',
+    summary: 'Search for users based on various criteria',
+    description: 'This endpoint allows searching for users based on various query criteria such as phone number, ID number, passport number, or the string "me" for the currently logged-in user.\n'
+      + '- **Phone number**: A user’s phone number (e.g., +254123456789).\n'
+      + '- **ID number**: A user’s identification number (e.g., 123456 or 987654321).\n'
+      + '- **Passport number**: A user’s passport number (e.g., A12345678).\n'
+      + '- **"me"**: The string "me" can be used to fetch details of the currently logged-in user.\n\n'
+      + 'Standard users can only access their own details by using "me", while moderators and admins have access to query any user using any of the above identifiers. If no limit is provided, the default is 10.',
     schema: {
-      params: z.object({
-        userIdentifier: z.string()
-      })
+      query: z.object({
+        phone_number: z.string().optional(),
+        id_type: z.string().optional(),
+        id_number: z.string().optional(),
+        me: z.string().optional(),
+        limit: z.number().optional().default(10)
+      }).partial()
     },
     response: {
       schema: z.array(publicUserSchema),
@@ -47,39 +47,45 @@ const getUserBySearchCriteria = (router: Router) => {
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {
-      const targetUser = req.params.userIdentifier;
-
-      const filters: string[] = [];
-      const filterArgs: Record<string, string | number> | [string] | string = {};
-
-      if (targetUser !== 'me' && req.user!.role === 'Standard') {
-        throw new HttpError(403);
-      }
-
-      if (targetUser === 'me') {
-        filterArgs.loggedInUserId = req.user!.id;
-        filters.push('users.id = :loggedInUserId');
-      } else if (ID_REGEX.test(targetUser)) {
-        filterArgs.idNumber = targetUser;
-        filters.push('users.id_number = :idNumber');
-      } else if (PHONE_REGEX.test(targetUser)) {
-        filterArgs.phoneNumber = targetUser;
-        filters.push('user_contact_details.phone_number = :phoneNumber');
-      } else if (PASSPORT_REGEX.test(targetUser)) {
-        filterArgs.idNumber = targetUser;
-        filters.push('users.id_number = :idNumber');
-      } else {
+      if (Object.keys(req.query).length === 0) {
         throw new HttpError(400);
       }
 
-      const query = SQL_GET_USER_BY_CRITERIA({});
+      const { phone_number, id_type, id_number, me, limit = 10 } = req.query;
 
-      if (filters.length > 0) query.extend(`WHERE ${filters.join(' AND ')}`, filterArgs);
-      query.extend('LIMIT 15', {});
-      const users = await query.many();
+      if (me === 'me' && req.user!.role === UserRole.USER) {
+        throw new HttpError(403);
+      }
+
+      const filters: string[] = [];
+      const filterArgs: Record<string, string | number> = { limit };
+
+      if (me) {
+        filterArgs.me = req.user!.id;
+        filters.push('users.id = :me');
+      }
+
+      if (phone_number) {
+        filterArgs.phone_number = phone_number;
+        filters.push('user_contact_details.phone_number = :phone_number');
+      }
+
+      if (id_type) {
+        filterArgs.id_type = id_type;
+        filters.push('users.id_type = :id_type');
+      }
+
+      if (id_number) {
+        filterArgs.id_number = id_number;
+        filters.push('users.id_number = :id_number');
+      }
+
+      const query = SQL_GET_USER_BY_CRITERIA({});
+      const users = await query.extend(`WHERE ${filters.join(' AND ')} LIMIT :limit`, filterArgs).many();
+
       res.json(users);
     }
   });
 };
 
-export default getUserBySearchCriteria;
+export default getUsersBySearchCriteria;
