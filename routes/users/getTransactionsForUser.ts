@@ -31,7 +31,8 @@ const getTransactionsForUser = (router: Router) => {
     description: 'This endpoint allows fetching financial transactions related to a user. The "userId" param can represent different identifiers, including:\n'
   + '- **user_id**: A user’s  unique identifier.\n'
   + '- **"me"**: The string "me" can be used to fetch details of the currently logged-in user.\n\n'
-  + 'Standard users can only access their own details by using "me", or their own userid while moderators and admins have access to query any user using any of the above identifiers.',
+  + 'Standard users can only access their own details by using "me", or their own userid while moderators and admins have access to query any user using  the user_id. \n'
+  + 'The path automatically shows the last 10 transactions if no limit has been requested but it allows the client to specify a limit.',
     schema: {
       params: z.object({
         user_id: z.string()

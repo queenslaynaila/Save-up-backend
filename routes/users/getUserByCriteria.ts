@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { sql } from '../../db';
 import { HttpError } from '../../middleware/errorMiddleware';
 import Router from '../../router';
-import { publicUserSchema, UserWithPublicAttributes } from './login';
+import { publicUserSchema, UserWithPublicAttributes } from '../auth/login';
 
 const SQL_GET_USER_BY_CRITERIA = sql<Record<string, never>, UserWithPublicAttributes>(`
   SELECT 
