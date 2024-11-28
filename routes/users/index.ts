@@ -1,11 +1,11 @@
 import Router from '../../router';
 import updateUserAttributes from './updateAttributes';
-import getUserBySearchCriteria from './getUserByCriteria';
+import getUsersBySearchCriteria from './getUserByCriteria';
 import getTransactionsForUser from './getTransactionsForUser';
 
 const router = Router.getRouterInstance('/users', 'Users');
 
-getUserBySearchCriteria(router);
+getUsersBySearchCriteria(router);
 getTransactionsForUser(router);
 updateUserAttributes(router);
 
