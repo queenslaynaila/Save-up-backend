@@ -4,8 +4,9 @@ import { HttpError } from '../../middleware/errorMiddleware';
 import Router from '../../router';
 import { transaction, Transaction } from '../pockets/getTransactionsForPocket';
 import { UserRole } from '../../globalTypes';
+import { transactionTypeSchema } from '../pockets/schema';
 
-const SQL_GET_TRANSACTIONS_FOR_USER = sql<{user_id:number, limit:number}, Transaction>(`
+const SQL_GET_TRANSACTIONS_FOR_USER = sql<{user_id:number}, Transaction>(`
   SELECT 
     transactions.xid, 
     transaction_types.slug,
@@ -18,9 +19,6 @@ const SQL_GET_TRANSACTIONS_FOR_USER = sql<{user_id:number, limit:number}, Transa
     transaction_types ON transactions.type_id = transaction_types.id
   WHERE 
     transactions.entity_id = :user_id
-  ORDER BY 
-    transactions.created_at DESC
-  LIMIT :limit;
 `);
 
 const getTransactionsForUser = (router: Router) => {
@@ -32,14 +30,18 @@ const getTransactionsForUser = (router: Router) => {
   + '- **user_id**: A user’s  unique identifier.\n'
   + '- **"me"**: The string "me" can be used to fetch details of the currently logged-in user.\n\n'
   + 'Standard users can only access their own details by using "me", or their own userid while moderators and admins have access to query any user using  the user_id. \n'
-  + 'The path automatically shows the last 10 transactions if no limit has been requested but it allows the client to specify a limit.',
+  + 'The path automatically shows the last 10 transactions if no limit has been requested but it allows the client to specify a limit and transaction type as query params.',
     schema: {
       params: z.object({
         user_id: z.string()
       }),
       query: z.object({
-        limit: z.number().optional().default(5)
-      })
+        slug: transactionTypeSchema.shape.slug,
+        start_at: z.string().date().optional(),
+        end_at: z.string().date().optional(),
+        limit: z.number().optional().default(10),
+        dir: z.enum(['asc', 'desc']).optional().default('desc')
+      }).partial()
     },
     response: {
       schema: z.array(transaction)
@@ -57,11 +59,31 @@ const getTransactionsForUser = (router: Router) => {
         throw new HttpError(403);
       }
 
-      const limit = req.query.limit || 10;
-      const transactions = await SQL_GET_TRANSACTIONS_FOR_USER({
-        user_id,
-        limit
-      }).many();
+      const { slug, limit = 10, start_at, end_at, dir = 'desc' } = req.query;
+
+      const filters: string[] = [];
+      const filterArgs: Record<string, string | number> = { limit, dir };
+
+      if (slug) {
+        filters.push('transaction_types.slug = :slug');
+        filterArgs.slug = slug;
+      }
+      if (start_at) {
+        filters.push('DATE(transactions.created_at) >= :start_at');
+        filterArgs.start_at = start_at;
+      }
+
+      if (end_at) {
+        filters.push('DATE(transactions.created_at) <= :end_at');
+        filterArgs.end_at = end_at;
+      }
+
+      const query = SQL_GET_TRANSACTIONS_FOR_USER({
+        user_id
+      });
+
+      query.extend(`AND ${filters.join(' AND ')} ORDER BY transactions.created_at :dir LIMIT :limit`, filterArgs);
+      const transactions = await query.many();
       return res.json(transactions);
     }
   });
