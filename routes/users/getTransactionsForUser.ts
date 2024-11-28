@@ -56,7 +56,7 @@ const getTransactionsForUser = (router: Router) => {
         throw new HttpError(403);
       }
 
-      const limit = req.query.limit || 5;
+      const limit = req.query.limit || 10;
       const transactions = await SQL_GET_TRANSACTIONS_FOR_USER({
         user_id,
         limit
