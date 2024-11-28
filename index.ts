@@ -13,7 +13,6 @@ import './routes/auth/index';
 import './routes/users/index';
 import './routes/nextOfKin/index';
 import './routes/securityQuestions/index';
-import './routes/securityAnswer/index';
 import './routes/pin/index';
 import './routes/categories/index';
 import './routes/pockets/index';
