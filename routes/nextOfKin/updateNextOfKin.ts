@@ -44,6 +44,7 @@ const updateNextOfKin = (router: Router) => {
     response: {
       schema: nextOfKinUpdatePayload.required()
     },
+    authMiddlewareOptions: {},
     middlewares: [authMiddleware()],
     handler: async (req, res) => {
       const { full_name, relationship, phone_number } = req.body;
