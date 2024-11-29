@@ -1,10 +1,10 @@
 import Router from '../../router';
 import { sql } from '../../db';
 import { ParsedQs } from 'qs';
-import authMiddleware from '../../middleware/authorization';
-import { entitySchema } from '../../globalTypes';
 import { z } from 'zod';
 import { pocket } from './createPocket';
+import { UserRole } from '../../globalTypes';
+import { HttpError } from '../../middleware/errorMiddleware';
 
 const pocketSchema = pocket.omit({
   entity_id: true,
@@ -16,7 +16,7 @@ const pocketSchema = pocket.omit({
 
 type Pocket = z.infer<typeof pocketSchema>;
 
-const SQL_GET_POCKETS = sql<{entity_id: number}, Pocket>(`
+const SQL_GET_POCKETS = sql<{ entity_id: number }, Pocket>(`
   SELECT pockets.xid, 
         pockets.name, 
         (
@@ -38,6 +38,7 @@ const pocketQueryParams = pocketSchema.pick({
   status: true
 }).extend({
   xid: z.string(),
+  entity_id: z.string().default('me'),
   category_id: z.string(),
   start_date: z.string(),
   end_date: z.string()
@@ -48,17 +49,27 @@ const getPocketByCriteria = (router: Router) => {
     method: 'get',
     path: '/',
     summary: 'Get list of pockets',
+    description: 'Fetches a list of pockets based on various criteria. \n'
+     + '- **entity_id**: The ID of the user or group whose pockets are to be fetched. \n'
+     + '- If no entity_id is provided, it defaults to "me" and fetches the logged-in user\'s pockets. \n'
+     + '- Admins and moderators can request pockets for any user or group using a user ID or group ID..\n'
+     + '- Note that the user_id or group_is must be sent as an entity_id query param.\n'
+     + '- Other query parameters include xid, category_id, priority, status, start_date, and end_date.\n',
     schema: {
-      body: entitySchema,
       query: pocketQueryParams
     },
     response: {
       schema: z.array(pocketSchema)
     },
-    middlewares: [authMiddleware()],
+    authMiddlewareOptions: {},
     handler: async (req, res) => {
-      const entity_id = req.body.entity_id ?? req.user!.id;
-      const { xid, category_id, priority, status, start_date, end_date } = req.query;
+      const { entity_id = 'me', xid, category_id, priority, status, start_date, end_date } = req.query;
+
+      const FinalEntity = entity_id ? req.user!.id : parseInt(entity_id, 10);
+
+      if (req.user!.role === UserRole.USER && req.user!.id !== FinalEntity) {
+        throw new HttpError(403);
+      }
 
       const filters: string[] = [];
       const filterArgs: string | string [] | ParsedQs | ParsedQs[] = {};
@@ -98,9 +109,10 @@ const getPocketByCriteria = (router: Router) => {
         }
       }
 
-      const query = SQL_GET_POCKETS({ entity_id });
+      const query = SQL_GET_POCKETS({
+        entity_id: FinalEntity
+      });
       if (filters.length > 0) query.extend(`AND ${filters.join(' AND ')}`, filterArgs);
-      query.extend('LIMIT 15', {});
       res.json(await query.many());
     }
   });

@@ -5,7 +5,7 @@ import { ParsedQs } from 'qs';
 import { z } from 'zod';
 import { transactionSchema, transactionTypeSchema } from './schema';
 
-const transaction = transactionSchema.pick({
+export const transaction = transactionSchema.pick({
   xid: true,
   delta: true,
   balance: true,
@@ -13,7 +13,7 @@ const transaction = transactionSchema.pick({
 }).extend({
   slug: transactionTypeSchema.shape.slug
 });
-type Transaction = z.infer<typeof transaction>;
+export type Transaction = z.infer<typeof transaction>;
 
 const SQL_GET_TRANSACTIONS = sql<{pocket_id:number, user_id:number}, Transaction>(`
   SELECT 
@@ -43,12 +43,12 @@ const transactionQueryParams = z.object({
 const getTransactionsForPocket = (router: Router) => {
   router.route({
     method: 'get',
-    path: '/:pocket_id/transactions',
+    path: '/:xid/transactions',
     summary: 'Get transactions for a pocket',
     middlewares: [authMiddleware()],
     schema: {
       query: transactionQueryParams,
-      params: z.object({ pocket_id: z.string() })
+      params: z.object({ xid: z.string() })
     },
     response: {
       schema: z.array(transaction)
@@ -77,7 +77,7 @@ const getTransactionsForPocket = (router: Router) => {
       }
 
       const query = SQL_GET_TRANSACTIONS({
-        pocket_id: Number(req.params.pocket_id),
+        pocket_id: Number(req.params.xid),
         user_id: req.user!.id
       });
       if (filters.length > 0) query.extend(`AND ${filters.join(' AND ')}`, filterArgs);

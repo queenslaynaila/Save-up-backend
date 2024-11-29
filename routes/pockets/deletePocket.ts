@@ -11,10 +11,14 @@ const SQL_DELETE_POCKET = sql<{pocket_id: number, entity_id: number}, Record<str
 const deletePocket = (router: Router) => {
   router.route({
     method: 'delete',
-    path: '/:id',
+    path: '/:xid',
     summary: 'Delete a pocket',
+    description: 'Deletes a pocket based on the pocket ID provided in the URL. \n'
+      + '- **xid**: The ID of the pocket to be deleted. \n'
+      + '- If the pocket has deposits, it cannot be deleted. Only 0 balance pockets can be deleyed \n'
+      + '- For group pockets, only admins can delete them. \n',
     schema: {
-      params: z.object({ id: z.string() }),
+      params: z.object({ xid: z.string() }),
       body: z.object({ entity_id: z.number() }).partial()
     },
     response: {
@@ -25,7 +29,7 @@ const deletePocket = (router: Router) => {
       const entity_id = req.body?.entity_id ?? req.user!.id;
       await SQL_DELETE_POCKET({
         entity_id,
-        pocket_id: Number(req.params.id)
+        pocket_id: Number(req.params.xid)
       }).exec().catch(err => {
         if (err.code === 'P0006') {
           throw new HttpError(409, { message: 'ERR_CANT_DELETE_PKT_WITH_DEPOSITS' });
