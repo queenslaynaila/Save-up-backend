@@ -64,12 +64,17 @@ const updateUserAttributes = (router: Router) => {
     method: 'patch',
     path: '/:user_id',
     summary: 'Update user attributes (ID number, phone number, PIN, or role)',
-    description: 'Endpoint allows a user to update their ID number, phone number, or PIN, and allows an admin to update a user\'s role.\n'
-      + '- The userId in the param is either the user\'s id or "me" for the logged in user.\n'
-      + '- **ID number update**: Provide the ID type and number.\n'
+    description: 'This endpoint allows updating various user attributes. The userId in the param can be either the user\'s id or "me" for the logged-in user.\n\n'
+      + 'The following updates are supported:\n'
+      + '- **ID number update**: Provide the ID type and new ID number.\n'
       + '- **Phone number update**: Provide the new phone number and current PIN for verification.\n'
-      + '- **Role update**: Admins can update a standard user\'s role.\n'
-      + '- **PIN update**: Provide the current PIN and a new PIN for updating.',
+      + '- **PIN update**: Provide the current PIN and a new PIN for updating.\n'
+      + '- **Role update**: Admins can update a user\'s role. The role must be provided in the body.\n\n'
+      + 'Requirements:\n'
+      + '- For role updates, only admins can perform this action.\n'
+      + '- For PIN updates, the logged-in user must submit the old and new PIN.\n'
+      + '- For phone number updates, the logged-in user must provide the new phone number and current PIN.\n'
+      + '- For ID number updates, the user must choose the type of ID and provide the new ID number.',
     schema: {
       params: z.object({
         user_id: z.string()
@@ -79,7 +84,7 @@ const updateUserAttributes = (router: Router) => {
     response: {
       schema: z.object({
         updated_attribute: z.string()
-      })
+      }) || null
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {

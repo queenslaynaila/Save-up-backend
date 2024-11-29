@@ -31,15 +31,16 @@ const getUsersBySearchCriteria = (router: Router) => {
       + '- **ID number**: A user’s identification number (e.g., 123456 or 987654321).\n'
       + '- **Passport number**: A user’s passport number (e.g., A12345678).\n'
       + '- **"me"**: The string "me" can be used to fetch details of the currently logged-in user.\n\n'
-      + 'Standard users can only access their own details by using "me", while moderators and admins have access to query any user using any of the above identifiers.\n\n'
-      + 'If no limit is provided, the default is 10. At least one query parameter must be provided to avoid retrieving all users.',
+      + 'Standard users can only access their own details by using "me". Moderators and admins have access to query any user using any of the above identifiers.\n\n'
+      + 'If no limit is provided, the default is 10.If no query parameter is provided, the default query parameter "me" will be used to fetch the logged-in user\'s details.',
     schema: {
       query: z.object({
         phone_number: z.string(),
         id_type: z.string(),
         id_number: z.string(),
-        me: z.string(),
-        limit: z.number().optional().default(10)
+        me: z.string().optional(),
+        user_id: z.string(),
+        limit: z.number().default(10)
       }).partial()
     },
     response: {
@@ -48,13 +49,9 @@ const getUsersBySearchCriteria = (router: Router) => {
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {
-      if (Object.keys(req.query).length === 0) {
-        throw new HttpError(400);
-      }
-
       const { phone_number, id_type, id_number, me, limit = 10 } = req.query;
 
-      if (me === 'me' && req.user!.role === UserRole.USER) {
+      if (req.user!.role === UserRole.USER && me === undefined) {
         throw new HttpError(403);
       }
 
@@ -82,7 +79,8 @@ const getUsersBySearchCriteria = (router: Router) => {
       }
 
       const query = SQL_GET_USER_BY_CRITERIA({});
-      const users = await query.extend(`WHERE ${filters.join(' AND ')} LIMIT :limit`, filterArgs).many();
+      query.extend(`WHERE ${filters.join(' AND ')} LIMIT :limit`, filterArgs);
+      const users = await query.many();
 
       res.json(users);
     }
