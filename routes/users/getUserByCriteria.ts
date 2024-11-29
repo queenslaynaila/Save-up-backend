@@ -4,6 +4,7 @@ import { HttpError } from '../../middleware/errorMiddleware';
 import Router from '../../router';
 import { publicUserSchema, UserWithPublicAttributes } from '../auth/login';
 import { UserRole } from '../../globalTypes';
+import logger from '../../logger';
 
 const SQL_GET_USER_BY_CRITERIA = sql<Record<string, never>, UserWithPublicAttributes>(`
   SELECT 
@@ -36,7 +37,6 @@ const getUsersBySearchCriteria = (router: Router) => {
     schema: {
       query: z.object({
         phone_number: z.string(),
-        id_type: z.string(),
         id_number: z.string(),
         user_id: z.string().optional().default('me'),
         limit: z.string().default('10')
@@ -48,15 +48,12 @@ const getUsersBySearchCriteria = (router: Router) => {
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {
-      const { phone_number, id_type, id_number, limit = 10, user_id } = req.query;
-      let targetUserId: number | null = null;
-      if (user_id === 'me') {
-        targetUserId = req.user!.id;
-      } else {
-        targetUserId = parseInt(user_id!, 10);
-        if (Number.isNaN(targetUserId)) {
-          throw new HttpError(400);
-        }
+      const { phone_number, id_number, limit = 10, user_id } = req.query;
+
+      const targetUserId = user_id === 'me' ? req.user!.id : parseInt(user_id!, 10);
+
+      if (Number.isNaN(targetUserId)) {
+        throw new HttpError(400);
       }
 
       if (req.user!.role === UserRole.USER
@@ -77,11 +74,6 @@ const getUsersBySearchCriteria = (router: Router) => {
         filters.push('user_contact_details.phone_number = :phone_number');
       }
 
-      if (id_type) {
-        filterArgs.id_type = id_type;
-        filters.push('users.id_type = :id_type');
-      }
-
       if (id_number) {
         filterArgs.id_number = id_number;
         filters.push('users.id_number = :id_number');
@@ -90,6 +82,7 @@ const getUsersBySearchCriteria = (router: Router) => {
       const query = SQL_GET_USER_BY_CRITERIA({});
       query.extend(`WHERE ${filters.join(' AND ')} LIMIT :limit`, filterArgs);
       const users = await query.many();
+      logger.info(`Found ${JSON.stringify(users)} users`);
 
       res.json(users);
     }
