@@ -4,6 +4,8 @@ import { sql } from '../../db';
 import Router from '../../router';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { userContactDetailsSchema, userSchema } from '../users/schema';
+import { generateToken } from '../../middleware/generatetoken';
+import { AuthenticatedUser, publicUserSchema } from './login';
 
 const createUserPayloadSchema = userSchema.pick({
   pin: true,
@@ -17,8 +19,8 @@ const createUserPayloadSchema = userSchema.pick({
 });
 type CreateUserPayload = z.infer<typeof createUserPayloadSchema>;
 
-const SQL_CREATE_USER = sql<CreateUserPayload, Record<string, never>>(`
-  SELECT create_user(:id_type, :id_number, :phone_number, :full_name, :gender, :pin, :role)
+const SQL_CREATE_USER = sql<CreateUserPayload, AuthenticatedUser>(`
+  SELECT * FROM create_user(:id_type, :id_number, :phone_number, :full_name, :gender, :pin, :role)
 `);
 
 const createUser = (router: Router) => {
@@ -30,21 +32,27 @@ const createUser = (router: Router) => {
       body: createUserPayloadSchema
     },
     response: {
+      schema: publicUserSchema,
       statusCode: 201
     },
     handler: async (req, res) => {
       const pinHash = bcrypt.hashSync(String(req.body.pin), 12);
-      await SQL_CREATE_USER({
+      const user = await SQL_CREATE_USER({
         ...req.body,
         role: req.body.role || 'Standard',
         pin: pinHash
-      }).exec().catch((err) => {
+      }).one().catch((err) => {
         if (err.code === '23505') {
           throw new HttpError(409);
         }
-        throw (err);
+        throw err;
       });
-      res.sendStatus(201);
+
+      const accessToken = generateToken(user.id, user.role, '7d');
+      res
+        .status(201)
+        .setHeader('Authorization', `Bearer ${accessToken}`)
+        .json(user);
     }
   });
 };
