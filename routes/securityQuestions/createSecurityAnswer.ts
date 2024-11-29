@@ -1,8 +1,7 @@
 import Router from '../../router';
 import bcrypt from 'bcrypt';
 import { sql } from '../../db';
-import authMiddleware from '../../middleware/authorization';
-import { securityAnswerSchema } from './schema';
+import { securityAnswerSchema } from '../securityAnswer/schema';
 import { z } from 'zod';
 
 const securityAnswerCreationSchema = securityAnswerSchema.pick({
@@ -19,24 +18,26 @@ const SQL_CREATE_ANSWER = sql<AnswerCreationPayload, Record<string, never>>(`
 const createSecurityAnswer = (router: Router) => {
   router.route({
     method: 'post',
-    path: '/',
+    path: '/:question_id/answers',
     summary: 'Create a security answer',
     schema: {
+      params: z.object({
+        question_id: z.string()
+      }),
       body: securityAnswerCreationSchema.pick({
-        question_id: true,
         answer: true
       })
     },
     response: {
       statusCode: 201
     },
-    middlewares: [authMiddleware()],
+    authMiddlewareOptions: {},
     handler: async (req, res) => {
       const hashedAnswer = await bcrypt.hash(req.body.answer, 12);
       await SQL_CREATE_ANSWER({
-        ...req.body,
         answer: hashedAnswer,
-        user_id: req.user!.id
+        user_id: req.user!.id,
+        question_id: Number(req.params.question_id)
       }).exec();
       res.sendStatus(201);
     }

@@ -17,7 +17,7 @@ const getAllSecurityQuestions = (router: Router) => {
   router.route({
     method: 'get',
     path: '/',
-    summary: 'Get list of security questions',
+    summary: 'Get list of system defined security questions',
     response: {
       schema: z.array(securityQuestions)
     },

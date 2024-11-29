@@ -3,7 +3,7 @@ import bcrypt from 'bcrypt';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { z } from 'zod';
-import { securityAnswerSchema } from './schema';
+import { securityAnswerSchema } from '../securityAnswer/schema';
 
 const answerUpdatePayload = securityAnswerSchema.pick({
   answer: true
@@ -28,8 +28,8 @@ const SQL_UPDATE_SECURITY_ANSWER = sql<AnswerUpdatePayload, Record<string, never
 const updateSecurityAnswer = (router: Router) => {
   router.route({
     method: 'patch',
-    path: '/:question_id',
-    summary: 'Update security answer',
+    path: '/:question_id/answers',
+    summary: 'Update a security answer',
     schema: {
       params: z.object({ question_id: z.string() }),
       body: answerUpdatePayload
