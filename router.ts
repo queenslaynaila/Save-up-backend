@@ -15,8 +15,17 @@ import zodToJsonSchema from 'zod-to-json-schema';
 import Ajv, { ErrorObject } from 'ajv';
 import { HttpError } from './middleware/errorMiddleware';
 import authMiddleware, { AuthMiddlewareOptions } from './middleware/authorization';
+import basicAuth from 'express-basic-auth';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const ajv = new Ajv();
+
+const swaggerConfig = {
+  username: process.env.SWAGGER_USERNAME,
+  password: process.env.SWAGGER_PASSWORD
+};
 
 const validateSchema = (schema: ZodSchema, data: unknown, section: 'body' | 'query' | 'params') => {
   const jsonSchema = zodToJsonSchema(schema, { target: 'openApi3' });
@@ -95,6 +104,15 @@ class Router {
     this.apiTag = apiTag;
     Router.app.use(express.json());
     Router.app.use(this.routePrefix, this.router);
+    Router.app.use(
+      ['/docs'],
+      basicAuth({
+        challenge: true,
+        users: {
+          [swaggerConfig.username!]: swaggerConfig.password!
+        }
+      })
+    );
   }
 
   public static getAppInstance(): Application {
