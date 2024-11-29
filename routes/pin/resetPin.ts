@@ -14,7 +14,7 @@ const SQL_RESET_PASSWORD = sql<{id: number; pin: string}, Record<string, never>>
 const resetPin = (router: Router) => {
   router.route({
     method: 'patch',
-    path: '/confirm',
+    path: '/reset',
     summary: 'Reset pin',
     schema: {
       body: z.object({ new_pin: z.string() })
