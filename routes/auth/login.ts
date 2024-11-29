@@ -20,7 +20,7 @@ const authenticatedUserSchema = userSchema.pick({
   phone_number: userContactDetailsSchema.shape.phone_number
 });
 
-type AuthenticatedUser = z.infer<typeof authenticatedUserSchema>;
+export type AuthenticatedUser = z.infer<typeof authenticatedUserSchema>;
 
 export const publicUserSchema = authenticatedUserSchema.omit({
   pin: true
