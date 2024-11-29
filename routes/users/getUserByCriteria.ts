@@ -38,9 +38,8 @@ const getUsersBySearchCriteria = (router: Router) => {
         phone_number: z.string(),
         id_type: z.string(),
         id_number: z.string(),
-        me: z.string().optional(),
-        user_id: z.string(),
-        limit: z.number().default(10)
+        user_id: z.string().optional().default('me'),
+        limit: z.string().default('10')
       }).partial()
     },
     response: {
@@ -49,18 +48,28 @@ const getUsersBySearchCriteria = (router: Router) => {
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {
-      const { phone_number, id_type, id_number, me, limit = 10 } = req.query;
+      const { phone_number, id_type, id_number, limit = 10, user_id } = req.query;
+      let targetUserId: number | null = null;
+      if (user_id === 'me') {
+        targetUserId = req.user!.id;
+      } else {
+        targetUserId = parseInt(user_id!, 10);
+        if (Number.isNaN(targetUserId)) {
+          throw new HttpError(400);
+        }
+      }
 
-      if (req.user!.role === UserRole.USER && me === undefined) {
+      if (req.user!.role === UserRole.USER
+        && targetUserId !== req.user!.id) {
         throw new HttpError(403);
       }
 
       const filters: string[] = [];
       const filterArgs: Record<string, string | number> = { limit };
 
-      if (me) {
-        filterArgs.me = req.user!.id;
-        filters.push('users.id = :me');
+      if (targetUserId !== null) {
+        filterArgs.user_id = targetUserId;
+        filters.push('users.id = :user_id');
       }
 
       if (phone_number) {
