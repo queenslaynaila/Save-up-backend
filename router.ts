@@ -14,7 +14,6 @@ import fastJson from 'fast-json-stringify';
 import zodToJsonSchema from 'zod-to-json-schema';
 import Ajv, { ErrorObject } from 'ajv';
 import { HttpError } from './middleware/errorMiddleware';
-import cors from 'cors';
 import authMiddleware, { AuthMiddlewareOptions } from './middleware/authorization';
 
 const ajv = new Ajv();
@@ -94,15 +93,6 @@ class Router {
     this.router = ExpressRouter();
     this.routePrefix = routePrefix;
     this.apiTag = apiTag;
-
-    Router.app.use(
-      cors({
-        origin: ['http://localhost:5173', 'https://save-up-seven.vercel.app'],
-        credentials: true,
-        exposedHeaders: ['Authorization'],
-        allowedHeaders: ['Content-Type', 'Authorization', 'Authorization']
-      })
-    );
     Router.app.use(express.json());
     Router.app.use(this.routePrefix, this.router);
   }
