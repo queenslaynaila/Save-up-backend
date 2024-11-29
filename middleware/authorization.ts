@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import jwt, { JwtPayload, Secret, VerifyErrors } from 'jsonwebtoken';
 import { UserRole } from '../globalTypes';
 import { HttpError } from './errorMiddleware';
+import logger from '../logger';
 
 export type User = {
   id: number;
@@ -25,7 +26,8 @@ function authMiddleware(options: AuthMiddlewareOptions = {}) {
   const roles = options.roles || [];
 
   return (req: Request, _res: Response, next: NextFunction) => {
-    const accessToken = req.headers.Authorization;
+    const accessToken = req.headers.authorization;
+    logger.info(`Access token: ${accessToken}`);
 
     if (!accessToken || typeof accessToken !== 'string') {
       throw new HttpError(401);
