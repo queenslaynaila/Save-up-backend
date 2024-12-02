@@ -78,7 +78,8 @@ app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
   logger.info(error.name);
   logger.error(`we are the global error handler and errors looks like: ${JSON.stringify(error)}`);
   if (error instanceof HttpError) {
-    logger.info(error.errors);
+    logger.info(`we are the global error http handler and errors looks like: ${JSON.stringify(error)}`);
+    logger.info(JSON.stringify(error.errors));
     return res.status(error.status).json(error);
   }
 
