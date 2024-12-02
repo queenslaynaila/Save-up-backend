@@ -1,3 +1,4 @@
+/* eslint-disable no-template-curly-in-string */
 /* eslint-disable no-use-before-define */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import express, {
@@ -55,6 +56,7 @@ const validateRequest = (schema: {
 }) => {
   return (req: Request, res: Response, next: NextFunction) => {
     if (schema.body) validateSchema(schema.body, req.body, 'body');
+    logger.info(`all queries are ${JSON.stringify(req.query)}`);
     if (schema.query) validateSchema(schema.query, req.query, 'query');
     if (schema.params) validateSchema(schema.params, req.params, 'params');
     next();
@@ -164,11 +166,13 @@ class Router {
     const responseSchema = response?.schema;
     const statusCode = String(response?.statusCode || 200);
     const description = response?.description || 'Success';
+    const transformedPath = path.replace(/:([^/]+)/g, '{$1}');
+    logger.info(transformedPath);
 
     registry.registerPath({
       tags: this.apiTag ? [this.apiTag] : undefined,
       method,
-      path: `${this.routePrefix}${path}`,
+      path: `${this.routePrefix}${transformedPath}`,
       summary: options.summary,
       description: options.description,
       security: authMiddlewareOptions ? [{ Authorization: [] }] : undefined,
