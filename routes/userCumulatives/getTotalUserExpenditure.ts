@@ -36,13 +36,13 @@ const getTotalUserExpenditure = (router: Router) => {
         filterArgs.start_date = Array.isArray(start_date)
           ? start_date[0] as string
           : start_date as string;
-        filters.push('date >= :start_date');
+        filters.push('spent_at >= :start_date');
       }
       if (end_date) {
         filterArgs.end_date = Array.isArray(end_date)
           ? end_date[0] as string
           : end_date as string;
-        filters.push('date <= :end_date');
+        filters.push('spent_at <= :end_date');
       }
       if (category_id) {
         filterArgs.category_id = Array.isArray(category_id)
