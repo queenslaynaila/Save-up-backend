@@ -3,7 +3,13 @@ import bcrypt from 'bcrypt';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { z } from 'zod';
-import { securityAnswerSchema } from '../securityAnswer/schema';
+
+export const securityAnswerSchema = z.object({
+  user_id: z.number().int(),
+  question_id: z.number().int(),
+  answer: z.string(),
+  created_at: z.string()
+});
 
 const answerUpdatePayload = securityAnswerSchema.pick({
   answer: true

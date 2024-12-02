@@ -1,8 +1,8 @@
 import Router from '../../router';
 import bcrypt from 'bcrypt';
 import { sql } from '../../db';
-import { securityAnswerSchema } from '../securityAnswer/schema';
 import { z } from 'zod';
+import { securityAnswerSchema } from './updateAnswer';
 
 const securityAnswerCreationSchema = securityAnswerSchema.pick({
   user_id: true,
