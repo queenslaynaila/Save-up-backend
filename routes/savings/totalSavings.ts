@@ -7,7 +7,7 @@ import { z } from 'zod';
 
 const SQL_GET_TOTAL_SAVINGS = sql<{user_id:number, type_id:number}, Totals>(`
   SELECT 
-    SUM(delta) AS total_savings
+    SELECT COALESCE(SUM(delta), 0) AS  total_savings
   FROM 
     transactions
   WHERE 
