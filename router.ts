@@ -167,7 +167,6 @@ class Router {
     const statusCode = String(response?.statusCode || 200);
     const description = response?.description || 'Success';
     const transformedPath = path.replace(/:([^/]+)/g, '{$1}');
-    logger.info(transformedPath);
 
     registry.registerPath({
       tags: this.apiTag ? [this.apiTag] : undefined,
@@ -223,7 +222,18 @@ registry.registerComponent(
     type: 'apiKey',
     name: 'Authorization',
     in: 'header',
-    description: 'JWT authorization using the Bearer scheme'
+    description: 'JWT Bearer token used for user authentication. The token must be included in the "Authorization" header as "Bearer <token>" for secure access to protected routes.'
+  }
+);
+
+registry.registerComponent(
+  'securitySchemes',
+  'Reset',
+  {
+    type: 'apiKey',
+    name: 'Authorization',
+    in: 'header',
+    description: 'JWT token used to manage the multi-step password reset process. The token is generated at each step, and its payload indicates the user\'s current step. It ensures the user cannot skip steps and is required for every request in the reset process.'
   }
 );
 
