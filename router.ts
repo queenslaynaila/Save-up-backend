@@ -110,7 +110,7 @@ class Router {
         origin: ['http://localhost:5173', 'https://save-up-seven.vercel.app'],
         credentials: true,
         exposedHeaders: ['authorization-token'],
-        allowedHeaders: ['Content-Type', 'Authorization', 'authorization-token']
+        allowedHeaders: ['Content-Type', 'Authorization']
       })
     );
     Router.app.use(express.json());
