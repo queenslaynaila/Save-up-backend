@@ -15,12 +15,12 @@ const SQL_GET_USER = sql<{ phone_number: string }, { id:number }>(`
   WHERE phone_number = :phone_number;
 `);
 
-const SQL_SAVE_TOKEN = sql<Pick<ResetToken, 'user_id'| 'token' | 'reason'>, Pick<ResetToken, 'token'>>(`
+const SQL_SAVE_TOKEN = sql<Pick<ResetToken, 'user_id' | 'token' | 'reason'>, Pick<ResetToken, 'token'>>(`
   INSERT INTO reset_tokens (user_id, xid, token, reason)
   SELECT :user_id,
-          COALESCE(MAX(xid), 0) + 1, 
-          :token,
-          :reason
+         COALESCE(MAX(xid), 0) + 1,
+         :token,
+         :reason
   FROM reset_tokens
   WHERE user_id = :user_id
   RETURNING token;
