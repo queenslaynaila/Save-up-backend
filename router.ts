@@ -18,6 +18,7 @@ import authMiddleware, { AuthMiddlewareOptions } from './middleware/authorizatio
 import basicAuth from 'express-basic-auth';
 import dotenv from 'dotenv';
 import logger from './logger';
+import cors from 'cors';
 
 dotenv.config();
 
@@ -104,6 +105,14 @@ class Router {
     this.router = ExpressRouter();
     this.routePrefix = routePrefix;
     this.apiTag = apiTag;
+    Router.app.use(
+      cors({
+        origin: ['http://localhost:5173', 'https://save-up-seven.vercel.app'],
+        credentials: true,
+        exposedHeaders: ['authorization-token'],
+        allowedHeaders: ['Content-Type', 'Authorization', 'authorization-token']
+      })
+    );
     Router.app.use(express.json());
     Router.app.use(this.routePrefix, this.router);
     Router.app.use(
