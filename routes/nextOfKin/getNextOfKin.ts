@@ -4,7 +4,6 @@ import { NextOfKin, nextOfKinPublicViewSchema } from './createNextOfKin';
 import { z } from 'zod';
 import { UserRole } from '../../globalTypes';
 import { HttpError } from '../../middleware/errorMiddleware';
-import logger from '../../logger';
 
 const SQL_GET_KIN = sql<{user_id: number}, NextOfKin>(`
   SELECT xid, full_name, relationship, phone_number, created_at
@@ -27,10 +26,7 @@ const getNextOfKin = (router: Router) => {
     schema: {
       query: z.object({
         user_id: z.string(),
-        include_history: z.string()
-          .optional()
-          .transform((value) => value === 'true')
-          .default('false')
+        include_history: z.string().default('false')
       }).partial()
     },
     response: {
@@ -38,15 +34,14 @@ const getNextOfKin = (router: Router) => {
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {
-      logger.info(req.query);
-      const { user_id, include_history = false } = req.query;
+      const { user_id, include_history = 'false' } = req.query;
       if (user_id && Number.isNaN(parseInt(user_id, 10))) {
         throw new HttpError(400);
       }
 
       const targetUser = user_id ? parseInt(user_id, 10) : req.user!.id;
-      logger.info(`this is ${include_history}`);
-      if (req.user!.role === UserRole.USER && include_history === true) {
+      if (req.user!.role === UserRole.USER
+        && (req.user!.id !== targetUser || include_history)) {
         throw new HttpError(403);
       }
 
