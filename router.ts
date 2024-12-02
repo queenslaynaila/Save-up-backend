@@ -109,7 +109,7 @@ class Router {
       cors({
         origin: ['http://localhost:5173', 'https://save-up-seven.vercel.app'],
         credentials: true,
-        exposedHeaders: ['authorization-token'],
+        exposedHeaders: ['Authorization'],
         allowedHeaders: ['Content-Type', 'Authorization']
       })
     );
