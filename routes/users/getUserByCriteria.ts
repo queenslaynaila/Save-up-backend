@@ -38,7 +38,7 @@ const getUsersBySearchCriteria = (router: Router) => {
       query: z.object({
         phone_number: z.string(),
         id_number: z.string(),
-        user_id: z.string().optional().default('me'),
+        user_id: z.string().optional(),
         limit: z.string().default('10')
       }).partial()
     },
@@ -48,7 +48,9 @@ const getUsersBySearchCriteria = (router: Router) => {
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {
+      logger.info(`my query is ${JSON.stringify(req.query)}`);
       const { phone_number, id_number, limit = 10, user_id } = req.query;
+      logger.info(`phone no is ${phone_number} id number is ${id_number} and limit is ${limit} user is ${user_id} logged in uer is ${req.user}`);
 
       const targetUserId = user_id === 'me' ? req.user!.id : parseInt(user_id!, 10);
 
