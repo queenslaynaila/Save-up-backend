@@ -39,8 +39,7 @@ const getTransactionsForUser = (router: Router) => {
         slug: transactionTypeSchema.shape.slug,
         start_at: z.string().date().optional(),
         end_at: z.string().date().optional(),
-        limit: z.number().optional().default(10),
-        dir: z.enum(['asc', 'desc']).optional().default('desc')
+        limit: z.string().optional().default('10')
       }).partial()
     },
     response: {
@@ -59,10 +58,10 @@ const getTransactionsForUser = (router: Router) => {
         throw new HttpError(403);
       }
 
-      const { slug, limit = 10, start_at, end_at, dir = 'desc' } = req.query;
+      const { slug, limit = 10, start_at, end_at } = req.query;
 
       const filters: string[] = [];
-      const filterArgs: Record<string, string | number> = { limit, dir };
+      const filterArgs: Record<string, string | number> = { limit };
 
       if (slug) {
         filters.push('transaction_types.slug = :slug');
@@ -82,7 +81,9 @@ const getTransactionsForUser = (router: Router) => {
         user_id
       });
 
-      query.extend(`AND ${filters.join(' AND ')} ORDER BY transactions.created_at :dir LIMIT :limit`, filterArgs);
+      if (filters.length > 0) query.extend(`AND ${filters.join(' AND ')}`, filterArgs);
+
+      query.extend('ORDER BY transactions.created_at DESC LIMIT :limit', filterArgs);
       const transactions = await query.many();
       return res.json(transactions);
     }
