@@ -17,6 +17,7 @@ import { HttpError } from './middleware/errorMiddleware';
 import authMiddleware, { AuthMiddlewareOptions } from './middleware/authorization';
 import basicAuth from 'express-basic-auth';
 import dotenv from 'dotenv';
+import logger from './logger';
 
 dotenv.config();
 
@@ -41,6 +42,7 @@ const validateSchema = (schema: ZodSchema, data: unknown, section: 'body' | 'que
       dataPath: err.dataPath,
       schemaPath: err.schemaPath
     }));
+    logger.error(`Validation error in ${section}`, errors);
     throw new HttpError(400, errors);
   }
 };
@@ -85,7 +87,7 @@ interface RouterOptions<
   handler: RequestHandler<InferZodType<Params>, ResBody, ReqBody, InferZodType<Query>>;
 }
 
-const registry = new OpenAPIRegistry();
+export const registry = new OpenAPIRegistry();
 
 class Router {
   private static app: Application = express();
@@ -201,18 +203,6 @@ class Router {
   }
 }
 
-export const generateOpenApiSpec = () => {
-  const generator = new OpenApiGeneratorV3(registry.definitions);
-  return generator.generateDocument({
-    openapi: '3.0.0',
-    info: {
-      title: 'API Documentation for Saveup',
-      version: '1.0.0',
-      description: 'This is the API documentation for Saveup.'
-    }
-  });
-};
-
 registry.registerComponent(
   'securitySchemes',
   'Authorization',
@@ -223,5 +213,22 @@ registry.registerComponent(
     description: 'JWT authorization using the Bearer scheme'
   }
 );
+
+export const generateOpenApiSpec = () => {
+  const generator = new OpenApiGeneratorV3(registry.definitions);
+  return generator.generateDocument({
+    openapi: '3.0.0',
+    info: {
+      title: 'API Documentation for Saveup',
+      version: '1.0.0',
+      description: 'This is the API documentation for Saveup.'
+    },
+    security: [
+      {
+        Authorization: []
+      }
+    ]
+  });
+};
 
 export default Router;
