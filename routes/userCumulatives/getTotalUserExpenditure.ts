@@ -1,5 +1,4 @@
 import { sql } from '../../db';
-import authMiddleware from '../../middleware/authorization';
 import { HttpError } from '../../middleware/errorMiddleware';
 import Router from '../../router';
 import {
@@ -26,7 +25,7 @@ const getTotalUserExpenditure = (router: Router) => {
     response: {
       schema: totalExpenseResultSchema
     },
-    middlewares: [authMiddleware()],
+    authMiddlewareOptions: {},
     handler: async (req, res) => {
       const user_id = req.user!.id;
       const { start_date, end_date, category_id } = req.query;
