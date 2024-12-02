@@ -10,7 +10,7 @@ import {
 } from './types';
 
 const SQL_GET_TOTAL_EXPENSES = sql<UserCumulaInterface, TotalExpenseInterface>(`
-  SELECT COALESCE(SUM(amount_spent), 0) AS total_expenses
+  SELECT COALESCE(SUM(amount), 0) AS total_expenses
   FROM expenses
   WHERE entity_id = :user_id
 `);
