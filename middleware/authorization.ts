@@ -27,7 +27,6 @@ function authMiddleware(options: AuthMiddlewareOptions = {}) {
 
   return (req: Request, _res: Response, next: NextFunction) => {
     const accessToken = req.headers.authorization;
-    logger.info(`Access token: ${accessToken}`);
 
     if (!accessToken || typeof accessToken !== 'string') {
       throw new HttpError(401);
@@ -63,6 +62,7 @@ function authMiddleware(options: AuthMiddlewareOptions = {}) {
         }
 
         req.user = user;
+        logger.info(`user has been found succefully and is ${JSON.stringify(user)}`);
         return next();
       }
     );
