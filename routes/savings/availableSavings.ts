@@ -2,11 +2,10 @@ import Router from '../../router';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { HttpError } from '../../middleware/errorMiddleware';
-import { Balance } from './types';
 import { GetByUserInterface } from '../../globalTypes';
 import { z } from 'zod';
 
-const SQL_GET_AVAILABLE_SAVINGS = sql<GetByUserInterface, Balance>(`
+const SQL_GET_AVAILABLE_SAVINGS = sql<GetByUserInterface, {balance: number}>(`
     SELECT COALESCE(SUM(balance), 0) AS balance
     FROM (
          SELECT DISTINCT ON (pocket_id) balance
@@ -22,7 +21,7 @@ const getAvailableSavings = (router: Router) => {
     path: '/current-savings',
     summary: 'Get current balance across all pockets',
     response: {
-      schema: z.object({ delta: z.number() })
+      schema: z.object({ balance: z.number() })
     },
     middlewares: [authMiddleware()],
     handler: async (req, res) => {
