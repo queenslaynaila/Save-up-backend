@@ -15,7 +15,7 @@ import fastJson from 'fast-json-stringify';
 import zodToJsonSchema from 'zod-to-json-schema';
 import Ajv, { ErrorObject } from 'ajv';
 import { HttpError } from './middleware/errorMiddleware';
-import authMiddleware, { AuthMiddlewareOptions } from './middleware/authorization';
+import authMiddleware, { authenticateResetToken, AuthMiddlewareOptions } from './middleware/authorization';
 import basicAuth from 'express-basic-auth';
 import dotenv from 'dotenv';
 import logger from './logger';
@@ -92,6 +92,18 @@ interface RouterOptions<
 
 export const registry = new OpenAPIRegistry();
 
+/**
+ * The `Router` class simplifies defining API routes with:
+ * - Request validation using Zod schemas.
+ * - Middleware integration.
+ * - Modifies default `res.json` behavior to use `fast-json-stringify` for speed.
+ * - Automatic OpenAPI documentation generation.
+ *
+ * Each router instance is associated with a specific route prefix and an apitag.
+ * @param routePrefix - Prefix for all routes in this router.Mostly the name of given resource.
+ * @param apiTag - Optional OpenAPI tag for grouping routes in the documentation.
+ */
+
 class Router {
   private static app: Application = express();
 
@@ -163,6 +175,14 @@ class Router {
       middlewares.push(validateRequest(schema));
     }
 
+    const security = [];
+    if (authMiddlewareOptions) {
+      security.push({ Authorization: [] });
+    }
+    if (middlewares?.includes(authenticateResetToken)) {
+      security.push({ Reset: [] });
+    }
+
     const responseSchema = response?.schema;
     const statusCode = String(response?.statusCode || 200);
     const description = response?.description || 'Success';
@@ -174,7 +194,7 @@ class Router {
       path: `${this.routePrefix}${transformedPath}`,
       summary: options.summary,
       description: options.description,
-      security: authMiddlewareOptions ? [{ Authorization: [] }] : undefined,
+      security,
       request: {
         params: schema?.params,
         body: schema?.body ? { content: { 'application/json': { schema: schema.body } } } : undefined,
@@ -231,7 +251,7 @@ registry.registerComponent(
   'Reset',
   {
     type: 'apiKey',
-    name: 'Authorization',
+    name: 'Reset',
     in: 'header',
     description: 'JWT token used to manage the multi-step password reset process. The token is generated at each step, and its payload indicates the user\'s current step. It ensures the user cannot skip steps and is required for every request in the reset process.'
   }
