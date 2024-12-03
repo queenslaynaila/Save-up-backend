@@ -5,7 +5,6 @@ import Router from '../../router';
 import { transaction, Transaction } from '../pockets/getTransactionsForPocket';
 import { UserRole } from '../../types';
 import { transactionTypeSchema } from '../pockets/schema';
-import logger from '../../logger';
 
 const SQL_GET_TRANSACTIONS_FOR_USER = sql<{user_id:number}, Transaction>(`
   SELECT 
@@ -48,16 +47,15 @@ const getTransactionsForUser = (router: Router) => {
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {
-      logger.info(JSON.stringify(req.params));
-      logger.info(JSON.stringify(req.params.user_id));
-      const param = req.params.user_id;
-      const user_id = param === 'me' ? req.user!.id : parseInt(param, 10);
+      const user_id = req.params.user_id;
+      const targetUserId = user_id === 'me' || user_id === undefined
+        ? req.user!.id : parseInt(user_id!, 10);
 
-      if (Number.isNaN(user_id)) {
+      if (Number.isNaN(targetUserId)) {
         throw new HttpError(400);
       }
 
-      if (req.user!.role === UserRole.USER && user_id !== req.user!.id) {
+      if (req.user!.role === UserRole.USER && targetUserId !== req.user!.id) {
         throw new HttpError(403);
       }
 
@@ -81,7 +79,7 @@ const getTransactionsForUser = (router: Router) => {
       }
 
       const query = SQL_GET_TRANSACTIONS_FOR_USER({
-        user_id
+        user_id: targetUserId
       });
 
       if (filters.length > 0) query.extend(`AND ${filters.join(' AND ')}`, filterArgs);
