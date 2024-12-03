@@ -1,7 +1,7 @@
 import Router from '../../router';
 import { sql } from '../../db';
 import HttpError from '../../httpError';
-import authMiddleware from '../../middleware/authorization';
+import authMiddleware from '../../authorization';
 import {
   expenseBodySchema,
   ExpenseUpdateInterface,

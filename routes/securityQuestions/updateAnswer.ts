@@ -1,7 +1,7 @@
 import Router from '../../router';
 import bcrypt from 'bcrypt';
 import { sql } from '../../db';
-import authMiddleware from '../../middleware/authorization';
+import authMiddleware from '../../authorization';
 import { z } from 'zod';
 
 export const securityAnswerSchema = z.object({

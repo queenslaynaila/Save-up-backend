@@ -1,7 +1,7 @@
 import Router from '../../router';
 import { z } from 'zod';
 import { sql } from '../../db';
-import authMiddleware from '../../middleware/authorization';
+import authMiddleware from '../../authorization';
 import HttpError from '../../httpError';
 import { nextOfKinSchema } from './schema';
 

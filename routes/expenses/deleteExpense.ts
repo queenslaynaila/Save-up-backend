@@ -1,6 +1,6 @@
 import Router from '../../router';
 import { sql } from '../../db';
-import authMiddleware from '../../middleware/authorization';
+import authMiddleware from '../../authorization';
 import { XidEntityInterface, idParamSchema, entitySchema } from '../../globalTypes';
 
 const SQL_DELETE_EXPENSE = sql<XidEntityInterface, Record<string, never>>(`

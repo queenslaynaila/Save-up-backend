@@ -1,7 +1,7 @@
 import Router from '../../router';
 import { sql } from '../../db';
 import { ExternalSavingInterface, externalSavingSchema } from './types';
-import authMiddleware from '../../middleware/authorization';
+import authMiddleware from '../../authorization';
 
 const SQL_CREATE_SAVING = sql<ExternalSavingInterface, Record<string, never>>(`
   SELECT create_external_savings( 

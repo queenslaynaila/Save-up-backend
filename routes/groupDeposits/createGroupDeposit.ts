@@ -1,6 +1,6 @@
 import Router from '../../router';
 import { sql } from '../../db';
-import authMiddleware from '../../middleware/authorization';
+import authMiddleware from '../../authorization';
 import { depositByGroup, GroupDeposit } from './types';
 
 const SQL_CREATE_GROUP_DEPOSIT = sql<GroupDeposit, Record<string, never>>(`

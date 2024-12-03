@@ -1,5 +1,5 @@
 import Router from '../../router';
-import authMiddleware from '../../middleware/authorization';
+import authMiddleware from '../../authorization';
 import HttpError from '../../httpError';
 import { sql } from '../../db';
 import { z } from 'zod';

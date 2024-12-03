@@ -1,6 +1,6 @@
 import Router from '../../router';
 import { sql } from '../../db';
-import authMiddleware from '../../middleware/authorization';
+import authMiddleware from '../../authorization';
 import { NextOfKin } from './createNextOfKin';
 import { z } from 'zod';
 import HttpError from '../../httpError';

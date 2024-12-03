@@ -1,6 +1,6 @@
 import Router from '../../router';
 import { sql } from '../../db';
-import authMiddleware from '../../middleware/authorization';
+import authMiddleware from '../../authorization';
 import { TransferInput, transferValidationSchema } from './types';
 import HttpError from '../../httpError';
 

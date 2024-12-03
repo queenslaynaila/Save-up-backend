@@ -1,6 +1,6 @@
 import { sql } from '../../db';
 import Router from '../../router';
-import authMiddleware from '../../middleware/authorization';
+import authMiddleware from '../../authorization';
 import { InviteResponseInterface, inviteValidationSchema } from './types';
 import { idParamSchema, StatusCodeInterface } from '../../globalTypes';
 

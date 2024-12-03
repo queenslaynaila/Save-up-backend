@@ -5,7 +5,7 @@ import { sql } from '../../db';
 import HttpError from '../../httpError';
 import { userSchema, loginAttemptSchema, userContactDetailsSchema } from '../users/schema';
 import Router from '../../router';
-import { generateToken } from '../../middleware/authorization';
+import { generateToken } from '../../authorization';
 
 const authenticatedUserSchema = userSchema.pick({
   id: true,

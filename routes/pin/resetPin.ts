@@ -2,7 +2,7 @@ import Router from '../../router';
 import bcrypt from 'bcrypt';
 import { sql } from '../../db';
 import { z } from 'zod';
-import { authenticateResetToken, checkResetStepProgression } from '../../middleware/authorization';
+import { authenticateResetToken, checkResetStepProgression } from '../../authorization';
 
 const SQL_RESET_PASSWORD = sql<{id: number; pin: string}, Record<string, never>>(`
   UPDATE users 

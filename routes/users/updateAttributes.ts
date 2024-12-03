@@ -4,7 +4,7 @@ import { sql } from '../../db';
 import HttpError from '../../httpError';
 import { userIdHistorySchema, userPhoneHistorySchema, userSchema } from './schema';
 import Router from '../../router';
-import { convertToTitleCase } from '../../middleware/caseNormalization';
+import { convertToTitleCase } from '../../caseNormalization';
 import { UserRole } from '../../globalTypes';
 
 const SQL_GET_USER_PIN = sql<{ id: number }, { pin: string }>(`

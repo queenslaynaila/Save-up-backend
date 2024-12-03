@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { sql } from '../../db';
 import Router from '../../router';
-import authMiddleware from '../../middleware/authorization';
+import authMiddleware from '../../authorization';
 
 const categorySchema = z.object({
   id: z.number(),

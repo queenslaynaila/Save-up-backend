@@ -1,6 +1,6 @@
 import Router from '../../router';
 import { sql } from '../../db';
-import authMiddleware from '../../middleware/authorization';
+import authMiddleware from '../../authorization';
 import { computeStatus, RatificationInterface } from './types';
 
 const SQL_CREATE_RATIFICATIONS = sql<RatificationInterface, Record<string, never>>(`

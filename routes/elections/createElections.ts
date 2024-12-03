@@ -1,6 +1,6 @@
 import Router from '../../router';
 import { sql } from '../../db';
-import authMiddleware from '../../middleware/authorization';
+import authMiddleware from '../../authorization';
 import { ElectionInterface, electionValidation } from './types';
 
 const SQL_CALL_ELECTION = sql<ElectionInterface, Record<string, never>>(`

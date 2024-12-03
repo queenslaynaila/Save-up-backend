@@ -1,6 +1,6 @@
 import Router from '../../router';
 import { sql } from '../../db';
-import authMiddleware from '../../middleware/authorization';
+import authMiddleware from '../../authorization';
 import { FinalnApproval, finalApprovalBody } from './types';
 
 const SQL_COMPUTE_APPROVALS = sql< FinalnApproval, Record<string, never>>(`

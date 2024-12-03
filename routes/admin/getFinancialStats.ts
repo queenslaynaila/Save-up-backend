@@ -1,7 +1,5 @@
 import Router from '../../router';
 import { sql } from '../../db';
-import authMiddleware from '../../middleware/authorization';
-import { convertToTitleCase } from '../../middleware/caseNormalization';
 import HttpError from '../../httpError';
 import {
   FinancialStatsInterface,
@@ -12,6 +10,8 @@ import {
   ValidResourcesEnum,
   ValidStatusEnum
 } from './types';
+import { convertToTitleCase } from '../../caseNormalization';
+import authMiddleware from '../../authorization';
 
 const SQL_GET_CUMULATIVES = (query: string) => sql<
 { operator: string; resource: string },

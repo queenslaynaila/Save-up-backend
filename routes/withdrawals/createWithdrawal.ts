@@ -1,5 +1,5 @@
 import { sql } from '../../db';
-import authMiddleware from '../../middleware/authorization';
+import authMiddleware from '../../authorization';
 import { withdrawalBodySchema, WithdrawalCreation } from './types';
 import HttpError from '../../httpError';
 import Router from '../../router';
