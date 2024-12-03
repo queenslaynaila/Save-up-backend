@@ -4,7 +4,6 @@ import HttpError from '../../httpError';
 import Router from '../../router';
 import { publicUserSchema, UserWithPublicAttributes } from '../auth/login';
 import { UserRole } from '../../types';
-import logger from '../../logger';
 
 const SQL_GET_USER_BY_CRITERIA = sql<Record<string, never>, UserWithPublicAttributes>(`
   SELECT 
@@ -28,7 +27,7 @@ const getUsersBySearchCriteria = (router: Router) => {
     path: '/',
     summary: 'Search for users based on various criteria',
     description: 'This endpoint allows searching for users based on various query criteria such as phone number, ID number, passport number, or the string "me" for the currently logged-in user.\n'
-      + '- **Phone number**: A user’s phone number (e.g., +254123456789).\n'
+      + '- **Phone number**: A user’s phone number (e.g., +254123456789).Note for phone numbers dont send the plus sign instaed of  +254123456789 send this 254123456789 the rule will be applied globally for all country codes \n'
       + '- **ID number**: A user’s identification number (e.g., 123456 or 987654321).\n'
       + '- **Passport number**: A user’s passport number (e.g., A12345678).\n'
       + '- **"me"**: The string "me" can be used to fetch details of the currently logged-in user.\n\n'
@@ -48,31 +47,30 @@ const getUsersBySearchCriteria = (router: Router) => {
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {
-      logger.info(`my query is ${JSON.stringify(req.query)}`);
       const { phone_number, id_number, limit = 10, user_id } = req.query;
-      logger.info(`phone no is ${phone_number} id number is ${id_number} and limit is ${limit} user is ${user_id} logged in uer is ${req.user}`);
 
-      const targetUserId = user_id === 'me' ? req.user!.id : parseInt(user_id!, 10);
+      const requestedUserId = user_id === 'me' || user_id === undefined
+        ? req.user!.id : parseInt(user_id!, 10);
 
-      if (Number.isNaN(targetUserId)) {
+      if (Number.isNaN(requestedUserId)) {
         throw new HttpError(400);
       }
 
       if (req.user!.role === UserRole.USER
-        && targetUserId !== req.user!.id) {
+        && requestedUserId !== req.user!.id) {
         throw new HttpError(403);
       }
 
       const filters: string[] = [];
       const filterArgs: Record<string, string | number> = { limit };
 
-      if (targetUserId !== null) {
-        filterArgs.user_id = targetUserId;
+      if (requestedUserId !== null) {
+        filterArgs.user_id = requestedUserId;
         filters.push('users.id = :user_id');
       }
 
       if (phone_number) {
-        filterArgs.phone_number = phone_number;
+        filterArgs.phone_number = `+${phone_number}`;
         filters.push('user_contact_details.phone_number = :phone_number');
       }
 
@@ -84,7 +82,6 @@ const getUsersBySearchCriteria = (router: Router) => {
       const query = SQL_GET_USER_BY_CRITERIA({});
       query.extend(`WHERE ${filters.join(' AND ')} LIMIT :limit`, filterArgs);
       const users = await query.many();
-      logger.info(`Found ${JSON.stringify(users)} users`);
 
       res.json(users);
     }
