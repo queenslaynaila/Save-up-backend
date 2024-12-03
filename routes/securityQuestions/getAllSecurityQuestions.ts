@@ -1,4 +1,4 @@
-import Router from '../../router';
+import Router from '../../m';
 import { z } from 'zod';
 import { sql } from '../../db';
 import { securityQuestionSchema } from './schema';
@@ -13,13 +13,23 @@ const SQL_GET_SECURITY_QUESTIONS = sql<Record<string, never>, SecurityQuestions>
   SELECT id, question FROM security_questions
 `);
 
+const errorSchema = z.union([
+  z.record(z.unknown()),
+  z.array(z.record(z.unknown()))
+]);
+
 const getAllSecurityQuestions = (router: Router) => {
   router.route({
     method: 'get',
     path: '/',
     summary: 'Get list of system defined security questions',
     response: {
-      schema: z.array(securityQuestions)
+      200: {
+        content: z.array(securityQuestions)
+      },
+      400: {
+        content: errorSchema
+      }
     },
     handler: async (req, res) => {
       const questions = await SQL_GET_SECURITY_QUESTIONS({}).many();
