@@ -65,7 +65,7 @@ const initiatePinReset = (router: Router) => {
         { expiresIn: '25m' }
       );
 
-      logger.info(`User ${user.id} completed step 1. Token is ${resetToken} Proceeding to next step.`);
+      logger.info(`User ${user.id} completed step 1. Token is ${resetToken} Proceeding to next step. and header is ${resetTokenHeader}`);
 
       res.setHeader('Reset', resetTokenHeader)
         .sendStatus(204);

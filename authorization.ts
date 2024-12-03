@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import jwt, { JwtPayload, Secret, VerifyErrors } from 'jsonwebtoken';
 import { UserRole } from './types';
 import HttpError from './httpError';
+import logger from './logger';
 
 export type User = {
   id: number;
@@ -83,12 +84,15 @@ function authMiddleware(options: AuthMiddlewareOptions = {}) {
  */
 function authenticateResetToken(req: Request, res: Response, next: NextFunction) {
   const token = req.headers.reset as string;
+  logger.info(`header received is ${token}`);
   if (!token) {
+    logger.info('no token found');
     throw new HttpError(403);
   }
 
   const resetTokenValue = token.split(' ')[1];
   if (!resetTokenValue) {
+    logger.info('token must have been sent w errors because split failed');
     throw new HttpError(403);
   }
 

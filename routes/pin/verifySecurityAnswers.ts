@@ -61,7 +61,7 @@ const verifySecurityAnswers = (router: Router) => {
         process.env.JWT_SECRET as Secret,
         { expiresIn: '15m' }
       );
-      logger.info(`User ${user_id} completed step 3.Questions answered well header sent moving to 4`);
+      logger.info(`User ${user_id} completed step 3.Questions answered well header sent moving to  Header is ${step3TokenHeader}`);
       res.setHeader('Reset', step3TokenHeader)
         .sendStatus(204);
     }
