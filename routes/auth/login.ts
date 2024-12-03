@@ -79,13 +79,13 @@ const SQL_GET_LAST_THREE_LOGIN_ATTEMPTS = sql<{ id: number }, LoginOutcome>(`
   LIMIT 3
 `);
 
-const recordLoginAttempt = async (
+export async function recordLoginAttempt(
   userId: number,
   ipAddress: string,
   userAgent: string,
   success: boolean,
   reason: string
-) => {
+) {
   await SQL_RECORD_LOGIN_ATTEMPT({
     user_id: userId,
     ip_address: ipAddress,
@@ -93,24 +93,28 @@ const recordLoginAttempt = async (
     success,
     reason
   }).exec();
-};
+}
 
-const getClientInfo = (req: Request) => ({
-  ipAddress: req.ip || 'unknown',
-  userAgent: req.get('User-Agent') || 'unknown'
-});
+export function getClientInfo(req: Request) {
+  return {
+    ipAddress: req.ip || 'unknown',
+    userAgent: req.get('User-Agent') || 'unknown'
+  };
+}
 
-const calculateLoginAttemptsLeft = (lastThreeAttempts: LoginOutcome[]) => {
+function calculateLoginAttemptsLeft(lastThreeAttempts: LoginOutcome[]) {
   if (lastThreeAttempts.length === 0 || lastThreeAttempts[0].success) {
     return 3;
   }
   if (lastThreeAttempts[0].reason === 'Locked') {
     throw new HttpError(423);
   }
-  const failedAttempts = lastThreeAttempts
-    .reduce((count, attempt)=> count + (!attempt.success ? 1 : 0), 0);
+  const failedAttempts = lastThreeAttempts.reduce(
+    (count, attempt) => count + (!attempt.success ? 1 : 0),
+    0
+  );
   return 3 - failedAttempts;
-};
+}
 
 const authSchema = z.object({
   phone_number: userContactDetailsSchema.shape.phone_number,
@@ -152,7 +156,7 @@ const login = (router: Router) => {
         throw new HttpError(401, { remaining_attempts: remainingAttempts - 1 });
       }
 
-      await recordLoginAttempt(user.id, ipAddress, userAgent, true, 'Success');
+      await recordLoginAttempt(user.id, ipAddress, userAgent, true, 'Returning');
       const accessToken = generateToken(user.id, user.role, '7d');
       res
         .setHeader('Authorization', accessToken)
