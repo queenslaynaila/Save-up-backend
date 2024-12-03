@@ -1,0 +1,295 @@
+/* eslint-disable no-template-curly-in-string */
+/* eslint-disable no-use-before-define */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import express, {
+  Router as ExpressRouter,
+  Request,
+  Response,
+  NextFunction,
+  Application,
+  RequestHandler
+} from 'express';
+import { AnyZodObject, z, ZodNever, ZodSchema } from 'zod';
+import { OpenApiGeneratorV3, OpenAPIRegistry } from '@asteasolutions/zod-to-openapi';
+import fastJson from 'fast-json-stringify';
+import zodToJsonSchema from 'zod-to-json-schema';
+import Ajv, { ErrorObject } from 'ajv';
+import authMiddleware, { authenticateResetToken, AuthMiddlewareOptions } from './authorization';
+import basicAuth from 'express-basic-auth';
+import dotenv from 'dotenv';
+import logger from './logger';
+import cors from 'cors';
+import HttpError from './httpError';
+
+dotenv.config();
+
+const ajv = new Ajv();
+
+const swaggerConfig = {
+  username: process.env.SWAGGER_USERNAME,
+  password: process.env.SWAGGER_PASSWORD
+};
+
+const validateSchema = (schema: ZodSchema, data: unknown, section: 'body' | 'query' | 'params') => {
+  const jsonSchema = zodToJsonSchema(schema, { target: 'openApi3' });
+  const validate = ajv.compile(jsonSchema);
+  const valid = validate(data);
+
+  if (!valid) {
+    const errors = validate.errors?.map((err: ErrorObject) => ({
+      section,
+      message: err.message,
+      params: err.params,
+      keyword: err.keyword,
+      dataPath: err.dataPath,
+      schemaPath: err.schemaPath
+    }));
+    logger.error(`Validation error in ${section}`, errors);
+    throw new HttpError(400, errors);
+  }
+};
+
+const validateRequest = (schema: {
+  body?: ZodSchema;
+  query?: AnyZodObject;
+  params?: AnyZodObject;
+}) => {
+  return (req: Request, res: Response, next: NextFunction) => {
+    if (schema.body) validateSchema(schema.body, req.body, 'body');
+    if (schema.query) validateSchema(schema.query, req.query, 'query');
+    if (schema.params) validateSchema(schema.params, req.params, 'params');
+    next();
+  };
+};
+const emptyObjectSchema = z.object({}).strict();
+  type InferZodType<T> = T extends AnyZodObject ? z.infer<T> : Record<string, never>;
+
+interface RouterOptions<
+  Params extends AnyZodObject | ZodNever = ZodNever,
+  ResBody = ZodSchema | ZodNever,
+  ReqBody = ZodSchema | ZodNever,
+  Query extends AnyZodObject | ZodNever = ZodNever
+> {
+  method: 'get' | 'post' | 'patch' | 'delete';
+  path: string;
+  summary: string;
+  description?: string;
+  schema?: {
+    body?: ZodSchema<ReqBody>;
+    query?: Query;
+    params?: Params;
+  };
+  response?: {
+    [statusCode: number]: {
+      content?: ZodSchema<ResBody>;
+    };
+  };
+  authMiddlewareOptions?: AuthMiddlewareOptions;
+  middlewares?: Array<(req: Request, res: Response, next: NextFunction) => void>;
+  handler: RequestHandler<InferZodType<Params>, ResBody, ReqBody, InferZodType<Query>>;
+}
+
+export const registry = new OpenAPIRegistry();
+
+/**
+   * The `Router` class simplifies defining API routes with:
+   * - Request validation using Zod schemas.
+   * - Middleware integration.
+   * - Modifies default `res.json` behavior to use `fast-json-stringify` for speed.
+   * - Automatic OpenAPI documentation generation.
+   *
+   * Each router instance is associated with a specific route prefix and an apitag.
+   * @param routePrefix - Prefix for all routes in this router.Mostly the name of given resource.
+   * @param apiTag - Optional OpenAPI tag for grouping routes in the documentation.
+   */
+
+class Router {
+  private static app: Application = express();
+
+  private static routerInstances: Map<string, Router> = new Map();
+
+  private router: ExpressRouter;
+
+  private routePrefix: string;
+
+  private apiTag?: string;
+
+  private constructor(routePrefix: string, apiTag?: string) {
+    this.router = ExpressRouter();
+    this.routePrefix = routePrefix;
+    this.apiTag = apiTag;
+    Router.app.use(
+      cors({
+        origin: ['http://localhost:5173', 'https://save-up-seven.vercel.app'],
+        credentials: true,
+        exposedHeaders: ['Authorization', 'Reset'],
+        allowedHeaders: ['Content-Type', 'Authorization', 'Reset']
+      })
+    );
+    Router.app.use(express.json());
+    Router.app.use(this.routePrefix, this.router);
+    Router.app.use(
+      ['/docs'],
+      basicAuth({
+        challenge: true,
+        users: {
+          [swaggerConfig.username!]: swaggerConfig.password!
+        }
+      })
+    );
+  }
+
+  public static getAppInstance(): Application {
+    return Router.app;
+  }
+
+  public static getRouterInstance(routePrefix: string, apiTag?: string): Router {
+    if (!Router.routerInstances.has(routePrefix)) {
+      Router.routerInstances.set(routePrefix, new Router(routePrefix, apiTag));
+    }
+    return Router.routerInstances.get(routePrefix)!;
+  }
+
+  public route<
+    Params extends AnyZodObject | typeof emptyObjectSchema = typeof emptyObjectSchema,
+    ResBody = ZodSchema | ZodNever,
+    ReqBody = ZodSchema | ZodNever,
+    Query extends AnyZodObject | typeof emptyObjectSchema = typeof emptyObjectSchema
+  >(options: RouterOptions<Params, ResBody, ReqBody, Query>) {
+    const {
+      method,
+      path,
+      schema,
+      response,
+      authMiddlewareOptions,
+      middlewares = [],
+      handler
+    } = options;
+
+    logger.info(`received response is ${response}`);
+
+    if (authMiddlewareOptions) {
+      middlewares.unshift(authMiddleware(authMiddlewareOptions));
+    }
+
+    if (schema) {
+      middlewares.push(validateRequest(schema));
+    }
+
+    const security = [];
+    if (authMiddlewareOptions) {
+      security.push({ Authorization: [] });
+    }
+    if (middlewares?.includes(authenticateResetToken)) {
+      security.push({ Reset: [] });
+    }
+
+    const openApiResponses: Record<string, any> = {};
+
+    if (response) {
+      Object.entries(response).forEach(([statusCode, responses]) => {
+        openApiResponses[statusCode] = {
+          content: responses.content
+            ? { 'application/json': { schema: zodToJsonSchema(responses.content, { target: 'openApi3' }) } }
+            : undefined
+        };
+      });
+    }
+
+    logger.debug(`generated response for open api is ${JSON.stringify(openApiResponses)}`);
+
+    const statusCode = response ? Object.keys(response)[0] : '200';
+    const responseSchema = response?.[Number(statusCode)]?.content;
+
+    const transformedPath = path.replace(/:([^/]+)/g, '{$1}');
+
+    registry.registerPath({
+      tags: this.apiTag ? [this.apiTag] : undefined,
+      method,
+      path: `${this.routePrefix}${transformedPath}`,
+      summary: options.summary,
+      description: options.description,
+      security,
+      request: {
+        params: schema?.params,
+        body: schema?.body ? { content: { 'application/json': { schema: schema.body } } } : undefined,
+        query: schema?.query
+      },
+      responses: openApiResponses
+    });
+
+    if (responseSchema) {
+      logger.info(`here is res schema ${responseSchema}`);
+      const jsonResponseSchema: any = zodToJsonSchema(responseSchema, { target: 'openApi3' });
+      logger.info(`the json version of ${responseSchema}`);
+      const stringify = fastJson(jsonResponseSchema);
+
+      const errorSchema = z.union([
+        z.record(z.unknown()),
+        z.array(z.record(z.unknown()))
+      ]);
+      const jsonErrorSchema: any = zodToJsonSchema(errorSchema, { target: 'openApi3' });
+      const errStringify = fastJson(jsonErrorSchema);
+
+      middlewares.push((_req: Request, res: Response, next: NextFunction) => {
+        res.json = <T extends object>(data: T) => {
+          res.setHeader('Content-Type', 'application/json');
+          if (data instanceof HttpError) {
+            return res.send(errStringify(data.errors));
+          }
+          return res.send(stringify(data));
+        };
+        next();
+      });
+    }
+
+    this.router[method](path, ...middlewares, handler as RequestHandler);
+  }
+}
+
+registry.registerComponent(
+  'securitySchemes',
+  'Authorization',
+  {
+    type: 'apiKey',
+    name: 'Authorization',
+    in: 'header',
+    description: 'JWT Bearer token used for user authentication. '
+    + 'The token must be included in the "Authorization" header as "Bearer <token>" '
+    + 'for secure access to protected routes.'
+  }
+);
+
+registry.registerComponent(
+  'securitySchemes',
+  'Reset',
+  {
+    type: 'apiKey',
+    name: 'Reset',
+    in: 'header',
+    description:
+      'JWT token used to manage the multi-step password reset process. '
+      + 'The token is generated at each step, and its payload indicates '
+      + 'the user\'s current step. It ensures the user cannot skip steps '
+      + 'and is required for every request in the reset process.'
+  }
+);
+
+export const generateOpenApiSpec = () => {
+  const generator = new OpenApiGeneratorV3(registry.definitions);
+  return generator.generateDocument({
+    openapi: '3.0.0',
+    info: {
+      title: 'API Documentation for Saveup',
+      version: '1.0.0',
+      description: 'This is the API documentation for Saveup.'
+    },
+    security: [
+      {
+        Authorization: []
+      }
+    ]
+  });
+};
+
+export default Router;
