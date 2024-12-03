@@ -2,13 +2,12 @@ import { NextFunction, Request, Response } from 'express';
 import jwt, { JwtPayload, Secret, VerifyErrors } from 'jsonwebtoken';
 import { UserRole } from '../globalTypes';
 import { HttpError } from './errorMiddleware';
-import logger from '../logger';
 
 export type User = {
   id: number;
   role: UserRole;
   step?: number;
-}
+};
 
 declare module 'express-serve-static-core' {
   interface Request {
@@ -16,12 +15,22 @@ declare module 'express-serve-static-core' {
   }
 }
 
+function generateToken(id: number, role: UserRole, expiresIn: string): string {
+  return jwt.sign(
+    { id, role },
+    process.env.JWT_SECRET as Secret,
+    { expiresIn, issuer: process.env.ISSUER }
+  );
+}
+
 export interface AuthMiddlewareOptions {
   roles?: UserRole[] | UserRole;
 }
 
-const ISSUER = 'saveup';
-
+/**
+ * Middleware to authenticate and authorize a user using an access token.
+ * Optionally restricts access to specific roles.
+ */
 function authMiddleware(options: AuthMiddlewareOptions = {}) {
   const roles = options.roles || [];
 
@@ -38,7 +47,7 @@ function authMiddleware(options: AuthMiddlewareOptions = {}) {
     }
 
     const verifyOptions: jwt.VerifyOptions = {
-      issuer: ISSUER
+      issuer: process.env.ISSUER
     };
 
     jwt.verify(
@@ -62,15 +71,44 @@ function authMiddleware(options: AuthMiddlewareOptions = {}) {
         }
 
         req.user = user;
-        logger.info(`user has been found succefully and is ${JSON.stringify(user)}`);
-        return next();
+        next();
       }
     );
   };
 }
 
-export function checkResetStepProgression(requiredStep:number) {
-  return (req:Request, _res:Response, next:NextFunction) => {
+/**
+ * Middleware to verify and decode a reset token from the request headers.
+ * Attaches the decoded user to the request object.
+ */
+function authenticateResetToken(req: Request, res: Response, next: NextFunction) {
+  const token = req.headers.reset as string;
+  if (!token) {
+    throw new HttpError(403);
+  }
+
+  const resetTokenValue = token.split(' ')[1];
+  if (!resetTokenValue) {
+    throw new HttpError(403);
+  }
+
+  jwt.verify(resetTokenValue, process.env.JWT_SECRET as Secret, (err, decodedResetToken)=>{
+    if (err) {
+      throw new HttpError(403);
+    }
+
+    const user = decodedResetToken as User;
+    req.user = user;
+    next();
+  });
+}
+
+/**
+ * Middleware to check the progression of the reset steps.
+ * Ensures the user is on the correct step before proceeding and has not skipped any.
+ */
+function checkResetStepProgression(requiredStep: number) {
+  return (req: Request, _res: Response, next: NextFunction) => {
     const step = req.user?.step;
     if (step !== requiredStep) {
       throw new HttpError(422);
@@ -79,22 +117,5 @@ export function checkResetStepProgression(requiredStep:number) {
   };
 }
 
-export const authenticateResetToken = (req: Request, res: Response, next: NextFunction) => {
-  const token = req.headers.reset as string;
-  if (!token) {
-    throw new HttpError(403);
-  }
-  const resetTokenValue = token.split(' ')[1];
-
-  jwt.verify(resetTokenValue, process.env.JWT_SECRET as Secret, (err, decodedResetToken) => {
-    if (err) {
-      throw new HttpError(403);
-    } else {
-      const user = decodedResetToken as User;
-      req.user = user;
-      next();
-    }
-  });
-};
-
 export default authMiddleware;
+export { authenticateResetToken, checkResetStepProgression, generateToken };
