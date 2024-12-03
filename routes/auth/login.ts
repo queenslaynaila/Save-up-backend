@@ -3,9 +3,9 @@ import bcrypt from 'bcrypt';
 import { z } from 'zod';
 import { sql } from '../../db';
 import HttpError from '../../httpError';
-import { generateToken } from '../../middleware/generatetoken';
 import { userSchema, loginAttemptSchema, userContactDetailsSchema } from '../users/schema';
 import Router from '../../router';
+import { generateToken } from '../../middleware/authorization';
 
 const authenticatedUserSchema = userSchema.pick({
   id: true,

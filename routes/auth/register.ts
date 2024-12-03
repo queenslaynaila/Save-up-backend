@@ -4,7 +4,7 @@ import { sql } from '../../db';
 import Router from '../../router';
 import HttpError from '../../httpError';
 import { userContactDetailsSchema, userSchema } from '../users/schema';
-import { generateToken } from '../../middleware/generatetoken';
+import { generateToken } from '../../middleware/authorization';
 import { AuthenticatedUser, publicUserSchema } from './login';
 
 const createUserPayloadSchema = userSchema.pick({
