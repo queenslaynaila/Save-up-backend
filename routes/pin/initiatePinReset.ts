@@ -4,7 +4,6 @@ import jwt, { Secret } from 'jsonwebtoken';
 import { z } from 'zod';
 import { resetPasswordLimiter } from '../../services/rateLimit';
 import { sql } from '../../db';
-import { generateResetPin } from '../../middleware/generateResetPin';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { ResetToken } from './schema';
 import logger from '../../logger';
@@ -25,6 +24,13 @@ const SQL_SAVE_TOKEN = sql<Pick<ResetToken, 'user_id' | 'token' | 'reason'>, Pic
   WHERE user_id = :user_id
   RETURNING token;
 `);
+
+function generateResetPin(): string {
+  const min = 1000;
+  const max = 9999;
+  const randomNumber = Math.floor(Math.random() * (max - min + 1)) + min;
+  return randomNumber.toString();
+}
 
 const initiatePinReset = (router: Router) => {
   router.route({
