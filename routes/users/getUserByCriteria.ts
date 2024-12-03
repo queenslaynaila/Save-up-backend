@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { sql } from '../../db';
-import { HttpError } from '../../middleware/errorMiddleware';
+import HttpError from '../../httpError';
 import Router from '../../router';
 import { publicUserSchema, UserWithPublicAttributes } from '../auth/login';
 import { UserRole } from '../../globalTypes';

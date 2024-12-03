@@ -2,7 +2,7 @@ import Router from '../../router';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { TransferInput, transferValidationSchema } from './types';
-import { HttpError } from '../../middleware/errorMiddleware';
+import HttpError from '../../httpError';
 
 const SQL_CREATE_TRANSFER = sql<TransferInput, Record<string, never>>(`
   SELECT create_user_transfer(

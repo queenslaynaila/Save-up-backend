@@ -4,7 +4,7 @@ import { ParsedQs } from 'qs';
 import { z } from 'zod';
 import { pocket } from './createPocket';
 import { UserRole } from '../../globalTypes';
-import { HttpError } from '../../middleware/errorMiddleware';
+import HttpError from '../../httpError';
 
 const pocketSchema = pocket.omit({
   entity_id: true,

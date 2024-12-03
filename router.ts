@@ -14,12 +14,12 @@ import { OpenApiGeneratorV3, OpenAPIRegistry } from '@asteasolutions/zod-to-open
 import fastJson from 'fast-json-stringify';
 import zodToJsonSchema from 'zod-to-json-schema';
 import Ajv, { ErrorObject } from 'ajv';
-import { HttpError } from './middleware/errorMiddleware';
 import authMiddleware, { authenticateResetToken, AuthMiddlewareOptions } from './middleware/authorization';
 import basicAuth from 'express-basic-auth';
 import dotenv from 'dotenv';
 import logger from './logger';
 import cors from 'cors';
+import HttpError from './httpError';
 
 dotenv.config();
 

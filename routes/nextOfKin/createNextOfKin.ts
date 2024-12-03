@@ -2,7 +2,7 @@ import Router from '../../router';
 import { z } from 'zod';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import { HttpError } from '../../middleware/errorMiddleware';
+import HttpError from '../../httpError';
 import { nextOfKinSchema } from './schema';
 
 const nextOfKinCreationSchema = nextOfKinSchema.pick({
@@ -53,7 +53,7 @@ const createNextOfKin = (router: Router) => {
         ...req.body,
         user_id: req.user!.id
       }).one(new HttpError(400));
-      return res.json(nextOfKin);
+      return res.sendStatus(201).json(nextOfKin);
     }
   });
 };

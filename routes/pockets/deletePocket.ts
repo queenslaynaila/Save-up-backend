@@ -1,7 +1,7 @@
 import Router from '../../router';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import { HttpError } from '../../middleware/errorMiddleware';
+import HttpError from '../../httpError';
 import { z } from 'zod';
 
 const SQL_DELETE_POCKET = sql<{pocket_id: number, entity_id: number}, Record<string, never>>(`

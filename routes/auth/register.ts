@@ -2,7 +2,7 @@ import bcrypt from 'bcrypt';
 import { z } from 'zod';
 import { sql } from '../../db';
 import Router from '../../router';
-import { HttpError } from '../../middleware/errorMiddleware';
+import HttpError from '../../httpError';
 import { userContactDetailsSchema, userSchema } from '../users/schema';
 import { generateToken } from '../../middleware/generatetoken';
 import { AuthenticatedUser, publicUserSchema } from './login';

@@ -1,7 +1,7 @@
 import Router from '../../router';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
-import { HttpError } from '../../middleware/errorMiddleware';
+import HttpError from '../../httpError';
 import { GetByUserInterface } from '../../globalTypes';
 import { z } from 'zod';
 

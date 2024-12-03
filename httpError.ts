@@ -1,4 +1,4 @@
-export class HttpError extends Error {
+export default class HttpError extends Error {
   public readonly status: number;
 
   public readonly errors: Record<string, unknown> | Record<string, unknown>[];

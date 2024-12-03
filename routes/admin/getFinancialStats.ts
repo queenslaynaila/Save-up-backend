@@ -2,7 +2,7 @@ import Router from '../../router';
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { convertToTitleCase } from '../../middleware/caseNormalization';
-import { HttpError } from '../../middleware/errorMiddleware';
+import HttpError from '../../httpError';
 import {
   FinancialStatsInterface,
   financialStatsSchema,

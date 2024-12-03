@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import jwt, { JwtPayload, Secret, VerifyErrors } from 'jsonwebtoken';
 import { UserRole } from '../globalTypes';
-import { HttpError } from './errorMiddleware';
+import HttpError from '../httpError';
 
 export type User = {
   id: number;

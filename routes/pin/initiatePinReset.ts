@@ -4,9 +4,9 @@ import jwt, { Secret } from 'jsonwebtoken';
 import { z } from 'zod';
 import { resetPasswordLimiter } from '../../services/rateLimit';
 import { sql } from '../../db';
-import { HttpError } from '../../middleware/errorMiddleware';
 import { ResetToken } from './schema';
 import logger from '../../logger';
+import HttpError from '../../httpError';
 
 const SQL_GET_USER = sql<{ phone_number: string }, { id:number }>(`
   SELECT id 

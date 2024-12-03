@@ -3,7 +3,7 @@ import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { NextOfKin } from './createNextOfKin';
 import { z } from 'zod';
-import { HttpError } from '../../middleware/errorMiddleware';
+import HttpError from '../../httpError';
 import { nextOfKinSchema } from './schema';
 
 const nextOfKinUpdatePayload = nextOfKinSchema.pick({

@@ -1,7 +1,7 @@
 import { sql } from '../../db';
 import authMiddleware from '../../middleware/authorization';
 import { withdrawalBodySchema, WithdrawalCreation } from './types';
-import { HttpError } from '../../middleware/errorMiddleware';
+import HttpError from '../../httpError';
 import Router from '../../router';
 
 const SQL_CREATE_WITHDRAWAL = sql<WithdrawalCreation, Record<string, never>>(`

@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt';
 import { z } from 'zod';
 import { sql } from '../../db';
-import { HttpError } from '../../middleware/errorMiddleware';
+import HttpError from '../../httpError';
 import { userIdHistorySchema, userPhoneHistorySchema, userSchema } from './schema';
 import Router from '../../router';
 import { convertToTitleCase } from '../../middleware/caseNormalization';

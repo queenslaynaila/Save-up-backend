@@ -1,5 +1,5 @@
 import { sql } from '../../db';
-import { HttpError } from '../../middleware/errorMiddleware';
+import HttpError from '../../httpError';
 import Router from '../../router';
 import {
   TotalExpenseInterface,

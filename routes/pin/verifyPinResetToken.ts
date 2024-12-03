@@ -2,7 +2,7 @@ import Router from '../../router';
 import bcrypt from 'bcrypt';
 import jwt, { Secret } from 'jsonwebtoken';
 import { sql } from '../../db';
-import { HttpError } from '../../middleware/errorMiddleware';
+import HttpError from '../../httpError';
 import { ResetToken } from './schema';
 import { z } from 'zod';
 import logger from '../../logger';

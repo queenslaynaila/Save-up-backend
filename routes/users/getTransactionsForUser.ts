@@ -1,10 +1,11 @@
 import { z } from 'zod';
 import { sql } from '../../db';
-import { HttpError } from '../../middleware/errorMiddleware';
+import HttpError from '../../httpError';
 import Router from '../../router';
 import { transaction, Transaction } from '../pockets/getTransactionsForPocket';
 import { UserRole } from '../../globalTypes';
 import { transactionTypeSchema } from '../pockets/schema';
+import logger from '../../logger';
 
 const SQL_GET_TRANSACTIONS_FOR_USER = sql<{user_id:number}, Transaction>(`
   SELECT 
@@ -47,6 +48,8 @@ const getTransactionsForUser = (router: Router) => {
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {
+      logger.info(JSON.stringify(req.params));
+      logger.info(JSON.stringify(req.params.user_id));
       const param = req.params.user_id;
       const user_id = param === 'me' ? req.user!.id : parseInt(param, 10);
 
