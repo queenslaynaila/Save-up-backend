@@ -2,12 +2,11 @@ import Router from '../../router';
 import bcrypt from 'bcrypt';
 import jwt, { Secret } from 'jsonwebtoken';
 import { sql } from '../../db';
-import { authenticateResetToken } from '../../middleware/resetTokenMIddleware';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { ResetToken } from './schema';
 import { z } from 'zod';
 import logger from '../../logger';
-import { checkResetStepProgression } from '../../middleware/authorization';
+import { authenticateResetToken, checkResetStepProgression } from '../../middleware/authorization';
 
 const SQL_GET_SECURITY_QUESTIONS = sql<{ user_id: number }, { id: number; question: string }>(`
   SELECT 
