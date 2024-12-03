@@ -4,7 +4,7 @@ import Router, { generateOpenApiSpec } from './router';
 import swaggerUi from 'swagger-ui-express';
 import cors from 'cors';
 import morgan from 'morgan';
-import { HttpError } from './middleware/errorMiddleware';
+import HttpError from './httpError';
 import dotenv from 'dotenv';
 import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
 import { z } from 'zod';
