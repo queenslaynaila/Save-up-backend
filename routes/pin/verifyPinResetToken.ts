@@ -2,10 +2,12 @@ import Router from '../../router';
 import bcrypt from 'bcrypt';
 import jwt, { Secret } from 'jsonwebtoken';
 import { sql } from '../../db';
-import { validateStepToken } from '../../middleware/resetTokenMIddleware';
+import { authenticateResetToken } from '../../middleware/resetTokenMIddleware';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { ResetToken } from './schema';
 import { z } from 'zod';
+import logger from '../../logger';
+import { checkResetStepProgression } from '../../middleware/authorization';
 
 const SQL_GET_SECURITY_QUESTIONS = sql<{ user_id: number }, { id: number; question: string }>(`
   SELECT 
@@ -56,13 +58,8 @@ const verifyPinResetToken = (router: Router) => {
     response: {
       schema: z.array(questionsSchema)
     },
-    middlewares: [validateStepToken],
+    middlewares: [authenticateResetToken, checkResetStepProgression(1)],
     handler: async (req, res) => {
-      const step = req.user!.step;
-      if (step !== 1) {
-        throw new HttpError(422, { required_step: 1 });
-      }
-
       const { reset_token } = req.body;
       const user_id = req.user!.id;
 
@@ -82,7 +79,14 @@ const verifyPinResetToken = (router: Router) => {
       }).exec();
       const securityQuestions = await SQL_GET_SECURITY_QUESTIONS({ user_id }).many();
       if (securityQuestions.length === 0) {
-        throw new HttpError(404);
+        const step4TokenPayload = { id: user_id, step: 3 };
+        const step4TokenHeader = jwt.sign(
+          step4TokenPayload,
+          process.env.JWT_SECRET as Secret,
+          { expiresIn: '15m' }
+        );
+        logger.info(`User ${user_id} completed step 2. User has no questions,Header sent. Skipping user to 4`);
+        return res.setHeader('Reset', step4TokenHeader).sendStatus(204);
       }
 
       const step2TokenPayload = { id: user_id, step: 2 };
@@ -91,7 +95,8 @@ const verifyPinResetToken = (router: Router) => {
         process.env.JWT_SECRET as Secret,
         { expiresIn: '15m' }
       );
-      res.setHeader('Reset', step2TokenHeader)
+      logger.info(`User ${user_id} completed step 2. Questions and header sent Proceeding to 3.`);
+      return res.setHeader('Reset', step2TokenHeader)
         .json(securityQuestions);
     }
   });

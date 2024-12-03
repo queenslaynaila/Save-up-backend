@@ -51,7 +51,6 @@ const initiatePinReset = (router: Router) => {
         token: hashedResetToken,
         reason: 'Reset'
       }).exec();
-      logger.info(`Reset token for user ${user.id} created and is ${resetToken}`);
 
       const step1TokenPayload = { id: user.id, step: 1 };
       const resetTokenHeader = jwt.sign(
@@ -59,6 +58,8 @@ const initiatePinReset = (router: Router) => {
         process.env.JWT_SECRET as Secret,
         { expiresIn: '25m' }
       );
+
+      logger.info(`User ${user.id} completed step 1. Token is ${resetToken} Proceeding to next step.`);
 
       res.setHeader('Reset', resetTokenHeader)
         .sendStatus(204);

@@ -69,4 +69,14 @@ function authMiddleware(options: AuthMiddlewareOptions = {}) {
   };
 }
 
+export function checkResetStepProgression(requiredStep:number) {
+  return (req:Request, _res:Response, next:NextFunction) => {
+    const step = req.user?.step;
+    if (step !== requiredStep) {
+      throw new HttpError(422);
+    }
+    next();
+  };
+}
+
 export default authMiddleware;

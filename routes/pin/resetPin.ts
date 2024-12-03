@@ -1,9 +1,9 @@
 import Router from '../../router';
 import bcrypt from 'bcrypt';
 import { sql } from '../../db';
-import { validateStepToken } from '../../middleware/resetTokenMIddleware';
-import { HttpError } from '../../middleware/errorMiddleware';
+import { authenticateResetToken } from '../../middleware/resetTokenMIddleware';
 import { z } from 'zod';
+import { checkResetStepProgression } from '../../middleware/authorization';
 
 const SQL_RESET_PASSWORD = sql<{id: number; pin: string}, Record<string, never>>(`
   UPDATE users 
@@ -22,13 +22,8 @@ const resetPin = (router: Router) => {
     response: {
       statusCode: 204
     },
-    middlewares: [validateStepToken],
+    middlewares: [authenticateResetToken, checkResetStepProgression(3)],
     handler: async (req, res) => {
-      const step = req.user!.step;
-      if (step !== 3) {
-        throw new HttpError(422);
-      }
-
       const { new_pin } = req.body;
       const user_id = req.user!.id;
 

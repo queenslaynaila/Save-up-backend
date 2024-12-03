@@ -3,8 +3,8 @@ import jwt, { Secret } from 'jsonwebtoken';
 import { HttpError } from './errorMiddleware';
 import { User } from './authorization';
 
-export const validateStepToken = (req: Request, res: Response, next: NextFunction) => {
-  const token = req.headers['reset-token'] as string;
+export const authenticateResetToken = (req: Request, res: Response, next: NextFunction) => {
+  const token = req.headers.reset as string;
   if (!token) {
     throw new HttpError(403);
   }

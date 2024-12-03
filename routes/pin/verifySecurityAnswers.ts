@@ -4,9 +4,11 @@ import Router from '../../router';
 import bcrypt from 'bcrypt';
 import jwt, { Secret } from 'jsonwebtoken';
 import { sql } from '../../db';
-import { validateStepToken } from '../../middleware/resetTokenMIddleware';
+import { authenticateResetToken } from '../../middleware/resetTokenMIddleware';
 import { HttpError } from '../../middleware/errorMiddleware';
 import { z } from 'zod';
+import logger from '../../logger';
+import { checkResetStepProgression } from '../../middleware/authorization';
 
 export const verifyAnswerSchema = z.object({
   question_id: z.number(),
@@ -30,12 +32,8 @@ const verifySecurityAnswers = (router: Router) => {
     response: {
       statusCode: 204
     },
-    middlewares: [validateStepToken],
+    middlewares: [authenticateResetToken, checkResetStepProgression(2)],
     handler: async (req, res) => {
-      const step = req.user!.step;
-      if (step !== 2) {
-        throw new HttpError(422);
-      }
       const answers = req.body;
       const user_id = req.user!.id;
 
@@ -64,6 +62,7 @@ const verifySecurityAnswers = (router: Router) => {
         process.env.JWT_SECRET as Secret,
         { expiresIn: '15m' }
       );
+      logger.info(`User ${user_id} completed step 3.Questions answered well header sent moving to 4`);
       res.setHeader('Reset', step3TokenHeader)
         .sendStatus(204);
     }
