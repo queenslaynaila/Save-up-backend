@@ -123,8 +123,8 @@ class Router {
       cors({
         origin: ['http://localhost:5173', 'https://save-up-seven.vercel.app'],
         credentials: true,
-        exposedHeaders: ['Authorization'],
-        allowedHeaders: ['Content-Type', 'Authorization']
+        exposedHeaders: ['Authorization', 'Reset'],
+        allowedHeaders: ['Content-Type', 'Authorization', 'Reset']
       })
     );
     Router.app.use(express.json());
