@@ -1,7 +1,7 @@
 import Router from '../../router';
 import { sql } from '../../db';
 import authMiddleware from '../../authorization';
-import { XidEntityInterface, idParamSchema, entitySchema } from '../../globalTypes';
+import { XidEntityInterface, idParamSchema, entitySchema } from '../../types';
 
 const SQL_DELETE_EXPENSE = sql<XidEntityInterface, Record<string, never>>(`
   UPDATE expenses

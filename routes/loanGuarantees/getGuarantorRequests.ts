@@ -2,7 +2,7 @@ import Router from '../../router';
 import { sql } from '../../db';
 import authMiddleware from '../../authorization';
 import { LoanRequest, loanRequestSchema } from './types';
-import { GetByUserInterface } from '../../globalTypes';
+import { GetByUserInterface } from '../../types';
 
 interface GuarantorRequest extends GetByUserInterface {
   type_id: number;

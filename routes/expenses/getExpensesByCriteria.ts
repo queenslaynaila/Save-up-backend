@@ -6,7 +6,7 @@ import {
   ExpenseSchema,
   expenseQuerySchema
 } from './types';
-import { entitySchema } from '../../globalTypes';
+import { entitySchema } from '../../types';
 import { z } from 'zod';
 import { ParsedQs } from 'qs';
 

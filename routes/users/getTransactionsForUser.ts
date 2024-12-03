@@ -3,7 +3,7 @@ import { sql } from '../../db';
 import HttpError from '../../httpError';
 import Router from '../../router';
 import { transaction, Transaction } from '../pockets/getTransactionsForPocket';
-import { UserRole } from '../../globalTypes';
+import { UserRole } from '../../types';
 import { transactionTypeSchema } from '../pockets/schema';
 import logger from '../../logger';
 

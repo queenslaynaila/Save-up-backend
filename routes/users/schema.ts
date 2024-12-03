@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { UserRole } from '../../globalTypes';
+import { UserRole } from '../../types';
 
 const ENTITY_TYPE_ENUM = z.enum(['User', 'Group', 'Donor']);
 const ID_TYPE_ENUM = z.enum(['National', 'Passport']);

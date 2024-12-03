@@ -3,7 +3,7 @@ import { sql } from '../../db';
 import { ParsedQs } from 'qs';
 import { z } from 'zod';
 import { pocket } from './createPocket';
-import { UserRole } from '../../globalTypes';
+import { UserRole } from '../../types';
 import HttpError from '../../httpError';
 
 const pocketSchema = pocket.omit({

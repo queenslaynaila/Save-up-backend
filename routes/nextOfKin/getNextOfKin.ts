@@ -2,7 +2,7 @@ import Router from '../../router';
 import { sql } from '../../db';
 import { NextOfKin, nextOfKinPublicViewSchema } from './createNextOfKin';
 import { z } from 'zod';
-import { UserRole } from '../../globalTypes';
+import { UserRole } from '../../types';
 import HttpError from '../../httpError';
 
 const SQL_GET_KIN = sql<{user_id: number}, NextOfKin>(`

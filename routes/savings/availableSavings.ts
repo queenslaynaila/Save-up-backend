@@ -2,7 +2,7 @@ import Router from '../../router';
 import { sql } from '../../db';
 import authMiddleware from '../../authorization';
 import HttpError from '../../httpError';
-import { GetByUserInterface } from '../../globalTypes';
+import { GetByUserInterface } from '../../types';
 import { z } from 'zod';
 
 const SQL_GET_AVAILABLE_SAVINGS = sql<GetByUserInterface, {balance: number}>(`

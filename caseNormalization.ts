@@ -1,4 +1,4 @@
-import { UserRole } from './globalTypes';
+import { UserRole } from './types';
 
 export const convertToTitleCase = (str: string): UserRole => {
   const titleCased = str.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());

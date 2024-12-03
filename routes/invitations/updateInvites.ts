@@ -2,7 +2,7 @@ import { sql } from '../../db';
 import Router from '../../router';
 import authMiddleware from '../../authorization';
 import { InviteResponseInterface, inviteValidationSchema } from './types';
-import { idParamSchema, StatusCodeInterface } from '../../globalTypes';
+import { idParamSchema, StatusCodeInterface } from '../../types';
 
 export interface ExtendedInviteResponseInterface extends InviteResponseInterface {
   xid: number;

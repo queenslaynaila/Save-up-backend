@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import jwt, { JwtPayload, Secret, VerifyErrors } from 'jsonwebtoken';
-import { UserRole } from './globalTypes';
+import { UserRole } from './types';
 import HttpError from './httpError';
 
 export type User = {

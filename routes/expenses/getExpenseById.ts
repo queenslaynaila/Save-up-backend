@@ -3,7 +3,7 @@ import { sql } from '../../db';
 import HttpError from '../../httpError';
 import authMiddleware from '../../authorization';
 import { Expense, ExpenseSchema } from './types';
-import { entitySchema, idParamSchema, XidEntityInterface } from '../../globalTypes';
+import { entitySchema, idParamSchema, XidEntityInterface } from '../../types';
 
 const SQL_GET_EXPENSE_BY_ID = sql<XidEntityInterface, Expense>(`
   SELECT xid, entity_id, category_id, description, amount, spent_at, created_at
