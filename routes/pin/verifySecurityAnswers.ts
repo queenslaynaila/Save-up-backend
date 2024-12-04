@@ -34,6 +34,7 @@ const verifySecurityAnswers = (router: Router) => {
     middlewares: [authenticateResetToken, checkResetStepProgression(2)],
     handler: async (req, res) => {
       const answers = req.body;
+      logger.info(`user provided the foll ${JSON.stringify(answers)}`);
       const user_id = req.user!.id;
 
       const userSecurityAnswers = await SQL_GET_SECURITY_ANSWERS({ user_id }).many();
@@ -41,18 +42,27 @@ const verifySecurityAnswers = (router: Router) => {
         throw new HttpError(404);
       }
 
+      logger.info(`security answers found for user is ${JSON.stringify(userSecurityAnswers)}`);
+
+      const answerMap = new Map(
+        userSecurityAnswers.map(({ question_id, answer }) => [question_id, answer])
+      );
+
+      logger.info(`answer map is ${JSON.stringify(answerMap)}`);
+
       const incorrectAnswers: number[] = [];
-      for (const submittedAnswer of answers) {
-        const storedAnswer = userSecurityAnswers.find(
-          a => a.question_id === submittedAnswer.question_id
-        );
-        if (!storedAnswer || !(await bcrypt.compare(submittedAnswer.answer, storedAnswer.answer))) {
-          incorrectAnswers.push(submittedAnswer.question_id);
+      for (const { question_id, answer } of answers) {
+        const hashedAnswer = answerMap.get(question_id);
+
+        if (!hashedAnswer || !(await bcrypt.compare(answer, hashedAnswer))) {
+          incorrectAnswers.push(question_id);
         }
       }
 
-      if (incorrectAnswers.length > 1) {
-        throw new HttpError(401);
+      logger.info(`incorect answers are ${incorrectAnswers}`);
+
+      if (incorrectAnswers.length > 2) {
+        throw new HttpError(403);
       }
 
       const step3TokenPayload = { id: user_id, step: 3 };
