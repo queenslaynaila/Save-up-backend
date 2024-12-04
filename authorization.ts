@@ -1,8 +1,10 @@
 import { NextFunction, Request, Response } from 'express';
+import bcrypt from 'bcrypt';
 import jwt, { JwtPayload, Secret, VerifyErrors } from 'jsonwebtoken';
 import { UserRole } from './types';
 import HttpError from './httpError';
 import logger from './logger';
+import { sql } from './db';
 
 export type User = {
   id: number;
@@ -37,6 +39,8 @@ function authMiddleware(options: AuthMiddlewareOptions = {}) {
 
   return (req: Request, _res: Response, next: NextFunction) => {
     const accessToken = req.headers.authorization;
+    logger.info(req.headers);
+    logger.info(`acces token is ${accessToken}`);
 
     if (!accessToken || typeof accessToken !== 'string') {
       throw new HttpError(401);
@@ -121,5 +125,25 @@ function checkResetStepProgression(requiredStep: number) {
   };
 }
 
+const SQL_GET_PIN = sql<{ user_id: number }, {pin:string}>(`
+  SELECT pin
+  FROM users
+  WHERE id = :user_id
+`);
+
+async function verifyPin(req: Request, res: Response, next: NextFunction) {
+  const user_id = req.user!.id;
+
+  const { pin: pinHash } = await SQL_GET_PIN({
+    user_id
+  }).one();
+
+  if (!await bcrypt.compare(req.body.pin, pinHash)) {
+    throw new HttpError(401);
+  }
+  logger.info('calling next');
+  next();
+}
+
 export default authMiddleware;
-export { authenticateResetToken, checkResetStepProgression, generateToken };
+export { authenticateResetToken, checkResetStepProgression, generateToken, verifyPin };

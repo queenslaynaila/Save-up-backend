@@ -1,8 +1,9 @@
 import Router from '../../router';
-import bcrypt from 'bcrypt';
 import { sql } from '../../db';
-import authMiddleware from '../../authorization';
+import { verifyPin } from '../../authorization';
 import { z } from 'zod';
+import bcrypt from 'bcrypt';
+import logger from '../../logger';
 
 export const securityAnswerSchema = z.object({
   user_id: z.number().int(),
@@ -11,47 +12,61 @@ export const securityAnswerSchema = z.object({
   created_at: z.string()
 });
 
-const answerUpdatePayload = securityAnswerSchema.pick({
-  answer: true
-}).extend({
-  new_question_id: z.string().optional()
+const answerSchema = z.object({
+  question_id: z.number(),
+  answer: z.string()
 });
 
-type AnswerUpdatePayload = z.infer<typeof answerUpdatePayload> & {
-  user_id: number,
-  question_id: number
-};
+const SQL_OVERIDE_EXISTING_ANSWERS = sql<{ user_id: number }, Record<string, never>>(`
+  DELETE FROM security_answers 
+  WHERE user_id = :user_id
+`);
 
-const SQL_UPDATE_SECURITY_ANSWER = sql<AnswerUpdatePayload, Record<string, never>>(`
-  UPDATE security_answers 
-  SET 
-    question_id = COALESCE(:new_question_id, question_id),
-    answer = :answer
-  WHERE user_id = :user_id 
-  AND question_id = :question_id
+const SQL_INSERT_SECURITY_ANSWERS = sql<{user_id:number, question_id:number, answer:string}, Record<string, never>>(`
+  INSERT INTO security_answers (user_id, question_id, answer)
+  VALUES (:user_id, :question_id, :answer)
 `);
 
 const updateSecurityAnswer = (router: Router) => {
   router.route({
     method: 'patch',
-    path: '/:question_id/answers',
-    summary: 'Update a security answer',
+    path: '/',
+    summary: 'Update security answers',
+    description: 'Allows a user to completely override their existing security answers and create new ones.\n'
+    + ' Security answers are not shown to users for privacy and security reasons. Therefore,we \n'
+    + 'assume that the user has forgotten all their previous answers. Instead of editing individual answers,\n'
+    + 'the system requires the user to submit a new set of answers to predefined security questions.\n'
+    + 'The users PIN is verified to ensure proper authorization before proceeding. \n'
+    + 'Once verified all existing answers for users are delted and new ones stored.',
     schema: {
-      params: z.object({ question_id: z.string() }),
-      body: answerUpdatePayload
+      body: z.object({
+        pin: z.string(),
+        questions: z.array(answerSchema)
+      })
     },
     response: {
       statusCode: 204
     },
-    middlewares: [authMiddleware()],
+    authMiddlewareOptions: {},
+    middlewares: [verifyPin],
     handler: async (req, res) => {
-      const answer = await bcrypt.hash(req.body.answer, 12);
-      await SQL_UPDATE_SECURITY_ANSWER({
-        ...req.body,
-        answer,
-        user_id: req.user!.id,
-        question_id: Number(req.params.question_id)
+      logger.info('here');
+      const questions = req.body.questions;
+      const user_id = req.user!.id;
+      await SQL_OVERIDE_EXISTING_ANSWERS({
+        user_id
       }).exec();
+
+      await Promise.all(
+        questions.map(async ({ question_id, answer }) => {
+          const hashedAnswer = await bcrypt.hash(answer, 12);
+          await SQL_INSERT_SECURITY_ANSWERS({
+            question_id,
+            answer: hashedAnswer,
+            user_id
+          }).exec();
+        })
+      );
       res.sendStatus(204);
     }
   });
