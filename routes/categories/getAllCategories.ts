@@ -1,7 +1,6 @@
 import { z } from 'zod';
 import { sql } from '../../db';
 import Router from '../../router';
-import authMiddleware from '../../authorization';
 
 const categorySchema = z.object({
   id: z.number(),
@@ -25,7 +24,7 @@ const getAllCategories = (router: Router) => {
     response: {
       schema: z.array(categorySchema)
     },
-    middlewares: [authMiddleware()],
+    authMiddlewareOptions: {},
     handler: async (_req, res) => {
       const categories = await SQL_GET_ALL_CATEGORIES({}).many();
       res.json(categories);
