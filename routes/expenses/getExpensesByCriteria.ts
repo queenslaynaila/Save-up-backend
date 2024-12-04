@@ -1,10 +1,8 @@
 import Router from '../../router';
 import { sql } from '../../db';
-
 import {
   Expense,
-  ExpenseSchema,
-  expenseQuerySchema
+  ExpenseSchema
 } from './types';
 import { entitySchema } from '../../types';
 import { z } from 'zod';
@@ -30,7 +28,13 @@ export const getExpensesByCriteria = (router: Router) => {
     path: '/',
     summary: 'Get list of expenses by criteria',
     schema: {
-      query: expenseQuerySchema,
+      query: z.object({
+        category_id: z.string(),
+        spent_from: z.string(),
+        spent_to: z.string(),
+        start_date: z.string(),
+        end_date: z.string()
+      }).partial(),
       body: entitySchema
     },
     response: {
@@ -39,7 +43,7 @@ export const getExpensesByCriteria = (router: Router) => {
     authMiddlewareOptions: {},
     handler: async (req, res) => {
       const entity_id = req.body?.entity_id ?? req.user!.id;
-      const { category_id, start_date, end_date } = req.query;
+      const { category_id, start_date, end_date, spent_from, spent_to } = req.query;
 
       const filters: string[] = [];
       const filterArgs: string | string [] | ParsedQs | ParsedQs[] = {};
@@ -48,6 +52,22 @@ export const getExpensesByCriteria = (router: Router) => {
         filterArgs.category_id = category_id;
         filters.push('category_id = :category_id');
       }
+
+      if (spent_from && spent_to) {
+        filterArgs.spent_from = spent_from;
+        filterArgs.spent_to = spent_to;
+        filters.push('DATE(spent_at) BETWEEN :spent_from AND :spent_to');
+      } else {
+        if (spent_from) {
+          filterArgs.spent_from = spent_from;
+          filters.push('DATE(spent_at) >= :spent_from');
+        }
+        if (spent_to) {
+          filterArgs.spent_to = spent_to;
+          filters.push('DATE(spent_at) <= :spent_to');
+        }
+      }
+
       if (start_date && end_date) {
         filterArgs.start_date = start_date;
         filterArgs.end_date = end_date;
