@@ -15,11 +15,12 @@ import './routes/nextOfKin/index';
 import './routes/securityQuestions/index';
 import './routes/pin/index';
 import './routes/categories/index';
+import './routes/expenses/index';
 import './routes/pockets/index';
 import './routes/savings/index';
 import './routes/transfers/index';
 import './routes/withdrawals/index';
-import './routes/expenses/index';
+import './routes/transactions/index';
 import './routes/groups/index';
 import './routes/invitations/index';
 import './routes/elections/index';
@@ -35,7 +36,6 @@ import './routes/loans/index';
 import './routes/loanGuarantees/index';
 import './routes/loanApprovals/index';
 import './routes/admin/index';
-import './routes/userCumulatives/index';
 
 extendZodWithOpenApi(z);
 
