@@ -1,9 +1,7 @@
 import Router from '../../router';
 import { sql } from '../../db';
-import authMiddleware from '../../authorization';
 import { NextOfKin } from './createNextOfKin';
 import { z } from 'zod';
-import HttpError from '../../httpError';
 import { nextOfKinSchema } from './schema';
 
 const nextOfKinUpdatePayload = nextOfKinSchema.pick({
@@ -45,7 +43,6 @@ const updateNextOfKin = (router: Router) => {
       schema: nextOfKinUpdatePayload.required()
     },
     authMiddlewareOptions: {},
-    middlewares: [authMiddleware()],
     handler: async (req, res) => {
       const { full_name, relationship, phone_number } = req.body;
       const kin = await SQL_UPDATE_KIN({
@@ -54,7 +51,7 @@ const updateNextOfKin = (router: Router) => {
         full_name,
         relationship,
         phone_number
-      }).one(new HttpError(404));
+      }).one();
       return res.json(kin);
     }
   });

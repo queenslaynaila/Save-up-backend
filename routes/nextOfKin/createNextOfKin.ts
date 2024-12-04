@@ -1,7 +1,6 @@
 import Router from '../../router';
 import { z } from 'zod';
 import { sql } from '../../db';
-import authMiddleware from '../../authorization';
 import HttpError from '../../httpError';
 import { nextOfKinSchema } from './schema';
 
@@ -47,7 +46,6 @@ const createNextOfKin = (router: Router) => {
       schema: nextOfKinPublicViewSchema
     },
     authMiddlewareOptions: {},
-    middlewares: [authMiddleware()],
     handler: async (req, res) => {
       const nextOfKin = await SQL_CREATE_KIN({
         ...req.body,
