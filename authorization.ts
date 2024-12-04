@@ -3,7 +3,6 @@ import bcrypt from 'bcrypt';
 import jwt, { JwtPayload, Secret, VerifyErrors } from 'jsonwebtoken';
 import { UserRole } from './types';
 import HttpError from './httpError';
-import logger from './logger';
 import { sql } from './db';
 
 export type User = {
@@ -39,8 +38,6 @@ function authMiddleware(options: AuthMiddlewareOptions = {}) {
 
   return (req: Request, _res: Response, next: NextFunction) => {
     const accessToken = req.headers.authorization;
-    logger.info(req.headers);
-    logger.info(`acces token is ${accessToken}`);
 
     if (!accessToken || typeof accessToken !== 'string') {
       throw new HttpError(401);
@@ -88,15 +85,12 @@ function authMiddleware(options: AuthMiddlewareOptions = {}) {
  */
 function authenticateResetToken(req: Request, res: Response, next: NextFunction) {
   const token = req.headers.reset as string;
-  logger.info(`header received is ${token}`);
   if (!token) {
-    logger.info('no token found');
     throw new HttpError(403);
   }
 
   const resetTokenValue = token.split(' ')[1];
   if (!resetTokenValue) {
-    logger.info('token must have been sent w errors because split failed');
     throw new HttpError(403);
   }
 
@@ -141,7 +135,6 @@ async function verifyPin(req: Request, res: Response, next: NextFunction) {
   if (!await bcrypt.compare(req.body.pin, pinHash)) {
     throw new HttpError(401);
   }
-  logger.info('calling next');
   next();
 }
 
