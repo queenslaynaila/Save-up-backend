@@ -52,8 +52,13 @@ const createNextOfKin = (router: Router) => {
       const nextOfKin = await SQL_CREATE_KIN({
         ...req.body,
         user_id: req.user!.id
-      }).one(new HttpError(400));
-      return res.sendStatus(201).json(nextOfKin);
+      }).oneOrNull().catch((err) => {
+        if (err.code === '23505') {
+          throw new HttpError(409);
+        }
+        throw err;
+      });
+      return res.status(201).json(nextOfKin);
     }
   });
 };
