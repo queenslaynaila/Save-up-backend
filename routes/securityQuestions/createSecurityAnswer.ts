@@ -3,6 +3,7 @@ import bcrypt from 'bcrypt';
 import { sql } from '../../db';
 import { z } from 'zod';
 import { securityAnswerSchema } from './updateAnswer';
+import HttpError from '../../httpError';
 
 const securityAnswerCreationSchema = securityAnswerSchema.pick({
   user_id: true,
@@ -38,7 +39,11 @@ const createSecurityAnswer = (router: Router) => {
         answer: hashedAnswer,
         user_id: req.user!.id,
         question_id: Number(req.params.question_id)
-      }).exec();
+      }).exec().catch((err) => {
+        if (err.code === 'P0003') {
+          throw new HttpError(400, { message: 'ERR_MAX_ANSWERS_EXCEEDED' });
+        }
+      });
       res.sendStatus(201);
     }
   });
