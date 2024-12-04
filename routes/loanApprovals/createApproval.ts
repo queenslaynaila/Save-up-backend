@@ -1,6 +1,6 @@
 import Router from '../../router';
 import { sql } from '../../db';
-import authMiddleware from '../../authorization';
+
 import { AdminLoanApproval, loanApprovalSchema } from './types';
 
 const SQL_APPROVE_LOAN = sql<AdminLoanApproval, Record<string, never>>(`
@@ -18,7 +18,7 @@ const createApproval = (router: Router) => {
     response: {
       statusCode: 204
     },
-    middlewares: [authMiddleware()],
+    authMiddlewareOptions: {},
     handler: async (req, res) => {
       await SQL_APPROVE_LOAN({
         ...req.body,

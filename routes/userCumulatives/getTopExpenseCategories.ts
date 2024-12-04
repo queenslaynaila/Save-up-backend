@@ -1,6 +1,6 @@
 import Router from '../../router';
 import { sql } from '../../db';
-import authMiddleware from '../../authorization';
+
 import { TopExpenseCategoriesInterface, topExpenseCategoriesSchema, UserCumulaInterface } from './types';
 import { z } from 'zod';
 
@@ -26,7 +26,7 @@ const getTopExpenseCategories = (router: Router) => {
     response: {
       schema: z.array(topExpenseCategoriesSchema)
     },
-    middlewares: [authMiddleware()],
+    authMiddlewareOptions: {},
     handler: async (req, res) => {
       const user_id = req.user!.id;
       const result = await SQL_GET_TOP_EXPENDITURE_CATEGORIES({ user_id }).many();

@@ -11,7 +11,7 @@ import {
   ValidStatusEnum
 } from './types';
 import { convertToTitleCase } from '../../caseNormalization';
-import authMiddleware from '../../authorization';
+
 
 const SQL_GET_CUMULATIVES = (query: string) => sql<
 { operator: string; resource: string },
@@ -29,7 +29,7 @@ const getFinancialStats = (router: Router) => {
     response: {
       schema: financialStatsSchema
     },
-    middlewares: [authMiddleware()],
+    authMiddlewareOptions: {},
     handler: async (req, res) => {
       req.params.resource = req.params.resource.toLowerCase();
       req.params.operator = req.params.operator.toUpperCase();

@@ -1,6 +1,6 @@
 import Router from '../../router';
 import { sql } from '../../db';
-import authMiddleware from '../../authorization';
+
 import { z } from 'zod';
 
 const member = z.object({
@@ -26,7 +26,7 @@ const getGroupMembers = (router:Router) => {
       schema: z.array(member)
     },
     summary: 'Get group members',
-    middlewares: [authMiddleware()],
+    authMiddlewareOptions: {},
     handler: async (req, res) => {
       const group_id = Number(req.params.id);
       const members = await SQL_GET_GROUP_MEMBERS({

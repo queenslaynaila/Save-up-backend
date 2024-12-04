@@ -1,6 +1,6 @@
 import Router from '../../router';
 import { sql } from '../../db';
-import authMiddleware from '../../authorization';
+
 import {
   CandidateRes,
   CandidateReq,
@@ -24,7 +24,7 @@ const getCandidates = (router: Router) => {
     response: {
       schema: z.array(candidateResSchema)
     },
-    middlewares: [authMiddleware()],
+    authMiddlewareOptions: {},
     handler: async (req, res) => {
       const groups = await SQL_GET_CANDIDATES({
         ...req.body, user_id: req.user!.id

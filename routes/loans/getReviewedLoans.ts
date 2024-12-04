@@ -1,6 +1,6 @@
 import Router from '../../router';
 import { sql } from '../../db';
-import authMiddleware from '../../authorization';
+
 import { ReviewedLoan, reviewedLoanSchema, ReviewedLoansParams } from './types';
 import { z } from 'zod';
 
@@ -45,7 +45,7 @@ const getReviewedLoans = (router: Router) => {
     response: {
       schema: reviewedLoanSchema.array()
     },
-    middlewares: [authMiddleware()],
+    authMiddlewareOptions: {},
     handler: async (req, res) => {
       const loans = await SQL_GET_APPLIED_LOANS({
         ...req.body,

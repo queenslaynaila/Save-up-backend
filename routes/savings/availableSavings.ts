@@ -1,6 +1,6 @@
 import Router from '../../router';
 import { sql } from '../../db';
-import authMiddleware from '../../authorization';
+
 import HttpError from '../../httpError';
 import { GetByUserInterface } from '../../types';
 import { z } from 'zod';
@@ -23,7 +23,7 @@ const getAvailableSavings = (router: Router) => {
     response: {
       schema: z.object({ balance: z.number() })
     },
-    middlewares: [authMiddleware()],
+    authMiddlewareOptions: {},
     handler: async (req, res) => {
       const result = await SQL_GET_AVAILABLE_SAVINGS({
         user_id: req.user!.id

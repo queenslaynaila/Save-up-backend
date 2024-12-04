@@ -1,6 +1,6 @@
 import Router from '../../router';
 import { sql } from '../../db';
-import authMiddleware from '../../authorization';
+
 import { baseInviteInterface, baseInviteSchema, InviteByReceiverInterface } from './types';
 
 const SQL_GET_PENDING_INVITATIONS = sql<InviteByReceiverInterface, baseInviteInterface>(`
@@ -25,7 +25,7 @@ const getInvites = (router: Router) => {
     response: {
       schema: baseInviteSchema.array()
     },
-    middlewares: [authMiddleware()],
+    authMiddlewareOptions: {},
     handler: async (req, res) => {
       const invitations = await SQL_GET_PENDING_INVITATIONS({
         receiver_id: req.user!.id

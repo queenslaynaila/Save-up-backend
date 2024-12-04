@@ -1,6 +1,6 @@
 import Router from '../../router';
 import { sql } from '../../db';
-import authMiddleware from '../../authorization';
+
 import {
   BallotComputeInterface,
   ballotBodyRequest,
@@ -24,7 +24,7 @@ const computeBallot = (router: Router) => {
     response: {
       schema: z.array(ballotResultSchema)
     },
-    middlewares: [authMiddleware()],
+    authMiddlewareOptions: {},
     handler: async (req, res) => {
       const winners = await SQL_GET_ELECTION_WINNERS({
         ...req.body,

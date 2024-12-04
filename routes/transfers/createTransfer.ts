@@ -1,6 +1,6 @@
 import Router from '../../router';
 import { sql } from '../../db';
-import authMiddleware from '../../authorization';
+
 import { TransferInput, transferValidationSchema } from './types';
 import HttpError from '../../httpError';
 
@@ -25,7 +25,7 @@ const createTransfer = (router: Router) => {
     response: {
       statusCode: 201
     },
-    middlewares: [authMiddleware()],
+    authMiddlewareOptions: {},
     handler: async (req, res) => {
       const entity_id = req.body.entity_id ?? req.user!.id;
 

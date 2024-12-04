@@ -1,6 +1,6 @@
 import Router from '../../router';
 import { sql } from '../../db';
-import authMiddleware from '../../authorization';
+
 import { BaseRequestLoan, requestLoanSchema } from './types';
 
 const SQL_REQUEST_LOAN = sql<BaseRequestLoan, Record<string, never>>(`
@@ -15,7 +15,7 @@ const createLoanRequest = (router: Router) => {
     schema: {
       body: requestLoanSchema
     },
-    middlewares: [authMiddleware()],
+    authMiddlewareOptions: {},
     handler: async (req, res) => {
       await SQL_REQUEST_LOAN({
         ...req.body,

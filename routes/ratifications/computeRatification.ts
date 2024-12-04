@@ -1,6 +1,6 @@
 import Router from '../../router';
 import { sql } from '../../db';
-import authMiddleware from '../../authorization';
+
 import {
   ratificationValidation,
   RatificationResultsInterface,
@@ -25,7 +25,7 @@ const computeRatification = (router: Router) => {
       schema: ratificationResults,
       statusCode: 201
     },
-    middlewares: [authMiddleware()],
+    authMiddlewareOptions: {},
     handler: async (req, res) => {
       await SQL_COMPUTE_RATIFICATIONS({
         ...req.body,

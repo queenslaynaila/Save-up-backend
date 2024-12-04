@@ -1,7 +1,7 @@
 import Router from '../../router';
 import { sql } from '../../db';
 import { BaseGuarantee, guaranteeLoanBodySchema } from './types';
-import authMiddleware from '../../authorization';
+
 
 const SQL_GUARANTEE_LOAN = sql<BaseGuarantee, Record<string, never>>(`
   INSERT INTO  guarantor_approvals (group_id, request_id, guarantor_id, approval) 
@@ -19,7 +19,7 @@ const guaranteeLoan = (router: Router) => {
     response: {
       statusCode: 201
     },
-    middlewares: [authMiddleware()],
+    authMiddlewareOptions: {},
     handler: async (req, res) => {
       await SQL_GUARANTEE_LOAN({
         ...req.body,

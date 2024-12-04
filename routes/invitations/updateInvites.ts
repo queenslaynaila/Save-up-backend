@@ -1,6 +1,6 @@
 import { sql } from '../../db';
 import Router from '../../router';
-import authMiddleware from '../../authorization';
+
 import { InviteResponseInterface, inviteValidationSchema } from './types';
 import { idParamSchema, StatusCodeInterface } from '../../types';
 
@@ -23,7 +23,7 @@ const updateInvites = (router: Router) => {
     response: {
       statusCode: 204
     },
-    middlewares: [authMiddleware()],
+    authMiddlewareOptions: {},
     handler: async (req, res) => {
       const xid = Number(req.params.id);
       const receiver_id = req.user!.id;

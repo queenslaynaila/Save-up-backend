@@ -1,6 +1,6 @@
 import Router from '../../router';
 import { sql } from '../../db';
-import authMiddleware from '../../authorization';
+
 import { Totals, totalSavings } from './types';
 import { ParsedQs } from 'qs';
 import { z } from 'zod';
@@ -29,7 +29,7 @@ const getotalSavings = (router: Router) => {
     response: {
       schema: totalSavings
     },
-    middlewares: [authMiddleware()],
+    authMiddlewareOptions: {},
     handler: async (req, res) => {
       const filters: string[] = [];
       const filterArgs: string | string [] | ParsedQs | ParsedQs[] = {};

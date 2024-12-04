@@ -1,7 +1,7 @@
 import Router from '../../router';
 import { sql } from '../../db';
 import HttpError from '../../httpError';
-import authMiddleware from '../../authorization';
+
 import {
   expenseBodySchema,
   ExpenseUpdateInterface,
@@ -35,7 +35,7 @@ const updateExpense = (router: Router) => {
     response: {
       schema: expenseBodySchema
     },
-    middlewares: [authMiddleware()],
+    authMiddlewareOptions: {},
     handler: async (req, res) => {
       const entity_id = req.body.entity_id ?? req.user!.id;
       const xid = Number(req.params.id);

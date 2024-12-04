@@ -1,6 +1,6 @@
 import Router from '../../router';
 import { sql } from '../../db';
-import authMiddleware from '../../authorization';
+
 import {
   TransactionRecipients,
   TransactionDetails,
@@ -29,7 +29,7 @@ const getTransactionById = (router: Router) => {
     response: {
       schema: transactionDetails.array()
     },
-    middlewares: [authMiddleware()],
+    authMiddlewareOptions: {},
     handler: async (req, res) => {
       const members = await SQL_GROUP_TRANSACTIONS({
         user_id: req.user!.id,

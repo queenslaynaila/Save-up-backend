@@ -1,6 +1,6 @@
 import Router from '../../router';
 import { sql } from '../../db';
-import authMiddleware from '../../authorization';
+
 import { z } from 'zod';
 import logger from '../../logger';
 import { groupsSchema } from './schema';
@@ -37,7 +37,7 @@ const getUserGroups = (router:Router) => {
     response: {
       schema: z.array(group)
     },
-    middlewares: [authMiddleware()],
+    authMiddlewareOptions: {},
     handler: async (req, res) => {
       logger.info('Fetching user groups');
       const groups = await SQL_FETCH_USER_GROUPS({

@@ -1,6 +1,6 @@
 import Router from '../../router';
 import { sql } from '../../db';
-import authMiddleware from '../../authorization';
+
 import { WithdrawalRequest, withdrawalValidation } from './types';
 
 const SQL_INITIATE_GRP_WITHDRAWAL = sql<WithdrawalRequest, Record<string, never>>(`
@@ -20,7 +20,7 @@ const createGroupWithdrawal = (router: Router) => {
     schema: {
       body: withdrawalValidation
     },
-    middlewares: [authMiddleware()],
+    authMiddlewareOptions: {},
     handler: async (req, res) => {
       await SQL_INITIATE_GRP_WITHDRAWAL({
         ...req.body,

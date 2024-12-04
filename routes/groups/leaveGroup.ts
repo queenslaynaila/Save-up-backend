@@ -1,6 +1,6 @@
 import Router from '../../router';
 import { sql } from '../../db';
-import authMiddleware from '../../authorization';
+
 import { z } from 'zod';
 
 const SQL_EXIT_GROUP = sql<{group_id: number, user_id: number}, {name: string}>(`
@@ -24,7 +24,7 @@ const leaveGroup = (router:Router) => {
         name: z.string()
       })
     },
-    middlewares: [authMiddleware()],
+    authMiddlewareOptions: {},
     handler: async (req, res) => {
       const group = await SQL_EXIT_GROUP({
         group_id: Number(req.params.group_id),

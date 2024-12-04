@@ -1,6 +1,6 @@
 import Router from '../../router';
 import { sql } from '../../db';
-import authMiddleware from '../../authorization';
+
 import {
   InviteInputInterface, userInviteSchema } from './types';
 
@@ -26,7 +26,7 @@ const sendInvite = (router: Router) => {
     response: {
       statusCode: 204
     },
-    middlewares: [authMiddleware()],
+    authMiddlewareOptions: {},
     handler: async (req, res) => {
       const { exists } = await SQL_CHECK_USER_EXISTENCE({
         phone_number: req.body.phone_number

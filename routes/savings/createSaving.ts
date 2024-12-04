@@ -1,6 +1,6 @@
 import Router from '../../router';
 import { sql } from '../../db';
-import authMiddleware from '../../authorization';
+
 import { SavingCreateType, savingPostRequestSchema } from './types';
 
 const SQL_CREATE_SAVING = sql<SavingCreateType, Record<string, never>>(`
@@ -18,7 +18,7 @@ const createSaving = (router: Router) => {
     response: {
       statusCode: 201
     },
-    middlewares: [authMiddleware()],
+    authMiddlewareOptions: {},
     handler: async (req, res) => {
       await SQL_CREATE_SAVING({
         ...req.body,

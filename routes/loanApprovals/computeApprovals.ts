@@ -1,6 +1,6 @@
 import Router from '../../router';
 import { sql } from '../../db';
-import authMiddleware from '../../authorization';
+
 import { FinalnApproval, finalApprovalBody } from './types';
 
 const SQL_COMPUTE_APPROVALS = sql< FinalnApproval, Record<string, never>>(`
@@ -18,7 +18,7 @@ const computeApprovals = (router: Router) => {
     response: {
       statusCode: 204
     },
-    middlewares: [authMiddleware()],
+    authMiddlewareOptions: {},
     handler: async (req, res) => {
       await SQL_COMPUTE_APPROVALS({
         ...req.body,

@@ -1,5 +1,5 @@
 import Router from '../../router';
-import authMiddleware from '../../authorization';
+
 import HttpError from '../../httpError';
 import { sql } from '../../db';
 import { z } from 'zod';
@@ -61,7 +61,7 @@ const updatePocket = (router: Router) => {
     response: {
       schema: pocket
     },
-    middlewares: [authMiddleware()],
+    authMiddlewareOptions: {},
     handler: async (req, res) => {
       const entity_id = req.body.entity_id ?? req.user!.id;
       const { name, category_id, target_amount, priority, target_at, pocket_type } = req.body;

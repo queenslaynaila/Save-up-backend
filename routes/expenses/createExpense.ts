@@ -1,6 +1,5 @@
 import Router from '../../router';
 import { sql } from '../../db';
-import authMiddleware from '../../authorization';
 import {
   ExpenseCreationInterface,
   Expense,
@@ -34,7 +33,7 @@ const createExpense = (router: Router) => {
       schema: ExpenseSchema,
       statusCode: 201
     },
-    middlewares: [authMiddleware()],
+    authMiddlewareOptions: {},
     handler: async (req, res) => {
       const entity_id = req.body.entity_id ?? req.user!.id;
       const { category_id, description, amount, spent_at } = req.body;

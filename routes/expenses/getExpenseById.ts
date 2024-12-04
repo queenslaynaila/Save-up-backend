@@ -1,7 +1,7 @@
 import Router from '../../router';
 import { sql } from '../../db';
 import HttpError from '../../httpError';
-import authMiddleware from '../../authorization';
+
 import { Expense, ExpenseSchema } from './types';
 import { entitySchema, idParamSchema, XidEntityInterface } from '../../types';
 
@@ -25,7 +25,7 @@ const getExpenseById = (router: Router) => {
     response: {
       schema: ExpenseSchema
     },
-    middlewares: [authMiddleware()],
+    authMiddlewareOptions: {},
     handler: async (req, res) => {
       const entity_id = req.body?.entity_id ?? req.user!.id;
       const result = await SQL_GET_EXPENSE_BY_ID({

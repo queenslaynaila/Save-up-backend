@@ -1,5 +1,5 @@
 import { sql } from '../../db';
-import authMiddleware from '../../authorization';
+
 import { withdrawalBodySchema, WithdrawalCreation } from './types';
 import HttpError from '../../httpError';
 import Router from '../../router';
@@ -19,7 +19,7 @@ const createWithdrawal = (router: Router) => {
     response: {
       statusCode: 201
     },
-    middlewares: [authMiddleware()],
+    authMiddlewareOptions: {},
     handler: async (req, res) => {
       await SQL_CREATE_WITHDRAWAL({
         ...req.body,

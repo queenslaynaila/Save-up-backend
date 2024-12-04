@@ -1,6 +1,6 @@
 import Router from '../../router';
 import { sql } from '../../db';
-import authMiddleware from '../../authorization';
+
 import HttpError from '../../httpError';
 import { z } from 'zod';
 
@@ -24,7 +24,7 @@ const deletePocket = (router: Router) => {
     response: {
       statusCode: 204
     },
-    middlewares: [authMiddleware()],
+    authMiddlewareOptions: {},
     handler: async (req, res) => {
       const entity_id = req.body?.entity_id ?? req.user!.id;
       await SQL_DELETE_POCKET({

@@ -1,6 +1,6 @@
 import Router from '../../router';
 import { sql } from '../../db';
-import authMiddleware from '../../authorization';
+
 import { z } from 'zod';
 import { Group, group } from './createGroups';
 
@@ -33,7 +33,7 @@ const getCommonGroups = (router:Router) => {
     response: {
       schema: z.array(group)
     },
-    middlewares: [authMiddleware()],
+    authMiddlewareOptions: {},
     handler: async (req, res) => {
       const logged_in_user_id = req.user!.id;
       const user_id = Number(req.params.id);

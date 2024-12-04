@@ -1,6 +1,6 @@
 import Router from '../../router';
 import { sql } from '../../db';
-import authMiddleware from '../../authorization';
+
 import {
   Expense,
   ExpenseSchema,
@@ -36,7 +36,7 @@ export const getExpensesByCriteria = (router: Router) => {
     response: {
       schema: z.array(ExpenseSchema)
     },
-    middlewares: [authMiddleware()],
+    authMiddlewareOptions: {},
     handler: async (req, res) => {
       const entity_id = req.body?.entity_id ?? req.user!.id;
       const { category_id, start_date, end_date } = req.query;

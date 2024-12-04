@@ -1,6 +1,6 @@
 import Router from '../../router';
 import { sql } from '../../db';
-import authMiddleware from '../../authorization';
+
 import { pocketSchema } from './schema';
 import { z } from 'zod';
 
@@ -57,7 +57,7 @@ const createPocket = (router: Router) => {
     response: {
       schema: pocket
     },
-    middlewares: [authMiddleware()],
+    authMiddlewareOptions: {},
     handler: async (req, res) => {
       const entity_id = req.body?.entity_id ?? req.user!.id;
       const newPocket = await SQL_CREATE_POCKET({

@@ -1,6 +1,6 @@
 import Router from '../../router';
 import { sql } from '../../db';
-import authMiddleware from '../../authorization';
+
 import {
   ElectionRequest,
   ElectionRetrieval,
@@ -23,7 +23,7 @@ const getElections = (router: Router) => {
     response: {
       schema: electionRetrievalSchema
     },
-    middlewares: [authMiddleware()],
+    authMiddlewareOptions: {},
     handler: async (req, res) => {
       const election = await SQL_GET_ONGOING_ELECTION({
         ...req.body,

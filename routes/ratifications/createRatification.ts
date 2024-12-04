@@ -1,6 +1,6 @@
 import Router from '../../router';
 import { sql } from '../../db';
-import authMiddleware from '../../authorization';
+
 import { computeStatus, RatificationInterface } from './types';
 
 const SQL_CREATE_RATIFICATIONS = sql<RatificationInterface, Record<string, never>>(`
@@ -19,7 +19,7 @@ const createRatification = (router: Router) => {
     response: {
       statusCode: 201
     },
-    middlewares: [authMiddleware()],
+    authMiddlewareOptions: {},
     handler: async (req, res) => {
       await SQL_CREATE_RATIFICATIONS({
         ...req.body, user_id: req.user!.id

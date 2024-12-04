@@ -1,6 +1,6 @@
 import Router from '../../router';
 import { sql } from '../../db';
-import authMiddleware from '../../authorization';
+
 import { ApproveWithdrawal, withdrawal } from './types';
 import { z } from 'zod';
 
@@ -24,7 +24,7 @@ const approveWithdrawal = (router:Router) => {
     response: {
       statusCode: 201
     },
-    middlewares: [authMiddleware()],
+    authMiddlewareOptions: {},
     handler: async (req, res) => {
       await SQL_APPROVE_GRP_WITHDRAWAL({
         ...req.body,

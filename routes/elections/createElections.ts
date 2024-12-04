@@ -1,6 +1,6 @@
 import Router from '../../router';
 import { sql } from '../../db';
-import authMiddleware from '../../authorization';
+
 import { ElectionInterface, electionValidation } from './types';
 
 const SQL_CALL_ELECTION = sql<ElectionInterface, Record<string, never>>(`
@@ -18,7 +18,7 @@ const createElections = (router: Router) => {
     response: {
       statusCode: 201
     },
-    middlewares: [authMiddleware()],
+    authMiddlewareOptions: {},
     handler: async (req, res) => {
       await SQL_CALL_ELECTION({
         ...req.body,

@@ -1,6 +1,6 @@
 import Router from '../../router';
 import { sql } from '../../db';
-import authMiddleware from '../../authorization';
+
 import { ParsedQs } from 'qs';
 import { z } from 'zod';
 import { transactionSchema, transactionTypeSchema } from './schema';
@@ -45,7 +45,7 @@ const getTransactionsForPocket = (router: Router) => {
     method: 'get',
     path: '/:xid/transactions',
     summary: 'Get transactions for a pocket',
-    middlewares: [authMiddleware()],
+    authMiddlewareOptions: {},
     schema: {
       query: transactionQueryParams,
       params: z.object({ xid: z.string() })

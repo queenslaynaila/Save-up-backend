@@ -1,6 +1,6 @@
 import Router from '../../router';
 import { sql } from '../../db';
-import authMiddleware from '../../authorization';
+
 import {
   groupsByUserSchema,
   removedMemberSchema
@@ -32,7 +32,7 @@ const removeMember = (router:Router) => {
     response: {
       schema: removedMemberSchema
     },
-    middlewares: [authMiddleware()],
+    authMiddlewareOptions: {},
     handler: async (req, res) => {
       const response = await SQL_REMOVE_GROUP_MBR({
         admin_id: req.user!.id,

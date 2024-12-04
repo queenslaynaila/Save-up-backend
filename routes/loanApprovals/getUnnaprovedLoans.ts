@@ -1,6 +1,6 @@
 import Router from '../../router';
 import { sql } from '../../db';
-import authMiddleware from '../../authorization';
+
 import { GetByGroupIdInterface } from '../../types';
 import { LoanRequest, loanRequestSchema } from '../loanGuarantees/types';
 import { z } from 'zod';
@@ -46,7 +46,7 @@ const getUnapprovedLoans = (router: Router) => {
     response: {
       schema: loanRequestSchema.array()
     },
-    middlewares: [authMiddleware()],
+    authMiddlewareOptions: {},
     handler: async (req, res) => {
       const loans = await SQL_GET_UNAPPROVED_LOAN({
         group_id: req.body.group_id,

@@ -1,6 +1,6 @@
 import Router from '../../router';
 import { sql } from '../../db';
-import authMiddleware from '../../authorization';
+
 import { z } from 'zod';
 
 const SQL_UPDATE_GROUP = sql<{
@@ -29,7 +29,7 @@ const updateGroup = (router:Router) => {
         new_name: z.string()
       })
     },
-    middlewares: [authMiddleware()],
+    authMiddlewareOptions: {},
     handler: async (req, res) => {
       const updatedGroup = await SQL_UPDATE_GROUP({
         ...req.body,

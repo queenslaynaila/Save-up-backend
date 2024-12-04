@@ -1,6 +1,6 @@
 import Router from '../../router';
 import { sql } from '../../db';
-import authMiddleware from '../../authorization';
+
 import { LoanRequest, loanRequestSchema } from './types';
 import { GetByUserInterface } from '../../types';
 
@@ -48,7 +48,7 @@ const getGuarantorRequests = (router: Router) => {
     response: {
       schema: loanRequestSchema.array()
     },
-    middlewares: [authMiddleware()],
+    authMiddlewareOptions: {},
     handler: async (req, res) => {
       const loan_requests = await SQL_GET_UNGUARANTEED_LOAN_REQUESTS({
         user_id: req.user!.id,

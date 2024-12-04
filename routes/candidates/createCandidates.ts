@@ -1,6 +1,6 @@
 import Router from '../../router';
 import { sql } from '../../db';
-import authMiddleware from '../../authorization';
+
 import { CandidateInterface, candidateRequestBody } from './types';
 
 const SQL_CREATE_CANDIDATES = sql<CandidateInterface, Record<string, never>>(`
@@ -19,7 +19,7 @@ const createCandidates = (router: Router) => {
     response: {
       statusCode: 201
     },
-    middlewares: [authMiddleware()],
+    authMiddlewareOptions: {},
     handler: async (req, res) => {
       const chosen_by = req.user!.id;
       await SQL_CREATE_CANDIDATES({
