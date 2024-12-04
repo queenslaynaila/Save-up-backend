@@ -25,7 +25,7 @@ const SQL_UPDATE_PIN = sql<{ pin: string; id: number }, Record<string, never>>(`
   WHERE id = :id
 `);
 
-const SQL_UPDATE_ROLE = sql<{ targetUserId: string; role: string; adminId: number }, { updatedRole: string }>(`
+const SQL_UPDATE_ROLE = sql<{ targetUserId: number; role: string; adminId: number }, { updatedRole: string }>(`
   UPDATE users 
   SET role = :role
   WHERE id = :targetUserId
@@ -82,55 +82,50 @@ const updateUserAttributes = (router: Router) => {
       body: updateUserDetailsSchema
     },
     response: {
-      schema: z.object({
-        updated_attribute: z.string()
-      }) || null
+      schema: z.record(z.string(), z.string()) || null
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {
-      const userId = req.params.user_id;
-      const id = userId === 'me' ? req.user!.id : parseInt(userId, 10);
+      const userIdParam = req.params.user_id;
+      const userId = userIdParam === 'me' ? req.user!.id : parseInt(userIdParam, 10);
 
-      if (Number.isNaN(id)) {
+      if (Number.isNaN(userId)) {
         throw new HttpError(400);
       }
 
       if ('id_type' in req.body && 'id_number' in req.body) {
         const { id_type, id_number } = req.body;
         const { new_id_number } = await SQL_UPDATE_ID_NUMBER({
-          user_id: id,
+          user_id: userId,
           id_type,
           id_number
         }).one();
-        return res.json({ updated_attribute: new_id_number });
+        return res.json({ id_number: new_id_number });
       }
 
       if ('phone_number' in req.body && 'pin' in req.body) {
         const { phone_number, pin } = req.body;
-        const userPassword = await SQL_GET_USER_PIN({ id }).one();
-
-        if (!await bcrypt.compare(pin, userPassword.pin)) {
+        const { pin: currentPin } = await SQL_GET_USER_PIN({ id: userId }).one();
+        if (!await bcrypt.compare(pin, currentPin)) {
           throw new HttpError(401);
         }
-
-        const { updated_phone_number } = await SQL_UPDATE_PHONE({
+        const { updated_phone_number: updatedPhone } = await SQL_UPDATE_PHONE({
           phone_number,
-          user_id: id
+          user_id: userId
         }).one();
-        return res.json({ updated_attribute: updated_phone_number });
+        return res.json({ phone_number: updatedPhone });
       }
 
       if ('old_pin' in req.body && 'new_pin' in req.body) {
-        const { pin: hashedUserPin } = await SQL_GET_USER_PIN({ id }).one();
-        const { old_pin, new_pin } = req.body;
+        const { old_pin: oldPin, new_pin: newPin } = req.body;
+        const { pin: currentPin } = await SQL_GET_USER_PIN({ id: userId }).one();
 
-        const isOldPinValid = await bcrypt.compare(old_pin, hashedUserPin);
-        if (!isOldPinValid) {
+        if (!await bcrypt.compare(oldPin, currentPin)) {
           throw new HttpError(401);
         }
 
-        const hashedNewPin = bcrypt.hashSync(new_pin, 10);
-        await SQL_UPDATE_PIN({ id, pin: hashedNewPin }).exec();
+        const hashedNewPin = bcrypt.hashSync(newPin, 10);
+        await SQL_UPDATE_PIN({ id: userId, pin: hashedNewPin }).exec();
         return res.sendStatus(204);
       }
 
@@ -149,7 +144,7 @@ const updateUserAttributes = (router: Router) => {
           }
           throw err;
         });
-        res.json({ updated_attribute: updatedRole });
+        res.json({ role: updatedRole });
       }
 
       throw new HttpError(400);
