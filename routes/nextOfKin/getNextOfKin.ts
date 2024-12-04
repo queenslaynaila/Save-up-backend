@@ -19,13 +19,13 @@ const getNextOfKin = (router: Router) => {
     description:
       'Fetches the next of kin details for a user. The route supports the following scenarios:\n'
       + '- **Active next of kin**: By default, fetches the currently active (non-deleted) next of kin for the user.\n'
-      + '- **Next-of-kin history**: By passing the `include_history=true` query parameter, all next-of-kin records (including soft-deleted ones) are retrieved. Only admins can do this otherwise its false\n'
+      + '- **Next-of-kin history**: By passing the `include_history=true` query parameter, all next-of-kin records (including soft-deleted ones) are retrieved. Only admins/mods can do this otherwise its false\n'
       + '\nThe `user_id` query parameter determines which user’s data is fetched:\n'
       + '- **Omitted**: Fetches the details for the currently logged-in user (default behavior if no `user_id` query param. \n'
       + '- **Specific user ID**: Fetches details for a specific user, but only admins or moderators can query kins by `user_id`.\n',
     schema: {
       query: z.object({
-        user_id: z.string(),
+        user_id: z.number(),
         include_history: z.string().default('false')
       }).partial()
     },
@@ -35,11 +35,7 @@ const getNextOfKin = (router: Router) => {
     authMiddlewareOptions: {},
     handler: async (req, res) => {
       const { user_id, include_history = 'false' } = req.query;
-      if (user_id && Number.isNaN(parseInt(user_id, 10))) {
-        throw new HttpError(400);
-      }
-
-      const targetUser = user_id ? parseInt(user_id, 10) : req.user!.id;
+      const targetUser = user_id || req.user!.id;
       if (req.user!.role === UserRole.USER
         && (req.user!.id !== targetUser || include_history === 'true')) {
         throw new HttpError(403);

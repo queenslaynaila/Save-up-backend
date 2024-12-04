@@ -56,7 +56,6 @@ const validateRequest = (schema: {
 }) => {
   return (req: Request, res: Response, next: NextFunction) => {
     if (schema.body) validateSchema(schema.body, req.body, 'body');
-    logger.info(`all queries are ${JSON.stringify(req.query)}`);
     if (schema.query) validateSchema(schema.query, req.query, 'query');
     if (schema.params) validateSchema(schema.params, req.params, 'params');
     next();
