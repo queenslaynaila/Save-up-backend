@@ -13,7 +13,7 @@ const SQL_TRANSACTION_AGREGATES = sql<{entity_id: number}, {total: number}>(`
   WHERE transactions.entity_id = :entity_id
 `);
 
-const ComputeTransactionTotals = (router: Router) => {
+const computeTransactionTotals = (router: Router) => {
   router.route({
     method: 'get',
     path: '/totals',
@@ -79,4 +79,4 @@ const ComputeTransactionTotals = (router: Router) => {
   });
 };
 
-export default ComputeTransactionTotals;
+export default computeTransactionTotals;

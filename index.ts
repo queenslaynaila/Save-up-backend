@@ -18,8 +18,6 @@ import './routes/categories/index';
 import './routes/expenses/index';
 import './routes/pockets/index';
 import './routes/savings/index';
-import './routes/transfers/index';
-import './routes/withdrawals/index';
 import './routes/transactions/index';
 import './routes/groups/index';
 import './routes/invitations/index';
