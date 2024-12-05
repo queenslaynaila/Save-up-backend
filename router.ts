@@ -120,8 +120,8 @@ class Router {
     this.apiTag = apiTag;
     Router.app.use(
       cors({
-        origin: ['http://localhost:5173', 'https://save-up-seven.vercel.app'],
-        credentials: true,
+        origin: ['*'],
+        credentials: false,
         exposedHeaders: ['Authorization', 'Reset'],
         allowedHeaders: ['Content-Type', 'Authorization', 'Reset']
       })
