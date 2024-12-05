@@ -1,6 +1,5 @@
 import { sql } from '../../db';
 import HttpError from '../../httpError';
-import logger from '../../logger';
 import Router from '../../router';
 import { z } from 'zod';
 import bcrypt from 'bcrypt';
@@ -36,7 +35,6 @@ const createWithdrawal = (router: Router) => {
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {
-      logger.info(`withdrwal req made by user ${req.user!.id}`);
       const { pocket_id, amount, pin } = req.body;
       const { pin: currentPin } = await SQL_GET_USER_PIN({ id: req.user!.id }).one();
 
