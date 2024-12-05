@@ -3,6 +3,8 @@ import HttpError from '../../httpError';
 import logger from '../../logger';
 import Router from '../../router';
 import { z } from 'zod';
+import bcrypt from 'bcrypt';
+import { SQL_GET_USER_PIN } from '../users/updateAttributes';
 
 const withdrawalPayload = z.object({
   pocket_id: z.number(),
@@ -25,6 +27,8 @@ const createWithdrawal = (router: Router) => {
       body: withdrawalPayload.pick({
         pocket_id: true,
         amount: true
+      }).extend({
+        pin: z.string()
       })
     },
     response: {
@@ -33,8 +37,17 @@ const createWithdrawal = (router: Router) => {
     authMiddlewareOptions: {},
     handler: async (req, res) => {
       logger.info(`withdrwal req made by user ${req.user!.id}`);
+      const { pocket_id, amount, pin } = req.body;
+      const { pin: currentPin } = await SQL_GET_USER_PIN({ id: req.user!.id }).one();
+
+      const isValidPin = await bcrypt.compare(pin, currentPin);
+      if (!isValidPin) {
+        throw new HttpError(403, { message: 'Invalid PIN' });
+      }
+
       await SQL_CREATE_WITHDRAWAL({
-        ...req.body,
+        pocket_id,
+        amount,
         user_id: req.user!.id
       }).exec().catch((err) => {
         if (err.code === 'P0004') {
