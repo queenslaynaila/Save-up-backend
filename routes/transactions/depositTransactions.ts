@@ -10,7 +10,7 @@ const SQL_CREATE_SAVING = sql<{user_id: number, amount:number, pocket_id:number,
 const createSaving = (router: Router) => {
   router.route({
     method: 'post',
-    path: '/deposit',
+    path: '/save',
     summary: 'Create a saving',
     description: 'Endpoint allows to deposit money to a pocket belonging to either grp or user. \n\n'
     + '-**Group Deposit**: For grp deposits add the optional grp id in body.\n\n'
