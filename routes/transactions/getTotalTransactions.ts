@@ -59,19 +59,15 @@ const ComputeTransactionTotals = (router: Router) => {
       }
 
       if (from && to) {
-        filterArgs.from = from;
-        filterArgs.to = to;
+        filterArgs.start_date = from;
+        filterArgs.end_date = to;
         filters.push('DATE(transactions.created_at) BETWEEN :start_date AND :end_date');
-      } else {
-        if (from) {
-          filterArgs.from = from;
-          filters.push('DATE(transactions.created_at) >= :from');
-        }
-
-        if (to) {
-          filterArgs.to = to;
-          filters.push('DATE(transactions.created_at) <= :to');
-        }
+      } else if (from) {
+        filterArgs.from = from;
+        filters.push('DATE(transactions.created_at) >= :from');
+      } else if (to) {
+        filterArgs.to = to;
+        filters.push('DATE(transactions.created_at) <= :to');
       }
 
       const query = SQL_TRANSACTION_AGREGATES({ entity_id });
