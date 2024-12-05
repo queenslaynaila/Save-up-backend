@@ -121,7 +121,7 @@ const updateUserAttributes = (router: Router) => {
         const { pin: currentPin } = await SQL_GET_USER_PIN({ id: userId }).one();
 
         if (!await bcrypt.compare(oldPin, currentPin)) {
-          throw new HttpError(401);
+          throw new HttpError(403);
         }
 
         const hashedNewPin = bcrypt.hashSync(newPin, 10);
