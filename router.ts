@@ -120,7 +120,7 @@ class Router {
     this.apiTag = apiTag;
     Router.app.use(
       cors({
-        origin: ['*'],
+        origin: '*',
         credentials: false,
         exposedHeaders: ['Authorization', 'Reset'],
         allowedHeaders: ['Content-Type', 'Authorization', 'Reset']
