@@ -50,11 +50,6 @@ const verifySecurityAnswers = (router: Router) => {
 
       logger.info(`answer map is ${JSON.stringify(answerMap)}`);
 
-      const mappedArray = userSecurityAnswers.map((
-        { question_id, answer }
-      ) => [question_id, answer]);
-      logger.info(`Mapped array: ${JSON.stringify(mappedArray)}`);
-
       const incorrectAnswers: number[] = [];
       for (const { question_id, answer } of answers) {
         const hashedAnswer = answerMap.get(question_id);
