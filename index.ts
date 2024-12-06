@@ -57,8 +57,8 @@ app.use((_, res, next) => {
 });
 app.use(
   cors({
-    origin: ['http://localhost:5173'],
-    credentials: true,
+    origin: '*',
+    credentials: false,
     exposedHeaders: ['Authorization', 'Reset']
   })
 );
