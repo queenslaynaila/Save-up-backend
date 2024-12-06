@@ -36,7 +36,7 @@ const computeTransactionTotals = (router: Router) => {
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {
-      const entity_id = Number(req.query?.group_id) ?? req.user!.id;
+      const entity_id = Number(req.query?.group_id) || req.user!.id;
       const { pocket_id, from, to } = req.query;
 
       const filters: string[] = [];
