@@ -41,7 +41,7 @@ export const getExpensesByCriteria = (router: Router) => {
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {
-      const entity_id = Number(req.query?.group_id) ?? req.user!.id;
+      const entity_id = Number(req.query?.group_id) || req.user!.id;
       const { category_id, start_date, end_date, spent_from, spent_to } = req.query;
 
       const filters: string[] = [];
