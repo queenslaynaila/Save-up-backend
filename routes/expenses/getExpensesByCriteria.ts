@@ -4,7 +4,6 @@ import {
   Expense,
   ExpenseSchema
 } from './types';
-import { entitySchema } from '../../types';
 import { z } from 'zod';
 import { ParsedQs } from 'qs';
 
@@ -29,20 +28,20 @@ export const getExpensesByCriteria = (router: Router) => {
     summary: 'Get list of expenses by criteria',
     schema: {
       query: z.object({
+        group_id: z.string(),
         category_id: z.string(),
         spent_from: z.string(),
         spent_to: z.string(),
         start_date: z.string(),
         end_date: z.string()
-      }).partial(),
-      body: entitySchema
+      }).partial()
     },
     response: {
       schema: z.array(ExpenseSchema)
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {
-      const entity_id = req.body?.entity_id ?? req.user!.id;
+      const entity_id = Number(req.query?.group_id) ?? req.user!.id;
       const { category_id, start_date, end_date, spent_from, spent_to } = req.query;
 
       const filters: string[] = [];
