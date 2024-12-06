@@ -64,8 +64,7 @@ const computeTransactionTotals = (router: Router) => {
 
       const balance = await query.many();
       const totalBalance = balance.reduce((sum, row) => sum + (row.balance || 0), 0);
-      const finalBalance = totalBalance || 0;
-      res.json({ balance: finalBalance });
+      res.json({ balance: totalBalance });
     }
   });
 };
