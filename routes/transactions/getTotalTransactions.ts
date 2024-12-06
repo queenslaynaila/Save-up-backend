@@ -1,16 +1,11 @@
 import { z } from 'zod';
 import { sql } from '../../db';
 import Router from '../../router';
-import { ParsedQs } from 'qs';
 
-const SQL_GET_BALANCE = sql<{entity_id: number}, {balance: number}>(`
-  SELECT COALESCE(SUM(balance), 0) AS balance
-  FROM (
-       SELECT DISTINCT ON (pocket_id) balance
-       FROM transactions
-       WHERE entity_id = :entity_id
-       ORDER BY pocket_id, created_at DESC
-  ) AS current_balance_per_pocket;
+const SQL_INNER_BALANCE = sql<{ entity_id: number, pocket_id?: string, from?: string, to?: string }, { balance: number }>(`
+  SELECT DISTINCT ON (pocket_id) balance
+  FROM transactions
+  WHERE entity_id = :entity_id
 `);
 
 const computeTransactionTotals = (router: Router) => {
@@ -18,11 +13,11 @@ const computeTransactionTotals = (router: Router) => {
     method: 'get',
     path: '/balance',
     summary: 'Get user / group balance across all pockets',
-    description: 'Calculates and retrieves the available balance for a system entity(grps,pockets). Allows optional query parameters:\n\n'
-    + '- **pocket_id**: Retrieves the current balance for a specific pocket.\n'
-    + '- **from**: Filters transactions from a specific start date.\n'
-    + '- **to**: Filters transaction up to a specific end date.\n'
-    + '- **group_id**: If provided, we get available balnce for a grp entity.',
+    description: 'Calculates and retrieves the available balance for a system entity (groups, pockets). Allows optional query parameters:\n\n'
+      + '- **pocket_id**: Retrieves the current balance for a specific pocket.\n'
+      + '- **from**: Filters transactions from a specific start date.\n'
+      + '- **to**: Filters transactions up to a specific end date.\n'
+      + '- **group_id**: If provided, retrieves the available balance for a group entity.',
     schema: {
       query: z.object({
         from: z.string(),
@@ -39,17 +34,22 @@ const computeTransactionTotals = (router: Router) => {
       const entity_id = Number(req.query?.group_id) || req.user!.id;
       const { pocket_id, from, to } = req.query;
 
+      const filterArgs: {
+        entity_id: number,
+        from?: string,
+        to?: string,
+        pocket_id?:string
+      } = { entity_id };
       const filters: string[] = [];
-      const filterArgs: string | string [] | ParsedQs | ParsedQs[] = {};
       if (pocket_id) {
         filterArgs.pocket_id = pocket_id;
-        filters.push('transactions.pocket_id = :pocket_id');
+        filters.push('pocket_id = :pocket_id');
       }
 
       if (from && to) {
-        filterArgs.start_date = from;
-        filterArgs.end_date = to;
-        filters.push('DATE(transactions.created_at) BETWEEN :start_date AND :end_date');
+        filterArgs.from = from;
+        filterArgs.to = to;
+        filters.push('DATE(transactions.created_at) BETWEEN :from AND :to');
       } else if (from) {
         filterArgs.from = from;
         filters.push('DATE(transactions.created_at) >= :from');
@@ -58,11 +58,14 @@ const computeTransactionTotals = (router: Router) => {
         filters.push('DATE(transactions.created_at) <= :to');
       }
 
-      const query = SQL_GET_BALANCE({ entity_id });
-
+      const query = SQL_INNER_BALANCE(filterArgs);
       if (filters.length > 0) query.extend(`AND ${filters.join(' AND ')}`, filterArgs);
-      const { balance } = await query.one();
-      res.json({ balance });
+      query.extend('ORDER BY pocket_id, created_at DESC', {});
+
+      const balance = await query.many();
+      const totalBalance = balance.reduce((sum, row) => sum + (row.balance || 0), 0);
+      const finalBalance = totalBalance || 0;
+      res.json({ balance: finalBalance });
     }
   });
 };
