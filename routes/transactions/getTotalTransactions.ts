@@ -2,9 +2,8 @@ import { z } from 'zod';
 import { sql } from '../../db';
 import Router from '../../router';
 import { ParsedQs } from 'qs';
-import { entitySchema } from '../../types';
 
-const SQL_GET_BALANCE = sql<{entity_id: number}, {total: number}>(`
+const SQL_GET_BALANCE = sql<{entity_id: number}, {balance: number}>(`
   SELECT COALESCE(SUM(balance), 0) AS balance
   FROM (
        SELECT DISTINCT ON (pocket_id) balance
@@ -17,27 +16,15 @@ const SQL_GET_BALANCE = sql<{entity_id: number}, {total: number}>(`
 const computeTransactionTotals = (router: Router) => {
   router.route({
     method: 'get',
-    path: '/totals',
-    summary: 'Get user balance across all pockets',
+    path: '/balance',
+    summary: 'Get user / group balance across all pockets',
     description: 'Calculates and retrieves the available balance for a system entity(grps,pockets). Allows optional query parameters:\n\n'
     + '- **pocket_id**: Retrieves the current balance for a specific pocket.\n'
     + '- **from**: Filters transactions from a specific start date.\n'
     + '- **to**: Filters transaction up to a specific end date.\n'
     + '- **group_id**: If provided, we get available balnce for a grp entity.',
     schema: {
-      body: entitySchema,
       query: z.object({
-        type: z.enum([
-          'Saving',
-          'ExternalSaving',
-          'Interest',
-          'Withdrawal',
-          'Penalty',
-          'TransferIn',
-          'TransferOut',
-          'Loan',
-          'Repayment'
-        ]).default('Saving'),
         from: z.string(),
         to: z.string(),
         pocket_id: z.string(),
@@ -45,7 +32,7 @@ const computeTransactionTotals = (router: Router) => {
       }).partial()
     },
     response: {
-      schema: z.object({ total: z.number() })
+      schema: z.object({ balance: z.number() })
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {
@@ -74,8 +61,8 @@ const computeTransactionTotals = (router: Router) => {
       const query = SQL_GET_BALANCE({ entity_id });
 
       if (filters.length > 0) query.extend(`AND ${filters.join(' AND ')}`, filterArgs);
-      const { total } = await query.one();
-      res.json({ total });
+      const { balance } = await query.one();
+      res.json({ balance });
     }
   });
 };
