@@ -1,7 +1,6 @@
 import { z } from 'zod';
 import { sql } from '../../db';
 import Router from '../../router';
-import { entitySchema } from '../../types';
 import logger from '../../logger';
 import { transactionSchema, transactionTypeSchema } from '../pockets/schema';
 
@@ -36,8 +35,8 @@ const getTransactions = (router: Router) => {
     path: '/',
     summary: 'Get all transactions by a user, for a pocket, and groups',
     schema: {
-      body: entitySchema,
       query: z.object({
+        group_id: z.string().optional(),
         slug: transactionTypeSchema.shape.slug,
         pocket_id: z.string().optional(),
         from: z.string().optional(),
@@ -50,7 +49,7 @@ const getTransactions = (router: Router) => {
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {
-      const entity_id = req.body?.entity_id ?? req.user!.id;
+      const entity_id = Number(req.query?.group_id) || req.user!.id;
       const { slug, pocket_id, from, to, limit = '10' } = req.query;
 
       const filters: string[] = [];
