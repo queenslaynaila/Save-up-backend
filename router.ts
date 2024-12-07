@@ -179,16 +179,14 @@ class Router {
     }
 
     const responseSchemas = Object.entries(response).reduce((acc, [statusCode, { schema }]) => {
-      if (schema) {
-        acc[statusCode] = {
-          description: statusCode.startsWith('2') ? 'Success' : 'Error',
-          content: {
-            'application/json': {
-              schema: zodToJsonSchema(schema, { target: 'openApi3' })
-            }
+      acc[statusCode] = {
+        description: statusCode.startsWith('2') ? 'Success' : 'Error',
+        content: schema ? {
+          'application/json': {
+            schema: zodToJsonSchema(schema, { target: 'openApi3' })
           }
-        };
-      }
+        } : undefined
+      };
       return acc;
     }, {} as Record<string, any>);
 
@@ -197,7 +195,6 @@ class Router {
         acc[statusCode] = schema;
         return acc;
       }, {} as Record<string, any>);
-
     const transformedPath = path.replace(/:([^/]+)/g, '{$1}');
 
     registry.registerPath({
