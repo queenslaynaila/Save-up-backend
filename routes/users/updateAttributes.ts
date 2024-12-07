@@ -75,14 +75,21 @@ const updateUserAttributes = (router: Router) => {
       + '- For PIN updates, the logged-in user must submit the old and new PIN.\n'
       + '- For phone number updates, the logged-in user must provide the new phone number and current PIN.\n'
       + '- For ID number updates, the user must choose the type of ID and provide the new ID number.',
-    schema: {
+    request: {
       params: z.object({
         user_id: z.string()
       }),
       body: updateUserDetailsSchema
     },
     response: {
-      schema: z.record(z.string(), z.string()) || null
+      200: {
+        schema: z.union([
+          z.object({ id_number: z.string() }),
+          z.object({ phone_number: z.string() }),
+          z.object({ role: z.string() })
+        ])
+      },
+      204: {}
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {

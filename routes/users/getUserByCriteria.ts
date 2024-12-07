@@ -33,7 +33,7 @@ const getUsersBySearchCriteria = (router: Router) => {
       + '- **"me"**: The string "me" can be used to fetch details of the currently logged-in user.\n\n'
       + 'Standard users can only access their own details by using "me". Moderators and admins have access to query any user using any of the above identifiers.\n\n'
       + 'If no limit is provided, the default is 10.If no query parameter is provided, the default query parameter "me" will be used to fetch the logged-in user\'s details.',
-    schema: {
+    request: {
       query: z.object({
         phone_number: z.string(),
         id_number: z.string(),
@@ -42,8 +42,9 @@ const getUsersBySearchCriteria = (router: Router) => {
       }).partial()
     },
     response: {
-      schema: z.array(publicUserSchema),
-      statusCode: 200
+      200: {
+        schema: z.array(publicUserSchema)
+      }
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {
