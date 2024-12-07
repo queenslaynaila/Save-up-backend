@@ -22,7 +22,9 @@ const getAllCategories = (router: Router) => {
     path: '/',
     summary: 'Get list of categories',
     response: {
-      schema: z.array(categorySchema)
+      200: {
+        schema: z.array(categorySchema)
+      }
     },
     authMiddlewareOptions: {},
     handler: async (_req, res) => {
