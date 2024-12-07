@@ -89,7 +89,9 @@ const updateUserAttributes = (router: Router) => {
           z.object({ role: z.string() })
         ])
       },
-      204: {}
+      204: {},
+      401: {},
+      403: {}
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {
