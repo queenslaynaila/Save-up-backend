@@ -23,14 +23,16 @@ const removeMember = (router:Router) => {
     method: 'delete',
     path: '/remove_member/:id',
     summary: 'Remove a group member',
-    schema: {
+    request: {
       params: z.object({
         id: z.string()
       }),
       body: groupsByUserSchema
     },
     response: {
-      schema: removedMemberSchema
+      200: {
+        schema: removedMemberSchema
+      }
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {

@@ -40,9 +40,6 @@ const initiatePinReset = (router: Router) => {
     request: {
       body: z.object({ phone_number: z.string() })
     },
-    response: {
-      204: {}
-    },
     middlewares: [resetPasswordLimiter],
     handler: async (req, res) => {
       const { phone_number } = req.body;

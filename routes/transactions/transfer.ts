@@ -27,7 +27,7 @@ const createTransfer = (router: Router) => {
     method: 'post',
     path: '/transfer',
     summary: 'Create a transfer',
-    schema: {
+    request: {
       body: transferPayload.pick({
         source_pocket_id: true,
         destination_pocket_id: true,
@@ -35,7 +35,7 @@ const createTransfer = (router: Router) => {
       })
     },
     response: {
-      statusCode: 201
+      201: {}
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {

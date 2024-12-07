@@ -55,11 +55,13 @@ const getPocketByCriteria = (router: Router) => {
      + '- Admins and moderators can request pockets for any user or group using a user ID or group ID..\n'
      + '- Note that the user_id or group_is must be sent as an entity_id query param.\n'
      + '- Other query parameters include xid, category_id, priority, status, start_date, and end_date.\n',
-    schema: {
+    request: {
       query: pocketQueryParams
     },
     response: {
-      schema: z.array(pocketSchema)
+      200: {
+        schema: z.array(pocketSchema)
+      }
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {

@@ -17,12 +17,9 @@ const deletePocket = (router: Router) => {
       + '- **xid**: The ID of the pocket to be deleted. \n'
       + '- If the pocket has deposits, it cannot be deleted. Only 0 balance pockets can be deleyed \n'
       + '- For group pockets, only admins can delete them. \n',
-    schema: {
+    request: {
       params: z.object({ xid: z.string() }),
       body: z.object({ entity_id: z.number() }).partial()
-    },
-    response: {
-      statusCode: 204
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {

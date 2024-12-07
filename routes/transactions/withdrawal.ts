@@ -22,7 +22,7 @@ const createWithdrawal = (router: Router) => {
     method: 'post',
     path: '/withdraw',
     summary: 'Withdraw from a pocket',
-    schema: {
+    request: {
       body: withdrawalPayload.pick({
         pocket_id: true,
         amount: true
@@ -31,7 +31,7 @@ const createWithdrawal = (router: Router) => {
       })
     },
     response: {
-      statusCode: 201
+      201: {}
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {

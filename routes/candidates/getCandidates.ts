@@ -18,11 +18,13 @@ const getCandidates = (router: Router) => {
     method: 'get',
     path: '/',
     summary: 'Get list of candidates',
-    schema: {
+    request: {
       body: candidateParamSchema
     },
     response: {
-      schema: z.array(candidateResSchema)
+      200: {
+        schema: z.array(candidateResSchema)
+      }
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {

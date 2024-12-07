@@ -18,12 +18,13 @@ const computeRatification = (router: Router) => {
     method: 'post',
     path: '/',
     summary: 'Compute ratifications',
-    schema: {
+    request: {
       body: ratificationValidation
     },
     response: {
-      schema: ratificationResults,
-      statusCode: 201
+      201: {
+        schema: ratificationResults
+      }
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {

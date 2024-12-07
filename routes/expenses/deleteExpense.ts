@@ -16,12 +16,12 @@ const deleteExpense = (router: Router) => {
     method: 'delete',
     path: '/:id',
     summary: 'Delete an expense',
-    schema: {
+    request: {
       params: idParamSchema,
       body: entitySchema
     },
     response: {
-      statusCode: 204
+      204: {}
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {

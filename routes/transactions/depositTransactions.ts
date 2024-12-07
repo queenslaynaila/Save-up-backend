@@ -15,7 +15,7 @@ const createSaving = (router: Router) => {
     description: 'Endpoint allows to deposit money to a pocket belonging to either grp or user. \n\n'
     + '-**Group Deposit**: For grp deposits add the optional grp id in body.\n\n'
     + 'If no group id in body is provided app will assume its a individual pocket transaction',
-    schema: {
+    request: {
       body: z.object({
         amount: z.number(),
         pocket_id: z.number(),
@@ -23,7 +23,7 @@ const createSaving = (router: Router) => {
       })
     },
     response: {
-      statusCode: 201
+      201: {}
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {

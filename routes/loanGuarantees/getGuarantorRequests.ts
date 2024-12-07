@@ -46,7 +46,9 @@ const getGuarantorRequests = (router: Router) => {
     path: '/:guarantor_id/requests',
     summary: 'Get list of loan requests that require guarantor approval',
     response: {
-      schema: loanRequestSchema.array()
+      200: {
+        schema: loanRequestSchema.array()
+      }
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {

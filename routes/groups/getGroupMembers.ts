@@ -17,13 +17,15 @@ const getGroupMembers = (router:Router) => {
   router.route({
     method: 'get',
     path: '/:id',
-    schema: {
+    request: {
       params: z.object({
         id: z.string()
       })
     },
     response: {
-      schema: z.array(member)
+      200: {
+        schema: z.array(member)
+      }
     },
     summary: 'Get group members',
     authMiddlewareOptions: {},

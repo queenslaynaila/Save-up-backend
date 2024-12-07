@@ -18,9 +18,6 @@ const resetPin = (router: Router) => {
     request: {
       body: z.object({ new_pin: z.string() })
     },
-    response: {
-      204: {}
-    },
     middlewares: [authenticateResetToken, checkResetStepProgression(3)],
     handler: async (req, res) => {
       const { new_pin } = req.body;

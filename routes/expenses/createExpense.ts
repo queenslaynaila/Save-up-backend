@@ -29,12 +29,13 @@ const createExpense = (router: Router) => {
     description: 'Expenses can be either a groups or an individual user. \n'
     + '- **For groups**:If expense is being recorded for a group, body must include the \\`entity_id\\`, which corresponds to the group ID. \n\n'
     + '- **Individual users**:If expense is for currently logged-in user, the entity id property in body can be left out. The app will associate the expense with the logged-in user. \n\n',
-    schema: {
+    request: {
       body: expenseCreationSchema
     },
     response: {
-      schema: ExpenseSchema,
-      statusCode: 201
+      201: {
+        schema: ExpenseSchema
+      }
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {

@@ -25,13 +25,15 @@ const getCommonGroups = (router:Router) => {
     method: 'get',
     path: '/:id/common-groups',
     summary: 'View common groups between two users.It takes a param id which is the user id of the other user',
-    schema: {
+    request: {
       params: z.object({
         id: z.string()
       })
     },
     response: {
-      schema: z.array(group)
+      200: {
+        schema: z.array(group)
+      }
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {

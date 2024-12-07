@@ -34,7 +34,7 @@ const getTransactions = (router: Router) => {
     method: 'get',
     path: '/',
     summary: 'Get all transactions by a user, for a pocket, and groups',
-    schema: {
+    request: {
       query: z.object({
         group_id: z.string().optional(),
         slug: transactionTypeSchema.shape.slug,
@@ -45,7 +45,9 @@ const getTransactions = (router: Router) => {
       }).partial()
     },
     response: {
-      schema: z.array(transaction)
+      200: {
+        schema: z.array(transaction)
+      }
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {

@@ -1,6 +1,5 @@
 import Router from '../../router';
 import { sql } from '../../db';
-
 import { ReviewedLoan, reviewedLoanSchema, ReviewedLoansParams } from './types';
 import { z } from 'zod';
 
@@ -37,13 +36,15 @@ const getReviewedLoans = (router: Router) => {
     method: 'get',
     path: '/',
     summary: 'Get list of reviewed loans',
-    schema: {
+    request: {
       body: z.object({
         group_id: z.number()
       })
     },
     response: {
-      schema: reviewedLoanSchema.array()
+      200: {
+        schema: reviewedLoanSchema.array()
+      }
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {

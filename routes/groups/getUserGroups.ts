@@ -35,7 +35,9 @@ const getUserGroups = (router:Router) => {
     path: '/',
     summary: 'Get groups a user belongs to',
     response: {
-      schema: z.array(group)
+      200: {
+        schema: z.array(group)
+      }
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {

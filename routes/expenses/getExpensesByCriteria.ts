@@ -26,7 +26,7 @@ export const getExpensesByCriteria = (router: Router) => {
     method: 'get',
     path: '/',
     summary: 'Get list of expenses by criteria',
-    schema: {
+    request: {
       query: z.object({
         group_id: z.string(),
         category_id: z.string(),
@@ -37,7 +37,9 @@ export const getExpensesByCriteria = (router: Router) => {
       }).partial()
     },
     response: {
-      schema: z.array(ExpenseSchema)
+      200: {
+        schema: z.array(ExpenseSchema)
+      }
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {

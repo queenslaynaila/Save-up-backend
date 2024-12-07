@@ -15,14 +15,14 @@ const approveWithdrawal = (router:Router) => {
     method: 'post',
     path: '/approve-withdrawal/:id',
     summary: 'Approve withdrwawal',
-    schema: {
+    request: {
       params: z.object({
         id: z.string()
       }),
       body: withdrawal
     },
     response: {
-      statusCode: 201
+      201: {}
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {

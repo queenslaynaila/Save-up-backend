@@ -23,7 +23,9 @@ const getInvites = (router: Router) => {
     path: '/',
     summary: 'Get list of pending invitations',
     response: {
-      schema: baseInviteSchema.array()
+      200: {
+        schema: baseInviteSchema.array()
+      }
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {

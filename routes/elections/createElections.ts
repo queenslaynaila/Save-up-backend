@@ -12,11 +12,11 @@ const createElections = (router: Router) => {
     method: 'post',
     path: '/',
     summary: 'Create a new election',
-    schema: {
+    request: {
       body: electionValidation
     },
     response: {
-      statusCode: 201
+      201: {}
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {

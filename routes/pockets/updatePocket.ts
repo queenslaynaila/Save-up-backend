@@ -54,12 +54,14 @@ const updatePocket = (router: Router) => {
     method: 'patch',
     path: '/:xid',
     summary: 'Update pocket',
-    schema: {
+    request: {
       params: z.object({ xid: z.string() }),
       body: pocketPatchParams.omit({ xid: true })
     },
     response: {
-      schema: pocket
+      200: {
+        schema: pocket
+      }
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {

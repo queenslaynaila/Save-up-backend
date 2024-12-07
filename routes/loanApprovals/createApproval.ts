@@ -12,11 +12,11 @@ const createApproval = (router: Router) => {
     method: 'post',
     path: '/',
     summary: 'Approve loan',
-    schema: {
+    request: {
       body: loanApprovalSchema
     },
     response: {
-      statusCode: 204
+      204: {}
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {

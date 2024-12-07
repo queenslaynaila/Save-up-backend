@@ -18,7 +18,7 @@ const computeTransactionTotals = (router: Router) => {
       + '- **from**: Filters transactions from a specific start date.\n'
       + '- **to**: Filters transactions up to a specific end date.\n'
       + '- **group_id**: If provided, retrieves the available balance for a group entity.',
-    schema: {
+    request: {
       query: z.object({
         from: z.string(),
         to: z.string(),
@@ -27,7 +27,9 @@ const computeTransactionTotals = (router: Router) => {
       }).partial()
     },
     response: {
-      schema: z.object({ balance: z.number() })
+      200: {
+        schema: z.object({ balance: z.number() })
+      }
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {

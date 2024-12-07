@@ -51,11 +51,13 @@ const createPocket = (router: Router) => {
     method: 'post',
     path: '/',
     summary: 'Create a pocket',
-    schema: {
+    request: {
       body: pocketCreationSchema
     },
     response: {
-      schema: pocket
+      200: {
+        schema: pocket
+      }
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {

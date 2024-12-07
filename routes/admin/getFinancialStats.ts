@@ -12,7 +12,6 @@ import {
 } from './types';
 import { convertToTitleCase } from '../../caseNormalization';
 
-
 const SQL_GET_CUMULATIVES = (query: string) => sql<
 { operator: string; resource: string },
 FinancialStatsInterface>(query);
@@ -22,12 +21,14 @@ const getFinancialStats = (router: Router) => {
     method: 'get',
     path: '/',
     summary: 'Get financial statistics',
-    schema: {
+    request: {
       query: statsQuerySchema,
       params: statsParamSchema
     },
     response: {
-      schema: financialStatsSchema
+      200: {
+        schema: financialStatsSchema
+      }
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {

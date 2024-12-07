@@ -26,14 +26,16 @@ const updateExpense = (router: Router) => {
     method: 'patch',
     path: '/:id',
     summary: 'Update an expense',
-    schema: {
+    request: {
       params: z.object({
         id: z.string()
       }),
       body: expenseBodySchema
     },
     response: {
-      schema: expenseBodySchema
+      200: {
+        schema: expenseBodySchema
+      }
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {

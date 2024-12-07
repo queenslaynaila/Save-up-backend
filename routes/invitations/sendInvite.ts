@@ -20,11 +20,11 @@ const sendInvite = (router: Router) => {
     method: 'post',
     path: '/',
     summary: 'Send an invitation to a user',
-    schema: {
+    request: {
       body: userInviteSchema
     },
     response: {
-      statusCode: 204
+      204: {}
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {

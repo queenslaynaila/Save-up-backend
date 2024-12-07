@@ -2,7 +2,6 @@ import Router from '../../router';
 import { sql } from '../../db';
 import { ExternalSavingInterface, externalSavingSchema } from './types';
 
-
 const SQL_CREATE_SAVING = sql<ExternalSavingInterface, Record<string, never>>(`
   SELECT create_external_savings( 
     :entity_id,
@@ -18,11 +17,11 @@ const createExSaving = (router: Router) => {
     method: 'post',
     path: '/',
     summary: 'Create external saving',
-    schema: {
+    request: {
       body: externalSavingSchema
     },
     response: {
-      statusCode: 201
+      201: {}
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {

@@ -15,7 +15,7 @@ const getTotalUserExpenditure = (router: Router) => {
     method: 'get',
     path: '/total-expenses',
     summary: 'Get total user expenditure',
-    schema: {
+    request: {
       body: entitySchema,
       query: z.object({
         start_date: z.string(),
@@ -26,7 +26,9 @@ const getTotalUserExpenditure = (router: Router) => {
       }).partial()
     },
     response: {
-      schema: z.object({ total_expenses: z.number() })
+      200: {
+        schema: z.object({ total_expenses: z.number() })
+      }
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {

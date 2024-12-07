@@ -16,12 +16,12 @@ const updateInvites = (router: Router) => {
     method: 'patch',
     path: '/:id',
     summary: 'Update an invitation',
-    schema: {
+    request: {
       params: idParamSchema,
       body: inviteValidationSchema
     },
     response: {
-      statusCode: 204
+      204: {}
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {

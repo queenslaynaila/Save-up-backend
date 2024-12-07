@@ -13,11 +13,11 @@ const createRatification = (router: Router) => {
     method: 'post',
     path: '/',
     summary: 'Create ratification',
-    schema: {
+    request: {
       body: computeStatus
     },
     response: {
-      statusCode: 201
+      201: {}
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {

@@ -16,7 +16,7 @@ const updateGroup = (router:Router) => {
     method: 'patch',
     path: '/:id',
     summary: 'Update group details',
-    schema: {
+    request: {
       params: z.object({
         id: z.string()
       }),
@@ -25,9 +25,11 @@ const updateGroup = (router:Router) => {
       })
     },
     response: {
-      schema: z.object({
-        new_name: z.string()
-      })
+      200: {
+        schema: z.object({
+          new_name: z.string()
+        })
+      }
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {

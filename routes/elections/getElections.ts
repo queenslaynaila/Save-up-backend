@@ -17,11 +17,13 @@ const getElections = (router: Router) => {
     method: 'get',
     path: '/',
     summary: 'Get list of elections',
-    schema: {
+    request: {
       body: electionBodySchema
     },
     response: {
-      schema: electionRetrievalSchema
+      200: {
+        schema: electionRetrievalSchema
+      }
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {

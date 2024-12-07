@@ -15,9 +15,9 @@ const createGroupWithdrawal = (router: Router) => {
     path: '/',
     summary: 'Create a group withdrawal request',
     response: {
-      statusCode: 201
+      201: {}
     },
-    schema: {
+    request: {
       body: withdrawalValidation
     },
     authMiddlewareOptions: {},

@@ -42,9 +42,6 @@ const updateSecurityAnswer = (router: Router) => {
         questions: z.array(answerSchema)
       })
     },
-    response: {
-      204: {}
-    },
     authMiddlewareOptions: {},
     middlewares: [verifyPin],
     handler: async (req, res) => {

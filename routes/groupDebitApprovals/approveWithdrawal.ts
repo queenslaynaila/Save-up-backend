@@ -14,11 +14,11 @@ const approveWithdrawal = (router: Router) => {
     method: 'post',
     path: '/',
     summary: 'Approve or reject group withdrawal',
-    schema: {
+    request: {
       body: approveValidation
     },
     response: {
-      statusCode: 201
+      201: {}
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {

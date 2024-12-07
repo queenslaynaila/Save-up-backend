@@ -16,13 +16,15 @@ const leaveGroup = (router:Router) => {
     method: 'delete',
     path: '/:group_id',
     summary: 'Exit a group',
-    schema: {
+    request: {
       params: groupParams
     },
     response: {
-      schema: z.object({
-        name: z.string()
-      })
+      200: {
+        schema: z.object({
+          name: z.string()
+        })
+      }
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {

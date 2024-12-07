@@ -12,11 +12,11 @@ const computeApprovals = (router: Router) => {
     method: 'post',
     path: '/',
     summary: 'Compute loan approvals',
-    schema: {
+    request: {
       body: finalApprovalBody
     },
     response: {
-      statusCode: 204
+      204: {}
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {

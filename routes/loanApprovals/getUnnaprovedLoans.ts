@@ -38,13 +38,15 @@ const getUnapprovedLoans = (router: Router) => {
     method: 'get',
     path: '/',
     summary: 'Get list of unapproved loans',
-    schema: {
+    request: {
       body: z.object({
         group_id: z.number()
       })
     },
     response: {
-      schema: loanRequestSchema.array()
+      200: {
+        schema: loanRequestSchema.array()
+      }
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {

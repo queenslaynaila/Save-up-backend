@@ -18,11 +18,13 @@ const computeBallot = (router: Router) => {
     method: 'post',
     path: '/',
     summary: 'Compute election winners',
-    schema: {
+    request: {
       body: ballotBodyRequest
     },
     response: {
-      schema: z.array(ballotResultSchema)
+      200: {
+        schema: z.array(ballotResultSchema)
+      }
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {

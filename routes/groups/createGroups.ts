@@ -31,12 +31,13 @@ const createGroup = (router:Router) => {
     method: 'post',
     path: '/',
     summary: 'Create a group',
-    schema: {
+    request: {
       body: groupParams
     },
     response: {
-      schema: group,
-      statusCode: 201
+      201: {
+        schema: group
+      }
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {

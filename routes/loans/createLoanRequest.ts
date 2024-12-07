@@ -12,7 +12,7 @@ const createLoanRequest = (router: Router) => {
     method: 'post',
     path: '/',
     summary: 'Create a loan request',
-    schema: {
+    request: {
       body: requestLoanSchema
     },
     authMiddlewareOptions: {},

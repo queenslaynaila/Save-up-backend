@@ -13,11 +13,11 @@ const createCandidates = (router: Router) => {
     method: 'post',
     path: '/',
     summary: 'Create candidates',
-    schema: {
+    request: {
       body: candidateRequestBody
     },
     response: {
-      statusCode: 201
+      201: {}
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {
