@@ -126,13 +126,13 @@ const login = (router: Router) => {
     method: 'post',
     path: '/login',
     summary: 'Let an existing user login',
-    schema: {
+    request: {
       body: authSchema
     },
     response: {
-      description: 'All user details',
-      statusCode: 201,
-      schema: publicUserSchema
+      201: {
+        schema: publicUserSchema
+      }
     },
     handler: async (req, res) => {
       const { pin, ...user } = await SQL_GET_USER({

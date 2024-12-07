@@ -6,7 +6,7 @@ const logout = (router: Router) => {
     path: '/logout',
     summary: 'Logout a user',
     response: {
-      statusCode: 204
+      204: {}
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {

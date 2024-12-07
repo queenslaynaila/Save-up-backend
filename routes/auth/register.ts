@@ -28,12 +28,13 @@ const createUser = (router: Router) => {
     method: 'post',
     path: '/register',
     summary: 'Create a new user',
-    schema: {
+    request: {
       body: createUserPayloadSchema
     },
     response: {
-      schema: publicUserSchema,
-      statusCode: 201
+      201: {
+        schema: publicUserSchema
+      }
     },
     handler: async (req, res) => {
       const pinHash = bcrypt.hashSync(String(req.body.pin), 12);
