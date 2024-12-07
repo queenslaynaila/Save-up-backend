@@ -61,7 +61,19 @@ const validateRequest = (schema: {
     next();
   };
 };
+
 const emptyObjectSchema = z.object({}).strict();
+type SuccessStatusCode = 200 | 201 | 204;
+type ErrorStatusCode = 400 | 401 | 403 | 404 | 409 | 422 | 423 | 429 | 500;
+type StatusCode = SuccessStatusCode | ErrorStatusCode;
+type ResponseDefinition<T, S extends StatusCode> = S extends 204
+  ? { schema?: undefined }
+  : { schema?: ZodSchema<T> };
+
+type ResponseMap<T> = { [K in StatusCode]?:
+  ResponseDefinition<K extends SuccessStatusCode ? T : any, K>;
+};
+
 type InferZodType<T> = T extends AnyZodObject ? z.infer<T> : Record<string, never>;
 
 interface RouterOptions<
@@ -74,34 +86,18 @@ interface RouterOptions<
   path: string;
   summary: string;
   description?: string;
-  schema?: {
+  request?: {
     body?: ZodSchema<ReqBody>;
     query?: Query;
     params?: Params;
   };
-  response?: {
-    description?: string;
-    statusCode?: number;
-    schema?: ZodSchema<ResBody>;
-  };
+  response: ResponseMap<ResBody>;
   authMiddlewareOptions?: AuthMiddlewareOptions;
   middlewares?: Array<(req: Request, res: Response, next: NextFunction) => void>;
   handler: RequestHandler<InferZodType<Params>, ResBody, ReqBody, InferZodType<Query>>;
 }
 
 export const registry = new OpenAPIRegistry();
-
-/**
- * The `Router` class simplifies defining API routes with:
- * - Request validation using Zod schemas.
- * - Middleware integration.
- * - Modifies default `res.json` behavior to use `fast-json-stringify` for speed.
- * - Automatic OpenAPI documentation generation.
- *
- * Each router instance is associated with a specific route prefix and an apitag.
- * @param routePrefix - Prefix for all routes in this router.Mostly the name of given resource.
- * @param apiTag - Optional OpenAPI tag for grouping routes in the documentation.
- */
 
 class Router {
   private static app: Application = express();
@@ -159,7 +155,7 @@ class Router {
     const {
       method,
       path,
-      schema,
+      request,
       response,
       authMiddlewareOptions,
       middlewares = [],
@@ -170,8 +166,8 @@ class Router {
       middlewares.unshift(authMiddleware(authMiddlewareOptions));
     }
 
-    if (schema) {
-      middlewares.push(validateRequest(schema));
+    if (request) {
+      middlewares.push(validateRequest(request));
     }
 
     const security = [];
@@ -182,9 +178,26 @@ class Router {
       security.push({ Reset: [] });
     }
 
-    const responseSchema = response?.schema;
-    const statusCode = String(response?.statusCode || 200);
-    const description = response?.description || 'Success';
+    const responseSchemas = Object.entries(response).reduce((acc, [statusCode, { schema }]) => {
+      if (schema) {
+        acc[statusCode] = {
+          description: statusCode.startsWith('2') ? 'Success' : 'Error',
+          content: {
+            'application/json': {
+              schema: zodToJsonSchema(schema, { target: 'openApi3' })
+            }
+          }
+        };
+      }
+      return acc;
+    }, {} as Record<string, any>);
+
+    const transformedResponses = Object.entries(responseSchemas)
+      .reduce((acc, [statusCode, schema]) => {
+        acc[statusCode] = schema;
+        return acc;
+      }, {} as Record<string, any>);
+
     const transformedPath = path.replace(/:([^/]+)/g, '{$1}');
 
     registry.registerPath({
@@ -195,20 +208,17 @@ class Router {
       description: options.description,
       security,
       request: {
-        params: schema?.params,
-        body: schema?.body ? { content: { 'application/json': { schema: schema.body } } } : undefined,
-        query: schema?.query
+        params: request?.params,
+        body: request?.body ? { content: { 'application/json': { schema: request.body } } } : undefined,
+        query: request?.query
       },
-      responses: {
-        [statusCode]: {
-          description: description || 'Success',
-          content: responseSchema ? { 'application/json': { schema: responseSchema } } : undefined
-        }
-      }
+      responses: transformedResponses
     });
 
-    if (responseSchema) {
-      const jsonResponseSchema: any = zodToJsonSchema(responseSchema, { target: 'openApi3' });
+    const successResponseSchema = response[200]?.schema || response[201]?.schema;
+
+    if (successResponseSchema) {
+      const jsonResponseSchema: any = zodToJsonSchema(successResponseSchema, { target: 'openApi3' });
       const stringify = fastJson(jsonResponseSchema);
 
       const errorSchema = z.union([
