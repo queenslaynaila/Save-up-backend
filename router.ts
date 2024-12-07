@@ -91,7 +91,7 @@ interface RouterOptions<
     query?: Query;
     params?: Params;
   };
-  response: ResponseMap<ResBody>;
+  response?: ResponseMap<ResBody>;
   authMiddlewareOptions?: AuthMiddlewareOptions;
   middlewares?: Array<(req: Request, res: Response, next: NextFunction) => void>;
   handler: RequestHandler<InferZodType<Params>, ResBody, ReqBody, InferZodType<Query>>;
@@ -156,7 +156,7 @@ class Router {
       method,
       path,
       request,
-      response,
+      response = { 204: { schema: undefined } },
       authMiddlewareOptions,
       middlewares = [],
       handler
