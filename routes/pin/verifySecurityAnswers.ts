@@ -25,11 +25,11 @@ const verifySecurityAnswers = (router: Router) => {
     method: 'post',
     path: '/verify-answers',
     summary: 'Verify security answers',
-    schema: {
+    request: {
       body: verifyAnswerSchema.array()
     },
     response: {
-      statusCode: 204
+      204: {}
     },
     middlewares: [authenticateResetToken, checkResetStepProgression(2)],
     handler: async (req, res) => {

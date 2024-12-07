@@ -36,14 +36,14 @@ const updateSecurityAnswer = (router: Router) => {
     description: 'Allows a user to completely override their existing security answers.Security answers are not shown to users for privacy and security reasons\n\n'
     + 'Security answers are not shown to users for privacy and security reasons. Therefore,we assume that the user has forgotten all their previous answers. Instead of editing individual answers we submit a new set of answers to predefined security questions \n\n'
     + 'The users PIN is verified to ensure proper authorization before proceeding.Once verified all existing answers for users are delted and new ones stored \n\n',
-    schema: {
+    request: {
       body: z.object({
         pin: z.string(),
         questions: z.array(answerSchema)
       })
     },
     response: {
-      statusCode: 204
+      204: {}
     },
     authMiddlewareOptions: {},
     middlewares: [verifyPin],

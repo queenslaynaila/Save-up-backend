@@ -15,11 +15,11 @@ const resetPin = (router: Router) => {
     method: 'patch',
     path: '/reset',
     summary: 'Reset pin',
-    schema: {
+    request: {
       body: z.object({ new_pin: z.string() })
     },
     response: {
-      statusCode: 204
+      204: {}
     },
     middlewares: [authenticateResetToken, checkResetStepProgression(3)],
     handler: async (req, res) => {

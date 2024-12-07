@@ -37,11 +37,11 @@ const initiatePinReset = (router: Router) => {
     method: 'post',
     path: '/request',
     summary: 'Initiate password reset',
-    response: {
-      statusCode: 204
-    },
-    schema: {
+    request: {
       body: z.object({ phone_number: z.string() })
+    },
+    response: {
+      204: {}
     },
     middlewares: [resetPasswordLimiter],
     handler: async (req, res) => {

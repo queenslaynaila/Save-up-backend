@@ -21,7 +21,7 @@ const createSecurityAnswer = (router: Router) => {
     method: 'post',
     path: '/:question_id/answers',
     summary: 'Create a security answer',
-    schema: {
+    request: {
       params: z.object({
         question_id: z.string()
       }),
@@ -30,7 +30,7 @@ const createSecurityAnswer = (router: Router) => {
       })
     },
     response: {
-      statusCode: 201
+      201: {}
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {
