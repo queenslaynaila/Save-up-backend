@@ -15,11 +15,11 @@ const deleteNextOfKin = (router: Router) => {
     method: 'delete',
     path: '/:xid',
     summary: 'Delete a next of kin',
-    schema: {
+    request: {
       params: z.object({ xid: z.string() })
     },
     response: {
-      statusCode: 204
+      204: {}
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {

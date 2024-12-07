@@ -35,12 +35,14 @@ const updateNextOfKin = (router: Router) => {
     method: 'patch',
     path: '/:xid',
     summary: 'Update a next of kin details',
-    schema: {
+    request: {
       params: z.object({ xid: z.string() }),
       body: nextOfKinUpdatePayload
     },
     response: {
-      schema: nextOfKinUpdatePayload.required()
+      200: {
+        schema: nextOfKinUpdatePayload.required()
+      }
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {

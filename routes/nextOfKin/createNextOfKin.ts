@@ -39,11 +39,13 @@ const createNextOfKin = (router: Router) => {
     method: 'post',
     path: '/',
     summary: 'Create next of kin',
-    schema: {
+    request: {
       body: nextOfKinCreationSchema
     },
     response: {
-      schema: nextOfKinPublicViewSchema
+      200: {
+        schema: nextOfKinPublicViewSchema
+      }
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {

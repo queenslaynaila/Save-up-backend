@@ -23,14 +23,16 @@ const getNextOfKin = (router: Router) => {
       + '\nThe `user_id` query parameter determines which user’s data is fetched:\n'
       + '- **Omitted**: Fetches the details for the currently logged-in user (default behavior if no `user_id` query param. \n'
       + '- **Specific user ID**: Fetches details for a specific user, but only admins or moderators can query kins by `user_id`.\n',
-    schema: {
+    request: {
       query: z.object({
         user_id: z.number(),
-        include_history: z.string().default('false')
+        include_history: z.string()
       }).partial()
     },
     response: {
-      schema: z.array(nextOfKinPublicViewSchema)
+      200: {
+        schema: z.array(nextOfKinPublicViewSchema)
+      }
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {
