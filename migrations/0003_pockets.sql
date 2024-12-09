@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS pockets (
   priority                enum_priority NOT NULL DEFAULT 'Intermediate',
   status                  enum_status NOT NULL DEFAULT 'In Progress',
   target_amount           NUMERIC(30, 2) NOT NULL DEFAULT 0,
-  target_at               TIMESTAMP WITH TIME ZONE,
+  target_at               TIMESTAMP WITH TIME ZONE (target_at > NOW()),
   completed_at            TIMESTAMP WITH TIME ZONE, 
   created_at              TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   deleted_at              TIMESTAMP WITH TIME ZONE,
