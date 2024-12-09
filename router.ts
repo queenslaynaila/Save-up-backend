@@ -84,7 +84,7 @@ interface RouterOptions<
 > {
   method: 'get' | 'post' | 'patch' | 'delete';
   path: string;
-  summary: string;
+  summary?: string;
   description?: string;
   request?: {
     body?: ZodSchema<ReqBody>;
