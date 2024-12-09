@@ -2,7 +2,6 @@ import 'express-async-errors';
 import { NextFunction, Request, Response } from 'express';
 import Router, { generateOpenApiSpec } from './router';
 import swaggerUi from 'swagger-ui-express';
-import cors from 'cors';
 import morgan from 'morgan';
 import HttpError from './httpError';
 import dotenv from 'dotenv';
@@ -41,8 +40,8 @@ const app = Router.getAppInstance();
 
 const openApiSpec = generateOpenApiSpec();
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(openApiSpec));
-const morganFormat = 'combined';
 
+const morganFormat = 'combined';
 const morganStream = {
   write: (message: string) => {
     logger.info(message.trim());
@@ -55,13 +54,6 @@ app.use((_, res, next) => {
   res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
   next();
 });
-app.use(
-  cors({
-    origin: '*',
-    credentials: false,
-    exposedHeaders: ['Authorization', 'Reset']
-  })
-);
 
 app.use(() => {
   throw new HttpError(404);
