@@ -64,7 +64,7 @@ const validateRequest = (schema: {
 
 const emptyObjectSchema = z.object({}).strict();
 type SuccessStatusCode = 200 | 201 | 204;
-type ErrorStatusCode = 400 | 401 | 403 | 404 | 409 | 422 | 423 | 429 | 500;
+type ErrorStatusCode = 400 | 401 | 403 | 409 | 422 | 423 | 429;
 type StatusCode = SuccessStatusCode | ErrorStatusCode;
 type ResponseDefinition<T, S extends StatusCode> = S extends 204
   ? { schema?: undefined }
@@ -114,6 +114,11 @@ class Router {
     this.router = ExpressRouter();
     this.routePrefix = routePrefix;
     this.apiTag = apiTag;
+
+    Router.app.use(this.routePrefix, this.router);
+  }
+
+  public static initialize() {
     Router.app.use(
       cors({
         origin: '*',
@@ -123,7 +128,6 @@ class Router {
       })
     );
     Router.app.use(express.json());
-    Router.app.use(this.routePrefix, this.router);
     Router.app.use(
       ['/docs'],
       basicAuth({
@@ -240,6 +244,8 @@ class Router {
     this.router[method](path, ...middlewares, handler as RequestHandler);
   }
 }
+
+Router.initialize();
 
 registry.registerComponent(
   'securitySchemes',
