@@ -3,13 +3,15 @@ import { sql } from '../../db';
 import Router from '../../router';
 import logger from '../../logger';
 
-const SQL_INNER_BALANCE = sql<{ entity_id: number, pocket_id?: string, from?: string, to?: string }, { total_savings: number }>(`
-    SELECT 
-      transactions.pocket_id, 
-      SUM(transactions.delta) AS total_savings
+const SQL_INNER_BALANCE = sql<{ entity_id: number, pocket_id?: string, from?: string, to?: string }, {name:string, total_savings: number }>(`
+  SELECT 
+    pockets.name,
+    SUM(transactions.delta) AS total_savings
   FROM transactions
   JOIN transaction_types ON transactions.type_id = transaction_types.id
-  WHERE transactions.entity_id = 66
+  JOIN pockets ON transactions.entity_id = pockets.entity_id 
+    AND transactions.pocket_id = pockets.xid
+  WHERE transactions.entity_id = :entity_id
   AND transaction_types.slug = 'Saving'
 `);
 
@@ -34,6 +36,7 @@ const computeTransactionTotals = (router: Router) => {
       200: {
         schema: z.array(
           z.object({
+            name: z.string(),
             total_savings: z.number()
           })
         )
@@ -65,7 +68,7 @@ const computeTransactionTotals = (router: Router) => {
 
       const query = SQL_INNER_BALANCE(filterArgs);
       if (filters.length > 0) query.extend(`AND ${filters.join(' AND ')}`, filterArgs);
-      query.extend('GROUP BY transactions.pocket_id LIMIT 15', {});
+      query.extend('GROUP BY pockets.name LIMIT 15', {});
       logger.info('Query:', query);
       const stats = await query.many();
       res.json(stats);
