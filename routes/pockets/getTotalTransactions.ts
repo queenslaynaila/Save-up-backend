@@ -64,7 +64,6 @@ const computeTransactionTotals = (router: Router) => {
       }
 
       const query = SQL_INNER_BALANCE(filterArgs);
-      logger.info('Query:', query);
       if (filters.length > 0) query.extend(`AND ${filters.join(' AND ')}`, filterArgs);
       query.extend('GROUP BY transactions.pocket_id LIMIT 15', {});
       logger.info('Query:', query);
