@@ -5,23 +5,23 @@ import { baseInviteInterface, baseInviteSchema, InviteByReceiverInterface } from
 
 const SQL_GET_PENDING_INVITATIONS = sql<InviteByReceiverInterface, baseInviteInterface>(`
   SELECT 
-    i.sender_id,
-    i.group_id,
-    u.full_name AS sender_name,
-    g.name AS group_name,
-    i.created_at
-  FROM invitations i
-  JOIN groups g ON i.group_id = g.id
-  JOIN user_contact_details u ON i.sender_id = u.id
-  WHERE i.receiver_id = :receiver_id
-  AND i.status = 'Pending';
+    invitations.sender_id,
+    invitations.group_id,
+    user_contact_details.full_name AS sender_name,
+    groups.name AS group_name,
+    invitations.created_at
+  FROM invitations
+  JOIN groups ON invitations.group_id = groups.id
+  JOIN user_contact_details ON invitations.sender_id = user_contact_details.id
+  WHERE invitations.receiver_id = :receiver_id
+  AND invitations.status = 'Pending'
 `);
 
 const getInvites = (router: Router) => {
   router.route({
     method: 'get',
     path: '/',
-    summary: 'Get list of pending invitations',
+    summary: 'Get pending group invitations for logged-in user',
     response: {
       200: {
         schema: baseInviteSchema.array()
@@ -36,5 +36,4 @@ const getInvites = (router: Router) => {
     }
   });
 };
-
 export default getInvites;

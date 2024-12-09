@@ -15,7 +15,7 @@ const updateInvites = (router: Router) => {
   router.route({
     method: 'patch',
     path: '/:id',
-    summary: 'Update an invitation',
+    summary: 'Respond to a group invitation',
     request: {
       params: idParamSchema,
       body: inviteValidationSchema

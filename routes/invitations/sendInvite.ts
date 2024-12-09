@@ -1,8 +1,8 @@
 import Router from '../../router';
 import { sql } from '../../db';
-
-import {
-  InviteInputInterface, userInviteSchema } from './types';
+import { InviteInputInterface, userInviteSchema } from './types';
+import HttpError from '../../httpError';
+import { z } from 'zod';
 
 const SQL_CHECK_USER_EXISTENCE = sql<{ phone_number: string }, { exists: boolean }>(`
   SELECT EXISTS (
@@ -19,12 +19,13 @@ const sendInvite = (router: Router) => {
   router.route({
     method: 'post',
     path: '/',
-    summary: 'Send an invitation to a user',
+    summary: 'Send a group invitation to an existing user via phone number',
     request: {
       body: userInviteSchema
     },
     response: {
-      204: {}
+      204: {},
+      400: { schema: z.object({ message: z.string() }) }
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {
@@ -33,8 +34,7 @@ const sendInvite = (router: Router) => {
       }).one();
 
       if (!exists) {
-        res.sendStatus(404);
-        return;
+        throw new HttpError(400, { message: 'User does not exist' });
       }
 
       await SQL_SEND_INVITATION({
