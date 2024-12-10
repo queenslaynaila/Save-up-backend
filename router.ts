@@ -87,9 +87,10 @@ interface RouterOptions<
   summary?: string;
   description?: string;
   request?: {
+    headers?: AnyZodObject;
+    params?: Params;
     body?: ZodSchema<ReqBody>;
     query?: Query;
-    params?: Params;
   };
   response?: ResponseMap<ResBody>;
   authMiddlewareOptions?: AuthMiddlewareOptions;
@@ -199,6 +200,7 @@ class Router {
         acc[statusCode] = schema;
         return acc;
       }, {} as Record<string, any>);
+
     const transformedPath = path.replace(/:([^/]+)/g, '{$1}');
 
     registry.registerPath({
@@ -211,7 +213,8 @@ class Router {
       request: {
         params: request?.params,
         body: request?.body ? { content: { 'application/json': { schema: request.body } } } : undefined,
-        query: request?.query
+        query: request?.query,
+        headers: request?.headers
       },
       responses: transformedResponses
     });
