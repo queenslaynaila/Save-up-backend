@@ -1,4 +1,3 @@
-/* eslint-disable no-template-curly-in-string */
 /* eslint-disable no-use-before-define */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import express, {
@@ -67,8 +66,8 @@ type SuccessStatusCode = 200 | 201 | 204;
 type ErrorStatusCode = 400 | 401 | 403 | 409 | 422 | 423 | 429;
 type StatusCode = SuccessStatusCode | ErrorStatusCode;
 type ResponseDefinition<T, S extends StatusCode> = S extends 204
-  ? { schema?: undefined }
-  : { schema?: ZodSchema<T> };
+  ? { schema?: undefined; headers?: AnyZodObject }
+  : { schema?: ZodSchema<T>; headers?: AnyZodObject };
 
 type ResponseMap<T> = { [K in StatusCode]?:
   ResponseDefinition<K extends SuccessStatusCode ? T : any, K>;
@@ -183,17 +182,27 @@ class Router {
       security.push({ Reset: [] });
     }
 
-    const responseSchemas = Object.entries(response).reduce((acc, [statusCode, { schema }]) => {
-      acc[statusCode] = {
-        description: statusCode.startsWith('2') ? 'Success' : 'Error',
-        content: schema ? {
-          'application/json': {
-            schema: zodToJsonSchema(schema, { target: 'openApi3' })
-          }
-        } : undefined
-      };
-      return acc;
-    }, {} as Record<string, any>);
+    const responseSchemas = Object.entries(response)
+      .reduce((acc, [statusCode, { schema, headers }]) => {
+        acc[statusCode] = {
+          description: statusCode.startsWith('2') ? 'Success' : 'Error',
+          content: schema ? {
+            'application/json': {
+              schema: zodToJsonSchema(schema, { target: 'openApi3' })
+            }
+          } : undefined,
+          headers: headers ? Object.keys(headers.shape).reduce((headerAcc, key) => {
+            return {
+              ...headerAcc,
+              [key]: {
+                description: 'Response headers',
+                schema: zodToJsonSchema(headers.shape[key], { target: 'openApi3' })
+              }
+            };
+          }, {}) : undefined
+        };
+        return acc;
+      }, {} as Record<string, any>);
 
     const transformedResponses = Object.entries(responseSchemas)
       .reduce((acc, [statusCode, schema]) => {
