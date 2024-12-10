@@ -14,11 +14,11 @@ const SQL_UPDATE_GROUP = sql<{
 const updateGroup = (router:Router) => {
   router.route({
     method: 'patch',
-    path: '/:id',
+    path: '/:group_id',
     summary: 'Update group details',
     request: {
       params: z.object({
-        id: z.string()
+        group_id: z.string()
       }),
       body: z.object({
         name: z.string()
@@ -35,7 +35,7 @@ const updateGroup = (router:Router) => {
     handler: async (req, res) => {
       const updatedGroup = await SQL_UPDATE_GROUP({
         ...req.body,
-        id: Number(req.params.id),
+        id: Number(req.params.group_id),
         user_id: req.user!.id
       }).one();
       res.json(updatedGroup);
