@@ -1,6 +1,5 @@
 import Router from '../../router';
 import { sql } from '../../db';
-
 import { z } from 'zod';
 
 const SQL_EXIT_GROUP = sql<{group_id: number, user_id: number}, {name: string}>(`
