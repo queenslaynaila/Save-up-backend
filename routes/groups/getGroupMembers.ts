@@ -1,6 +1,5 @@
 import Router from '../../router';
 import { sql } from '../../db';
-
 import { z } from 'zod';
 
 const member = z.object({
@@ -16,10 +15,10 @@ const SQL_GET_GROUP_MEMBERS = sql<{ group_id: number, user_id:number}, Member>(`
 const getGroupMembers = (router:Router) => {
   router.route({
     method: 'get',
-    path: '/:id',
+    path: '/:group_id/members',
     request: {
       params: z.object({
-        id: z.string()
+        group_id: z.string()
       })
     },
     response: {
@@ -30,9 +29,9 @@ const getGroupMembers = (router:Router) => {
     summary: 'Get group members',
     authMiddlewareOptions: {},
     handler: async (req, res) => {
-      const group_id = Number(req.params.id);
       const members = await SQL_GET_GROUP_MEMBERS({
-        group_id, user_id: req.user!.id
+        group_id: Number(req.params.group_id),
+        user_id: req.user!.id
       }).many();
       return res.json(members);
     }
