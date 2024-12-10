@@ -14,7 +14,7 @@ const groupParams = z.object({
 const manageGroupMembership = (router: Router) => {
   router.route({
     method: 'delete',
-    path: '/groups/:group_id/members/:member_id',
+    path: '/:group_id/members/:member_id',
     summary: 'Manage group membership (exit or remove)',
     description: 'Allows a user to exit a group or an admin to remove a member from a group. If the member_id is "me", it indicates a self-removal; otherwise, it is an admin removal.',
     request: {
