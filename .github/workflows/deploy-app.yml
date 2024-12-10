@@ -21,4 +21,4 @@ jobs:
       - name: Deploy to Server
         run: |
           set -e
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} "cd mpot/Save-up-backend && git fetch origin && git reset --hard origin/main && npm install &&  rm -rf dist && npm run build && pm2 restart Save-up-backend" 2>&1 | tee deployment_log.txt
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} "cd mpot/Save-up-backend && git pull origin main && git reset --hard origin/main && npm install &&  rm -rf dist && npm run build && pm2 restart saveup" 2>&1 | tee deployment_log.txt
