@@ -29,22 +29,6 @@ const SQL_FETCH_USER_GROUPS = sql<{ user_id:number }, Group>(`
     AND groups.deleted_at IS NULL;
 `);
 
-export const SQL_GET_COMMON_GROUPS = sql< { logged_in_user_id: number, user_id: number}, Group>(`
-  SELECT groups.id, 
-         groups.name, 
-         groups.created_at
-  FROM groups
-  LEFT JOIN group_members gm1 
-    ON groups.id = gm1.group_id  
-  LEFT JOIN group_members gm2 
-    ON groups.id = gm2.group_id  
-  WHERE gm1.user_id = :logged_in_user_id 
-    AND gm2.user_id = :user_id
-    AND gm1.is_active = TRUE
-    AND gm2.is_active = TRUE
-    AND groups.deleted_at IS NULL;
-`);
-
 const getUserGroups = (router:Router) => {
   router.route({
     method: 'get',
