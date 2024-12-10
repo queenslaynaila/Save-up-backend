@@ -23,7 +23,7 @@ const getCommonGroups = (router:Router) => {
   router.route({
     method: 'get',
     path: '/:peer_user_id/shared-groups',
-    summary: 'View common groups between two users.',
+    summary: 'View common groups between a logged in user and a peer user.',
     request: {
       params: z.object({
         peer_user_id: z.string()
