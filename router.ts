@@ -61,25 +61,22 @@ const validateRequest = (schema: {
   };
 };
 
-const emptyObjectSchema = z.object({}).strict();
-type SuccessStatusCode = 200 | 201 | 204;
-type ErrorStatusCode = 400 | 401 | 403 | 409 | 422 | 423 | 429;
-type StatusCode = SuccessStatusCode | ErrorStatusCode;
-type ResponseDefinition<T, S extends StatusCode> = S extends 204
-  ? { schema?: undefined; headers?: AnyZodObject }
-  : { schema?: ZodSchema<T>; headers?: AnyZodObject };
+type HttpStatusCodes = 200 | 201 | 204 | 400 | 401 | 403 | 409 | 422 | 423 | 429;
 
-type ResponseMap<T> = { [K in StatusCode]?:
-  ResponseDefinition<K extends SuccessStatusCode ? T : any, K>;
+type ResponseDefinition<T, S extends HttpStatusCodes> = {
+  schema?: S extends 204 ? undefined : ZodSchema<T>;
+  headers?: AnyZodObject;
 };
 
-type InferZodType<T> = T extends AnyZodObject ? z.infer<T> : Record<string, never>;
+type ResponseMap<T> = { [K in HttpStatusCodes]?:
+  ResponseDefinition<K extends 200 | 201 | 204 ? T : any, K>;
+};
 
 interface RouterOptions<
-  Params extends AnyZodObject | ZodNever = ZodNever,
+  RouteParams extends AnyZodObject = AnyZodObject,
   ResBody = ZodSchema | ZodNever,
   ReqBody = ZodSchema | ZodNever,
-  Query extends AnyZodObject | ZodNever = ZodNever
+  QueryParams extends AnyZodObject = AnyZodObject
 > {
   method: 'get' | 'post' | 'patch' | 'delete';
   path: string;
@@ -87,14 +84,14 @@ interface RouterOptions<
   description?: string;
   request?: {
     headers?: AnyZodObject;
-    params?: Params;
+    params?: RouteParams;
     body?: ZodSchema<ReqBody>;
-    query?: Query;
+    query?: QueryParams;
   };
   response?: ResponseMap<ResBody>;
   authMiddlewareOptions?: AuthMiddlewareOptions;
   middlewares?: Array<(req: Request, res: Response, next: NextFunction) => void>;
-  handler: RequestHandler<InferZodType<Params>, ResBody, ReqBody, InferZodType<Query>>;
+  handler: RequestHandler<z.infer<RouteParams>, ResBody, ReqBody, z.infer<QueryParams>>;
 }
 
 export const registry = new OpenAPIRegistry();
@@ -151,10 +148,10 @@ class Router {
   }
 
   public route<
-    Params extends AnyZodObject | typeof emptyObjectSchema = typeof emptyObjectSchema,
+    Params extends AnyZodObject = AnyZodObject,
     ResBody = ZodSchema | ZodNever,
     ReqBody = ZodSchema | ZodNever,
-    Query extends AnyZodObject | typeof emptyObjectSchema = typeof emptyObjectSchema
+    Query extends AnyZodObject = AnyZodObject
   >(options: RouterOptions<Params, ResBody, ReqBody, Query>) {
     const {
       method,
