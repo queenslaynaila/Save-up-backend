@@ -16,7 +16,7 @@ const manageGroupMembership = (router: Router) => {
     method: 'delete',
     path: '/:group_id/members/:member_id',
     summary: 'Manage group membership (exit or remove)',
-    description: 'Allows a user to exit a group or an admin to remove a member from a group. If the member_id is special string "me", it indicates a self-removal; otherwise, it is an admin removal.',
+    description: 'Allows a user to exit a group or an admin to remove a member from a group. If the member_id is special string "me" or its equal to the logged in userid, it indicates a self-removal; otherwise, it is an admin removal.',
     request: {
       params: groupParams
     },
