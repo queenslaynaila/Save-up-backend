@@ -1,6 +1,4 @@
 import Router from '../../router';
-
-import HttpError from '../../httpError';
 import { sql } from '../../db';
 import { z } from 'zod';
 import { pocketSchema } from './schema';
@@ -76,7 +74,7 @@ const updatePocket = (router: Router) => {
         priority,
         target_at,
         pocket_type
-      }).one(new HttpError(404));
+      }).one();
       return res.json(goal);
     }
   });
