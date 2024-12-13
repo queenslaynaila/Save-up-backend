@@ -127,11 +127,19 @@ const login = (router: Router) => {
     path: '/login',
     summary: 'Let an existing user login',
     request: {
+      headers: z.object({
+        Authorization: z.string()
+      }),
       body: authSchema
     },
     response: {
       201: {
         schema: publicUserSchema
+      },
+      401: {
+        schema: z.object({
+          remaining_attempts: z.number()
+        })
       }
     },
     handler: async (req, res) => {
