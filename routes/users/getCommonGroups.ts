@@ -1,7 +1,7 @@
 import Router from '../../router';
 import { sql } from '../../db';
 import { z } from 'zod';
-import { Group, group } from '../groups/createGroups';
+import { Group, groupAttributes } from '../groups/createGroups';
 
 const SQL_GET_COMMON_GROUPS = sql< { logged_in_user_id: number, peer_user_id: number }, Group>(`
   SELECT groups.id, 
@@ -31,7 +31,7 @@ const getCommonGroups = (router:Router) => {
     },
     response: {
       200: {
-        schema: z.array(group)
+        schema: z.array(groupAttributes)
       }
     },
     authMiddlewareOptions: {},
