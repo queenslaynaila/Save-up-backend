@@ -8,7 +8,7 @@ import express, {
   Application,
   RequestHandler
 } from 'express';
-import { AnyZodObject, z, ZodNever, ZodSchema } from 'zod';
+import { AnyZodObject, z, ZodNever, ZodSchema, ZodUndefined } from 'zod';
 import { OpenApiGeneratorV3, OpenAPIRegistry } from '@asteasolutions/zod-to-openapi';
 import fastJson from 'fast-json-stringify';
 import zodToJsonSchema from 'zod-to-json-schema';
@@ -63,17 +63,17 @@ const validateRequest = (schema: {
 
 type HttpStatusCodes = 200 | 201 | 204 | 400 | 401 | 403 | 409 | 422 | 423 | 429;
 
-type ResponseDefinition<T, S extends HttpStatusCodes> = {
-  schema?: S extends 204 ? undefined : ZodSchema<T>;
+type ResponseDefinition<ResBody, StatusCode extends HttpStatusCodes> = {
+  schema?: StatusCode extends 204 ? ZodUndefined : ZodSchema<ResBody>;
   headers?: AnyZodObject;
 };
 
-type ResponseMap<T> = { [K in HttpStatusCodes]?:
-  ResponseDefinition<K extends 200 | 201 | 204 ? T : any, K>;
+type ResponseMap<ResBody> = { [StatusCode in HttpStatusCodes]?:
+  ResponseDefinition<StatusCode extends 200 | 201 | 204 ? ResBody : any, StatusCode>;
 };
 
 interface RouterOptions<
-  RouteParams extends AnyZodObject = AnyZodObject,
+  Params extends AnyZodObject | ZodNever = ZodNever,
   ResBody = ZodSchema | ZodNever,
   ReqBody = ZodSchema | ZodNever,
   QueryParams extends AnyZodObject = AnyZodObject
@@ -84,16 +84,16 @@ interface RouterOptions<
   description?: string;
   request?: {
     headers?: AnyZodObject;
-    params?: RouteParams;
+    params?: Params;
     body?: ZodSchema<ReqBody>;
     query?: QueryParams;
   };
   response?: ResponseMap<ResBody>;
   authMiddlewareOptions?: AuthMiddlewareOptions;
   middlewares?: Array<(req: Request, res: Response, next: NextFunction) => void>;
-  handler: RequestHandler<z.infer<RouteParams>, ResBody, ReqBody, z.infer<QueryParams>>;
+  handler: RequestHandler<z.infer<Params>, ResBody, ReqBody, z.infer<QueryParams>>;
 }
-
+const emptyObjectSchema = z.object({}).strict();
 export const registry = new OpenAPIRegistry();
 
 class Router {
@@ -148,10 +148,10 @@ class Router {
   }
 
   public route<
-    Params extends AnyZodObject = AnyZodObject,
+    Params extends AnyZodObject | typeof emptyObjectSchema = typeof emptyObjectSchema,
     ResBody = ZodSchema | ZodNever,
     ReqBody = ZodSchema | ZodNever,
-    Query extends AnyZodObject = AnyZodObject
+    Query extends AnyZodObject | typeof emptyObjectSchema = typeof emptyObjectSchema
   >(options: RouterOptions<Params, ResBody, ReqBody, Query>) {
     const {
       method,
