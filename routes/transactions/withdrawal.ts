@@ -7,7 +7,7 @@ import { SQL_GET_USER_PIN } from '../users/updateAttributes';
 
 const withdrawalPayload = z.object({
   pocket_id: z.number().min(1),
-  amount: z.number(),
+  amount: z.number().min(50),
   user_id: z.number()
 });
 

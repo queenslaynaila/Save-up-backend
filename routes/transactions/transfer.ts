@@ -8,7 +8,7 @@ const transferPayload = z.object({
   user_id: z.number().min(1),
   source_pocket_id: z.number().min(1),
   destination_pocket_id: z.number().min(1),
-  amount: z.number()
+  amount: z.number().min(10)
 });
 
 type TransferPayload = z.infer<typeof transferPayload>;

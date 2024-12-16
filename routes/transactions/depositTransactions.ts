@@ -17,7 +17,7 @@ const createSaving = (router: Router) => {
     + 'If no group id in body is provided app will assume its a individual pocket transaction',
     request: {
       body: z.object({
-        amount: z.number(),
+        amount: z.number().min(50),
         pocket_id: z.number().min(1),
         group_id: z.number().optional()
       })

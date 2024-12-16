@@ -12,11 +12,11 @@ export const pocketSchema = z.object({
   pocket_type: ENUM_POCKET_TYPE,
   priority: ENUM_PRIORITY,
   status: ENUM_STATUS,
-  target_amount: z.number(),
-  target_at: z.string(),
-  completed_at: z.string(),
-  created_at: z.string(),
-  deleted_at: z.string().optional()
+  target_amount: z.number().min(100),
+  target_at: z.string().date(),
+  completed_at: z.string().datetime().optional(),
+  created_at: z.string().datetime(),
+  deleted_at: z.string().datetime().optional()
 });
 
 const ENUM_TRANSACTION_TYPE = z.enum([
@@ -43,7 +43,7 @@ export const transactionSchema = z.object({
   type_id: z.number(),
   pocket_id: z.number().min(1),
   reference_id: z.number(),
-  delta: z.number(),
+  delta: z.number().min(5),
   balance: z.number(),
   created_at: z.string().datetime()
 });

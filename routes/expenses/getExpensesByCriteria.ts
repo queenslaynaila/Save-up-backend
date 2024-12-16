@@ -30,12 +30,12 @@ const getExpensesByCriteria = (router: Router) => {
     + '- **Individual users**:If expense is for currently logged-in user, The app will associate the expense with the logged-in user. \n\n',
     request: {
       query: z.object({
-        group_id: z.string(),
-        category_id: z.string(),
-        spent_from: z.string(),
-        spent_to: z.string(),
-        start_date: z.string(),
-        end_date: z.string()
+        group_id: z.string().regex(/^\d+$/),
+        category_id: z.string().regex(/^\d+$/),
+        spent_from: z.string().date(),
+        spent_to: z.string().date(),
+        start_date: z.string().date(),
+        end_date: z.string().date()
       }).partial()
     },
     response: {
