@@ -33,7 +33,10 @@ const createUser = (router: Router) => {
     },
     response: {
       201: {
-        schema: publicUserSchema
+        schema: publicUserSchema,
+        headers: z.object({
+          Authorization: z.string()
+        })
       }
     },
     handler: async (req, res) => {

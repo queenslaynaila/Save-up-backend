@@ -131,7 +131,10 @@ const login = (router: Router) => {
     },
     response: {
       201: {
-        schema: publicUserSchema
+        schema: publicUserSchema,
+        headers: z.object({
+          Authorization: z.string()
+        })
       },
       401: {
         schema: z.object({
