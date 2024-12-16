@@ -17,7 +17,7 @@ export const userSchema = z.object({
   id_number: z.string().regex(/^(?:\d{8}|\d{9}(\d{4})?|\d{10}|\d{13}|\d{16})$/),
   role: USER_ROLE_ENUM,
   gender: GENDER_ENUM.optional(),
-  pin: z.string(),
+  pin: z.string().regex(/^\d{4}$/),
   created_at: z.string().datetime()
 });
 
