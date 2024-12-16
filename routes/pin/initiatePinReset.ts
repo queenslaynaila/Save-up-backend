@@ -5,8 +5,8 @@ import { z } from 'zod';
 import { resetPasswordLimiter } from '../../services/rateLimit';
 import { sql } from '../../db';
 import { ResetToken } from './schema';
-import logger from '../../logger';
 import HttpError from '../../httpError';
+import sendSms from '../../services/twilio';
 
 const SQL_GET_USER = sql<{ phone_number: string }, { id:number }>(`
   SELECT id 
@@ -25,7 +25,7 @@ const SQL_SAVE_TOKEN = sql<Pick<ResetToken, 'user_id' | 'token' | 'reason'>, Pic
   RETURNING token;
 `);
 
-function generateResetPin(): string {
+function generateOtp(): string {
   const min = 1000;
   const max = 9999;
   const randomNumber = Math.floor(Math.random() * (max - min + 1)) + min;
@@ -46,7 +46,7 @@ const initiatePinReset = (router: Router) => {
       const user = await SQL_GET_USER({ phone_number })
         .one(new HttpError(404));
 
-      const resetToken = generateResetPin();
+      const resetToken = generateOtp();
       const hashedResetToken = await bcrypt.hash(resetToken, 10);
 
       await SQL_SAVE_TOKEN({
@@ -62,7 +62,11 @@ const initiatePinReset = (router: Router) => {
         { expiresIn: '25m' }
       );
 
-      logger.info(`User ${user.id} completed step 1. Token is ${resetToken} Proceeding to next step. and header is ${resetTokenHeader}`);
+      sendSms(
+        phone_number,
+        `Your OTP for password reset is: ${resetToken}. 
+         It expires in 10 minutes. Do not share with anyone.`
+      );
 
       res.setHeader('Reset', resetTokenHeader)
         .sendStatus(204);
