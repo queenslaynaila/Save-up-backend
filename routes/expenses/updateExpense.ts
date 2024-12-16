@@ -1,15 +1,23 @@
 import Router from '../../router';
 import { sql } from '../../db';
 import HttpError from '../../httpError';
-
 import {
-  expenseBodySchema,
-  ExpenseUpdateInterface,
-  ExpenseUpdateRes
-} from './types';
+  expenseSchema,
+  Expense
+} from './schema';
 import { z } from 'zod';
 
-const SQL_UPDATE_EXPENSE = sql<ExpenseUpdateInterface, ExpenseUpdateRes>(`
+const expenseUpdateParams = expenseSchema.pick({
+  category_id: true,
+  description: true,
+  amount: true,
+  spent_at: true
+}).partial();
+
+type ExpenseInterface = z.infer<typeof expenseUpdateParams>;
+
+const SQL_UPDATE_EXPENSE = sql<ExpenseInterface & {entity_id:number, xid:number},
+Expense>(`
   UPDATE expenses
   SET description = COALESCE(:description, expenses.description),
       category_id = COALESCE(:category_id, expenses.category_id),
@@ -18,7 +26,7 @@ const SQL_UPDATE_EXPENSE = sql<ExpenseUpdateInterface, ExpenseUpdateRes>(`
   WHERE entity_id = :entity_id 
   AND xid = :xid
   AND deleted_at IS NULL
-  RETURNING category_id, description, amount, spent_at
+  RETURNING entity_id, xid, category_id, description, amount, spent_at, created_at;
 `);
 
 const updateExpense = (router: Router) => {
@@ -30,16 +38,19 @@ const updateExpense = (router: Router) => {
       params: z.object({
         id: z.string()
       }),
-      body: expenseBodySchema
+      body: expenseUpdateParams,
+      query: z.object({
+        group_id: z.string().regex(/^\d+$/).optional()
+      })
     },
     response: {
       200: {
-        schema: expenseBodySchema
+        schema: expenseSchema
       }
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {
-      const entity_id = req.body.entity_id ?? req.user!.id;
+      const entity_id = Number(req.query.group_id) ?? req.user!.id;
       const xid = Number(req.params.id);
       const { description, category_id, amount, spent_at } = req.body;
       const result = await SQL_UPDATE_EXPENSE({

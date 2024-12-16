@@ -1,13 +1,20 @@
 import Router from '../../router';
 import { sql } from '../../db';
 import {
-  ExpenseCreationInterface,
   Expense,
-  expenseCreationSchema,
-  ExpenseSchema
-} from './types';
+  expenseSchema
+} from './schema';
+import { z } from 'zod';
 
-const SQL_CREATE_EXPENSES = sql<ExpenseCreationInterface, Expense>(`
+const expenseCreationParams = expenseSchema.pick({
+  category_id: true,
+  description: true,
+  amount: true,
+  spent_at: true
+});
+type ExpenseCreationParams = z.infer<typeof expenseCreationParams>;
+
+const SQL_CREATE_EXPENSES = sql<ExpenseCreationParams & {entity_id:number}, Expense>(`
   INSERT INTO expenses (entity_id, xid, category_id, description, amount, spent_at)
   SELECT 
       :entity_id,
@@ -27,19 +34,22 @@ const createExpense = (router: Router) => {
     path: '/',
     summary: 'Create an expense',
     description: 'Expenses can be either a groups or an individual user. \n'
-    + '- **For groups**:If expense is being recorded for a group, body must include the \\`entity_id\\`, which corresponds to the group ID. \n\n'
+    + '- **For groups**:If expense is being recorded for a group, pass in a query param of a groupid. \n\n'
     + '- **Individual users**:If expense is for currently logged-in user, the entity id property in body can be left out. The app will associate the expense with the logged-in user. \n\n',
     request: {
-      body: expenseCreationSchema
+      body: expenseCreationParams,
+      query: z.object({
+        group_id: z.string().regex(/^\d+$/).optional()
+      })
     },
     response: {
       201: {
-        schema: ExpenseSchema
+        schema: expenseSchema
       }
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {
-      const entity_id = req.body.entity_id ?? req.user!.id;
+      const entity_id = Number(req.query.group_id) ?? req.user!.id;
       const { category_id, description, amount, spent_at } = req.body;
       const expense = await SQL_CREATE_EXPENSES({
         category_id,

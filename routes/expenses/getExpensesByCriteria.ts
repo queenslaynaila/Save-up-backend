@@ -2,8 +2,8 @@ import Router from '../../router';
 import { sql } from '../../db';
 import {
   Expense,
-  ExpenseSchema
-} from './types';
+  expenseSchema
+} from './schema';
 import { z } from 'zod';
 import { ParsedQs } from 'qs';
 
@@ -26,6 +26,8 @@ const getExpensesByCriteria = (router: Router) => {
     method: 'get',
     path: '/',
     summary: 'Get list of expenses by criteria',
+    description: '- **For groups**:If expense is being requested for a group, pass in a query param of a groupid. \n\n'
+    + '- **Individual users**:If expense is for currently logged-in user, The app will associate the expense with the logged-in user. \n\n',
     request: {
       query: z.object({
         group_id: z.string(),
@@ -38,7 +40,7 @@ const getExpensesByCriteria = (router: Router) => {
     },
     response: {
       200: {
-        schema: z.array(ExpenseSchema)
+        schema: z.array(expenseSchema)
       }
     },
     authMiddlewareOptions: {},

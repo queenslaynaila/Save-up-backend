@@ -15,15 +15,13 @@ const getTotalUserExpenditure = (router: Router) => {
     path: '/total-expenses',
     summary: 'Get total user expenditure',
     request: {
-      body: z.object({
-        entity_id: z.number().int().optional()
-      }),
       query: z.object({
-        start_date: z.string(),
-        end_date: z.string(),
-        category_id: z.string(),
-        spent_from: z.string(),
-        spent_to: z.string()
+        group_id: z.string().regex(/^\d+$/),
+        start_date: z.string().date(),
+        end_date: z.string().date(),
+        category_id: z.string().min(1),
+        spent_from: z.string().date(),
+        spent_to: z.string().date()
       }).partial()
     },
     response: {
@@ -33,7 +31,7 @@ const getTotalUserExpenditure = (router: Router) => {
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {
-      const entity_id = req.body?.entity_id ?? req.user!.id;
+      const entity_id = Number(req.query?.group_id) ?? req.user!.id;
       const { start_date, end_date, category_id, spent_from, spent_to } = req.query;
 
       const filters: string[] = [];
