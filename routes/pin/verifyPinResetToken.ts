@@ -5,7 +5,6 @@ import { sql } from '../../db';
 import HttpError from '../../httpError';
 import { ResetToken } from './schema';
 import { z } from 'zod';
-import logger from '../../logger';
 import { authenticateResetToken, checkResetStepProgression } from '../../authorization';
 
 const SQL_GET_SECURITY_QUESTIONS = sql<{ user_id: number }, { id: number; question: string }>(`
@@ -86,7 +85,6 @@ const verifyPinResetToken = (router: Router) => {
           process.env.JWT_SECRET as Secret,
           { expiresIn: '15m' }
         );
-        logger.info(`User ${user_id} completed step 2. User has no questions,Header sent. Skipping user to 4 Header is ${step4TokenHeader}`);
         return res.setHeader('Reset', step4TokenHeader).sendStatus(204);
       }
 
@@ -96,7 +94,6 @@ const verifyPinResetToken = (router: Router) => {
         process.env.JWT_SECRET as Secret,
         { expiresIn: '15m' }
       );
-      logger.info(`User ${user_id} completed step 2. Questions and header sent Proceeding to 3. Header is ${step2TokenHeader}`);
       return res.setHeader('Reset', step2TokenHeader)
         .json(securityQuestions);
     }
