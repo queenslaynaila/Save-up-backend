@@ -19,7 +19,7 @@ const deleteExpense = (router: Router) => {
       params: z.object({
         id: z.string().min(1)
       }),
-      body: z.object({
+      query: z.object({
         entity_id: z.number().min(1).optional()
       })
     },
@@ -28,7 +28,7 @@ const deleteExpense = (router: Router) => {
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {
-      const entity_id = req.body?.entity_id ?? req.user!.id;
+      const entity_id = Number(req.query?.entity_id) ?? req.user!.id;
       await SQL_DELETE_EXPENSE({
         xid: Number(req.params.id),
         entity_id
