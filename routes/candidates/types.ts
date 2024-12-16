@@ -1,8 +1,8 @@
 import { z } from 'zod';
 
 const candidateSchema = z.object({
-  group_id: z.number(),
-  election_id: z.number(),
+  group_id: z.number().min(1),
+  election_id: z.number().min(1),
   candidate_id: z.number(),
   chosen_by: z.number()
 });
@@ -14,7 +14,7 @@ export const candidateRequestBody = candidateSchema.omit({
 });
 
 export const candidateParamSchema = z.object({
-  group_id: z.number(),
+  group_id: z.number().min(1),
   election_id: z.number()
 });
 

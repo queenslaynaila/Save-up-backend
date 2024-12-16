@@ -14,7 +14,7 @@ export const securityAnswerSchema = z.object({
 });
 
 const answerSchema = z.object({
-  question_id: z.number(),
+  question_id: z.number().min(1),
   answer: z.string()
 });
 

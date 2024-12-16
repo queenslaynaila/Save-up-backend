@@ -5,9 +5,9 @@ import { z } from 'zod';
 import logger from '../../logger';
 
 const transferPayload = z.object({
-  user_id: z.number(),
-  source_pocket_id: z.number(),
-  destination_pocket_id: z.number(),
+  user_id: z.number().min(1),
+  source_pocket_id: z.number().min(1),
+  destination_pocket_id: z.number().min(1),
   amount: z.number()
 });
 

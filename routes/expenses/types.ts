@@ -1,19 +1,19 @@
 import { z } from 'zod';
 
 export const ExpenseSchema = z.object({
-  entity_id: z.number(),
-  xid: z.number(),
-  category_id: z.number(),
+  entity_id: z.number().min(1),
+  xid: z.number().min(1),
+  category_id: z.number().min(1),
   description: z.string(),
-  amount: z.number(),
-  spent_at: z.string().date().optional(),
-  created_at: z.string()
+  amount: z.number().min(10),
+  spent_at: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  created_at: z.string().datetime()
 });
 
 export type Expense = z.infer<typeof ExpenseSchema>;
 
 export const expenseCreationSchema = ExpenseSchema.extend({
-  entity_id: z.number().optional()
+  entity_id: z.number().min(1).optional()
 }).omit({
   xid: true,
   created_at: true
@@ -28,7 +28,7 @@ const expenseUpdateSchema = ExpenseSchema.pick({
   spent_at: true,
   entity_id: true
 }).partial().extend({
-  xid: z.number()
+  xid: z.number().min(1)
 });
 
 export type ExpenseUpdateInterface = z.infer<typeof expenseUpdateSchema>;

@@ -6,8 +6,8 @@ const Recipient = z.object({
 });
 
 const withdrawalRequest = z.object({
-  group_id: z.number(),
-  pocket_id: z.number(),
+  group_id: z.number().min(1),
+  pocket_id: z.number().min(1),
   initiator_id: z.number(),
   amount: z.number(),
   reason: z.string(),

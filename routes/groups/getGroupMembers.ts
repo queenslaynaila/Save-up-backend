@@ -3,7 +3,7 @@ import { sql } from '../../db';
 import { z } from 'zod';
 
 const member = z.object({
-  user_id: z.number(),
+  user_id: z.number().min(1),
   full_name: z.string()
 });
 type Member = z.infer<typeof member>;

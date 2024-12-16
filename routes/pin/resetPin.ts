@@ -16,7 +16,9 @@ const resetPin = (router: Router) => {
     path: '/reset',
     summary: 'Reset pin',
     request: {
-      body: z.object({ new_pin: z.string() })
+      body: z.object({
+        new_pin: z.string().regex(/^\d{4}$/)
+      })
     },
     middlewares: [authenticateResetToken, checkResetStepProgression(3)],
     handler: async (req, res) => {

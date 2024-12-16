@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const baseInviteSchema = z.object({
-  group_id: z.number(),
+  group_id: z.number().min(1),
   sender_id: z.number(),
   sender_name: z.string(),
   group_name: z.string(),
@@ -16,7 +16,7 @@ const inviteInputSchema = baseInviteSchema
     sender_id: true
   })
   .extend({
-    phone_number: z.string()
+    phone_number: z.string().regex(/^\+\d{1,4}\d{9}$/)
   });
 
 export const userInviteSchema = inviteInputSchema.omit({
@@ -26,7 +26,7 @@ export const userInviteSchema = inviteInputSchema.omit({
 export type InviteInputInterface = z.infer<typeof inviteInputSchema>;
 
 const inviteResponseSchema = z.object({
-  group_id: z.number(),
+  group_id: z.number().min(1),
   receiver_id: z.number(),
   status: z.string()
 });

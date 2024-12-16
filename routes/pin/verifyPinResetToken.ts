@@ -40,7 +40,7 @@ const SQL_UPDATE_TOKEN_USAGE = sql<Pick<ResetToken, 'reason' | 'user_id'|'token'
 `);
 
 const questionsSchema = z.object({
-  id: z.number(),
+  id: z.number().min(1),
   question: z.string()
 });
 
@@ -51,7 +51,9 @@ const verifyPinResetToken = (router: Router) => {
     summary: 'Verify PIN reset token',
     description: 'Verify the PIN reset token provided by the user',
     request: {
-      body: z.object({ reset_token: z.string() })
+      body: z.object({
+        reset_token: z.string().regex(/^\d{4}$/)
+      })
     },
     response: {
       200: {

@@ -104,7 +104,7 @@ export function getClientInfo(req: Request) {
 
 function calculateLoginAttemptsLeft(lastThreeAttempts: LoginOutcome[]) {
   if (lastThreeAttempts.length === 0 || lastThreeAttempts[0].success) {
-    return 3;
+    return 4;
   }
   if (lastThreeAttempts[0].reason === 'Locked') {
     throw new HttpError(423);
@@ -113,7 +113,7 @@ function calculateLoginAttemptsLeft(lastThreeAttempts: LoginOutcome[]) {
     (count, attempt) => count + (!attempt.success ? 1 : 0),
     0
   );
-  return 3 - failedAttempts;
+  return 4 - failedAttempts;
 }
 
 const authSchema = z.object({
@@ -138,7 +138,7 @@ const login = (router: Router) => {
       },
       401: {
         schema: z.object({
-          remaining_attempts: z.number()
+          remaining_attempts: z.number().min(0).max(3)
         })
       }
     },

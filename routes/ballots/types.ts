@@ -1,8 +1,8 @@
 import { z } from 'zod';
 
 const ballotSchema = z.object({
-  group_id: z.number(),
-  election_id: z.number(),
+  group_id: z.number().min(1),
+  election_id: z.number().min(1),
   candidate_id: z.number(),
   user_id: z.number()
 });

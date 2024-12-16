@@ -1,9 +1,9 @@
 import { z } from 'zod';
 
 const ratificationSchema = z.object({
-  group_id: z.number(),
-  election_id: z.number(),
-  user_id: z.number(),
+  group_id: z.number().min(1),
+  election_id: z.number().min(1),
+  user_id: z.number().min(1),
   is_ratified: z.boolean()
 });
 

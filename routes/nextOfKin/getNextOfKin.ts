@@ -25,7 +25,7 @@ const getNextOfKin = (router: Router) => {
       + '- **Specific user ID**: Fetches details for a specific user, but only admins or moderators can query kins by `user_id`.\n',
     request: {
       query: z.object({
-        user_id: z.number(),
+        user_id: z.number().min(1),
         include_history: z.string()
       }).partial()
     },

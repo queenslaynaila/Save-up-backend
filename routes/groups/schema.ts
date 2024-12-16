@@ -12,22 +12,22 @@ export const groupsSchema = z.object({
 });
 
 const PrevGroupNamesSchema = z.object({
-  group_id: z.number(),
-  xid: z.number(),
+  group_id: z.number().min(1),
+  xid: z.number().min(1),
   name: z.string(),
   created_at: z.string().datetime()
 });
 
 const GroupMembersSchema = z.object({
-  group_id: z.number(),
-  user_id: z.number(),
+  group_id: z.number().min(1),
+  user_id: z.number().min(1),
   is_active: z.boolean()
 });
 
 const GroupJoinsSchema = z.object({
-  group_id: z.number(),
-  user_id: z.number(),
-  xid: z.number(),
+  group_id: z.number().min(1),
+  user_id: z.number().min(1),
+  xid: z.number().min(1),
   created_at: z.string().datetime()
 });
 

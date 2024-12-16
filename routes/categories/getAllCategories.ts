@@ -3,7 +3,7 @@ import { sql } from '../../db';
 import Router from '../../router';
 
 const categorySchema = z.object({
-  id: z.number(),
+  id: z.number().min(1),
   name: z.string(),
   description: z.string(),
   image_url: z.string()

@@ -6,7 +6,7 @@ import bcrypt from 'bcrypt';
 import { SQL_GET_USER_PIN } from '../users/updateAttributes';
 
 const withdrawalPayload = z.object({
-  pocket_id: z.number(),
+  pocket_id: z.number().min(1),
   amount: z.number(),
   user_id: z.number()
 });
@@ -27,7 +27,7 @@ const createWithdrawal = (router: Router) => {
         pocket_id: true,
         amount: true
       }).extend({
-        pin: z.string()
+        pin: z.string().regex(/^\d{4}$/)
       })
     },
     response: {

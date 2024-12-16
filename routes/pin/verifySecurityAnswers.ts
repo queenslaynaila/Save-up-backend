@@ -9,7 +9,7 @@ import { z } from 'zod';
 import logger from '../../logger';
 import { authenticateResetToken, checkResetStepProgression } from '../../authorization';
 const verifyAnswerSchema = z.object({
-  question_id: z.number(),
+  question_id: z.number().min(1),
   answer: z.string()
 });
 

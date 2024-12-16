@@ -6,7 +6,7 @@ enum ElectionType {
 }
 
 const election = z.object({
-  group_id: z.number(),
+  group_id: z.number().min(1),
   initiator_id: z.number(),
   type: z.enum([ElectionType.BALLOT, ElectionType.RATIFICATION])
 });
@@ -30,9 +30,9 @@ const electionRequestSchema = election.pick({
 export type ElectionRequest = z.infer<typeof electionRequestSchema>;
 
 export const electionRetrievalSchema = election.extend({
-  election_id: z.number(),
+  election_id: z.number().min(1),
   initiator_name: z.string(),
-  created_at: z.string()
+  created_at: z.string().datetime()
 });
 
 export type ElectionRetrieval = z.infer<typeof electionRetrievalSchema>;

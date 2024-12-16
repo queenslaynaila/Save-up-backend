@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 const approveWithdrawalSchema = z.object({
-  group_id: z.number(),
+  group_id: z.number().min(1),
   admin_id: z.number(),
   withdrawal_id: z.number(),
   status: z.enum(['Reject', 'Approved', 'Pending']),

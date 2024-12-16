@@ -17,10 +17,10 @@ const deleteExpense = (router: Router) => {
     summary: 'Delete an expense',
     request: {
       params: z.object({
-        id: z.string()
+        id: z.string().min(1)
       }),
       body: z.object({
-        entity_id: z.number()
+        entity_id: z.number().min(1).optional()
       })
     },
     response: {

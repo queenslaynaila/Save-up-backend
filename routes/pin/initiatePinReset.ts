@@ -6,7 +6,6 @@ import { resetPasswordLimiter } from '../../services/rateLimit';
 import { sql } from '../../db';
 import { ResetToken } from './schema';
 import HttpError from '../../httpError';
-
 import logger from '../../logger';
 import sendSms from '../../services/sms';
 
@@ -40,7 +39,7 @@ const initiatePinReset = (router: Router) => {
     path: '/request',
     summary: 'Initiate password reset',
     request: {
-      body: z.object({ phone_number: z.string() })
+      body: z.object({ phone_number: z.string().regex(/^\+\d{1,4}\d{9}$/) })
     },
     middlewares: [resetPasswordLimiter],
     handler: async (req, res) => {
