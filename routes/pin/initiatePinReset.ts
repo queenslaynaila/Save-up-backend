@@ -6,7 +6,9 @@ import { resetPasswordLimiter } from '../../services/rateLimit';
 import { sql } from '../../db';
 import { ResetToken } from './schema';
 import HttpError from '../../httpError';
-import sendSms from '../../services/twilio';
+
+import logger from '../../logger';
+import sendSms from '../../services/sms';
 
 const SQL_GET_USER = sql<{ phone_number: string }, { id:number }>(`
   SELECT id 
@@ -62,10 +64,12 @@ const initiatePinReset = (router: Router) => {
         { expiresIn: '25m' }
       );
 
+      logger.info(`Sending OTP to ${phone_number}`);
+
       sendSms(
         phone_number,
-        `Your OTP for password reset is: ${resetToken}. 
-         It expires in 10 minutes. Do not share with anyone.`
+        'Hello, your PIN reset verification code is: ' + resetToken
+        + '. It expires in 10 minutes. Do not share with anyone.'
       );
 
       res.setHeader('Reset', resetTokenHeader)
