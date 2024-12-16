@@ -4,7 +4,7 @@ import { sql } from '../../db';
 import { pocketSchema } from './schema';
 import { z } from 'zod';
 
-export const pocketCreationSchema = pocketSchema.pick({
+const pocketCreationSchema = pocketSchema.pick({
   category_id: true,
   name: true,
   priority: true,

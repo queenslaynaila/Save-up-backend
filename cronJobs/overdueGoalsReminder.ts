@@ -45,7 +45,8 @@ const SQL_UPDATE_POCKET_REMINDER = sql<UpdatePocketReminder, Record<string, neve
   WHERE id = :pocket_id
 `);
 
-export default async function remindStalePockets() {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+async function remindStalePockets() {
   const currentTime = new Date();
   const overduePockets = await SQL_GET_OVERDUE_POCKETS({}).many();
 

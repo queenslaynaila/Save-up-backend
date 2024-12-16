@@ -3,11 +3,11 @@ import { z } from 'zod';
 import { sql } from '../../db';
 import { securityQuestionSchema } from './schema';
 
-export const securityQuestions = securityQuestionSchema.pick({
+const securityQuestions = securityQuestionSchema.pick({
   id: true,
   question: true
 });
-export type SecurityQuestions = z.infer<typeof securityQuestions>;
+type SecurityQuestions = z.infer<typeof securityQuestions>;
 
 const SQL_GET_SECURITY_QUESTIONS = sql<Record<string, never>, SecurityQuestions>(`
   SELECT id, question FROM security_questions

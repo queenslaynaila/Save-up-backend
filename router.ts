@@ -1,5 +1,5 @@
-/* eslint-disable no-use-before-define */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable no-use-before-define */
 import express, {
   Router as ExpressRouter,
   Request,
@@ -94,7 +94,7 @@ interface RouterOptions<
   handler: RequestHandler<z.infer<Params>, ResBody, ReqBody, z.infer<QueryParams>>;
 }
 const emptyObjectSchema = z.object({}).strict();
-export const registry = new OpenAPIRegistry();
+const registry = new OpenAPIRegistry();
 
 class Router {
   private static app: Application = express();

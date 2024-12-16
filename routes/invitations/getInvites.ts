@@ -1,9 +1,8 @@
 import Router from '../../router';
 import { sql } from '../../db';
+import { baseInviteInterface, baseInviteSchema } from './types';
 
-import { baseInviteInterface, baseInviteSchema, InviteByReceiverInterface } from './types';
-
-const SQL_GET_PENDING_INVITATIONS = sql<InviteByReceiverInterface, baseInviteInterface>(`
+const SQL_GET_PENDING_INVITATIONS = sql<{receiver_id:number}, baseInviteInterface>(`
   SELECT 
     invitations.sender_id,
     invitations.group_id,

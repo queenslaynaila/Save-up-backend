@@ -1,12 +1,11 @@
 import Router from '../../router';
 import { sql } from '../../db';
-
-import { GetByGroupIdInterface } from '../../types';
 import { LoanRequest, loanRequestSchema } from '../loanGuarantees/types';
 import { z } from 'zod';
 
-interface ExtendedGetByGroupIdInterface extends GetByGroupIdInterface {
+interface ExtendedGetByGroupIdInterface {
   approval_status:'Pending';
+  group_id:number;
 }
 
 const SQL_GET_UNAPPROVED_LOAN = sql<ExtendedGetByGroupIdInterface, LoanRequest>(`

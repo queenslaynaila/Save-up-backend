@@ -12,7 +12,7 @@ const transaction = transactionSchema.pick({
 }).extend({
   slug: transactionTypeSchema.shape.slug
 });
-export type Transaction = z.infer<typeof transaction>;
+type Transaction = z.infer<typeof transaction>;
 
 const SQL_GET_TRANSACTIONS = sql<{ entity_id: number }, Transaction>(`
     SELECT 

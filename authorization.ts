@@ -6,10 +6,10 @@ import HttpError from './httpError';
 import { sql } from './db';
 import { USER_ROLE_ENUM } from './routes/users/schema';
 
-export type UserRole = z.infer<typeof USER_ROLE_ENUM>;
+type UserRole = z.infer<typeof USER_ROLE_ENUM>;
 
 // Extend the User type with the role from the enum
-export type User = {
+type User = {
   id: number;
   role: UserRole;
   step?: number;

@@ -21,7 +21,7 @@ const SQL_GET_EXPENSES = sql<{ entity_id:number }, Expense>(`
   AND deleted_at IS NULL
 `);
 
-export const getExpensesByCriteria = (router: Router) => {
+const getExpensesByCriteria = (router: Router) => {
   router.route({
     method: 'get',
     path: '/',

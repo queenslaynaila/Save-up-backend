@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const baseRequestLoanSchema = z.object({
+const baseRequestLoanSchema = z.object({
   group_id: z.number().int().positive(),
   pocket_id: z.number().int().positive(),
   borrower_id: z.number().int().positive(), // Added borrower_id here for completeness
@@ -16,9 +16,7 @@ export const requestLoanSchema = baseRequestLoanSchema.omit({
   borrower_id: true
 });
 
-export type RequestLoan = z.infer<typeof requestLoanSchema>;
-
-export const reviewedLoansParams = baseRequestLoanSchema.pick({
+const reviewedLoansParams = baseRequestLoanSchema.pick({
   group_id: true
 }).extend({
   user_id: z.number().int(),

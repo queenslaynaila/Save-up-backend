@@ -8,8 +8,7 @@ import HttpError from '../../httpError';
 import { z } from 'zod';
 import logger from '../../logger';
 import { authenticateResetToken, checkResetStepProgression } from '../../authorization';
-
-export const verifyAnswerSchema = z.object({
+const verifyAnswerSchema = z.object({
   question_id: z.number(),
   answer: z.string()
 });

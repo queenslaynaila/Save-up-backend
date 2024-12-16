@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const candidateSchema = z.object({
+const candidateSchema = z.object({
   group_id: z.number(),
   election_id: z.number(),
   candidate_id: z.number(),
@@ -13,16 +13,12 @@ export const candidateRequestBody = candidateSchema.omit({
   chosen_by: true
 });
 
-export type CandidateRequestBody = z.infer<typeof candidateRequestBody>;
-
 export const candidateParamSchema = z.object({
   group_id: z.number(),
   election_id: z.number()
 });
 
-export type CandidateParam = z.infer<typeof candidateParamSchema>
-
-export const candidateReqSchema = candidateParamSchema.extend({
+const candidateReqSchema = candidateParamSchema.extend({
   user_id: z.number()
 });
 

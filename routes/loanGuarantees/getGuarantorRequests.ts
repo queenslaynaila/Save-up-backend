@@ -1,11 +1,10 @@
 import Router from '../../router';
 import { sql } from '../../db';
-
 import { LoanRequest, loanRequestSchema } from './types';
-import { GetByUserInterface } from '../../types';
 
-interface GuarantorRequest extends GetByUserInterface {
+interface GuarantorRequest {
   type_id: number;
+  user_id: number;
 }
 
 const SQL_GET_UNGUARANTEED_LOAN_REQUESTS = sql<GuarantorRequest, LoanRequest>(`

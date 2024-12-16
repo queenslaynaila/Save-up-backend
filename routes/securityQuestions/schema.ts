@@ -5,5 +5,3 @@ export const securityQuestionSchema = z.object({
   question: z.string(),
   created_at: z.string()
 });
-
-export type SecurityQuestions = z.infer<typeof securityQuestionSchema>;

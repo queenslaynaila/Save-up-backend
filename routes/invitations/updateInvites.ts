@@ -3,7 +3,7 @@ import { sql } from '../../db';
 import Router from '../../router';
 import { InviteResponseInterface, inviteValidationSchema } from './types';
 
-export interface ExtendedInviteResponseInterface extends InviteResponseInterface {
+interface ExtendedInviteResponseInterface extends InviteResponseInterface {
   xid: number;
 }
 const SQL_RESPOND_TO_INVITE = sql<ExtendedInviteResponseInterface, Record<string, never>>(`

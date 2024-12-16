@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const ballotSchema = z.object({
+const ballotSchema = z.object({
   group_id: z.number(),
   election_id: z.number(),
   candidate_id: z.number(),
@@ -13,9 +13,7 @@ export const ballotBodySchema = ballotSchema.omit({
   user_id: true
 });
 
-export type BallotBodyInterface = z.infer<typeof ballotBodySchema>
-
-export const computeBallot = ballotBodySchema.omit({
+const computeBallot = ballotBodySchema.omit({
   candidate_id: true
 }).extend({
   user_id: z.number()
@@ -23,18 +21,18 @@ export const computeBallot = ballotBodySchema.omit({
 
 export type BallotComputeInterface = z.infer<typeof computeBallot>
 
-export const ballotParamsSchema = ballotBodySchema.pick({
+const ballotParamsSchema = ballotBodySchema.pick({
   group_id: true
 });
 
-export type BallotParamsInterface = z.infer<typeof ballotParamsSchema>
+type BallotParamsInterface = z.infer<typeof ballotParamsSchema>
 
 export const ballotBodyRequest = ballotBodySchema.pick({
   election_id: true,
   group_id: true
 });
 
-export type BallotBodyRequestInterface = z.infer<typeof ballotBodyRequest>
+type BallotBodyRequestInterface = z.infer<typeof ballotBodyRequest>
 
 export const ballotResultSchema = z.object({
   full_name: z.string()

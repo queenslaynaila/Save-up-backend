@@ -21,19 +21,7 @@ export const expenseCreationSchema = ExpenseSchema.extend({
 
 export type ExpenseCreationInterface = z.infer<typeof expenseCreationSchema>;
 
-export const ExpenseUpdateValidationSchema = expenseCreationSchema.omit({
-  entity_id: true
-}).partial();
-
-export const expenseQuerySchema = z.object({
-  category_id: z.string(),
-  start_date: z.string(),
-  end_date: z.string()
-}).partial();
-
-export type ExpenseQueryInterface = z.infer<typeof expenseQuerySchema>;
-
-export const expenseUpdateSchema = ExpenseSchema.pick({
+const expenseUpdateSchema = ExpenseSchema.pick({
   category_id: true,
   description: true,
   amount: true,
@@ -49,9 +37,7 @@ export const expenseBodySchema = expenseUpdateSchema.omit({
   xid: true
 });
 
-export type ExpenseBodyInterface = z.infer<typeof expenseBodySchema>;
-
-export const expenseUpdateRes = ExpenseSchema.pick({
+const expenseUpdateRes = ExpenseSchema.pick({
   category_id: true,
   description: true,
   amount: true,

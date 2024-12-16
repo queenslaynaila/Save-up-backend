@@ -1,15 +1,8 @@
 import { z } from 'zod';
 
-const ENTITY_TYPE_ENUM = z.enum(['User', 'Group', 'Donor']);
 const ID_TYPE_ENUM = z.enum(['National', 'Passport']);
 export const USER_ROLE_ENUM = z.enum(['Admin', 'Standard', 'Moderator']);
 const GENDER_ENUM = z.enum(['Male', 'Female']);
-
-export const entitySchema = z.object({
-  id: z.number().int(),
-  entity_type: ENTITY_TYPE_ENUM,
-  created_at: z.string().datetime()
-});
 
 export const userContactDetailsSchema = z.object({
   id: z.number().int(),
@@ -35,13 +28,6 @@ export const loginAttemptSchema = z.object({
   browser_info: z.string().optional(),
   success: z.boolean(),
   reason: z.string().optional(),
-  created_at: z.string().datetime()
-});
-
-export const userRoleHistorySchema = z.object({
-  user_id: z.number().int(),
-  xid: z.number().int(),
-  role: USER_ROLE_ENUM,
   created_at: z.string().datetime()
 });
 

@@ -10,7 +10,7 @@ const categorySchema = z.object({
 });
 type Category = z.infer<typeof categorySchema>;
 
-export const SQL_GET_ALL_CATEGORIES = sql<Record<string, never>, Category>(`
+const SQL_GET_ALL_CATEGORIES = sql<Record<string, never>, Category>(`
   SELECT id, name, description, image_url 
   FROM categories 
   WHERE deleted_at IS NULL

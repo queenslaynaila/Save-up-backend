@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const baseGuaranteeSchema = z.object({
+const baseGuaranteeSchema = z.object({
   group_id: z.number().int(),
   request_id: z.number().int(),
   user_id: z.number().int(),
@@ -13,7 +13,6 @@ export const guaranteeLoanBodySchema = baseGuaranteeSchema.omit({
   user_id: true
 });
 
-export type GuaranteeLoanBody = z.infer<typeof guaranteeLoanBodySchema>;
 
 export const loanRequestSchema = baseGuaranteeSchema.pick({
   group_id: true

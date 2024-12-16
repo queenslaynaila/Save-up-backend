@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const ratificationSchema = z.object({
+const ratificationSchema = z.object({
   group_id: z.number(),
   election_id: z.number(),
   user_id: z.number(),
@@ -9,7 +9,7 @@ export const ratificationSchema = z.object({
 
 export type RatificationInterface = z.infer<typeof ratificationSchema>
 
-export const computeRatification = ratificationSchema.pick({
+const computeRatification = ratificationSchema.pick({
   group_id: true,
   election_id: true,
   user_id: true
@@ -29,10 +29,7 @@ export const ratificationValidation = ratificationSchema.omit({
   is_ratified: true
 });
 
-export type RatificationValidationInterface = z.infer<typeof ratificationValidation>
 
 export const computeStatus = ratificationSchema.omit({
   user_id: true
 });
-
-export type ComputeStatusInterface = z.infer<typeof computeStatus>

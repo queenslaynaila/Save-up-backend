@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { z } from 'zod';
 
-export const ENUM_EXIT_REASON = z.enum(['Self removal', 'Admin removal']);
+const ENUM_EXIT_REASON = z.enum(['Self removal', 'Admin removal']);
 
 export const groupsSchema = z.object({
   id: z.number(),

@@ -6,8 +6,6 @@ import { USER_ROLE_ENUM, userIdHistorySchema, userPhoneHistorySchema, userSchema
 import Router from '../../router';
 import { convertToTitleCase } from '../../caseNormalization';
 
-export type UserRole = z.infer<typeof USER_ROLE_ENUM>;
-
 export const SQL_GET_USER_PIN = sql<{ id: number }, { pin: string }>(`
   SELECT pin FROM users WHERE id = :id
 `);
