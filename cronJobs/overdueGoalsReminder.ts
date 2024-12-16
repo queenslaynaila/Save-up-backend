@@ -2,7 +2,7 @@
 /* eslint-disable no-restricted-syntax */
 import { z } from 'zod';
 import { sql } from '../db';
-import sendSms from '../services/twilio';
+import sendSms from '../services/sms';
 
 const pocketSchema = z.object({
   pocket_id: z.number(),
