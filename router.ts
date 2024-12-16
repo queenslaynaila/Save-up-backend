@@ -113,6 +113,9 @@ class Router {
     this.apiTag = apiTag;
 
     Router.app.use(this.routePrefix, this.router);
+  }
+
+  public static initialize() {
     Router.app.use(
       cors({
         origin: ['http://localhost:5173', 'https://save-up-seven.vercel.app'],
@@ -122,9 +125,6 @@ class Router {
         allowedHeaders: ['Content-Type', 'Authorization', 'Reset']
       })
     );
-  }
-
-  public static initialize() {
     Router.app.use(express.json());
     Router.app.use(
       ['/docs'],
