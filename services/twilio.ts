@@ -1,5 +1,6 @@
 import twilio from 'twilio';
 import { config } from 'dotenv';
+import logger from '../logger';
 config({ path: '.env' });
 
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
@@ -14,7 +15,7 @@ const sendSms = (phone: string, message: string): void => {
       from: twilioPhoneNumber,
       to: phone
     })
-    .then((msg) => console.log(`Message sent: ${msg.sid}`))
+    .then((msg) => logger.info(`Message sent: ${msg.sid}`))
     .catch((error: Error) => `This is Error: ${error.message}`);
 };
 
