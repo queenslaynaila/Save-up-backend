@@ -120,7 +120,7 @@ class Router {
       cors({
         origin: 'http://localhost:5173',
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-        credentials: false,
+        credentials: true,
         exposedHeaders: ['Authorization', 'Reset'],
         allowedHeaders: ['Content-Type', 'Authorization', 'Reset']
       })
