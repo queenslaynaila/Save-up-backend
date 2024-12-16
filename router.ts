@@ -121,7 +121,8 @@ class Router {
         origin: '*',
         credentials: false,
         exposedHeaders: ['Authorization', 'Reset'],
-        allowedHeaders: ['Content-Type', 'Authorization', 'Reset']
+        allowedHeaders: ['Content-Type', 'Authorization', 'Reset'],
+        methods: '*'
       })
     );
     Router.app.use(express.json());
