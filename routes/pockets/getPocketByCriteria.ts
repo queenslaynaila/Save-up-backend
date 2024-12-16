@@ -3,8 +3,8 @@ import { sql } from '../../db';
 import { ParsedQs } from 'qs';
 import { z } from 'zod';
 import { pocket } from './createPocket';
-import { UserRole } from '../../types';
 import HttpError from '../../httpError';
+import { USER_ROLE_ENUM } from '../users/schema';
 
 const pocketSchema = pocket.omit({
   entity_id: true,
@@ -69,7 +69,7 @@ const getPocketByCriteria = (router: Router) => {
 
       const FinalEntity = entity_id ? req.user!.id : parseInt(entity_id, 10);
 
-      if (req.user!.role === UserRole.USER && req.user!.id !== FinalEntity) {
+      if (req.user!.role === USER_ROLE_ENUM.Enum.Standard && req.user!.id !== FinalEntity) {
         throw new HttpError(403);
       }
 

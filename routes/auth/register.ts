@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { sql } from '../../db';
 import Router from '../../router';
 import HttpError from '../../httpError';
-import { userContactDetailsSchema, userSchema } from '../users/schema';
+import { USER_ROLE_ENUM, userContactDetailsSchema, userSchema } from '../users/schema';
 import { AuthenticatedUser, getClientInfo, publicUserSchema, recordLoginAttempt } from './login';
 import { generateToken } from '../../authorization';
 
@@ -11,11 +11,11 @@ const createUserPayloadSchema = userSchema.pick({
   pin: true,
   id_type: true,
   id_number: true,
-  gender: true
+  gender: true,
+  role: true
 }).extend({
   full_name: userContactDetailsSchema.shape.full_name,
-  phone_number: userContactDetailsSchema.shape.phone_number,
-  role: z.string().optional()
+  phone_number: userContactDetailsSchema.shape.phone_number
 });
 type CreateUserPayload = z.infer<typeof createUserPayloadSchema>;
 
@@ -43,7 +43,7 @@ const createUser = (router: Router) => {
       const pinHash = bcrypt.hashSync(String(req.body.pin), 12);
       const user = await SQL_CREATE_USER({
         ...req.body,
-        role: req.body.role || 'Standard',
+        role: req.body.role || USER_ROLE_ENUM.Enum.Standard,
         pin: pinHash
       }).one().catch((err) => {
         if (err.code === '23505') {

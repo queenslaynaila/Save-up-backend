@@ -1,9 +1,8 @@
 import { z } from 'zod';
-import { UserRole } from '../../types';
 
 const ENTITY_TYPE_ENUM = z.enum(['User', 'Group', 'Donor']);
 const ID_TYPE_ENUM = z.enum(['National', 'Passport']);
-const USER_ROLE_ENUM = z.enum(['Admin', 'Standard', 'Moderator']);
+export const USER_ROLE_ENUM = z.enum(['Admin', 'Standard', 'Moderator']);
 const GENDER_ENUM = z.enum(['Male', 'Female']);
 
 export const entitySchema = z.object({
@@ -15,15 +14,15 @@ export const entitySchema = z.object({
 export const userContactDetailsSchema = z.object({
   id: z.number().int(),
   full_name: z.string(),
-  phone_number: z.string(),
+  phone_number: z.string().regex(/^\+\d{1,4}\d{9}$/),
   created_at: z.string().datetime()
 });
 
 export const userSchema = z.object({
   id: z.number().int(),
   id_type: ID_TYPE_ENUM,
-  id_number: z.string().regex(/^[0-9]+$/),
-  role: z.nativeEnum(UserRole),
+  id_number: z.string().regex(/^(?:\d{8}|\d{9}(\d{4})?|\d{10}|\d{13}|\d{16})$/),
+  role: USER_ROLE_ENUM,
   gender: GENDER_ENUM.optional(),
   pin: z.string(),
   created_at: z.string().datetime()

@@ -1,10 +1,14 @@
 import { NextFunction, Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import jwt, { JwtPayload, Secret, VerifyErrors } from 'jsonwebtoken';
-import { UserRole } from './types';
+import { z } from 'zod';
 import HttpError from './httpError';
 import { sql } from './db';
+import { USER_ROLE_ENUM } from './routes/users/schema';
 
+export type UserRole = z.infer<typeof USER_ROLE_ENUM>;
+
+// Extend the User type with the role from the enum
 export type User = {
   id: number;
   role: UserRole;
@@ -94,7 +98,7 @@ function authenticateResetToken(req: Request, res: Response, next: NextFunction)
     throw new HttpError(403);
   }
 
-  jwt.verify(resetTokenValue, process.env.JWT_SECRET as Secret, (err, decodedResetToken)=>{
+  jwt.verify(resetTokenValue, process.env.JWT_SECRET as Secret, (err, decodedResetToken) => {
     if (err) {
       throw new HttpError(403);
     }
@@ -119,7 +123,7 @@ function checkResetStepProgression(requiredStep: number) {
   };
 }
 
-const SQL_GET_PIN = sql<{ user_id: number }, {pin:string}>(`
+const SQL_GET_PIN = sql<{ user_id: number }, { pin: string }>(`
   SELECT pin
   FROM users
   WHERE id = :user_id

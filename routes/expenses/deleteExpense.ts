@@ -1,9 +1,8 @@
 import Router from '../../router';
 import { sql } from '../../db';
+import { z } from 'zod';
 
-import { XidEntityInterface, idParamSchema, entitySchema } from '../../types';
-
-const SQL_DELETE_EXPENSE = sql<XidEntityInterface, Record<string, never>>(`
+const SQL_DELETE_EXPENSE = sql<{xid:number, entity_id:number}, Record<string, never>>(`
   UPDATE expenses
   SET deleted_at = NOW()
   WHERE xid = :xid
@@ -17,8 +16,12 @@ const deleteExpense = (router: Router) => {
     path: '/:id',
     summary: 'Delete an expense',
     request: {
-      params: idParamSchema,
-      body: entitySchema
+      params: z.object({
+        id: z.string()
+      }),
+      body: z.object({
+        entity_id: z.number()
+      })
     },
     response: {
       204: {}

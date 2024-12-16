@@ -2,10 +2,11 @@ import bcrypt from 'bcrypt';
 import { z } from 'zod';
 import { sql } from '../../db';
 import HttpError from '../../httpError';
-import { userIdHistorySchema, userPhoneHistorySchema, userSchema } from './schema';
+import { USER_ROLE_ENUM, userIdHistorySchema, userPhoneHistorySchema, userSchema } from './schema';
 import Router from '../../router';
 import { convertToTitleCase } from '../../caseNormalization';
-import { UserRole } from '../../types';
+
+export type UserRole = z.infer<typeof USER_ROLE_ENUM>;
 
 export const SQL_GET_USER_PIN = sql<{ id: number }, { pin: string }>(`
   SELECT pin FROM users WHERE id = :id
@@ -137,8 +138,7 @@ const updateUserAttributes = (router: Router) => {
         await SQL_UPDATE_PIN({ id: userId, pin: hashedNewPin }).exec();
         return res.sendStatus(204);
       }
-
-      if ('role' in req.body && req.user!.role === UserRole.ADMIN) {
+      if ('role' in req.body && req.user!.role === USER_ROLE_ENUM.Enum.Admin) {
         const role = convertToTitleCase(req.body.role);
         const { updatedRole } = await SQL_UPDATE_ROLE({
           targetUserId: userId,

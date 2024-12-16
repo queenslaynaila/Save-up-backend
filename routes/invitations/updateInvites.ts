@@ -1,13 +1,12 @@
+import { z } from 'zod';
 import { sql } from '../../db';
 import Router from '../../router';
-
 import { InviteResponseInterface, inviteValidationSchema } from './types';
-import { idParamSchema, StatusCodeInterface } from '../../types';
 
 export interface ExtendedInviteResponseInterface extends InviteResponseInterface {
   xid: number;
 }
-const SQL_RESPOND_TO_INVITE = sql<ExtendedInviteResponseInterface, StatusCodeInterface>(`
+const SQL_RESPOND_TO_INVITE = sql<ExtendedInviteResponseInterface, Record<string, never>>(`
    SELECT update_invite(:xid, :group_id, :receiver_id, :status)
 `);
 
@@ -17,7 +16,9 @@ const updateInvites = (router: Router) => {
     path: '/:id',
     summary: 'Respond to a group invitation',
     request: {
-      params: idParamSchema,
+      params: z.object({
+        id: z.string()
+      }),
       body: inviteValidationSchema
     },
     response: {

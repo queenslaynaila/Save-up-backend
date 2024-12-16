@@ -1,9 +1,10 @@
-import { UserRole } from './types';
-
-export const convertToTitleCase = (str: string): UserRole => {
+import { USER_ROLE_ENUM } from './routes/users/schema';
+export const convertToTitleCase = (str: string): string => {
   const titleCased = str.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());
-  if (!Object.values(UserRole).includes(titleCased as UserRole)) {
+
+  if (!USER_ROLE_ENUM.safeParse(titleCased).success) {
     throw new Error('Invalid role');
   }
-  return titleCased as UserRole;
+
+  return titleCased;
 };

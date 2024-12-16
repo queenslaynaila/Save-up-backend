@@ -2,8 +2,8 @@ import Router from '../../router';
 import { sql } from '../../db';
 import { NextOfKin, nextOfKinPublicViewSchema } from './createNextOfKin';
 import { z } from 'zod';
-import { UserRole } from '../../types';
 import HttpError from '../../httpError';
+import { USER_ROLE_ENUM } from '../users/schema';
 
 const SQL_GET_KIN = sql<{user_id: number}, NextOfKin>(`
   SELECT xid, full_name, relationship, phone_number, created_at
@@ -38,7 +38,7 @@ const getNextOfKin = (router: Router) => {
     handler: async (req, res) => {
       const { user_id, include_history = 'false' } = req.query;
       const targetUser = user_id || req.user!.id;
-      if (req.user!.role === UserRole.USER
+      if (req.user!.role === USER_ROLE_ENUM.Enum.Standard
         && (req.user!.id !== targetUser || include_history === 'true')) {
         throw new HttpError(403);
       }
