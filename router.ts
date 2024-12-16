@@ -118,11 +118,11 @@ class Router {
   public static initialize() {
     Router.app.use(
       cors({
-        origin: '*',
+        origin: 'http://localhost:5173',
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
         credentials: false,
         exposedHeaders: ['Authorization', 'Reset'],
-        allowedHeaders: ['Content-Type', 'Authorization', 'Reset'],
-        methods: '*'
+        allowedHeaders: ['Content-Type', 'Authorization', 'Reset']
       })
     );
     Router.app.use(express.json());
