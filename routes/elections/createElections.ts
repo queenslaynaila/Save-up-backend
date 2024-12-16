@@ -1,6 +1,5 @@
 import Router from '../../router';
 import { sql } from '../../db';
-
 import { ElectionInterface, electionValidation } from './types';
 
 const SQL_CALL_ELECTION = sql<ElectionInterface, Record<string, never>>(`

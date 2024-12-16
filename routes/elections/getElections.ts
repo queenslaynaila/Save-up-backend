@@ -1,6 +1,5 @@
 import Router from '../../router';
 import { sql } from '../../db';
-
 import {
   ElectionRequest,
   ElectionRetrieval,
