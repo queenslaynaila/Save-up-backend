@@ -34,11 +34,6 @@ const getUserGroups = (router:Router) => {
     method: 'get',
     path: '/',
     summary: 'Get groups a user belongs to',
-    request: {
-      query: z.object({
-        id: z.string()
-      })
-    },
     response: {
       200: {
         schema: z.array(group)
