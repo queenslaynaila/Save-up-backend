@@ -1,6 +1,5 @@
 import Router from '../../router';
 import { sql } from '../../db';
-import { InviteInputInterface, userInviteSchema } from './types';
 import HttpError from '../../httpError';
 import { z } from 'zod';
 
@@ -11,17 +10,24 @@ const SQL_CHECK_USER_EXISTENCE = sql<{ phone_number: string }, { exists: boolean
   ) AS exists
 `);
 
-const SQL_SEND_INVITATION = sql<InviteInputInterface, Record<string, never>>(`
+const SQL_SEND_INVITATION = sql<{
+  group_id: number;
+  sender_id: number;
+  phone_number: string;
+}, Record<string, never>>(`
   SELECT send_invite( :group_id, :phone_number, :sender_id)
 `);
 
-const sendInvite = (router: Router) => {
+const createInvite = (router: Router) => {
   router.route({
     method: 'post',
     path: '/',
     summary: 'Send a group invitation to an existing user via phone number',
     request: {
-      body: userInviteSchema
+      body: z.object({
+        group_id: z.number().min(1),
+        phone_number: z.string().regex(/^\+\d{1,4}\d{9}$/)
+      })
     },
     response: {
       204: {},
@@ -38,11 +44,13 @@ const sendInvite = (router: Router) => {
       }
 
       await SQL_SEND_INVITATION({
-        ...req.body, sender_id: req.user!.id
+        group_id: req.body.group_id,
+        phone_number: req.body.phone_number,
+        sender_id: req.user!.id
       }).exec();
       res.sendStatus(204);
     }
   });
 };
 
-export default sendInvite;
+export default createInvite;

@@ -1,11 +1,11 @@
 import Router from '../../router';
-import sendInvite from './sendInvite';
+import createInvite from './createInvite';
 import getInvites from './getInvites';
 import updateInvites from './updateInvites';
 
 const router = Router.getRouterInstance('/invitations', 'Invitations');
 
-sendInvite(router);
+createInvite(router);
 getInvites(router);
 updateInvites(router);
 

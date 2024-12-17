@@ -13,11 +13,11 @@ const SQL_RESPOND_TO_INVITE = sql<ExtendedInviteResponseInterface, Record<string
 const updateInvites = (router: Router) => {
   router.route({
     method: 'patch',
-    path: '/:id',
+    path: '/:xid',
     summary: 'Respond to a group invitation',
     request: {
       params: z.object({
-        id: z.string()
+        xid: z.string()
       }),
       body: inviteValidationSchema
     },
@@ -26,7 +26,7 @@ const updateInvites = (router: Router) => {
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {
-      const xid = Number(req.params.id);
+      const xid = Number(req.params.xid);
       const receiver_id = req.user!.id;
       await SQL_RESPOND_TO_INVITE({
         ...req.body,

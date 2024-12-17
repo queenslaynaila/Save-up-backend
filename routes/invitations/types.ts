@@ -1,5 +1,17 @@
 import { z } from 'zod';
 
+const INVITE_ENUM = z.enum(['Pending', 'Accepted', 'Decline']);
+
+export const inviteSchema = z.object({
+  group_id: z.number().min(1),
+  receiver_id: z.number().min(1),
+  sender_id: z.number().min(1),
+  xid: z.number().min(1),
+  status: INVITE_ENUM,
+  created_at: z.string().datetime(),
+  deleted_at: z.string().date()
+});
+
 export const baseInviteSchema = z.object({
   group_id: z.number().min(1),
   sender_id: z.number(),
