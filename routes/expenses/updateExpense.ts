@@ -32,11 +32,11 @@ Expense>(`
 const updateExpense = (router: Router) => {
   router.route({
     method: 'patch',
-    path: '/:id',
+    path: '/:xid',
     summary: 'Update an expense',
     request: {
       params: z.object({
-        id: z.string()
+        xid: z.string()
       }),
       body: expenseUpdateParams,
       query: z.object({
@@ -51,7 +51,7 @@ const updateExpense = (router: Router) => {
     authMiddlewareOptions: {},
     handler: async (req, res) => {
       const entity_id = Number(req.query.group_id) ?? req.user!.id;
-      const xid = Number(req.params.id);
+      const xid = Number(req.params.xid);
       const { description, category_id, amount, spent_at } = req.body;
       const result = await SQL_UPDATE_EXPENSE({
         description, category_id, amount, spent_at, entity_id, xid

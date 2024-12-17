@@ -13,11 +13,11 @@ const SQL_DELETE_EXPENSE = sql<{xid:number, entity_id:number}, Record<string, ne
 const deleteExpense = (router: Router) => {
   router.route({
     method: 'delete',
-    path: '/:id',
+    path: '/:xid',
     summary: 'Delete an expense',
     request: {
       params: z.object({
-        id: z.string().min(1)
+        xid: z.string().min(1)
       }),
       query: z.object({
         entity_id: z.number().min(1).optional()
@@ -30,7 +30,7 @@ const deleteExpense = (router: Router) => {
     handler: async (req, res) => {
       const entity_id = Number(req.query?.entity_id) ?? req.user!.id;
       await SQL_DELETE_EXPENSE({
-        xid: Number(req.params.id),
+        xid: Number(req.params.xid),
         entity_id
       }).exec();
       res.sendStatus(204);
