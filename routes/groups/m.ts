@@ -19,7 +19,7 @@ const PrevGroupNamesSchema = z.object({
   created_at: z.string().datetime()
 });
 
-type PrevGroupNames = z.infer<typeof PrevGroupNamesSchema>;
+export type PrevGroupNames = z.infer<typeof PrevGroupNamesSchema>;
 
 const groupMembersSchema = z.object({
   group_id: z.number(),
@@ -27,7 +27,7 @@ const groupMembersSchema = z.object({
   is_active: z.boolean()
 });
 
-type GroupMembers = z.infer<typeof groupMembersSchema>;
+export type GroupMembers = z.infer<typeof groupMembersSchema>;
 
 const groupJoinSchema = z.object({
   group_id: z.number(),
@@ -36,7 +36,7 @@ const groupJoinSchema = z.object({
   created_at: z.string().datetime()
 });
 
-type GroupJoin = z.infer<typeof groupJoinSchema>;
+export type GroupJoin = z.infer<typeof groupJoinSchema>;
 
 const groupLeaveSchema = z.object({
   group_id: z.number(),
@@ -46,4 +46,4 @@ const groupLeaveSchema = z.object({
   created_at: z.string().datetime()
 });
 
-type GroupLeave = z.infer<typeof groupLeaveSchema>;
+export type GroupLeave = z.infer<typeof groupLeaveSchema>;
