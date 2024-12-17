@@ -63,7 +63,7 @@ const initiatePinReset = (router: Router) => {
         { expiresIn: '25m' }
       );
 
-      logger.info(`Sending OTP to ${phone_number}`);
+      logger.info(`Sending OTP ${resetToken} to ${phone_number}`);
 
       sendSms(
         phone_number,
