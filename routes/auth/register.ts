@@ -11,11 +11,11 @@ const createUserPayloadSchema = userSchema.pick({
   pin: true,
   id_type: true,
   id_number: true,
-  gender: true,
-  role: true
+  gender: true
 }).extend({
   full_name: userContactDetailsSchema.shape.full_name,
-  phone_number: userContactDetailsSchema.shape.phone_number
+  phone_number: userContactDetailsSchema.shape.phone_number,
+  role: USER_ROLE_ENUM.optional()
 });
 type CreateUserPayload = z.infer<typeof createUserPayloadSchema>;
 
