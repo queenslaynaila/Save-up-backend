@@ -45,7 +45,7 @@ const initiatePinReset = (router: Router) => {
     handler: async (req, res) => {
       const { phone_number } = req.body;
       const user = await SQL_GET_USER({ phone_number })
-        .one(new HttpError(404));
+        .one(new HttpError(400));
 
       const resetToken = generateOtp();
       const hashedResetToken = await bcrypt.hash(resetToken, 10);
