@@ -1,24 +1,10 @@
 import Router from '../../router';
 import { sql } from '../../db';
-import { groupsSchema } from './schema';
-import { z } from 'zod';
+import { Group, groupsSchema } from './m';
 
-const groupCreationSchema = groupsSchema.pick({
-  name: true
-}).extend({
-  created_by: z.number()
-});
-type GroupCreationInterface = z.infer<typeof groupCreationSchema>;
-
-export const groupAttributes = groupsSchema.pick({
-  id: true,
-  name: true,
-  created_at: true
-});
-export type Group = z.infer<typeof groupAttributes>;
-
-const SQL_CREATE_GROUP = sql<GroupCreationInterface, Group>(`
-    SELECT * FROM create_group(:name, :created_by )
+const SQL_CREATE_GROUP = sql<Pick<Group, 'name' | 'creator_id'>,
+Pick<Group, 'id' | 'name'|'created_at'>>(`
+  SELECT * FROM create_group(:name, :creator_id)
 `);
 
 const createGroup = (router:Router) => {
@@ -27,20 +13,18 @@ const createGroup = (router:Router) => {
     path: '/',
     summary: 'Create a group',
     request: {
-      body: z.object({
-        name: z.string()
-      })
+      body: groupsSchema.pick({ name: true })
     },
     response: {
       201: {
-        schema: groupAttributes
+        schema: groupsSchema.pick({ id: true, name: true, created_at: true })
       }
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {
       const group = await SQL_CREATE_GROUP({
-        ...req.body,
-        created_by: req.user!.id
+        creator_id: req.user!.id,
+        name: req.body.name
       }).one();
       res.status(201).json(group);
     }
