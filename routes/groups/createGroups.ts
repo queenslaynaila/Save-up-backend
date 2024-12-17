@@ -1,6 +1,6 @@
 import Router from '../../router';
 import { sql } from '../../db';
-import { Group, groupsSchema } from './m';
+import { Group, groupsSchema } from './schema';
 
 const SQL_CREATE_GROUP = sql<Pick<Group, 'name' | 'creator_id'>,
 Pick<Group, 'id' | 'name'|'created_at'>>(`

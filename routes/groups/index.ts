@@ -1,18 +1,16 @@
 import Router from '../../router';
 import createGroup from './createGroups';
 import UpdateGroup from './updateGroup';
-import getUserGroups from './getUserGroups';
+import getUserGroups from './getGroups';
 import getGroupMembers from './getGroupMembers';
-// import approveWithdrawal from './approveWithdrawal';
 import manageGroupMembership from './leaveGroup';
 
 const router = Router.getRouterInstance('/groups', 'Groups');
 
 createGroup(router);
+UpdateGroup(router);
 getUserGroups(router);
 getGroupMembers(router);
-UpdateGroup(router);
-// approveWithdrawal(router);
 manageGroupMembership(router);
 
 export default router;

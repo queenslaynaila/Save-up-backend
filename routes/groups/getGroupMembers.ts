@@ -4,7 +4,9 @@ import { z } from 'zod';
 
 const member = z.object({
   user_id: z.number().min(1),
-  full_name: z.string()
+  full_name: z.string(),
+  joined_at: z.string().datetime(),
+  is_admin: z.boolean()
 });
 type Member = z.infer<typeof member>;
 
