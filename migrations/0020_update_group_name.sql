@@ -1,16 +1,15 @@
 CREATE OR REPLACE FUNCTION update_group_name(
-    p_group_id   INT,
-    p_user_id    INT,
-    p_new_name   TEXT
-) RETURNS TABLE (
-    new_name    TEXT
-) AS $$
+    p_group_id INT,
+    p_user_id INT,
+    p_new_name TEXT
+) 
+RETURNS TABLE (name TEXT) AS $$
 DECLARE
     v_old_name TEXT;
 BEGIN
     PERFORM check_grp_membership(p_group_id, p_user_id);
 
-    SELECT name INTO STRICT v_old_name
+    SELECT groups.name INTO STRICT v_old_name
     FROM groups
     WHERE id = p_group_id;
 
@@ -26,7 +25,7 @@ BEGIN
     SET name = p_new_name
     WHERE id = p_group_id
     AND deleted_at IS NULL
-    RETURNING name INTO STRICT new_name;
+    RETURNING groups.name INTO STRICT name;
 
     RETURN NEXT;
 END;
