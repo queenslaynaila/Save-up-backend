@@ -1,12 +1,10 @@
 import { z } from 'zod';
 import { sql } from '../../db';
 import Router from '../../router';
-import { InviteResponseInterface, inviteValidationSchema } from './types';
+import { Invitation, invitationSchema } from './schema';
 
-interface ExtendedInviteResponseInterface extends InviteResponseInterface {
-  xid: number;
-}
-const SQL_RESPOND_TO_INVITE = sql<ExtendedInviteResponseInterface, Record<string, never>>(`
+const SQL_RESPOND_TO_INVITE = sql<
+Pick<Invitation, 'xid'|'group_id'|'status'|'receiver_id'>, Record<string, never>>(`
    SELECT update_invite(:xid, :group_id, :receiver_id, :status)
 `);
 
@@ -19,18 +17,22 @@ const updateInvites = (router: Router) => {
       params: z.object({
         xid: z.string()
       }),
-      body: inviteValidationSchema
+      body: invitationSchema.pick({
+        group_id: true,
+        status: true
+      })
     },
     response: {
       204: {}
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {
-      const xid = Number(req.params.xid);
+      const { group_id, status } = req.body;
       const receiver_id = req.user!.id;
       await SQL_RESPOND_TO_INVITE({
-        ...req.body,
-        xid,
+        xid: Number(req.params.xid),
+        group_id,
+        status,
         receiver_id
       }).exec();
       res.sendStatus(204);

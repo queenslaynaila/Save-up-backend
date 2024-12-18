@@ -15,7 +15,7 @@ const SQL_SEND_INVITATION = sql<{
   sender_id: number;
   phone_number: string;
 }, Record<string, never>>(`
-  SELECT send_invite( :group_id, :phone_number, :sender_id)
+  SELECT send_invite(:group_id, :phone_number, :sender_id)
 `);
 
 const createInvite = (router: Router) => {
@@ -47,7 +47,11 @@ const createInvite = (router: Router) => {
         group_id: req.body.group_id,
         phone_number: req.body.phone_number,
         sender_id: req.user!.id
-      }).exec();
+      }).exec().catch((err)=>{
+        if (err.code === '23503') {
+          throw new HttpError(400, { message: 'Group does not exist' });
+        }
+      });
       res.sendStatus(204);
     }
   });
