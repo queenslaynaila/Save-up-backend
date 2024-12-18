@@ -5,8 +5,8 @@ import { sql } from '../db';
 import sendSms from '../services/sms';
 
 const pocketSchema = z.object({
-  pocket_id: z.number(),
-  entity_id: z.number(),
+  pocket_id: z.number().min(1),
+  entity_id: z.number().min(1),
   target_at: z.date(),
   amount: z.number(),
   reminder_count: z.number(),
