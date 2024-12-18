@@ -3,7 +3,7 @@ import createPocket from './createPocket';
 import deletePocket from './deletePocket';
 import getPocketByCriteria from './getPocketByCriteria';
 import updatePocket from './updatePocket';
-import computeTransactionTotals from './getTotalTransactions';
+import fetchPocketBalances from './getTotalTransactions';
 
 const router = Router.getRouterInstance('/pockets', 'Pockets');
 
@@ -11,6 +11,6 @@ createPocket(router);
 deletePocket(router);
 getPocketByCriteria(router);
 updatePocket(router);
-computeTransactionTotals(router);
+fetchPocketBalances(router);
 
 export default router;
