@@ -1,7 +1,6 @@
 import Router from '../../router';
 import { sql } from '../../db';
 import { z } from 'zod';
-import logger from '../../logger';
 
 const SQL_CREATE_SAVING = sql<{user_id: number, amount:number, pocket_id:number, group_id:number | null}, Record<string, never>>(`
   SELECT create_saving(:user_id, :amount, :pocket_id, :group_id)
@@ -28,14 +27,12 @@ const createSaving = (router: Router) => {
     authMiddlewareOptions: {},
     handler: async (req, res) => {
       const { amount, pocket_id, group_id } = req.body;
-      logger.info('we are here');
       await SQL_CREATE_SAVING({
         user_id: req.user!.id,
         amount,
         pocket_id,
         group_id: group_id ?? null
       }).exec();
-      logger.info('we are here again');
       res.sendStatus(201);
     }
   });
