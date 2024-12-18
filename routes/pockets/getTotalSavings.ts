@@ -18,7 +18,7 @@ const SQL_INNER_BALANCE = sql<{ entity_id: number, pocket_id?: string, from?: st
 const getTotalSavings = (router: Router) => {
   router.route({
     method: 'get',
-    path: 'total-savings',
+    path: '/total-savings',
     summary: 'Get user / group balance across all pockets',
     description: 'Calculates and retrieves the total amount ever deposited (as savings) into each pocket.does not take into account any withdrawals from the pocket. Allows optional query parameters:\n\n'
   + '- **pocket_id**: Retrieves the total savings for a specific pocket.\n'
