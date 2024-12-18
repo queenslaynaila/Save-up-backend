@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS invitations (
   created_at      TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   deleted_at      TIMESTAMP WITH TIME ZONE,
   PRIMARY KEY     (group_id, xid),
+  FOREIGN KEY     (group_id) REFERENCES groups(id),
   FOREIGN KEY     (receiver_id) REFERENCES entities(id),
   FOREIGN KEY     (sender_id) REFERENCES entities(id)
 );
