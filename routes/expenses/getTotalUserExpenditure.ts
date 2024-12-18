@@ -31,7 +31,7 @@ const getTotalUserExpenditure = (router: Router) => {
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {
-      const entity_id = Number(req.query?.group_id) ?? req.user!.id;
+      const entity_id = Number(req.query?.group_id) || req.user!.id;
       const { start_date, end_date, category_id, spent_from, spent_to } = req.query;
 
       const filters: string[] = [];
