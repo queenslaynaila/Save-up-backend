@@ -61,7 +61,7 @@ const createPocket = (router: Router) => {
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {
-      const entity_id = req.body?.entity_id ?? req.user!.id;
+      const entity_id = req.body?.entity_id || req.user!.id;
       const newPocket = await SQL_CREATE_POCKET({
         ...req.body,
         entity_id

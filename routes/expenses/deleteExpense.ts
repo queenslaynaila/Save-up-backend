@@ -28,7 +28,7 @@ const deleteExpense = (router: Router) => {
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {
-      const entity_id = Number(req.query?.entity_id) ?? req.user!.id;
+      const entity_id = Number(req.query?.entity_id) || req.user!.id;
       await SQL_DELETE_EXPENSE({
         xid: Number(req.params.xid),
         entity_id

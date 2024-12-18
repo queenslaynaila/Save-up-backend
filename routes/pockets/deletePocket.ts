@@ -23,7 +23,7 @@ const deletePocket = (router: Router) => {
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {
-      const entity_id = req.body?.entity_id ?? req.user!.id;
+      const entity_id = req.body?.entity_id || req.user!.id;
       await SQL_DELETE_POCKET({
         entity_id,
         pocket_id: Number(req.params.xid)

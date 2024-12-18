@@ -31,7 +31,7 @@ const createSaving = (router: Router) => {
         user_id: req.user!.id,
         amount,
         pocket_id,
-        group_id: group_id ?? null
+        group_id: group_id || null
       }).exec();
       res.sendStatus(201);
     }
