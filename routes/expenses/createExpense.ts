@@ -49,7 +49,7 @@ const createExpense = (router: Router) => {
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {
-      const entity_id = Number(req.query.group_id) ?? req.user!.id;
+      const entity_id = Number(req.query.group_id) || req.user!.id;
       const { category_id, description, amount, spent_at } = req.body;
       const expense = await SQL_CREATE_EXPENSES({
         category_id,
