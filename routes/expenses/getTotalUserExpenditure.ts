@@ -12,7 +12,7 @@ const SQL_GET_TOTAL_EXPENSES = sql<{entity_id: number}, {total_expenses: number}
 const getTotalUserExpenditure = (router: Router) => {
   router.route({
     method: 'get',
-    path: '/total-expenses',
+    path: '/total',
     summary: 'Get total user expenditure',
     request: {
       query: z.object({
