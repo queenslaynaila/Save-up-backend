@@ -1,8 +1,10 @@
 import Router from '../../router';
 import { sql } from '../../db';
-import { NextOfKin } from './createNextOfKin';
+import { NextOfKin, SQL_GET_PIN } from './createNextOfKin';
 import { z } from 'zod';
 import { nextOfKinSchema } from './schema';
+import HttpError from '../../httpError';
+import bcrypt from 'bcrypt';
 
 const nextOfKinUpdatePayload = nextOfKinSchema.pick({
   full_name: true,
@@ -37,7 +39,9 @@ const updateNextOfKin = (router: Router) => {
     summary: 'Update a next of kin details',
     request: {
       params: z.object({ xid: z.string() }),
-      body: nextOfKinUpdatePayload
+      body: nextOfKinUpdatePayload.extend({
+        pin: z.string().regex(/^\d{4}$/)
+      })
     },
     response: {
       200: {
@@ -46,6 +50,13 @@ const updateNextOfKin = (router: Router) => {
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {
+      const { pin } = await SQL_GET_PIN({
+        id: req.user!.id
+      }).one(new HttpError(401));
+
+      if (!await bcrypt.compare(req.body.pin, pin)) {
+        throw new HttpError(401);
+      }
       const { full_name, relationship, phone_number } = req.body;
       const kin = await SQL_UPDATE_KIN({
         user_id: req.user!.id,
