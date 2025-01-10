@@ -4,29 +4,32 @@ import { sql } from '../../db';
 import { z } from 'zod';
 import { securityAnswerSchema } from './updateAnswer';
 import HttpError from '../../httpError';
+import { SQL_GET_PIN } from '../nextOfKin/createNextOfKin';
 
-const securityAnswerCreationSchema = securityAnswerSchema.pick({
-  user_id: true,
-  question_id: true,
-  answer: true
+const securityAnswerCreationSchema = z.object({
+  answers: z.array(securityAnswerSchema.pick({
+    question_id: true,
+    answer: true
+  }))
 });
 type AnswerCreationPayload = z.infer<typeof securityAnswerCreationSchema>;
 
-const SQL_CREATE_ANSWER = sql<AnswerCreationPayload, Record<string, never>>(`
-  SELECT create_answer (:user_id, :question_id, :answer)
+const SQL_CREATE_ANSWERS = sql<
+AnswerCreationPayload & {user_id:number}, Record<string, never>>(`
+  SELECT create_answers (:user_id, :answers)
 `);
 
 const createSecurityAnswer = (router: Router) => {
   router.route({
     method: 'post',
-    path: '/:question_id/answers',
+    path: '/answers',
     summary: 'Create a security answer',
     request: {
       params: z.object({
         question_id: z.string()
       }),
-      body: securityAnswerCreationSchema.pick({
-        answer: true
+      body: securityAnswerCreationSchema.extend({
+        pin: z.string().regex(/^\d{4}$/)
       })
     },
     response: {
@@ -34,11 +37,23 @@ const createSecurityAnswer = (router: Router) => {
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {
-      const hashedAnswer = await bcrypt.hash(req.body.answer, 12);
-      await SQL_CREATE_ANSWER({
-        answer: hashedAnswer,
+      const { pin } = await SQL_GET_PIN({
+        id: req.user!.id
+      }).one(new HttpError(401));
+
+      if (!await bcrypt.compare(req.body.pin, pin)) {
+        throw new HttpError(401);
+      }
+      const hashedAnswers = await Promise.all(
+        req.body.answers.map(async ({ question_id, answer }) => ({
+          question_id,
+          answer: await bcrypt.hash(answer, 12)
+        }))
+      );
+
+      await SQL_CREATE_ANSWERS({
         user_id: req.user!.id,
-        question_id: Number(req.params.question_id)
+        answers: hashedAnswers
       }).exec().catch((err) => {
         if (err.code === 'P0003') {
           throw new HttpError(400, { message: 'ERR_MAX_ANSWERS_EXCEEDED' });
