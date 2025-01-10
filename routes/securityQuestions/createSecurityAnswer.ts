@@ -10,7 +10,7 @@ const securityAnswerCreationSchema = z.object({
   answers: z.array(securityAnswerSchema.pick({
     question_id: true,
     answer: true
-  }))
+  })).length(3)
 });
 type AnswerCreationPayload = z.infer<typeof securityAnswerCreationSchema>;
 
