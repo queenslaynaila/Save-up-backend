@@ -131,7 +131,10 @@ const login = (router: Router) => {
     },
     response: {
       201: {
-        schema: publicUserSchema,
+        schema: publicUserSchema.omit({
+          id_type: true,
+          id_number: true
+        }),
         headers: z.object({
           Authorization: z.string()
         })
