@@ -22,7 +22,7 @@ export const nextOfKinPublicViewSchema = nextOfKinSchema.pick({
 });
 export type NextOfKin = z.infer<typeof nextOfKinPublicViewSchema>;
 
-const SQL_GET_PIN = sql<{ id: number }, {pin:string}>(`
+export const SQL_GET_PIN = sql<{ id: number }, {pin:string}>(`
   SELECT 
     users.pin,
   FROM 
