@@ -1,4 +1,3 @@
-
 CREATE OR REPLACE FUNCTION create_user(
     p_id_type       enum_id_type,
     p_id_number     TEXT,
@@ -9,15 +8,15 @@ CREATE OR REPLACE FUNCTION create_user(
     p_role          enum_user_role DEFAULT 'Standard' 
 )
 RETURNS TABLE (
-    id INT,
-    id_type enum_id_type,
-    id_number TEXT,
-    phone_number TEXT,
-    full_name TEXT,
-    role enum_user_role,
-    gender enum_gender,
-    pin TEXT,
-    created_at TIMESTAMP WITH TIME ZONE 
+    id              INT,
+    id_type         enum_id_type,
+    id_number       TEXT,
+    phone_number    TEXT,
+    full_name       TEXT,
+    role            enum_user_role,
+    gender          enum_gender,
+    pin             TEXT,
+    created_at      TIMESTAMP WITH TIME ZONE 
 ) AS $$
 DECLARE
     v_entity_id   INT;
