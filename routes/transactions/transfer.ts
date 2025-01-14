@@ -2,7 +2,8 @@ import Router from '../../router';
 import { sql } from '../../db';
 import HttpError from '../../httpError';
 import { z } from 'zod';
-import logger from '../../logger';
+import { SQL_GET_USER_PIN } from '../users/updateAttributes';
+import bcrypt from 'bcrypt';
 
 const transferPayload = z.object({
   user_id: z.number().min(1),
@@ -32,6 +33,8 @@ const createTransfer = (router: Router) => {
         source_pocket_id: true,
         destination_pocket_id: true,
         amount: true
+      }).extend({
+        pin: z.string().regex(/^\d{4}$/)
       })
     },
     response: {
@@ -39,8 +42,14 @@ const createTransfer = (router: Router) => {
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {
+      const { pin: currentPin } = await SQL_GET_USER_PIN({ id: req.user!.id }).one();
+
+      const isValidPin = await bcrypt.compare(req.body.pin, currentPin);
+      if (!isValidPin) {
+        throw new HttpError(403, { message: 'Invalid PIN' });
+      }
       const { source_pocket_id, destination_pocket_id, amount } = req.body;
-      logger.info(`this is the body ${JSON.stringify(req.body)} by user ${req.user!.id}`);
+
       await SQL_CREATE_TRANSFER({
         source_pocket_id,
         destination_pocket_id,
@@ -51,7 +60,7 @@ const createTransfer = (router: Router) => {
           throw new HttpError(400, { message: 'ERR_INSUFFICIENT_FUNDS' });
         }
       });
-      logger.info('query complete');
+
       res.sendStatus(201);
     }
   });
