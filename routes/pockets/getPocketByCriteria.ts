@@ -38,24 +38,34 @@ const pocketQueryParams = pocketSchema.pick({
   status: true
 }).extend({
   xid: z.string(),
-  entity_id: z.string().default('me'),
+  group_id: z.string(),
   category_id: z.string(),
   start_date: z.string(),
   end_date: z.string()
 }).partial();
 
-const getPocketByCriteria = (router: Router) => {
+const getPocketsByUser = (router: Router) => {
   router.route({
     method: 'get',
-    path: '/',
-    summary: 'Get list of pockets',
-    description: 'Fetches a list of pockets based on various criteria. \n'
-     + '- **entity_id**: The ID of the user or group whose pockets are to be fetched. \n'
-     + '- If no entity_id is provided, it defaults to "me" and fetches the logged-in user\'s pockets. \n'
-     + '- Admins and moderators can request pockets for any user or group using a user ID or group ID..\n'
-     + '- Note that the user_id or group_is must be sent as an entity_id query param.\n'
-     + '- Other query parameters include xid, category_id, priority, status, start_date, and end_date.\n',
+    path: '/:user_id',
+    summary: 'Retrieve a list of pockets for a user or group',
+    description: 'Fetches a list of pockets belonging to a specific user or group, with optional filters to refine the results.\n'
+      + '- If the path parameter is **me**, the request will return the pockets of the logged-in user.\n'
+      + '- If the path parameter is a user ID, the request will return the pockets of the specified user.\n'
+      + '- Admins and moderators can request pockets for any user or group\n'
+      + '- Regular users can only access their own pockets or of grps they are in\n'
+      + '- **Query Parameters**:\n'
+        + '- **xid**: The unique identifier for a specific pocket.\n'
+        + '- **group_id**: The ID of the group whose pockets are to be fetched. m\n'
+        + '- **category_id**: The category of the pocket.\n'
+        + '- **priority**: The priority level of the pocket.\n'
+        + '- **status**: The current status of the pocket (e.g., active, inactive).\n'
+        + '- **start_date**: Start date for filtering the records.\n'
+        + '- **end_date**: End date for filtering the records.\n',
     request: {
+      params: z.object({
+        user_id: z.string().default('me')
+      }),
       query: pocketQueryParams
     },
     response: {
@@ -65,13 +75,29 @@ const getPocketByCriteria = (router: Router) => {
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {
-      const { entity_id = 'me', xid, category_id, priority, status, start_date, end_date } = req.query;
+      const { user_id } = req.params;
 
-      const FinalEntity = entity_id ? req.user!.id : parseInt(entity_id, 10);
+      const targetUserId = user_id === 'me' ? req.user!.id : Number(user_id);
+      if (Number.isNaN(targetUserId)) {
+        throw new HttpError(400);
+      }
 
-      if (req.user!.role === USER_ROLE_ENUM.Enum.Standard && req.user!.id !== FinalEntity) {
+      if (req.user!.role === USER_ROLE_ENUM.Enum.Standard
+        && req.user!.id !== targetUserId) {
         throw new HttpError(403);
       }
+
+      const {
+        group_id,
+        xid,
+        category_id,
+        priority,
+        status,
+        start_date,
+        end_date
+      } = req.query;
+
+      const FinalEntity = Number(group_id) || targetUserId;
 
       const filters: string[] = [];
       const filterArgs: string | string [] | ParsedQs | ParsedQs[] = {};
@@ -120,4 +146,4 @@ const getPocketByCriteria = (router: Router) => {
   });
 };
 
-export default getPocketByCriteria;
+export default getPocketsByUser;
