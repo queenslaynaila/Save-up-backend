@@ -143,6 +143,7 @@ const getPocketsByUser = (router: Router) => {
       });
       logger.info(`Query: ${JSON.stringify(query)}`);
       if (filters.length > 0) query.extend(`AND ${filters.join(' AND ')}`, filterArgs);
+      logger.info(`Query after extension: ${JSON.stringify(query)}`);
       res.json(await query.many());
     }
   });
