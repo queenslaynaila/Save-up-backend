@@ -5,7 +5,7 @@ export const invitationSchema = z.object({
   receiver_id: z.number().min(1),
   sender_id: z.number().min(1),
   xid: z.number().min(1),
-  status: z.enum(['Pending', 'Accepted', 'Decline']),
+  status: z.enum(['Pending', 'Accept', 'Decline']),
   created_at: z.string().datetime(),
   deleted_at: z.string().datetime()
 });
