@@ -19,5 +19,5 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: cats
-        path: ${{ github.workspace }}
+        path: ${{ github.workspace }}/routes
 
