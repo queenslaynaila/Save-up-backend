@@ -97,7 +97,7 @@ const getPocketsByUser = (router: Router) => {
         end_date
       } = req.query;
 
-      const FinalEntity = Number(group_id) || targetUserId;
+      const FinalEntity = group_id ? Number(group_id) : targetUserId;
 
       const filters: string[] = [];
       const filterArgs: string | string [] | ParsedQs | ParsedQs[] = {};
