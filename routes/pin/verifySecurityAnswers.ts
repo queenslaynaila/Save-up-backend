@@ -6,7 +6,6 @@ import jwt, { Secret } from 'jsonwebtoken';
 import { sql } from '../../db';
 import HttpError from '../../httpError';
 import { z } from 'zod';
-import logger from '../../logger';
 import { authenticateResetToken, checkResetStepProgression } from '../../authorization';
 const verifyAnswerSchema = z.object({
   question_id: z.number().min(1),
@@ -33,7 +32,7 @@ const verifySecurityAnswers = (router: Router) => {
     middlewares: [authenticateResetToken, checkResetStepProgression(2)],
     handler: async (req, res) => {
       const answers = req.body;
-      logger.info(`user provided the foll ${JSON.stringify(answers)}`);
+
       const user_id = req.user!.id;
 
       const userSecurityAnswers = await SQL_GET_SECURITY_ANSWERS({ user_id }).many();
@@ -41,13 +40,9 @@ const verifySecurityAnswers = (router: Router) => {
         throw new HttpError(404);
       }
 
-      logger.info(`security answers found for user is ${JSON.stringify(userSecurityAnswers)}`);
-
       const answerMap = new Map(
         userSecurityAnswers.map(({ question_id, answer }) => [question_id, answer])
       );
-
-      logger.info(`answer map is ${JSON.stringify(answerMap)}`);
 
       const incorrectAnswers: number[] = [];
       for (const { question_id, answer } of answers) {
@@ -57,8 +52,6 @@ const verifySecurityAnswers = (router: Router) => {
           incorrectAnswers.push(question_id);
         }
       }
-
-      logger.info(`incorect answers are ${incorrectAnswers}`);
 
       if (incorrectAnswers.length > 2) {
         throw new HttpError(403);
@@ -70,7 +63,7 @@ const verifySecurityAnswers = (router: Router) => {
         process.env.JWT_SECRET as Secret,
         { expiresIn: '15m' }
       );
-      logger.info(`User ${user_id} completed step 3.Questions answered well header sent moving to  Header is ${step3TokenHeader}`);
+
       res.setHeader('Reset', step3TokenHeader)
         .sendStatus(204);
     }
