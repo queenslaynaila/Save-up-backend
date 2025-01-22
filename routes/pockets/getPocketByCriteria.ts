@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { pocket } from './createPocket';
 import HttpError from '../../httpError';
 import { USER_ROLE_ENUM } from '../users/schema';
+import logger from '../../logger';
 
 const pocketSchema = pocket.omit({
   entity_id: true,
@@ -140,6 +141,7 @@ const getPocketsByUser = (router: Router) => {
       const query = SQL_GET_POCKETS({
         entity_id: FinalEntity
       });
+      logger.info(`Query: ${query}`);
       if (filters.length > 0) query.extend(`AND ${filters.join(' AND ')}`, filterArgs);
       res.json(await query.many());
     }
