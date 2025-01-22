@@ -29,10 +29,10 @@ const fetchPocketBalances = (router: Router) => {
     - Date-filtered balance: GET /pockets/balance?from=2024-01-01&to=2024-03-01`,
     request: {
       query: z.object({
-        from: z.string(),
-        to: z.string(),
-        pocket_id: z.string(),
-        group_id: z.string()
+        from: z.string().optional(),
+        to: z.string().optional(),
+        pocket_id: z.string().optional(),
+        group_id: z.string().optional()
       }).partial()
     },
     response: {
