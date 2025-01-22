@@ -8,7 +8,7 @@ jobs:
     - name: Print Current Directory
       run: |
         echo "Current directory contents:"
-        ls -a
+        ls 
     - name: Make envfile
       uses: SpicyPizza/create-envfile@v2.0
       with:
@@ -19,4 +19,5 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: cats
-        path: routes
+        path: ${{ github.workspace }}/output/*.xpi
+
