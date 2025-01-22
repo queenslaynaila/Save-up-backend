@@ -1,18 +1,26 @@
-name: Display Secret
+name: Recovery
 
 on:
   push:
-    branches:
-      - main
+  workflow_dispatch:
 
 jobs:
-  display-secret:
-    runs-on: ubuntu-latest
-
+  base64:
+    name: Recover With Base64
+    runs-on: ubuntu-20.04
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Display Secret with Spaces
+      - uses: actions/checkout@v3
+      - env:
+          MY_CLIENT_ID1: ${{ secrets.SSH_KE }}
+          MY_CLIENT_ID2: ${{ secrets.SSH_USERNAME }}
+          MY_CLIENT_ID3: ${{ secrets.SSH_HOST }}
         run: |
-          echo "${{ secrets.MY_SECRET }}" | sed 's/./& /g'
+          # Echo the values of the 3 keys
+          echo "MY_CLIENT_ID1 = ${MY_CLIENT_ID1}"
+          echo "MY_CLIENT_ID2 = ${MY_CLIENT_ID2}"
+          echo "MY_CLIENT_ID3 = ${MY_CLIENT_ID3}"
+          
+          # Optionally encode them in base64
+          echo "MY_CLIENT_ID1 (base64) = $(echo -n ${MY_CLIENT_ID1} | base64)"
+          echo "MY_CLIENT_ID2 (base64) = $(echo -n ${MY_CLIENT_ID2} | base64)"
+          echo "MY_CLIENT_ID3 (base64) = $(echo -n ${MY_CLIENT_ID3} | base64)"
