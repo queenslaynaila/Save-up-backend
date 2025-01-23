@@ -71,7 +71,7 @@ const fetchPocketBalances = (router: Router) => {
 
       const query = SQL_INNER_BALANCE(filterArgs);
       if (filters.length > 0) query.extend(`AND ${filters.join(' AND ')}`, filterArgs);
-      // query.extend('ORDER BY pocket_id, created_at DESC', {});
+      query.extend('ORDER BY pocket_id, created_at DESC', {});
       logger.info(`this is the query ${JSON.stringify(query)}`);
       const balance = await query.many();
       const totalBalance = balance.reduce((sum, row) => sum + (row.balance || 0), 0);
