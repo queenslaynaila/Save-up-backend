@@ -17,7 +17,9 @@ const createSaving = (router: Router) => {
     request: {
       body: z.object({
         amount: z.number().min(50),
-        pocket_id: z.number().min(1),
+        pocket_id: z.number().min(1)
+      }),
+      query: z.object({
         group_id: z.number().optional()
       })
     },
@@ -26,12 +28,12 @@ const createSaving = (router: Router) => {
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {
-      const { amount, pocket_id, group_id } = req.body;
+      const { amount, pocket_id } = req.body;
       await SQL_CREATE_SAVING({
         user_id: req.user!.id,
         amount,
         pocket_id,
-        group_id: group_id || null
+        group_id: req.query.group_id || null
       }).exec();
       res.sendStatus(201);
     }
