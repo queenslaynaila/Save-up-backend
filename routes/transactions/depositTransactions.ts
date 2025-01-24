@@ -20,7 +20,7 @@ const createSaving = (router: Router) => {
         pocket_id: z.number().min(1)
       }),
       query: z.object({
-        group_id: z.number().optional()
+        group_id: z.string().regex(/^\d+$/).optional()
       })
     },
     response: {
@@ -33,7 +33,7 @@ const createSaving = (router: Router) => {
         user_id: req.user!.id,
         amount,
         pocket_id,
-        group_id: req.query.group_id || null
+        group_id: Number(req.query.group_id) || null
       }).exec();
       res.sendStatus(201);
     }
