@@ -20,7 +20,7 @@ const deleteExpense = (router: Router) => {
         xid: z.string().min(1)
       }),
       query: z.object({
-        entity_id: z.number().min(1).optional()
+        entity_id: z.string().min(1).optional()
       })
     },
     response: {
