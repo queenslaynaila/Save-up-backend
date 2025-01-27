@@ -6,7 +6,7 @@ import { SQL_GET_USER_PIN } from '../users/updateAttributes';
 import bcrypt from 'bcrypt';
 
 const transferPayload = z.object({
-  user_id: z.number().min(1),
+  entity_id: z.number().min(1),
   source_pocket_id: z.number().min(1),
   destination_pocket_id: z.number().min(1),
   amount: z.number().min(10)
@@ -18,7 +18,7 @@ const SQL_CREATE_TRANSFER = sql<TransferPayload, Record<string, never>>(`
   SELECT create_transfer(
     :source_pocket_id, 
     :destination_pocket_id, 
-    :user_id, 
+    :entity_id, 
     :amount
   )
 `);
@@ -35,6 +35,9 @@ const createTransfer = (router: Router) => {
         amount: true
       }).extend({
         pin: z.string().regex(/^\d{4}$/)
+      }),
+      query: z.object({
+        group_id: z.string().regex(/^\d+$/).optional()
       })
     },
     response: {
@@ -53,7 +56,7 @@ const createTransfer = (router: Router) => {
       await SQL_CREATE_TRANSFER({
         source_pocket_id,
         destination_pocket_id,
-        user_id: req.user!.id,
+        entity_id: Number(req.query.group_id) || req.user!.id,
         amount
       }).exec().catch((err) => {
         if (err.code === 'P0004') {
