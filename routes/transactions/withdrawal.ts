@@ -8,13 +8,13 @@ import { SQL_GET_USER_PIN } from '../users/updateAttributes';
 const withdrawalPayload = z.object({
   pocket_id: z.number().min(1),
   amount: z.number().min(50),
-  user_id: z.number()
+  entity_id: z.number()
 });
 
 type Withdrawal = z.infer<typeof withdrawalPayload>
 
 const SQL_CREATE_WITHDRAWAL = sql<Withdrawal, Record<string, never>>(`
-  SELECT create_withdrawal(:user_id, :pocket_id, :amount);
+  SELECT create_withdrawal(:entity_id, :pocket_id, :amount);
 `);
 
 const createWithdrawal = (router: Router) => {
@@ -28,6 +28,9 @@ const createWithdrawal = (router: Router) => {
         amount: true
       }).extend({
         pin: z.string().regex(/^\d{4}$/)
+      }),
+      query: z.object({
+        group_id: z.string().regex(/^\d+$/).optional()
       })
     },
     response: {
@@ -46,7 +49,7 @@ const createWithdrawal = (router: Router) => {
       await SQL_CREATE_WITHDRAWAL({
         pocket_id,
         amount,
-        user_id: req.user!.id
+        entity_id: Number(req.query.group_id) || req.user!.id
       }).exec().catch((err) => {
         if (err.code === 'P0004') {
           throw new HttpError(400, { message: 'ERR_INSUFFICIENT_FUNDS' });
