@@ -55,6 +55,10 @@ app.use((_, res, next) => {
   next();
 });
 
+app.use('/', (req: Request, res: Response) => {
+  return res.status(200).json({ message: 'Welcome to SaveUp API' });
+});
+
 app.use(() => {
   throw new HttpError(404);
 });
