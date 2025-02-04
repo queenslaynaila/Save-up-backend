@@ -109,7 +109,7 @@ class Router {
 
   private constructor(routePrefix: string, apiTag?: string) {
     this.router = ExpressRouter();
-    this.routePrefix = routePrefix;
+    this.routePrefix = `/saveup${routePrefix}`;
     this.apiTag = apiTag;
 
     Router.app.use(this.routePrefix, this.router);

@@ -39,7 +39,7 @@ dotenv.config();
 const app = Router.getAppInstance();
 
 const openApiSpec = generateOpenApiSpec();
-app.use('/docs', swaggerUi.serve, swaggerUi.setup(openApiSpec));
+app.use('/saveup/docs', swaggerUi.serve, swaggerUi.setup(openApiSpec));
 
 const morganFormat = 'combined';
 const morganStream = {
