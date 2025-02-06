@@ -1,25 +1,25 @@
 CREATE OR REPLACE FUNCTION create_group(
-  p_name         TEXT, 
-  p_creator_id   INT
-)
-RETURNS TABLE (
-  id            INT,
-  name          TEXT,
-  created_at    TIMESTAMP WITH TIME ZONE
+    p_name         TEXT,
+    p_creator_id   INT
+) RETURNS TABLE (
+    id            INT,
+    name          TEXT,
+    created_at    TIMESTAMP WITH TIME ZONE
 ) AS $$
 DECLARE
-  v_entity_id   INT;
-  v_pocket_id   INT;
-BEGIN 
+    v_entity_id   INT;
+    v_pocket_id   INT;
+    v_election_id INT;
+BEGIN
     INSERT INTO entities (entity_type)
     VALUES ('Group')
     RETURNING entities.id INTO STRICT v_entity_id;
-
+  
     INSERT INTO groups (id, name, creator_id)
     VALUES (v_entity_id, p_name, p_creator_id);
-
+    
     PERFORM join_group(v_entity_id, p_creator_id);
-
+    
     INSERT INTO pockets (
         entity_id, 
         xid,
@@ -41,12 +41,58 @@ BEGIN
 
     INSERT INTO default_pockets (entity_id, pocket_id)
     VALUES(v_entity_id, v_pocket_id);
+  
+    INSERT INTO elections (
+        group_id,
+        xid,
+        initiator_id,
+        type,
+        status,
+        created_at,
+        closed_at
+    )
+    SELECT
+        v_entity_id,
+        COALESCE(MAX(xid), 0) + 1,
+        p_creator_id,
+        'Default'::enum_election_type,
+        'Closed'::enum_election_status,
+        NOW(),
+        NOW()
+    FROM elections
+    WHERE group_id = v_entity_id
+    RETURNING xid INTO STRICT v_election_id;
 
-    RETURN QUERY SELECT 
-      groups.id,
-      groups.name, 
-      groups.created_at 
-    FROM groups 
+    INSERT INTO candidates (
+        group_id,
+        election_id,
+        candidate_id,
+        chosen_by
+    )
+    VALUES (
+        v_entity_id,
+        v_election_id,
+        p_creator_id,
+        p_creator_id
+    );
+    
+    INSERT INTO group_admins (
+        group_id,
+        election_id,
+        user_id
+    )
+    VALUES (
+        v_entity_id,
+        v_election_id,
+        p_creator_id
+    );
+  
+    RETURN QUERY
+    SELECT 
+        groups.id,
+        groups.name,
+        groups.created_at
+    FROM groups
     WHERE groups.id = v_entity_id;
 END;
 $$ LANGUAGE plpgsql;
