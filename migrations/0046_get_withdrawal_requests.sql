@@ -4,7 +4,7 @@ CREATE OR REPLACE FUNCTION get_withdrawal_requests(
     p_pocket_id  INT
 )
 RETURNS TABLE(
-    withdrawal_id        INT,
+    xid                  INT,
     requested_by         TEXT,
     amount               NUMERIC(30, 2),
     reason               TEXT, 
@@ -17,13 +17,13 @@ BEGIN
 
     RETURN QUERY
     SELECT  
-        debit_requests.xid AS withdrawal_id,  
+        debit_requests.xid,  
         initiator_contact_details.full_name AS requested_by,
         debit_requests.amount, 
         debit_requests.reason,
         (
             SELECT json_agg(json_build_object(
-                'admin_name', admin_contact_details.full_name,
+                'full_name', admin_contact_details.full_name,
                 'status', debit_approvals.status,
                 'reason', debit_approvals.reason
             ))

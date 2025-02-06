@@ -1,17 +1,19 @@
 import Router from '../../router';
 import { sql } from '../../db';
 import { z } from 'zod';
-import { pocket } from '../pockets/createPocket';
 
 const Approval = z.object({
-  admin_name: z.string(),
+  user_id: z.string(),
+  full_name: z.string(),
   status: z.string(),
   reason: z.string()
 });
 
 const WithdrawalRequest = z.object({
-  withdrawal_id: z.number(),
+  xid: z.number(),
+  requested_by_id: z.number(),
   requested_by: z.string(),
+  recipient_id: z.number(),
   recipient_name: z.string(),
   amount: z.number(),
   reason: z.string(),
