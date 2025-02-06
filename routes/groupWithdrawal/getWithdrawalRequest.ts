@@ -10,8 +10,11 @@ const Approval = z.object({
 
 const WithdrawalRequest = z.object({
   withdrawal_id: z.number(),
+  requested_by: z.string(),
+  recipient_name: z.string(),
   amount: z.number(),
   reason: z.string(),
+  requested_at: z.string(),
   approvals: z.array(Approval)
 });
 
