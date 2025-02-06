@@ -1,4 +1,4 @@
-=CREATE OR REPLACE FUNCTION initiate_grp_withdrawal(
+CREATE OR REPLACE FUNCTION initiate_grp_withdrawal(
   p_group_id             INT,
   p_pocket_id            INT,
   p_initiator_id         INT,
@@ -51,7 +51,7 @@ BEGIN
     p_pocket_id,
     p_amount,
     p_reason
-  FROM group_withdrawal_requests
+  FROM debit_requests
   WHERE group_id = p_group_id
   RETURNING xid INTO STRICT v_withdrawal_id;
 
