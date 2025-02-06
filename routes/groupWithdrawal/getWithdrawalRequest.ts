@@ -39,13 +39,13 @@ const getGroupWithdrawals = (router: Router) => {
     },
     request: {
       query: z.object({
-        group_id: z.number()
+        group_id: z.string()
       })
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {
      const withdrawals = await SQL_INITIATE_GRP_WITHDRAWAL({
-        group_id: req.query.group_id,
+        group_id: Number(req.query.group_id),
         user_id: req.user!.id
       }).many();
       res.json(withdrawals);
