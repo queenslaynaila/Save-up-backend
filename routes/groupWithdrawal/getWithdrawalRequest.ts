@@ -18,7 +18,8 @@ const WithdrawalRequest = z.object({
   amount: z.number(),
   reason: z.string(),
   requested_at: z.string(),
-  approvals: z.array(Approval)
+  status: z.string(),
+  reviews: z.array(Approval)
 });
 
 export type WithdrawalRequestType = z.infer<typeof WithdrawalRequest>;

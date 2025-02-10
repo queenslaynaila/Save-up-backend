@@ -8,7 +8,8 @@ RETURNS TABLE(
     requested_by         TEXT,
     amount               NUMERIC(30, 2),
     reason               TEXT, 
-    approvals            JSON, -- admin name, approval status, and reason for approval
+    status               enum_approval_status,
+    reviews              JSON,  
     recipient_name       TEXT, 
     requested_at         TIMESTAMP WITH TIME ZONE 
 ) AS $$
@@ -21,6 +22,7 @@ BEGIN
         initiator_contact_details.full_name AS requested_by,
         debit_requests.amount, 
         debit_requests.reason,
+        debit_requests.status, -- Include status from debit_requests
         (
             SELECT json_agg(json_build_object(
                 'full_name', admin_contact_details.full_name,
@@ -31,7 +33,7 @@ BEGIN
             JOIN user_contact_details AS admin_contact_details ON debit_approvals.admin_id = admin_contact_details.id
             WHERE debit_approvals.group_id = debit_requests.group_id
             AND debit_approvals.request_id = debit_requests.xid
-        ) AS approvals,
+        ) AS reviews,
         recipient_contact_details.full_name AS recipient_name,
         debit_requests.created_at AS requested_at
     FROM debit_requests
