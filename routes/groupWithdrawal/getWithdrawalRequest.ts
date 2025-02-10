@@ -19,7 +19,7 @@ const WithdrawalRequest = z.object({
   reason: z.string(),
   requested_at: z.string(),
   status: z.string(),
-  reviews: z.array(Approval)
+  reviews: z.array(Approval).nullable()
 });
 
 export type WithdrawalRequestType = z.infer<typeof WithdrawalRequest>;
@@ -48,7 +48,7 @@ const getGroupWithdrawals = (router: Router) => {
         pocket_id: z.string()
       })
     },
-    authMiddlewareOptions: {},
+    authMiddlewareOptions: {}, 
     handler: async (req, res) => {
      const withdrawals = await SQL_INITIATE_GRP_WITHDRAWAL({
         group_id: Number(req.query.group_id),
