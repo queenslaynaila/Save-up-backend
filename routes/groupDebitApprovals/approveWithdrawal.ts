@@ -1,11 +1,10 @@
 import Router from '../../router';
 import { sql } from '../../db';
-
 import { approveValidation, ApproveWithdrawal } from './types';
 
 const SQL_APPROVE_GRP_WITHDRAWAL = sql<ApproveWithdrawal, Record<string, never>>(`
     SELECT approve_debit (
-       :group_id, :withdrawal_id, :admin_id,  :status, :reason
+       :group_id, :request_id, :admin_id,  :status, :reason
     )
 `);
 
