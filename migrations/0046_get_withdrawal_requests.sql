@@ -22,9 +22,10 @@ BEGIN
         initiator_contact_details.full_name AS requested_by,
         debit_requests.amount, 
         debit_requests.reason,
-        debit_requests.status, -- Include status from debit_requests
+        debit_requests.status,
         (
             SELECT json_agg(json_build_object(
+                'user_id', debit_approvals.admin_id,
                 'full_name', admin_contact_details.full_name,
                 'status', debit_approvals.status,
                 'reason', debit_approvals.reason
@@ -42,7 +43,7 @@ BEGIN
     JOIN user_contact_details AS recipient_contact_details ON debit_recipients.recipient_id = recipient_contact_details.id
     WHERE debit_requests.group_id = p_group_id
     AND debit_requests.pocket_id = p_pocket_id
-    AND debit_requests.type_id = 2; -- Ensure we are only fetching withdrawal requests
+    AND debit_requests.type_id = 2; 
 END;
 $$ LANGUAGE plpgsql;
 
