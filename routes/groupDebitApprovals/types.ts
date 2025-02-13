@@ -4,7 +4,7 @@ const approveWithdrawalSchema = z.object({
   group_id: z.number().min(1),
   admin_id: z.number(),
   request_id: z.number(),
-  status: z.enum(['Reject', 'Approved', 'Pending']),
+  status: z.enum(['Rejected', 'Approved', 'Pending']),
   reason: z.string()
 });
 
