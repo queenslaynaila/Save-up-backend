@@ -68,7 +68,7 @@ const getTransactions = (router: Router) => {
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {
-      const group_id = req.query.group_id ? Number(req.query.group_id) : undefined;
+      const group_id = req.query.group_id ? Number(req.query.group_id) : null;
       const entity_id = group_id || req.user!.id;
       const { slug, pocket_id, from, to, limit = '10' } = req.query;
 
@@ -115,7 +115,7 @@ const getTransactions = (router: Router) => {
 
       const query = SQL_GET_TRANSACTIONS({ 
         entity_id, 
-        group_id: group_id ? group_id : null
+        group_id
       });
 
       if (filters.length > 0) {
