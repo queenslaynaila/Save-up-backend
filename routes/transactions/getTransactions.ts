@@ -34,9 +34,9 @@ const SQL_GET_TRANSACTIONS = sql<{entity_id: number, group_id?: number}, Transac
            JOIN user_contact_details ON disbursements.user_id = user_contact_details.id
            WHERE disbursements.group_id = transactions.entity_id 
            AND disbursements.transaction_id = transactions.xid)
-        )
+        )::TEXT
       ELSE 
-        NULL 
+        NULL::TEXT
     END AS member_name,
     transactions.created_at
   FROM 
@@ -118,7 +118,7 @@ const getTransactions = (router: Router) => {
       if (filters.length > 0) {
         query.extend(`AND ${filters.join(' AND ')}`, filterArgs);
       }
-      
+
       query.extend('ORDER BY transactions.created_at DESC LIMIT :limit', filterArgs);
 
       logger.info(`full query is ${JSON.stringify(query)}`);
