@@ -22,7 +22,7 @@ const SQL_GET_TRANSACTIONS = sql<{entity_id: number, group_id: number|null}, Tra
     transactions.delta,
     transactions.balance,
     CASE 
-      WHEN CAST(:group_id AS INTEGER) IS NOT NULL
+      WHEN CAST(:group_id AS INTEGER) IS NOT NULL THEN 
         COALESCE(
           (SELECT user_contact_details.full_name 
            FROM group_deposits 
