@@ -52,7 +52,7 @@ const getInvites = (router: Router) => {
   router.route({
     method: 'get',
     path: '/',
-    summary: 'Get pending group invitations for logged-in user',
+    summary: 'Get pending group invitations for logged-in user or pending sent invites for grp',
     request:{
       query: z.object({
         group_id: z.string().optional()
@@ -60,7 +60,7 @@ const getInvites = (router: Router) => {
     },
     response: {
       200: {
-        schema: z.union([pendingInvitations.array(), sentInvitations.array()])
+        schema: z.union([ sentInvitations.array(), pendingInvitations.array(),])
       }
     },
     authMiddlewareOptions: {},
