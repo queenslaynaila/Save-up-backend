@@ -36,7 +36,7 @@ const createInvite = (router: Router) => {
       }).one();
 
       const inviteLink = 'https://save-up-seven.vercel.app/notifications';
-      const signupLink = 'https://save-up-seven.vercel.app/sign-up/';
+      const signupLink = `https://save-up-seven.vercel.app/sign-up?phone=${encodeURIComponent(req.body.phone_number)}`;
       const message = is_member
         ? `${sender_name} invited you to join a group ${group_name} on SaveUP. View your invite here: ${inviteLink}`
         : `${sender_name} invited you to join a group ${group_name} on SaveUP. Sign up here: ${signupLink} to join the group`;
