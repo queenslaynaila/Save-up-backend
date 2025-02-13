@@ -3,7 +3,6 @@ import { sql } from '../../db';
 import Router from '../../router';
 import logger from '../../logger';
 import { transactionSchema, transactionTypeSchema } from '../pockets/schema';
-import { group } from 'console';
 
 const transaction = transactionSchema.pick({
   xid: true,
@@ -16,24 +15,36 @@ const transaction = transactionSchema.pick({
 });
 type Transaction = z.infer<typeof transaction>;
 
-const SQL_GET_TRANSACTIONS = sql<{group_id?:number}, Transaction>(`
-    SELECT 
-      transactions.xid, 
-      transaction_types.slug,
-      transactions.delta,
-      transactions.balance,
-      CASE 
-        WHEN :group_id IS NOT NULL THEN 
-          COALESCE(deposit_user.full_name, disbursement_user.full_name) 
-        ELSE 
-          NULL 
-        END AS member_name,
-      transactions.created_at
-    FROM 
-      transactions
-    JOIN 
-      transaction_types ON transactions.type_id = transaction_types.id
-  `);
+const SQL_GET_TRANSACTIONS = sql<{entity_id: number, group_id?: number}, Transaction>(`
+  SELECT 
+    transactions.xid, 
+    transaction_types.slug,
+    transactions.delta,
+    transactions.balance,
+    CASE 
+      WHEN :group_id IS NOT NULL THEN 
+        COALESCE(
+          (SELECT user_contact_details.full_name 
+           FROM group_deposits 
+           JOIN user_contact_details ON group_deposits.user_id = user_contact_details.id
+           WHERE group_deposits.group_id = transactions.entity_id 
+           AND group_deposits.deposit_id = transactions.xid),
+          (SELECT user_contact_details.full_name 
+           FROM disbursements 
+           JOIN user_contact_details ON disbursements.user_id = user_contact_details.id
+           WHERE disbursements.group_id = transactions.entity_id 
+           AND disbursements.transaction_id = transactions.xid)
+        )
+      ELSE 
+        NULL 
+    END AS member_name,
+    transactions.created_at
+  FROM 
+    transactions
+  JOIN 
+    transaction_types ON transactions.type_id = transaction_types.id
+  WHERE transactions.entity_id = :entity_id
+`);
 
 const getTransactions = (router: Router) => {
   router.route({
@@ -62,12 +73,19 @@ const getTransactions = (router: Router) => {
       const { slug, pocket_id, from, to, limit = '10' } = req.query;
 
       const filters: string[] = [];
-      const filterArgs: Record<string, string | number> = { entity_id, limit: Number(limit) };
+      const filterArgs: Record<string, string | number> = { 
+        entity_id, 
+        limit: Number(limit)
+      };
+
+      if (group_id) {
+        filterArgs.group_id = group_id;
+      }
 
       logger.info(`pocket is ${pocket_id}`);
 
       if (pocket_id) {
-        filterArgs.pocket_id = pocket_id;
+        filterArgs.pocket_id = Number(pocket_id);
         filters.push('transactions.pocket_id = :pocket_id');
       }
 
@@ -94,29 +112,13 @@ const getTransactions = (router: Router) => {
         }
       }
 
-      logger.info(`from and to is ${from} and to is ${to}`);
 
-      const query = SQL_GET_TRANSACTIONS({group_id});
-
-      if (group_id) {
-        query.extend('LEFT JOIN ' +
-          'group_deposits ON transactions.entity_id = group_deposits.group_id ' +
-            'AND transactions.xid = group_deposits.deposit_id ' +
-          'LEFT JOIN ' +
-            'user_contact_details AS deposit_user ON group_deposits.user_id = deposit_user.id ' +
-          'LEFT JOIN ' +
-            'disbursements ON transactions.entity_id = disbursements.group_id ' +
-            'AND transactions.xid = disbursements.transaction_id ' +
-          'LEFT JOIN ' +
-            'user_contact_details AS disbursement_user ON disbursements.user_id = disbursement_user.id'
-        , {});
-      }
-
-      query.extend('WHERE transactions.entity_id = :entity_id', {entity_id});
+      const query = SQL_GET_TRANSACTIONS({ entity_id, group_id });
 
       if (filters.length > 0) {
         query.extend(`AND ${filters.join(' AND ')}`, filterArgs);
       }
+      
       query.extend('ORDER BY transactions.created_at DESC LIMIT :limit', filterArgs);
 
       logger.info(`full query is ${JSON.stringify(query)}`);
