@@ -15,7 +15,7 @@ const transaction = transactionSchema.pick({
 });
 type Transaction = z.infer<typeof transaction>;
 
-const SQL_GET_TRANSACTIONS = sql<{entity_id: number, group_id?: number}, Transaction>(`
+const SQL_GET_TRANSACTIONS = sql<{entity_id: number, group_id: number|null}, Transaction>(`
   SELECT 
     transactions.xid, 
     transaction_types.slug,
@@ -34,9 +34,9 @@ const SQL_GET_TRANSACTIONS = sql<{entity_id: number, group_id?: number}, Transac
            JOIN user_contact_details ON disbursements.user_id = user_contact_details.id
            WHERE disbursements.group_id = transactions.entity_id 
            AND disbursements.transaction_id = transactions.xid)
-        )::TEXT
+        )
       ELSE 
-        NULL::TEXT
+        NULL
     END AS member_name,
     transactions.created_at
   FROM 
@@ -113,7 +113,10 @@ const getTransactions = (router: Router) => {
       }
 
 
-      const query = SQL_GET_TRANSACTIONS({ entity_id, group_id });
+      const query = SQL_GET_TRANSACTIONS({ 
+        entity_id, 
+        group_id: group_id ? group_id : null
+      });
 
       if (filters.length > 0) {
         query.extend(`AND ${filters.join(' AND ')}`, filterArgs);
@@ -124,6 +127,7 @@ const getTransactions = (router: Router) => {
       logger.info(`full query is ${JSON.stringify(query)}`);
 
       const transactions = await query.many();
+      logger.info(`transactions are ${JSON.stringify(transactions)}`);
       res.json(transactions);
     }
   });
