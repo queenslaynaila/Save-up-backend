@@ -1,20 +1,13 @@
 import Router from '../../router';
 import { sql } from '../../db';
-import HttpError from '../../httpError';
 import { z } from 'zod';
-
-const SQL_CHECK_USER_EXISTENCE = sql<{ phone_number: string }, { exists: boolean }>(`
-  SELECT EXISTS (
-    SELECT 1 FROM user_contact_details 
-    WHERE phone_number = :phone_number
-  ) AS exists
-`);
+import sendSms from '../../services/sms';
 
 const SQL_SEND_INVITATION = sql<{
   group_id: number;
   sender_id: number;
   phone_number: string;
-}, Record<string, never>>(`
+}, { is_member: boolean; sender_name: string, group_name:string }>(`
   SELECT send_invite(:group_id, :phone_number, :sender_id)
 `);
 
@@ -22,7 +15,8 @@ const createInvite = (router: Router) => {
   router.route({
     method: 'post',
     path: '/',
-    summary: 'Send a group invitation to an existing user via phone number',
+    summary: 'Send a group invitation via phone number',
+    description: 'Allows a user to send an invitation to a member or non members. The invitees will receive an SMS with a link to join the group.For non-members, the SMS will include a link to sign up for SaveUP and once theyve signed up theyll find the invite in their notifications.',
     request: {
       body: z.object({
         group_id: z.number().min(1),
@@ -35,23 +29,19 @@ const createInvite = (router: Router) => {
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {
-      const { exists } = await SQL_CHECK_USER_EXISTENCE({
-        phone_number: req.body.phone_number
-      }).one();
-
-      if (!exists) {
-        throw new HttpError(400, { message: 'User does not exist' });
-      }
-
-      await SQL_SEND_INVITATION({
+      const { is_member, sender_name, group_name } = await SQL_SEND_INVITATION({
         group_id: req.body.group_id,
         phone_number: req.body.phone_number,
         sender_id: req.user!.id
-      }).exec().catch((err)=>{
-        if (err.code === '23503') {
-          throw new HttpError(400, { message: 'Group does not exist' });
-        }
-      });
+      }).one();
+
+      const inviteLink = 'https://save-up-seven.vercel.app/notifications';
+      const signupLink = 'https://save-up-seven.vercel.app/sign-up/';
+      const message = is_member
+        ? `${sender_name} invited you to join a group ${group_name} on SaveUP. View your invite here: ${inviteLink}`
+        : `${sender_name} invited you to join a group ${group_name} on SaveUP. Sign up here: ${signupLink} to join the group`;
+      sendSms(req.body.phone_number, message);
+
       res.sendStatus(204);
     }
   });
