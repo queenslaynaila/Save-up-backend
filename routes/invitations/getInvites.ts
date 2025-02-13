@@ -12,7 +12,15 @@ const pendingInvitations = invitationSchema.pick({
   sender_name: z.string()
 });
 
+const sentInvitations = z.object({
+  xid: z.number(),
+  sender_id: z.number(),
+  sender_name: z.string(),
+  sent_to: z.string() 
+});
+
 type Invitations = z.infer<typeof pendingInvitations>;
+type SentInvitations = z.infer<typeof sentInvitations>;
 
 const SQL_GET_PENDING_INVITATIONS = sql<{receiver_id:number}, Invitations>(`
   SELECT 
@@ -28,22 +36,48 @@ const SQL_GET_PENDING_INVITATIONS = sql<{receiver_id:number}, Invitations>(`
   AND invitations.status = 'Pending'
 `);
 
+const SQL_GET_SENT_PENDING_INVITATIONS= sql<{group_id:number}, SentInvitations>(`
+  SELECT 
+    invitations.xid,
+    invitations.sender_id,
+    user_contact_details.full_name AS sender_name,
+    invitations.phone_number AS sent_to
+  FROM invitations
+  JOIN user_contact_details ON invitations.sender_id = user_contact_details.id
+  WHERE invitations.group_id = :group_id
+  AND invitations.status = 'Pending';
+`);
+
 const getInvites = (router: Router) => {
   router.route({
     method: 'get',
     path: '/',
     summary: 'Get pending group invitations for logged-in user',
+    request:{
+      query: z.object({
+        group_id: z.string().optional()
+      })
+    },
     response: {
       200: {
-        schema: pendingInvitations.array()
+        schema: z.union([pendingInvitations.array(), sentInvitations.array()])
       }
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {
-      const invitations = await SQL_GET_PENDING_INVITATIONS({
+      const group_id  = Number(req.query.group_id) ?? undefined;
+
+      if ( group_id) {
+        const sentInvites = await SQL_GET_SENT_PENDING_INVITATIONS({
+          group_id: Number(group_id)
+        }).many();
+        return res.json(sentInvites);
+      }
+
+      const receivedInvites = await SQL_GET_PENDING_INVITATIONS({
         receiver_id: req.user!.id
       }).many();
-      res.json(invitations);
+      return res.json(receivedInvites);
     }
   });
 };
