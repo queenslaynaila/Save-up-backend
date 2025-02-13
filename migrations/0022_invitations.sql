@@ -2,7 +2,8 @@ CREATE TYPE enum_invite AS ENUM ('Pending', 'Accept', 'Decline');
 
 CREATE TABLE IF NOT EXISTS invitations (   
   group_id        INT NOT NULL,  
-  receiver_id     INT NOT NULL,
+  receiver_id     INT,
+  phone_number    TEXT,
   sender_id       INT NOT NULL,
   xid             INT NOT NULL,     
   status          enum_invite NOT NULL DEFAULT 'Pending',
@@ -16,8 +17,8 @@ CREATE TABLE IF NOT EXISTS invitations (
 SELECT create_distributed_table('invitations', 'group_id');
 
 -- If a user already has pending invitation for grp no need to send another one
-CREATE UNIQUE INDEX invitations_group_id_receiver_id_key 
-ON invitations(group_id, receiver_id) 
+CREATE UNIQUE INDEX invitations_group_id_receiver_id_phone_key 
+ON invitations(group_id, COALESCE(receiver_id::TEXT, phone_number)) 
 WHERE deleted_at IS NULL;
 
 GRANT INSERT, SELECT, UPDATE ON invitations TO app_user;
