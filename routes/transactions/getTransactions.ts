@@ -22,7 +22,7 @@ const SQL_GET_TRANSACTIONS = sql<{entity_id: number, group_id: number|null}, Tra
     transactions.delta,
     transactions.balance,
     CASE 
-      WHEN :group_id IS NOT NULL THEN 
+      WHEN CAST(:group_id AS INTEGER) IS NOT NULL
         COALESCE(
           (SELECT user_contact_details.full_name 
            FROM group_deposits 
@@ -34,9 +34,9 @@ const SQL_GET_TRANSACTIONS = sql<{entity_id: number, group_id: number|null}, Tra
            JOIN user_contact_details ON disbursements.user_id = user_contact_details.id
            WHERE disbursements.group_id = transactions.entity_id 
            AND disbursements.transaction_id = transactions.xid)
-        )
+        )::TEXT
       ELSE 
-        NULL
+        NULL::TEXT
     END AS member_name,
     transactions.created_at
   FROM 
