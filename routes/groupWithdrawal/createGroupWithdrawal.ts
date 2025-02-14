@@ -1,6 +1,7 @@
 import Router from '../../router';
 import { sql } from '../../db';
 import { WithdrawalRequest, withdrawalValidation } from './types';
+import HttpError from '../../httpError';
 
 const SQL_INITIATE_GRP_WITHDRAWAL = sql<WithdrawalRequest, Record<string, never>>(`
   SELECT initiate_grp_withdrawal(
@@ -24,7 +25,16 @@ const createGroupWithdrawal = (router: Router) => {
       await SQL_INITIATE_GRP_WITHDRAWAL({
         ...req.body,
         initiator_id: req.user!.id
-      }).exec();
+      }).exec().catch((err) => {
+        if(err.code === 'P0001') {
+          throw new HttpError(400, { message: 'ERR_NOT_ADMIN' });
+        }
+        if (err.code === 'P0004') {
+          throw new HttpError(400, { message: 'ERR_INSUFFICIENT_FUNDS' });
+        }
+        if (err.code === 'P0005') {
+          throw new HttpError(400, { message: 'ERR_FUNDS_LOCKED' });
+        }});
       res.sendStatus(201);
     }
   });
