@@ -25,8 +25,7 @@ const SQL_FETCH_USER_GROUPS = sql<{ user_id: number; other_user_id?: number|null
   WHERE group_members.user_id = :user_id
     AND group_members.is_active = TRUE
     AND groups.deleted_at IS NULL
-    -- If other_user_id is provided, filter to only common groups
-    AND (:other_user_id IS NULL 
+    AND (:other_user_id::INT IS NULL 
       OR EXISTS (
           SELECT 1 FROM group_members 
           WHERE group_members.group_id = groups.id 
