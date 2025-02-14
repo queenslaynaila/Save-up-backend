@@ -16,7 +16,8 @@ const sentInvitations = z.object({
   xid: z.number(),
   sender_id: z.number(),
   sender_name: z.string(),
-  sent_to: z.string() 
+  sent_to: z.string(),
+  receiver_id: z.number().nullable() 
 });
 
 type Invitations = z.infer<typeof pendingInvitations>;
@@ -41,7 +42,8 @@ const SQL_GET_SENT_PENDING_INVITATIONS= sql<{group_id:number}, SentInvitations>(
     invitations.xid,
     invitations.sender_id,
     user_contact_details.full_name AS sender_name,
-    invitations.phone_number AS sent_to
+    invitations.phone_number AS sent_to,
+    invitations.receiver_id
   FROM invitations
   JOIN user_contact_details ON invitations.sender_id = user_contact_details.id
   WHERE invitations.group_id = :group_id
