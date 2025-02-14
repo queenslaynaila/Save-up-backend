@@ -11,7 +11,9 @@ const transaction = transactionSchema.pick({
   created_at: true
 }).extend({
   slug: transactionTypeSchema.shape.slug,
-  member_name: z.string().optional().nullable()
+  member_name: z.string().optional().nullable(),
+  destination_pocket_name: z.string().optional().nullable(),
+  source_pocket_name: z.string().optional().nullable()
 });
 type Transaction = z.infer<typeof transaction>;
 
@@ -38,6 +40,20 @@ const SQL_GET_TRANSACTIONS = sql<{entity_id: number, group_id: number|null}, Tra
       ELSE 
         NULL::TEXT
     END AS member_name,
+    CASE 
+      WHEN transaction_types.slug = 'TransferOut' THEN 
+        (SELECT pockets.name FROM pockets WHERE pockets.entity_id = transactions.entity_id 
+        AND pockets.xid = transactions.pocket_id)
+      ELSE 
+        NULL
+    END AS destination_pocket_name,
+     CASE 
+      WHEN transaction_types.slug = 'TransferIn' THEN 
+        (SELECT pockets.name FROM pockets WHERE pockets.entity_id = transactions.entity_id 
+        AND pockets.xid = transactions.pocket_id)
+      ELSE 
+        NULL
+    END AS source_pocket_name,
     transactions.created_at
   FROM 
     transactions
