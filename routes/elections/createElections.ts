@@ -15,7 +15,7 @@ const createElections = (router: Router) => {
     summary: 'Create a new election',
     request: {
       body: electionValidation.extend({
-        nomination_ends_at: z.string().datetime(),
+        nomination_ends_at: z.string().datetime().optional(),
       })
     },
     response: {
