@@ -58,29 +58,32 @@ const SQL_GET_TRANSACTIONS = sql<{entity_id: number, group_id: number|null}, Tra
       ELSE NULL::TEXT
     END AS member_name,
 
-    CASE 
-      WHEN transaction_types.slug = 'TransferOut' THEN 
-        (SELECT pockets.name 
-         FROM pockets 
-         WHERE pockets.entity_id = transactions.entity_id 
-           AND pockets.xid = transactions.pocket_id)
-      ELSE NULL
-    END AS source_pocket_name,
+    (SELECT pockets.name 
+      FROM transactions source_transactions
+      JOIN transaction_types source_transaction_types 
+        ON source_transactions.type_id = source_transaction_types.id
+      JOIN pockets 
+        ON source_transactions.pocket_id = pockets.xid 
+        AND pockets.entity_id = source_transactions.entity_id
+      WHERE source_transactions.reference_id = transactions.reference_id 
+        AND source_transaction_types.slug = 'TransferOut'
+        AND source_transactions.entity_id = transactions.entity_id) AS source_pocket_name,
 
-    CASE 
-      WHEN transaction_types.slug = 'TransferIn' THEN 
-        (SELECT pockets.name 
-         FROM pockets 
-         WHERE pockets.entity_id = transactions.entity_id 
-           AND pockets.xid = transactions.pocket_id)
-      ELSE NULL
-    END AS destination_pocket_name,
-
-    transactions.created_at
+    (SELECT pockets.name 
+    FROM transactions destination_transactions
+    JOIN transaction_types destination_transaction_types 
+      ON destination_transactions.type_id = destination_transaction_types.id
+    JOIN pockets 
+      ON destination_transactions.pocket_id = pockets.xid 
+      AND pockets.entity_id = destination_transactions.entity_id
+    WHERE destination_transactions.reference_id = transactions.reference_id 
+      AND destination_transaction_types.slug = 'TransferIn'
+      AND destination_transactions.entity_id = transactions.entity_id) AS destination_pocket_name,
+  transactions.created_at
   FROM transactions
   JOIN transaction_types 
     ON transactions.type_id = transaction_types.id
-  WHERE transactions.entity_id = :entity_id
+    WHERE transactions.entity_id = :entity_id
 `);
 
 const getTransactions = (router: Router) => {
