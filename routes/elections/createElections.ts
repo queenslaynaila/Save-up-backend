@@ -4,7 +4,8 @@ import { ElectionInterface, electionValidation } from './types';
 import { z } from 'zod';
 import HttpError from '../../httpError';
 
-const SQL_CALL_ELECTION = sql<ElectionInterface, Record<string, never>>(`
+const SQL_CALL_ELECTION = sql<
+ElectionInterface & {nomination_ends_at?:string}, Record<string, never>>(`
   SELECT create_election(:group_id, :initiator_id, :type, :nomination_ends_at)
 `);
 
@@ -23,8 +24,12 @@ const createElections = (router: Router) => {
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {
+      const { type, group_id} = req.body;
       await SQL_CALL_ELECTION({
-        ...req.body,
+        type,
+        group_id,
+        nomination_ends_at: req.body.nomination_ends_at 
+                  ?? new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
         initiator_id: req.user!.id
       }).exec().catch(err => {
         if (err.code === 'P0001') {

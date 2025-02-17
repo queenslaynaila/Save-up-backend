@@ -1,8 +1,8 @@
 CREATE OR REPLACE FUNCTION create_election(
-    p_group_id        INT,
-    p_initiator_id    INT,
-    p_type            enum_election_type,
-    p_nomination_ends_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() + INTERVAL '7 days'
+    p_group_id          INT,
+    p_initiator_id       INT,
+    p_type               enum_election_type,
+    p_nomination_ends_at  TIMESTAMP WITH TIME ZONE DEFAULT NOW() + INTERVAL '7 days'
 )
 RETURNS VOID AS $$
 BEGIN
@@ -31,8 +31,6 @@ BEGIN
         p_nomination_ends_at
     FROM elections
     WHERE group_id = p_group_id;
-
-    RETURN;
 END;
 $$ LANGUAGE plpgsql;
 GRANT EXECUTE ON FUNCTION create_election(INT, INT, enum_election_type, TIMESTAMP WITH TIME ZONE) TO app_user;
