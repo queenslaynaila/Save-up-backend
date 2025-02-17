@@ -7,7 +7,7 @@ const updateElectionSchema = z.object({
   group_id: z.number(),
   user_id: z.number(),
   election_id: z.number(),
-  status: z.enum(['Open', 'Canceled']).optional(),
+  status: z.enum(['Open', 'Cancelled']).optional(),
   nomination_ends_at: z.string().datetime().optional()
 });
 
@@ -47,7 +47,7 @@ const updateElections = (router: Router) => {
       }),
       body: z.object({
         group_id: z.number(),
-        status: z.enum(['Open', 'Canceled']).optional(),
+        status: z.enum(['Open', 'Cancelled']).optional(),
         nomination_ends_at: z.string().datetime().optional()
       })
     },
