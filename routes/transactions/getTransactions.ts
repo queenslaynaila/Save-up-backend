@@ -26,7 +26,6 @@ const SQL_GET_TRANSACTIONS = sql<{entity_id: number, group_id: number|null}, Tra
     CASE 
         WHEN :group_id IS NOT NULL THEN 
             COALESCE(
-                -- Get member name for deposits
                 (SELECT user_contact_details.full_name 
                  FROM group_deposits 
                  JOIN user_contact_details 
@@ -34,7 +33,6 @@ const SQL_GET_TRANSACTIONS = sql<{entity_id: number, group_id: number|null}, Tra
                  WHERE group_deposits.group_id = transactions.entity_id 
                    AND group_deposits.deposit_id = transactions.xid),
                 
-                -- Get member name for disbursements
                 (SELECT user_contact_details.full_name 
                  FROM disbursements 
                  JOIN user_contact_details 
@@ -42,7 +40,6 @@ const SQL_GET_TRANSACTIONS = sql<{entity_id: number, group_id: number|null}, Tra
                  WHERE disbursements.group_id = transactions.entity_id 
                      AND disbursements.transaction_id = transactions.xid),
                 
-                -- Get member name for transfers
                 (SELECT user_contact_details.full_name 
                  FROM group_transfers 
                  JOIN user_contact_details 
@@ -72,7 +69,7 @@ const SQL_GET_TRANSACTIONS = sql<{entity_id: number, group_id: number|null}, Tra
   FROM transactions
   JOIN transaction_types 
     ON transactions.type_id = transaction_types.id
-  WHERE transactions.entity_id = :entity_id;
+  WHERE transactions.entity_id = :entity_id
 `);
 
 const getTransactions = (router: Router) => {
