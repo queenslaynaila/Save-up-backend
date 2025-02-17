@@ -23,9 +23,9 @@ const SQL_GET_TRANSACTIONS = sql<{entity_id: number, group_id: number|null}, Tra
     transaction_types.slug,
     transactions.delta,
     transactions.balance,
-    CASE 
-        WHEN :group_id IS NOT NULL THEN 
-            COALESCE(
+    CASE
+      WHEN CAST(:group_id AS INTEGER) IS NOT NULL THEN
+        COALESCE(
                 (SELECT user_contact_details.full_name 
                  FROM group_deposits 
                  JOIN user_contact_details 
@@ -99,8 +99,8 @@ const getTransactions = (router: Router) => {
       const { slug, pocket_id, from, to, limit = '10' } = req.query;
 
       const filters: string[] = [];
-      const filterArgs: Record<string, string | number> = { 
-        entity_id, 
+      const filterArgs: Record<string, string | number> = {
+        entity_id,
         limit: Number(limit)
       };
 
@@ -139,8 +139,8 @@ const getTransactions = (router: Router) => {
       }
 
 
-      const query = SQL_GET_TRANSACTIONS({ 
-        entity_id, 
+      const query = SQL_GET_TRANSACTIONS({
+        entity_id,
         group_id
       });
 
