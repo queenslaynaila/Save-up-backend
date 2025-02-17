@@ -8,6 +8,7 @@ RETURNS TABLE (
     type                TEXT,
     initiator_id        INT,
     initiator_name      TEXT,
+    nomination_ends_at  TIMESTAMP WITH TIME ZONE,
     created_at          TIMESTAMP WITH TIME ZONE
 ) AS $$
 BEGIN
@@ -20,12 +21,12 @@ BEGIN
             elections.type,
             elections.initiator_id,
             user_contact_details.full_name AS initiator_name,
+            elections. nomination_ends_at,
             elections.created_at
         FROM elections
             JOIN user_contact_details
                 ON elections.initiator_id = user_contact_details.id
-        WHERE elections.group_id = p_group_id
-          AND elections.status = 'Open';
+        WHERE elections.group_id = p_group_id;
 END;
 $$ LANGUAGE plpgsql;
 

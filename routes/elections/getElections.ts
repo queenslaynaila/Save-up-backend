@@ -6,8 +6,9 @@ import {
   electionBodySchema,
   electionRetrievalSchema
 } from './types';
+import { z } from 'zod';
 
-const SQL_GET_ONGOING_ELECTION = sql< ElectionRequest, ElectionRetrieval>(`
+const SQL_GET_ONGOING_ELECTION = sql< ElectionRequest, ElectionRetrieval & {nomination_ends_at:string}>(`
   SELECT * FROM  get_ongoing_election(:group_id, :user_id)
 `);
 
@@ -21,7 +22,9 @@ const getElections = (router: Router) => {
     },
     response: {
       200: {
-        schema: electionRetrievalSchema
+        schema: electionRetrievalSchema.extend({
+          nomination_ends_at: z.string().datetime()
+        })
       }
     },
     authMiddlewareOptions: {},

@@ -16,10 +16,15 @@ const SQL_GET_CANDIDATES = sql<CandidateReq, CandidateRes>(`
 const getCandidates = (router: Router) => {
   router.route({
     method: 'get',
-    path: '/',
-    summary: 'Get list of candidates',
+    path: '/:election_id/candidates',
+    summary: 'Get list of candidates for an election',
     request: {
-      body: candidateParamSchema
+        params: z.object({
+            election_id: z.string()
+        }),
+      body: z.object({
+        group_id: z.number()
+        })
     },
     response: {
       200: {
@@ -29,7 +34,9 @@ const getCandidates = (router: Router) => {
     authMiddlewareOptions: {},
     handler: async (req, res) => {
       const groups = await SQL_GET_CANDIDATES({
-        ...req.body, user_id: req.user!.id
+        election_id: Number(req.params.election_id),
+        group_id: req.body.group_id, 
+        user_id: req.user!.id
       }).many();
       return res.json(groups);
     }
