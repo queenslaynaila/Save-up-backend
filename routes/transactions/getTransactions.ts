@@ -26,45 +26,56 @@ const SQL_GET_TRANSACTIONS = sql<{entity_id: number, group_id: number|null}, Tra
     CASE
       WHEN CAST(:group_id AS INTEGER) IS NOT NULL THEN
         COALESCE(
-                (SELECT user_contact_details.full_name 
-                 FROM group_deposits 
-                 JOIN user_contact_details 
-                   ON group_deposits.user_id = user_contact_details.id
-                 WHERE group_deposits.group_id = transactions.entity_id 
-                   AND group_deposits.deposit_id = transactions.xid),
-                
-                (SELECT user_contact_details.full_name 
-                 FROM disbursements 
-                 JOIN user_contact_details 
-                   ON disbursements.user_id = user_contact_details.id
-                 WHERE disbursements.group_id = transactions.entity_id 
-                     AND disbursements.transaction_id = transactions.xid),
-                
-                (SELECT user_contact_details.full_name 
-                 FROM group_transfers 
-                 JOIN user_contact_details 
-                   ON group_transfers.admin_id = user_contact_details.id
-                 WHERE group_transfers.group_id = transactions.entity_id 
-                   AND group_transfers.transaction_id = transactions.xid)
-            )::TEXT
-        ELSE NULL::TEXT
+
+          (SELECT user_contact_details.full_name 
+           FROM group_deposits 
+           JOIN user_contact_details 
+             ON group_deposits.user_id = user_contact_details.id
+           WHERE group_deposits.group_id = transactions.entity_id 
+             AND group_deposits.deposit_id = transactions.xid),
+          
+          (SELECT user_contact_details.full_name 
+           FROM disbursements 
+           JOIN user_contact_details 
+             ON disbursements.user_id = user_contact_details.id
+           WHERE disbursements.group_id = transactions.entity_id 
+             AND disbursements.transaction_id = transactions.xid),
+          
+          (SELECT user_contact_details.full_name 
+           FROM group_transfers 
+           JOIN user_contact_details 
+             ON group_transfers.admin_id = user_contact_details.id
+           WHERE group_transfers.group_id = transactions.entity_id 
+             AND group_transfers.source_transaction_id = transactions.xid),
+
+          (SELECT user_contact_details.full_name 
+           FROM group_transfers 
+           JOIN user_contact_details 
+             ON group_transfers.admin_id = user_contact_details.id
+           WHERE group_transfers.group_id = transactions.entity_id 
+             AND group_transfers.destination_transaction_id = transactions.xid)
+        )::TEXT
+      ELSE NULL::TEXT
     END AS member_name,
+
     CASE 
-        WHEN transaction_types.slug = 'TransferOut' THEN 
-            (SELECT pockets.name 
-             FROM pockets 
-             WHERE pockets.entity_id = transactions.entity_id 
-               AND pockets.xid = transactions.pocket_id)
-        ELSE NULL
+      WHEN transaction_types.slug = 'TransferOut' THEN 
+        (SELECT pockets.name 
+         FROM pockets 
+         WHERE pockets.entity_id = transactions.entity_id 
+           AND pockets.xid = transactions.pocket_id)
+      ELSE NULL
     END AS source_pocket_name,
+
     CASE 
-        WHEN transaction_types.slug = 'TransferIn' THEN 
-            (SELECT pockets.name 
-             FROM pockets 
-             WHERE pockets.entity_id = transactions.entity_id 
-               AND pockets.xid = transactions.pocket_id)
-        ELSE NULL
+      WHEN transaction_types.slug = 'TransferIn' THEN 
+        (SELECT pockets.name 
+         FROM pockets 
+         WHERE pockets.entity_id = transactions.entity_id 
+           AND pockets.xid = transactions.pocket_id)
+      ELSE NULL
     END AS destination_pocket_name,
+
     transactions.created_at
   FROM transactions
   JOIN transaction_types 
