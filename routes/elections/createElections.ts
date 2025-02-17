@@ -1,9 +1,11 @@
 import Router from '../../router';
 import { sql } from '../../db';
 import { ElectionInterface, electionValidation } from './types';
+import { z } from 'zod';
+import HttpError from '../../httpError';
 
 const SQL_CALL_ELECTION = sql<ElectionInterface, Record<string, never>>(`
-  SELECT create_election(:group_id, :initiator_id, :type)
+  SELECT create_election(:group_id, :initiator_id, :type, :nomination_ends_at)
 `);
 
 const createElections = (router: Router) => {
@@ -12,7 +14,9 @@ const createElections = (router: Router) => {
     path: '/',
     summary: 'Create a new election',
     request: {
-      body: electionValidation
+      body: electionValidation.extend({
+        nomination_ends_at: z.string().datetime(),
+      })
     },
     response: {
       201: {}
@@ -22,7 +26,15 @@ const createElections = (router: Router) => {
       await SQL_CALL_ELECTION({
         ...req.body,
         initiator_id: req.user!.id
-      }).exec();
+      }).exec().catch(err => {
+        if (err.code === 'P0001') {
+          throw new HttpError(401, { message: 'ERR_NOT_GRP_MBR' });
+        }
+        if (err.code === 'P0004') {
+          throw new HttpError(409, { message: 'ERR_ONGOING_ELECTION_EXISTS' });
+        }
+
+      });
       res.sendStatus(201);
     }
   });
