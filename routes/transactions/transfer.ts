@@ -7,6 +7,7 @@ import bcrypt from 'bcrypt';
 
 const transferPayload = z.object({
   entity_id: z.number().min(1),
+  user_id: z.number().min(1),
   source_pocket_id: z.number().min(1),
   destination_pocket_id: z.number().min(1),
   amount: z.number().min(10)
@@ -18,8 +19,9 @@ const SQL_CREATE_TRANSFER = sql<TransferPayload, Record<string, never>>(`
   SELECT create_transfer(
     :source_pocket_id, 
     :destination_pocket_id, 
-    :entity_id, 
-    :amount
+    :user_id, 
+    :amount,
+    :entity_id
   )
 `);
 
@@ -56,9 +58,16 @@ const createTransfer = (router: Router) => {
       await SQL_CREATE_TRANSFER({
         source_pocket_id,
         destination_pocket_id,
-        entity_id: Number(req.query.group_id) || req.user!.id,
-        amount
+        user_id: req.user!.id,
+        amount,
+        entity_id: Number(req.query.group_id) || req.user!.id
       }).exec().catch((err) => {
+        if (err.code === 'P0004') {
+          throw new HttpError(401, { message: 'ERR_NOT_ADMIN' });
+        }
+        if (err.code === 'P0005') {
+          throw new HttpError(400, { message: 'ERR_FUNDS_LOCKED' });
+        }
         if (err.code === 'P0004') {
           throw new HttpError(400, { message: 'ERR_INSUFFICIENT_FUNDS' });
         }
