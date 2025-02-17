@@ -16,6 +16,7 @@ DECLARE
     v_latest_election_id      INT;
     v_pocket_type             TEXT;
     v_target_at               TIMESTAMP WITH TIME ZONE;
+    v_transaction_id          INT;
 BEGIN
     v_is_group_transfer := p_entity_id <> p_user_id;
 
@@ -57,17 +58,17 @@ BEGIN
     v_new_destination_balance := v_destination_balance + p_amount;
     v_reference_id := floor(random() * 1000000 + 1)::INT;
 
-    PERFORM insert_transaction_log(
-        p_user_id, 6, p_destination_pocket_id, v_reference_id, p_amount, v_new_destination_balance
+    v_transaction_id := insert_transaction_log(
+        p_entity_id, 6, p_destination_pocket_id, v_reference_id, p_amount, v_new_destination_balance
     );
 
     PERFORM insert_transaction_log(
-        p_user_id, 7, p_source_pocket_id, v_reference_id, p_amount, v_new_source_balance
+        p_entity_id, 7, p_source_pocket_id, v_reference_id, p_amount, v_new_source_balance
     );
 
     IF v_is_group_transfer THEN
         INSERT INTO group_transfers (group_id, transaction_id, election_id, admin_id, created_at)
-        VALUES (p_entity_id, v_reference_id, v_latest_election_id, p_user_id, NOW());
+        VALUES (p_entity_id, v_transaction_id, v_latest_election_id, p_user_id, NOW());
     END IF;
 END;
 $$ LANGUAGE plpgsql;
