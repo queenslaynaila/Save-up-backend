@@ -20,7 +20,6 @@ import './routes/transactions/index';
 import './routes/invitations/index';
 import './routes/groups/index';
 import './routes/elections/index';
-import './routes/candidates/index';
 import './routes/ballots/index';
 import './routes/ratifications/index';
 import './routes/groupWithdrawal/index';
@@ -53,10 +52,6 @@ app.use(morgan(morganFormat, { stream: morganStream }));
 app.use((_, res, next) => {
   res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
   next();
-});
-
-app.use('/', (req: Request, res: Response) => {
-  return res.status(200).json({ message: 'Welcome to SaveUp API' });
 });
 
 app.use(() => {
