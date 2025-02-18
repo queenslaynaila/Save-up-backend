@@ -1,4 +1,4 @@
-CREATE TYPE enum_election_type AS ENUM ('Ballot', 'Ratification');
+CREATE TYPE enum_election_type AS ENUM ('Ballot', 'Ratification', 'Default');
 CREATE TYPE enum_election_status AS ENUM ('Open', 'Closed', 'Cancelled');
 
 CREATE TABLE elections (
