@@ -22,8 +22,8 @@ const getCandidates = (router: Router) => {
         params: z.object({
             election_id: z.string()
         }),
-      body: z.object({
-        group_id: z.number()
+      query: z.object({
+        group_id: z.string()
         })
     },
     response: {
@@ -34,8 +34,8 @@ const getCandidates = (router: Router) => {
     authMiddlewareOptions: {},
     handler: async (req, res) => {
       const groups = await SQL_GET_CANDIDATES({
-        election_id: Number(req.params.election_id),
-        group_id: req.body.group_id, 
+        election_id: parseInt(req.params.election_id),
+        group_id: parseInt(req.query.group_id), 
         user_id: req.user!.id
       }).many();
       return res.json(groups);

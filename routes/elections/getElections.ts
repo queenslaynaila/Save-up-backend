@@ -3,7 +3,6 @@ import { sql } from '../../db';
 import {
   ElectionRequest,
   ElectionRetrieval,
-  electionBodySchema,
   electionRetrievalSchema
 } from './types';
 import { z } from 'zod';
@@ -18,7 +17,9 @@ const getElections = (router: Router) => {
     path: '/',
     summary: 'Get list of elections',
     request: {
-      body: electionBodySchema
+      query: z.object({
+        group_id: z.string()
+      })
     },
     response: {
       200: {
@@ -30,7 +31,7 @@ const getElections = (router: Router) => {
     authMiddlewareOptions: {},
     handler: async (req, res) => {
       const election = await SQL_GET_ONGOING_ELECTION({
-        ...req.body,
+        group_id: parseInt(req.query.group_id),
         user_id: req.user!.id
       }).one();
       res.json(election);
