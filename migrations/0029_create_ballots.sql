@@ -9,8 +9,8 @@ DECLARE
   v_ballot_count   INT;
   v_total_members  INT;
   v_total_votes    INT;
+  v_top_candidates RECORD;
 BEGIN
-    -- Ensure election is still open
     IF NOT EXISTS (
         SELECT 1
         FROM elections
@@ -24,7 +24,6 @@ BEGIN
             ERRCODE = 'P0007';
     END IF;
 
-    -- Check if user has exceeded voting limit
     SELECT COUNT(*) INTO STRICT v_ballot_count
     FROM ballots
     WHERE user_id = p_user_id
@@ -55,11 +54,27 @@ BEGIN
         SET status = 'Closed', closed_at = NOW()
         WHERE group_id = p_group_id
           AND xid = p_election_id;
+
+        FOR v_top_candidates IN 
+            SELECT candidate_id
+            FROM ballots
+            JOIN group_members ON ballots.candidate_id = group_members.user_id
+            WHERE ballots.group_id = p_group_id
+              AND ballots.election_id = p_election_id
+              AND group_members.is_active = TRUE
+            GROUP BY candidate_id
+            ORDER BY COUNT(*) DESC
+            LIMIT 3
+        LOOP
+            INSERT INTO group_admins (group_id, election_id, user_id)
+            VALUES (p_group_id, p_election_id, v_top_candidates.candidate_id);
+        END LOOP;
     END IF;
 
     RETURN;
 END;
 $$ LANGUAGE plpgsql;
+
 
 GRANT EXECUTE ON FUNCTION create_ballot(INT, INT, INT, INT) TO app_user;
 SELECT create_distributed_function(
