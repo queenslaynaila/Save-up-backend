@@ -32,6 +32,9 @@ const createCandidates = (router: Router) => {
         candidate_id: req.body.candidate_id,
         user_id: req.user!.id
       }).exec().catch(err=>{
+        if (err.code === '23505') {
+          throw new HttpError(409, { message: 'ERR_CANDIDATE_ALREADY_NOMINATED' });
+        }
         if (err.code === 'P0007') {
           throw new HttpError(401, { message: 'ERR_ELECTION_CLOSED' });
         }

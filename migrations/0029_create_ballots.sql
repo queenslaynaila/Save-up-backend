@@ -27,7 +27,7 @@ BEGIN
         AND group_id = p_group_id
         AND election_id = p_election_id;
   
-   IF v_ballot_count >= 1 THEN
+   IF v_ballot_count >= 3 THEN
       RAISE EXCEPTION USING
          MESSAGE = 'ERR_MAX_VOTE_CAST',
          ERRCODE = 'P0003';

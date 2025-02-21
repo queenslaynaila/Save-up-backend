@@ -44,7 +44,7 @@ BEGIN
     IF nomination_count >= 3  THEN
         RAISE EXCEPTION USING
             MESSAGE = 'ERR_NOMINATION_LIMIT_REACHED',
-            ERRCODE = 'P003';
+            ERRCODE = 'P0003';
     END IF;
 
     INSERT INTO candidates (group_id, election_id, candidate_id, chosen_by)
