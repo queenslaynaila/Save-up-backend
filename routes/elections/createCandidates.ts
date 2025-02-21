@@ -13,7 +13,7 @@ const candidateSchema = z.object({
 type Candidates = z.infer<typeof candidateSchema>;
 
 const SQL_CREATE_CANDIDATE = sql<Candidates, Record<string, never>>(`
-  SELECT create_candidate(:group_id, :election_id, :candidate_ids, :user_id);
+  SELECT create_candidates(:group_id, :election_id, :candidate_ids, :user_id);
 `);
 
 const createCandidates = (router: Router) => {
@@ -53,7 +53,8 @@ const createCandidates = (router: Router) => {
         if (err.code === 'P0003') {
           throw new HttpError(401, { message: 'ERR_NOMINATION_ATTEMPTS_EXHAUSTED' });
         }
-       });;
+        throw err;
+       });
       res.sendStatus(201);
     }
   });
