@@ -6,14 +6,14 @@ import HttpError from '../../httpError';
 const candidateSchema = z.object({
   group_id: z.number().min(1),
   election_id: z.number().min(1),
-  candidate_ids: z.array(z.number()),
+  candidate_ids: z.array(z.number()).min(1).max(3),
   user_id: z.number()
 });
 
 type Candidates = z.infer<typeof candidateSchema>;
 
 const SQL_CREATE_CANDIDATE = sql<Candidates, Record<string, never>>(`
-  SELECT create_candidate(:group_id, :election_id, :candidate_id, :user_id);
+  SELECT create_candidate(:group_id, :election_id, :candidate_ids, :user_id);
 `);
 
 const createCandidates = (router: Router) => {
@@ -26,7 +26,8 @@ const createCandidates = (router: Router) => {
         election_id: z.string(),
       }),
       body: candidateSchema.omit({
-        election_id: true
+        election_id: true,
+        user_id: true
       })
     },
     response: {

@@ -6,10 +6,10 @@ import HttpError from '../../httpError';
 const SQL_CREATE_BALLOT = sql< {
     group_id: number;
     election_id: number;
-    candidate_id: number;
+    candidate_ids: number[];
     user_id: number;
 }, Record<string, never>>(`
-  SELECT create_ballot(:group_id, :election_id, :candidate_id, :user_id)
+  SELECT create_ballot(:group_id, :election_id, :candidate_ids, :user_id)
 `);
 
 const createBallot = (router: Router) => {
@@ -23,7 +23,7 @@ const createBallot = (router: Router) => {
       }),
       body: z.object({
         group_id: z.number(),
-        candidate_id: z.number()
+        candidate_ids: z.array(z.number()).min(1).max(3) 
       })
     },
     response: {
@@ -34,7 +34,7 @@ const createBallot = (router: Router) => {
       await SQL_CREATE_BALLOT({
         election_id: Number(req.params.election_id),
         group_id: req.body.group_id,
-        candidate_id: req.body.candidate_id,
+        candidate_ids: req.body.candidate_ids,
         user_id: req.user!.id
       }).exec().catch(err=>{
         if (err.code === '23505') {
