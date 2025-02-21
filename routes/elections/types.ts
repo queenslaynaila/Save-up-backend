@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-enum ElectionType {
+export enum ElectionType {
   BALLOT = 'Ballot',
   RATIFICATION = 'Ratification'
 }

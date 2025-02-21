@@ -4,7 +4,6 @@ import { sql } from '../../db';
 import {
   CandidateRes,
   CandidateReq,
-  candidateParamSchema,
   candidateResSchema
 } from './types';
 import { z } from 'zod';

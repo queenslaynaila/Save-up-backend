@@ -20,8 +20,6 @@ import './routes/transactions/index';
 import './routes/invitations/index';
 import './routes/groups/index';
 import './routes/elections/index';
-import './routes/ballots/index';
-import './routes/ratifications/index';
 import './routes/groupWithdrawal/index';
 import './routes/groupDeposits/index';
 import './routes/groupDebitApprovals/index';
