@@ -33,6 +33,6 @@ BEGIN
     WHERE group_admins.group_id = p_group_id
       AND group_admins.election_id = p_election_id;
 
-    RETURN COALESCE(v_results, '[]'::JSON);
+    RETURN v_results;
 END;
 $$ LANGUAGE plpgsql;
