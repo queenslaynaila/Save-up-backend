@@ -1,12 +1,13 @@
-CREATE OR REPLACE FUNCTION create_candidate(
+CREATE OR REPLACE FUNCTION create_candidates(
     p_group_id     INT,
     p_election_id  INT,
-    p_candidate_id INT,
+    p_candidate_ids INT[],
     p_user_id      INT
 )
 RETURNS VOID AS $$
 DECLARE
     nomination_count INT;
+    candidate_id INT;
 BEGIN
     PERFORM check_grp_membership(p_group_id, p_user_id);
 
@@ -41,20 +42,18 @@ BEGIN
       AND election_id = p_election_id
       AND chosen_by = p_user_id;
 
-    IF nomination_count >= 3  THEN
+    IF nomination_count + array_length(p_candidate_ids, 1) > 3 THEN
         RAISE EXCEPTION USING
             MESSAGE = 'ERR_NOMINATION_LIMIT_REACHED',
             ERRCODE = 'P0003';
     END IF;
 
-    INSERT INTO candidates (group_id, election_id, candidate_id, chosen_by)
-    VALUES (p_group_id, p_election_id, p_candidate_id, p_user_id);
+    FOREACH candidate_id IN ARRAY p_candidate_ids LOOP
+        INSERT INTO candidates (group_id, election_id, candidate_id, chosen_by)
+        VALUES (p_group_id, p_election_id, candidate_id, p_user_id)
+        ON CONFLICT DO NOTHING;
+    END LOOP;
 
     RETURN;
 END;
 $$ LANGUAGE plpgsql;
-
-GRANT EXECUTE ON FUNCTION create_candidate(INT, INT, INT, INT) TO app_user;
-SELECT create_distributed_function(
-  'create_candidate(INT, INT, INT, INT)', 'p_group_id'
-);

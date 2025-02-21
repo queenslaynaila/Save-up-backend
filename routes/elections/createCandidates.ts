@@ -1,10 +1,18 @@
 import Router from '../../router';
 import { sql } from '../../db';
-import { CandidateInterface, candidateRequestBody } from './types';
 import { z } from 'zod';
 import HttpError from '../../httpError';
 
-const SQL_CREATE_CANDIDATE = sql<CandidateInterface, Record<string, never>>(`
+const candidateSchema = z.object({
+  group_id: z.number().min(1),
+  election_id: z.number().min(1),
+  candidate_ids: z.array(z.number()),
+  user_id: z.number()
+});
+
+type Candidates = z.infer<typeof candidateSchema>;
+
+const SQL_CREATE_CANDIDATE = sql<Candidates, Record<string, never>>(`
   SELECT create_candidate(:group_id, :election_id, :candidate_id, :user_id);
 `);
 
@@ -17,7 +25,7 @@ const createCandidates = (router: Router) => {
       params: z.object ({
         election_id: z.string(),
       }),
-      body: candidateRequestBody.omit({
+      body: candidateSchema.omit({
         election_id: true
       })
     },
@@ -29,7 +37,7 @@ const createCandidates = (router: Router) => {
       await SQL_CREATE_CANDIDATE({
         group_id: Number(req.body.group_id),
         election_id: Number(req.params.election_id),
-        candidate_id: req.body.candidate_id,
+        candidate_ids: req.body.candidate_ids,
         user_id: req.user!.id
       }).exec().catch(err=>{
         if (err.code === '23505') {
