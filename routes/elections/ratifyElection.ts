@@ -1,21 +1,20 @@
 import Router from '../../router';
 import { sql } from '../../db';
-
-import {
-  CandidateRes,
-  CandidateReq,
-  candidateParamSchema,
-  candidateResSchema
-} from './types';
 import { z } from 'zod';
 
-const SQL_GET_ELECTION_RESULTS = sql<CandidateReq, CandidateRes>(`
-  SELECT * FROM get_candidates(:group_id, :election_id, :user_id) 
+const SQL_RATIFY_ELECTION = sql<{
+  group_id: number;
+  election_id: number;
+  user_id: number;
+  is_ratified: boolean;
+}, Record<string,never>>(`
+  INSERT INTO ratifications (group_id, election_id, user_id, is_ratified)
+  VALUES (:group_id, :election_id, :user_id, :is_ratified)
 `);
 
 const ratifyElection = (router: Router) => {
   router.route({
-    method: 'get',
+    method: 'post',
     path: '/:election_id/ratifications',
     summary: 'Ratify an election results',
     request: {
@@ -23,22 +22,22 @@ const ratifyElection = (router: Router) => {
             election_id: z.string()
         }),
       body: z.object({
-        group_id: z.number()
-        })
+        group_id: z.number(),
+        is_ratified: z.boolean()
+      })
     },
     response: {
-      200: {
-        schema: z.array(candidateResSchema)
-      }
+      201: {}
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {
-      const groups = await SQL_GET_ELECTION_RESULTS({
+      await SQL_RATIFY_ELECTION({
         election_id: Number(req.params.election_id),
         group_id: req.body.group_id, 
-        user_id: req.user!.id
-      }).many();
-      return res.json(groups);
+        user_id: req.user!.id,
+        is_ratified: req.body.is_ratified
+      }).exec();
+      return res.sendStatus(201);
     }
   });
 };
