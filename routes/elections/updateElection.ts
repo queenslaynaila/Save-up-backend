@@ -7,32 +7,14 @@ const updateElectionSchema = z.object({
   group_id: z.number(),
   user_id: z.number(),
   election_id: z.number(),
-  status: z.enum(['Open', 'Cancelled']).optional(),
-  nomination_ends_at: z.string().datetime().optional()
+  status: z.enum(['Open', 'Cancelled']).optional().nullable(),
+  nomination_ends_at: z.string().datetime().optional().nullable()
 });
 
 type UpdateElectionParams = z.infer<typeof updateElectionSchema>;
 
 const SQL_UPDATE_ELECTION = sql<UpdateElectionParams, Record<string, never>>(`
-  DO $$
-  BEGIN
-    IF NOT EXISTS (
-      SELECT 1 FROM group_members 
-      WHERE group_id = :group_id 
-        AND user_id = :user_id 
-        AND is_active = TRUE
-    ) THEN RAISE EXCEPTION USING
-            MESSAGE = 'ERR_NOT_GROUP_MEMBER',
-            ERRCODE = 'P0001';
-    END IF;
-
-    UPDATE elections
-    SET status = COALESCE(:status, status),
-        nomination_ends_at = COALESCE(:nomination_ends_at, nomination_ends_at)
-    WHERE group_id = :group_id
-      AND xid = :election_id
-      AND status != 'Closed';
-  END $$;
+  SELECT update_election(:user_id, :group_id, :election_id, :status::enum_election_status, :nomination_ends_at)
 `);
 
 const updateElections = (router: Router) => {
@@ -63,13 +45,14 @@ const updateElections = (router: Router) => {
       await SQL_UPDATE_ELECTION({
         group_id,
         election_id: parseInt(election_id),
-        status,
-        nomination_ends_at,
+        status: status ?? null,
+        nomination_ends_at: nomination_ends_at ?? null,
         user_id: req.user!.id
       }).exec().catch(err => {
           if (err.code === 'P0001') {
             throw new HttpError(401, { message: 'ERR_NOT_GRP_MBR' });
           }
+          throw err;
       });
 
       res.sendStatus(200);
