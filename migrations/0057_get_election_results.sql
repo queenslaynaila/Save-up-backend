@@ -3,12 +3,12 @@ CREATE OR REPLACE FUNCTION get_election_results(
   p_election_id INT, 
   p_user_id     INT
 )
-RETURNS JSON AS $$
-DECLARE
-  v_results JSON;
+RETURNS TABLE (
+  candidate_id INT,
+  full_name TEXT
+) AS $$
 BEGIN
     PERFORM check_grp_membership(p_group_id, p_user_id);
-
     IF NOT EXISTS (
         SELECT 1
         FROM elections
@@ -22,17 +22,11 @@ BEGIN
             ERRCODE = 'P0007';
     END IF;
 
-    SELECT JSON_AGG(
-        JSON_BUILD_OBJECT(
-            'candidate_id', group_admins.user_id,
-            'full_name', user_contact_details.full_name
-        )
-    ) INTO v_results
-    FROM group_admins
-    JOIN user_contact_details ON group_admins.user_id = user_contact_details.id
-    WHERE group_admins.group_id = p_group_id
-      AND group_admins.election_id = p_election_id;
-
-    RETURN v_results;
+    RETURN QUERY
+    SELECT ga.user_id AS candidate_id, ucd.full_name
+    FROM group_admins ga
+    JOIN user_contact_details ucd ON ga.user_id = ucd.id
+    WHERE ga.group_id = p_group_id
+      AND ga.election_id = p_election_id;
 END;
 $$ LANGUAGE plpgsql;
