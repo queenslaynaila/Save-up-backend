@@ -1,16 +1,15 @@
 import Router from '../../router';
 import { sql } from '../../db';
-
 import {
   CandidateRes,
   CandidateReq,
-  candidateParamSchema,
   candidateResSchema
 } from './types';
 import { z } from 'zod';
+import HttpError from '../../httpError';
 
 const SQL_GET_ELECTION_RESULTS = sql<CandidateReq, CandidateRes>(`
-  SELECT * FROM get_candidates(:group_id, :election_id, :user_id) 
+  SELECT * FROM get_election_results(:group_id, :election_id, :user_id) 
 `);
 
 const viewResults = (router: Router) => {
@@ -33,12 +32,17 @@ const viewResults = (router: Router) => {
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {
-      const groups = await SQL_GET_ELECTION_RESULTS({
+      const results = await SQL_GET_ELECTION_RESULTS({
         election_id: Number(req.params.election_id),
         group_id: req.body.group_id, 
         user_id: req.user!.id
-      }).many();
-      return res.json(groups);
+      }).many().catch((err) => {
+         if (err.code === 'P0007') {
+           throw new HttpError (400, { message: 'ERR_ELECTION_ONGOING' });
+          }
+          throw err;
+      });
+      return res.json(results);
     }
   });
 };
