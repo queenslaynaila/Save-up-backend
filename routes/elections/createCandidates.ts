@@ -4,7 +4,7 @@ import { CandidateInterface, candidateRequestBody } from './types';
 import { z } from 'zod';
 
 const SQL_CREATE_CANDIDATE = sql<CandidateInterface, Record<string, never>>(`
-  SELECT create_candidate(:group_id, :election_id, :candidate_id, :chosen_by);
+  SELECT create_candidate(:group_id, :election_id, :candidate_id, :user_id);
 `);
 
 const createCandidates = (router: Router) => {
@@ -16,7 +16,9 @@ const createCandidates = (router: Router) => {
       params: z.object ({
         election_id: z.string(),
       }),
-      body: candidateRequestBody
+      body: candidateRequestBody.omit({
+        election_id: true
+      })
     },
     response: {
       201: {}
@@ -27,7 +29,7 @@ const createCandidates = (router: Router) => {
         group_id: Number(req.body.group_id),
         election_id: Number(req.params.election_id),
         candidate_id: req.body.candidate_id,
-        chosen_by: req.user!.id
+        user_id: req.user!.id
       }).exec();
       res.sendStatus(201);
     }

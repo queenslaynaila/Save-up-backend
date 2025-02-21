@@ -41,13 +41,13 @@ const candidateSchema = z.object({
   group_id: z.number().min(1),
   election_id: z.number().min(1),
   candidate_id: z.number(),
-  chosen_by: z.number()
+  user_id: z.number()
 });
 
 export type CandidateInterface = z.infer<typeof candidateSchema>;
 
 export const candidateRequestBody = candidateSchema.omit({
-  chosen_by: true
+  user_id: true
 });
 
 export const candidateParamSchema = z.object({

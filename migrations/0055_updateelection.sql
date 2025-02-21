@@ -2,24 +2,12 @@ CREATE OR REPLACE FUNCTION create_candidate(
     p_group_id     INT,
     p_election_id  INT,
     p_candidate_id INT,
-    p_chosen_by    INT
+    p_user_id   INT
 )
 RETURNS VOID AS $$
 BEGIN
-    -- Check if chosen_by is an active group member
-    IF NOT EXISTS (
-        SELECT 1
-        FROM group_members
-        WHERE group_id = p_group_id
-          AND user_id = p_chosen_by
-          AND is_active = TRUE
-    ) THEN
-        RAISE EXCEPTION USING
-            MESSAGE = 'ERR_NOT_ACTIVE_GROUP_MEMBER',
-            ERRCODE = 'P0008';
-    END IF;
+    PERFORM check_grp_membership(p_group_id, p_user_id);
 
-    -- Check if the election is open and has not been closed
     IF NOT EXISTS (
         SELECT 1
         FROM elections
@@ -48,7 +36,7 @@ BEGIN
 
     -- Insert the candidate
     INSERT INTO candidates (group_id, election_id, candidate_id, chosen_by)
-    VALUES (p_group_id, p_election_id, p_candidate_id, p_chosen_by);
+    VALUES (p_group_id, p_election_id, p_candidate_id, p_user_id);
 
     RETURN;
 END;
