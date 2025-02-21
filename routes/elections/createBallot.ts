@@ -1,6 +1,7 @@
 import Router from '../../router';
 import { sql } from '../../db';
 import { z } from 'zod';
+import HttpError from '../../httpError';
 
 const SQL_CREATE_BALLOT = sql< {
     group_id: number;
@@ -35,7 +36,14 @@ const createBallot = (router: Router) => {
         group_id: req.body.group_id,
         candidate_id: req.body.candidate_id,
         user_id: req.user!.id
-      }).exec();
+      }).exec().catch(err=>{
+        if (err.code === 'P0007') {
+          throw new HttpError(401, { message: 'ERR_ELECTION_CLOSED' });
+        }
+        if (err.code === 'P0003') {
+          throw new HttpError(401, { message: 'ERR_MAX_VOTE_CAST' });
+        }
+      });
       res.sendStatus(201);
     }
   });
