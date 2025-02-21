@@ -7,6 +7,7 @@ import { z } from 'zod';
 import logger from '../../logger';
 
 const ElectionType = z.enum(["Ballot", "Ratification"]); 
+const ElectionStatus = z.enum(["Open", "Closed", "Cancelled"]);
 
 const adminSchema = z.object({
   user_id: z.number(),
@@ -17,6 +18,7 @@ const ongoingElectionSchema = z.object({
   group_id: z.number(),
   election_id: z.number(),
   type: ElectionType,
+  status: ElectionStatus,
   initiator_id: z.number(),
   initiator_name: z.string(),
   nomination_ends_at: z.string().datetime({ offset: true }),

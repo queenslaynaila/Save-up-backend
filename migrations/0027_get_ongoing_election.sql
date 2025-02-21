@@ -6,6 +6,7 @@ RETURNS TABLE (
     group_id            INT,
     election_id         INT,
     type                enum_election_type,
+    status              enum_election_status,
     initiator_id        INT,
     initiator_name      TEXT,
     nomination_ends_at  TIMESTAMP WITH TIME ZONE,
@@ -20,6 +21,7 @@ BEGIN
         elections.group_id,
         elections.xid AS election_id,
         elections.type,
+        elections.status, 
         elections.initiator_id,
         user_contact_details.full_name AS initiator_name,
         elections.nomination_ends_at,
@@ -28,7 +30,7 @@ BEGIN
             jsonb_agg(
                 jsonb_build_object(
                     'user_id', group_admins.user_id,
-                    'full_name', user_contact_details.full_name
+                    'full_name', admin_details.full_name
                 )
             ) FILTER (WHERE group_admins.user_id IS NOT NULL),
             '[]'::JSONB
@@ -42,7 +44,7 @@ BEGIN
     LEFT JOIN user_contact_details AS admin_details
         ON group_admins.user_id = admin_details.id
     WHERE elections.group_id = p_group_id
-    GROUP BY elections.group_id, elections.xid, elections.type, elections.initiator_id, user_contact_details.full_name, elections.nomination_ends_at, elections.created_at;
+    GROUP BY elections.group_id, elections.xid, elections.type, elections.status, elections.initiator_id, user_contact_details.full_name, elections.nomination_ends_at, elections.created_at;
 END;
 $$ LANGUAGE plpgsql;
 
