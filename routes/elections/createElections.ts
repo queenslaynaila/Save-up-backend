@@ -3,12 +3,13 @@ import { sql } from '../../db';
 import { ElectionInterface, electionValidation } from './types';
 import { z } from 'zod';
 import HttpError from '../../httpError';
+import logger from '../../logger';
 
 const SQL_CALL_ELECTION = sql<
   ElectionInterface & { nomination_ends_at?: string; candidates: number[]|null; },
   Record<string, never>
 >(`
-  SELECT create_election(:group_id, :initiator_id, :type, :nomination_ends_at, :closes_at, :candidates)
+  SELECT create_election(:group_id, :initiator_id, :type, :nomination_ends_at, :candidates)
 `);
 
 const createElections = (router: Router) => {
@@ -46,6 +47,8 @@ const createElections = (router: Router) => {
         if (err.code === 'P0006') {
           throw new HttpError(400, { message: 'ERR_INVALID_CLOSED_AT' });
         }
+        console.error(err);
+        throw err;
       });
 
       res.sendStatus(201);
