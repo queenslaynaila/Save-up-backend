@@ -5,7 +5,7 @@ import { z } from 'zod';
 import HttpError from '../../httpError';
 
 const SQL_CALL_ELECTION = sql<
-  ElectionInterface & { nomination_ends_at?: string; candidates: number[]|null; closes_at?: string; },
+  ElectionInterface & { nomination_ends_at?: string; candidates: number[]|null; },
   Record<string, never>
 >(`
   SELECT create_election(:group_id, :initiator_id, :type, :nomination_ends_at, :closes_at, :candidates)
@@ -19,7 +19,6 @@ const createElections = (router: Router) => {
     request: {
       body: electionValidation.extend({
         nomination_ends_at: z.string().datetime().optional(),
-        closed_at: z.string().datetime().optional(),
         candidates_ids: z.array(z.number()).min(1).max(3).optional(),
       })
     },
@@ -31,14 +30,10 @@ const createElections = (router: Router) => {
       const nominationEndsAt = req.body.nomination_ends_at 
         ?? new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString();
 
-      const closedAt = req.body.closed_at 
-        ?? new Date(new Date(nominationEndsAt).getTime() + 3 * 24 * 60 * 60 * 1000).toISOString();
-
       await SQL_CALL_ELECTION({
         type: req.body.type,
         group_id: req.body.group_id,
         nomination_ends_at: nominationEndsAt,
-        closes_at: closedAt,
         candidates: req.body.type === 'Ratification' ? req.body.candidates_ids ?? null : null,
         initiator_id: req.user!.id
       }).exec().catch(err => {
