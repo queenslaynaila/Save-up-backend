@@ -19,7 +19,7 @@ const createElections = (router: Router) => {
     request: {
       body: electionValidation.extend({
         nomination_ends_at: z.string().datetime().optional(),
-        candidates: z.array(z.number()).min(1).max(3).optional(),
+        candidates_ids: z.array(z.number()).min(1).max(3).optional(),
       })
     },
     response: {
@@ -27,13 +27,13 @@ const createElections = (router: Router) => {
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {
-      const { type, group_id, candidates} = req.body;
+      const { type, group_id, candidates_ids} = req.body;
       await SQL_CALL_ELECTION({
         type,
         group_id,
         nomination_ends_at: req.body.nomination_ends_at 
                   ?? new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-        candidates: type === 'Ratification' ? req.body.candidates ?? null : null,
+        candidates: type === 'Ratification' ? req.body.candidates_ids ?? null : null,
         initiator_id: req.user!.id
       }).exec().catch(err => {
         if (err.code === 'P0001') {
