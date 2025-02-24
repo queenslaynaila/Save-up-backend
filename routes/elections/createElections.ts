@@ -5,10 +5,10 @@ import { z } from 'zod';
 import HttpError from '../../httpError';
 
 const SQL_CALL_ELECTION = sql<
-  ElectionInterface & { nomination_ends_at?: string; candidates: number[]|null },
+  ElectionInterface & { nomination_ends_at?: string; candidates: number[]|null; closes_at?: string; },
   Record<string, never>
 >(`
-  SELECT create_election(:group_id, :initiator_id, :type, :nomination_ends_at, :candidates)
+  SELECT create_election(:group_id, :initiator_id, :type, :nomination_ends_at, :closes_at, :candidates)
 `);
 
 const createElections = (router: Router) => {
@@ -19,6 +19,7 @@ const createElections = (router: Router) => {
     request: {
       body: electionValidation.extend({
         nomination_ends_at: z.string().datetime().optional(),
+        closed_at: z.string().datetime().optional(),
         candidates_ids: z.array(z.number()).min(1).max(3).optional(),
       })
     },
@@ -27,13 +28,18 @@ const createElections = (router: Router) => {
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {
-      const { type, group_id, candidates_ids} = req.body;
+      const nominationEndsAt = req.body.nomination_ends_at 
+        ?? new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString();
+
+      const closedAt = req.body.closed_at 
+        ?? new Date(new Date(nominationEndsAt).getTime() + 3 * 24 * 60 * 60 * 1000).toISOString();
+
       await SQL_CALL_ELECTION({
-        type,
-        group_id,
-        nomination_ends_at: req.body.nomination_ends_at 
-                  ?? new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-        candidates: type === 'Ratification' ? req.body.candidates_ids ?? null : null,
+        type: req.body.type,
+        group_id: req.body.group_id,
+        nomination_ends_at: nominationEndsAt,
+        closes_at: closedAt,
+        candidates: req.body.type === 'Ratification' ? req.body.candidates_ids ?? null : null,
         initiator_id: req.user!.id
       }).exec().catch(err => {
         if (err.code === 'P0001') {
@@ -42,11 +48,15 @@ const createElections = (router: Router) => {
         if (err.code === 'P0004') {
           throw new HttpError(409, { message: 'ERR_ONGOING_ELECTION_EXISTS' });
         }
-
+        if (err.code === 'P0006') {
+          throw new HttpError(400, { message: 'ERR_INVALID_CLOSED_AT' });
+        }
       });
+
       res.sendStatus(201);
     }
   });
 };
+
 
 export default createElections;

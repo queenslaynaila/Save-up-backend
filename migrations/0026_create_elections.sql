@@ -2,7 +2,8 @@ CREATE OR REPLACE FUNCTION create_election(
     p_group_id          INT,
     p_initiator_id      INT,
     p_type              enum_election_type,
-    p_nomination_ends_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() + INTERVAL '7 days',
+    p_nomination_ends_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() + INTERVAL '2 days',
+    p_closes_at         TIMESTAMP WITH TIME ZONE DEFAULT NOW() + INTERVAL '3 days',
     p_candidates        INT[] DEFAULT NULL
 )
 RETURNS VOID AS $$
