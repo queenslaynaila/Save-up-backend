@@ -8,8 +8,7 @@ const SQL_RATIFY_ELECTION = sql<{
   user_id: number;
   is_ratified: boolean;
 }, Record<string,never>>(`
-  INSERT INTO ratifications (group_id, election_id, user_id, is_ratified)
-  VALUES (:group_id, :election_id, :user_id, :is_ratified)
+   SELECT ratify_election(:group_id, :election_id,  :user_id, :is_ratified);
 `);
 
 const ratifyElection = (router: Router) => {
