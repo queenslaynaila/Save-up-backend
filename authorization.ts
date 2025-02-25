@@ -71,24 +71,23 @@ export default function authMiddleware(options: AuthMiddlewareOptions = {}) {
 
         const user: User = { id, role };
 
+
         if (roles.length > 0 && !roles.includes(user.role)) {
           throw new HttpError(403);
         }
-
         req.user = user;
 
         if (req.params.user_id === 'me') {
           req.params.user_id = user.id.toString();
         }
 
-        const requestedUserId = parseInt(req.params.user_id, 10);
+        if ('user_id' in req.params) {
+          const requestedUserId = parseInt(req.params.user_id, 10);
         
-        if (requestedUserId !== user.id) {
-          if (!allowModeratorAccess) {
-            throw new HttpError(403);
-          }
-          if (user.role !== 'Admin' && user.role !== 'Moderator') {
-            throw new HttpError(403);
+          if (requestedUserId !== user.id) {
+            if (!allowModeratorAccess || (user.role !== 'Admin' && user.role !== 'Moderator')) {
+              throw new HttpError(403);
+            }
           }
         }
 
