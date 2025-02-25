@@ -24,11 +24,17 @@ const SQL_GET_EXPENSES = sql<{ entity_id:number }, Expense>(`
 const getExpensesByCriteria = (router: Router) => {
   router.route({
     method: 'get',
-    path: '/',
+    path: '/:user_id',
     summary: 'Get list of expenses by criteria',
     description: '- **For groups**:If expense is being requested for a group, pass in a query param of a groupid. \n\n'
     + '- **Individual users**:If expense is for currently logged-in user, The app will associate the expense with the logged-in user. \n\n',
     request: {
+      params: z.object({
+        user_id: z.union([
+          z.string().regex(/^[1-9]\d*$/, "Must be a positive integer string"),
+          z.literal("me"), 
+        ]).default('me' )
+      }),
       query: z.object({
         group_id: z.string().regex(/^\d+$/),
         category_id: z.string().regex(/^\d+$/),
@@ -45,7 +51,7 @@ const getExpensesByCriteria = (router: Router) => {
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {
-      const entity_id = Number(req.query?.group_id) || req.user!.id;
+      const entity_id = Number(req.query?.group_id) || parseInt(req.params.user_id, 10);
       const { category_id, start_date, end_date, spent_from, spent_to } = req.query;
 
       const filters: string[] = [];

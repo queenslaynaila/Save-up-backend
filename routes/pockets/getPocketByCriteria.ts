@@ -65,7 +65,10 @@ const getPocketsByUser = (router: Router) => {
         + '- **end_date**: End date for filtering the records.\n',
     request: {
       params: z.object({
-        user_id: z.string().default('me')
+        user_id: z.union([
+          z.string().regex(/^[1-9]\d*$/, "Must be a positive integer string"),
+          z.literal("me"), 
+        ]).default('me' )
       }),
       query: pocketQueryParams
     },
@@ -76,18 +79,6 @@ const getPocketsByUser = (router: Router) => {
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {
-      const { user_id } = req.params;
-
-      const targetUserId = user_id === 'me' ? req.user!.id : Number(user_id);
-      if (Number.isNaN(targetUserId)) {
-        throw new HttpError(400);
-      }
-
-      if (req.user!.role === USER_ROLE_ENUM.Enum.Standard
-        && req.user!.id !== targetUserId) {
-        throw new HttpError(403);
-      }
-
       const {
         group_id,
         xid,
@@ -98,7 +89,7 @@ const getPocketsByUser = (router: Router) => {
         end_date
       } = req.query;
 
-      const FinalEntity = group_id ? Number(group_id) : targetUserId;
+      const FinalEntity = group_id ? Number(group_id) : parseInt(req.params.user_id, 10);
 
       const filters: string[] = [];
       const filterArgs: string | string [] | ParsedQs | ParsedQs[] = {};

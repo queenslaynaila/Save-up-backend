@@ -89,9 +89,15 @@ const SQL_GET_TRANSACTIONS = sql<{entity_id: number, group_id: number|null}, Tra
 const getTransactions = (router: Router) => {
   router.route({
     method: 'get',
-    path: '/',
+    path: '/:user_id',
     summary: 'Get all transactions by a user, for a pocket, and groups',
     request: {
+      params: z.object({
+        user_id: z.union([
+          z.string().regex(/^[1-9]\d*$/, "Must be a positive integer string"),
+          z.literal("me"), 
+        ]).default('me' )
+      }),
       query: z.object({
         group_id: z.string().optional(),
         slug: transactionTypeSchema.shape.slug,
@@ -109,7 +115,7 @@ const getTransactions = (router: Router) => {
     authMiddlewareOptions: {},
     handler: async (req, res) => {
       const group_id = req.query.group_id ? Number(req.query.group_id) : null;
-      const entity_id = group_id || req.user!.id;
+      const entity_id = group_id || parseInt(req.params.user_id, 10);
       const { slug, pocket_id, from, to, limit = '10' } = req.query;
 
       const filters: string[] = [];

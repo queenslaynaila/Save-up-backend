@@ -39,11 +39,17 @@ const SQL_FETCH_USER_GROUPS = sql<{ user_id: number; other_user_id?: number|null
 const getUserGroups = (router:Router) => {
   router.route({
     method: 'get',
-    path: '/',
+    path: '/:user_id',
     summary: 'Get groups a logged in user belongs to/ get common grps between 2 members',
     request: {
+      params: z.object({
+        user_id: z.union([
+          z.string().regex(/^[1-9]\d*$/, "Must be a positive integer string"),
+          z.literal("me"), 
+        ]).default('me' )
+      }),
       query: z.object({
-        user_id: z.string().optional()
+        mutual_user_id: z.string().optional()
       })
     },
     response: {
@@ -53,13 +59,14 @@ const getUserGroups = (router:Router) => {
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {
-      logger.info('Fetching user groups');
-      const otherUserId = req.query.user_id 
-        ? Number(req.query.user_id) 
+      const user_id = parseInt(req.params.user_id, 10);
+
+      const otherUserId = req.query.mutual_user_id 
+        ? Number(req.query.mutual_user_id) 
         : null;
 
       const groups = await SQL_FETCH_USER_GROUPS({
-        user_id: req.user!.id,
+        user_id,
         other_user_id: otherUserId
       }).many();
       return res.json(groups);

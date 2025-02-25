@@ -53,9 +53,15 @@ const SQL_GET_SENT_PENDING_INVITATIONS= sql<{group_id:number}, SentInvitations>(
 const getInvites = (router: Router) => {
   router.route({
     method: 'get',
-    path: '/',
+    path: '/:user_id',
     summary: 'Get pending group invitations for logged-in user or pending sent invites for grp',
     request:{
+      params: z.object({
+        user_id: z.union([
+          z.string().regex(/^[1-9]\d*$/, "Must be a positive integer string"),
+          z.literal("me"), 
+        ]).default('me' )
+      }),
       query: z.object({
         group_id: z.string().optional()
       })
@@ -67,6 +73,7 @@ const getInvites = (router: Router) => {
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {
+      const user_id = parseInt(req.params.user_id, 10);
       const group_id  = Number(req.query.group_id) ?? undefined;
 
       if ( group_id) {
@@ -77,7 +84,7 @@ const getInvites = (router: Router) => {
       }
 
       const receivedInvites = await SQL_GET_PENDING_INVITATIONS({
-        receiver_id: req.user!.id
+        receiver_id: user_id
       }).many();
       return res.json(receivedInvites);
     }

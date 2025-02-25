@@ -1,25 +1,30 @@
-import { NextFunction, Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcrypt';
-import jwt, { JwtPayload, Secret, VerifyErrors } from 'jsonwebtoken';
+import jwt, { Secret, VerifyErrors, JwtPayload } from 'jsonwebtoken';
 import { z } from 'zod';
-import HttpError from './httpError';
 import { sql } from './db';
-import { USER_ROLE_ENUM } from './routes/users/schema';
+import HttpError from './httpError';
 
+export const USER_ROLE_ENUM = z.enum(['Admin', 'Standard', 'Moderator']);
 type UserRole = z.infer<typeof USER_ROLE_ENUM>;
 
-// Extend the User type with the role from the enum
-type User = {
+export interface AuthMiddlewareOptions {
+  roles?: UserRole[] | UserRole;
+  allowModeratorAccess?: boolean;
+}
+
+interface User {
   id: number;
   role: UserRole;
   step?: number;
-};
+}
 
 declare module 'express-serve-static-core' {
   interface Request {
     user?: User;
   }
 }
+
 
 function generateToken(id: number, role: UserRole, expiresIn: string): string {
   return jwt.sign(
@@ -29,16 +34,9 @@ function generateToken(id: number, role: UserRole, expiresIn: string): string {
   );
 }
 
-export interface AuthMiddlewareOptions {
-  roles?: UserRole[] | UserRole;
-}
-
-/**
- * Middleware to authenticate and authorize a user using an access token.
- * Optionally restricts access to specific roles.
- */
-function authMiddleware(options: AuthMiddlewareOptions = {}) {
-  const roles = options.roles || [];
+export default function authMiddleware(options: AuthMiddlewareOptions = {}) {
+  const roles = Array.isArray(options.roles) ? options.roles : options.roles ? [options.roles] : [];
+  const allowModeratorAccess = options.allowModeratorAccess || false;
 
   return (req: Request, _res: Response, next: NextFunction) => {
     const accessToken = req.headers.authorization;
@@ -53,7 +51,7 @@ function authMiddleware(options: AuthMiddlewareOptions = {}) {
     }
 
     const verifyOptions: jwt.VerifyOptions = {
-      issuer: process.env.ISSUER
+      issuer: process.env.ISSUER,
     };
 
     jwt.verify(
@@ -72,11 +70,28 @@ function authMiddleware(options: AuthMiddlewareOptions = {}) {
         }
 
         const user: User = { id, role };
+
         if (roles.length > 0 && !roles.includes(user.role)) {
           throw new HttpError(403);
         }
 
         req.user = user;
+
+        if (req.params.user_id === 'me') {
+          req.params.user_id = user.id.toString();
+        }
+
+        const requestedUserId = parseInt(req.params.user_id, 10);
+        
+        if (requestedUserId !== user.id) {
+          if (!allowModeratorAccess) {
+            throw new HttpError(403);
+          }
+          if (user.role !== 'Admin' && user.role !== 'Moderator') {
+            throw new HttpError(403);
+          }
+        }
+
         next();
       }
     );
@@ -142,5 +157,4 @@ async function verifyPin(req: Request, res: Response, next: NextFunction) {
   next();
 }
 
-export default authMiddleware;
 export { authenticateResetToken, checkResetStepProgression, generateToken, verifyPin };
