@@ -71,7 +71,7 @@ export default function authMiddleware(options: AuthMiddlewareOptions = {}) {
 
         const user: User = { id, role };
 
-
+        console.log(`User ${id} authenticated with role ${role}`);
         if (roles.length > 0 && !roles.includes(user.role)) {
           throw new HttpError(403);
         }
@@ -81,7 +81,9 @@ export default function authMiddleware(options: AuthMiddlewareOptions = {}) {
           req.params.user_id = user.id.toString();
         }
 
-        if ('user_id' in req.params) {
+        if (req.params.user_id) {
+          console.log('im here');
+          console.log('user_id', req.params.user_id);
           const requestedUserId = parseInt(req.params.user_id, 10);
         
           if (requestedUserId !== user.id) {
