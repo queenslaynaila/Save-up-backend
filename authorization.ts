@@ -82,8 +82,6 @@ export default function authMiddleware(options: AuthMiddlewareOptions = {}) {
         }
 
         if (req.params.user_id) {
-          console.log('im here');
-          console.log('user_id', req.params.user_id);
           const requestedUserId = parseInt(req.params.user_id, 10);
         
           if (requestedUserId !== user.id) {
