@@ -57,7 +57,7 @@ const getUserGroups = (router:Router) => {
         schema: z.array(group)
       }
     },
-    authMiddlewareOptions: {},
+    authMiddlewareOptions: {allowModeratorAccess: true},
     handler: async (req, res) => {
       const user_id = parseInt(req.params.user_id, 10);
 
