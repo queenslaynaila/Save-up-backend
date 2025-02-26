@@ -79,5 +79,4 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Grant execution permission
 GRANT EXECUTE ON FUNCTION ratify_election(INT, INT, INT, BOOLEAN) TO app_user;
