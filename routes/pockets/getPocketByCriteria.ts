@@ -132,9 +132,9 @@ const getPocketsByUser = (router: Router) => {
       const query = SQL_GET_POCKETS({
         entity_id: FinalEntity
       });
-      logger.info(`Query: ${JSON.stringify(query)}`);
+
       if (filters.length > 0) query.extend(`AND ${filters.join(' AND ')}`, filterArgs);
-      logger.info(`Query after extension: ${JSON.stringify(query)}`);
+
       res.json(await query.many());
     }
   });
