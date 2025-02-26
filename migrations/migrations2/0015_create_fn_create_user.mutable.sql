@@ -39,6 +39,12 @@ BEGIN
     INSERT INTO default_pockets (entity_id, pocket_id)
     VALUES (v_entity_id, v_pocket_id);
 
+    UPDATE invitations
+    SET receiver_id = v_entity_id
+    WHERE invitations.phone_number = p_phone_number
+        AND invitations.receiver_id IS NULL
+        AND invitations.status = 'Pending'
+
     RETURN QUERY
     SELECT 
         users.id, 
