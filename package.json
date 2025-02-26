@@ -19,7 +19,7 @@
   "license": "ISC",
   "dependencies": {
     "@asteasolutions/zod-to-openapi": "github:asteasolutions/zod-to-openapi",
-    "@m-pot/sql-query": "^2.0.11",
+    "@m-pot/sql-query": "^3.0.4",
     "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
