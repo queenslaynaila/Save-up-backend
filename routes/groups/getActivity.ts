@@ -102,7 +102,7 @@ export const activitySchema = baseActivitySchema.extend({
   ...targetSchema.shape,
   ...pocketSchema.shape,
   amount: z.number().nullable(),
-  metadata: z.any().nullable(),
+  metadata: z.object({}).nullable(),
 });
 
 export type Activity = z.infer<typeof activitySchema>;
