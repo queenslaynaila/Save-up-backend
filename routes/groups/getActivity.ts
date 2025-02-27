@@ -3,7 +3,7 @@ import Router from '../../router';
 import { sql } from '../../db';
 
 const baseActivitySchema = z.object({
-  id: z.string(),
+  id: z.number(),
   actor_id: z.number(),
   actor_name: z.string(),
   created_at: z.string().datetime(),
@@ -54,7 +54,7 @@ export const withdrawalRequestActivity = baseActivitySchema.extend({
   type: z.literal('WithdrawalRequest'),
   ...pocketSchema.shape,
   amount: z.number(),
-  metadata: metadataSchemas.withdrawalRequest.nullable(),
+  metadata: metadataSchemas.withdrawalRequest,
 });
 
 export const withdrawalApprovalActivity = baseActivitySchema.extend({
@@ -102,7 +102,7 @@ export const activitySchema = baseActivitySchema.extend({
   ...targetSchema.shape,
   ...pocketSchema.shape,
   amount: z.number().nullable(),
-  metadata: z.object({}).nullable(),
+  metadata:z.any().nullable()
 });
 
 export type Activity = z.infer<typeof activitySchema>;
@@ -391,6 +391,7 @@ const getGroupActivities = (router:Router) => {
             group_id: groupId, 
             size
         }).many();
+        console.log(activities);
         res.json(activities);
       }
     });
