@@ -24,7 +24,7 @@ export type NextOfKin = z.infer<typeof nextOfKinPublicViewSchema>;
 
 export const SQL_GET_PIN = sql<{ id: number }, {pin:string}>(`
   SELECT 
-    users.pin,
+    users.pin
   FROM 
     users
   WHERE users.id = :id
