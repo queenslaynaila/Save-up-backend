@@ -45,7 +45,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-GRANT EXECUTE ON FUNCTION create_user_withdrawal(INT, INT, NUMERIC) TO app_user;
+GRANT EXECUTE ON FUNCTION create_user_withdrawal(INT, INT, NUMERIC) TO saveup_www;
 SELECT create_distributed_function(
   'create_user_withdrawal(INT, INT, NUMERIC)', 'p_user_id'
 );

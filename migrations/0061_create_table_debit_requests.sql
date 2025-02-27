@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS debit_requests (
     FOREIGN KEY           (group_id, election_id) REFERENCES elections (group_id, xid),
     FOREIGN KEY           (type_id) REFERENCES debit_types (id)
 );
-GRANT INSERT, SELECT ON debit_requests TO app_user;
+GRANT INSERT, SELECT ON debit_requests TO saveup_www;
 SELECT create_distributed_table('debit_requests', 'group_id');
 ALTER TABLE debit_requests
 ADD FOREIGN KEY (type_id) REFERENCES debit_types (id);

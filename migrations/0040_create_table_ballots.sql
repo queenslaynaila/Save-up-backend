@@ -9,5 +9,5 @@ CREATE TABLE IF NOT EXISTS ballots (
   FOREIGN KEY    (group_id, user_id) REFERENCES group_members(group_id,user_id)
 );
 SELECT create_distributed_table('ballots', 'group_id');
-GRANT INSERT, SELECT ON ballots TO app_user;
+GRANT INSERT, SELECT ON ballots TO saveup_www;
 

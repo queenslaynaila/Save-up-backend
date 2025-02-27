@@ -101,7 +101,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-GRANT EXECUTE ON FUNCTION manage_group_membership(INT, INT, INT) TO app_user;
+GRANT EXECUTE ON FUNCTION manage_group_membership(INT, INT, INT) TO saveup_www;
 SELECT create_distributed_function(
   'manage_group_membership(INT, INT, INT)', 'p_group_id'
 );

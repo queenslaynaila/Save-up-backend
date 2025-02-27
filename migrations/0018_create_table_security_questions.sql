@@ -5,4 +5,4 @@ CREATE TABLE IF NOT EXISTS security_questions (
 );
 
 SELECT create_reference_table('security_questions');
-GRANT SELECT ON security_questions TO app_user;
+GRANT SELECT ON security_questions TO saveup_www;

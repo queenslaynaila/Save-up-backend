@@ -46,7 +46,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-GRANT EXECUTE ON FUNCTION leave_group(INT, INT) TO app_user;
+GRANT EXECUTE ON FUNCTION leave_group(INT, INT) TO saveup_www;
 SELECT create_distributed_function(
   'leave_group(INT, INT)', 'p_group_id'
 );

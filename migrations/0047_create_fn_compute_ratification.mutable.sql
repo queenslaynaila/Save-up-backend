@@ -42,7 +42,7 @@ $$ LANGUAGE plpgsql;
 
 GRANT EXECUTE ON FUNCTION compute_ratification_results(
     INT, INT, INT
-) TO app_user;
+) TO saveup_www;
 SELECT create_distributed_function(
   'compute_ratification_results(INT, INT, INT)', 'p_group_id'
 );

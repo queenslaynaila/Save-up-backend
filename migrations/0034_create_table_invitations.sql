@@ -20,4 +20,4 @@ CREATE UNIQUE INDEX invitations_group_id_receiver_id_phone_key
 ON invitations(group_id, COALESCE(receiver_id::TEXT, phone_number)) 
 WHERE deleted_at IS NULL;
 
-GRANT INSERT, SELECT, UPDATE ON invitations TO app_user;
+GRANT INSERT, SELECT, UPDATE ON invitations TO saveup_www;

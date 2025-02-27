@@ -28,7 +28,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-GRANT EXECUTE ON FUNCTION update_invite(INT, INT, INT, enum_invite) TO app_user;
+GRANT EXECUTE ON FUNCTION update_invite(INT, INT, INT, enum_invite) TO saveup_www;
 SELECT create_distributed_function(
   'update_invite(INT, INT, INT, enum_invite)', 'p_group_id'
 );

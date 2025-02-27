@@ -45,7 +45,7 @@ BEGIN
 END; 
 $$ LANGUAGE plpgsql;
 
-GRANT EXECUTE ON FUNCTION get_group_members(INT, INT, BOOLEAN) TO app_user;
+GRANT EXECUTE ON FUNCTION get_group_members(INT, INT, BOOLEAN) TO saveup_www;
 SELECT create_distributed_function(
     'get_group_members(INT, INT, BOOLEAN)', 
     'p_group_id'

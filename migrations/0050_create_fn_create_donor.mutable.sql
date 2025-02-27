@@ -19,7 +19,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-GRANT EXECUTE ON FUNCTION create_donor(TEXT, TEXT) TO app_user;
+GRANT EXECUTE ON FUNCTION create_donor(TEXT, TEXT) TO saveup_www;
 SELECT create_distributed_function(
   'create_donor(TEXT, TEXT)'
 );

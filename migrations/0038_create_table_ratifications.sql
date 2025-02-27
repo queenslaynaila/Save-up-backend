@@ -11,5 +11,5 @@ CREATE TABLE IF NOT EXISTS ratifications (
     ON DELETE RESTRICT ON UPDATE RESTRICT
 );
 SELECT create_distributed_table('ratifications', 'group_id');
-GRANT INSERT, SELECT ON ratifications TO app_user;
+GRANT INSERT, SELECT ON ratifications TO saveup_www;
 

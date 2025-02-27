@@ -31,7 +31,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-GRANT EXECUTE ON FUNCTION check_grp_membership(INT, INT, BOOLEAN) TO app_user;
+GRANT EXECUTE ON FUNCTION check_grp_membership(INT, INT, BOOLEAN) TO saveup_www;
 SELECT create_distributed_function(
     'check_grp_membership(INT, INT, BOOLEAN)', 
     'p_group_id'

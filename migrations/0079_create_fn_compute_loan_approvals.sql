@@ -67,4 +67,4 @@ $$ LANGUAGE plpgsql;
 SELECT create_distributed_function(
     'compute_approvals(INT, INT, INT)', 'p_group_id'
 );
-GRANT EXECUTE ON FUNCTION compute_approvals(INT, INT, INT) TO app_user;
+GRANT EXECUTE ON FUNCTION compute_approvals(INT, INT, INT) TO saveup_www;

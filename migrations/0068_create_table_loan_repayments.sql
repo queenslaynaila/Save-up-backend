@@ -8,4 +8,4 @@ CREATE TABLE IF NOT EXISTS loan_repayments (
     --FOREIGN KEY           (user_id, transaction_id) REFERENCES transactions (entity_id, xid),
     FOREIGN KEY           (group_id, request_id) REFERENCES debit_requests (group_id, xid)
 );
-GRANT INSERT, SELECT ON loan_repayments TO app_user;
+GRANT INSERT, SELECT ON loan_repayments TO saveup_www;

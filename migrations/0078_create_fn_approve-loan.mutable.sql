@@ -33,7 +33,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-GRANT EXECUTE ON FUNCTION approve_loan( INT, INT, INT, enum_approval_status, TEXT ) TO app_user;
+GRANT EXECUTE ON FUNCTION approve_loan( INT, INT, INT, enum_approval_status, TEXT ) TO saveup_www;
 SELECT create_distributed_function(
 'approve_loan(INT, INT, INT, enum_approval_status, TEXT)', 'p_group_id'
 );

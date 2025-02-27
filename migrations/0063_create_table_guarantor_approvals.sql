@@ -7,6 +7,6 @@ CREATE TABLE IF NOT EXISTS guarantor_approvals (
     PRIMARY KEY      (group_id, request_id),
     FOREIGN KEY      (group_id, request_id) REFERENCES debit_requests (group_id, xid)
 );
-GRANT INSERT, SELECT ON guarantor_approvals TO app_user;
+GRANT INSERT, SELECT ON guarantor_approvals TO saveup_www;
 SELECT create_distributed_table ('guarantor_approvals', 'group_id');
 

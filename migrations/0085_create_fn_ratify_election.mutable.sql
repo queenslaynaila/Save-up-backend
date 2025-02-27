@@ -79,4 +79,4 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-GRANT EXECUTE ON FUNCTION ratify_election(INT, INT, INT, BOOLEAN) TO app_user;
+GRANT EXECUTE ON FUNCTION ratify_election(INT, INT, INT, BOOLEAN) TO saveup_www;

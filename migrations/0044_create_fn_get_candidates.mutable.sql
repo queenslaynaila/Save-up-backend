@@ -30,7 +30,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-GRANT EXECUTE ON FUNCTION get_candidates(INT, INT, INT) TO app_user;
+GRANT EXECUTE ON FUNCTION get_candidates(INT, INT, INT) TO saveup_www;
 SELECT create_distributed_function(
   'get_candidates(INT, INT, INT)', 'p_group_id'
 );

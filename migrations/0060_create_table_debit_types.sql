@@ -3,6 +3,6 @@ CREATE TABLE IF NOT EXISTS debit_types (
     type        TEXT NOT NULL UNIQUE
 );
 INSERT INTO debit_types (type) VALUES ('Loan'), ('Withdrawal');
-GRANT SELECT ON debit_types TO app_user;
+GRANT SELECT ON debit_types TO saveup_www;
 SELECT create_reference_table('debit_types');
 

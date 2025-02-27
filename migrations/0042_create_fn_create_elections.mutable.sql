@@ -43,4 +43,4 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-GRANT EXECUTE ON FUNCTION create_election(INT, INT, enum_election_type, TIMESTAMP WITH TIME ZONE, INT[]) TO app_user;
+GRANT EXECUTE ON FUNCTION create_election(INT, INT, enum_election_type, TIMESTAMP WITH TIME ZONE, INT[]) TO saveup_www;

@@ -7,4 +7,4 @@ CREATE TABLE IF NOT EXISTS donors (
   FOREIGN KEY          (id) REFERENCES entities(id)
 );
 SELECT create_distributed_table('donors', 'id'); 
-GRANT INSERT, SELECT, UPDATE ON donors TO app_user; 
+GRANT INSERT, SELECT, UPDATE ON donors TO saveup_www; 

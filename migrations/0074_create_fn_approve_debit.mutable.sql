@@ -52,7 +52,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-GRANT EXECUTE ON FUNCTION approve_debit(INT, INT, INT, enum_approval_status, TEXT) TO app_user;
+GRANT EXECUTE ON FUNCTION approve_debit(INT, INT, INT, enum_approval_status, TEXT) TO saveup_www;
 
 SELECT create_distributed_function(
   'approve_debit(INT, INT, INT, enum_approval_status, TEXT)', 'p_group_id'
@@ -170,4 +170,4 @@ END;
 $$ LANGUAGE plpgsql;
 
 
-GRANT EXECUTE ON FUNCTION compute_loan_approvals(INT, INT, INT) TO app_user;
+GRANT EXECUTE ON FUNCTION compute_loan_approvals(INT, INT, INT) TO saveup_www;

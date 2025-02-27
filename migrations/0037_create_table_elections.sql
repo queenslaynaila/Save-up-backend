@@ -16,4 +16,4 @@ CREATE TABLE IF NOT EXISTS elections (
 );
 
 SELECT create_distributed_table('elections', 'group_id');
-GRANT INSERT, SELECT, UPDATE ON elections TO app_user;
+GRANT INSERT, SELECT, UPDATE ON elections TO saveup_www;

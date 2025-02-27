@@ -13,6 +13,6 @@ VALUES  ('Saving'),
         ('TransferOut'),
         ('Loan'),
         ('Repayment');
-GRANT SELECT ON transaction_types TO app_user;
+GRANT SELECT ON transaction_types TO saveup_www;
 SELECT create_reference_table('transaction_types');
 

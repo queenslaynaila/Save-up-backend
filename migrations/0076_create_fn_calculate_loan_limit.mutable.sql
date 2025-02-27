@@ -54,7 +54,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-GRANT EXECUTE ON FUNCTION calculate_loan_limit(INT, INT, INT) TO app_user;
+GRANT EXECUTE ON FUNCTION calculate_loan_limit(INT, INT, INT) TO saveup_www;
 SELECT create_distributed_function(
     'calculate_loan_limit(INT, INT, INT)', 'p_pocket_id'
 );

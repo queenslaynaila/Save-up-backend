@@ -48,5 +48,5 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-GRANT EXECUTE ON FUNCTION get_ongoing_election(INT, INT) TO app_user;
+GRANT EXECUTE ON FUNCTION get_ongoing_election(INT, INT) TO saveup_www;
 SELECT create_distributed_function('get_ongoing_election(INT, INT)', 'p_group_id');

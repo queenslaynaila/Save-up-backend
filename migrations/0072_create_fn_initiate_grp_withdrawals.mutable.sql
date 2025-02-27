@@ -98,7 +98,7 @@ $$ LANGUAGE plpgsql;
 -- Grant permissions
 GRANT EXECUTE ON FUNCTION initiate_grp_withdrawal(
     INT, INT, INT, NUMERIC, TEXT, JSON[]
-) TO app_user;
+) TO saveup_www;
 
 -- Make it distributed
 SELECT create_distributed_function(

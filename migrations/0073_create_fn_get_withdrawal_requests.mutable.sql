@@ -50,4 +50,4 @@ $$ LANGUAGE plpgsql;
 SELECT create_distributed_function(
   'get_withdrawal_requests(INT, INT, INT)', 'p_group_id'
 );
-GRANT EXECUTE ON FUNCTION get_withdrawal_requests(INT, INT, INT) TO app_user;
+GRANT EXECUTE ON FUNCTION get_withdrawal_requests(INT, INT, INT) TO saveup_www;

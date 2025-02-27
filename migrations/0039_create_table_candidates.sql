@@ -11,5 +11,5 @@ CREATE TABLE IF NOT EXISTS candidates (
     ON DELETE RESTRICT ON UPDATE RESTRICT
 );
 SELECT create_distributed_table('candidates', 'group_id');
-GRANT INSERT, SELECT ON candidates TO app_user;
+GRANT INSERT, SELECT ON candidates TO saveup_www;
 

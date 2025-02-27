@@ -31,7 +31,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-GRANT EXECUTE ON FUNCTION update_group_name(INT, INT, TEXT) TO app_user;
+GRANT EXECUTE ON FUNCTION update_group_name(INT, INT, TEXT) TO saveup_www;
 SELECT create_distributed_function(
   'update_group_name(INT, INT, TEXT)', 'p_group_id'
 );

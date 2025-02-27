@@ -7,6 +7,6 @@ CREATE TABLE IF NOT EXISTS debit_recipients (
     FOREIGN KEY       (group_id, request_id) REFERENCES debit_requests (group_id, xid),
     FOREIGN KEY       (group_id, recipient_id) REFERENCES group_members (group_id, user_id)
 );
-GRANT INSERT, SELECT ON debit_recipients TO app_user;
+GRANT INSERT, SELECT ON debit_recipients TO saveup_www;
 SELECT create_distributed_table('debit_recipients', 'group_id');
 

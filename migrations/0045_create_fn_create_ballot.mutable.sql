@@ -88,4 +88,4 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Grant execution permission
-GRANT EXECUTE ON FUNCTION create_ballot(INT, INT, INT[], INT) TO app_user;
+GRANT EXECUTE ON FUNCTION create_ballot(INT, INT, INT[], INT) TO saveup_www;

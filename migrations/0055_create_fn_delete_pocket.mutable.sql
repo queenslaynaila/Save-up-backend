@@ -21,7 +21,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-GRANT EXECUTE ON FUNCTION delete_pocket(INT, INT) TO app_user;
+GRANT EXECUTE ON FUNCTION delete_pocket(INT, INT) TO saveup_www;
 SELECT create_distributed_function(
   'delete_pocket(INT, INT)', 'p_entity_id'
 );

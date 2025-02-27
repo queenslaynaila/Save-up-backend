@@ -19,7 +19,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-GRANT EXECUTE ON FUNCTION get_transaction_info(INT, INT) TO app_user;
+GRANT EXECUTE ON FUNCTION get_transaction_info(INT, INT) TO saveup_www;
 SELECT create_distributed_function(
   'get_transaction_info(INT, INT)', 'p_entity_id'
 );

@@ -8,6 +8,6 @@ CREATE TABLE IF NOT EXISTS disbursements (
     FOREIGN KEY           (group_id, request_id) REFERENCES debit_requests (group_id, xid)
     --FOREIGN KEY           (user_id, transaction_id) REFERENCES transactions (entity_id, xid)
 );
-GRANT INSERT, SELECT ON disbursements TO app_user;
+GRANT INSERT, SELECT ON disbursements TO saveup_www;
 SELECT create_distributed_table('disbursements', 'group_id');
 

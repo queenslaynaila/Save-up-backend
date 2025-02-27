@@ -46,7 +46,7 @@ $$ LANGUAGE plpgsql;
 
 GRANT EXECUTE ON FUNCTION get_group_transactions(
     INT, INT, INT
-) TO app_user;
+) TO saveup_www;
 SELECT create_distributed_function(
     'get_group_transactions(INT, INT, INT)', 'p_group_id'
 );
