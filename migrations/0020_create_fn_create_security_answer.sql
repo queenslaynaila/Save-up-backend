@@ -26,7 +26,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-GRANT EXECUTE ON FUNCTION create_answers(INT, JSONB) TO app_user;
+GRANT EXECUTE ON FUNCTION create_security_answer(INT, JSONB) TO app_user;
 
 SELECT create_distributed_function(
   'create_security_answer(INT, JSONB)', 'p_user_id'
