@@ -15,8 +15,8 @@ const securityAnswerCreationSchema = z.object({
 type AnswerCreationPayload = z.infer<typeof securityAnswerCreationSchema>;
 
 const SQL_CREATE_ANSWERS = sql<
-AnswerCreationPayload & {user_id:number}, Record<string, never>>(`
-  SELECT create_answers (:user_id, :answers)
+{user_id:number} & AnswerCreationPayload, Record<string, never>>(`
+  SELECT create_security_answer(:user_id, :answers::jsonb)
 `);
 
 const createSecurityAnswer = (router: Router) => {
@@ -41,6 +41,7 @@ const createSecurityAnswer = (router: Router) => {
       if (!await bcrypt.compare(req.body.pin, pin)) {
         throw new HttpError(401);
       }
+
       const hashedAnswers = await Promise.all(
         req.body.answers.map(async ({ question_id, answer }) => ({
           question_id,
@@ -50,7 +51,7 @@ const createSecurityAnswer = (router: Router) => {
 
       await SQL_CREATE_ANSWERS({
         user_id: req.user!.id,
-        answers: hashedAnswers
+        answers:hashedAnswers
       }).exec().catch((err) => {
         if (err.code === 'P0003') {
           throw new HttpError(400, { message: 'ERR_MAX_ANSWERS_EXCEEDED' });
