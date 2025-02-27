@@ -25,9 +25,6 @@ const createSecurityAnswer = (router: Router) => {
     path: '/answers',
     summary: 'Create a security answer',
     request: {
-      params: z.object({
-        question_id: z.string()
-      }),
       body: securityAnswerCreationSchema.extend({
         pin: z.string().regex(/^\d{4}$/)
       })
