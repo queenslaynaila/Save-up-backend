@@ -1,3 +1,5 @@
+SET LOCAL citus.multi_shard_modify_mode TO 'sequential';
+
 CREATE TABLE IF NOT EXISTS pocket_type_history (
   entity_id             INT NOT NULL,
   pocket_id             INT NOT NULL,

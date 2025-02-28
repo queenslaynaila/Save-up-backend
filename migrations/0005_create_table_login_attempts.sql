@@ -1,3 +1,5 @@
+SET LOCAL citus.multi_shard_modify_mode TO 'sequential';
+
 CREATE TABLE IF NOT EXISTS login_attempts (
   user_id         INT NOT NULL,
   xid             INT NOT NULL,
@@ -12,3 +14,5 @@ CREATE TABLE IF NOT EXISTS login_attempts (
 
 SELECT create_distributed_table('login_attempts', 'user_id');
 GRANT INSERT, SELECT ON login_attempts TO saveup_www;
+
+SET citus.multi_shard_modify_mode TO 'parallel';
