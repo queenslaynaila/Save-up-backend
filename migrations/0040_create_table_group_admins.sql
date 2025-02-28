@@ -1,5 +1,3 @@
-CREATE TYPE enum_transaction_type AS ENUM (
-
 CREATE TABLE IF NOT EXISTS group_admins (
   group_id      INT NOT NULL,
   election_id   INT NOT NULL,

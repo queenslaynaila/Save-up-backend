@@ -1,5 +1,20 @@
-CREATE TYPE enum_election_type AS ENUM ('Ballot', 'Ratification', 'Default');
-CREATE TYPE enum_election_status AS ENUM ('Open', 'Closed', 'Cancelled');
+
+DO $$
+BEGIN
+  CREATE TYPE enum_election_type AS ENUM (
+    'Ballot', 
+    'Ratification', 
+    'Default'
+  );
+  CREATE TYPE enum_election_status AS ENUM (
+    'Open', 
+    'Closed', 
+    'Cancelled'
+  );
+EXCEPTION
+  WHEN DUPLICATE_OBJECT THEN NULL;
+END
+$$;
 
 CREATE TABLE IF NOT EXISTS elections (
   group_id       INT NOT NULL,

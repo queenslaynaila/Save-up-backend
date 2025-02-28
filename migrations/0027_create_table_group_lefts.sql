@@ -1,7 +1,8 @@
 DO $$
 BEGIN
   CREATE TYPE enum_exit_reason AS ENUM (
-    'Self removal', 'Admin removal'
+    'Self removal', 
+    'Admin removal'
   );
 EXCEPTION
   WHEN DUPLICATE_OBJECT THEN NULL;

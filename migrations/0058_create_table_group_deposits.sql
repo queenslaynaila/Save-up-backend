@@ -1,5 +1,3 @@
-CREATE TYPE enum_approval_status AS ENUM ('Approved', 'Rejected', 'Pending');
-
 CREATE TABLE IF NOT EXISTS group_deposits (
     group_id              INT NOT NULL,
     deposit_id            INT NOT NULL,

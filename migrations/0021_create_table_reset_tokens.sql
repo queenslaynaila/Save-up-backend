@@ -1,6 +1,10 @@
 DO $$
 BEGIN
-  CREATE TYPE enum_token_reason AS ENUM ('Reset', 'Update', 'Unlock');
+  CREATE TYPE enum_token_reason AS ENUM (
+    'Reset', 
+    'Update', 
+    'Unlock'
+  );
 EXCEPTION
   WHEN DUPLICATE_OBJECT THEN NULL;
 END

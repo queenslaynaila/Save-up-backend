@@ -1,4 +1,11 @@
-CREATE TYPE enum_invite AS ENUM ('Pending', 'Accept', 'Decline');
+
+DO $$
+BEGIN
+  CREATE TYPE enum_invite AS ENUM ('Pending', 'Accept', 'Decline');
+EXCEPTION
+  WHEN DUPLICATE_OBJECT THEN NULL;
+END
+$$;
 
 CREATE TABLE IF NOT EXISTS invitations (   
   group_id        INT NOT NULL,  
