@@ -6,5 +6,5 @@ CREATE TABLE IF NOT EXISTS user_contact_details (
   FOREIGN KEY     (id) REFERENCES entities(id)
 );
 
-SELECT create_reference_table('user_contact_details');
 GRANT INSERT, SELECT, UPDATE ON user_contact_details TO saveup_www;
+SELECT create_reference_table('user_contact_details');

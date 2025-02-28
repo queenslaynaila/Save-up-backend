@@ -16,5 +16,5 @@ CREATE TABLE IF NOT EXISTS entities (
     created_at      TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );
 
-SELECT create_reference_table('entities');
 GRANT INSERT, SELECT ON entities TO saveup_www;
+SELECT create_reference_table('entities');
