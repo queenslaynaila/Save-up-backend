@@ -14,3 +14,8 @@
 /.vscode
 *.notes
 *.notes.ts
+
+#SCRIPTS
+/migrations/reorder.sh
+/migrations/rename.sh
+/migrations/seed.sh
