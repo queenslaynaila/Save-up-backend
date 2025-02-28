@@ -1,12 +1,12 @@
-DO
-$$
-  BEGIN
-    CREATE TYPE enum_id_type AS ENUM ('National', 'Passport');
-    CREATE TYPE enum_user_role AS ENUM ('Admin', 'Standard', 'Moderator');
-    CREATE TYPE enum_gender AS ENUM ('Male', 'Female');
-  EXCEPTION
-    WHEN DUPLICATE_OBJECT THEN NULL;
-END;
+DO $$
+BEGIN
+  CREATE TYPE enum_id_type AS ENUM ('National', 'Passport');
+  CREATE TYPE enum_user_role AS ENUM ('Admin', 'Standard', 'Moderator');
+  CREATE TYPE enum_gender AS ENUM ('Male', 'Female');
+EXCEPTION
+  WHEN DUPLICATE_OBJECT THEN NULL;
+END
+$$;
 
 CREATE TABLE IF NOT EXISTS users (
   id              INT PRIMARY KEY,  
@@ -19,5 +19,5 @@ CREATE TABLE IF NOT EXISTS users (
   FOREIGN KEY     (id) REFERENCES user_contact_details(id)
 );
 
-SELECT create_distributed_table('users', 'id');  
 GRANT INSERT, SELECT, UPDATE ON users TO saveup_www;
+SELECT create_distributed_table('users', 'id');  
