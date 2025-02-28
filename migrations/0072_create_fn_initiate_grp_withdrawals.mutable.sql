@@ -14,7 +14,6 @@ DECLARE
     v_target_at          TIMESTAMP WITH TIME ZONE;
     v_withdrawal_id       INT;
 BEGIN
-    -- Verify current term and admin status
     SELECT MAX(xid)
     INTO STRICT v_latest_election_id
     FROM elections
@@ -34,7 +33,6 @@ BEGIN
             ERRCODE = 'P0001';
     END IF;
 
-    -- Check pocket status and availability
     SELECT pocket_type, target_at
     INTO STRICT v_pocket_type, v_target_at
     FROM pockets
@@ -47,7 +45,6 @@ BEGIN
             ERRCODE = 'P0005';
     END IF;
 
-    -- Verify sufficient funds
     v_current_balance := get_transaction_info(p_group_id, p_pocket_id);
     IF v_current_balance < p_amount THEN
         RAISE EXCEPTION USING
@@ -55,7 +52,6 @@ BEGIN
             ERRCODE = 'P0004';
     END IF;
 
-    -- Create withdrawal request
     INSERT INTO debit_requests (
         group_id,
         xid,
@@ -79,7 +75,6 @@ BEGIN
     WHERE group_id = p_group_id
     RETURNING xid INTO STRICT v_withdrawal_id;
 
-    -- Create recipient records
     INSERT INTO debit_recipients (
         group_id,
         request_id,
@@ -95,12 +90,10 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Grant permissions
 GRANT EXECUTE ON FUNCTION initiate_grp_withdrawal(
     INT, INT, INT, NUMERIC, TEXT, JSON[]
 ) TO saveup_www;
 
--- Make it distributed
 SELECT create_distributed_function(
     'initiate_grp_withdrawal(INT, INT, INT, NUMERIC, TEXT, JSON[])',
     'p_group_id'

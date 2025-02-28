@@ -38,3 +38,8 @@ BEGIN
     RETURN v_transaction_id;
 END;
 $$ LANGUAGE plpgsql;
+
+GRANT EXECUTE ON FUNCTION complete_group_withdrawal(INT, INT) TO saveup_www;
+SELECT create_distributed_function(
+  'complete_group_withdrawal(INT, INT)', 'p_group_id'
+);

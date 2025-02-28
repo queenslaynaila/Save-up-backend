@@ -87,5 +87,8 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Grant execution permission
 GRANT EXECUTE ON FUNCTION create_ballot(INT, INT, INT[], INT) TO saveup_www;
+SELECT create_distributed_function(
+    'create_ballot(INT, INT, INT[], INT)', 
+    'p_group_id'
+);

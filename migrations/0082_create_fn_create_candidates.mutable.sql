@@ -57,3 +57,8 @@ BEGIN
     RETURN;
 END;
 $$ LANGUAGE plpgsql;
+
+GRANT EXECUTE ON FUNCTION create_candidates(INT, INT, INT[], INT) TO api_user;
+SELECT create_distributed_function(
+    'create_candidates(INT, INT, INT[], INT)w'
+);
