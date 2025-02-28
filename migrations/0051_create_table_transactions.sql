@@ -11,6 +11,8 @@ CREATE TABLE IF NOT EXISTS transactions (
   --PRIMARY KEY             (entity_id, xid, type_id, pocket_id),
   FOREIGN KEY             (type_id) REFERENCES transaction_types(id)
 );
+
+GRANT INSERT, SELECT ON transactions TO saveup_www;
 SELECT create_distributed_table('transactions', 'entity_id');
 
 ALTER TABLE transactions

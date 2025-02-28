@@ -24,4 +24,3 @@ CREATE TABLE IF NOT EXISTS debit_approvals (
 );
 GRANT INSERT, SELECT ON debit_approvals TO saveup_www;
 SELECT create_distributed_table('debit_approvals', 'group_id');
-

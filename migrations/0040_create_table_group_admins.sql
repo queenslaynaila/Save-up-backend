@@ -6,4 +6,5 @@ CREATE TABLE IF NOT EXISTS group_admins (
   FOREIGN KEY   (group_id, election_id, user_id) REFERENCES candidates (group_id, election_id, candidate_id)
 );
 
+GRANT INSERT, SELECT ON group_admins TO saveup_www;
 SELECT create_distributed_table('group_admins', 'group_id');

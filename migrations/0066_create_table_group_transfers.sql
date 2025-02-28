@@ -12,4 +12,5 @@ CREATE TABLE IF NOT EXISTS group_transfers (
     FOREIGN KEY               (group_id, destination_transaction_id) REFERENCES transactions (entity_id,xid)
 );
 
-
+GRANT INSERT, SELECT ON group_transfers TO saveup_www;
+SELECT create_distributed_table('group_transfers', 'group_id');
