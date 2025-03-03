@@ -44,59 +44,6 @@ const metadataSchemas = {
   }),
 };
 
-export const depositActivity = baseActivitySchema.extend({
-  type: z.literal('Deposit'),
-  ...pocketSchema.shape,
-  amount: z.number(),
-});
-
-export const withdrawalRequestActivity = baseActivitySchema.extend({
-  type: z.literal('WithdrawalRequest'),
-  ...pocketSchema.shape,
-  amount: z.number(),
-  metadata: metadataSchemas.withdrawalRequest,
-});
-
-export const withdrawalApprovalActivity = baseActivitySchema.extend({
-  type: z.literal('WithdrawalApproval'),
-  ...pocketSchema.shape,
-  ...targetSchema.shape,
-  amount: z.number(),
-  metadata: metadataSchemas.withdrawalApproval.nullable(),
-});
-
-export const withdrawalRejectionActivity = baseActivitySchema.extend({
-  type: z.literal('WithdrawalRejection'),
-  ...pocketSchema.shape,
-  ...targetSchema.shape,
-  amount: z.number(),
-  metadata: metadataSchemas.withdrawalRejection.nullable(),
-});
-
-export const transferActivity = baseActivitySchema.extend({
-  type: z.literal('Transfer'),
-  amount: z.number(),
-  metadata: metadataSchemas.transfer.nullable(),
-});
-
-export const memberJoinedActivity = baseActivitySchema.extend({
-  type: z.literal('MemberJoined'),
-});
-
-export const memberLeftActivity = baseActivitySchema.extend({
-  type: z.literal('MemberLeft'),
-});
-
-export const memberRemovedActivity = baseActivitySchema.extend({
-  type: z.literal('MemberRemoved'),
-  ...targetSchema.shape,
-});
-
-export const adminElectedActivity = baseActivitySchema.extend({
-  type: z.literal('AdminElected'),
-  ...targetSchema.shape,
-});
-
 export const activitySchema = baseActivitySchema.extend({
   type: z.string(),
   ...targetSchema.shape,
@@ -105,7 +52,7 @@ export const activitySchema = baseActivitySchema.extend({
   metadata:z.any().nullable()
 });
 
-export type Activity = z.infer<typeof activitySchema>;
+type Activity = z.infer<typeof activitySchema>;
 
 const SQL_GET_GROUP_ACTIVITIES = sql<{ group_id: number, size: number }, Activity>(`
     SELECT *

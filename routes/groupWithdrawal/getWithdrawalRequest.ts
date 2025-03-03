@@ -22,7 +22,7 @@ const WithdrawalRequest = z.object({
   reviews: z.array(Approval).nullable()
 });
 
-export type WithdrawalRequestType = z.infer<typeof WithdrawalRequest>;
+type WithdrawalRequestType = z.infer<typeof WithdrawalRequest>;
 
 const SQL_INITIATE_GRP_WITHDRAWAL = sql<{group_id:number; user_id:number, pocket_id:number}, WithdrawalRequestType>(`
   SELECT * FROM get_withdrawal_requests(

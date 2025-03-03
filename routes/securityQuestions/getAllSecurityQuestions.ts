@@ -2,7 +2,7 @@ import Router from '../../router';
 import { z } from 'zod';
 import { sql } from '../../db';
 
-export const securityQuestionSchema = z.object({
+const securityQuestionSchema = z.object({
   id: z.number().min(1),
   question: z.string(),
   created_at: z.string()

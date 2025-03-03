@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export enum ElectionType {
+enum ElectionType {
   BALLOT = 'Ballot',
   RATIFICATION = 'Ratification'
 }
@@ -17,10 +17,6 @@ export const electionValidation = election.omit({
   initiator_id: true
 });
 
-export const electionBodySchema = election.pick({
-  group_id: true
-});
-
 const electionRequestSchema = election.pick({
   group_id: true
 }).extend({
@@ -29,14 +25,6 @@ const electionRequestSchema = election.pick({
 
 export type ElectionRequest = z.infer<typeof electionRequestSchema>;
 
-export const electionRetrievalSchema = election.extend({
-  election_id: z.number().min(1),
-  initiator_name: z.string(),
-  created_at: z.string().datetime()
-});
-
-export type ElectionRetrieval = z.infer<typeof electionRetrievalSchema>;
-
 const candidateSchema = z.object({
   group_id: z.number().min(1),
   election_id: z.number().min(1),
@@ -44,13 +32,12 @@ const candidateSchema = z.object({
   user_id: z.number()
 });
 
-export type CandidateInterface = z.infer<typeof candidateSchema>;
 
-export const candidateRequestBody = candidateSchema.omit({
+const candidateRequestBody = candidateSchema.omit({
   user_id: true
 });
 
-export const candidateParamSchema = z.object({
+const candidateParamSchema = z.object({
   group_id: z.number().min(1),
   election_id: z.number()
 });

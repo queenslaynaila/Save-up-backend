@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { sql } from './db';
 import HttpError from './httpError';
 
-export const USER_ROLE_ENUM = z.enum(['Admin', 'Standard', 'Moderator']);
+const USER_ROLE_ENUM = z.enum(['Admin', 'Standard', 'Moderator']);
 type UserRole = z.infer<typeof USER_ROLE_ENUM>;
 
 export interface AuthMiddlewareOptions {
