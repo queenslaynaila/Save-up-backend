@@ -16,7 +16,6 @@ import Ajv, { ErrorObject } from 'ajv';
 import authMiddleware, { authenticateResetToken, AuthMiddlewareOptions } from './authorization';
 import basicAuth from 'express-basic-auth';
 import dotenv from 'dotenv';
-import logger from './logger';
 import cors from 'cors';
 import HttpError from './httpError';
 
@@ -43,7 +42,6 @@ const validateSchema = (schema: ZodSchema, data: unknown, section: 'body' | 'que
       dataPath: err.dataPath,
       schemaPath: err.schemaPath
     }));
-    logger.error(`Validation error in ${section}`, errors);
     throw new HttpError(400, errors);
   }
 };
