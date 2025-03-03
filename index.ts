@@ -2,7 +2,6 @@ import 'express-async-errors';
 import { NextFunction, Request, Response } from 'express';
 import Router, { generateOpenApiSpec } from './router';
 import swaggerUi from 'swagger-ui-express';
-import morgan from 'morgan';
 import HttpError from './httpError';
 import dotenv from 'dotenv';
 import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
@@ -38,15 +37,6 @@ const app = Router.getAppInstance();
 
 const openApiSpec = generateOpenApiSpec();
 app.use('/saveup/docs', swaggerUi.serve, swaggerUi.setup(openApiSpec));
-
-const morganFormat = 'combined';
-const morganStream = {
-  write: (message: string) => {
-    logger.info(message.trim());
-  }
-};
-
-app.use(morgan(morganFormat, { stream: morganStream }));
 
 app.use((_, res, next) => {
   res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
