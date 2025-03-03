@@ -91,6 +91,8 @@ export default function authMiddleware(options: AuthMiddlewareOptions = {}) {
           }
         }
 
+        console.log(`User ${id} authenticated with role ${role} calling next`);
+
         next();
       }
     );
@@ -153,7 +155,10 @@ async function verifyPin(req: Request, res: Response, next: NextFunction) {
   if (!await bcrypt.compare(req.body.pin, pinHash)) {
     throw new HttpError(401);
   }
-  next();
+  console.log("✅ Authentication passed, calling next() now...");
+next();
+console.log("❌ This should never appear if next() worked.");
+
 }
 
 export { authenticateResetToken, checkResetStepProgression, generateToken, verifyPin };

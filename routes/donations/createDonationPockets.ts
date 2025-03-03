@@ -6,9 +6,8 @@ const donationParams = z.object({
   group_id: z.number().positive(),
   name: z.string(),
   description: z.string(),
-  target_amount: z.number().min(50),
-  target_at: z.string().datetime(),
-  images: z.array(z.string()).optional().nullable(),
+  target_amount: z.number(),
+  target_at: z.string(),
 });
 
 const SQL_CREATE_POCKET = sql<{
@@ -38,7 +37,7 @@ const SQL_CREATE_POCKET = sql<{
       :target_at
   FROM pockets 
   WHERE entity_id = :group_id
-  RETURNING 
+  RETURNING +
       xid, 
       category_id, 
       name, 
@@ -54,7 +53,7 @@ const SQL_CREATE_DONATION_POCKET = sql<{
   group_id: number;
   pocket_id: number;
   description: string;
-  images: string[];
+  //images: string[];
 }, {
   description: string;
   images: string[];
@@ -79,7 +78,6 @@ const createDonations = (router: Router) => {
           description: true,
           target_amount: true,
           target_at: true,
-          images: true,
         }).extend({
           xid: z.number(),
           pocket_type: z.string(),
@@ -91,13 +89,13 @@ const createDonations = (router: Router) => {
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {
+      console.log(`Creating a donation pocket`);
       const { 
         group_id, 
         name, 
         description, 
         target_amount, 
         target_at, 
-        images
       } = req.body;
 
       await sql.transaction(async (trx) => {
@@ -113,7 +111,7 @@ const createDonations = (router: Router) => {
           group_id,
           pocket_id: pocket.xid,
           description,
-          images: images || [],
+          // images: images || [],
         }).using(trx).one();
 
         res.status(201).json({
@@ -121,7 +119,7 @@ const createDonations = (router: Router) => {
           category_id: pocket.category_id,
           name: pocket.name,
           description: donationPocket.description,
-          images: donationPocket.images,
+          // images: donationPocket.images,
           pocket_type: pocket.pocket_type,
           status: pocket.status,
           target_amount: pocket.target_amount,

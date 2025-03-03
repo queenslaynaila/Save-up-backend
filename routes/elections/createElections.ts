@@ -3,7 +3,6 @@ import { sql } from '../../db';
 import { ElectionInterface, electionValidation } from './types';
 import { z } from 'zod';
 import HttpError from '../../httpError';
-import logger from '../../logger';
 
 const SQL_CALL_ELECTION = sql<
   ElectionInterface & { nomination_ends_at?: string; candidates: number[]|null; },

@@ -4,7 +4,6 @@ import {
   ElectionRequest,
 } from './types';
 import { z } from 'zod';
-import logger from '../../logger';
 
 const ElectionType = z.enum(["Ballot", "Ratification"]); 
 const ElectionStatus = z.enum(["Open", "Closed", "Cancelled"]);

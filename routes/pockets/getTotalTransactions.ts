@@ -1,7 +1,6 @@
 import { z } from 'zod';
 import { sql } from '../../db';
 import Router from '../../router';
-import logger from '../../logger';
 
 const SQL_INNER_BALANCE = sql<{ entity_id: number, pocket_id?: string, from?: string, to?: string }, { balance: number }>(`
   SELECT DISTINCT ON (pocket_id) balance
@@ -72,7 +71,7 @@ const fetchPocketBalances = (router: Router) => {
       const query = SQL_INNER_BALANCE(filterArgs);
       if (filters.length > 0) query.extend(`AND ${filters.join(' AND ')}`, filterArgs);
       query.extend('ORDER BY pocket_id, created_at DESC', {});
-      logger.info(`this is the query ${JSON.stringify(query)}`);
+
       const balance = await query.many();
       const totalBalance = balance.reduce((sum, row) => sum + (row.balance || 0), 0);
       res.json({ balance: totalBalance });

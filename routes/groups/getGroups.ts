@@ -1,7 +1,6 @@
 import Router from '../../router';
 import { sql } from '../../db';
 import { z } from 'zod';
-import logger from '../../logger';
 import { groupsSchema } from './schema';
 
 const group = groupsSchema.pick({

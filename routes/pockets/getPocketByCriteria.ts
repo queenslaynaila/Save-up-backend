@@ -3,9 +3,6 @@ import { sql } from '../../db';
 import { ParsedQs } from 'qs';
 import { z } from 'zod';
 import { pocket } from './createPocket';
-import HttpError from '../../httpError';
-import { USER_ROLE_ENUM } from '../users/schema';
-import logger from '../../logger';
 
 const pocketSchema = pocket.omit({
   entity_id: true,

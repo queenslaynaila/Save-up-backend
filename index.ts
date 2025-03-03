@@ -59,9 +59,7 @@ app.use(() => {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
-  logger.error(`global error handler and errors looks like: ${JSON.stringify(error)}`);
   if (error instanceof HttpError) {
-    logger.info(`http handler and errors looks like: ${JSON.stringify(error.errors)}`);
     return res.status(error.status).json(error);
   }
 

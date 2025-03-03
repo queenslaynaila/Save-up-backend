@@ -1,7 +1,6 @@
 import Router from '../../router';
 import { sql } from '../../db';
 import { z } from 'zod';
-import logger from '../../logger';
 import HttpError from '../../httpError';
 
 const SQL_UPDATE_GROUP = sql<
@@ -32,7 +31,6 @@ const updateGroup = (router:Router) => {
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {
-      logger.info(`Updating group ${req.params.group_id} and name is ${req.body.name}`);
       const { name } = await SQL_UPDATE_GROUP({
         group_id: Number(req.params.group_id),
         user_id: req.user!.id,
@@ -43,7 +41,6 @@ const updateGroup = (router:Router) => {
         }
         throw err;
       });
-      logger.info(`Group ${req.params.group_id} updated by ${req.user!.id} and name is ${name}`);
       res.json({ name });
     }
   });

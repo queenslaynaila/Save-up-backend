@@ -1,7 +1,6 @@
 import { z } from 'zod';
 import { sql } from '../../db';
 import Router from '../../router';
-import logger from '../../logger';
 import { transactionSchema, transactionTypeSchema } from '../pockets/schema';
 
 const transaction = transactionSchema.pick({
@@ -128,8 +127,6 @@ const getTransactions = (router: Router) => {
         filterArgs.group_id = group_id;
       }
 
-      logger.info(`pocket is ${pocket_id}`);
-
       if (pocket_id) {
         filterArgs.pocket_id = Number(pocket_id);
         filters.push('transactions.pocket_id = :pocket_id');
@@ -139,8 +136,6 @@ const getTransactions = (router: Router) => {
         filterArgs.slug = slug;
         filters.push('transaction_types.slug = :slug');
       }
-
-      logger.info(`type is ${slug}`);
 
       if (from && to) {
         filterArgs.start_date = from;
@@ -170,10 +165,7 @@ const getTransactions = (router: Router) => {
 
       query.extend('ORDER BY transactions.created_at DESC LIMIT :limit', filterArgs);
 
-      logger.info(`full query is ${JSON.stringify(query)}`);
-
       const transactions = await query.many();
-      logger.info(`transactions are ${JSON.stringify(transactions)}`);
       res.json(transactions);
     }
   });

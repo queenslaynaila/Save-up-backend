@@ -7,7 +7,6 @@ import {
 } from './types';
 import { z } from 'zod';
 import HttpError from '../../httpError';
-import logger from '../../logger';
 
 const SQL_GET_ELECTION_RESULTS = sql<CandidateReq, CandidateRes>(`
   SELECT * FROM get_election_results(:group_id, :election_id, :user_id) 
@@ -43,7 +42,6 @@ const viewResults = (router: Router) => {
           }
           throw err;
       });
-      logger.info(`User ${req.user!.id} viewed election results for election ${req.params.election_id} they are ${JSON.stringify(results)}`);
       return res.json(results);
     }
   });

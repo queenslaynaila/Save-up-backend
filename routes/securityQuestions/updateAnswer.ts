@@ -4,7 +4,6 @@ import { sql } from '../../db';
 import { verifyPin } from '../../authorization';
 import { z } from 'zod';
 import bcrypt from 'bcrypt';
-import logger from '../../logger';
 
 export const securityAnswerSchema = z.object({
   user_id: z.number().int(),
@@ -45,7 +44,6 @@ const updateSecurityAnswer = (router: Router) => {
     authMiddlewareOptions: {},
     middlewares: [verifyPin],
     handler: async (req, res) => {
-      logger.info('here');
       const questions = req.body.questions;
       const user_id = req.user!.id;
       await SQL_OVERIDE_EXISTING_ANSWERS({

@@ -1,7 +1,6 @@
 import { z } from 'zod';
 import { sql } from '../../db';
 import Router from '../../router';
-import logger from '../../logger';
 
 const SQL_INNER_BALANCE = sql<{ entity_id: number, pocket_id?: string, from?: string, to?: string }, {name:string, total_savings: number }>(`
   SELECT 
@@ -69,7 +68,6 @@ const getTotalSavings = (router: Router) => {
       const query = SQL_INNER_BALANCE(filterArgs);
       if (filters.length > 0) query.extend(`AND ${filters.join(' AND ')}`, filterArgs);
       query.extend('GROUP BY pockets.name LIMIT 15', {});
-      logger.info('Query:', query);
       const stats = await query.many();
       res.json(stats);
     }

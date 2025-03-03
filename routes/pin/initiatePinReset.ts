@@ -6,7 +6,6 @@ import { resetPasswordLimiter } from '../../services/rateLimit';
 import { sql } from '../../db';
 import { ResetToken } from './schema';
 import HttpError from '../../httpError';
-import logger from '../../logger';
 import sendSms from '../../services/sms';
 
 const SQL_GET_USER = sql<{ phone_number: string }, { id:number }>(`
@@ -62,8 +61,6 @@ const initiatePinReset = (router: Router) => {
         process.env.JWT_SECRET as Secret,
         { expiresIn: '25m' }
       );
-
-      logger.info(`Sending OTP ${resetToken} to ${phone_number}`);
 
       sendSms(
         phone_number,
