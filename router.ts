@@ -120,9 +120,7 @@ class Router {
       cors({
         origin: [
           'http://localhost:5173',
-          'https://save-up-seven.vercel.app',
-          'http://192.168.0.159:5173',
-          'http://192.168.0.143:5173'
+          'https://save-up-seven.vercel.app'
         ],
         methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
         credentials: true,
