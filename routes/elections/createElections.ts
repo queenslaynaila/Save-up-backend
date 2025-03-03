@@ -46,7 +46,6 @@ const createElections = (router: Router) => {
         if (err.code === 'P0006') {
           throw new HttpError(400, { message: 'ERR_INVALID_CLOSED_AT' });
         }
-        console.error(err);
         throw err;
       });
 

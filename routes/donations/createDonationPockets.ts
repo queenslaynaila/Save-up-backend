@@ -89,7 +89,6 @@ const createDonations = (router: Router) => {
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {
-      console.log(`Creating a donation pocket`);
       const { 
         group_id, 
         name, 

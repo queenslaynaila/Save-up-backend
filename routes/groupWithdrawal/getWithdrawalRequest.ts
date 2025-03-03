@@ -55,7 +55,6 @@ const getGroupWithdrawals = (router: Router) => {
         pocket_id: Number(req.query.pocket_id),
         user_id: req.user!.id
       }).many();
-      console.log(withdrawals);
       res.json(withdrawals);
     }
   });

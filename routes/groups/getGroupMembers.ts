@@ -44,7 +44,6 @@ const getGroupMembers = (router:Router) => {
           if (err.code === 'P0001') {
             throw new HttpError(401);
           }
-          console.error(err);
           throw err;
       });
       return res.json(members);

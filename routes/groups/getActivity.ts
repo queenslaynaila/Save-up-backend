@@ -338,7 +338,6 @@ const getGroupActivities = (router:Router) => {
             group_id: groupId, 
             size
         }).many();
-        console.log(activities);
         res.json(activities);
       }
     });

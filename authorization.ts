@@ -71,7 +71,6 @@ export default function authMiddleware(options: AuthMiddlewareOptions = {}) {
 
         const user: User = { id, role };
 
-        console.log(`User ${id} authenticated with role ${role}`);
         if (roles.length > 0 && !roles.includes(user.role)) {
           throw new HttpError(403);
         }
@@ -90,8 +89,6 @@ export default function authMiddleware(options: AuthMiddlewareOptions = {}) {
             }
           }
         }
-
-        console.log(`User ${id} authenticated with role ${role} calling next`);
 
         next();
       }
@@ -155,9 +152,8 @@ async function verifyPin(req: Request, res: Response, next: NextFunction) {
   if (!await bcrypt.compare(req.body.pin, pinHash)) {
     throw new HttpError(401);
   }
-  console.log("✅ Authentication passed, calling next() now...");
-next();
-console.log("❌ This should never appear if next() worked.");
+
+  next();
 
 }
 
