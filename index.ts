@@ -28,6 +28,7 @@ import './routes/loans/index';
 import './routes/loanGuarantees/index';
 import './routes/loanApprovals/index';
 import './routes/admin/index';
+import './routes/donations/index';
 
 extendZodWithOpenApi(z);
 
