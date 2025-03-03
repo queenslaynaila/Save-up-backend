@@ -1,4 +1,3 @@
-
 DO $$
 BEGIN
   CREATE TYPE enum_election_type AS ENUM (
