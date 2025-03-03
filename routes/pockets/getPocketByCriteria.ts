@@ -3,6 +3,7 @@ import { sql } from '../../db';
 import { ParsedQs } from 'qs';
 import { z } from 'zod';
 import { pocket } from './createPocket';
+import verifyGroupMembership from '../../verifyGrpMembership';
 
 const pocketSchema = pocket.omit({
   entity_id: true,
@@ -75,6 +76,7 @@ const getPocketsByUser = (router: Router) => {
       }
     },
     authMiddlewareOptions: {},
+    middlewares: [verifyGroupMembership({ allowAdmins: true })],  
     handler: async (req, res) => {
       const {
         group_id,

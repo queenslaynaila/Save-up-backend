@@ -3,6 +3,7 @@ import { sql } from '../../db';
 
 import { pocketSchema } from './schema';
 import { z } from 'zod';
+import verifyGroupMembership from '../../verifyGrpMembership';
 
 const pocketCreationSchema = pocketSchema.pick({
   category_id: true,
@@ -60,6 +61,7 @@ const createPocket = (router: Router) => {
       }
     },
     authMiddlewareOptions: {},
+    middlewares: [verifyGroupMembership()],
     handler: async (req, res) => {
       const entity_id = req.body?.entity_id || req.user!.id;
       const newPocket = await SQL_CREATE_POCKET({
