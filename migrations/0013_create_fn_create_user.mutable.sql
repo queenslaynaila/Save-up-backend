@@ -5,7 +5,7 @@ CREATE OR REPLACE FUNCTION create_user(
     p_full_name     TEXT,
     p_gender        enum_gender,
     p_pin           TEXT,
-    p_role          enum_user_role DEFAULT 'Standard' 
+    p_role          enum_user_role DEFAULT 'Standard'
 )
 RETURNS TABLE (
     id              INT,
@@ -16,7 +16,7 @@ RETURNS TABLE (
     role            enum_user_role,
     gender          enum_gender,
     pin             TEXT,
-    created_at      TIMESTAMP WITH TIME ZONE 
+    created_at      TIMESTAMP WITH TIME ZONE
 ) AS $$
 DECLARE
     v_entity_id   INT;
@@ -43,24 +43,24 @@ BEGIN
     SET receiver_id = v_entity_id
     WHERE invitations.phone_number = p_phone_number
         AND invitations.receiver_id IS NULL
-        AND invitations.status = 'Pending'
+        AND invitations.status = 'Pending';
 
     RETURN QUERY
-    SELECT 
-        users.id, 
-        users.id_type, 
+    SELECT
+        users.id,
+        users.id_type,
         users.id_number,
-        user_contact_details.phone_number, 
-        user_contact_details.full_name, 
-        users.role, 
-        users.gender, 
+        user_contact_details.phone_number,
+        user_contact_details.full_name,
+        users.role,
+        users.gender,
         users.pin,
         users.created_at
-    FROM 
+    FROM
         users
-    LEFT JOIN 
+    LEFT JOIN
         user_contact_details ON users.id = user_contact_details.id
-    WHERE 
+    WHERE
         users.id = v_entity_id;
 EXCEPTION
     WHEN unique_violation THEN
