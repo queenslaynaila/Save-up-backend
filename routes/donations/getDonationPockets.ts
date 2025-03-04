@@ -51,7 +51,7 @@ const getDonationPockets = (router: Router) => {
     summary: "Get all donation pockets for a group",
     request: {
       params: z.object({
-        group_id: z.number().positive(),
+        group_id: z.string(),
       })
     },
     response: {
@@ -74,7 +74,7 @@ const getDonationPockets = (router: Router) => {
     authMiddlewareOptions: {},
     middlewares:[verifyGroupMembership(true)],
     handler: async (req, res) => {
-      const {group_id } = req.params;
+      const group_id  = Number(req.params.group_id);
       const pockets = await SQL_GET_DONATION_POCKETS({ 
         group_id
       }).many();
