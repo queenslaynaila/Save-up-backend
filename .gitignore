@@ -144,6 +144,7 @@ dist
 /migrations/reorder.sh
 /migrations/rename.sh
 /migrations/seed.sh
+/migrations/check.sh
 
 *.notes
 *.notes.ts

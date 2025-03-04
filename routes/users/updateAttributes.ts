@@ -4,7 +4,10 @@ import { sql } from '../../db';
 import HttpError from '../../httpError';
 import { USER_ROLE_ENUM, userIdHistorySchema, userPhoneHistorySchema, userSchema } from './schema';
 import Router from '../../router';
-import { convertToTitleCase } from  '../../middlewares/caseNormalization';
+
+const convertToTitleCase = (str: string): string => {
+  return str.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());
+};
 
 export const SQL_GET_USER_PIN = sql<{ id: number }, { pin: string }>(`
   SELECT pin FROM users WHERE id = :id
