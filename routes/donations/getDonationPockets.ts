@@ -1,6 +1,7 @@
 import { z } from "zod";
 import Router from "../../router";
 import { sql } from "../../db";
+import verifyGroupMembership from "../../middlewares/verifyGrpMembership";
 
 const SQL_GET_DONATION_POCKETS = sql<{
   group_id: number;
@@ -70,6 +71,8 @@ const getDonationPockets = (router: Router) => {
         ),
       },
     },
+    authMiddlewareOptions: {},
+    middlewares:[verifyGroupMembership({allowAdminsAndModerators: true})],
     handler: async (req, res) => {
       const {group_id } = req.params;
       const pockets = await SQL_GET_DONATION_POCKETS({ 
