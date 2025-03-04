@@ -7,29 +7,37 @@ const SQL_CHECK_GROUP_MEMBERSHIP = sql<{
   user_id: number;
   allow_admin_access: boolean;
 }, Record<string, never>>(`
-  SELECT check_grp_membership(:group_id, :user_id, :allow_admin_access)
+  SELECT check_grp_membership(
+    :group_id, 
+    :user_id, 
+    :allow_admin_access
+  )
 `);
 
 type VerifyOptions = {
-  allowAdmins: boolean;
+  allowAdminsAndModerators: boolean;
 };
 
-export default function verifyGroupMembership(options: VerifyOptions = { allowAdmins: false }) {
+export default function verifyGroupMembership(
+  options: VerifyOptions = { allowAdminsAndModerators: false }
+) {
   return async (req: Request, _res: Response, next: NextFunction) => {
-    const groupId = Number(req.query.group_id) || Number(req.body.group_id) || Number(req.params.group_id);
-    if (!groupId) {
-      return next();
-    }
+    const groupId = Number(req.params.group_id) || 
+                   Number(req.body.group_id) || 
+                   Number(req.query.group_id);
+
+    if (!groupId) next()
 
     await SQL_CHECK_GROUP_MEMBERSHIP({
       group_id: groupId,
       user_id: req.user!.id,
-      allow_admin_access: options.allowAdmins
+      allow_admin_access: options.allowAdminsAndModerators
     }).exec()
       .catch((err) => {
-        if(err.code === 'P0001') {
+        if (err.code === 'P0001') {
           throw new HttpError(403);
         }
+        throw err;
       });
 
     next();

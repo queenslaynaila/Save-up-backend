@@ -48,6 +48,7 @@ app.use(() => {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
+  logger.error(error);
   if (error instanceof HttpError) {
     return res.status(error.status).json(error);
   }
