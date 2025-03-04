@@ -4,6 +4,7 @@ import jwt, { Secret, VerifyErrors, JwtPayload } from 'jsonwebtoken';
 import { z } from 'zod';
 import { sql } from '../db';
 import HttpError from '../httpError';
+import Config from '../config';
 
 const USER_ROLE_ENUM = z.enum(['Admin', 'Standard', 'Moderator']);
 type UserRole = z.infer<typeof USER_ROLE_ENUM>;
@@ -29,8 +30,8 @@ declare module 'express-serve-static-core' {
 function generateToken(id: number, role: UserRole, expiresIn: string): string {
   return jwt.sign(
     { id, role },
-    process.env.JWT_SECRET as Secret,
-    { expiresIn, issuer: process.env.ISSUER }
+    Config.JWT_SECRET as Secret,
+    { expiresIn, issuer: Config.JWT_ISSUER }
   );
 }
 
@@ -51,12 +52,12 @@ export default function authMiddleware(options: AuthMiddlewareOptions = {}) {
     }
 
     const verifyOptions: jwt.VerifyOptions = {
-      issuer: process.env.ISSUER,
+      issuer: Config.JWT_ISSUER,
     };
 
     jwt.verify(
       accessTokenValue,
-      process.env.JWT_SECRET as Secret,
+      Config.JWT_SECRET as Secret,
       verifyOptions,
       (err: VerifyErrors | null, decoded: JwtPayload | string | undefined) => {
         if (err || !decoded) {
@@ -111,7 +112,7 @@ function authenticateResetToken(req: Request, res: Response, next: NextFunction)
     throw new HttpError(403);
   }
 
-  jwt.verify(resetTokenValue, process.env.JWT_SECRET as Secret, (err, decodedResetToken) => {
+  jwt.verify(resetTokenValue, Config.JWT_SECRET as Secret, (err, decodedResetToken) => {
     if (err) {
       throw new HttpError(403);
     }

@@ -6,6 +6,7 @@ import HttpError from '../../httpError';
 import { ResetToken } from './schema';
 import { z } from 'zod';
 import { authenticateResetToken, checkResetStepProgression } from '../../middlewares/authorization';
+import Config from '../../config';
 
 const SQL_GET_SECURITY_QUESTIONS = sql<{ user_id: number }, { id: number; question: string }>(`
   SELECT 
@@ -84,7 +85,7 @@ const verifyPinResetToken = (router: Router) => {
         const step4TokenPayload = { id: user_id, step: 3 };
         const step4TokenHeader = jwt.sign(
           step4TokenPayload,
-          process.env.JWT_SECRET as Secret,
+          Config.JWT_SECRET as Secret,
           { expiresIn: '15m' }
         );
         return res.setHeader('Reset', step4TokenHeader).sendStatus(204);
@@ -93,7 +94,7 @@ const verifyPinResetToken = (router: Router) => {
       const step2TokenPayload = { id: user_id, step: 2 };
       const step2TokenHeader = jwt.sign(
         step2TokenPayload,
-        process.env.JWT_SECRET as Secret,
+        Config.JWT_SECRET as Secret,
         { expiresIn: '15m' }
       );
       return res.setHeader('Reset', step2TokenHeader)

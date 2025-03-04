@@ -15,17 +15,16 @@ import zodToJsonSchema from 'zod-to-json-schema';
 import Ajv, { ErrorObject } from 'ajv';
 import authMiddleware, { authenticateResetToken, AuthMiddlewareOptions } from './middlewares/authorization';
 import basicAuth from 'express-basic-auth';
-import dotenv from 'dotenv';
 import cors from 'cors';
 import HttpError from './httpError';
+import Config from './config';
 
-dotenv.config();
 
 const ajv = new Ajv();
 
 const swaggerConfig = {
-  username: process.env.SWAGGER_USERNAME,
-  password: process.env.SWAGGER_PASSWORD
+  username: Config.SWAGGER_USERNAME,
+  password: Config.SWAGGER_PASSWORD
 };
 
 const validateSchema = (schema: ZodSchema, data: unknown, section: 'body' | 'query' | 'params') => {

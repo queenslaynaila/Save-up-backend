@@ -1,16 +1,17 @@
 import https from 'follow-redirects';
 import dotenv from 'dotenv';
 import logger from '../logger';
+import Config from '../config';
 
 dotenv.config();
 
 const sendSms = (to: string, text: string) => {
   const options = {
     method: 'POST',
-    hostname: process.env.BASE_URL,
+    hostname: Config.BASE_URL,
     path: '/sms/2/text/advanced',
     headers: {
-      Authorization: `App ${process.env.API_KEY}`,
+      Authorization: `App ${Config.API_KEY}`,
       'Content-Type': 'application/json',
       Accept: 'application/json'
     },
@@ -38,7 +39,7 @@ const sendSms = (to: string, text: string) => {
     messages: [
       {
         destinations: [{ to }],
-        from: process.env.SENDER,
+        from: Config.SENDER,
         text
       }
     ]

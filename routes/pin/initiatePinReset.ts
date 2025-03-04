@@ -7,6 +7,7 @@ import { sql } from '../../db';
 import { ResetToken } from './schema';
 import HttpError from '../../httpError';
 import sendSms from '../../services/sms';
+import Config from '../../config';
 
 const SQL_GET_USER = sql<{ phone_number: string }, { id:number }>(`
   SELECT id 
@@ -58,7 +59,7 @@ const initiatePinReset = (router: Router) => {
       const step1TokenPayload = { id: user.id, step: 1 };
       const resetTokenHeader = jwt.sign(
         step1TokenPayload,
-        process.env.JWT_SECRET as Secret,
+        Config.JWT_SECRET as Secret,
         { expiresIn: '25m' }
       );
 

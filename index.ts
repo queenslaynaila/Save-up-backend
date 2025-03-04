@@ -26,6 +26,7 @@ import './routes/loans/index';
 import './routes/loanGuarantees/index';
 import './routes/loanApprovals/index';
 import './routes/donations/index';
+import Config from './config';
 
 extendZodWithOpenApi(z);
 
@@ -55,7 +56,6 @@ app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
   return res.sendStatus(500);
 });
 
-const port: number = parseInt(process.env.PORT as string, 10);
-app.listen(port, () => {
-  logger.info(`Server running on port ${port}`);
+app.listen(Config.PORT, () => {
+  logger.info(`Server running on port ${Config.PORT}`);
 });

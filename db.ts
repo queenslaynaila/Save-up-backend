@@ -1,13 +1,12 @@
 import { createBasicSQL } from '@m-pot/sql-query';
-import { config } from 'dotenv';
-config({ path: '.env' });
+import Config from './config';
 
 export const { sql, shutdown: closeDbConnection } = createBasicSQL({
-  host: process.env.DB_HOST,
-  port: parseInt(process.env.DB_PORT || '5432', 10),
-  database: process.env.DB_DATABASE,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  disablePooling: Boolean(process.env.DB_BOUNCER_ENABLED) || true,
+  host: Config.DB_HOST,
+  port: Config.DB_PORT,
+  database:Config.DB_DATABASE,
+  user: Config.DB_USER,
+  password: Config.DB_PASSWORD,
+  disablePooling: Config.DB_BOUNCER_ENABLED,
   max: 60
 });

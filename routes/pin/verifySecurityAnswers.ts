@@ -7,6 +7,7 @@ import { sql } from '../../db';
 import HttpError from '../../httpError';
 import { z } from 'zod';
 import { authenticateResetToken, checkResetStepProgression } from '../../middlewares/authorization';
+import Config from '../../config';
 const verifyAnswerSchema = z.object({
   question_id: z.number().min(1),
   answer: z.string()
@@ -60,7 +61,7 @@ const verifySecurityAnswers = (router: Router) => {
       const step3TokenPayload = { id: user_id, step: 3 };
       const step3TokenHeader = jwt.sign(
         step3TokenPayload,
-        process.env.JWT_SECRET as Secret,
+        Config.JWT_SECRET as Secret,
         { expiresIn: '15m' }
       );
 
