@@ -13,7 +13,7 @@ const fetchPocketBalances = (router: Router) => {
   router.route({
     method: 'get',
     path: '/balance',
-    summary: 'Retrieve  cuurent balance for users or groups across pockets',
+    summary: 'Retrieve  current balance for users or groups across pockets',
     description: `Retrieve the combined balance from all financial transactions:
     
     *Use Cases:*

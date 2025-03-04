@@ -32,11 +32,6 @@ const candidateSchema = z.object({
   user_id: z.number()
 });
 
-
-const candidateRequestBody = candidateSchema.omit({
-  user_id: true
-});
-
 const candidateParamSchema = z.object({
   group_id: z.number().min(1),
   election_id: z.number()

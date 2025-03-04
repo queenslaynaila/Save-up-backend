@@ -17,7 +17,7 @@ const answerSchema = z.object({
   answer: z.string()
 });
 
-const SQL_OVERIDE_EXISTING_ANSWERS = sql<{ user_id: number }, Record<string, never>>(`
+const SQL_OVERRIDE_EXISTING_ANSWERS = sql<{ user_id: number }, Record<string, never>>(`
   DELETE FROM security_answers 
   WHERE user_id = :user_id
 `);
@@ -34,7 +34,7 @@ const updateSecurityAnswer = (router: Router) => {
     summary: 'Update security answers',
     description: 'Allows a user to completely override their existing security answers.Security answers are not shown to users for privacy and security reasons\n\n'
     + 'Security answers are not shown to users for privacy and security reasons. Therefore,we assume that the user has forgotten all their previous answers. Instead of editing individual answers we submit a new set of answers to predefined security questions \n\n'
-    + 'The users PIN is verified to ensure proper authorization before proceeding.Once verified all existing answers for users are delted and new ones stored \n\n',
+    + 'The users PIN is verified to ensure proper authorization before proceeding.Once verified all existing answers for users are deleted and new ones stored \n\n',
     request: {
       body: z.object({
         pin: z.string(),
@@ -46,7 +46,7 @@ const updateSecurityAnswer = (router: Router) => {
     handler: async (req, res) => {
       const questions = req.body.questions;
       const user_id = req.user!.id;
-      await SQL_OVERIDE_EXISTING_ANSWERS({
+      await SQL_OVERRIDE_EXISTING_ANSWERS({
         user_id
       }).exec();
 

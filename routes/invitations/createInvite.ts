@@ -16,7 +16,7 @@ const createInvite = (router: Router) => {
     method: 'post',
     path: '/',
     summary: 'Send a group invitation via phone number',
-    description: 'Allows a user to send an invitation to a member or non members. The invitees will receive an SMS with a link to join the group.For non-members, the SMS will include a link to sign up for SaveUP and once theyve signed up theyll find the invite in their notifications.',
+    description: 'Allows a user to send an invitation to a member or non members. The invitees will receive an SMS with a link to join the group.For non-members, the SMS will include a link to sign up for SaveUP and once they have signed up they will find the invite in their notifications.',
     request: {
       body: z.object({
         group_id: z.number().min(1),

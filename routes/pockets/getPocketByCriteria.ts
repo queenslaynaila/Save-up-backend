@@ -52,7 +52,7 @@ const getPocketsByUser = (router: Router) => {
       + '- If the path parameter is **me**, the request will return the pockets of the logged-in user.\n'
       + '- If the path parameter is a user ID, the request will return the pockets of the specified user.\n'
       + '- Admins and moderators can request pockets for any user or group\n'
-      + '- Regular users can only access their own pockets or of grps they are in\n'
+      + '- Regular users can only access their own pockets or of groups they are in\n'
       + '- **Query Parameters**:\n'
         + '- **xid**: The unique identifier for a specific pocket.\n'
         + '- **group_id**: The ID of the group whose pockets are to be fetched. m\n'
@@ -65,7 +65,7 @@ const getPocketsByUser = (router: Router) => {
       params: z.object({
         user_id: z.union([
           z.string().regex(/^[1-9]\d*$/, "Must be a positive integer string"),
-          z.literal("me"), 
+          z.literal("me"),
         ]).default('me' )
       }),
       query: pocketQueryParams
@@ -76,7 +76,7 @@ const getPocketsByUser = (router: Router) => {
       }
     },
     authMiddlewareOptions: {},
-    middlewares: [verifyGroupMembership({allowAdminsAndModerators: true })],  
+    middlewares: [verifyGroupMembership({allowAdminsAndModerators: true })],
     handler: async (req, res) => {
       const {
         group_id,

@@ -9,7 +9,7 @@ const logout = (router: Router) => {
       204: {}
     },
     authMiddlewareOptions: {},
-    handler: async (req, res) => {
+    handler: async (_req, res) => {
       res.removeHeader('Authorization');
       res.sendStatus(204);
     }
