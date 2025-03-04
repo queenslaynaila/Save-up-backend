@@ -164,13 +164,14 @@ class Router {
       handler
     } = options;
 
-    if (authMiddlewareOptions) {
-      middlewares.unshift(authMiddleware(authMiddlewareOptions));
-    }
-
     if (request) {
-      middlewares.push(validateRequest(request));
+      middlewares.unshift(validateRequest(request));
     }
+    
+    if (authMiddlewareOptions) {
+      middlewares.splice(1, 0, authMiddleware(authMiddlewareOptions));
+    }
+    
 
     const security = [];
     if (authMiddlewareOptions) {
