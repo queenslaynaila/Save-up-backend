@@ -22,7 +22,6 @@ import './routes/elections/index';
 import './routes/groupWithdrawal/index';
 import './routes/groupDeposits/index';
 import './routes/groupDebitApprovals/index';
-import './routes/externalSaving/index';
 import './routes/loans/index';
 import './routes/loanGuarantees/index';
 import './routes/loanApprovals/index';
