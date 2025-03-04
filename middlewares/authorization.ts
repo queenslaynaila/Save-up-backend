@@ -88,11 +88,7 @@ export default function authMiddleware(options: AuthMiddlewareOptions = {}) {
   };
 }
 
-/**
- * Middleware to verify and decode a reset token from the request headers.
- * Attaches the decoded user to the request object.
- */
-function authenticateResetToken(req: Request, res: Response, next: NextFunction) {
+export function authenticateResetToken(req: Request, res: Response, next: NextFunction) {
   const token = req.headers.reset as string;
   if (!token) {
     throw new HttpError(403);
@@ -114,11 +110,7 @@ function authenticateResetToken(req: Request, res: Response, next: NextFunction)
   });
 }
 
-/**
- * Middleware to check the progression of the reset steps.
- * Ensures the user is on the correct step before proceeding and has not skipped any.
- */
-function checkResetStepProgression(requiredStep: number) {
+export function checkResetStepProgression(requiredStep: number) {
   return (req: Request, _res: Response, next: NextFunction) => {
     const step = req.user?.step;
     if (step !== requiredStep) {
@@ -134,7 +126,7 @@ const SQL_GET_PIN = sql<{ user_id: number }, { pin: string }>(`
   WHERE id = :user_id
 `);
 
-async function verifyPin(req: Request, res: Response, next: NextFunction) {
+export async function verifyPin(req: Request, res: Response, next: NextFunction) {
   const user_id = req.user!.id;
 
   const { pin: pinHash } = await SQL_GET_PIN({
@@ -146,7 +138,4 @@ async function verifyPin(req: Request, res: Response, next: NextFunction) {
   }
 
   next();
-
 }
-
-export { authenticateResetToken, checkResetStepProgression,  verifyPin };

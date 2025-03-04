@@ -1,9 +1,9 @@
 import Router from '../../router';
-import bcrypt from 'bcrypt';
 import { z } from 'zod';
 import { sql } from '../../db';
 import HttpError from '../../httpError';
 import { nextOfKinSchema } from './schema';
+import { verifyPin } from '../../middlewares/authorization';
 
 const nextOfKinCreationSchema = nextOfKinSchema.pick({
   full_name: true,
@@ -21,14 +21,6 @@ export const nextOfKinPublicViewSchema = nextOfKinSchema.pick({
   created_at: true
 });
 export type NextOfKin = z.infer<typeof nextOfKinPublicViewSchema>;
-
-export const SQL_GET_PIN = sql<{ id: number }, {pin:string}>(`
-  SELECT 
-    users.pin
-  FROM 
-    users
-  WHERE users.id = :id
-`);
 
 const SQL_CREATE_KIN = sql<NextOfKinCreationPayLoad, NextOfKin>(`
   INSERT INTO next_of_kins (user_id, xid, full_name, relationship, phone_number)
@@ -59,14 +51,8 @@ const createNextOfKin = (router: Router) => {
       }
     },
     authMiddlewareOptions: {},
+    middlewares: [verifyPin],
     handler: async (req, res) => {
-      const { pin } = await SQL_GET_PIN({
-        id: req.user!.id
-      }).one(new HttpError(401));
-
-      if (!await bcrypt.compare(req.body.pin, pin)) {
-        throw new HttpError(401);
-      }
       const nextOfKin = await SQL_CREATE_KIN({
         ...req.body,
         user_id: req.user!.id

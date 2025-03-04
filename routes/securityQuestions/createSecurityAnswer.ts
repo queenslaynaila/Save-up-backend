@@ -4,7 +4,7 @@ import { sql } from '../../db';
 import { z } from 'zod';
 import { securityAnswerSchema } from './updateAnswer';
 import HttpError from '../../httpError';
-import { SQL_GET_PIN } from '../nextOfKin/createNextOfKin';
+import { verifyPin } from '../../middlewares/authorization';
 
 const securityAnswerCreationSchema = z.object({
   answers: z.array(securityAnswerSchema.pick({
@@ -33,15 +33,8 @@ const createSecurityAnswer = (router: Router) => {
       201: {}
     },
     authMiddlewareOptions: {},
+    middlewares: [verifyPin],
     handler: async (req, res) => {
-      const { pin } = await SQL_GET_PIN({
-        id: req.user!.id
-      }).one(new HttpError(401));
-
-      if (!await bcrypt.compare(req.body.pin, pin)) {
-        throw new HttpError(401);
-      }
-
       const hashedAnswers = await Promise.all(
         req.body.answers.map(async ({ question_id, answer }) => ({
           question_id,

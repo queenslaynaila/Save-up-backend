@@ -1,6 +1,7 @@
 import Router from '../../router';
 import { sql } from '../../db';
 import { z } from 'zod';
+import { verifyPin } from '../../middlewares/authorization';
 
 const SQL_DELETE_KIN = sql<{user_id: number, xid: number}, Record<string, never>>(`
   UPDATE next_of_kins  
@@ -16,12 +17,16 @@ const deleteNextOfKin = (router: Router) => {
     path: '/:xid',
     summary: 'Delete a next of kin',
     request: {
-      params: z.object({ xid: z.string() })
+      params: z.object({ xid: z.string() }),
+        body: z.object({
+              pin: z.string().regex(/^\d{4}$/)
+            })
     },
     response: {
       204: {}
     },
     authMiddlewareOptions: {},
+    middlewares: [verifyPin],
     handler: async (req, res) => {
       await SQL_DELETE_KIN({
         user_id: req.user!.id,

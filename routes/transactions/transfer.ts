@@ -2,8 +2,7 @@ import Router from '../../router';
 import { sql } from '../../db';
 import HttpError from '../../httpError';
 import { z } from 'zod';
-import { SQL_GET_USER_PIN } from '../users/updateAttributes';
-import bcrypt from 'bcrypt';
+import { verifyPin } from '../../middlewares/authorization';
 
 const transferPayload = z.object({
   entity_id: z.number().min(1),
@@ -46,13 +45,8 @@ const createTransfer = (router: Router) => {
       201: {}
     },
     authMiddlewareOptions: {},
+    middlewares: [verifyPin],
     handler: async (req, res) => {
-      const { pin: currentPin } = await SQL_GET_USER_PIN({ id: req.user!.id }).one();
-
-      const isValidPin = await bcrypt.compare(req.body.pin, currentPin);
-      if (!isValidPin) {
-        throw new HttpError(403, { message: 'Invalid PIN' });
-      }
       const { source_pocket_id, destination_pocket_id, amount } = req.body;
 
       await SQL_CREATE_TRANSFER({

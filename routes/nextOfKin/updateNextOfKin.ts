@@ -1,10 +1,9 @@
 import Router from '../../router';
 import { sql } from '../../db';
-import { NextOfKin, SQL_GET_PIN } from './createNextOfKin';
+import { NextOfKin } from './createNextOfKin';
 import { z } from 'zod';
 import { nextOfKinSchema } from './schema';
-import HttpError from '../../httpError';
-import bcrypt from 'bcrypt';
+import { verifyPin } from '../../middlewares/authorization';
 
 const nextOfKinUpdatePayload = nextOfKinSchema.pick({
   full_name: true,
@@ -49,14 +48,8 @@ const updateNextOfKin = (router: Router) => {
       }
     },
     authMiddlewareOptions: {},
+    middlewares: [verifyPin],
     handler: async (req, res) => {
-      const { pin } = await SQL_GET_PIN({
-        id: req.user!.id
-      }).one(new HttpError(401));
-
-      if (!await bcrypt.compare(req.body.pin, pin)) {
-        throw new HttpError(401);
-      }
       const { full_name, relationship, phone_number } = req.body;
       const kin = await SQL_UPDATE_KIN({
         user_id: req.user!.id,

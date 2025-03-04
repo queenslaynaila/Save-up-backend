@@ -2,8 +2,8 @@ import { sql } from '../../db';
 import HttpError from '../../httpError';
 import Router from '../../router';
 import { z } from 'zod';
-import bcrypt from 'bcrypt';
-import { SQL_GET_USER_PIN } from '../users/updateAttributes';
+import { verifyPin } from '../../middlewares/authorization';
+import verifyGroupMembership from '../../middlewares/verifyGrpMembership';
 
 const withdrawalPayload = z.object({
   pocket_id: z.number().min(1),
@@ -37,15 +37,9 @@ const createWithdrawal = (router: Router) => {
       201: {}
     },
     authMiddlewareOptions: {},
+    middlewares: [verifyPin, verifyGroupMembership()],
     handler: async (req, res) => {
-      const { pocket_id, amount, pin } = req.body;
-      const { pin: currentPin } = await SQL_GET_USER_PIN({ id: req.user!.id }).one();
-
-      const isValidPin = await bcrypt.compare(pin, currentPin);
-      if (!isValidPin) {
-        throw new HttpError(403, { message: 'Invalid PIN' });
-      }
-
+      const { pocket_id, amount } = req.body;
       await SQL_CREATE_WITHDRAWAL({
         pocket_id,
         amount,

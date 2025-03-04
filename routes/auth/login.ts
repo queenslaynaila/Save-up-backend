@@ -21,8 +21,6 @@ export function generateToken(id: number, role: UserRole, expiresIn: string): st
   );
 }
 
-
-
 const authenticatedUserSchema = userSchema.pick({
   id: true,
   id_type: true,
