@@ -1,6 +1,7 @@
 import Router from '../../router';
 import { sql } from '../../db';
 import { z } from 'zod';
+import verifyGroupMembership from '../../middlewares/verifyGrpMembership';
 
 const Approval = z.object({
   user_id: z.string(),
@@ -49,6 +50,7 @@ const getGroupWithdrawals = (router: Router) => {
       })
     },
     authMiddlewareOptions: {}, 
+    middlewares: [verifyGroupMembership({allowAdminsAndModerators: true})],
     handler: async (req, res) => {
      const withdrawals = await SQL_INITIATE_GRP_WITHDRAWAL({
         group_id: Number(req.query.group_id),
