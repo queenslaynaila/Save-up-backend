@@ -14,21 +14,24 @@ type VerifyOptions = {
   allowAdmins: boolean;
 };
 
-
 export default function verifyGroupMembership(options: VerifyOptions = { allowAdmins: false }) {
-  return (req: Request, _res: Response, next: NextFunction) => {
+  return async (req: Request, _res: Response, next: NextFunction) => {
     const groupId = Number(req.query.group_id) || Number(req.body.group_id) || Number(req.params.group_id);
     if (!groupId) {
       return next();
     }
 
-    SQL_CHECK_GROUP_MEMBERSHIP({
+    await SQL_CHECK_GROUP_MEMBERSHIP({
       group_id: groupId,
       user_id: req.user!.id,
       allow_admin_access: options.allowAdmins
-    })
-      .exec()
-      .then(() => next())
-      .catch(err => next(err.code === 'P0001' ? new HttpError(403) : err)); 
+    }).exec()
+      .catch((err) => {
+        if(err.code === 'P0001') {
+          throw new HttpError(403);
+        }
+      });
+
+    next();
   };
 }
