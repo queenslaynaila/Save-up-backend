@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import Router from '../../router';
 import { sql } from '../../db';
+import verifyGroupMembership from "../../middlewares/verifyGrpMembership";
 
 const baseActivitySchema = z.object({
   id: z.number(),
@@ -322,7 +323,7 @@ const getGroupActivities = (router:Router) => {
         }),
         query: z.object({
             size: z.string().default('200')
-        })  
+        })
       },
       response:{
         200: {
@@ -331,16 +332,17 @@ const getGroupActivities = (router:Router) => {
       },
       summary: 'Get group activities',
       authMiddlewareOptions: {},
+      middlewares: [verifyGroupMembership({allowAdminsAndModerators:true})],
       handler: async (req, res) => {
         const groupId = Number(req.params.group_id);
         const size = Number(req.query.size) || 200;
         const activities = await SQL_GET_GROUP_ACTIVITIES({
-            group_id: groupId, 
+            group_id: groupId,
             size
         }).many();
         res.json(activities);
       }
     });
   };
-  
+
   export default getGroupActivities;
