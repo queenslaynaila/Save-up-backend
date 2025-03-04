@@ -1,9 +1,6 @@
 import https from 'follow-redirects';
-import dotenv from 'dotenv';
 import logger from '../logger';
 import Config from '../config';
-
-dotenv.config();
 
 const sendSms = (to: string, text: string) => {
   const options = {

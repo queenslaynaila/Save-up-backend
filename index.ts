@@ -3,7 +3,6 @@ import { NextFunction, Request, Response } from 'express';
 import Router, { generateOpenApiSpec } from './router';
 import swaggerUi from 'swagger-ui-express';
 import HttpError from './httpError';
-import dotenv from 'dotenv';
 import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
 import { z } from 'zod';
 import logger from './logger';
@@ -29,8 +28,6 @@ import './routes/donations/index';
 import Config from './config';
 
 extendZodWithOpenApi(z);
-
-dotenv.config();
 
 const app = Router.getAppInstance();
 
