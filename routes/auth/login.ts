@@ -9,7 +9,19 @@ import {
   userContactDetailsSchema 
 } from '../users/schema';
 import Router from '../../router';
-import { generateToken } from '../../middlewares/authorization';
+import Config from '../../config';
+import { UserRole } from '../../middlewares/authorization';
+import jwt, { Secret } from 'jsonwebtoken';
+
+export function generateToken(id: number, role: UserRole, expiresIn: string): string {
+  return jwt.sign(
+    { id, role },
+    Config.JWT_SECRET as Secret,
+    { expiresIn, issuer: Config.JWT_ISSUER }
+  );
+}
+
+
 
 const authenticatedUserSchema = userSchema.pick({
   id: true,

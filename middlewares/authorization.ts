@@ -7,7 +7,7 @@ import HttpError from '../httpError';
 import Config from '../config';
 
 const USER_ROLE_ENUM = z.enum(['Admin', 'Standard', 'Moderator']);
-type UserRole = z.infer<typeof USER_ROLE_ENUM>;
+export type UserRole = z.infer<typeof USER_ROLE_ENUM>;
 
 export interface AuthMiddlewareOptions {
   roles?: UserRole[] | UserRole;
@@ -24,15 +24,6 @@ declare module 'express-serve-static-core' {
   interface Request {
     user?: User;
   }
-}
-
-
-function generateToken(id: number, role: UserRole, expiresIn: string): string {
-  return jwt.sign(
-    { id, role },
-    Config.JWT_SECRET as Secret,
-    { expiresIn, issuer: Config.JWT_ISSUER }
-  );
 }
 
 export default function authMiddleware(options: AuthMiddlewareOptions = {}) {
@@ -158,4 +149,4 @@ async function verifyPin(req: Request, res: Response, next: NextFunction) {
 
 }
 
-export { authenticateResetToken, checkResetStepProgression, generateToken, verifyPin };
+export { authenticateResetToken, checkResetStepProgression,  verifyPin };
