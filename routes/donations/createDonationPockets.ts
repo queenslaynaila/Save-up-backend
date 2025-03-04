@@ -59,7 +59,7 @@ const SQL_LINK_DONATION_DETAILS = sql<{
   images: string[];
 }>(`
   INSERT INTO fundraiser_details (entity_id, pocket_id, description, images)
-  VALUES (:group_id, :pocket_id, :description, COALESCE(:images, '[]'))
+  VALUES (:group_id, :pocket_id, :description, :images)
   RETURNING description, images
 `);
 
