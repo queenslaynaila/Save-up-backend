@@ -1,6 +1,7 @@
 import Router from '../../router';
 import { sql } from '../../db';
 import { z } from 'zod';
+import verifyGroupMembership from '../../middlewares/verifyGrpMembership';
 
 const SQL_DELETE_EXPENSE = sql<{xid:number, entity_id:number}, Record<string, never>>(`
   UPDATE expenses
@@ -27,6 +28,7 @@ const deleteExpense = (router: Router) => {
       204: {}
     },
     authMiddlewareOptions: {},
+    middlewares: [verifyGroupMembership()],
     handler: async (req, res) => {
       const entity_id = Number(req.query?.entity_id) || req.user!.id;
       await SQL_DELETE_EXPENSE({

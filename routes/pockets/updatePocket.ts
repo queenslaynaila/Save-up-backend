@@ -2,6 +2,7 @@ import Router from '../../router';
 import { sql } from '../../db';
 import { z } from 'zod';
 import { pocketSchema } from './schema';
+import verifyGroupMembership from '../../middlewares/verifyGrpMembership';
 
 const pocketPatchParams = pocketSchema.pick({
   xid: true,
@@ -62,6 +63,7 @@ const updatePocket = (router: Router) => {
       }
     },
     authMiddlewareOptions: {},
+    middlewares: [verifyGroupMembership()],
     handler: async (req, res) => {
       const entity_id = req.body.entity_id || req.user!.id;
       const { name, category_id, target_amount, priority, target_at, pocket_type } = req.body;

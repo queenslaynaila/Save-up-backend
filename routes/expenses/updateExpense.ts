@@ -6,6 +6,7 @@ import {
   Expense
 } from './schema';
 import { z } from 'zod';
+import verifyGroupMembership from '../../middlewares/verifyGrpMembership';
 
 const expenseUpdateParams = expenseSchema.pick({
   category_id: true,
@@ -49,6 +50,7 @@ const updateExpense = (router: Router) => {
       }
     },
     authMiddlewareOptions: {},
+    middlewares: [verifyGroupMembership()],
     handler: async (req, res) => {
       const entity_id = Number(req.query.group_id) || req.user!.id;
       const xid = Number(req.params.xid);

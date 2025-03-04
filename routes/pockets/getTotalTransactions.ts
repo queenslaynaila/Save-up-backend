@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { sql } from '../../db';
 import Router from '../../router';
+import verifyGroupMembership from '../../middlewares/verifyGrpMembership';
 
 const SQL_INNER_BALANCE = sql<{ entity_id: number, pocket_id?: string, from?: string, to?: string }, { balance: number }>(`
   SELECT DISTINCT ON (pocket_id) balance
@@ -40,6 +41,7 @@ const fetchPocketBalances = (router: Router) => {
       }
     },
     authMiddlewareOptions: {},
+    middlewares: [verifyGroupMembership({allowAdminsAndModerators: true})],
     handler: async (req, res) => {
       const entity_id = Number(req.query?.group_id) || req.user!.id;
       const { pocket_id, from, to } = req.query;
