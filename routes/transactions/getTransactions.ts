@@ -113,7 +113,7 @@ const getTransactions = (router: Router) => {
       }
     },
     authMiddlewareOptions: {},
-    middlewares: [verifyGroupMembership({allowAdminsAndModerators: true})],
+    middlewares: [verifyGroupMembership(true)],
     handler: async (req, res) => {
       const group_id = req.query.group_id ? Number(req.query.group_id) : null;
       const entity_id = group_id || parseInt(req.params.user_id, 10);

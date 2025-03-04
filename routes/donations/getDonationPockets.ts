@@ -72,7 +72,7 @@ const getDonationPockets = (router: Router) => {
       },
     },
     authMiddlewareOptions: {},
-    middlewares:[verifyGroupMembership({allowAdminsAndModerators: true})],
+    middlewares:[verifyGroupMembership(true)],
     handler: async (req, res) => {
       const {group_id } = req.params;
       const pockets = await SQL_GET_DONATION_POCKETS({ 

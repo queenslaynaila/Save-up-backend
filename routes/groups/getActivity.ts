@@ -332,7 +332,7 @@ const getGroupActivities = (router:Router) => {
       },
       summary: 'Get group activities',
       authMiddlewareOptions: {},
-      middlewares: [verifyGroupMembership({allowAdminsAndModerators:true})],
+      middlewares: [verifyGroupMembership(true)],
       handler: async (req, res) => {
         const groupId = Number(req.params.group_id);
         const size = Number(req.query.size) || 200;
