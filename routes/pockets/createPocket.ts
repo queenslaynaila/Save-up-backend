@@ -3,7 +3,7 @@ import { sql } from '../../db';
 
 import { pocketSchema } from './schema';
 import { z } from 'zod';
-import verifyGroupMembership from '../../verifyGrpMembership';
+import verifyGroupMembership from '../../middlewares/verifyGrpMembership';
 
 const pocketCreationSchema = pocketSchema.pick({
   category_id: true,

@@ -3,7 +3,11 @@ import bcrypt from 'bcrypt';
 import { z } from 'zod';
 import { sql } from '../../db';
 import HttpError from '../../httpError';
-import { userSchema, loginAttemptSchema, userContactDetailsSchema } from '../users/schema';
+import { 
+  userSchema, 
+  loginAttemptSchema, 
+  userContactDetailsSchema 
+} from '../users/schema';
 import Router from '../../router';
 import { generateToken } from '../../authorization';
 

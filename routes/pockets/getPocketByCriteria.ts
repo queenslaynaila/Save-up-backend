@@ -3,7 +3,7 @@ import { sql } from '../../db';
 import { ParsedQs } from 'qs';
 import { z } from 'zod';
 import { pocket } from './createPocket';
-import verifyGroupMembership from '../../verifyGrpMembership';
+import verifyGroupMembership from '../../middlewares/verifyGrpMembership';
 
 const pocketSchema = pocket.omit({
   entity_id: true,

@@ -3,8 +3,17 @@ import { z } from 'zod';
 import { sql } from '../../db';
 import Router from '../../router';
 import HttpError from '../../httpError';
-import { USER_ROLE_ENUM, userContactDetailsSchema, userSchema } from '../users/schema';
-import { AuthenticatedUser, getClientInfo, publicUserSchema, recordLoginAttempt } from './login';
+import { 
+  USER_ROLE_ENUM, 
+  userContactDetailsSchema, 
+  userSchema
+ } from '../users/schema';
+import {
+  AuthenticatedUser, 
+  getClientInfo, 
+  publicUserSchema, 
+  recordLoginAttempt
+} from './login';
 import { generateToken } from '../../authorization';
 
 const createUserPayloadSchema = userSchema.pick({
@@ -57,6 +66,7 @@ const createUser = (router: Router) => {
 
       const { ipAddress, userAgent } = getClientInfo(req);
       await recordLoginAttempt(user.id, ipAddress, userAgent, true, 'First Time');
+
       const accessToken = generateToken(user.id, user.role, '7d');
       res
         .status(201)

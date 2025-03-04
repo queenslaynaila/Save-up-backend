@@ -6,7 +6,7 @@ import {
 } from './schema';
 import { z } from 'zod';
 import { ParsedQs } from 'qs';
-import verifyGroupMembership from '../../verifyGrpMembership';
+import verifyGroupMembership from '../../middlewares/verifyGrpMembership';
 
 const SQL_GET_EXPENSES = sql<{ entity_id:number }, Expense>(`
   SELECT entity_id, 
