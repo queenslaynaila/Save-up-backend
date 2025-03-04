@@ -2,12 +2,13 @@ import { z } from "zod";
 import Router from "../../router";
 import { sql } from "../../db";
 import verifyGroupMembership from "../../middlewares/verifyGrpMembership";
+import logger from "../../logger";
 
 const donationParams = z.object({
-  group_id: z.number().positive(),
+  group_id: z.number().int(),
   name: z.string(),
   description: z.string(),
-  images: z.array(z.string()).optional(),
+  images: z.array(z.string()).nullable().optional(),
   target_amount: z.number(),
   target_at: z.string(),
 });
@@ -27,7 +28,7 @@ const SQL_CREATE_DONATION_FUND = sql<{
   target_at: string;
   created_at: string;
 }>(`
-  INSERT INTO fundraisers (entity_id, xid, category_id, name, target_amount, target_at)
+  INSERT INTO pockets(entity_id, xid, category_id, name, target_amount, target_at)
   SELECT 
       :group_id,
       COALESCE(MAX(xid), 0) + 1,
@@ -35,7 +36,7 @@ const SQL_CREATE_DONATION_FUND = sql<{
       :name,
       :target_amount,
       :target_at
-  FROM fundraisers 
+  FROM pockets
   WHERE entity_id = :group_id
   RETURNING 
       xid, 
@@ -58,7 +59,7 @@ const SQL_LINK_DONATION_DETAILS = sql<{
   description: string;
   images: string[];
 }>(`
-  INSERT INTO fundraiser_details (entity_id, pocket_id, description, images)
+  INSERT INTO donation_pockets (entity_id, pocket_id, description, images)
   VALUES (:group_id, :pocket_id, :description, :images)
   RETURNING description, images
 `);
@@ -69,7 +70,7 @@ const createFundraiser = (router: Router) => {
     path: "/",
     summary: "Create a fundraiser",
     request: {
-      body: donationParams,
+      body:donationParams
     },
     response: {
       201: {
@@ -106,14 +107,21 @@ const createFundraiser = (router: Router) => {
           name,
           target_amount,
           target_at,
-        }).using(trx).one();
+        }).using(trx).one().catch((err) => {
+          logger.info(`error one is ${err}`)
+          throw err
+        });
+;
 
         const fundraiserDetails = await SQL_LINK_DONATION_DETAILS({
           group_id,
           pocket_id: fundraiser.xid,
           description,
           images: images ?? [],
-        }).using(trx).one();
+        }).using(trx).one().catch((err) => {
+          logger.info(`error is ${err}`)
+          throw err
+        });
 
         res.json({
           xid: fundraiser.xid,
