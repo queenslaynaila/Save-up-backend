@@ -6,7 +6,7 @@ import jwt, { Secret } from 'jsonwebtoken';
 import { sql } from '../../db';
 import HttpError from '../../httpError';
 import { z } from 'zod';
-import { authenticateResetToken, checkResetStepProgression } from '../../authorization';
+import { authenticateResetToken, checkResetStepProgression } from '../../middlewares/authorization';
 const verifyAnswerSchema = z.object({
   question_id: z.number().min(1),
   answer: z.string()

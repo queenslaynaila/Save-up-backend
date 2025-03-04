@@ -5,7 +5,7 @@ import { sql } from '../../db';
 import HttpError from '../../httpError';
 import { ResetToken } from './schema';
 import { z } from 'zod';
-import { authenticateResetToken, checkResetStepProgression } from '../../authorization';
+import { authenticateResetToken, checkResetStepProgression } from '../../middlewares/authorization';
 
 const SQL_GET_SECURITY_QUESTIONS = sql<{ user_id: number }, { id: number; question: string }>(`
   SELECT 

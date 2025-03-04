@@ -1,9 +1,9 @@
 /* eslint-disable max-len */
 import Router from '../../router';
 import { sql } from '../../db';
-import { verifyPin } from '../../authorization';
 import { z } from 'zod';
 import bcrypt from 'bcrypt';
+import { verifyPin } from '../../middlewares/authorization';
 
 export const securityAnswerSchema = z.object({
   user_id: z.number().int(),

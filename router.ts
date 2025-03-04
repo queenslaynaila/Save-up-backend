@@ -13,7 +13,7 @@ import { OpenApiGeneratorV3, OpenAPIRegistry } from '@asteasolutions/zod-to-open
 import fastJson from 'fast-json-stringify';
 import zodToJsonSchema from 'zod-to-json-schema';
 import Ajv, { ErrorObject } from 'ajv';
-import authMiddleware, { authenticateResetToken, AuthMiddlewareOptions } from './authorization';
+import authMiddleware, { authenticateResetToken, AuthMiddlewareOptions } from './middlewares/authorization';
 import basicAuth from 'express-basic-auth';
 import dotenv from 'dotenv';
 import cors from 'cors';

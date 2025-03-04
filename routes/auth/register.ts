@@ -14,7 +14,7 @@ import {
   publicUserSchema, 
   recordLoginAttempt
 } from './login';
-import { generateToken } from '../../authorization';
+import { generateToken } from '../../middlewares/authorization';
 
 const createUserPayloadSchema = userSchema.pick({
   pin: true,

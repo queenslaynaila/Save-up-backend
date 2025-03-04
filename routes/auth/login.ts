@@ -9,7 +9,7 @@ import {
   userContactDetailsSchema 
 } from '../users/schema';
 import Router from '../../router';
-import { generateToken } from '../../authorization';
+import { generateToken } from '../../middlewares/authorization';
 
 const authenticatedUserSchema = userSchema.pick({
   id: true,
