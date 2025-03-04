@@ -20,6 +20,8 @@ const finalApprovalSchema = adminLoanApprovalSchema.omit({
   reason: true
 });
 
+export type FinalApproval = z.infer<typeof finalApprovalSchema>;
+
 export const finalApprovalBody = finalApprovalSchema.omit({
   admin_id: true
 });

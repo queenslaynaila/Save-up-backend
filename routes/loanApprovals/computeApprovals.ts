@@ -1,9 +1,8 @@
 import Router from '../../router';
 import { sql } from '../../db';
+import { FinalApproval, finalApprovalBody } from './types';
 
-import { FinalnApproval, finalApprovalBody } from './types';
-
-const SQL_COMPUTE_APPROVALS = sql< FinalnApproval, Record<string, never>>(`
+const SQL_COMPUTE_APPROVALS = sql< FinalApproval, Record<string, never>>(`
   SELECT compute_loan_approvals(:group_id, :request_id, :admin_id );
 `);
 
