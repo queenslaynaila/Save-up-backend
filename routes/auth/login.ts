@@ -6,12 +6,9 @@ import HttpError from '../../httpError';
 import { 
   userSchema, 
   loginAttemptSchema, 
-  userContactDetailsSchema, 
-  Role 
+  userContactDetailsSchema
 } from '../users/schema';
 import Router from '../../router';
-import Config from '../../config';
-import jwt, { Secret } from 'jsonwebtoken';
 import { generateToken } from '../../utils';
 
 const authenticatedUserSchema = userSchema.pick({
