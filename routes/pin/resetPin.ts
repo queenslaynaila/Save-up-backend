@@ -2,7 +2,7 @@ import Router from '../../router';
 import bcrypt from 'bcrypt';
 import { sql } from '../../db';
 import { z } from 'zod';
-import { authenticateResetToken, checkResetStepProgression } from '../../middlewares/authorization';
+import { authenticateResetTokenAndCheckStep } from '../../middlewares/authorization';
 
 const SQL_RESET_PASSWORD = sql<{id: number; pin: string}, Record<string, never>>(`
   UPDATE users 
@@ -20,7 +20,7 @@ const resetPin = (router: Router) => {
         new_pin: z.string().regex(/^\d{4}$/)
       })
     },
-    middlewares: [authenticateResetToken, checkResetStepProgression(3)],
+    middlewares: [authenticateResetTokenAndCheckStep(3)],
     handler: async (req, res) => {
       const { new_pin } = req.body;
       const user_id = req.user!.id;

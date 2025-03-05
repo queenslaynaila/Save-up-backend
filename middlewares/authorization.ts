@@ -16,7 +16,7 @@ export interface AuthMiddlewareOptions {
 
 interface User {
   id: number;
-  role: UserRole;
+  role: UserRole;  
   step?: number;
 }
 
@@ -41,26 +41,34 @@ function extractToken(headerValue?: string): string {
 
 function verifyJwtToken(token: string): User {
   const decoded = jwt.verify(token, Config.JWT_SECRET as Secret) as JwtPayload;
+
   if (!decoded || 
-      (decoded.exp && 
-        decoded.exp * 1000 <= Date.now())){
-     throw new HttpError(401);
+      !decoded.id || 
+      !decoded.role || 
+      (decoded.exp && decoded.exp * 1000 <= Date.now())
+    ) {
+    throw new HttpError(401);
   }
+
   return { id: decoded.id, role: decoded.role };
 }
 
 export async function authMiddleware(options: AuthMiddlewareOptions = {}) {
-  const roles = Array.isArray(options.roles) ? options.roles : options.roles ? [options.roles] : [];
+  const roles = Array.isArray(options.roles) 
+    ? options.roles 
+    : options.roles 
+      ? [options.roles] 
+      : [];
   const allowModeratorAccess = options.allowModeratorAccess || false;
 
-  return function (req: Request, _res: Response, next: NextFunction) {
+  return function(req: Request, _res: Response, next: NextFunction) {
     req.user = verifyJwtToken(extractToken(req.headers.authorization));
 
-    if (roles.length && !roles.includes(req.user.role)){
-       throw new HttpError(403);
+    if (roles.length && !roles.includes(req.user.role)) {
+      throw new HttpError(403);
     }
 
-    if (req.params.user_id === 'me'){
+    if (req.params.user_id === 'me') {
       req.params.user_id = req.user.id.toString();
     }
 
@@ -74,30 +82,69 @@ export async function authMiddleware(options: AuthMiddlewareOptions = {}) {
   };
 }
 
-export async function authenticateResetToken(req: Request, _res: Response, next: NextFunction) {
-  req.user = verifyJwtToken(extractToken(req.headers.reset as string));
-  next();
-}
-
-export async function checkResetStepProgression(requiredStep: number) {
+export function authenticateResetTokenAndCheckStep(requiredStep: number) {
   return function (req: Request, _res: Response, next: NextFunction) {
-    if (req.user?.step !== requiredStep){
-       throw new HttpError(403);
+    req.user = verifyJwtToken(extractToken(req.headers.reset as string));
+
+    if (req.user?.step !== requiredStep) {
+      throw new HttpError(403);
     }
+
     next();
   };
 }
 
 const SQL_GET_PIN = sql<{ user_id: number }, { pin: string }>(`
-  SELECT pin FROM users WHERE id = :user_id
+  SELECT pin 
+  FROM users 
+  WHERE id = :user_id
 `);
 
 export async function verifyPin(req: Request, _res: Response, next: NextFunction) {
   const { pin: hashedPin } = await SQL_GET_PIN({ 
     user_id: req.user!.id 
   }).one();
-  if (!await bcrypt.compare(req.body.pin, hashedPin)){
+
+  if (!await bcrypt.compare(req.body.pin, hashedPin)) {
     throw new HttpError(401);
   }
   next();
-};
+}
+
+const SQL_CHECK_GROUP_MEMBERSHIP = sql<{
+  group_id: number;
+  user_id: number;
+  allow_admin_access: boolean;
+}, Record<string, never>>(`
+  SELECT check_grp_membership(
+    :group_id,
+    :user_id,
+    :allow_admin_access
+  )
+`);
+
+export default function verifyGroupMembership(allowAdminsAndModerators = false) {
+  return async (req: Request, _res: Response, next: NextFunction) => {
+    const groupId = Number(req.params.group_id) ||
+                   Number(req.body.group_id) ||
+                   Number(req.query.group_id);
+
+    if (!groupId) {
+      return next();
+    }
+
+    await SQL_CHECK_GROUP_MEMBERSHIP({
+      group_id: groupId,
+      user_id: req.user!.id,
+      allow_admin_access: allowAdminsAndModerators
+    }).exec()
+      .catch((err) => {
+        if (err.code === 'P0001') {
+          throw new HttpError(403);
+        }
+        throw err;
+      });
+
+    next();
+  };
+}

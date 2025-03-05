@@ -6,7 +6,7 @@ import jwt, { Secret } from 'jsonwebtoken';
 import { sql } from '../../db';
 import HttpError from '../../httpError';
 import { z } from 'zod';
-import { authenticateResetToken, checkResetStepProgression } from '../../middlewares/authorization';
+import { authenticateResetTokenAndCheckStep} from '../../middlewares/authorization';
 import Config from '../../config';
 const verifyAnswerSchema = z.object({
   question_id: z.number().min(1),
@@ -30,7 +30,7 @@ const verifySecurityAnswers = (router: Router) => {
     response: {
       204: {}
     },
-    middlewares: [authenticateResetToken, checkResetStepProgression(2)],
+      middlewares: [authenticateResetTokenAndCheckStep(2)],
     handler: async (req, res) => {
       const answers = req.body;
 

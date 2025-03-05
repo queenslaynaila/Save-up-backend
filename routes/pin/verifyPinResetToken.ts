@@ -5,8 +5,8 @@ import { sql } from '../../db';
 import HttpError from '../../httpError';
 import { ResetToken } from './schema';
 import { z } from 'zod';
-import { authenticateResetToken, checkResetStepProgression } from '../../middlewares/authorization';
 import Config from '../../config';
+import { authenticateResetTokenAndCheckStep } from '../../middlewares/authorization';
 
 const SQL_GET_SECURITY_QUESTIONS = sql<{ user_id: number }, { id: number; question: string }>(`
   SELECT 
@@ -61,7 +61,7 @@ const verifyPinResetToken = (router: Router) => {
         schema: z.array(questionsSchema)
       }
     },
-    middlewares: [authenticateResetToken, checkResetStepProgression(1)],
+       middlewares: [authenticateResetTokenAndCheckStep(1)],
     handler: async (req, res) => {
       const { reset_token } = req.body;
       const user_id = req.user!.id;
