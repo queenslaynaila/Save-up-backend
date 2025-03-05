@@ -19,7 +19,7 @@ declare module 'express-serve-static-core' {
 }
 
 export function generateToken(id: number, role: Role, expiresIn: string, step?: number): string {
-  const payload: Record<string, any> = { id, role };
+  const payload: AuthenticatedUser = { id, role };
   if (step) payload.step = step;
 
   return jwt.sign(
