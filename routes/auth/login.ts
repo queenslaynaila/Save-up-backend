@@ -7,7 +7,7 @@ import {
   userSchema, 
   loginAttemptSchema, 
   userContactDetailsSchema, 
-  Role
+  Role 
 } from '../users/schema';
 import Router from '../../router';
 import Config from '../../config';
@@ -35,10 +35,7 @@ const authenticatedUserSchema = userSchema.pick({
 });
 
 export type AuthenticatedUser = z.infer<typeof authenticatedUserSchema>;
-
-export const publicUserSchema = authenticatedUserSchema.omit({
-  pin: true
-});
+export const publicUserSchema = authenticatedUserSchema.omit({ pin: true });
 export type UserWithPublicAttributes = z.infer<typeof publicUserSchema>;
 
 const SQL_GET_USER = sql<{ phone_number: string }, AuthenticatedUser>(`
@@ -52,10 +49,9 @@ const SQL_GET_USER = sql<{ phone_number: string }, AuthenticatedUser>(`
     users.gender, 
     users.pin,
     users.created_at
-  FROM 
-    users
-  LEFT JOIN 
-    user_contact_details ON users.id = user_contact_details.id
+  FROM users
+  LEFT JOIN user_contact_details 
+    ON users.id = user_contact_details.id
   WHERE user_contact_details.phone_number = :phone_number
 `);
 
@@ -66,16 +62,25 @@ const loginSchema = loginAttemptSchema.pick({
   success: true,
   reason: true
 });
+
 type LoginAttempt = z.infer<typeof loginSchema>;
+
 const SQL_RECORD_LOGIN_ATTEMPT = sql<LoginAttempt, Record<string, never>>(`
-  INSERT INTO login_attempts (user_id, xid, ip_address, browser_info, success, reason)
+  INSERT INTO login_attempts (
+    user_id, 
+    xid, 
+    ip_address, 
+    browser_info, 
+    success, 
+    reason
+  )
   SELECT 
-      :user_id,
-      COALESCE(MAX(xid), 0) + 1, 
-      :ip_address, 
-      :browser_info, 
-      :success, 
-      :reason
+    :user_id,
+    COALESCE(MAX(xid), 0) + 1, 
+    :ip_address, 
+    :browser_info, 
+    :success, 
+    :reason
   FROM login_attempts
   WHERE user_id = :user_id
 `);
@@ -84,9 +89,11 @@ const loginOutcomeSchema = loginSchema.pick({
   success: true,
   reason: true
 });
+
 type LoginOutcome = z.infer<typeof loginOutcomeSchema>;
+
 const SQL_GET_LAST_THREE_LOGIN_ATTEMPTS = sql<{ id: number }, LoginOutcome>(`
-  SELECT success
+  SELECT success, reason
   FROM login_attempts
   WHERE user_id = :id
   ORDER BY xid DESC
@@ -120,13 +127,16 @@ function calculateLoginAttemptsLeft(lastThreeAttempts: LoginOutcome[]) {
   if (lastThreeAttempts.length === 0 || lastThreeAttempts[0].success) {
     return 4;
   }
+
   if (lastThreeAttempts[0].reason === 'Locked') {
     throw new HttpError(423);
   }
+
   const failedAttempts = lastThreeAttempts.reduce(
     (count, attempt) => count + (!attempt.success ? 1 : 0),
     0
   );
+
   return 4 - failedAttempts;
 }
 
@@ -172,17 +182,37 @@ const login = (router: Router) => {
       const { ipAddress, userAgent } = getClientInfo(req);
 
       if (remainingAttempts === 0) {
-        await recordLoginAttempt(user.id, ipAddress, userAgent, false, 'Locked');
+        await recordLoginAttempt(
+          user.id, 
+          ipAddress, 
+          userAgent, 
+          false, 
+          'Locked'
+        );
         throw new HttpError(423);
       }
 
       if (!await bcrypt.compare(req.body.pin, pin)) {
-        await recordLoginAttempt(user.id, ipAddress, userAgent, false, 'Incorrect pin');
+        await recordLoginAttempt(
+          user.id, 
+          ipAddress, 
+          userAgent, 
+          false, 
+          'Incorrect pin'
+        );
         throw new HttpError(401, { remaining_attempts: remainingAttempts - 1 });
       }
 
-      await recordLoginAttempt(user.id, ipAddress, userAgent, true, 'Returning');
+      await recordLoginAttempt(
+        user.id, 
+        ipAddress, 
+        userAgent, 
+        true, 
+        'Returning'
+      );
+
       const accessToken = generateToken(user.id, user.role, '7d');
+      
       res
         .setHeader('Authorization', accessToken)
         .json(user);
