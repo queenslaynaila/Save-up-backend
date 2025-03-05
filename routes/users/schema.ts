@@ -1,8 +1,16 @@
 import { z } from 'zod';
 
-const ID_TYPE_ENUM = z.enum(['National', 'Passport']);
-export const USER_ROLE_ENUM = z.enum(['Admin', 'Standard', 'Moderator']);
-const GENDER_ENUM = z.enum(['Male', 'Female']);
+export const UserRole = z.enum(['Admin', 'Standard', 'Moderator']);
+const IdType = z.enum(['National', 'Passport']);
+export type UserRole = z.infer<typeof UserRole>;
+const Gender = z.enum(['Male', 'Female']);
+
+const authenticatedUser = z.object({
+  id: z.number().min(1),
+  role: UserRole,
+  step: z.number().optional()
+});
+export type AuthenticatedUser = z.infer<typeof authenticatedUser>;
 
 export const userContactDetailsSchema = z.object({
   id: z.number().min(1),
@@ -13,10 +21,10 @@ export const userContactDetailsSchema = z.object({
 
 export const userSchema = z.object({
   id: z.number().min(1),
-  id_type: ID_TYPE_ENUM,
+  id_type: IdType,
   id_number: z.string().regex(/^(?:\d{8}|\d{9}(\d{4})?|\d{10}|\d{13}|\d{16})$/),
-  role: USER_ROLE_ENUM,
-  gender: GENDER_ENUM.optional(),
+  role: UserRole,
+  gender: Gender.optional(),
   pin: z.string().regex(/^\d{4}$/),
   created_at: z.string().datetime()
 });
@@ -41,7 +49,7 @@ export const userPhoneHistorySchema = z.object({
 export const userIdHistorySchema = z.object({
   user_id: z.number().min(1),
   xid: z.number().int(),
-  id_type: ID_TYPE_ENUM,
+  id_type: IdType,
   id_number: z.string().regex(/^[0-9]+$/),
   created_at: z.string().datetime()
 });

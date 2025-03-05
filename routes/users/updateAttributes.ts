@@ -2,7 +2,7 @@ import bcrypt from 'bcrypt';
 import { z } from 'zod';
 import { sql } from '../../db';
 import HttpError from '../../httpError';
-import { USER_ROLE_ENUM, userIdHistorySchema, userPhoneHistorySchema, userSchema } from './schema';
+import { UserRole, userIdHistorySchema, userPhoneHistorySchema, userSchema } from './schema';
 import Router from '../../router';
 
 const convertToTitleCase = (str: string): string => {
@@ -139,7 +139,7 @@ const updateUserAttributes = (router: Router) => {
         await SQL_UPDATE_PIN({ id: userId, pin: hashedNewPin }).exec();
         return res.sendStatus(204);
       }
-      if ('role' in req.body && req.user!.role === USER_ROLE_ENUM.Enum.Admin) {
+      if ('role' in req.body && req.user!.role === UserRole.Enum.Admin) {
         const role = convertToTitleCase(req.body.role);
         const { updatedRole } = await SQL_UPDATE_ROLE({
           targetUserId: userId,

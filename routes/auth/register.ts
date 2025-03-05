@@ -4,7 +4,7 @@ import { sql } from '../../db';
 import Router from '../../router';
 import HttpError from '../../httpError';
 import { 
-  USER_ROLE_ENUM, 
+  UserRole, 
   userContactDetailsSchema, 
   userSchema
  } from '../users/schema';
@@ -24,7 +24,7 @@ const createUserPayloadSchema = userSchema.pick({
 }).extend({
   full_name: userContactDetailsSchema.shape.full_name,
   phone_number: userContactDetailsSchema.shape.phone_number,
-  role: USER_ROLE_ENUM.optional()
+  role: UserRole.optional()
 });
 type CreateUserPayload = z.infer<typeof createUserPayloadSchema>;
 
@@ -55,7 +55,7 @@ const createUser = (router: Router) => {
       const pinHash = bcrypt.hashSync(String(req.body.pin), 12);
       const user = await SQL_CREATE_USER({
         ...req.body,
-        role: req.body.role || USER_ROLE_ENUM.Enum.Standard,
+        role: req.body.role || UserRole.Enum.Standard,
         pin: pinHash
       }).one().catch((err) => {
         if (err.code === '23505') {

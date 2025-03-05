@@ -6,11 +6,11 @@ import HttpError from '../../httpError';
 import { 
   userSchema, 
   loginAttemptSchema, 
-  userContactDetailsSchema 
+  userContactDetailsSchema, 
+  UserRole
 } from '../users/schema';
 import Router from '../../router';
 import Config from '../../config';
-import { UserRole } from '../../utils';
 import jwt, { Secret } from 'jsonwebtoken';
 
 export function generateToken(id: number, role: UserRole, expiresIn: string): string {

@@ -5,28 +5,20 @@ import { z } from 'zod';
 import { sql } from './db';
 import HttpError from './httpError';
 import Config from './config';
-
-const USER_ROLE_ENUM = z.enum(['Admin', 'Standard', 'Moderator']);
-export type UserRole = z.infer<typeof USER_ROLE_ENUM>;
+import { AuthenticatedUser, UserRole } from './routes/users/schema';
 
 export interface AuthMiddlewareOptions {
   roles?: UserRole[] | UserRole;
   allowModeratorAccess?: boolean;
 }
 
-interface User {
-  id: number;
-  role: UserRole;
-  step?: number;
-}
-
 declare module 'express-serve-static-core' {
   interface Request {
-    user?: User;
+    user?:AuthenticatedUser;
   }
 }
 
-function extractAndVerifyJwtToken(headerValue?: string): User {
+function extractAndVerifyJwtToken(headerValue?: string): AuthenticatedUser {
   if (!headerValue) {
     throw new HttpError(401);
   }
@@ -48,7 +40,6 @@ function extractAndVerifyJwtToken(headerValue?: string): User {
 
   return { id: decoded.id, role: decoded.role, step: decoded.step };
 }
-
 
 export function authMiddleware(options: AuthMiddlewareOptions = {}) {
   const roles = Array.isArray(options.roles)

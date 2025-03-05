@@ -3,7 +3,7 @@ import { sql } from '../../db';
 import { NextOfKin, nextOfKinPublicViewSchema } from './createNextOfKin';
 import { z } from 'zod';
 import HttpError from '../../httpError';
-import { USER_ROLE_ENUM } from '../users/schema';
+import { UserRole } from '../users/schema';
 
 const SQL_GET_KIN = sql<{user_id: number}, NextOfKin>(`
   SELECT xid, full_name, relationship, phone_number, created_at
@@ -41,7 +41,7 @@ const getNextOfKin = (router: Router) => {
       const user_id = parseInt(req.params.user_id, 10);
       const { include_history = 'false' }= req.query;
       const targetUser = user_id || req.user!.id;
-      if (req.user!.role === USER_ROLE_ENUM.Enum.Standard
+      if (req.user!.role === UserRole.Enum.Standard
         && (req.user!.id !== targetUser || include_history)) {
         throw new HttpError(403);
       }

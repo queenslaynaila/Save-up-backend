@@ -3,7 +3,7 @@ import { sql } from '../../db';
 import HttpError from '../../httpError';
 import Router from '../../router';
 import { publicUserSchema, UserWithPublicAttributes } from '../auth/login';
-import { USER_ROLE_ENUM } from './schema';
+import { UserRole } from './schema';
 
 const SQL_GET_USER_BY_CRITERIA = sql<Record<string, never>, UserWithPublicAttributes>(`
   SELECT 
@@ -57,7 +57,7 @@ const getUsersBySearchCriteria = (router: Router) => {
         throw new HttpError(400);
       }
 
-      if (req.user!.role === USER_ROLE_ENUM.Enum.Standard
+      if (req.user!.role === UserRole.Enum.Standard
         && requestedUserId !== req.user!.id) {
         throw new HttpError(403);
       }
