@@ -13,11 +13,11 @@ import { OpenApiGeneratorV3, OpenAPIRegistry } from '@asteasolutions/zod-to-open
 import fastJson from 'fast-json-stringify';
 import zodToJsonSchema from 'zod-to-json-schema';
 import Ajv, { ErrorObject } from 'ajv';
-import authMiddleware, { authenticateResetToken, AuthMiddlewareOptions } from './middlewares/authorization';
 import basicAuth from 'express-basic-auth';
 import cors from 'cors';
 import HttpError from './httpError';
 import Config from './config';
+import { authenticateResetTokenAndCheckStep, authMiddleware, AuthMiddlewareOptions } from './middlewares/authorization';
 
 
 const ajv = new Ajv();
@@ -169,7 +169,7 @@ class Router {
     }
     
     if (authMiddlewareOptions) {
-      middlewares.splice(1, 0, authMiddleware(authMiddlewareOptions));
+      middlewares.splice(1, 0,  authMiddleware(authMiddlewareOptions));
     }
     
 
@@ -177,9 +177,9 @@ class Router {
     if (authMiddlewareOptions) {
       security.push({ Authorization: [] });
     }
-    if (middlewares?.includes(authenticateResetToken)) {
+    if (middlewares?.some(m => m.name === "resetStepValidator")) {
       security.push({ Reset: [] });
-    }
+    }    
 
     const responseSchemas = Object.entries(response)
       .reduce((acc, [statusCode, { schema, headers }]) => {

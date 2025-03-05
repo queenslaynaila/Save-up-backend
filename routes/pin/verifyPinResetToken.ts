@@ -61,7 +61,7 @@ const verifyPinResetToken = (router: Router) => {
         schema: z.array(questionsSchema)
       }
     },
-       middlewares: [authenticateResetTokenAndCheckStep(1)],
+    middlewares: [authenticateResetTokenAndCheckStep(1)],
     handler: async (req, res) => {
       const { reset_token } = req.body;
       const user_id = req.user!.id;

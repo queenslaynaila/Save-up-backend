@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcrypt';
-import jwt, { Secret, VerifyErrors, JwtPayload } from 'jsonwebtoken';
+import jwt, { Secret,JwtPayload } from 'jsonwebtoken';
 import { z } from 'zod';
 import { sql } from '../db';
 import HttpError from '../httpError';
@@ -53,7 +53,7 @@ function verifyJwtToken(token: string): User {
   return { id: decoded.id, role: decoded.role };
 }
 
-export async function authMiddleware(options: AuthMiddlewareOptions = {}) {
+export function authMiddleware(options: AuthMiddlewareOptions = {}) {
   const roles = Array.isArray(options.roles) 
     ? options.roles 
     : options.roles 
@@ -83,7 +83,7 @@ export async function authMiddleware(options: AuthMiddlewareOptions = {}) {
 }
 
 export function authenticateResetTokenAndCheckStep(requiredStep: number) {
-  return function (req: Request, _res: Response, next: NextFunction) {
+  const resetStepValidator = function (req: Request, _res: Response, next: NextFunction) {
     req.user = verifyJwtToken(extractToken(req.headers.reset as string));
 
     if (req.user?.step !== requiredStep) {
@@ -92,7 +92,10 @@ export function authenticateResetTokenAndCheckStep(requiredStep: number) {
 
     next();
   };
+
+  return resetStepValidator;
 }
+
 
 const SQL_GET_PIN = sql<{ user_id: number }, { pin: string }>(`
   SELECT pin 
