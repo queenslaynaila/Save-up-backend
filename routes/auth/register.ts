@@ -6,17 +6,17 @@ import HttpError from '../../httpError';
 import { 
   UserRole, 
   userContactDetailsSchema, 
-  userSchema
- } from '../users/schema';
+  userSchema 
+} from '../users/schema';
 import {
-  AuthenticatedUser, 
-  generateToken, 
-  getClientInfo, 
-  publicUserSchema, 
+  AuthenticatedUser,
+  generateToken,
+  getClientInfo,
+  publicUserSchema,
   recordLoginAttempt
 } from './login';
 
-const createUserPayloadSchema = userSchema.pick({
+const UserRegistrationSchema = userSchema.pick({
   pin: true,
   id_type: true,
   id_number: true,
@@ -26,10 +26,20 @@ const createUserPayloadSchema = userSchema.pick({
   phone_number: userContactDetailsSchema.shape.phone_number,
   role: UserRole.optional()
 });
-type CreateUserPayload = z.infer<typeof createUserPayloadSchema>;
 
-const SQL_CREATE_USER = sql<CreateUserPayload, AuthenticatedUser>(`
-  SELECT * FROM create_user(:id_type, :id_number, :phone_number, :full_name, :gender, :pin, :role)
+type UserRegistrationParams = z.infer<typeof UserRegistrationSchema>;
+
+const SQL_CREATE_USER = sql<UserRegistrationParams, AuthenticatedUser>(`
+  SELECT * 
+  FROM create_user(
+    :id_type, 
+    :id_number, 
+    :phone_number, 
+    :full_name, 
+    :gender, 
+    :pin, 
+    :role
+  )
 `);
 
 const createUser = (router: Router) => {
@@ -38,13 +48,17 @@ const createUser = (router: Router) => {
     path: '/register',
     summary: 'Create a new user',
     request: {
-      body: createUserPayloadSchema
+      body: UserRegistrationSchema
     },
     response: {
       201: {
-        schema: publicUserSchema.omit({
-          id_type: true,
-          id_number: true
+        schema: publicUserSchema.pick({
+            id: true,
+            role: true,
+            full_name: true,
+            phone_number: true,
+            gender: true,
+            created_at: true
         }),
         headers: z.object({
           Authorization: z.string()
@@ -52,22 +66,31 @@ const createUser = (router: Router) => {
       }
     },
     handler: async (req, res) => {
-      const pinHash = bcrypt.hashSync(String(req.body.pin), 12);
+      const hashedPin = bcrypt.hashSync(String(req.body.pin), 12);
+      
       const user = await SQL_CREATE_USER({
         ...req.body,
         role: req.body.role || UserRole.Enum.Standard,
-        pin: pinHash
-      }).one().catch((err) => {
-        if (err.code === '23505') {
-          throw new HttpError(409);
-        }
-        throw err;
-      });
+        pin: hashedPin
+      }).one()
+        .catch((err) => {
+          if (err.code === '23505') {
+            throw new HttpError(409);
+          }
+          throw err;
+        });
 
       const { ipAddress, userAgent } = getClientInfo(req);
-      await recordLoginAttempt(user.id, ipAddress, userAgent, true, 'First Time');
+      await recordLoginAttempt(
+        user.id, 
+        ipAddress, 
+        userAgent, 
+        true, 
+        'First Time'
+      );
 
       const accessToken = generateToken(user.id, user.role, '7d');
+      
       res
         .status(201)
         .setHeader('Authorization', accessToken)
