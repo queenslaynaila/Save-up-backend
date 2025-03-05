@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable no-use-before-define */
 import express, {
   Router as ExpressRouter,
   Request,
@@ -50,7 +48,7 @@ const validateRequest = (schema: {
   query?: AnyZodObject;
   params?: AnyZodObject;
 }) => {
-  return (req: Request, res: Response, next: NextFunction) => {
+  return (req: Request, _res: Response, next: NextFunction) => {
     if (schema.body) validateSchema(schema.body, req.body, 'body');
     if (schema.query) validateSchema(schema.query, req.query, 'query');
     if (schema.params) validateSchema(schema.params, req.params, 'params');
@@ -98,11 +96,11 @@ class Router {
 
   private static routerInstances: Map<string, Router> = new Map();
 
-  private router: ExpressRouter;
+  private readonly router: ExpressRouter;
 
-  private routePrefix: string;
+  private readonly routePrefix: string;
 
-  private apiTag?: string;
+  private readonly apiTag?: string;
 
   private constructor(routePrefix: string, apiTag?: string) {
     this.router = ExpressRouter();
@@ -167,11 +165,11 @@ class Router {
     if (request) {
       middlewares.unshift(validateRequest(request));
     }
-    
+
     if (authMiddlewareOptions) {
       middlewares.splice(1, 0,  authMiddleware(authMiddlewareOptions));
     }
-    
+
 
     const security = [];
     if (authMiddlewareOptions) {
@@ -179,7 +177,7 @@ class Router {
     }
     if (middlewares?.some(m => m.name === "resetStepValidator")) {
       security.push({ Reset: [] });
-    }    
+    }
 
     const responseSchemas = Object.entries(response)
       .reduce((acc, [statusCode, { schema, headers }]) => {
