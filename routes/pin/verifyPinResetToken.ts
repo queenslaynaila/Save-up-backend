@@ -82,15 +82,10 @@ const verifyPinResetToken = (router: Router) => {
       }).exec();
       const securityQuestions = await SQL_GET_SECURITY_QUESTIONS({ user_id }).many();
       if (securityQuestions.length === 0) {
-        const step4TokenPayload = { id: user_id, step: 3 };
-        const step4TokenHeader = jwt.sign(
-          step4TokenPayload,
-          Config.JWT_SECRET as Secret,
-          { expiresIn: '15m' }
-        );
+        const step4TokenHeader = generateToken(user_id, req.user!.role, '15m', 4);
         return res.setHeader('Reset', step4TokenHeader).sendStatus(204);
       }
-      
+
       const step2TokenHeader = generateToken(user_id, req.user!.role, '15m', 2);
       return res.setHeader('Reset', step2TokenHeader)
         .json(securityQuestions);
