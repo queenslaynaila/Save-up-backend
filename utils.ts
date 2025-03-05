@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcrypt';
 import jwt, { Secret,JwtPayload } from 'jsonwebtoken';
-import { z } from 'zod';
 import { sql } from './db';
 import HttpError from './httpError';
 import Config from './config';

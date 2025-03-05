@@ -19,7 +19,7 @@ const SQL_UPDATE_ID_NUMBER = sql<UserIdParams, Record<string,never>>(`
   )
 `);
 
-const updateUserAttributes = (router: Router) => {
+const updateIdDetails = (router: Router) => {
   router.route({
     method: 'patch',
     path: '/:user_id/id-details',
@@ -47,4 +47,4 @@ const updateUserAttributes = (router: Router) => {
   });
 };
 
-export default updateUserAttributes;
+export default updateIdDetails;
