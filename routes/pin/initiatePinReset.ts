@@ -56,7 +56,7 @@ const initiatePinReset = (router: Router) => {
         reason: 'Reset'
       }).exec();
 
-      const step1TokenPayload = { id: user.id, step: 1 };
+      const step1TokenPayload = { id: user.id, step: 1, role: req.user!.role };
       const resetTokenHeader = jwt.sign(
         step1TokenPayload,
         Config.JWT_SECRET as Secret,

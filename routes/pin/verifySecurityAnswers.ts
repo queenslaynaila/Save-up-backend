@@ -58,7 +58,7 @@ const verifySecurityAnswers = (router: Router) => {
         throw new HttpError(403);
       }
 
-      const step3TokenPayload = { id: user_id, step: 3 };
+      const step3TokenPayload = { id: user_id, step: 3, role: req.user!.role };
       const step3TokenHeader = jwt.sign(
         step3TokenPayload,
         Config.JWT_SECRET as Secret,

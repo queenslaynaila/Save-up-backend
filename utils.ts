@@ -26,7 +26,7 @@ declare module 'express-serve-static-core' {
   }
 }
 
-function extractToken(headerValue?: string): string {
+function extractAndVerifyJwtToken(headerValue?: string): User {
   if (!headerValue) {
     throw new HttpError(401);
   }
@@ -36,10 +36,6 @@ function extractToken(headerValue?: string): string {
     throw new HttpError(401);
   }
 
-  return token;
-}
-
-function verifyJwtToken(token: string): User {
   const decoded = jwt.verify(token, Config.JWT_SECRET as Secret) as JwtPayload;
 
   if (!decoded || 
@@ -50,8 +46,9 @@ function verifyJwtToken(token: string): User {
     throw new HttpError(401);
   }
 
-  return { id: decoded.id, role: decoded.role };
+  return { id: decoded.id, role: decoded.role, step: decoded.step };
 }
+
 
 export function authMiddleware(options: AuthMiddlewareOptions = {}) {
   const roles = Array.isArray(options.roles) 
@@ -62,7 +59,7 @@ export function authMiddleware(options: AuthMiddlewareOptions = {}) {
   const allowModeratorAccess = options.allowModeratorAccess || false;
 
   return function(req: Request, _res: Response, next: NextFunction) {
-    req.user = verifyJwtToken(extractToken(req.headers.authorization));
+    req.user = extractAndVerifyJwtToken(req.headers.authorization);
 
     if (roles.length && !roles.includes(req.user.role)) {
       throw new HttpError(403);
@@ -84,9 +81,13 @@ export function authMiddleware(options: AuthMiddlewareOptions = {}) {
 
 export function authenticateResetTokenAndCheckStep(requiredStep: number) {
   const resetStepValidator = function (req: Request, _res: Response, next: NextFunction) {
-    req.user = verifyJwtToken(extractToken(req.headers.reset as string));
+    req.user = extractAndVerifyJwtToken(req.headers.reset as string);
 
-    if (req.user?.step !== requiredStep) {
+    if (req.user.step === undefined) {
+      throw new HttpError(401);
+    }
+
+    if (req.user!.step !== requiredStep) {
       throw new HttpError(403);
     }
 
@@ -95,7 +96,6 @@ export function authenticateResetTokenAndCheckStep(requiredStep: number) {
 
   return resetStepValidator;
 }
-
 
 const SQL_GET_PIN = sql<{ user_id: number }, { pin: string }>(`
   SELECT pin 

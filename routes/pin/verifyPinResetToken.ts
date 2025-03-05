@@ -91,7 +91,7 @@ const verifyPinResetToken = (router: Router) => {
         return res.setHeader('Reset', step4TokenHeader).sendStatus(204);
       }
 
-      const step2TokenPayload = { id: user_id, step: 2 };
+      const step2TokenPayload = { id: user_id, step: 2, role: req.user!.role };
       const step2TokenHeader = jwt.sign(
         step2TokenPayload,
         Config.JWT_SECRET as Secret,
