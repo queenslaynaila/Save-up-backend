@@ -75,7 +75,7 @@ export async function authMiddleware(options: AuthMiddlewareOptions = {}) {
 }
 
 export async function authenticateResetToken(req: Request, _res: Response, next: NextFunction) {
-  req.user = verifyJwtToken(extractToken(req.headers.reset));
+  req.user = verifyJwtToken(extractToken(req.headers.reset as string));
   next();
 }
 
