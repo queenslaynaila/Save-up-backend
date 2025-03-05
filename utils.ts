@@ -16,7 +16,7 @@ export interface AuthMiddlewareOptions {
 
 interface User {
   id: number;
-  role: UserRole;  
+  role: UserRole;
   step?: number;
 }
 
@@ -38,9 +38,9 @@ function extractAndVerifyJwtToken(headerValue?: string): User {
 
   const decoded = jwt.verify(token, Config.JWT_SECRET as Secret) as JwtPayload;
 
-  if (!decoded || 
-      !decoded.id || 
-      !decoded.role || 
+  if (!decoded ||
+      !decoded.id ||
+      !decoded.role ||
       (decoded.exp && decoded.exp * 1000 <= Date.now())
     ) {
     throw new HttpError(401);
@@ -51,10 +51,10 @@ function extractAndVerifyJwtToken(headerValue?: string): User {
 
 
 export function authMiddleware(options: AuthMiddlewareOptions = {}) {
-  const roles = Array.isArray(options.roles) 
-    ? options.roles 
-    : options.roles 
-      ? [options.roles] 
+  const roles = Array.isArray(options.roles)
+    ? options.roles
+    : options.roles
+      ? [options.roles]
       : [];
   const allowModeratorAccess = options.allowModeratorAccess || false;
 
@@ -96,7 +96,6 @@ export function authenticateResetTokenAndCheckStep(requiredStep: number) {
 
   return resetStepValidator;
 }
-
 const SQL_GET_PIN = sql<{ user_id: number }, { pin: string }>(`
   SELECT pin 
   FROM users 
@@ -104,8 +103,8 @@ const SQL_GET_PIN = sql<{ user_id: number }, { pin: string }>(`
 `);
 
 export async function verifyPin(req: Request, _res: Response, next: NextFunction) {
-  const { pin: hashedPin } = await SQL_GET_PIN({ 
-    user_id: req.user!.id 
+  const { pin: hashedPin } = await SQL_GET_PIN({
+    user_id: req.user!.id
   }).one();
 
   if (!await bcrypt.compare(req.body.pin, hashedPin)) {
