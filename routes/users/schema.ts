@@ -1,8 +1,8 @@
 import { z } from 'zod';
 
 export const UserRole = z.enum(['Admin', 'Standard', 'Moderator']);
+export type Role = z.infer<typeof UserRole>;
 const IdType = z.enum(['National', 'Passport']);
-export type UserRole = z.infer<typeof UserRole>;
 const Gender = z.enum(['Male', 'Female']);
 
 const authenticatedUser = z.object({

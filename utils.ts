@@ -5,10 +5,10 @@ import { z } from 'zod';
 import { sql } from './db';
 import HttpError from './httpError';
 import Config from './config';
-import { AuthenticatedUser, UserRole } from './routes/users/schema';
+import { AuthenticatedUser, Role } from './routes/users/schema';
 
 export interface AuthMiddlewareOptions {
-  roles?: UserRole[] | UserRole;
+  roles?: Role[] | Role;
   allowModeratorAccess?: boolean;
 }
 

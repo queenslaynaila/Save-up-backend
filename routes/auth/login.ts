@@ -7,13 +7,13 @@ import {
   userSchema, 
   loginAttemptSchema, 
   userContactDetailsSchema, 
-  UserRole
+  Role
 } from '../users/schema';
 import Router from '../../router';
 import Config from '../../config';
 import jwt, { Secret } from 'jsonwebtoken';
 
-export function generateToken(id: number, role: UserRole, expiresIn: string): string {
+export function generateToken(id: number, role: Role, expiresIn: string): string {
   return jwt.sign(
     { id, role },
     Config.JWT_SECRET as Secret,
