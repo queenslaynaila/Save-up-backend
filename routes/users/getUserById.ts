@@ -21,18 +21,11 @@ const SQL_GET_USER_BY_CRITERIA = sql<Record<string, never>, UserWithPublicAttrib
     user_contact_details ON users.id = user_contact_details.id
 `);
 
-const getUsersBySearchCriteria = (router: Router) => {
+const getUsersByUserId = (router: Router) => {
   router.route({
     method: 'get',
-    path: '/search',
-    summary: 'Search for users based on various criteria.Admin/mod only',
-    description: 'This endpoint allows searching for users based on various query criteria such as phone number, ID number, passport number, or the string "me" for the currently logged-in user.\n'
-      + '- **Phone number**: A user’s phone number (e.g., +254123456789).Note for phone numbers dont send the plus sign instaed of  +254123456789 send this 254123456789 the rule will be applied globally for all country codes \n'
-      + '- **ID number**: A user’s identification number (e.g., 123456 or 987654321).\n'
-      + '- **Passport number**: A user’s passport number (e.g., A12345678).\n'
-      + '- **"me"**: The string "me" can be used to fetch details of the currently logged-in user.\n\n'
-      + 'Standard users can only access their own details by using "me". Moderators and admins have access to query any user using any of the above identifiers.\n\n'
-      + 'If no limit is provided, the default is 10.If no query parameter is provided, the default query parameter "me" will be used to fetch the logged-in user\'s details.',
+    path: '/:user_id',
+    summary: 'Get user by user ID',
     request: {
       query: z.object({
         phone_number: z.string(),
@@ -89,4 +82,4 @@ const getUsersBySearchCriteria = (router: Router) => {
   });
 };
 
-export default getUsersBySearchCriteria;
+export default getUsersByUserId;

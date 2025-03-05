@@ -2,9 +2,7 @@ import Router from '../../router';
 import { sql } from '../../db';
 import { approveValidation, ApproveWithdrawal } from './types';
 import { z } from 'zod';
-import { SQL_GET_USER_PIN } from '../users/updateAttributes';
-import HttpError from '../../httpError';
-import bcrypt from 'bcrypt';
+import { verifyPin } from '../../utils';
 
 const SQL_APPROVE_GRP_WITHDRAWAL = sql<ApproveWithdrawal, Record<string, never>>(`
   SELECT approve_debit(
@@ -32,16 +30,9 @@ const approveWithdrawal = (router: Router) => {
       403: { schema: z.object({ message: z.string() }) }
     },
     authMiddlewareOptions: {},
+    middlewares:[verifyPin],
     handler: async (req, res) => {
       const { pin, ...approvalData } = req.body;
-      const { pin: currentPin } = await SQL_GET_USER_PIN({
-        id: req.user!.id
-      }).one();
-      
-      const isValidPin = await bcrypt.compare(pin.toString(), currentPin);
-      if (!isValidPin) {
-        throw new HttpError(403, { message: 'Invalid PIN' });
-      }
 
       await SQL_APPROVE_GRP_WITHDRAWAL({
         ...approvalData,
