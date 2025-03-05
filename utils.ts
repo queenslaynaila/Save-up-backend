@@ -2,9 +2,9 @@ import { Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcrypt';
 import jwt, { Secret,JwtPayload } from 'jsonwebtoken';
 import { z } from 'zod';
-import { sql } from '../db';
-import HttpError from '../httpError';
-import Config from '../config';
+import { sql } from './db';
+import HttpError from './httpError';
+import Config from './config';
 
 const USER_ROLE_ENUM = z.enum(['Admin', 'Standard', 'Moderator']);
 export type UserRole = z.infer<typeof USER_ROLE_ENUM>;

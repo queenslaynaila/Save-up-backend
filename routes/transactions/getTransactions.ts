@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { sql } from '../../db';
 import Router from '../../router';
 import { transactionSchema, transactionTypeSchema } from '../pockets/schema';
-import verifyGroupMembership from '../../middlewares/verifyGrpMembership';
+import verifyGroupMembership from '../../utils';
 
 const transaction = transactionSchema.pick({
   xid: true,

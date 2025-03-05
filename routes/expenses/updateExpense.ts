@@ -6,7 +6,7 @@ import {
   Expense
 } from './schema';
 import { z } from 'zod';
-import verifyGroupMembership from '../../middlewares/verifyGrpMembership';
+import verifyGroupMembership from '../../utils';
 
 const expenseUpdateParams = expenseSchema.pick({
   category_id: true,

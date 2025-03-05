@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { sql } from '../../db';
 import HttpError from '../../httpError';
 import { nextOfKinSchema } from './schema';
-import { verifyPin } from '../../middlewares/authorization';
+import { verifyPin } from '../../utils';
 
 const nextOfKinCreationSchema = nextOfKinSchema.pick({
   full_name: true,

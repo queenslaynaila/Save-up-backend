@@ -2,7 +2,7 @@ import Router from '../../router';
 import { sql } from '../../db';
 import { z } from 'zod';
 import { pocketSchema } from './schema';
-import verifyGroupMembership from '../../middlewares/verifyGrpMembership';
+import verifyGroupMembership from '../../utils';
 
 const pocketPatchParams = pocketSchema.pick({
   xid: true,

@@ -1,7 +1,7 @@
 import Router from '../../router';
 import { sql } from '../../db';
 import { z } from 'zod';
-import verifyGroupMembership from '../../middlewares/verifyGrpMembership';
+import verifyGroupMembership from '../../utils';
 
 const SQL_DELETE_EXPENSE = sql<{xid:number, entity_id:number}, Record<string, never>>(`
   UPDATE expenses

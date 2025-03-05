@@ -2,7 +2,7 @@ import Router from '../../router';
 import { sql } from '../../db';
 import HttpError from '../../httpError';
 import { z } from 'zod';
-import { verifyPin } from '../../middlewares/authorization';
+import { verifyPin } from '../../utils';
 
 const transferPayload = z.object({
   entity_id: z.number().min(1),

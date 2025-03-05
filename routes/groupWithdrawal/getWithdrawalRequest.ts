@@ -1,7 +1,7 @@
 import Router from '../../router';
 import { sql } from '../../db';
 import { z } from 'zod';
-import verifyGroupMembership from '../../middlewares/verifyGrpMembership';
+import verifyGroupMembership from '../../utils';
 
 const Approval = z.object({
   user_id: z.string(),

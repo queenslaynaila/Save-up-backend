@@ -2,8 +2,8 @@ import { sql } from '../../db';
 import HttpError from '../../httpError';
 import Router from '../../router';
 import { z } from 'zod';
-import { verifyPin } from '../../middlewares/authorization';
-import verifyGroupMembership from '../../middlewares/verifyGrpMembership';
+import { verifyPin } from '../../utils';
+import verifyGroupMembership from '../../utils';
 
 const withdrawalPayload = z.object({
   pocket_id: z.number().min(1),

@@ -10,7 +10,7 @@ import {
 } from '../users/schema';
 import Router from '../../router';
 import Config from '../../config';
-import { UserRole } from '../../middlewares/authorization';
+import { UserRole } from '../../utils';
 import jwt, { Secret } from 'jsonwebtoken';
 
 export function generateToken(id: number, role: UserRole, expiresIn: string): string {

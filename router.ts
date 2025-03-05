@@ -17,7 +17,7 @@ import basicAuth from 'express-basic-auth';
 import cors from 'cors';
 import HttpError from './httpError';
 import Config from './config';
-import { authenticateResetTokenAndCheckStep, authMiddleware, AuthMiddlewareOptions } from './middlewares/authorization';
+import {authMiddleware, AuthMiddlewareOptions } from './utils';
 
 
 const ajv = new Ajv();

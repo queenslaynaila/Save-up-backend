@@ -3,7 +3,7 @@ import { sql } from '../../db';
 
 import HttpError from '../../httpError';
 import { z } from 'zod';
-import verifyGroupMembership from '../../middlewares/verifyGrpMembership';
+import verifyGroupMembership from '../../utils';
 
 const SQL_DELETE_POCKET = sql<{pocket_id: number, entity_id: number}, Record<string, never>>(`
   SELECT delete_pocket(:entity_id, :pocket_id)

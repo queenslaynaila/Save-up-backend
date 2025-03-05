@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { sql } from '../../db';
 import Router from '../../router';
-import verifyGroupMembership from '../../middlewares/verifyGrpMembership';
+import verifyGroupMembership from '../../utils';
 
 const SQL_INNER_BALANCE = sql<{ entity_id: number, pocket_id?: string, from?: string, to?: string }, { balance: number }>(`
   SELECT DISTINCT ON (pocket_id) balance

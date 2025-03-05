@@ -3,7 +3,7 @@ import Router from '../../router';
 import { sql } from '../../db';
 import { z } from 'zod';
 import bcrypt from 'bcrypt';
-import { verifyPin } from '../../middlewares/authorization';
+import { verifyPin } from '../../utils';
 
 export const securityAnswerSchema = z.object({
   user_id: z.number().int(),

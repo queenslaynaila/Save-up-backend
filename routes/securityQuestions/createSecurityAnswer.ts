@@ -4,7 +4,7 @@ import { sql } from '../../db';
 import { z } from 'zod';
 import { securityAnswerSchema } from './updateAnswer';
 import HttpError from '../../httpError';
-import { verifyPin } from '../../middlewares/authorization';
+import { verifyPin } from '../../utils';
 
 const securityAnswerCreationSchema = z.object({
   answers: z.array(securityAnswerSchema.pick({

@@ -1,7 +1,7 @@
 import { z } from "zod";
 import Router from "../../router";
 import { sql } from "../../db";
-import verifyGroupMembership from "../../middlewares/verifyGrpMembership";
+import verifyGroupMembership from '../../utils';
 import logger from "../../logger";
 
 const donationParams = z.object({

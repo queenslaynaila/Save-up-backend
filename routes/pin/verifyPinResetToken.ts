@@ -6,7 +6,7 @@ import HttpError from '../../httpError';
 import { ResetToken } from './schema';
 import { z } from 'zod';
 import Config from '../../config';
-import { authenticateResetTokenAndCheckStep } from '../../middlewares/authorization';
+import { authenticateResetTokenAndCheckStep } from '../../utils';
 
 const SQL_GET_SECURITY_QUESTIONS = sql<{ user_id: number }, { id: number; question: string }>(`
   SELECT 

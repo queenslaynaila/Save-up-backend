@@ -1,7 +1,7 @@
 import Router from '../../router';
 import { sql } from '../../db';
 import { z } from 'zod';
-import { verifyPin } from '../../middlewares/authorization';
+import { verifyPin } from '../../utils';
 
 const SQL_DELETE_KIN = sql<{user_id: number, xid: number}, Record<string, never>>(`
   UPDATE next_of_kins  
