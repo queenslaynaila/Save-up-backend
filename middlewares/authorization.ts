@@ -26,116 +26,78 @@ declare module 'express-serve-static-core' {
   }
 }
 
-export default function authMiddleware(options: AuthMiddlewareOptions = {}) {
+function extractToken(headerValue?: string): string {
+  if (!headerValue) {
+    throw new HttpError(401);
+  }
+
+  const [bearer, token] = headerValue.split(' ');
+  if (bearer !== 'Bearer' || !token) {
+    throw new HttpError(401);
+  }
+
+  return token;
+}
+
+function verifyJwtToken(token: string): User {
+  const decoded = jwt.verify(token, Config.JWT_SECRET as Secret) as JwtPayload;
+  if (!decoded || 
+      (decoded.exp && 
+        decoded.exp * 1000 <= Date.now())){
+     throw new HttpError(401);
+  }
+  return { id: decoded.id, role: decoded.role };
+}
+
+export async function authMiddleware(options: AuthMiddlewareOptions = {}) {
   const roles = Array.isArray(options.roles) ? options.roles : options.roles ? [options.roles] : [];
   const allowModeratorAccess = options.allowModeratorAccess || false;
 
-  return (req: Request, _res: Response, next: NextFunction) => {
-    const accessToken = req.headers.authorization;
+  return function (req: Request, _res: Response, next: NextFunction) {
+    req.user = verifyJwtToken(extractToken(req.headers.authorization));
 
-    if (!accessToken || typeof accessToken !== 'string') {
-      throw new HttpError(401);
+    if (roles.length && !roles.includes(req.user.role)){
+       throw new HttpError(403);
     }
 
-    const accessTokenValue = accessToken.split(' ')[1];
-    if (!accessTokenValue) {
-      throw new HttpError(401);
+    if (req.params.user_id === 'me'){
+      req.params.user_id = req.user.id.toString();
     }
 
-    const verifyOptions: jwt.VerifyOptions = {
-      issuer: Config.JWT_ISSUER,
-    };
-
-    jwt.verify(
-      accessTokenValue,
-      Config.JWT_SECRET as Secret,
-      verifyOptions,
-      (err: VerifyErrors | null, decoded: JwtPayload | string | undefined) => {
-        if (err || !decoded) {
-          throw new HttpError(401);
-        }
-
-        const { id, role, exp } = decoded as { id: number; role: UserRole; exp: number };
-
-        if (typeof exp === 'number' && exp * 1000 <= Date.now()) {
-          throw new HttpError(401);
-        }
-
-        const user: User = { id, role };
-
-        if (roles.length > 0 && !roles.includes(user.role)) {
-          throw new HttpError(403);
-        }
-        req.user = user;
-
-        if (req.params.user_id === 'me') {
-          req.params.user_id = user.id.toString();
-        }
-
-        if (req.params.user_id) {
-          const requestedUserId = parseInt(req.params.user_id, 10);
-        
-          if (requestedUserId !== user.id) {
-            if (!allowModeratorAccess || (user.role !== 'Admin' && user.role !== 'Moderator')) {
-              throw new HttpError(403);
-            }
-          }
-        }
-
-        next();
+    if (req.params.user_id && parseInt(req.params.user_id, 10) !== req.user.id) {
+      if (!allowModeratorAccess || !['Admin', 'Moderator'].includes(req.user.role)) {
+        throw new HttpError(403);
       }
-    );
+    }
+
+    next();
   };
 }
 
-export function authenticateResetToken(req: Request, res: Response, next: NextFunction) {
-  const token = req.headers.reset as string;
-  if (!token) {
-    throw new HttpError(403);
-  }
-
-  const resetTokenValue = token.split(' ')[1];
-  if (!resetTokenValue) {
-    throw new HttpError(403);
-  }
-
-  jwt.verify(resetTokenValue, Config.JWT_SECRET as Secret, (err, decodedResetToken) => {
-    if (err) {
-      throw new HttpError(403);
-    }
-
-    const user = decodedResetToken as User;
-    req.user = user;
-    next();
-  });
+export async function authenticateResetToken(req: Request, _res: Response, next: NextFunction) {
+  req.user = verifyJwtToken(extractToken(req.headers.reset));
+  next();
 }
 
-export function checkResetStepProgression(requiredStep: number) {
-  return (req: Request, _res: Response, next: NextFunction) => {
-    const step = req.user?.step;
-    if (step !== requiredStep) {
-      throw new HttpError(422);
+export async function checkResetStepProgression(requiredStep: number) {
+  return function (req: Request, _res: Response, next: NextFunction) {
+    if (req.user?.step !== requiredStep){
+       throw new HttpError(403);
     }
     next();
   };
 }
 
 const SQL_GET_PIN = sql<{ user_id: number }, { pin: string }>(`
-  SELECT pin
-  FROM users
-  WHERE id = :user_id
+  SELECT pin FROM users WHERE id = :user_id
 `);
 
-export async function verifyPin(req: Request, res: Response, next: NextFunction) {
-  const user_id = req.user!.id;
-
-  const { pin: pinHash } = await SQL_GET_PIN({
-    user_id
+export async function verifyPin(req: Request, _res: Response, next: NextFunction) {
+  const { pin: hashedPin } = await SQL_GET_PIN({ 
+    user_id: req.user!.id 
   }).one();
-
-  if (!await bcrypt.compare(req.body.pin, pinHash)) {
+  if (!await bcrypt.compare(req.body.pin, hashedPin)){
     throw new HttpError(401);
   }
-
   next();
-}
+};
