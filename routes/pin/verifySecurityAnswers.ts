@@ -6,7 +6,7 @@ import jwt, { Secret } from 'jsonwebtoken';
 import { sql } from '../../db';
 import HttpError from '../../httpError';
 import { z } from 'zod';
-import { authenticateResetTokenAndCheckStep} from '../../utils';
+import { authenticateResetTokenAndCheckStep, generateToken} from '../../utils';
 import Config from '../../config';
 const verifyAnswerSchema = z.object({
   question_id: z.number().min(1),
@@ -57,13 +57,7 @@ const verifySecurityAnswers = (router: Router) => {
       if (incorrectAnswers.length > 2) {
         throw new HttpError(403);
       }
-
-      const step3TokenPayload = { id: user_id, step: 3, role: req.user!.role };
-      const step3TokenHeader = jwt.sign(
-        step3TokenPayload,
-        Config.JWT_SECRET as Secret,
-        { expiresIn: '15m' }
-      );
+      const step3TokenHeader = generateToken(user_id, req.user!.role, '15m', 3);
 
       res.setHeader('Reset', step3TokenHeader)
         .sendStatus(204);

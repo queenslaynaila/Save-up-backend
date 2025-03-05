@@ -12,14 +12,7 @@ import {
 import Router from '../../router';
 import Config from '../../config';
 import jwt, { Secret } from 'jsonwebtoken';
-
-export function generateToken(id: number, role: Role, expiresIn: string): string {
-  return jwt.sign(
-    { id, role },
-    Config.JWT_SECRET as Secret,
-    { expiresIn, issuer: Config.JWT_ISSUER }
-  );
-}
+import { generateToken } from '../../utils';
 
 const authenticatedUserSchema = userSchema.pick({
   id: true,

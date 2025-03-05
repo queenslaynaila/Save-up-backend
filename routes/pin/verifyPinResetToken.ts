@@ -6,7 +6,7 @@ import HttpError from '../../httpError';
 import { ResetToken } from './schema';
 import { z } from 'zod';
 import Config from '../../config';
-import { authenticateResetTokenAndCheckStep } from '../../utils';
+import { authenticateResetTokenAndCheckStep, generateToken } from '../../utils';
 
 const SQL_GET_SECURITY_QUESTIONS = sql<{ user_id: number }, { id: number; question: string }>(`
   SELECT 
@@ -90,13 +90,8 @@ const verifyPinResetToken = (router: Router) => {
         );
         return res.setHeader('Reset', step4TokenHeader).sendStatus(204);
       }
-
-      const step2TokenPayload = { id: user_id, step: 2, role: req.user!.role };
-      const step2TokenHeader = jwt.sign(
-        step2TokenPayload,
-        Config.JWT_SECRET as Secret,
-        { expiresIn: '15m' }
-      );
+      
+      const step2TokenHeader = generateToken(user_id, req.user!.role, '15m', 2);
       return res.setHeader('Reset', step2TokenHeader)
         .json(securityQuestions);
     }

@@ -18,6 +18,17 @@ declare module 'express-serve-static-core' {
   }
 }
 
+export function generateToken(id: number, role: Role, expiresIn: string, step?: number): string {
+  const payload: Record<string, any> = { id, role };
+  if (step) payload.step = step;
+
+  return jwt.sign(
+    payload,
+    Config.JWT_SECRET as Secret,
+    { expiresIn, issuer: Config.JWT_ISSUER }
+  );
+}
+
 function extractAndVerifyJwtToken(headerValue?: string): AuthenticatedUser {
   if (!headerValue) {
     throw new HttpError(401);

@@ -10,11 +10,11 @@ import {
 } from '../users/schema';
 import {
   AuthenticatedUser,
-  generateToken,
   getClientInfo,
   publicUserSchema,
   recordLoginAttempt
 } from './login';
+import { generateToken } from '../../utils';
 
 const UserRegistrationSchema = userSchema.pick({
   pin: true,
