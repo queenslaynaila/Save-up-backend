@@ -10,7 +10,6 @@ import './routes/auth/index';
 import './routes/users/index';
 import './routes/nextOfKin/index';
 import './routes/securityQuestions/index';
-import './routes/pin/index';
 import './routes/categories/index';
 import './routes/expenses/index';
 import './routes/pockets/index';
@@ -43,13 +42,11 @@ app.use(() => {
   throw new HttpError(404);
 });
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
-  logger.error(error);
+app.use((error: Error, _req: Request, res: Response, _next: NextFunction) => {
+  logger.error(`error is ${(error)}`);
   if (error instanceof HttpError) {
     return res.status(error.status).json(error);
   }
-
   return res.sendStatus(500);
 });
 
