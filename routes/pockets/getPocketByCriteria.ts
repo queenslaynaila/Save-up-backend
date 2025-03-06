@@ -46,7 +46,7 @@ const pocketQueryParams = pocketSchema.pick({
 const getPocketsByUser = (router: Router) => {
   router.route({
     method: 'get',
-    path: '/:user_id',
+    path: '/:entity_id',
     summary: 'Retrieve a list of pockets for a user or group',
     description: 'Fetches a list of pockets belonging to a specific user or group, with optional filters to refine the results.\n'
       + '- If the path parameter is **me**, the request will return the pockets of the logged-in user.\n'
@@ -63,9 +63,9 @@ const getPocketsByUser = (router: Router) => {
         + '- **end_date**: End date for filtering the records.\n',
     request: {
       params: z.object({
-        user_id: z.union([
+        entity_id: z.union([
           z.string().regex(/^[1-9]\d*$/, "Must be a positive integer string"),
-          z.literal("me"),
+          z.literal("me"), 
         ]).default('me' )
       }),
       query: pocketQueryParams
@@ -87,9 +87,7 @@ const getPocketsByUser = (router: Router) => {
         start_date,
         end_date
       } = req.query;
-
-      const FinalEntity = group_id ? Number(group_id) : parseInt(req.params.user_id, 10);
-
+      const FinalEntity =  Number(req.params.entity_id);
       const filters: string[] = [];
       const filterArgs: string | string [] | ParsedQs | ParsedQs[] = {};
 

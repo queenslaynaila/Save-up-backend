@@ -14,10 +14,14 @@ const SQL_DELETE_EXPENSE = sql<{xid:number, entity_id:number}, Record<string, ne
 const deleteExpense = (router: Router) => {
   router.route({
     method: 'delete',
-    path: '/:xid',
+    path: '/:entity_id/:xid',
     summary: 'Delete an expense',
     request: {
       params: z.object({
+        entity_id: z.union([
+          z.string().regex(/^[1-9]\d*$/, "Must be a positive integer string"),
+          z.literal("me"), 
+        ]).default('me' ),
         xid: z.string().min(1)
       }),
       query: z.object({
@@ -30,7 +34,7 @@ const deleteExpense = (router: Router) => {
     authMiddlewareOptions: {},
     middlewares: [verifyGroupMembership()],
     handler: async (req, res) => {
-      const entity_id = Number(req.query?.entity_id) || req.user!.id;
+      const entity_id = Number(req.params.entity_id);
       await SQL_DELETE_EXPENSE({
         xid: Number(req.params.xid),
         entity_id

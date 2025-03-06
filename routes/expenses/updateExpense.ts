@@ -33,10 +33,14 @@ Expense>(`
 const updateExpense = (router: Router) => {
   router.route({
     method: 'patch',
-    path: '/:xid',
+    path: '/:entity_id/:xid',
     summary: 'Update an expense',
     request: {
       params: z.object({
+        entity_id: z.union([
+          z.string().regex(/^[1-9]\d*$/, "Must be a positive integer string"),
+          z.literal("me"), 
+        ]).default('me' ),
         xid: z.string()
       }),
       body: expenseUpdateParams,
@@ -52,7 +56,7 @@ const updateExpense = (router: Router) => {
     authMiddlewareOptions: {},
     middlewares: [verifyGroupMembership()],
     handler: async (req, res) => {
-      const entity_id = Number(req.query.group_id) || req.user!.id;
+      const entity_id = Number(req.params.entity_id);
       const xid = Number(req.params.xid);
       const { description, category_id, amount, spent_at } = req.body;
       const result = await SQL_UPDATE_EXPENSE({

@@ -12,14 +12,20 @@ const SQL_DELETE_POCKET = sql<{pocket_id: number, entity_id: number}, Record<str
 const deletePocket = (router: Router) => {
   router.route({
     method: 'delete',
-    path: '/:xid',
+    path: '/:entity_id/:xid',
     summary: 'Delete a pocket',
     description: 'Deletes a pocket based on the pocket ID provided in the URL. \n'
       + '- **xid**: The ID of the pocket to be deleted. \n'
       + '- If the pocket has deposits, it cannot be deleted. Only 0 balance pockets can be deleyed \n'
       + '- For group pockets, only admins can delete them. \n',
     request: {
-      params: z.object({ xid: z.string() }),
+      params: z.object({
+        entity_id: z.union([
+          z.string().regex(/^[1-9]\d*$/, "Must be a positive integer string"),
+          z.literal("me"), 
+        ]).default('me' ),
+        xid: z.string().min(1)
+      }),
       body: z.object({ entity_id: z.number() }).partial()
     },
     authMiddlewareOptions: {},

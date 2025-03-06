@@ -32,16 +32,19 @@ const SQL_CREATE_EXPENSES = sql<ExpenseCreationParams & {entity_id:number}, Expe
 const createExpense = (router: Router) => {
   router.route({
     method: 'post',
-    path: '/',
+    path: '/:entity_id/',
     summary: 'Create an expense',
     description: 'Expenses can be either a groups or an individual user. \n'
     + '- **For groups**:If expense is being recorded for a group, pass in a query param of a group_id. \n\n'
     + '- **Individual users**:If expense is for currently logged-in user, the entity id property in body can be left out. The app will associate the expense with the logged-in user. \n\n',
     request: {
+      params: z.object({
+        entity_id: z.union([
+          z.string().regex(/^[1-9]\d*$/, "Must be a positive integer string"),
+          z.literal("me"), 
+        ]).default('me' )
+      }),
       body: expenseCreationParams,
-      query: z.object({
-        group_id: z.string().regex(/^\d+$/).optional()
-      })
     },
     response: {
       201: {
@@ -51,7 +54,7 @@ const createExpense = (router: Router) => {
     authMiddlewareOptions: {},
     middlewares: [verifyGroupMembership()],
     handler: async (req, res) => {
-      const entity_id = Number(req.query.group_id) || req.user!.id;
+      const entity_id = Number(req.params.entity_id);
       const { category_id, description, amount, spent_at } = req.body;
       const expense = await SQL_CREATE_EXPENSES({
         category_id,

@@ -9,10 +9,10 @@ import getTotalSavings from './getTotalSavings';
 const router = Router.getRouterInstance('/pockets', 'Pockets');
 
 createPocket(router);
-fetchPocketBalances(router);
-getTotalSavings(router);
 getPocketsByUser(router);
 deletePocket(router);
 updatePocket(router);
+fetchPocketBalances(router);
+getTotalSavings(router);
 
 export default router;

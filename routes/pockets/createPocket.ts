@@ -50,9 +50,15 @@ const SQL_CREATE_POCKET = sql<PocketCreationType, Pocket>(`
 const createPocket = (router: Router) => {
   router.route({
     method: 'post',
-    path: '/',
+    path: '/:entity_id',
     summary: 'Create a pocket',
     request: {
+      params: z.object({
+        entity_id: z.union([
+          z.string().regex(/^[1-9]\d*$/, "Must be a positive integer string"),
+          z.literal("me"), 
+        ]).default('me' )
+      }),
       body: pocketCreationSchema
     },
     response: {
@@ -63,7 +69,7 @@ const createPocket = (router: Router) => {
     authMiddlewareOptions: {},
     middlewares: [verifyGroupMembership()],
     handler: async (req, res) => {
-      const entity_id = req.body?.entity_id || req.user!.id;
+      const entity_id = Number(req.params.entity_id);
       const newPocket = await SQL_CREATE_POCKET({
         ...req.body,
         entity_id

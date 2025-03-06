@@ -9,7 +9,6 @@ import logger from './logger';
 import './routes/auth/index';
 import './routes/users/index';
 import './routes/nextOfKin/index';
-import './routes/securityQuestions/index';
 import './routes/categories/index';
 import './routes/expenses/index';
 import './routes/pockets/index';
@@ -24,6 +23,7 @@ import './routes/loans/index';
 import './routes/loanGuarantees/index';
 import './routes/loanApprovals/index';
 import './routes/donations/index';
+import './routes/securityQuestions/index';
 import Config from './config';
 
 extendZodWithOpenApi(z);

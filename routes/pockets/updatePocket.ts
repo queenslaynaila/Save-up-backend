@@ -51,10 +51,16 @@ const SQL_UPDATE_POCKET = sql<PocketPatchParams, Pocket>(`
 const updatePocket = (router: Router) => {
   router.route({
     method: 'patch',
-    path: '/:xid',
+    path: '/:entity_id/:xid',
     summary: 'Update pocket',
     request: {
-      params: z.object({ xid: z.string() }),
+      params: z.object({
+        entity_id: z.union([
+          z.string().regex(/^[1-9]\d*$/, "Must be a positive integer string"),
+          z.literal("me"), 
+        ]).default('me' ),
+        xid: z.string().min(1)
+      }),
       body: pocketPatchParams.omit({ xid: true })
     },
     response: {

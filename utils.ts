@@ -70,6 +70,10 @@ export function authMiddleware(options: AuthMiddlewareOptions = {}) {
       req.params.user_id = req.user.id.toString();
     }
 
+    if (req.params.entity_id === 'me') {
+      req.params.entity_id = req.user.id.toString();
+    }
+
     if (req.params.user_id && parseInt(req.params.user_id, 10) !== req.user.id) {
       if (!allowModeratorAccess || !['Admin', 'Moderator'].includes(req.user.role)) {
         throw new HttpError(403);

@@ -7,10 +7,9 @@ import getTotalUserExpenditure from './getTotalUserExpenditure';
 
 const router = Router.getRouterInstance('/expenses', 'Expenses');
 createExpense(router);
-getTotalUserExpenditure(router);
 getExpensesByCriteria(router);
 updateExpense(router);
 deleteExpense(router);
-
+getTotalUserExpenditure(router);
 
 export default router;
