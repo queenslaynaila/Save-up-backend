@@ -10,8 +10,8 @@ const router = Router.getRouterInstance('/pockets', 'Pockets');
 
 createPocket(router);
 getPocketsByUser(router);
-deletePocket(router);
 updatePocket(router);
+deletePocket(router);
 fetchPocketBalances(router);
 getTotalSavings(router);
 
