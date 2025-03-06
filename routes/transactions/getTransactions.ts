@@ -2,7 +2,6 @@ import { z } from 'zod';
 import { sql } from '../../db';
 import Router from '../../router';
 import { transactionSchema, transactionTypeSchema } from '../pockets/schema';
-import verifyGroupMembership from '../../utils';
 
 const transaction = transactionSchema.pick({
   xid: true,
@@ -113,7 +112,6 @@ const getTransactions = (router: Router) => {
       }
     },
     authMiddlewareOptions: {},
-    middlewares: [verifyGroupMembership(true)],
     handler: async (req, res) => {
       const group_id = req.query.group_id ? Number(req.query.group_id) : null;
       const entity_id = parseInt(req.params.entity_id, 10);

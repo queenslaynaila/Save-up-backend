@@ -1,7 +1,6 @@
 import { z } from 'zod';
 import { sql } from '../../db';
 import Router from '../../router';
-import verifyGroupMembership from '../../utils';
 
 const SQL_INNER_BALANCE = sql<{ entity_id: number, pocket_id?: string, from?: string, to?: string }, {name:string, total_savings: number }>(`
   SELECT 
@@ -43,7 +42,6 @@ const getTotalSavings = (router: Router) => {
       }
     },
     authMiddlewareOptions: {},
-    middlewares: [verifyGroupMembership(true)],
     handler: async (req, res) => {
       const entity_id = Number(req.query?.group_id) || req.user!.id;
       const { from, to } = req.query;

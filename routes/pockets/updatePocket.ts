@@ -69,7 +69,7 @@ const updatePocket = (router: Router) => {
       }
     },
     authMiddlewareOptions: {},
-    middlewares: [verifyGroupMembership()],
+    middlewares: [verifyGroupMembership(true)],
     handler: async (req, res) => {
       const entity_id = req.body.entity_id || req.user!.id;
       const { name, category_id, target_amount, priority, target_at, pocket_type } = req.body;

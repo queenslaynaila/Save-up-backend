@@ -34,9 +34,6 @@ const createExpense = (router: Router) => {
     method: 'post',
     path: '/:entity_id/',
     summary: 'Create an expense',
-    description: 'Expenses can be either a groups or an individual user. \n'
-    + '- **For groups**:If expense is being recorded for a group, pass in a query param of a group_id. \n\n'
-    + '- **Individual users**:If expense is for currently logged-in user, the entity id property in body can be left out. The app will associate the expense with the logged-in user. \n\n',
     request: {
       params: z.object({
         entity_id: z.union([
@@ -52,7 +49,7 @@ const createExpense = (router: Router) => {
       }
     },
     authMiddlewareOptions: {},
-    middlewares: [verifyGroupMembership()],
+    middlewares: [verifyGroupMembership(true)],
     handler: async (req, res) => {
       const entity_id = Number(req.params.entity_id);
       const { category_id, description, amount, spent_at } = req.body;

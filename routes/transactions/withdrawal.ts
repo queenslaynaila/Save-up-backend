@@ -3,7 +3,6 @@ import HttpError from '../../httpError';
 import Router from '../../router';
 import { z } from 'zod';
 import { verifyPin } from '../../utils';
-import verifyGroupMembership from '../../utils';
 
 const withdrawalPayload = z.object({
   pocket_id: z.number().min(1),
@@ -37,7 +36,7 @@ const createWithdrawal = (router: Router) => {
       201: {}
     },
     authMiddlewareOptions: {},
-    middlewares: [verifyPin, verifyGroupMembership()],
+    middlewares: [verifyPin],
     handler: async (req, res) => {
       const { pocket_id, amount } = req.body;
       await SQL_CREATE_WITHDRAWAL({

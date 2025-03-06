@@ -54,7 +54,7 @@ const updateExpense = (router: Router) => {
       }
     },
     authMiddlewareOptions: {},
-    middlewares: [verifyGroupMembership()],
+    middlewares: [verifyGroupMembership(true)],
     handler: async (req, res) => {
       const entity_id = Number(req.params.entity_id);
       const xid = Number(req.params.xid);

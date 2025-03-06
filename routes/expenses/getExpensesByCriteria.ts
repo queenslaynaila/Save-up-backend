@@ -27,8 +27,6 @@ const getExpensesByCriteria = (router: Router) => {
     method: 'get',
     path: '/:entity_id',
     summary: 'Get list of expenses by criteria',
-    description: '- **For groups**:If expense is being requested for a group, pass in a query param of a group_id. \n\n'
-    + '- **Individual users**:If expense is for currently logged-in user, The app will associate the expense with the logged-in user. \n\n',
     request: {
       params: z.object({
         entity_id: z.union([
@@ -37,7 +35,6 @@ const getExpensesByCriteria = (router: Router) => {
         ]).default('me' )
       }),
       query: z.object({
-        group_id: z.string().regex(/^\d+$/),
         category_id: z.string().regex(/^\d+$/),
         spent_from: z.string().date(),
         spent_to: z.string().date(),

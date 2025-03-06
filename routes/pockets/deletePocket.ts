@@ -1,6 +1,5 @@
 import Router from '../../router';
 import { sql } from '../../db';
-
 import HttpError from '../../httpError';
 import { z } from 'zod';
 import verifyGroupMembership from '../../utils';
@@ -29,7 +28,7 @@ const deletePocket = (router: Router) => {
       body: z.object({ entity_id: z.number() }).partial()
     },
     authMiddlewareOptions: {},
-    middlewares: [verifyGroupMembership()],  
+    middlewares: [verifyGroupMembership()],
     handler: async (req, res) => {
       const entity_id = req.body?.entity_id || req.user!.id;
       await SQL_DELETE_POCKET({

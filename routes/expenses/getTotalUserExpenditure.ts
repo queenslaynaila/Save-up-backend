@@ -2,7 +2,6 @@ import { z } from 'zod';
 import { sql } from '../../db';
 import Router from '../../router';
 import { ParsedQs } from 'qs';
-import verifyGroupMembership from '../../utils';
 
 const SQL_GET_TOTAL_EXPENSES = sql<{entity_id: number}, {total_expenses: number}>(`
   SELECT COALESCE(SUM(amount), 0) AS total_expenses
@@ -31,7 +30,6 @@ const getTotalUserExpenditure = (router: Router) => {
       }
     },
     authMiddlewareOptions: {},
-    middlewares: [verifyGroupMembership(true)],
     handler: async (req, res) => {
       const entity_id = Number(req.query?.group_id) || req.user!.id;
       const { start_date, end_date, category_id, spent_from, spent_to } = req.query;
