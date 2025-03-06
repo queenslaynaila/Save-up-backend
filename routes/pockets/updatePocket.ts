@@ -3,6 +3,7 @@ import { sql } from '../../db';
 import { z } from 'zod';
 import { pocketSchema } from './schema';
 import verifyGroupMembership from '../../utils';
+import logger from '../../logger';
 
 const pocketPatchParams = pocketSchema.pick({
   xid: true,
@@ -69,10 +70,12 @@ const updatePocket = (router: Router) => {
       }
     },
     authMiddlewareOptions: {},
-    middlewares: [verifyGroupMembership(true)],
+    middlewares: [verifyGroupMembership()],
     handler: async (req, res) => {
-      const entity_id = req.body.entity_id || req.user!.id;
+      const entity_id = Number(req.params.entity_id);
+
       const { name, category_id, target_amount, priority, target_at, pocket_type } = req.body;
+  
       const goal = await SQL_UPDATE_POCKET({
         xid: Number(req.params.xid),
         entity_id,
