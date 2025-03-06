@@ -89,7 +89,11 @@ const createUser = (router: Router) => {
         'First Time'
       );
 
-      const accessToken = generateToken(user.id, user.role, '7d');
+      const accessToken = generateToken(
+        user.id,
+        new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+        user.role
+      );
       
       res
         .status(201)
