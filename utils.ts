@@ -5,6 +5,7 @@ import { sql } from './db';
 import HttpError from './httpError';
 import Config from './config';
 import { AuthenticatedUser, PinResetState, Role } from './routes/users/schema';
+import logger from './logger';
 
 export interface AuthMiddlewareOptions {
   roles?: Role[] | Role;
@@ -118,11 +119,7 @@ export function checkResetTokenValidity(requiredStep: number) {
   };
 }
 
-const SQL_GET_PIN = sql<{
-  user_id: number
-}, {
-  pin: string
-}>(`
+const SQL_GET_PIN = sql<{user_id: number}, {pin: string}>(`
   SELECT pin 
   FROM users 
   WHERE id = :user_id
@@ -140,38 +137,48 @@ export async function verifyPin(req: Request, _res: Response, next: NextFunction
   next();
 }
 
-const SQL_CHECK_GROUP_MEMBERSHIP = sql<{
-  group_id: number;
-  user_id: number;
-}, {
-  is_member: boolean;
-}>(`
+const SQL_CHECK_ENTITY_EXISTS = sql<{ entity_id: number }, { exists: boolean }>(`
+  SELECT EXISTS (
+    SELECT 1 
+    FROM entities 
+    WHERE id = :entity_id
+  ) as exists;
+`);
+
+const SQL_CHECK_GROUP_MEMBERSHIP = sql<
+{ group_id: number; user_id: number }, { is_member: boolean }
+>(`
   SELECT EXISTS (
     SELECT 1
     FROM group_members
     WHERE user_id = :user_id
       AND group_id = :group_id
       AND is_active = TRUE
-  ) as is_member
+  ) as is_member;
 `);
 
 export default function verifyGroupMembership(allowAdminsAndModerators = false) {
   return async (req: Request, _res: Response, next: NextFunction) => {
     const entityId = Number(req.params.entity_id);
+    const userId = req.user!.id;
+
+    if (entityId === userId) return next();
+
+    const entityExists = await SQL_CHECK_ENTITY_EXISTS({ 
+      entity_id: entityId
+     }).oneFirst();
+    if (!entityExists) throw new HttpError(404);
 
     if (allowAdminsAndModerators && ['Admin', 'Moderator'].includes(req.user!.role)) {
-      next();
+      return next();
     }
 
-    const isMember = await SQL_CHECK_GROUP_MEMBERSHIP({
-      group_id: entityId,
-      user_id: req.user!.id
-    }).one();
-
-    if (!isMember) {
-      throw new HttpError(403);
-    }
-
-    next();
+    const isMember = await SQL_CHECK_GROUP_MEMBERSHIP({ 
+      group_id: entityId, 
+      user_id: userId
+     }).oneFirst();
+    if (!isMember) throw new HttpError(403);
+    
+    return next();
   };
 }
