@@ -47,10 +47,11 @@ function validateAndDecodeJwt(headerValue?: string): JwtPayload {
     throw new HttpError(401);
   }
 
-  const [bearer, token] = headerValue.split(' ');
-  if (bearer !== 'Bearer' || !token) {
-    throw new HttpError(401);
+  const parts = headerValue.split(' ');
+  if (parts.length !== 2 || parts[0] !== 'Bearer') {
+    throw new HttpError(400);
   }
+  const token = parts[1];
 
   const decoded = jwt.verify(token, Config.JWT_SECRET as Secret) as JwtPayload;
   if (!decoded ||
