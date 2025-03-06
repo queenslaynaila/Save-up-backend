@@ -6,36 +6,45 @@ import { z } from 'zod';
 import { authenticateResetTokenAndCheckStep, generateToken } from '../../utils';
 import { ResetToken } from './initiatePinReset';
 
-const SQL_GET_SECURITY_QUESTIONS = sql<{ user_id: number }, { id: number; question: string }>(`
+const SQL_GET_SECURITY_QUESTIONS = sql<{
+  user_id: number
+}, {
+  id: number;
+  question: string;
+}>(`
   SELECT 
-        security_questions.id, 
-        security_questions.question 
+    security_questions.id, 
+    security_questions.question 
   FROM security_answers 
   INNER JOIN security_questions 
-  ON security_answers.question_id = security_questions.id 
-  WHERE security_answers.user_id = :user_id;
+    ON security_answers.question_id = security_questions.id 
+  WHERE security_answers.user_id = :user_id
 `);
 
 const SQL_GET_RESET_TOKEN = sql<
-Pick<ResetToken, 'reason' | 'user_id'>,
-Pick<ResetToken, 'token'>>(`
+  Pick<ResetToken, 'reason' | 'user_id'>,
+  Pick<ResetToken, 'token'>
+>(`
   SELECT token
   FROM reset_tokens 
   WHERE user_id = :user_id
-  AND reason = :reason
-  AND used_at IS NULL 
-  AND expired_at > NOW()
+    AND reason = :reason
+    AND used_at IS NULL 
+    AND expired_at > NOW()
   ORDER BY xid DESC 
-  LIMIT 1;
+  LIMIT 1
 `);
 
-const SQL_UPDATE_TOKEN_USAGE = sql<Pick<ResetToken, 'reason' | 'user_id'|'token'>, Record<string, never>>(`
+const SQL_UPDATE_TOKEN_USAGE = sql<
+  Pick<ResetToken, 'reason' | 'user_id' | 'token'>,
+  Record<string, never>
+>(`
   UPDATE reset_tokens 
   SET used_at = NOW() 
   WHERE user_id = :user_id
-  AND token = :token
-  AND reason = :reason
-  AND used_at IS NULL 
+    AND token = :token
+    AND reason = :reason
+    AND used_at IS NULL 
 `);
 
 const questionsSchema = z.object({
@@ -56,7 +65,16 @@ const verifyPinResetToken = (router: Router) => {
     },
     response: {
       200: {
-        schema: z.array(questionsSchema)
+        schema: z.array(questionsSchema),
+        headers: z.object({
+          Reset: z.string()
+        })
+      },
+      204: {
+        schema: undefined,
+        headers: z.object({
+          Reset: z.string()
+        })
       }
     },
     middlewares: [authenticateResetTokenAndCheckStep(1)],
@@ -78,14 +96,31 @@ const verifyPinResetToken = (router: Router) => {
         user_id,
         token
       }).exec();
-      const securityQuestions = await SQL_GET_SECURITY_QUESTIONS({ user_id }).many();
+
+      const securityQuestions = await SQL_GET_SECURITY_QUESTIONS({
+        user_id
+      }).many();
+
       if (securityQuestions.length === 0) {
-        const step3TokenHeader = generateToken(user_id, req.user!.role, '15m', 3);
-        return res.setHeader('Reset', step3TokenHeader).sendStatus(204);
+        const resetTokenHeader = generateToken(
+          user_id,
+         '15m',
+          3
+        );
+
+        return res
+          .setHeader('Reset', resetTokenHeader)
+          .sendStatus(204);
       }
 
-      const step2TokenHeader = generateToken(user_id, req.user!.role, '15m', 2);
-      return res.setHeader('Reset', step2TokenHeader)
+      const resetTokenHeader = generateToken(
+        user_id,
+        new Date(Date.now() + 15 * 60 * 1000).toISOString(),
+        2
+      );
+
+      return res
+        .setHeader('Reset', resetTokenHeader)
         .json(securityQuestions);
     }
   });

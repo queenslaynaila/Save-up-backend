@@ -19,7 +19,11 @@ const resetTokenSchema = z.object({
 
 export type ResetToken = z.infer<typeof resetTokenSchema>;
 
-const SQL_GET_USER = sql<{ phone_number: string }, { id: number }>(`
+const SQL_GET_USER = sql<{ 
+  phone_number: string 
+}, { 
+  id: number 
+}>(`
   SELECT id 
   FROM user_contact_details 
   WHERE phone_number = :phone_number
@@ -63,6 +67,14 @@ const initiatePinReset = (router: Router) => {
       })
     },
     middlewares: [resetPasswordLimiter],
+    response: {
+      204: {
+        schema: undefined,
+        headers: z.object({
+          Reset: z.string()
+        })
+      }
+    },
     handler: async (req, res) => {
       const { phone_number } = req.body;
       
@@ -80,10 +92,9 @@ const initiatePinReset = (router: Router) => {
       }).exec();
 
       const resetTokenHeader = generateToken(
-        user.id, 
-        req.user!.role, 
-        '10m', 
-        1
+        user.id,
+        new Date(Date.now() + 15 * 60 * 1000).toISOString(),
+        1,
       );
 
       sendSms(
