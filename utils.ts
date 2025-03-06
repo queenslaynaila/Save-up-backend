@@ -52,7 +52,6 @@ function validateAndDecodeJwt(headerValue?: string): JwtPayload {
   }
 
   const decoded = jwt.verify(token, Config.JWT_SECRET as Secret) as JwtPayload;
-
   if (!decoded ||
       !decoded.id ||
       (decoded.exp && decoded.exp * 1000 <= Date.now())
@@ -73,13 +72,12 @@ export function authMiddleware(options: AuthMiddlewareOptions = {}) {
 
   return function(req: Request, _res: Response, next: NextFunction) {
     const decoded = validateAndDecodeJwt(req.headers.authorization);
-    
     if (!decoded.id || !decoded.role) {
       throw new HttpError(400);
     }
-    
+
     req.user = { id: decoded.id, role: decoded.role };
-    
+
     if (roles.length && !roles.includes(req.user.role)) {
       throw new HttpError(403);
     }
@@ -87,7 +85,6 @@ export function authMiddleware(options: AuthMiddlewareOptions = {}) {
     if (req.params.user_id === 'me') {
       req.params.user_id = req.user.id.toString();
     }
-
     if (req.params.entity_id === 'me') {
       req.params.entity_id = req.user.id.toString();
     }
@@ -106,11 +103,11 @@ export function checkResetTokenValidity(requiredStep: number) {
   return function(req: Request, _res: Response, next: NextFunction) {
     const resetToken = req.headers.reset as string;
     const decoded = validateAndDecodeJwt(resetToken);
-    
+
     if (!decoded.id || !decoded.step) {
       throw new HttpError(400);
     }
-    
+
     req.resetState = { userId: decoded.id, step: decoded.step };
 
     if (req.resetState.step !== requiredStep) {
@@ -139,43 +136,41 @@ export async function verifyPin(req: Request, _res: Response, next: NextFunction
   if (!await bcrypt.compare(req.body.pin, hashedPin)) {
     throw new HttpError(401);
   }
-  
+
   next();
 }
 
 const SQL_CHECK_GROUP_MEMBERSHIP = sql<{
   group_id: number;
   user_id: number;
-  allow_admin_access: boolean;
-}, Record<string, never>>(`
-  SELECT check_grp_membership(
-    :group_id,
-    :user_id,
-    :allow_admin_access
-  )
+}, {
+  is_member: boolean;
+}>(`
+  SELECT EXISTS (
+    SELECT 1
+    FROM group_members
+    WHERE user_id = :user_id
+      AND group_id = :group_id
+      AND is_active = TRUE
+  ) as is_member
 `);
 
 export default function verifyGroupMembership(allowAdminsAndModerators = false) {
   return async (req: Request, _res: Response, next: NextFunction) => {
-    const groupId = Number(req.params.group_id) ||
-                   Number(req.body.group_id) ||
-                   Number(req.query.group_id);
+    const entityId = Number(req.params.entity_id);
 
-    if (!groupId) {
-      return next();
+    if (allowAdminsAndModerators && ['Admin', 'Moderator'].includes(req.user!.role)) {
+      next();
     }
 
-    await SQL_CHECK_GROUP_MEMBERSHIP({
-      group_id: groupId,
-      user_id: req.user!.id,
-      allow_admin_access: allowAdminsAndModerators
-    }).exec()
-      .catch(err => {
-        if (err.code === 'P0001') {
-          throw new HttpError(403);
-        }
-        throw err;
-      });
+    const isMember = await SQL_CHECK_GROUP_MEMBERSHIP({
+      group_id: entityId,
+      user_id: req.user!.id
+    }).one();
+
+    if (!isMember) {
+      throw new HttpError(403);
+    }
 
     next();
   };
