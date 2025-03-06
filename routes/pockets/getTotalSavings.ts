@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { sql } from '../../db';
 import Router from '../../router';
+import verifyGroupMembership from '../../utils';
 
 const SQL_INNER_BALANCE = sql<{ entity_id: number, pocket_id?: string, from?: string, to?: string }, {name:string, total_savings: number }>(`
   SELECT 
@@ -17,7 +18,7 @@ const SQL_INNER_BALANCE = sql<{ entity_id: number, pocket_id?: string, from?: st
 const getTotalSavings = (router: Router) => {
   router.route({
     method: 'get',
-    path: '/total-savings',
+    path: '/:entity_id/total-savings',
     summary: 'Get total savings across all pockets for a user or group',
     description: 'Calculates and retrieves the total amount ever deposited (as savings) into each pocket. Does not take into account any withdrawals from the pocket. Allows optional query parameters:\n\n'
   + '- **pocket_id**: Retrieves the total savings for a specific pocket.\n'
@@ -25,6 +26,12 @@ const getTotalSavings = (router: Router) => {
   + '- **to**: Filters transactions up to a specific end date.\n'
   + '- **group_id**: If provided, retrieves the total savings for a group entity.',
     request: {
+      params: z.object({
+        entity_id: z.union([
+          z.string().regex(/^[1-9]\d*$/, "Must be a positive integer string"),
+          z.literal("me"), 
+        ]).default('me' )
+      }),
       query: z.object({
         from: z.string(),
         to: z.string(),
@@ -42,8 +49,9 @@ const getTotalSavings = (router: Router) => {
       }
     },
     authMiddlewareOptions: {},
+    middlewares: [verifyGroupMembership()],
     handler: async (req, res) => {
-      const entity_id = Number(req.query?.group_id) || req.user!.id;
+      const entity_id = Number(req.params.entity_id);
       const { from, to } = req.query;
 
       const filterArgs: {

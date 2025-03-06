@@ -12,7 +12,7 @@ const SQL_INNER_BALANCE = sql<{ entity_id: number, pocket_id?: string, from?: st
 const fetchPocketBalances = (router: Router) => {
   router.route({
     method: 'get',
-    path: '/balance',
+    path: '/{entity_id}/balance',
     summary: 'Retrieve  current balance for users or groups across pockets',
     description: `Retrieve the combined balance from all financial transactions:
     
@@ -28,11 +28,16 @@ const fetchPocketBalances = (router: Router) => {
     - Balance for a specific group pocket: GET /pockets/balance?group_id=456&pocket_id=123
     - Date-filtered balance: GET /pockets/balance?from=2024-01-01&to=2024-03-01`,
     request: {
+      params: z.object({
+        entity_id: z.union([
+          z.string().regex(/^[1-9]\d*$/, "Must be a positive integer string"),
+          z.literal("me"), 
+        ]).default('me' )
+      }),
       query: z.object({
         from: z.string().optional(),
         to: z.string().optional(),
         pocket_id: z.string().optional(),
-        group_id: z.string().optional()
       }).partial()
     },
     response: {
@@ -41,8 +46,9 @@ const fetchPocketBalances = (router: Router) => {
       }
     },
     authMiddlewareOptions: {},
+    middlewares: [verifyGroupMembership()],
     handler: async (req, res) => {
-      const entity_id = Number(req.query?.group_id) || req.user!.id;
+      const entity_id = Number(req.params.entity_id);
       const { pocket_id, from, to } = req.query;
 
       const filterArgs: {

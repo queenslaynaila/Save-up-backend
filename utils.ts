@@ -137,24 +137,26 @@ export async function verifyPin(req: Request, _res: Response, next: NextFunction
   next();
 }
 
-const SQL_CHECK_ENTITY_EXISTS = sql<{ entity_id: number }, { exists: boolean }>(`
-  SELECT EXISTS (
-    SELECT 1 
-    FROM entities 
-    WHERE id = :entity_id
-  ) as exists;
-`);
-
-const SQL_CHECK_GROUP_MEMBERSHIP = sql<
-{ group_id: number; user_id: number }, { is_member: boolean }
->(`
-  SELECT EXISTS (
-    SELECT 1
-    FROM group_members
-    WHERE user_id = :user_id
-      AND group_id = :group_id
-      AND is_active = TRUE
-  ) as is_member;
+const SQL_CHECK_GROUP_VALIDITY = sql<{
+  entity_id: number;
+  user_id: number;
+}, {
+  entity_exists: boolean;
+  is_member: boolean;
+}>(`
+  SELECT 
+    EXISTS (
+      SELECT 1 
+      FROM entities 
+      WHERE id = :entity_id
+    ) AS entity_exists,
+    EXISTS (
+      SELECT 1 
+      FROM group_members 
+      WHERE user_id = :user_id 
+        AND group_id = :entity_id 
+        AND is_active = TRUE
+    ) AS is_member
 `);
 
 export default function verifyGroupMembership(allowAdminsAndModerators = false) {
@@ -164,21 +166,19 @@ export default function verifyGroupMembership(allowAdminsAndModerators = false) 
 
     if (entityId === userId) return next();
 
-    const entityExists = await SQL_CHECK_ENTITY_EXISTS({ 
-      entity_id: entityId
-     }).oneFirst();
-    if (!entityExists) throw new HttpError(404);
+    const { entity_exists, is_member } = await SQL_CHECK_GROUP_VALIDITY({
+      entity_id: entityId,
+      user_id: userId
+    }).one();
+
+    if (!entity_exists) throw new HttpError(404);
 
     if (allowAdminsAndModerators && ['Admin', 'Moderator'].includes(req.user!.role)) {
       return next();
     }
 
-    const isMember = await SQL_CHECK_GROUP_MEMBERSHIP({ 
-      group_id: entityId, 
-      user_id: userId
-     }).oneFirst();
-    if (!isMember) throw new HttpError(403);
-    
+    if (!is_member) throw new HttpError(403);
+
     return next();
   };
 }

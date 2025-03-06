@@ -9,12 +9,15 @@ const SQL_CREATE_SAVING = sql<{user_id: number, amount:number, pocket_id:number,
 const createSaving = (router: Router) => {
   router.route({
     method: 'post',
-    path: '/save',
+    path: '/:entity_id/save',
     summary: 'Create a saving',
-    description: 'Endpoint allows to deposit money to a pocket belonging to either grp or user. \n\n'
-    + '-**Group Deposit**: For grp deposits add the optional grp id in body.\n\n'
-    + 'If no group id in body is provided app will assume its a individual pocket transaction',
     request: {
+      params: z.object({
+        entity_id: z.union([
+          z.string().regex(/^[1-9]\d*$/, "Must be a positive integer string"),
+          z.literal("me"), 
+        ]).default('me' )
+      }),
       body: z.object({
         amount: z.number().min(50),
         pocket_id: z.number().min(1)

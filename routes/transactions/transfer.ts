@@ -27,18 +27,21 @@ const SQL_CREATE_TRANSFER = sql<TransferPayload, Record<string, never>>(`
 const createTransfer = (router: Router) => {
   router.route({
     method: 'post',
-    path: '/transfer',
+    path: '/:entity_id/transfer',
     summary: 'Create a transfer',
     request: {
+      params: z.object({
+        entity_id: z.union([
+          z.string().regex(/^[1-9]\d*$/, "Must be a positive integer string"),
+          z.literal("me"), 
+        ]).default('me' )
+      }),
       body: transferPayload.pick({
         source_pocket_id: true,
         destination_pocket_id: true,
         amount: true
       }).extend({
         pin: z.string().regex(/^\d{4}$/)
-      }),
-      query: z.object({
-        group_id: z.string().regex(/^\d+$/).optional()
       })
     },
     response: {
@@ -54,7 +57,7 @@ const createTransfer = (router: Router) => {
         destination_pocket_id,
         user_id: req.user!.id,
         amount,
-        entity_id: Number(req.query.group_id) || req.user!.id
+        entity_id: Number(req.params.entity_id)
       }).exec().catch((err) => {
         if (err.code === 'P0004') {
           throw new HttpError(401, { message: 'ERR_NOT_ADMIN' });
