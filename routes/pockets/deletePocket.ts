@@ -13,10 +13,6 @@ const deletePocket = (router: Router) => {
     method: 'delete',
     path: '/:entity_id/:xid',
     summary: 'Delete a pocket',
-    description: 'Deletes a pocket based on the pocket ID provided in the URL. \n'
-      + '- **xid**: The ID of the pocket to be deleted. \n'
-      + '- If the pocket has deposits, it cannot be deleted. Only 0 balance pockets can be deleyed \n'
-      + '- For group pockets, only admins can delete them. \n',
     request: {
       params: z.object({
         entity_id: z.union([
