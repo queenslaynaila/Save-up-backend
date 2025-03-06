@@ -2,7 +2,7 @@ import Router from '../../router';
 import bcrypt from 'bcrypt';
 import { sql } from '../../db';
 import { z } from 'zod';
-import { authenticateResetTokenAndCheckStep } from '../../utils';
+import { checkResetTokenValidity } from '../../utils';
 
 const SQL_RESET_PASSWORD = sql<{
   id: number;
@@ -23,7 +23,7 @@ const resetPin = (router: Router) => {
         new_pin: z.string().regex(/^\d{4}$/)
       })
     },
-    middlewares: [authenticateResetTokenAndCheckStep(3)],
+    middlewares: [checkResetTokenValidity(3)],
     handler: async (req, res) => {
       const newPin = req.body.new_pin;
       const hashPassword = bcrypt.hashSync(newPin, 10);

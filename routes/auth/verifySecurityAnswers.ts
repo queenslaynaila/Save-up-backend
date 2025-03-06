@@ -3,7 +3,7 @@ import bcrypt from 'bcrypt';
 import { sql } from '../../db';
 import HttpError from '../../httpError';
 import { z } from 'zod';
-import { authenticateResetTokenAndCheckStep, generateToken } from '../../utils';
+import { checkResetTokenValidity, generateToken } from '../../utils';
 
 const verifyAnswerSchema = z.object({
   question_id: z.number().min(1),
@@ -34,7 +34,7 @@ const verifySecurityAnswers = (router: Router) => {
         schema: undefined
       }
     },
-    middlewares: [authenticateResetTokenAndCheckStep(2)],
+    middlewares: [checkResetTokenValidity(2)],
     handler: async (req, res) => {
       const answers = req.body;
       const user_id = req.user!.id;

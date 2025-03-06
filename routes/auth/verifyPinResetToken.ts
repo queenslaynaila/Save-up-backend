@@ -3,7 +3,7 @@ import bcrypt from 'bcrypt';
 import { sql } from '../../db';
 import HttpError from '../../httpError';
 import { z } from 'zod';
-import { authenticateResetTokenAndCheckStep, generateToken } from '../../utils';
+import { checkResetTokenValidity, generateToken } from '../../utils';
 import { ResetToken } from './initiatePinReset';
 
 const SQL_GET_SECURITY_QUESTIONS = sql<{
@@ -77,7 +77,7 @@ const verifyPinResetToken = (router: Router) => {
         })
       }
     },
-    middlewares: [authenticateResetTokenAndCheckStep(1)],
+    middlewares: [checkResetTokenValidity(1)],
     handler: async (req, res) => {
       const { reset_token } = req.body;
       const user_id = req.user!.id;
