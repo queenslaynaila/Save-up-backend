@@ -30,9 +30,8 @@ const deletePocket = (router: Router) => {
     authMiddlewareOptions: {},
     middlewares: [verifyGroupMembership()],
     handler: async (req, res) => {
-      const entity_id = req.body?.entity_id || req.user!.id;
       await SQL_DELETE_POCKET({
-        entity_id,
+        entity_id:Number(req.params.entity_id),
         pocket_id: Number(req.params.xid)
       }).exec().catch(err => {
         if (err.code === 'P0006') {

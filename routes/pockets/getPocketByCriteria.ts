@@ -87,7 +87,7 @@ const getPocketsByUser = (router: Router) => {
         start_date,
         end_date
       } = req.query;
-      const FinalEntity =  Number(req.params.entity_id);
+
       const filters: string[] = [];
       const filterArgs: string | string [] | ParsedQs | ParsedQs[] = {};
 
@@ -127,7 +127,7 @@ const getPocketsByUser = (router: Router) => {
       }
 
       const query = SQL_GET_POCKETS({
-        entity_id: FinalEntity
+        entity_id: Number(req.params.entity_id)
       });
 
       if (filters.length > 0) query.extend(`AND ${filters.join(' AND ')}`, filterArgs);

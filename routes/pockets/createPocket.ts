@@ -69,10 +69,9 @@ const createPocket = (router: Router) => {
     authMiddlewareOptions: {},
     middlewares: [verifyGroupMembership()],
     handler: async (req, res) => {
-      const entity_id = Number(req.params.entity_id);
       const newPocket = await SQL_CREATE_POCKET({
         ...req.body,
-        entity_id
+        entity_id: Number(req.params.entity_id)
       }).one();
       return res.json(newPocket);
     }

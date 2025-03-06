@@ -20,11 +20,6 @@ const getTotalSavings = (router: Router) => {
     method: 'get',
     path: '/:entity_id/total-savings',
     summary: 'Get total savings across all pockets for a user or group',
-    description: 'Calculates and retrieves the total amount ever deposited (as savings) into each pocket. Does not take into account any withdrawals from the pocket. Allows optional query parameters:\n\n'
-  + '- **pocket_id**: Retrieves the total savings for a specific pocket.\n'
-  + '- **from**: Filters transactions from a specific start date.\n'
-  + '- **to**: Filters transactions up to a specific end date.\n'
-  + '- **group_id**: If provided, retrieves the total savings for a group entity.',
     request: {
       params: z.object({
         entity_id: z.union([
@@ -51,14 +46,14 @@ const getTotalSavings = (router: Router) => {
     authMiddlewareOptions: {},
     middlewares: [verifyGroupMembership()],
     handler: async (req, res) => {
-      const entity_id = Number(req.params.entity_id);
+      const entityId = Number(req.params.entity_id);
       const { from, to } = req.query;
 
       const filterArgs: {
         entity_id: number,
         from?: string,
         to?: string
-      } = { entity_id };
+      } = { entity_id: entityId };
       const filters: string[] = [];
 
       if (from && to) {
