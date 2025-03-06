@@ -7,10 +7,15 @@ const Gender = z.enum(['Male', 'Female']);
 
 const authenticatedUser = z.object({
   id: z.number().min(1),
-  role: UserRole,
-  step: z.number().optional()
+  role: UserRole
 });
 export type AuthenticatedUser = z.infer<typeof authenticatedUser>;
+
+const pinResetSchema = z.object({
+  userId: z.number().min(1),
+  step: z.number().min(1)
+});
+export type PinResetState = z.infer<typeof pinResetSchema>;
 
 export const userContactDetailsSchema = z.object({
   id: z.number().min(1),
