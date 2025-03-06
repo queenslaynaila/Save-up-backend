@@ -48,19 +48,6 @@ const getPocketsByUser = (router: Router) => {
     method: 'get',
     path: '/:entity_id',
     summary: 'Retrieve a list of pockets for a user or group',
-    description: 'Fetches a list of pockets belonging to a specific user or group, with optional filters to refine the results.\n'
-      + '- If the path parameter is **me**, the request will return the pockets of the logged-in user.\n'
-      + '- If the path parameter is a user ID, the request will return the pockets of the specified user.\n'
-      + '- Admins and moderators can request pockets for any user or group\n'
-      + '- Regular users can only access their own pockets or of groups they are in\n'
-      + '- **Query Parameters**:\n'
-        + '- **xid**: The unique identifier for a specific pocket.\n'
-        + '- **group_id**: The ID of the group whose pockets are to be fetched. m\n'
-        + '- **category_id**: The category of the pocket.\n'
-        + '- **priority**: The priority level of the pocket.\n'
-        + '- **status**: The current status of the pocket (e.g., active, inactive).\n'
-        + '- **start_date**: Start date for filtering the records.\n'
-        + '- **end_date**: End date for filtering the records.\n',
     request: {
       params: z.object({
         entity_id: z.union([
