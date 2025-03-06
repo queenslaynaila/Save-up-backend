@@ -32,7 +32,7 @@ const deleteExpense = (router: Router) => {
       204: {}
     },
     authMiddlewareOptions: {},
-    middlewares: [verifyGroupMembership(true)],
+    middlewares: [verifyGroupMembership()],
     handler: async (req, res) => {
       const entity_id = Number(req.params.entity_id);
       await SQL_DELETE_EXPENSE({

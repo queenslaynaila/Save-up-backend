@@ -49,7 +49,7 @@ const createExpense = (router: Router) => {
       }
     },
     authMiddlewareOptions: {},
-    middlewares: [verifyGroupMembership(true)],
+    middlewares: [verifyGroupMembership(false)],
     handler: async (req, res) => {
       const entity_id = Number(req.params.entity_id);
       const { category_id, description, amount, spent_at } = req.body;
@@ -59,7 +59,7 @@ const createExpense = (router: Router) => {
         amount,
         spent_at,
         entity_id
-      }).one();
+      }).one()
       return res.json(expense);
     }
   });

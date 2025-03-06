@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { sql } from '../../db';
 import Router from '../../router';
 import { ParsedQs } from 'qs';
+import verifyGroupMembership from '../../utils';
 
 const SQL_GET_TOTAL_EXPENSES = sql<{entity_id: number}, {total_expenses: number}>(`
   SELECT COALESCE(SUM(amount), 0) AS total_expenses
@@ -12,11 +13,16 @@ const SQL_GET_TOTAL_EXPENSES = sql<{entity_id: number}, {total_expenses: number}
 const getTotalUserExpenditure = (router: Router) => {
   router.route({
     method: 'get',
-    path: '/total',
-    summary: 'Get total user expenditure',
+    path: '/{entity_id}/total',
+    summary: 'Get total user/grp expenditure',
     request: {
+      params: z.object({
+        entity_id: z.union([
+          z.string().regex(/^[1-9]\d*$/, "Must be a positive integer string"),
+          z.literal("me"), 
+        ]).default('me' )
+      }),
       query: z.object({
-        group_id: z.string().regex(/^\d+$/),
         start_date: z.string().date(),
         end_date: z.string().date(),
         category_id: z.string().min(1),
@@ -30,8 +36,9 @@ const getTotalUserExpenditure = (router: Router) => {
       }
     },
     authMiddlewareOptions: {},
+    middlewares: [verifyGroupMembership(true)],
     handler: async (req, res) => {
-      const entity_id = Number(req.query?.group_id) || req.user!.id;
+      const entity_id = Number(req.params.entity_id);
       const { start_date, end_date, category_id, spent_from, spent_to } = req.query;
 
       const filters: string[] = [];

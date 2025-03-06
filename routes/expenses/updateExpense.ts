@@ -43,10 +43,7 @@ const updateExpense = (router: Router) => {
         ]).default('me' ),
         xid: z.string()
       }),
-      body: expenseUpdateParams,
-      query: z.object({
-        group_id: z.string().regex(/^\d+$/).optional()
-      })
+      body: expenseUpdateParams
     },
     response: {
       200: {
@@ -54,7 +51,7 @@ const updateExpense = (router: Router) => {
       }
     },
     authMiddlewareOptions: {},
-    middlewares: [verifyGroupMembership(true)],
+    middlewares: [verifyGroupMembership()],
     handler: async (req, res) => {
       const entity_id = Number(req.params.entity_id);
       const xid = Number(req.params.xid);
