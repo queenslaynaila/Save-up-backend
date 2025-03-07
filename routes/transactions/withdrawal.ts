@@ -13,7 +13,7 @@ const withdrawalPayload = z.object({
 type Withdrawal = z.infer<typeof withdrawalPayload>
 
 const SQL_CREATE_WITHDRAWAL = sql<Withdrawal, Record<string, never>>(`
-  SELECT create_withdrawal(:entity_id, :pocket_id, :amount);
+  SELECT withdraw_from_user_pocket(:entity_id, :pocket_id, :amount);
 `);
 
 const createWithdrawal = (router: Router) => {

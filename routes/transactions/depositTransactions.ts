@@ -1,9 +1,15 @@
 import Router from '../../router';
 import { sql } from '../../db';
 import { z } from 'zod';
+import verifyGroupMembership from '../../utils';
 
-const SQL_CREATE_SAVING = sql<{user_id: number, amount:number, pocket_id:number, group_id:number | null}, Record<string, never>>(`
-  SELECT create_saving(:user_id, :amount, :pocket_id, :group_id)
+const SQL_CREATE_SAVING = sql<{
+  entity_id: number, 
+  amount:number, 
+  pocket_id:number, 
+  user_id:number
+}, Record<string, never>>(`
+  SELECT create_saving(:entity_id, :user_id, :pocket_id, :amount)
 `);
 
 const createSaving = (router: Router) => {
@@ -21,22 +27,20 @@ const createSaving = (router: Router) => {
       body: z.object({
         amount: z.number().min(50),
         pocket_id: z.number().min(1)
-      }),
-      query: z.object({
-        group_id: z.string().regex(/^\d+$/).optional()
       })
     },
     response: {
       201: {}
     },
     authMiddlewareOptions: {},
+    middlewares: [verifyGroupMembership()],
     handler: async (req, res) => {
       const { amount, pocket_id } = req.body;
       await SQL_CREATE_SAVING({
-        user_id: req.user!.id,
+        entity_id:Number(req.params.entity_id),
         amount,
         pocket_id,
-        group_id: Number(req.query.group_id) || null
+        user_id: req.user!.id
       }).exec();
       res.sendStatus(201);
     }
