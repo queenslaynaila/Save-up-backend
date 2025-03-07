@@ -27,11 +27,11 @@ const pocketQueryParams = pocketSchema
     status: true
   })
   .extend({
-    xid: z.string().optional(),
-    category_id: z.string().optional(),
-    start_date: z.string().optional(),
-    end_date: z.string().optional()
-  });
+    xid: z.string(),
+    category_id: z.string(),
+    start_date: z.string(),
+    end_date: z.string()
+  }).partial();
 
 const SQL_GET_POCKETS = sql<
   { 
@@ -82,7 +82,7 @@ const getPocketsByEntity = (router: Router) => {
           z.literal("me")
         ]).default('me')
       }),
-      query: pocketQueryParams.partial()
+      query: pocketQueryParams
     },
     response: {
       200: {
