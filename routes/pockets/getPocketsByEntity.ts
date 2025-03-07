@@ -82,7 +82,7 @@ const getPocketsByEntity = (router: Router) => {
           z.literal("me")
         ]).default('me')
       }),
-      query: pocketQueryParams
+      query: pocketQueryParams.partial()
     },
     response: {
       200: {
