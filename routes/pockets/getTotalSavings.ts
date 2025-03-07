@@ -44,7 +44,7 @@ const getTotalSavings = (router: Router) => {
       }
     },
     authMiddlewareOptions: {},
-    middlewares: [verifyGroupMembership()],
+    middlewares: [verifyGroupMembership({allowModeratorAccess: true})],
     handler: async (req, res) => {
       const entityId = Number(req.params.entity_id);
       const { from, to } = req.query;

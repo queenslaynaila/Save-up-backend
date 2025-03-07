@@ -24,7 +24,7 @@ const deletePocket = (router: Router) => {
       body: z.object({ entity_id: z.number() }).partial()
     },
     authMiddlewareOptions: {},
-    middlewares: [verifyGroupMembership()],
+    middlewares: [verifyGroupMembership({requiredGroupRole:'Admin'})],
     handler: async (req, res) => {
       await SQL_DELETE_POCKET({
         entity_id:Number(req.params.entity_id),

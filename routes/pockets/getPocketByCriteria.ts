@@ -63,7 +63,7 @@ const getPocketsByUser = (router: Router) => {
       }
     },
     authMiddlewareOptions: {},
-    middlewares: [verifyGroupMembership(true)],
+    middlewares: [verifyGroupMembership({allowModeratorAccess: true})],
     handler: async (req, res) => {
       const {
         group_id,

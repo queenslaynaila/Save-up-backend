@@ -46,7 +46,7 @@ const fetchPocketBalances = (router: Router) => {
       }
     },
     authMiddlewareOptions: {},
-    middlewares: [verifyGroupMembership()],
+    middlewares: [verifyGroupMembership({allowModeratorAccess: true})],
     handler: async (req, res) => {
       const entity_id = Number(req.params.entity_id);
       const { pocket_id, from, to } = req.query;
