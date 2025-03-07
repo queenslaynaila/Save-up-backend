@@ -1,6 +1,5 @@
 import Router from '../../router';
 import { sql } from '../../db';
-
 import { pocketSchema } from './schema';
 import { z } from 'zod';
 import verifyGroupMembership from '../../utils';
@@ -67,7 +66,7 @@ const createPocket = (router: Router) => {
       }
     },
     authMiddlewareOptions: {},
-    middlewares: [verifyGroupMembership()],
+    middlewares: [verifyGroupMembership({requiredGroupRole: 'Admin'})],
     handler: async (req, res) => {
       const newPocket = await SQL_CREATE_POCKET({
         ...req.body,

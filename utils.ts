@@ -142,43 +142,62 @@ const SQL_CHECK_GROUP_VALIDITY = sql<{
   entity_id: number;
   user_id: number;
 }, {
-  entity_exists: boolean;
+  is_admin_member: boolean;
   is_member: boolean;
 }>(`
   SELECT 
     EXISTS (
       SELECT 1 
-      FROM entities 
-      WHERE id = :entity_id
-    ) AS entity_exists,
-    EXISTS (
-      SELECT 1 
       FROM group_members 
-      WHERE user_id = :user_id 
-        AND group_id = :entity_id 
+      WHERE user_id = :user_id     
+        AND group_id = :entity_id
         AND is_active = TRUE
-    ) AS is_member
+    ) AS is_member,
+    EXISTS (
+      SELECT 1
+      FROM group_admins 
+      JOIN elections 
+        ON group_admins.group_id = elections.group_id 
+        AND group_admins.election_id = elections.xid
+      WHERE group_admins.group_id = :entity_id
+        AND group_admins.user_id = :user_id
+        AND elections.status = 'Closed'
+        AND elections.xid = (
+          SELECT MAX(xid) 
+          FROM elections 
+          WHERE group_id = :entity_id
+            AND status = 'Closed'
+        )
+    ) AS is_admin_member;
 `);
 
-export default function verifyGroupMembership(allowAdminsAndModerators = false) {
+interface GroupMembershipOptions {
+  allowModeratorAccess?: boolean;
+  requiredGroupRole?: 'Admin' | 'Member';
+}
+
+export default function verifyGroupMembership({
+  allowModeratorAccess = false,
+  requiredGroupRole = 'Member'
+}: GroupMembershipOptions = {}) {
   return async (req: Request, _res: Response, next: NextFunction) => {
     const entityId = Number(req.params.entity_id);
     const userId = req.user!.id;
 
     if (entityId === userId) return next();
 
-    const { entity_exists, is_member } = await SQL_CHECK_GROUP_VALIDITY({
+    if (allowModeratorAccess && ['Admin', 'Moderator'].includes(req.user!.role)) {
+      return next();
+    }
+
+    const { is_admin_member, is_member } = await SQL_CHECK_GROUP_VALIDITY({
       entity_id: entityId,
       user_id: userId
     }).one();
 
-    if (!entity_exists) throw new HttpError(404);
-
-    if (allowAdminsAndModerators && ['Admin', 'Moderator'].includes(req.user!.role)) {
-      return next();
+    if (!is_member || (requiredGroupRole === 'Admin' && !is_admin_member)) {
+      throw new HttpError(403);
     }
-
-    if (!is_member) throw new HttpError(403);
 
     return next();
   };
