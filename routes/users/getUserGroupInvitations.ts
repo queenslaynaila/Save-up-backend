@@ -12,18 +12,9 @@ const pendingInvitations = invitationSchema.pick({
   sender_name: z.string()
 });
 
-const sentInvitations = z.object({
-  xid: z.number(),
-  sender_id: z.number(),
-  sender_name: z.string(),
-  sent_to: z.string(),
-  receiver_id: z.number().nullable() 
-});
-
 type Invitations = z.infer<typeof pendingInvitations>;
-type SentInvitations = z.infer<typeof sentInvitations>;
 
-const SQL_GET_PENDING_INVITATIONS = sql<{receiver_id:number}, Invitations>(`
+const SQL_GET_PENDING_INVITATIONS = sql<{user_id:number}, Invitations>(`
   SELECT 
     invitations.xid,
     invitations.group_id,
@@ -33,58 +24,32 @@ const SQL_GET_PENDING_INVITATIONS = sql<{receiver_id:number}, Invitations>(`
   FROM invitations
   JOIN groups ON invitations.group_id = groups.id
   JOIN user_contact_details ON invitations.sender_id = user_contact_details.id
-  WHERE invitations.receiver_id = :receiver_id
+  WHERE invitations.receiver_id = :user_id
   AND invitations.status = 'Pending'
-`);
-
-const SQL_GET_SENT_PENDING_INVITATIONS= sql<{group_id:number}, SentInvitations>(`
-  SELECT 
-    invitations.xid,
-    invitations.sender_id,
-    user_contact_details.full_name AS sender_name,
-    invitations.phone_number AS sent_to,
-    invitations.receiver_id
-  FROM invitations
-  JOIN user_contact_details ON invitations.sender_id = user_contact_details.id
-  WHERE invitations.group_id = :group_id
-  AND invitations.status = 'Pending';
 `);
 
 const getInvites = (router: Router) => {
   router.route({
     method: 'get',
-    path: '/me/invitations',
-    summary: 'Get pending group invitations for logged-in user or pending sent invites for grp',
+    path: '/:user_id/invitations',
+    summary: 'Get pending invitations for a user',
     request:{
       params: z.object({
         user_id: z.union([
           z.string().regex(/^[1-9]\d*$/, "Must be a positive integer string"),
           z.literal("me"), 
         ]).default('me' )
-      }),
-      query: z.object({
-        group_id: z.string().optional()
       })
     },
     response: {
       200: {
-        schema: z.union([ sentInvitations.array(), pendingInvitations.array(),])
+        schema: pendingInvitations.array()
       }
     },
-    authMiddlewareOptions: {},
+    authMiddlewareOptions: {allowModeratorAccess: true},
     handler: async (req, res) => {
-      const user_id = parseInt(req.params.user_id, 10);
-      const group_id  = Number(req.query.group_id) ?? undefined;
-
-      if ( group_id) {
-        const sentInvites = await SQL_GET_SENT_PENDING_INVITATIONS({
-          group_id: Number(group_id)
-        }).many();
-        return res.json(sentInvites);
-      }
-
       const receivedInvites = await SQL_GET_PENDING_INVITATIONS({
-        receiver_id: user_id
+        user_id: req.user!.id
       }).many();
       return res.json(receivedInvites);
     }

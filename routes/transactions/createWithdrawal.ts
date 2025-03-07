@@ -19,7 +19,7 @@ const SQL_CREATE_WITHDRAWAL = sql<Withdrawal, Record<string, never>>(`
 const createWithdrawal = (router: Router) => {
   router.route({
     method: 'post',
-    path: '/:entity_id/withdraw',
+    path: '/:user_id/withdraw',
     summary: 'Withdraw from a pocket',
     request: {
       params: z.object({

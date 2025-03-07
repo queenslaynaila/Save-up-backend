@@ -2,7 +2,7 @@ import Router from '../../router';
 import { sql } from '../../db';
 import HttpError from '../../httpError';
 import { z } from 'zod';
-import { verifyPin } from '../../utils';
+import verifyGroupMembership, { verifyPin } from '../../utils';
 
 const transferPayload = z.object({
   entity_id: z.number().min(1),
@@ -48,7 +48,7 @@ const createTransfer = (router: Router) => {
       201: {}
     },
     authMiddlewareOptions: {},
-    middlewares: [verifyPin],
+    middlewares: [verifyPin, verifyGroupMembership({requiredGroupRole:'Admin'})],
     handler: async (req, res) => {
       const { source_pocket_id, destination_pocket_id, amount } = req.body;
 
