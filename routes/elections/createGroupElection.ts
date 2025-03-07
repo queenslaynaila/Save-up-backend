@@ -3,6 +3,7 @@ import { sql } from '../../db';
 import { ElectionInterface, electionValidation } from './types';
 import { z } from 'zod';
 import HttpError from '../../httpError';
+import verifyGroupMembership from '../../utils';
 
 const SQL_CALL_ELECTION = sql<
   ElectionInterface & { nomination_ends_at?: string; candidates: number[]|null; },
@@ -11,12 +12,15 @@ const SQL_CALL_ELECTION = sql<
   SELECT create_election(:group_id, :initiator_id, :type, :nomination_ends_at, :candidates)
 `);
 
-const createElections = (router: Router) => {
+const createGroupElection = (router: Router) => {
   router.route({
     method: 'post',
-    path: '/',
-    summary: 'Create a new election',
+    path: '/:group_id',
+    summary: 'Create a new group election',
     request: {
+      params: z.object({
+        group_id: z.string()
+      }),
       body: electionValidation.extend({
         nomination_ends_at: z.string().datetime().optional(),
         candidates_ids: z.array(z.number()).min(1).max(3).optional(),
@@ -26,6 +30,7 @@ const createElections = (router: Router) => {
       201: {}
     },
     authMiddlewareOptions: {},
+    middlewares: [verifyGroupMembership()],
     handler: async (req, res) => {
       const nominationEndsAt = req.body.nomination_ends_at 
         ?? new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString();
@@ -34,20 +39,17 @@ const createElections = (router: Router) => {
         type: req.body.type,
         group_id: req.body.group_id,
         nomination_ends_at: nominationEndsAt,
-        candidates: req.body.type === 'Ratification' ? req.body.candidates_ids ?? null : null,
+        candidates: req.body.candidates_ids ?? null,
         initiator_id: req.user!.id
       }).exec().catch(err => {
-        if (err.code === 'P0002') {
-          throw new HttpError(404, { message: 'ERR_INSUFFICIENT_MEMBERS' });
-        }
-        if (err.code === 'P0001') {
-          throw new HttpError(401, { message: 'ERR_NOT_GRP_MBR' });
-        }
         if (err.code === 'P0004') {
-          throw new HttpError(409, { message: 'ERR_ONGOING_ELECTION_EXISTS' });
+          throw new HttpError(409, { message: 'ERR_ELECTION_IN_PROGRESS' });
         }
-        if (err.code === 'P0006') {
-          throw new HttpError(400, { message: 'ERR_INVALID_CLOSED_AT' });
+        if (err.code === 'P0002') {
+          throw new HttpError(404, { message:  'ERR_MIN_MEMBERS_NOT_MET'});
+        }
+        if (err.code === 'P0005') {
+          throw new HttpError(404, { message:  'ERR_INVALID_CANDIDATE_COUNT'});
         }
         throw err;
       });
@@ -58,4 +60,4 @@ const createElections = (router: Router) => {
 };
 
 
-export default createElections;
+export default createGroupElection;

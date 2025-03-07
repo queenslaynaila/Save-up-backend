@@ -4,6 +4,7 @@ import {
   ElectionRequest,
 } from './types';
 import { z } from 'zod';
+import verifyGroupMembership from '../../utils';
 
 const ElectionType = z.enum(["Ballot", "Ratification"]); 
 const ElectionStatus = z.enum(["Open", "Closed", "Cancelled"]);
@@ -31,13 +32,13 @@ const SQL_GET_ONGOING_ELECTION = sql<ElectionRequest, OngoingElection>(`
   SELECT * FROM  get_ongoing_election(:group_id, :user_id)
 `);
 
-const getElections = (router: Router) => {
+const getGroupElectionList = (router: Router) => {
   router.route({
     method: 'get',
-    path: '/',
-    summary: 'Get list of elections',
+    path: '/:group_id',
+    summary: 'Get list of elections for a group',
     request: {
-      query: z.object({
+      params: z.object({
         group_id: z.string()
       })
     },
@@ -47,9 +48,10 @@ const getElections = (router: Router) => {
       }
     },
     authMiddlewareOptions: {},
+    middlewares: [verifyGroupMembership({allowModeratorAccess: true})],
     handler: async (req, res) => {
       const election = await SQL_GET_ONGOING_ELECTION({
-        group_id: parseInt(req.query.group_id),
+        group_id: parseInt(req.params.group_id),
         user_id: req.user!.id
       }).many();
       res.json(election);
@@ -57,4 +59,4 @@ const getElections = (router: Router) => {
   });
 };
 
-export default getElections;
+export default getGroupElectionList;

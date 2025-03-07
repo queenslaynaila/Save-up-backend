@@ -2,7 +2,7 @@ import Router from '../../router';
 import createWithdrawal from './createGroupWithdrawal';
 import getGroupWithdrawals from './getWithdrawalRequest';
 
-const router = Router.getRouterInstance('/group-withdrawals', 'Group Withdrawal Request');
+const router = Router.getRouterInstance('/debit-requests', 'Group Debit Requests');
 
 createWithdrawal(router);
 getGroupWithdrawals(router);

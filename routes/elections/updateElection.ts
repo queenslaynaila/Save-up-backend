@@ -2,6 +2,7 @@ import Router from '../../router';
 import { sql } from '../../db';
 import { z } from 'zod';
 import HttpError from '../../httpError';
+import verifyGroupMembership from '../../utils';
 
 const updateElectionSchema = z.object({
   group_id: z.number(),
@@ -20,15 +21,15 @@ const SQL_UPDATE_ELECTION = sql<UpdateElectionParams, Record<string, never>>(`
 const updateElections = (router: Router) => {
   router.route({
     method: 'patch',
-    path: '/:election_id',
-    summary: 'Update an existing election',
+    path: '/:group_id/:election_id',
+    summary: 'Update an existing group election',
     description: 'Allows updating election status and nomination end date if not closed',
     request: {
       params: z.object({
+        group_id: z.number(),
         election_id: z.string()
       }),
       body: z.object({
-        group_id: z.number(),
         status: z.enum(['Open', 'Cancelled']).optional(),
         nomination_ends_at: z.string().datetime().optional()
       })
@@ -38,12 +39,13 @@ const updateElections = (router: Router) => {
       400: { schema: z.object({ message: z.string() }) }
     },
     authMiddlewareOptions: {},
+    middlewares: [verifyGroupMembership()],
     handler: async (req, res) => {
       const { election_id } = req.params;
-      const { status, nomination_ends_at, group_id } = req.body;
+      const { status, nomination_ends_at } = req.body;
 
       await SQL_UPDATE_ELECTION({
-        group_id,
+        group_id:Number(req.params.group_id),
         election_id: parseInt(election_id),
         status: status ?? null,
         nomination_ends_at: nomination_ends_at ?? null,
