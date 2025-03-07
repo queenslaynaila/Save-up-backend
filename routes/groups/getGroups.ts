@@ -39,7 +39,7 @@ const getUserGroups = (router:Router) => {
   router.route({
     method: 'get',
     path: '/:user_id',
-    summary: 'Get groups a logged in user belongs to/ get common grps between 2 members',
+    summary: 'Get user groups or mutual groups',
     request: {
       params: z.object({
         user_id: z.union([

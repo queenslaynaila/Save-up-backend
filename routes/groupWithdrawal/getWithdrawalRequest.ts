@@ -50,7 +50,7 @@ const getGroupWithdrawals = (router: Router) => {
       })
     },
     authMiddlewareOptions: {}, 
-    middlewares: [verifyGroupMembership(true)],
+    middlewares: [verifyGroupMembership({allowModeratorAccess: true})],
     handler: async (req, res) => {
      const withdrawals = await SQL_INITIATE_GRP_WITHDRAWAL({
         group_id: Number(req.query.group_id),

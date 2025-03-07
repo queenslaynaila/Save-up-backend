@@ -8,6 +8,7 @@ CREATE OR REPLACE FUNCTION create_election(
 RETURNS VOID AS $$
 DECLARE
     v_election_id INT;
+    v_member_count INT;
 BEGIN
     PERFORM check_grp_membership(p_group_id, p_initiator_id);
 
@@ -18,6 +19,18 @@ BEGIN
           AND closed_at IS NULL
     ) THEN
         RAISE EXCEPTION USING MESSAGE = 'ERR_ONGOING_ELECTION_EXISTS', ERRCODE = 'P0004';
+    END IF;
+
+    SELECT COUNT(*)
+    INTO v_member_count
+    FROM group_members
+    WHERE group_id = p_group_id
+      AND is_active = TRUE;
+
+    IF v_member_count < 3 THEN
+        RAISE EXCEPTION USING 
+            MESSAGE = 'ERR_INSUFFICIENT_MEMBERS',
+            ERRCODE = 'P0002';
     END IF;
 
     INSERT INTO elections (group_id, xid, initiator_id, type, nomination_ends_at)

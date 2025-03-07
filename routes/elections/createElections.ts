@@ -37,6 +37,9 @@ const createElections = (router: Router) => {
         candidates: req.body.type === 'Ratification' ? req.body.candidates_ids ?? null : null,
         initiator_id: req.user!.id
       }).exec().catch(err => {
+        if (err.code === 'P0002') {
+          throw new HttpError(404, { message: 'ERR_INSUFFICIENT_MEMBERS' });
+        }
         if (err.code === 'P0001') {
           throw new HttpError(401, { message: 'ERR_NOT_GRP_MBR' });
         }
