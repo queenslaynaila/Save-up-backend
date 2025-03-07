@@ -48,7 +48,7 @@ const getExpensesByCriteria = (router: Router) => {
       }
     },
     authMiddlewareOptions: {allowModeratorAccess: true},
-    middlewares: [verifyGroupMembership(true)],
+    middlewares: [verifyGroupMembership({allowModeratorAccess: true})],
     handler: async (req, res) => {
       const entity_id = Number(req.params.entity_id);
       const { category_id, start_date, end_date, spent_from, spent_to } = req.query;
