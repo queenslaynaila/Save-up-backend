@@ -1,7 +1,7 @@
 import Router from '../../router';
 import { sql } from '../../db';
-import { invitationSchema } from './schema';
 import { z } from 'zod';
+import { invitationSchema } from './schema';
 
 const pendingInvitations = invitationSchema.pick({
   xid: true,
@@ -53,7 +53,7 @@ const SQL_GET_SENT_PENDING_INVITATIONS= sql<{group_id:number}, SentInvitations>(
 const getInvites = (router: Router) => {
   router.route({
     method: 'get',
-    path: '/:user_id',
+    path: '/me/invitations',
     summary: 'Get pending group invitations for logged-in user or pending sent invites for grp',
     request:{
       params: z.object({

@@ -11,7 +11,7 @@ Pick<Invitation, 'xid'|'group_id'|'status'|'receiver_id'>, Record<string, never>
 const updateInvites = (router: Router) => {
   router.route({
     method: 'patch',
-    path: '/:xid',
+    path: '/me/invitations/:xid',
     summary: 'Respond to a group invitation',
     request: {
       params: z.object({

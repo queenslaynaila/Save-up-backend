@@ -14,12 +14,17 @@ const SQL_SEND_INVITATION = sql<{
 const createInvite = (router: Router) => {
   router.route({
     method: 'post',
-    path: '/',
+    path: '/:group_id/invitations',
     summary: 'Send a group invitation via phone number',
-    description: 'Allows a user to send an invitation to a member or non members. The invitees will receive an SMS with a link to join the group.For non-members, the SMS will include a link to sign up for SaveUP and once they have signed up they will find the invite in their notifications.',
+    description: 'Allows a user to send an invitation to a registered user or non regusrted user.\n' +
+    'The invitees will receive an SMS with a link to join the group.\n' +
+    'For non-regisr=tered user, the SMS will include a special link to sign up for SaveUP ' +
+    'and once they have signed up they will find the invite in their notifications.',
     request: {
+      params: z.object({
+        group_id: z.string()
+      }),
       body: z.object({
-        group_id: z.number().min(1),
         phone_number: z.string().regex(/^\+\d{1,4}\d{9}$/)
       })
     },
@@ -30,7 +35,7 @@ const createInvite = (router: Router) => {
     authMiddlewareOptions: {},
     handler: async (req, res) => {
       const { is_member, sender_name, group_name } = await SQL_SEND_INVITATION({
-        group_id: req.body.group_id,
+        group_id: Number(req.params.group_id),
         phone_number: req.body.phone_number,
         sender_id: req.user!.id
       }).one();
