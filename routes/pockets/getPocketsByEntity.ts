@@ -27,14 +27,24 @@ const pocketQueryParams = pocketSchema
     status: true
   })
   .extend({
-    xid: z.string(),
-    category_id: z.string(),
-    start_date: z.string(),
-    end_date: z.string()
-  })
-  .partial();
+    xid: z.string().optional(),
+    category_id: z.string().optional(),
+    start_date: z.string().optional(),
+    end_date: z.string().optional()
+  });
 
-const SQL_GET_POCKETS = sql<{ entity_id: number }, Pocket>(`
+const SQL_GET_POCKETS = sql<
+  { 
+    entity_id: number; 
+    xid?: string; 
+    category_id?: string; 
+    priority?: string; 
+    status?: string; 
+    start_date?: string; 
+    end_date?: string 
+  },
+  Pocket
+>(`
   SELECT 
     pockets.xid,
     pockets.name,
@@ -52,9 +62,15 @@ const SQL_GET_POCKETS = sql<{ entity_id: number }, Pocket>(`
   FROM pockets
   WHERE pockets.deleted_at IS NULL
     AND pockets.entity_id = :entity_id
+    AND (:xid::INT IS NULL OR pockets.xid = :xid)
+    AND (:category_id::INT IS NULL OR pockets.category_id = :category_id)
+    AND (:priority::enum_priority IS NULL OR pockets.priority = :priority)
+    AND (:status::enum_status IS NULL OR pockets.status = :status)
+    AND (:start_date::DATE IS NULL OR DATE(pockets.created_at) >= :start_date)
+    AND (:end_date::DATE IS NULL OR DATE(pockets.created_at) <= :end_date)
 `);
 
-const getPocketsByUser = (router: Router) => {
+const getPocketsByEntity = (router: Router) => {
   router.route({
     method: 'get',
     path: '/:entity_id',
@@ -78,64 +94,22 @@ const getPocketsByUser = (router: Router) => {
       verifyGroupMembership({ allowModeratorAccess: true })
     ],
     handler: async (req, res) => {
-      const {
+      const entityId = Number(req.params.entity_id);
+      const { xid, category_id, priority, status, start_date, end_date } = req.query;
+
+      const pockets = await SQL_GET_POCKETS({
+        entity_id: entityId,
         xid,
         category_id,
         priority,
         status,
         start_date,
         end_date
-      } = req.query;
+      }).many();
 
-      const filters: string[] = [];
-      const filterArgs: Record<string, string> = {};
-
-      if (category_id) {
-        filterArgs.category_id = category_id;
-        filters.push('category_id = :category_id');
-      }
-
-      if (priority) {
-        filterArgs.priority = priority;
-        filters.push('priority = :priority');
-      }
-
-      if (status) {
-        filterArgs.status = status;
-        filters.push('status = :status');
-      }
-
-      if (xid) {
-        filterArgs.xid = xid;
-        filters.push('xid = :xid');
-      }
-
-      if (start_date && end_date) {
-        filterArgs.start_date = start_date;
-        filterArgs.end_date = end_date;
-        filters.push('DATE(completed_at) BETWEEN :start_date AND :end_date');
-      } else {
-        if (start_date) {
-          filterArgs.start_date = start_date;
-          filters.push('DATE(created_at) >= :start_date');
-        }
-        if (end_date) {
-          filterArgs.end_date = end_date;
-          filters.push('DATE(created_at) <= :end_date');
-        }
-      }
-
-      const query = SQL_GET_POCKETS({
-        entity_id: Number(req.params.entity_id)
-      });
-
-      if (filters.length > 0) {
-        query.extend(`AND ${filters.join(' AND ')}`, filterArgs);
-      }
-
-      res.json(await query.many());
+      res.json(pockets);
     }
   });
 };
 
-export default getPocketsByUser;
+export default getPocketsByEntity;

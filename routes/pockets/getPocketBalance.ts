@@ -17,7 +17,7 @@ const SQL_GET_BALANCE = sql<
     SELECT DISTINCT ON (pocket_id) balance
     FROM transactions
     WHERE entity_id = :entity_id
-      AND (:pocket_id::INTEGER IS NULL OR pocket_id = :pocket_id)
+      AND (:pocket_id::INT IS NULL OR pocket_id = :pocket_id)
       AND (:from::DATE IS NULL OR DATE(created_at) >= :from) 
       AND (:to::DATE IS NULL OR DATE(created_at) <= :to) 
     ORDER BY pocket_id, xid DESC

@@ -1,7 +1,7 @@
 import Router from '../../router';
 import createPocket from './createPocket';
 import deletePocket from './deletePocket';
-import getPocketsByUser from './getPocketByCriteria';
+import getPocketsByEntity from './getPocketsByEntity';
 import updatePocket from './updatePocket';
 import getBalanceForAnEntity from './getPocketBalance';
 import getTotalSavings from './getTotalSavings';
@@ -9,7 +9,7 @@ import getTotalSavings from './getTotalSavings';
 const router = Router.getRouterInstance('/pockets', 'Pockets');
 
 createPocket(router);
-getPocketsByUser(router);
+getPocketsByEntity(router);
 updatePocket(router);
 deletePocket(router);
 getBalanceForAnEntity(router);

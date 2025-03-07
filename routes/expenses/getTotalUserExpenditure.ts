@@ -1,34 +1,45 @@
 import { z } from 'zod';
 import { sql } from '../../db';
 import Router from '../../router';
-import { ParsedQs } from 'qs';
 import verifyGroupMembership from '../../utils';
 
-const SQL_GET_TOTAL_EXPENSES = sql<{entity_id: number}, {total_expenses: number}>(`
+const SQL_GET_TOTAL_EXPENSES = sql<{
+  entity_id: number;
+  category_id?: string;
+  spent_from?: string;
+  spent_to?: string;
+  start_date?: string;
+  end_date?: string;
+}, { total_expenses: number }>(`
   SELECT COALESCE(SUM(amount), 0) AS total_expenses
   FROM expenses
   WHERE entity_id = :entity_id
+    AND (:category_id::INT IS NULL OR category_id = :category_id::INT)
+    AND (:spent_from::DATE IS NULL OR DATE(spent_at) >= :spent_from::DATE)
+    AND (:spent_to::DATE IS NULL OR DATE(spent_at) <= :spent_to::DATE)
+    AND (:start_date::DATE IS NULL OR DATE(created_at) >= :start_date::DATE)
+    AND (:end_date::DATE IS NULL OR DATE(created_at) <= :end_date::DATE)
 `);
 
 const getTotalUserExpenditure = (router: Router) => {
   router.route({
     method: 'get',
-    path: '/{entity_id}/total',
-    summary: 'Get total user/grp expenditure',
+    path: '/:entity_id/total',
+    summary: 'Get total user/group expenditure',
     request: {
       params: z.object({
         entity_id: z.union([
           z.string().regex(/^[1-9]\d*$/, "Must be a positive integer string"),
           z.literal("me"), 
-        ]).default('me' )
+        ]).default('me')
       }),
       query: z.object({
-        start_date: z.string().date(),
-        end_date: z.string().date(),
-        category_id: z.string().min(1),
-        spent_from: z.string().date(),
-        spent_to: z.string().date()
-      }).partial()
+        start_date: z.string().date().optional(),
+        end_date: z.string().date().optional(),
+        category_id: z.string().regex(/^[1-9]\d*$/).optional(),
+        spent_from: z.string().date().optional(),
+        spent_to: z.string().date().optional()
+      })
     },
     response: {
       200: {
@@ -36,53 +47,20 @@ const getTotalUserExpenditure = (router: Router) => {
       }
     },
     authMiddlewareOptions: {},
-    middlewares: [verifyGroupMembership({allowModeratorAccess: true})],
+    middlewares: [verifyGroupMembership({ allowModeratorAccess: true })],
     handler: async (req, res) => {
       const entity_id = Number(req.params.entity_id);
-      const { start_date, end_date, category_id, spent_from, spent_to } = req.query;
+      const { category_id, spent_from, spent_to, start_date, end_date } = req.query;
 
-      const filters: string[] = [];
-      const filterArgs: string | string [] | ParsedQs | ParsedQs[] = {};
+      const { total_expenses } = await SQL_GET_TOTAL_EXPENSES({
+        entity_id,
+        category_id,
+        spent_from,
+        spent_to,
+        start_date,
+        end_date
+      }).one();
 
-      if (category_id) {
-        filterArgs.category_id = category_id;
-        filters.push('category_id = :category_id');
-      }
-
-      if (spent_from && spent_to) {
-        filterArgs.spent_from = spent_from;
-        filterArgs.spent_to = spent_to;
-        filters.push('spent_at BETWEEN :spent_from AND :spent_to');
-      } else {
-        if (spent_from) {
-          filterArgs.spent_from = spent_from;
-          filters.push('spent_at >= :spent_from');
-        }
-        if (spent_to) {
-          filterArgs.spent_to = spent_to;
-          filters.push('spent_at <= :spent_to');
-        }
-      }
-
-      if (start_date && end_date) {
-        filterArgs.start_date = start_date;
-        filterArgs.end_date = end_date;
-        filters.push('DATE(created_at) BETWEEN :start_date AND :end_date');
-      } else {
-        if (start_date) {
-          filterArgs.start_date = start_date;
-          filters.push('DATE(created_at) >= :start_date');
-        }
-        if (end_date) {
-          filterArgs.end_date = end_date;
-          filters.push('DATE(created_at) <= :end_date');
-        }
-      }
-
-      const query = SQL_GET_TOTAL_EXPENSES({ entity_id });
-      if (filters.length > 0) query.extend(`AND ${filters.join(' AND ')}`, filterArgs);
-
-      const { total_expenses } = await query.one();
       res.json({ total_expenses });
     }
   });
