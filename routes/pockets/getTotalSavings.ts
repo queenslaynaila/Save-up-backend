@@ -3,16 +3,16 @@ import { sql } from '../../db';
 import Router from '../../router';
 import verifyGroupMembership from '../../utils';
 
-const SQL_INNER_BALANCE = sql<
+const SQL_TOTAL_SAVINGS = sql<
   { 
-    entity_id: number;
-    pocket_id?: string;
-    from?: string;
-    to?: string 
+    entity_id: number; 
+    from?: string; 
+    to?: string; 
+    limit: number 
   },
   { 
-    name: string;
-    total_savings: number 
+    name: string; 
+    total_savings: number
   }
 >(`
   SELECT 
@@ -26,6 +26,10 @@ const SQL_INNER_BALANCE = sql<
     AND transactions.pocket_id = pockets.xid
   WHERE transactions.entity_id = :entity_id
     AND transaction_types.slug = 'Saving'
+    AND (:from::DATE IS NULL OR DATE(transactions.created_at) >= :from)
+    AND (:to::DATE IS NULL OR DATE(transactions.created_at) <= :to)
+  GROUP BY pockets.name
+  LIMIT :limit
 `);
 
 const getTotalSavings = (router: Router) => {
@@ -41,9 +45,10 @@ const getTotalSavings = (router: Router) => {
         ]).default('me')
       }),
       query: z.object({
-        from: z.string(),
-        to: z.string()
-      }).partial()
+        from: z.string().optional(),
+        to: z.string().optional(),
+        limit: z.string().default("15")
+      })
     },
     response: {
       200: {
@@ -61,37 +66,16 @@ const getTotalSavings = (router: Router) => {
     ],
     handler: async (req, res) => {
       const entityId = Number(req.params.entity_id);
+      const limit = Number(req.query.limit);
       const { from, to } = req.query;
 
-      const filterArgs: {
-        entity_id: number;
-        from?: string;
-        to?: string;
-      } = { entity_id: entityId };
-      
-      const filters: string[] = [];
+      const stats = await SQL_TOTAL_SAVINGS({
+        entity_id: entityId,
+        from,
+        to,
+        limit
+      }).many();
 
-      if (from && to) {
-        filterArgs.from = from;
-        filterArgs.to = to;
-        filters.push('DATE(transactions.created_at) BETWEEN :from AND :to');
-      } else if (from) {
-        filterArgs.from = from;
-        filters.push('DATE(transactions.created_at) >= :from');
-      } else if (to) {
-        filterArgs.to = to;
-        filters.push('DATE(transactions.created_at) <= :to');
-      }
-
-      const query = SQL_INNER_BALANCE(filterArgs);
-
-      if (filters.length > 0) {
-        query.extend(`AND ${filters.join(' AND ')}`, filterArgs);
-      }
-
-      query.extend('GROUP BY pockets.name LIMIT 15', {});
-
-      const stats = await query.many();
       res.json(stats);
     }
   });
