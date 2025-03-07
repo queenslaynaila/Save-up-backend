@@ -16,16 +16,16 @@ const transaction = transactionSchema.pick({
 });
 type Transaction = z.infer<typeof transaction>;
 
-const SQL_GET_TRANSACTIONS = sql<{entity_id: number, group_id: number|null}, Transaction>(`
+const SQL_GET_TRANSACTIONS = sql<{ entity_id: number }, Transaction>(`
   SELECT 
     transactions.xid, 
     transaction_types.slug,
     transactions.delta,
     transactions.balance,
-    CASE
-      WHEN CAST(:group_id AS INTEGER) IS NOT NULL THEN
+    
+    CASE 
+      WHEN (SELECT entity_type FROM entities WHERE id = transactions.entity_id) = 'Group' THEN
         COALESCE(
-
           (SELECT user_contact_details.full_name 
            FROM group_deposits 
            JOIN user_contact_details 
@@ -78,11 +78,12 @@ const SQL_GET_TRANSACTIONS = sql<{entity_id: number, group_id: number|null}, Tra
     WHERE destination_transactions.reference_id = transactions.reference_id 
       AND destination_transaction_types.slug = 'TransferIn'
       AND destination_transactions.entity_id = transactions.entity_id) AS destination_pocket_name,
-  transactions.created_at
+
+    transactions.created_at
   FROM transactions
   JOIN transaction_types 
     ON transactions.type_id = transaction_types.id
-    WHERE transactions.entity_id = :entity_id
+  WHERE transactions.entity_id = :entity_id
 `);
 
 const getTransactions = (router: Router) => {
@@ -98,7 +99,6 @@ const getTransactions = (router: Router) => {
         ]).default('me' )
       }),
       query: z.object({
-        group_id: z.string().optional(),
         slug: transactionTypeSchema.shape.slug,
         pocket_id: z.string().optional(),
         from: z.string().optional(),
@@ -113,8 +113,7 @@ const getTransactions = (router: Router) => {
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {
-      const group_id = req.query.group_id ? Number(req.query.group_id) : null;
-      const entity_id = parseInt(req.params.entity_id, 10);
+      const entity_id = Number(req.params.entity_id);
       const { slug, pocket_id, from, to, limit = '10' } = req.query;
 
       const filters: string[] = [];
@@ -122,10 +121,6 @@ const getTransactions = (router: Router) => {
         entity_id,
         limit: Number(limit)
       };
-
-      if (group_id) {
-        filterArgs.group_id = group_id;
-      }
 
       if (pocket_id) {
         filterArgs.pocket_id = Number(pocket_id);
@@ -155,8 +150,7 @@ const getTransactions = (router: Router) => {
 
 
       const query = SQL_GET_TRANSACTIONS({
-        entity_id,
-        group_id
+        entity_id
       });
 
       if (filters.length > 0) {
