@@ -2,41 +2,43 @@ import Router from '../../router';
 import { sql } from '../../db';
 import { z } from 'zod';
 
-const SQL_MANAGE_GROUP_MEMBERSHIP = sql<{group_id: number, initiator_id: number, target_id: number}, {initiator_name: string, target_name: string}>(`
-  SELECT * FROM manage_group_membership (:group_id, :initiator_id, :target_id);
+const SQL_MANAGE_GROUP_MEMBERSHIP = sql<{ 
+  group_id: number; 
+  initiator_id: number; 
+  target_id: number
+ },Record<string, never>>(`
+  SELECT exit_or_remove_group_member(:group_id, :initiator_id, :target_id);
 `);
 
-const groupParams = z.object({
-  group_id: z.string(),
-  member_id: z.string()
-});
 
 const manageGroupMembership = (router: Router) => {
   router.route({
     method: 'delete',
-    path: '/:group_id/members/:member_id',
-    summary: 'Manage group membership (exit or remove)',
-    description: 'Allows a user to exit a group or an admin to remove a member from a group. If the member_id is special string "me" or its equal to the logged in userid, it indicates a self-removal; otherwise, it is an admin removal.',
+    path: '/:group_id/members/:user_id',
+    summary: 'Self-removal or Admin removal from group',
+    description: 'Allows:\n' +
+                '1. Self-removal: Members can leave using `/{group_id}/members/me`\n' +
+                '2. Admin removal: Admins can remove others using `/{group_id}/members/{user_id}`',
     request: {
-      params: groupParams
-    },
-    response: {
-      200: {
-        schema: z.object({
-          initiator_name: z.string().nullable(),
-          target_name: z.string()
-        })
-      }
+      params: z.object({
+        group_id: z.string(),
+        user_id: z.union([
+          z.string().regex(/^[1-9]\d*$/, "Must be a positive integer string"),
+          z.literal("me")
+        ]).default('me')
+      })
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {
-      const target_id = req.params.member_id === 'me' ? req.user!.id : Number(req.params.member_id);
-      const result = await SQL_MANAGE_GROUP_MEMBERSHIP({
+      const target_id = Number(req.params.user_id);
+      
+      await SQL_MANAGE_GROUP_MEMBERSHIP({
         group_id: Number(req.params.group_id),
         initiator_id: req.user!.id,
         target_id
-      }).one();
-      res.json(result);
+      }).exec();
+
+      res.sendStatus(204);
     }
   });
 };
