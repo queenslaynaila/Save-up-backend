@@ -3,30 +3,32 @@ import { sql } from '../../db';
 import { z } from 'zod';
 import { pocketSchema } from './schema';
 import verifyGroupMembership from '../../utils';
-import logger from '../../logger';
 
-const pocketPatchParams = pocketSchema.pick({
-  xid: true,
-  entity_id: true,
-  category_id: true,
-  name: true,
-  priority: true,
-  pocket_type: true,
-  target_amount: true,
-  target_at: true
-}).partial();
+const pocketParams = pocketSchema
+  .pick({
+    category_id: true,
+    name: true,
+    priority: true,
+    pocket_type: true,
+    target_amount: true,
+    target_at: true
+  })
+  .partial();
+
+const pocketPatchParams = pocketSchema
+  .partial()
+  .extend({
+    entity_id: z.number().int(),
+    xid: z.number().int()
+  });
+
 type PocketPatchParams = z.infer<typeof pocketPatchParams>;
 
-const pocket = pocketSchema.pick({
-  name: true,
-  category_id: true,
-  target_amount: true,
-  priority: true,
-  pocket_type: true,
-  target_at: true
-}).extend({
-  category_name: z.string()
-});
+const pocket = pocketParams
+  .extend({
+    entity_id: z.number().int()
+  });
+
 type Pocket = z.infer<typeof pocket>;
 
 const SQL_UPDATE_POCKET = sql<PocketPatchParams, Pocket>(`
@@ -38,15 +40,20 @@ const SQL_UPDATE_POCKET = sql<PocketPatchParams, Pocket>(`
       pocket_type = COALESCE(:pocket_type, pocket_type),
       target_at = COALESCE(:target_at, target_at)
   WHERE entity_id = :entity_id
-  AND xid = :xid
-  AND deleted_at IS NULL
-  RETURNING name, 
-            category_id, 
-            (SELECT name FROM categories WHERE id = pockets.category_id) AS category_name,
-            target_amount, 
-            priority, 
-            pocket_type, 
-            target_at
+    AND xid = :xid
+    AND deleted_at IS NULL
+  RETURNING 
+    name,
+    category_id,
+    (
+      SELECT name 
+      FROM categories 
+      WHERE id = pockets.category_id
+    ) AS category_name,
+    target_amount,
+    priority,
+    pocket_type,
+    target_at
 `);
 
 const updatePocket = (router: Router) => {
@@ -57,12 +64,12 @@ const updatePocket = (router: Router) => {
     request: {
       params: z.object({
         entity_id: z.union([
-          z.string().regex(/^[1-9]\d*$/, "Must be a positive integer string"),
-          z.literal("me"), 
-        ]).default('me' ),
+          z.string().regex(/^[1-9]\d*$/),
+          z.literal("me")
+        ]).default('me'),
         xid: z.string().min(1)
       }),
-      body: pocketPatchParams.omit({ xid: true })
+      body: pocketParams
     },
     response: {
       200: {
@@ -70,11 +77,17 @@ const updatePocket = (router: Router) => {
       }
     },
     authMiddlewareOptions: {},
-    middlewares: [verifyGroupMembership({requiredGroupRole:'Admin'})],
+    middlewares: [verifyGroupMembership({ requiredGroupRole: 'Admin' })],
     handler: async (req, res) => {
       const entity_id = Number(req.params.entity_id);
-
-      const { name, category_id, target_amount, priority, target_at, pocket_type } = req.body;
+      const { 
+        name,
+        category_id,
+        target_amount,
+        priority,
+        target_at,
+        pocket_type 
+      } = req.body;
   
       const goal = await SQL_UPDATE_POCKET({
         xid: Number(req.params.xid),
@@ -86,6 +99,7 @@ const updatePocket = (router: Router) => {
         target_at,
         pocket_type
       }).one();
+
       return res.json(goal);
     }
   });

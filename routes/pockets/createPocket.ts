@@ -4,46 +4,67 @@ import { pocketSchema } from './schema';
 import { z } from 'zod';
 import verifyGroupMembership from '../../utils';
 
-const pocketCreationSchema = pocketSchema.pick({
+const pocketParamsSchema = pocketSchema.pick({
   category_id: true,
   name: true,
   priority: true,
   pocket_type: true,
   target_amount: true,
   target_at: true
-}).extend({
-  entity_id: pocketSchema.shape.entity_id.optional()
 });
-type PocketCreationType = z.infer<typeof pocketCreationSchema>;
 
-export const pocket = pocketSchema.omit({
-  deleted_at: true
+type PocketParams = z.infer<typeof pocketParamsSchema>;
+
+export const newPocketSchema = pocketSchema.pick({
+  entity_id: true,
+  xid: true,
+  category_id: true,
+  name: true,
+  priority: true,
+  status: true,
+  pocket_type: true,
+  target_amount: true,
+  target_at: true,
+  created_at: true,
+  completed_at: true
 });
-type Pocket = z.infer<typeof pocket>;
 
-const SQL_CREATE_POCKET = sql<PocketCreationType, Pocket>(`
-  INSERT INTO pockets (entity_id, xid, category_id, name, priority, pocket_type, target_amount, target_at)
-  SELECT :entity_id,
-          COALESCE(MAX(xid), 0) + 1,
-          :category_id,
-          :name,
-          :priority,
-          :pocket_type,
-          :target_amount,
-          :target_at
+type Pocket = z.infer<typeof newPocketSchema>;
+
+const SQL_CREATE_POCKET = sql<PocketParams & { entity_id: number }, Pocket>(`
+  INSERT INTO pockets (
+    entity_id,
+    xid,
+    category_id,
+    name,
+    priority,
+    pocket_type,
+    target_amount,
+    target_at
+  )
+  SELECT 
+    :entity_id,
+    COALESCE(MAX(xid), 0) + 1,
+    :category_id,
+    :name,
+    :priority,
+    :pocket_type,
+    :target_amount,
+    :target_at
   FROM pockets 
   WHERE entity_id = :entity_id
-  RETURNING entity_id, 
-            xid, 
-            category_id, 
-            name, 
-            priority, 
-            status, 
-            pocket_type, 
-            target_amount,  
-            target_at, 
-            created_at, 
-            completed_at
+  RETURNING 
+    entity_id,
+    xid,
+    category_id,
+    name,
+    priority,
+    status,
+    pocket_type,
+    target_amount,
+    target_at,
+    created_at,
+    completed_at
 `);
 
 const createPocket = (router: Router) => {
@@ -54,24 +75,27 @@ const createPocket = (router: Router) => {
     request: {
       params: z.object({
         entity_id: z.union([
-          z.string().regex(/^[1-9]\d*$/, "Must be a positive integer string"),
-          z.literal("me"), 
-        ]).default('me' )
+          z.string().regex(/^[1-9]\d*$/),
+          z.literal("me")
+        ]).default('me')
       }),
-      body: pocketCreationSchema
+      body: pocketParamsSchema
     },
     response: {
       200: {
-        schema: pocket
+        schema: newPocketSchema
       }
     },
     authMiddlewareOptions: {},
-    middlewares: [verifyGroupMembership({requiredGroupRole: 'Admin'})],
+    middlewares: [
+      verifyGroupMembership({ requiredGroupRole: 'Admin' })
+    ],
     handler: async (req, res) => {
       const newPocket = await SQL_CREATE_POCKET({
         ...req.body,
         entity_id: Number(req.params.entity_id)
       }).one();
+      
       return res.json(newPocket);
     }
   });

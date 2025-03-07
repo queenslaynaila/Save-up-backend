@@ -10,49 +10,36 @@ const SQL_INNER_BALANCE = sql<
     from?: string;
     to?: string 
   },
-  { 
-    name: string;
-    total_savings: number 
-  }
+  { balance: number }
 >(`
-  SELECT 
-    pockets.name,
-    COALESCE(SUM(transactions.delta), 0) AS total_savings
+  SELECT DISTINCT ON (pocket_id) balance
   FROM transactions
-  JOIN transaction_types 
-    ON transactions.type_id = transaction_types.id
-  JOIN pockets 
-    ON transactions.entity_id = pockets.entity_id 
-    AND transactions.pocket_id = pockets.xid
-  WHERE transactions.entity_id = :entity_id
-    AND transaction_types.slug = 'Saving'
+  WHERE entity_id = :entity_id
 `);
 
-const getTotalSavings = (router: Router) => {
+const getBalanceForAnEntity = (router: Router) => {
   router.route({
     method: 'get',
-    path: '/:entity_id/total-savings',
-    summary: 'Get total savings across all pockets for an entity',
+    path: '/:entity_id/balance',
+    summary: 'Retrieve current balance for an entity across pockets',
     request: {
       params: z.object({
         entity_id: z.union([
-          z.string().regex(/^[1-9]\d*$/, "Must be a positive integer string"),
+          z.string().regex(/^[1-9]\d*$/),
           z.literal("me")
         ]).default('me')
       }),
       query: z.object({
-        from: z.string(),
-        to: z.string()
+        from: z.string().optional(),
+        to: z.string().optional(),
+        pocket_id: z.string().optional()
       }).partial()
     },
     response: {
       200: {
-        schema: z.array(
-          z.object({
-            name: z.string(),
-            total_savings: z.number()
-          })
-        )
+        schema: z.object({ 
+          balance: z.number() 
+        })
       }
     },
     authMiddlewareOptions: {},
@@ -60,16 +47,22 @@ const getTotalSavings = (router: Router) => {
       verifyGroupMembership({ allowModeratorAccess: true })
     ],
     handler: async (req, res) => {
-      const entityId = Number(req.params.entity_id);
-      const { from, to } = req.query;
+      const entity_id = Number(req.params.entity_id);
+      const { pocket_id, from, to } = req.query;
 
       const filterArgs: {
         entity_id: number;
         from?: string;
         to?: string;
-      } = { entity_id: entityId };
-      
+        pocket_id?: string;
+      } = { entity_id };
+
       const filters: string[] = [];
+
+      if (pocket_id) {
+        filterArgs.pocket_id = pocket_id;
+        filters.push('pocket_id = :pocket_id');
+      }
 
       if (from && to) {
         filterArgs.from = from;
@@ -84,17 +77,22 @@ const getTotalSavings = (router: Router) => {
       }
 
       const query = SQL_INNER_BALANCE(filterArgs);
-
+      
       if (filters.length > 0) {
         query.extend(`AND ${filters.join(' AND ')}`, filterArgs);
       }
+      
+      query.extend('ORDER BY pocket_id, created_at DESC', {});
 
-      query.extend('GROUP BY pockets.name LIMIT 15', {});
+      const balance = await query.many();
+      const totalBalance = balance.reduce(
+        (sum, row) => sum + (row.balance || 0),
+        0
+      );
 
-      const stats = await query.many();
-      res.json(stats);
+      res.json({ balance: totalBalance });
     }
   });
 };
 
-export default getTotalSavings;
+export default getBalanceForAnEntity;
