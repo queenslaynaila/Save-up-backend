@@ -184,10 +184,10 @@ export default function verifyGroupMembership({
     const entityId = Number(req.params.entity_id);
     const userId = req.user!.id;
 
-    if (entityId === userId) return next();
+    if (entityId === userId) next();
 
     if (allowModeratorAccess && ['Admin', 'Moderator'].includes(req.user!.role)) {
-      return next();
+      next();
     }
 
     const { is_admin_member, is_member } = await SQL_CHECK_GROUP_VALIDITY({
@@ -199,6 +199,6 @@ export default function verifyGroupMembership({
       throw new HttpError(403);
     }
 
-    return next();
+    next();
   };
 }
