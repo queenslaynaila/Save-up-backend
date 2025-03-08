@@ -42,11 +42,7 @@ export function generateToken(
   );
 }
 
-function validateAndDecodeJwt(headerValue?: string): JwtPayload {
-  if (!headerValue) {
-    throw new HttpError(401);
-  }
-
+function validateAndDecodeJwt(headerValue: string): JwtPayload {
   const parts = headerValue.split(' ');
   if (parts.length !== 2 || parts[0] !== 'Bearer') {
     throw new HttpError(400);
@@ -73,6 +69,9 @@ export function authMiddleware(options: AuthMiddlewareOptions = {}) {
   const allowModeratorAccess = options.allowModeratorAccess || false;
 
   return function(req: Request, _res: Response, next: NextFunction) {
+    if (!req.headers.authorization) {
+      throw new HttpError(400);
+    }
     const decoded = validateAndDecodeJwt(req.headers.authorization);
     if (!decoded.id || !decoded.role) {
       throw new HttpError(400);
