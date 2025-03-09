@@ -5,7 +5,6 @@ import { sql } from './db';
 import HttpError from './httpError';
 import Config from './config';
 import { AuthenticatedUser, PinResetState, Role } from './routes/users/schema';
-import logger from './logger';
 
 export interface AuthMiddlewareOptions {
   roles?: Role[] | Role;
@@ -70,7 +69,7 @@ export function authMiddleware(options: AuthMiddlewareOptions = {}) {
 
   return function(req: Request, _res: Response, next: NextFunction) {
     if (!req.headers.authorization) {
-      throw new HttpError(400);
+      throw new HttpError(401);
     }
     const decoded = validateAndDecodeJwt(req.headers.authorization);
     if (!decoded.id || !decoded.role) {
@@ -106,7 +105,7 @@ export function checkResetTokenValidity(requiredStep: number) {
     const decoded = validateAndDecodeJwt(resetToken);
 
     if (!decoded.id || !decoded.step) {
-      throw new HttpError(400);
+      throw new HttpError(401);
     }
 
     req.resetState = { userId: decoded.id, step: decoded.step };
@@ -183,11 +182,11 @@ export default function verifyGroupMembership({
     const entityId = Number(req.params.entity_id);
     const userId = req.user!.id;
 
-    if (entityId === userId) next();
+    if (entityId === userId) return next();
 
-    if (allowModeratorAccess && ['Admin', 'Moderator'].includes(req.user!.role)) {
-      next();
-    }
+
+    if (allowModeratorAccess && ['Admin', 'Moderator'].includes(req.user!.role))
+      return next();
 
     const { is_admin_member, is_member } = await SQL_CHECK_GROUP_VALIDITY({
       entity_id: entityId,
