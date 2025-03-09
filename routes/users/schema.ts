@@ -27,12 +27,13 @@ export const userContactDetailsSchema = z.object({
 export const userSchema = z.object({
   id: z.number().min(1),
   id_type: IdType,
-  id_number: z.string().regex(/^(?:\d{8}|\d{9}(\d{4})?|\d{10}|\d{13}|\d{16})$/),
+  id_number: z.string().regex(/^(?:[A-Z]{1,2}\d{6,9}|\d{8,10}|\d{13}|\d{16})$/),
   role: UserRole,
   gender: Gender.optional(),
   pin: z.string().regex(/^\d{4}$/),
   created_at: z.string().datetime()
 });
+
 
 export const loginAttemptSchema = z.object({
   user_id: z.number().min(1),
