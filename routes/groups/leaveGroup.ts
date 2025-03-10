@@ -1,6 +1,7 @@
 import Router from '../../router';
 import { sql } from '../../db';
 import { z } from 'zod';
+import verifyGroupMembership from '../../utils';
 
 const SQL_MANAGE_GROUP_MEMBERSHIP = sql<{ 
   group_id: number; 
@@ -29,6 +30,8 @@ const manageGroupMembership = (router: Router) => {
       })
     },
     authMiddlewareOptions: {},
+
+    middlewares: [verifyGroupMembership()],
     handler: async (req, res) => {
       const target_id = Number(req.params.user_id);
       

@@ -8,52 +8,83 @@ const baseActivitySchema = z.object({
   actor_id: z.number(),
   actor_name: z.string(),
   created_at: z.string().datetime(),
-});
-
-const pocketSchema = z.object({
-  pocket_id: z.number().nullable(),
-  pocket_name: z.string().nullable(),
-});
-
-const targetSchema = z.object({
   target_id: z.number().nullable(),
   target_name: z.string().nullable(),
+  pocket_id: z.number().nullable(),
+  pocket_name: z.string().nullable(),
+  amount: z.number().nullable(),
 });
 
-const metadataSchemas = {
-  withdrawalRequest: z.object({
-    reason: z.string(),
-    recipients: z.array(
-      z.object({
+const activitySchemas = {
+  MemberJoined: baseActivitySchema.extend({
+    type: z.literal('MemberJoined'),
+    metadata: z.null()
+  }),
+  MemberLeft: baseActivitySchema.extend({
+    type: z.literal('MemberLeft'),
+    metadata: z.null()
+  }),
+  MemberRemoved: baseActivitySchema.extend({
+    type: z.literal('MemberRemoved'),
+    metadata: z.null()
+  }),
+  Deposit: baseActivitySchema.extend({
+    type: z.literal('Deposit'),
+    metadata: z.null()
+  }),
+  Transfer: baseActivitySchema.extend({
+    type: z.literal('Transfer'),
+    metadata: z.object({
+      source_pocket: z.object({
+        id: z.number(),
+        name: z.string()
+      }),
+      destination_pocket: z.object({
+        id: z.number(),
+        name: z.string()
+      })
+    })
+  }),
+  WithdrawalRequest: baseActivitySchema.extend({
+    type: z.literal('WithdrawalRequest'),
+    metadata: z.object({
+      reason: z.string(),
+      recipients: z.array(z.object({
         id: z.number(),
         name: z.string(),
-        amount: z.number(),
-      })
-    ),
+        amount: z.number()
+      }))
+    })
   }),
-  withdrawalApproval: z.object({
-    reason: z.string(),
-    status: z.literal('Approved'),
+  WithdrawalApproval: baseActivitySchema.extend({
+    type: z.literal('WithdrawalApproval'),
+    metadata: z.object({
+      reason: z.string(),
+      status: z.literal('Approved')
+    })
   }),
-  withdrawalRejection: z.object({
-    reason: z.string(),
-    status: z.literal('Rejected'),
-  }),
-  transfer: z.object({
-    source_pocket: pocketSchema,
-    destination_pocket: pocketSchema,
-  }),
+  WithdrawalRejection: baseActivitySchema.extend({
+    type: z.literal('WithdrawalRejection'),
+    metadata: z.object({
+      reason: z.string(),
+      status: z.literal('Rejected')
+    })
+  })
 };
 
-export const activitySchema = baseActivitySchema.extend({
-  type: z.string(),
-  ...targetSchema.shape,
-  ...pocketSchema.shape,
-  amount: z.number().nullable(),
-  metadata:z.any().nullable()
-});
+export const activitySchema = z.discriminatedUnion('type', [
+  activitySchemas.MemberJoined,
+  activitySchemas.MemberLeft,
+  activitySchemas.MemberRemoved,
+  activitySchemas.Deposit,
+  activitySchemas.Transfer,
+  activitySchemas.WithdrawalRequest,
+  activitySchemas.WithdrawalApproval,
+  activitySchemas.WithdrawalRejection
+]);
 
 type Activity = z.infer<typeof activitySchema>;
+
 
 const SQL_GET_GROUP_ACTIVITIES = sql<{ group_id: number, size: number }, Activity>(`
     SELECT *

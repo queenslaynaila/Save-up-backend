@@ -2,7 +2,6 @@ import Router from '../../router';
 import { sql } from '../../db';
 import { z } from 'zod';
 import verifyGroupMembership from '../../utils';
-import logger from '../../logger';
 
 const SQL_UPDATE_GROUP = sql<
   {
@@ -44,7 +43,6 @@ const updateGroup = (router: Router) => {
       })
     ],
     handler: async (req, res) => {
-      logger.info(`Updating group ${req.params.group_id} name to ${req.body.name} user ${req.user!.id}`);
       const { name } = await SQL_UPDATE_GROUP({
         group_id: Number(req.params.group_id),
         user_id: req.user!.id,
