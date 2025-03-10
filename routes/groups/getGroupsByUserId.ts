@@ -11,7 +11,6 @@ const group = groupsSchema.pick({
 }).extend({
   created_by: z.string()
 });
-
 type Group = z.infer<typeof group>;
 
 const SQL_FETCH_USER_GROUPS = sql<
@@ -46,11 +45,11 @@ const SQL_FETCH_USER_GROUPS = sql<
   ORDER BY groups.created_at DESC
 `);
 
-const getUserGroups = (router: Router) => {
+const getGroupsByUserId = (router: Router) => {
   router.route({
     method: 'get',
     path: '/:user_id',
-    summary: 'List groups and mutual memberships',
+    summary: 'Get groups by user id',
     description: 
       'Returns active groups for a user. Optional `mutual_user_id` filter ' +
       'shows only groups shared with another user.',
@@ -84,4 +83,4 @@ const getUserGroups = (router: Router) => {
   });
 };
 
-export default getUserGroups;
+export default getGroupsByUserId;

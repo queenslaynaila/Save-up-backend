@@ -12,7 +12,7 @@ const SQL_MANAGE_GROUP_MEMBERSHIP = sql<{
 `);
 
 
-const manageGroupMembership = (router: Router) => {
+const handleGroupExit = (router: Router) => {
   router.route({
     method: 'delete',
     path: '/:group_id/members/:user_id',
@@ -46,4 +46,4 @@ const manageGroupMembership = (router: Router) => {
   });
 };
 
-export default manageGroupMembership;
+export default handleGroupExit;

@@ -1,12 +1,12 @@
 import Router from '../../router';
 import { sql } from '../../db';
-
 import {
   CandidateRes,
   CandidateReq,
   candidateResSchema
 } from './types';
 import { z } from 'zod';
+import verifyGroupMembership from '../../utils';
 
 const SQL_GET_CANDIDATES = sql<CandidateReq, CandidateRes>(`
   SELECT * FROM get_candidates(:group_id, :election_id, :user_id) 
@@ -15,15 +15,13 @@ const SQL_GET_CANDIDATES = sql<CandidateReq, CandidateRes>(`
 const getCandidates = (router: Router) => {
   router.route({
     method: 'get',
-    path: '/:election_id/candidates',
+    path: '/:group_id/:election_id/candidates',
     summary: 'Get list of candidates for an election',
     request: {
         params: z.object({
-            election_id: z.string()
+            election_id: z.string(),
+            group_id: z.string()
         }),
-      query: z.object({
-        group_id: z.string()
-        })
     },
     response: {
       200: {
@@ -31,10 +29,11 @@ const getCandidates = (router: Router) => {
       }
     },
     authMiddlewareOptions: {},
+    middlewares:[verifyGroupMembership({allowModeratorAccess:true})],
     handler: async (req, res) => {
       const groups = await SQL_GET_CANDIDATES({
         election_id: parseInt(req.params.election_id),
-        group_id: parseInt(req.query.group_id), 
+        group_id: parseInt(req.params.group_id), 
         user_id: req.user!.id
       }).many();
       return res.json(groups);

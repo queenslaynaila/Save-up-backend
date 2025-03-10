@@ -1,6 +1,8 @@
 import Router from '../../router';
 import { sql } from '../../db';
 import { z } from 'zod';
+import verifyGroupMembership from '../../utils';
+import { group } from 'console';
 
 const SQL_RATIFY_ELECTION = sql<{
   group_id: number;
@@ -14,14 +16,14 @@ const SQL_RATIFY_ELECTION = sql<{
 const ratifyElection = (router: Router) => {
   router.route({
     method: 'post',
-    path: '/:election_id/ratifications',
+    path: '/:group_id/:election_id/ratifications',
     summary: 'Ratify an election results',
     request: {
         params: z.object({
-            election_id: z.string()
+            election_id: z.string(),
+            group_id: z.string()
         }),
       body: z.object({
-        group_id: z.number(),
         is_ratified: z.boolean()
       })
     },
@@ -29,10 +31,11 @@ const ratifyElection = (router: Router) => {
       201: {}
     },
     authMiddlewareOptions: {},
+    middlewares:[verifyGroupMembership()],
     handler: async (req, res) => {
       await SQL_RATIFY_ELECTION({
         election_id: Number(req.params.election_id),
-        group_id: req.body.group_id, 
+        group_id: Number(req.params.group_id), 
         user_id: req.user!.id,
         is_ratified: req.body.is_ratified
       }).exec();

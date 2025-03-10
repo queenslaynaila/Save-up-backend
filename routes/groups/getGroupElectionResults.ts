@@ -4,7 +4,7 @@ import {
   CandidateRes,
   CandidateReq,
   candidateResSchema
-} from './types';
+} from '../elections/types';
 import { z } from 'zod';
 import HttpError from '../../httpError';
 
@@ -12,17 +12,15 @@ const SQL_GET_ELECTION_RESULTS = sql<CandidateReq, CandidateRes>(`
   SELECT * FROM get_election_results(:group_id, :election_id, :user_id) 
 `);
 
-const viewResults = (router: Router) => {
+const getGroupElectionResults = (router: Router) => {
   router.route({
     method: 'get',
-    path: '/:election_id/results',
+    path: '/:group_id/:election_id/results',
     summary: 'View an election result progress',
     request: {
         params: z.object({
-            election_id: z.string()
-        }),
-      query: z.object({
-        group_id: z.string()
+            election_id: z.string(),
+            group_id: z.string()
         })
     },
     response: {
@@ -34,7 +32,7 @@ const viewResults = (router: Router) => {
     handler: async (req, res) => {
       const results = await SQL_GET_ELECTION_RESULTS({
         election_id: Number(req.params.election_id),
-        group_id: Number(req.query.group_id), 
+        group_id: Number(req.params.group_id), 
         user_id: req.user!.id
       }).many().catch((err) => {
          if (err.code === 'P0007') {
@@ -47,4 +45,4 @@ const viewResults = (router: Router) => {
   });
 };
 
-export default viewResults;
+export default getGroupElectionResults;

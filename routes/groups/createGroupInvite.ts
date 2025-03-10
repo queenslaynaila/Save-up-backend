@@ -20,7 +20,7 @@ const SQL_SEND_INVITATION = sql<
   SELECT send_invite(:group_id, :phone_number, :sender_id)
 `);
 
-const createInvite = (router: Router) => {
+const createGroupInvite = (router: Router) => {
   router.route({
     method: 'post',
     path: '/:group_id/invitations',
@@ -47,7 +47,11 @@ const createInvite = (router: Router) => {
       })
     ],
     handler: async (req, res) => {
-      const { is_member, sender_name, group_name } = await SQL_SEND_INVITATION({
+      const { 
+        is_member, 
+        sender_name, 
+        group_name
+      } = await SQL_SEND_INVITATION({
         group_id: Number(req.params.group_id),
         phone_number: req.body.phone_number,
         sender_id: req.user!.id
@@ -75,4 +79,4 @@ const createInvite = (router: Router) => {
   });
 };
 
-export default createInvite;
+export default createGroupInvite;

@@ -1,20 +1,15 @@
 import Router from '../../router';
 import { sql } from '../../db';
-import {
-  ElectionRequest,
-} from './types';
 import { z } from 'zod';
 import verifyGroupMembership from '../../utils';
-
-const ElectionType = z.enum(["Ballot", "Ratification"]); 
-const ElectionStatus = z.enum(["Open", "Closed", "Cancelled"]);
+import { ElectionStatus, ElectionType } from './schema';
 
 const adminSchema = z.object({
   user_id: z.number(),
   full_name: z.string(),
 });
 
-const ongoingElectionSchema = z.object({
+const ongoingElectionSchema= z.object({
   group_id: z.number(),
   election_id: z.number(),
   type: ElectionType,
@@ -28,14 +23,14 @@ const ongoingElectionSchema = z.object({
 type OngoingElection = z.infer<typeof ongoingElectionSchema>;
 
 
-const SQL_GET_ONGOING_ELECTION = sql<ElectionRequest, OngoingElection>(`
+const SQL_GET_ONGOING_ELECTION = sql<{group_id:number; user_id:number}, OngoingElection>(`
   SELECT * FROM  get_ongoing_election(:group_id, :user_id)
 `);
 
 const getGroupElectionList = (router: Router) => {
   router.route({
     method: 'get',
-    path: '/:group_id',
+    path: '/:group_id/elections',
     summary: 'Get list of elections for a group',
     request: {
       params: z.object({

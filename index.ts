@@ -14,7 +14,6 @@ import './routes/groups/index';
 import './routes/expenses/index';
 import './routes/pockets/index';
 import './routes/transactions/index';
-import './routes/elections/index';
 import './routes/groupWithdrawal/index';
 import './routes/groupDebitApprovals/index';
 import './routes/loans/index';
@@ -41,7 +40,7 @@ app.use(() => {
 });
 
 app.use((error: Error, _req: Request, res: Response, _next: NextFunction) => {
-  logger.error(`error is ${(error)}`);
+  logger.error(`error is ${JSON.stringify(error)}`);
   if (error instanceof HttpError) {
     return res.status(error.status).json(error);
   }

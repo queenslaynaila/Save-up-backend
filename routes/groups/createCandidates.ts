@@ -2,41 +2,42 @@ import Router from '../../router';
 import { sql } from '../../db';
 import { z } from 'zod';
 import HttpError from '../../httpError';
+import { candidateSchema } from './schema';
+import verifyGroupMembership from '../../utils';
 
-const candidateSchema = z.object({
-  group_id: z.number().min(1),
-  election_id: z.number().min(1),
+const candidateParams = candidateSchema.pick({
+  group_id: true,
+  election_id: true,
+}).extend({
   candidate_ids: z.array(z.number()).min(1).max(3),
   user_id: z.number()
-});
+})
 
-type Candidates = z.infer<typeof candidateSchema>;
+type CandidatesParams = z.infer<typeof candidateParams>;
 
-const SQL_CREATE_CANDIDATE = sql<Candidates, Record<string, never>>(`
+const SQL_CREATE_CANDIDATE = sql<CandidatesParams, Record<string, never>>(`
   SELECT create_candidates(:group_id, :election_id, :candidate_ids, :user_id);
 `);
 
 const createCandidates = (router: Router) => {
   router.route({
     method: 'post',
-    path: '/:election_id/candidates',
+    path: '/:group_id/:election_id/candidates',
     summary: 'Create candidates for an open election',
     request: {
       params: z.object ({
         election_id: z.string(),
+        group_id: z.string()
       }),
-      body: candidateSchema.omit({
-        election_id: true,
-        user_id: true
+      body: candidateParams.pick({
+        candidate_ids: true
       })
     },
-    response: {
-      201: {}
-    },
     authMiddlewareOptions: {},
+    middlewares: [verifyGroupMembership()],
     handler: async (req, res) => {
       await SQL_CREATE_CANDIDATE({
-        group_id: Number(req.body.group_id),
+        group_id: Number(req.params.group_id),
         election_id: Number(req.params.election_id),
         candidate_ids: req.body.candidate_ids,
         user_id: req.user!.id

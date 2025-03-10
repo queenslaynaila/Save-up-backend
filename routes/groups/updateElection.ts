@@ -4,7 +4,7 @@ import { z } from 'zod';
 import HttpError from '../../httpError';
 import verifyGroupMembership from '../../utils';
 
-const updateElectionSchema = z.object({
+const updateElectionSchema= z.object({
   group_id: z.number(),
   user_id: z.number(),
   election_id: z.number(),
@@ -39,7 +39,7 @@ const updateElections = (router: Router) => {
       400: { schema: z.object({ message: z.string() }) }
     },
     authMiddlewareOptions: {},
-    middlewares: [verifyGroupMembership()],
+    middlewares: [verifyGroupMembership({requiredGroupRole:'Admin'})],
     handler: async (req, res) => {
       const { election_id } = req.params;
       const { status, nomination_ends_at } = req.body;

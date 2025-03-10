@@ -269,7 +269,15 @@ const SQL_GET_GROUP_ACTIVITIES = sql<{ group_id: number, size: number }, Activit
                 ON pockets.xid = debit_requests.pocket_id
                 AND pockets.entity_id = debit_requests.group_id
             WHERE debit_requests.group_id = :group_id
-            GROUP BY debit_requests.xid, debit_requests.initiator_id, user_contact_details.full_name, debit_requests.pocket_id, pockets.name, debit_requests.amount, debit_requests.reason, debit_requests.created_at
+            GROUP BY 
+              debit_requests.xid, 
+              debit_requests.initiator_id, 
+              user_contact_details.full_name, 
+              debit_requests.pocket_id, 
+              pockets.name, 
+              debit_requests.amount, 
+              debit_requests.reason, 
+              debit_requests.created_at
             ORDER BY debit_requests.created_at DESC
             LIMIT :size
         )

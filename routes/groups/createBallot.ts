@@ -2,6 +2,8 @@ import Router from '../../router';
 import { sql } from '../../db';
 import { z } from 'zod';
 import HttpError from '../../httpError';
+import { group } from 'console';
+import e from 'express';
 
 const SQL_CREATE_BALLOT = sql< {
     group_id: number;
@@ -15,14 +17,14 @@ const SQL_CREATE_BALLOT = sql< {
 const createBallot = (router: Router) => {
   router.route({
     method: 'post',
-    path: '/:election_id/ballots',
+    path: '/:group_id/:election_id/ballots',
     summary: 'Vote for a candidate in an election',
     request: {
       params: z.object({
-        election_id: z.string()
+        election_id: z.string(),
+        group_id: z.string()
       }),
       body: z.object({
-        group_id: z.number(),
         candidate_ids: z.array(z.number()).min(1).max(3) 
       })
     },
@@ -33,7 +35,7 @@ const createBallot = (router: Router) => {
     handler: async (req, res) => {
       await SQL_CREATE_BALLOT({
         election_id: Number(req.params.election_id),
-        group_id: req.body.group_id,
+        group_id: Number(req.params.group_id),
         candidate_ids: req.body.candidate_ids,
         user_id: req.user!.id
       }).exec().catch(err=>{
@@ -54,3 +56,14 @@ const createBallot = (router: Router) => {
 };
 
 export default createBallot;
+
+
+// /saveup/elections/{group_id}                     Create a new group election 
+// /saveup/elections/{group_id}                       Get list of elections for a group
+// /saveup/elections/{group_id}/{election_id}            Update an existsing group election 
+// /saveup/elections/{group_id}/{election_id}/candidates  Create candidates for an open election
+// /saveup/elections/{group_id}/{election_id}/candidates  Get list of candidates for an election
+
+// /saveup/elections/{group_id}/{election_id}/ballots  Vote for a candidate in an election post
+// /saveup/elections/{group_id}/{election_id}/results  View an election result progress get 
+// /saveup/elections/{group_id}/{election_id}/ratifications  Ratification of election results post 
