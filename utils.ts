@@ -5,6 +5,7 @@ import { sql } from './db';
 import HttpError from './httpError';
 import Config from './config';
 import { AuthenticatedUser, PinResetState, Role } from './routes/users/schema';
+import logger from './logger';
 
 export interface AuthMiddlewareOptions {
   roles?: Role[] | Role;
@@ -179,7 +180,7 @@ export default function verifyGroupMembership({
   requiredGroupRole = 'Member'
 }: GroupMembershipOptions = {}) {
   return async (req: Request, _res: Response, next: NextFunction) => {
-    const entityId = Number(req.params.entity_id);
+    const entityId = Number(req.params.entity_id ?? req.params.group_id);
     const userId = req.user!.id;
 
     if (entityId === userId) return next();
