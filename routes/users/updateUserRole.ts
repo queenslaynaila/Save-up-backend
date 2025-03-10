@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { sql } from '../../db';
 import { UserRole } from './schema';
 import Router from '../../router';
+import HttpError from '../../httpError';
 
 const convertToTitleCase = (str: string): string => {
   return str.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());
@@ -34,6 +35,10 @@ const updateUserRole = (router: Router) => {
     handler: async (req, res) => {
       const role = convertToTitleCase(req.body.role);
       const targetUserId = Number(req.params.user_id);
+
+      if (req.user!.id === targetUserId) {
+        throw new HttpError(403, { message: 'ERR_CANT_ACT_ON_SELF' });
+      }
       
       await SQL_UPDATE_ROLE({
         targetUserId,
