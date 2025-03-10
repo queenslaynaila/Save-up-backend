@@ -1,20 +1,23 @@
 import { z } from 'zod';
 import { sql } from '../../db';
 import Router from '../../router';
-import { IdType, userSchema } from './schema';
+import { 
+  IdType, 
+  userIdParamsSchema, 
+  userSchema
+} from './schema';
 
-const userIdParams = z.object({
+const IdParams = z.object({
   id_type: IdType,
   id_number: userSchema.shape.id_number
 });
 
-type UserIdParams = z.infer<typeof userIdParams> & { user_id: number };
+type UserIdParams = z.infer<typeof IdParams> & { user_id: number };
 
-const SQL_UPDATE_ID_NUMBER = sql<UserIdParams, Record<string,never>>(`
-  SELECT * 
-  FROM update_id_number(
+const SQL_UPDATE_ID_NUMBER = sql<UserIdParams, Pick<UserIdParams,'id_number'>>(`
+  SELECT * FROM update_id_number(
     :user_id, 
-    :id_type, 
+    :id_type::enum_id_type, 
     :id_number
   )
 `);
@@ -25,21 +28,25 @@ const updateIdDetails = (router: Router) => {
     path: '/:user_id/id-details',
     summary: 'Update ID type and number',
     request: {
-      params: z.object({
-        user_id: z.string().regex(/^\d+$/)
-      }),
-      body: userIdParams
+      params:userIdParamsSchema,
+      body: IdParams
+    },
+    response: {
+      200: {
+        schema: z.object({
+          id_number: userSchema.shape.id_number
+        })
+      },
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {
-      const { id_type, id_number } = req.body;
-       await SQL_UPDATE_ID_NUMBER({
+      const {id_number}= await SQL_UPDATE_ID_NUMBER({
         user_id: req.user!.id,
-        id_type,
-        id_number
-      }).exec();
+        id_type: req.body.id_type,
+        id_number: req.body.id_number
+      }).one();
 
-      res.sendStatus(204);
+      res.json({id_number});
     }
   });
 };

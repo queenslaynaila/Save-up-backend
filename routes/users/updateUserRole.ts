@@ -12,9 +12,7 @@ const SQL_UPDATE_ROLE = sql<{
   role: string;
   adminId: number;
 }, Record<string,never>>(`
-  UPDATE users 
-  SET role = :role
-  WHERE id = :targetUserId
+  SELECT update_user_role(:targetUserId, :role, :adminId)
 `);
 
 const updateUserRole = (router: Router) => {
@@ -34,11 +32,11 @@ const updateUserRole = (router: Router) => {
       roles: [UserRole.Enum.Admin]
     },
     handler: async (req, res) => {
-      const userId = req.user!.id;
       const role = convertToTitleCase(req.body.role);
+      const targetUserId = Number(req.params.user_id);
       
       await SQL_UPDATE_ROLE({
-        targetUserId: userId,
+        targetUserId,
         role,
         adminId: req.user!.id
       }).exec();
