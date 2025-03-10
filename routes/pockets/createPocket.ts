@@ -82,7 +82,7 @@ const createPocket = (router: Router) => {
       body: pocketParamsSchema
     },
     response: {
-      200: {
+      201: {
         schema: newPocketSchema
       }
     },

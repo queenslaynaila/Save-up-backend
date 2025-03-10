@@ -30,9 +30,6 @@ const updateUserRole = (router: Router) => {
         role: UserRole
       })
     },
-    response: {
-      200: {},
-    },
     authMiddlewareOptions: {
       roles: [UserRole.Enum.Admin]
     },
@@ -46,7 +43,7 @@ const updateUserRole = (router: Router) => {
         adminId: req.user!.id
       }).exec();
 
-      res.sendStatus(200);
+      res.sendStatus(204);
     }
   });
 };

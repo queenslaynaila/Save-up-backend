@@ -46,7 +46,7 @@ const createNextOfKin = (router: Router) => {
       })
     },
     response: {
-      200: {
+      201: {
         schema: nextOfKinPublicViewSchema
       }
     },

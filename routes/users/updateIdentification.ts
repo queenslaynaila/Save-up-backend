@@ -30,9 +30,6 @@ const updateIdDetails = (router: Router) => {
       }),
       body: userIdParams
     },
-    response: {
-      200: {},
-    },
     authMiddlewareOptions: {},
     handler: async (req, res) => {
       const { id_type, id_number } = req.body;
@@ -42,7 +39,7 @@ const updateIdDetails = (router: Router) => {
         id_number
       }).exec();
 
-      res.sendStatus(200);
+      res.sendStatus(204);
     }
   });
 };

@@ -10,9 +10,9 @@ const router = Router.getRouterInstance('/users', 'Users');
 
 getUsersBySearchCriteria(router);
 updateUserPin(router);
-updateInvites(router);
 updateIdDetails(router);
 updateUserRole(router);
 getInvites(router);
+updateInvites(router);
 
 export default router;
