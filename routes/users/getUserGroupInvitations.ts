@@ -1,7 +1,7 @@
 import Router from '../../router';
 import { sql } from '../../db';
 import { z } from 'zod';
-import { invitationSchema } from './schema';
+import { invitationSchema, userIdParamsSchema } from './schema';
 
 const pendingInvitations = invitationSchema.pick({
   xid: true,
@@ -34,12 +34,7 @@ const getInvites = (router: Router) => {
     path: '/:user_id/invitations',
     summary: 'Get pending invitations for a user',
     request:{
-      params: z.object({
-        user_id: z.union([
-          z.string().regex(/^[1-9]\d*$/, "Must be a positive integer string"),
-          z.literal("me"), 
-        ]).default('me' )
-      })
+      params: userIdParamsSchema
     },
     response: {
       200: {
@@ -48,8 +43,9 @@ const getInvites = (router: Router) => {
     },
     authMiddlewareOptions: {allowModeratorAccess: true},
     handler: async (req, res) => {
+      const userId = Number(req.params.user_id);
       const receivedInvites = await SQL_GET_PENDING_INVITATIONS({
-        user_id: req.user!.id
+        user_id: userId
       }).many();
       return res.json(receivedInvites);
     }

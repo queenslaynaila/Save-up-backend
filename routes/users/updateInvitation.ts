@@ -4,7 +4,8 @@ import Router from '../../router';
 import { Invitation, invitationSchema } from './schema';
 
 const SQL_RESPOND_TO_INVITE = sql<
-Pick<Invitation, 'xid'|'group_id'|'status'|'receiver_id'>, Record<string, never>>(`
+Pick<Invitation, 'xid'|'group_id'|'status'|'receiver_id'>, 
+Record<string, never>>(`
    SELECT update_invite(:xid, :group_id, :receiver_id, :status)
 `);
 
