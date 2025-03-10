@@ -1,5 +1,12 @@
 import { z } from 'zod';
 
+export const userIdParamsSchema = z.object({
+  user_id: z.union([
+    z.string().regex(/^[1-9]\d*$/, "Must be a positive integer string"),
+    z.literal("me"), 
+  ]).default('me' )
+});
+
 export const UserRole = z.enum(['Admin', 'Standard', 'Moderator']);
 export type Role = z.infer<typeof UserRole>;
 export const IdType = z.enum(['National', 'Passport']);
