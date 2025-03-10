@@ -18,7 +18,7 @@ const createBallot = (router: Router) => {
   router.route({
     method: 'post',
     path: '/:group_id/:election_id/ballots',
-    summary: 'Vote for a candidate in an election',
+    summary: 'Submit a vote for a candidate in an election',
     request: {
       params: z.object({
         election_id: z.string(),

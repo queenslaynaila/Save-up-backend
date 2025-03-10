@@ -1,14 +1,23 @@
 import Router from '../../router';
 import { sql } from '../../db';
-import {
-  CandidateRes,
-  CandidateReq,
-  candidateResSchema
-} from '../elections/types';
 import { z } from 'zod';
 import HttpError from '../../httpError';
+import { electionSchema } from './schema';
 
-const SQL_GET_ELECTION_RESULTS = sql<CandidateReq, CandidateRes>(`
+const electionParams = electionSchema.pick({
+  group_id: true,
+  xid: true,
+  initiator_id: true,
+});
+type ElectionParams = z.infer<typeof electionParams>;
+
+export const candidatesSchema = z.object({
+  candidate_id: z.number(),
+  full_name: z.string(),
+});
+export type Candidates = z.infer<typeof candidatesSchema>;
+
+const SQL_GET_ELECTION_RESULTS = sql<ElectionParams, Candidates>(`
   SELECT * FROM get_election_results(:group_id, :election_id, :user_id) 
 `);
 
@@ -25,15 +34,15 @@ const getGroupElectionResults = (router: Router) => {
     },
     response: {
       200: {
-        schema: z.array(candidateResSchema)
+        schema: z.array(candidatesSchema)
       }
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {
       const results = await SQL_GET_ELECTION_RESULTS({
-        election_id: Number(req.params.election_id),
+        xid: Number(req.params.election_id),
         group_id: Number(req.params.group_id), 
-        user_id: req.user!.id
+        initiator_id: req.user!.id
       }).many().catch((err) => {
          if (err.code === 'P0007') {
            throw new HttpError (400, { message: 'ERR_ELECTION_ONGOING' });

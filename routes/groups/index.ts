@@ -10,6 +10,8 @@ import createGroupElection from './createGroupElection';
 import getGroupElectionList from './getGroupElectionList';
 import updateGroupElections from './updateElection';
 import getGroupElectionResults from './getGroupElectionResults';
+import ratifyElection from './ratifyElection';
+import createBallot from './createBallot';
 
 const router = Router.getRouterInstance('/groups', 'Groups');
 
@@ -23,6 +25,8 @@ getGroupActivities(router);
 createGroupElection(router);
 getGroupElectionList(router);
 updateGroupElections(router);
+createBallot(router);
 getGroupElectionResults(router);
+ratifyElection(router);
 
 export default router;

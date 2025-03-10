@@ -1,42 +1,57 @@
 import Router from '../../router';
 import { sql } from '../../db';
-import {
-  CandidateRes,
-  CandidateReq,
-  candidateResSchema
-} from './types';
 import { z } from 'zod';
 import verifyGroupMembership from '../../utils';
+import { candidatesSchema, Candidates } from './getGroupElectionResults';
 
-const SQL_GET_CANDIDATES = sql<CandidateReq, CandidateRes>(`
-  SELECT * FROM get_candidates(:group_id, :election_id, :user_id) 
+const SQL_GET_CANDIDATES = sql<
+  {
+    election_id: number;
+    group_id: number;
+  },
+  Candidates
+>(`
+  SELECT 
+    user_contact_details.id AS candidate_id,
+    user_contact_details.full_name
+  FROM candidates
+  INNER JOIN user_contact_details
+    ON user_contact_details.id = candidates.candidate_id
+  WHERE candidates.group_id = :group_id
+    AND candidates.election_id = :election_id
 `);
 
 const getCandidates = (router: Router) => {
   router.route({
     method: 'get',
     path: '/:group_id/:election_id/candidates',
-    summary: 'Get list of candidates for an election',
+    summary: 'Retrieves all candidates nominated for a specific election.',
     request: {
-        params: z.object({
-            election_id: z.string(),
-            group_id: z.string()
-        }),
+      params: z.object({
+        election_id: z.string()
+          .regex(/^[1-9]\d*$/),
+        group_id: z.string()
+          .regex(/^[1-9]\d*$/)
+      })
     },
     response: {
       200: {
-        schema: z.array(candidateResSchema)
+        schema: z.array(candidatesSchema)
       }
     },
     authMiddlewareOptions: {},
-    middlewares:[verifyGroupMembership({allowModeratorAccess:true})],
+    middlewares: [
+      verifyGroupMembership({ 
+        allowModeratorAccess: true 
+      })
+    ],
     handler: async (req, res) => {
-      const groups = await SQL_GET_CANDIDATES({
-        election_id: parseInt(req.params.election_id),
-        group_id: parseInt(req.params.group_id), 
-        user_id: req.user!.id
+      const candidates = await SQL_GET_CANDIDATES({
+        election_id: Number(req.params.election_id),
+        group_id: Number(req.params.group_id)
       }).many();
-      return res.json(groups);
+
+      return res.json(candidates);
     }
   });
 };

@@ -16,7 +16,7 @@ const SQL_RATIFY_ELECTION = sql<{
 const ratifyElection = (router: Router) => {
   router.route({
     method: 'post',
-    path: '/:group_id/:election_id/ratifications',
+    path: '/:group_id/:election_id/confirm-results',
     summary: 'Ratify an election results',
     request: {
         params: z.object({
