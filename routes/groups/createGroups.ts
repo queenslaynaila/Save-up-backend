@@ -13,11 +13,17 @@ const createGroup = (router:Router) => {
     path: '/',
     summary: 'Create a group',
     request: {
-      body: groupsSchema.pick({ name: true })
+      body: groupsSchema.pick({ 
+        name: true
+      })
     },
     response: {
       201: {
-        schema: groupsSchema.pick({ id: true, name: true, created_at: true })
+        schema: groupsSchema.pick({ 
+          id: true, 
+          name: true, 
+          created_at: true 
+        })
       }
     },
     authMiddlewareOptions: {},
