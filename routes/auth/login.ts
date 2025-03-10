@@ -144,7 +144,7 @@ const login = (router: Router) => {
       body: authSchema
     },
     response: {
-      201: {
+      200: {
         schema: publicUserSchema.omit({
           id_type: true,
           id_number: true

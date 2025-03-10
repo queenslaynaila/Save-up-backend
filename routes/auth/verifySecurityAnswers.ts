@@ -29,11 +29,6 @@ const verifySecurityAnswers = (router: Router) => {
     request: {
       body: verifyAnswerSchema.array()
     },
-    response: {
-      204: {
-        schema: undefined
-      }
-    },
     middlewares: [checkResetTokenValidity(2)],
     handler: async (req, res) => {
       const answers = req.body;
