@@ -7,8 +7,8 @@ CREATE OR REPLACE FUNCTION create_election(
 ) 
 RETURNS VOID AS $$
 DECLARE
-    v_election_id  INT;
-    v_member_count INT;
+    v_election_id    INT;
+    v_member_count   INT;
 BEGIN
     IF EXISTS (
         SELECT 1 
@@ -70,10 +70,21 @@ END;
 $$ LANGUAGE plpgsql;
 
 GRANT EXECUTE ON FUNCTION create_election(
-    INT, INT, enum_election_type, TIMESTAMP WITH TIME ZONE, INT[]
+    INT,                         
+    INT,                         
+    enum_election_type,         
+    TIMESTAMP WITH TIME ZONE,    
+    INT[]                    
 ) TO saveup_www;
 
+
 SELECT create_distributed_function(
-    'create_election(INT, INT, enum_election_type, TIMESTAMP WITH TIME ZONE, INT[])',
+    'create_election(
+        INT, 
+        INT, 
+        enum_election_type, 
+        TIMESTAMP WITH TIME ZONE, 
+        INT[]
+    )',
     'p_group_id'
 );
