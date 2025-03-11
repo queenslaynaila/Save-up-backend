@@ -4,7 +4,6 @@ import { z } from 'zod';
 import sendSms from '../../services/sms';
 import verifyGroupMembership from '../../utils';
 import HttpError from '../../httpError';
-import logger from '../../logger';
 
 const SQL_SEND_INVITATION = sql<
   {
@@ -92,10 +91,6 @@ const createGroupInvite = (router: Router) => {
       const signupLink = `${baseUrl}/sign-up?phone=${
         encodeURIComponent(req.body.phone_number)
       }`;
-
-      logger.info(`receiver_id: ${receiver_id}`);
-      logger.info(`sender_name: ${sender_name}`);
-      logger.info(`group_name: ${group_name}`);
 
       const baseMessage = 
         `${sender_name} invited you to join group ${group_name} on SaveUP.`;
