@@ -3,7 +3,31 @@ import Router from '../../router';
 import { sql } from '../../db';
 import verifyGroupMembership from '../../utils';
 
-const baseActivitySchema = z.object({
+const emptyMetadata = z.object({}).nullable();
+const transferMetadata = z.object({
+  source_pocket: z.object({
+    id: z.number(),
+    name: z.string()
+  }),
+  destination_pocket: z.object({
+    id: z.number(),
+    name: z.string()
+  })
+});
+const withdrawalRequestMetadata = z.object({
+  reason: z.string(),
+  recipients: z.array(z.object({
+    id: z.number(),
+    name: z.string(),
+    amount: z.number()
+  }))
+});
+const withdrawalStatusMetadata = z.object({
+  reason: z.string(),
+  status: z.enum(['Approved', 'Rejected'])
+});
+
+export const activitySchema = z.object({
   id: z.number(),
   actor_id: z.number(),
   actor_name: z.string(),
@@ -13,78 +37,26 @@ const baseActivitySchema = z.object({
   pocket_id: z.number().nullable(),
   pocket_name: z.string().nullable(),
   amount: z.number().nullable(),
+  type: z.enum([
+    'MemberJoined', 
+    'MemberLeft', 
+    'MemberRemoved', 
+    'Deposit', 
+    'Transfer', 
+    'WithdrawalRequest', 
+    'WithdrawalApproval', 
+    'WithdrawalRejection'
+  ]),
+  metadata: z.union([
+    emptyMetadata,
+    transferMetadata,
+    withdrawalRequestMetadata,
+    withdrawalStatusMetadata
+  ])
 });
 
-const activitySchemas = {
-  MemberJoined: baseActivitySchema.extend({
-    type: z.literal('MemberJoined'),
-    metadata: z.null()
-  }),
-  MemberLeft: baseActivitySchema.extend({
-    type: z.literal('MemberLeft'),
-    metadata: z.null()
-  }),
-  MemberRemoved: baseActivitySchema.extend({
-    type: z.literal('MemberRemoved'),
-    metadata: z.null()
-  }),
-  Deposit: baseActivitySchema.extend({
-    type: z.literal('Deposit'),
-    metadata: z.null()
-  }),
-  Transfer: baseActivitySchema.extend({
-    type: z.literal('Transfer'),
-    metadata: z.object({
-      source_pocket: z.object({
-        id: z.number(),
-        name: z.string()
-      }),
-      destination_pocket: z.object({
-        id: z.number(),
-        name: z.string()
-      })
-    })
-  }),
-  WithdrawalRequest: baseActivitySchema.extend({
-    type: z.literal('WithdrawalRequest'),
-    metadata: z.object({
-      reason: z.string(),
-      recipients: z.array(z.object({
-        id: z.number(),
-        name: z.string(),
-        amount: z.number()
-      }))
-    })
-  }),
-  WithdrawalApproval: baseActivitySchema.extend({
-    type: z.literal('WithdrawalApproval'),
-    metadata: z.object({
-      reason: z.string(),
-      status: z.literal('Approved')
-    })
-  }),
-  WithdrawalRejection: baseActivitySchema.extend({
-    type: z.literal('WithdrawalRejection'),
-    metadata: z.object({
-      reason: z.string(),
-      status: z.literal('Rejected')
-    })
-  })
-};
-
-export const activitySchema = z.discriminatedUnion('type', [
-  activitySchemas.MemberJoined,
-  activitySchemas.MemberLeft,
-  activitySchemas.MemberRemoved,
-  activitySchemas.Deposit,
-  activitySchemas.Transfer,
-  activitySchemas.WithdrawalRequest,
-  activitySchemas.WithdrawalApproval,
-  activitySchemas.WithdrawalRejection
-]);
 
 type Activity = z.infer<typeof activitySchema>;
-
 
 const SQL_GET_GROUP_ACTIVITIES = sql<{ group_id: number, size: number }, Activity>(`
     SELECT *
@@ -376,8 +348,8 @@ const getGroupActivities = (router:Router) => {
         const groupId = Number(req.params.group_id);
         const size = Number(req.query.size) || 200;
         const activities = await SQL_GET_GROUP_ACTIVITIES({
-            group_id: groupId,
-            size
+          group_id: groupId,
+          size
         }).many();
         res.json(activities);
       }
