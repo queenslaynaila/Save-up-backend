@@ -4,6 +4,7 @@ import { z } from 'zod';
 import sendSms from '../../services/sms';
 import verifyGroupMembership from '../../utils';
 import HttpError from '../../httpError';
+import logger from '../../logger';
 
 const SQL_SEND_INVITATION = sql<
   {
@@ -12,12 +13,34 @@ const SQL_SEND_INVITATION = sql<
     phone_number: string;
   },
   {
-    is_member: boolean;
+    receiver_id: number | null;
     sender_name: string;
     group_name: string;
   }
 >(`
-  SELECT send_invite(:group_id, :phone_number, :sender_id)
+  INSERT INTO invitations (
+    group_id,
+    xid,
+    sender_id,
+    receiver_id,
+    phone_number
+  )
+  SELECT 
+    :group_id,
+    COALESCE(MAX(xid), 0) + 1,
+    :sender_id,
+    (
+      SELECT id 
+      FROM user_contact_details 
+      WHERE phone_number = :phone_number
+    ),
+    :phone_number
+  FROM invitations
+  WHERE group_id = :group_id
+  RETURNING 
+    (SELECT name FROM groups WHERE id = :group_id) AS group_name,
+    (SELECT full_name FROM user_contact_details WHERE id = :sender_id) AS sender_name,
+    receiver_id
 `);
 
 const createGroupInvite = (router: Router) => {
@@ -34,10 +57,12 @@ const createGroupInvite = (router: Router) => {
       'their notifications.',
     request: {
       params: z.object({
-        group_id: z.string().regex(/^[1-9]\d*$/)
+        group_id: z.string()
+          .regex(/^[1-9]\d*$/)
       }),
       body: z.object({
-        phone_number: z.string().regex(/^\+\d{1,4}\d{9}$/)
+        phone_number: z.string()
+          .regex(/^\+\d{1,4}\d{9}$/)
       })
     },
     authMiddlewareOptions: {},
@@ -48,9 +73,9 @@ const createGroupInvite = (router: Router) => {
     ],
     handler: async (req, res) => {
       const { 
-        is_member, 
+        receiver_id, 
         sender_name, 
-        group_name
+        group_name 
       } = await SQL_SEND_INVITATION({
         group_id: Number(req.params.group_id),
         phone_number: req.body.phone_number,
@@ -64,13 +89,19 @@ const createGroupInvite = (router: Router) => {
 
       const baseUrl = 'https://save-up-seven.vercel.app';
       const inviteLink = `${baseUrl}/notifications`;
-      const signupLink = `${baseUrl}/sign-up?phone=${encodeURIComponent(req.body.phone_number)}`;
-      
-      const message = is_member
-        ? `${sender_name} invited you to join a group ${group_name} on SaveUP. ` +
-          `View your invite here: ${inviteLink}`
-        : `${sender_name} invited you to join a group ${group_name} on SaveUP. ` +
-          `Sign up here: ${signupLink} to join the group`;
+      const signupLink = `${baseUrl}/sign-up?phone=${
+        encodeURIComponent(req.body.phone_number)
+      }`;
+
+      logger.info(`receiver_id: ${receiver_id}`);
+      logger.info(`sender_name: ${sender_name}`);
+      logger.info(`group_name: ${group_name}`);
+
+      const baseMessage = 
+        `${sender_name} invited you to join group ${group_name} on SaveUP.`;
+      const message = receiver_id === null
+        ? `${baseMessage} Sign up here: ${signupLink} to join the group`
+        : `${baseMessage} View your invite here: ${inviteLink}`;
 
       sendSms(req.body.phone_number, message);
 
