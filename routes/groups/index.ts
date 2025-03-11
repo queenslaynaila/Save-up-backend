@@ -4,7 +4,7 @@ import updateGroup from './updateGroup';
 import createGroupInvite from './createGroupInvite';
 import getGroupsByUserId from './getGroupsByUserId';
 import getGroupMembers from './getGroupMembers';
-import handleGroupExit from './leaveGroup';
+import handleGroupExit from './removeGroupMember';
 import getGroupActivities from './getGroupActivities';
 import createGroupElection from './createGroupElection';
 import getGroupElectionList from './getGroupElectionList';

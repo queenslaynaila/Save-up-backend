@@ -49,15 +49,15 @@ const getGroupsByUserId = (router: Router) => {
   router.route({
     method: 'get',
     path: '/:user_id',
-    summary: 'Get groups by user id',
+    summary: 'Get a user\'s active groups',
     description: 
-      'Returns active groups for a user. Optional `mutual_user_id` filter ' +
+      'Optional `mutual_user_id` filter ' +
       'shows only groups shared with another user.',
     request: {
       params: userIdParamsSchema,
       query: z.object({
         mutual_user_id: z.string()
-          .regex(/^[1-9]\d*$/, 'Must be a positive integer')
+          .regex(/^[1-9]\d*$/)
           .optional()
       })
     },
@@ -66,16 +66,18 @@ const getGroupsByUserId = (router: Router) => {
         schema: z.array(group)
       }
     },
-    authMiddlewareOptions: { allowModeratorAccess: true },
+    authMiddlewareOptions: { 
+      allowModeratorAccess: true 
+    },
     handler: async (req, res) => {
       const user_id = Number(req.params.user_id);
-      const otherUserId = req.query.mutual_user_id 
+      const other_user_id = req.query.mutual_user_id
         ? Number(req.query.mutual_user_id)
         : undefined;
 
       const groups = await SQL_FETCH_USER_GROUPS({
         user_id,
-        other_user_id: otherUserId
+        other_user_id
       }).many();
 
       return res.json(groups);

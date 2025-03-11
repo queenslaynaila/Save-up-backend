@@ -43,7 +43,7 @@ const SQL_GET_GROUP_MEMBERS = sql<
     ON user_contact_details.id = group_members.user_id
   WHERE group_members.group_id = :group_id
     AND group_members.is_active = TRUE
-  ORDER BY is_admin DESC
+  ORDER BY is_admin DESC, joined_at ASC
 `);
 
 const getGroupMembers = (router: Router) => {
@@ -54,17 +54,20 @@ const getGroupMembers = (router: Router) => {
     description: 'Retrieve all active members of a group with their admin status',
     request: {
       params: z.object({
-        group_id: z.string().regex(/^[1-9]\d*$/)
+        group_id: z.string()
+          .regex(/^[1-9]\d*$/, 'Must be a positive integer')
       })
     },
     response: {
       200: {
-        schema: z.array(member)
+        schema: z.array(member),
       }
     },
     authMiddlewareOptions: {},
     middlewares: [
-      verifyGroupMembership({ allowModeratorAccess: true })
+      verifyGroupMembership({ 
+        allowModeratorAccess: true 
+      })
     ],
     handler: async (req, res) => {
       const members = await SQL_GET_GROUP_MEMBERS({

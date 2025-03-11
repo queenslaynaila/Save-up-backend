@@ -10,9 +10,12 @@ const SQL_UPDATE_GROUP = sql<
     name: string;
     user_id: number;
   },
-  { name: string }
+  { 
+    name: string 
+  }
 >(`
-  SELECT * FROM update_group_name(
+  SELECT * 
+  FROM update_group_name(
     :group_id,
     :user_id,
     :name
@@ -23,20 +26,21 @@ const updateGroup = (router: Router) => {
   router.route({
     method: 'patch',
     path: '/:group_id',
-    summary: 'Update group details. Group administrators only',
+    summary: 'Update group details',
+    description: 'Update group name. Requires group admin role.',
     request: {
-      params:z.object({
+      params: z.object({
         group_id: z.string()
           .regex(/^[1-9]\d*$/)
       }),
-      body:groupsSchema.pick({
-        name:true
+      body: groupsSchema.pick({
+        name: true
       })
     },
     response: {
       200: {
-        schema:groupsSchema.pick({
-          name:true
+        schema: groupsSchema.pick({
+          name: true
         }),
       }
     },
