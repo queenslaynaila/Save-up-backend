@@ -4,27 +4,9 @@ CREATE OR REPLACE FUNCTION exit_or_remove_group_member(
     p_target_id       INT
 ) RETURNS VOID AS $$
 DECLARE
-    v_latest_election_id INT;
     v_member_count INT;
 BEGIN
     IF p_target_id != p_initiator_id THEN
-        SELECT MAX(xid)
-        INTO STRICT v_latest_election_id
-        FROM elections
-        WHERE group_id = p_group_id;
-
-        IF NOT EXISTS (
-            SELECT 1
-            FROM group_admins
-            WHERE group_id = p_group_id
-            AND election_id = v_latest_election_id
-            AND user_id = p_initiator_id
-        ) THEN
-            RAISE EXCEPTION USING 
-                MESSAGE = 'ERR_NOT_GROUP_ADMIN',
-                ERRCODE = 'P0002';
-        END IF;
-
         IF EXISTS (
             SELECT 1 
             FROM group_deposits
@@ -43,11 +25,15 @@ BEGIN
     AND user_id = p_target_id
     AND is_active = TRUE;
 
-    INSERT INTO group_lefts (group_id, user_id, xid, reason)
+    INSERT INTO group_lefts (group_id, user_id, xid, admin_id, reason)
     SELECT 
         p_group_id, 
         p_target_id,
         COALESCE(MAX(xid), 0) + 1, 
+        CASE 
+            WHEN p_target_id != p_initiator_id THEN p_initiator_id 
+            ELSE NULL 
+        END,
         CASE 
             WHEN p_target_id != p_initiator_id THEN 
                 'Admin removal'::enum_exit_reason
