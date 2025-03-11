@@ -89,7 +89,7 @@ export function authMiddleware(options: AuthMiddlewareOptions = {}) {
     if (req.params.entity_id === 'me') {
       req.params.entity_id = req.user.id.toString();
     }
-
+  
     if (req.params.user_id && parseInt(req.params.user_id, 10) !== req.user.id) {
       if (!allowModeratorAccess || !['Admin', 'Moderator'].includes(req.user.role)) {
         throw new HttpError(403);
@@ -182,19 +182,35 @@ export default function verifyGroupMembership({
   return async (req: Request, _res: Response, next: NextFunction) => {
     const entityId = Number(req.params.entity_id ?? req.params.group_id);
     const userId = req.user!.id;
-
-    if (entityId === userId) return next();
-
-
-    if (allowModeratorAccess && ['Admin', 'Moderator'].includes(req.user!.role))
+    
+    if (entityId === userId) {
       return next();
+    }
+
+    if (req.params.member_id === 'me') {
+      req.params.member_id = userId.toString();
+    }
+
+    if (allowModeratorAccess && ['Admin', 'Moderator'].includes(req.user!.role)) {
+      return next();
+    }
 
     const { is_admin_member, is_member } = await SQL_CHECK_GROUP_VALIDITY({
       entity_id: entityId,
       user_id: userId
     }).one();
 
-    if (!is_member || (requiredGroupRole === 'Admin' && !is_admin_member)) {
+    if (!is_member) {
+      throw new HttpError(403);
+    }
+
+    if (req.params.member_id && 
+        userId !== parseInt(req.params.member_id) && 
+        !is_admin_member) {
+      throw new HttpError(403);
+    }
+
+    if (requiredGroupRole === 'Admin' && !is_admin_member) {
       throw new HttpError(403);
     }
 
