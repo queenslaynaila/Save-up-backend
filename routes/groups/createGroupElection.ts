@@ -9,17 +9,16 @@ const RatificationSchema = z.object({
   type: z.literal("Ratification"),
   nomination_ends_at: z.string().optional(),
   candidates_ids: z.array(z.number()).min(2).max(3)
-});
+}).strict(); 
 
 const BallotSchema = z.object({
   type: z.literal("Ballot"),
-  nomination_ends_at: z.string().optional(),
-  candidates_ids: z.null()
-});
+  nomination_ends_at: z.string().optional()
+}).strict(); 
 
 const electionParams = z.discriminatedUnion("type", [
-  RatificationSchema.strict(),
-  BallotSchema.strict()
+  RatificationSchema,
+  BallotSchema
 ]);
 
 const electionSqlPayload = z.object({
@@ -49,7 +48,7 @@ const createGroupElection = (router: Router) => {
     summary: 'Create a new group election',
     description: 
       'Creates an election for group admin positions.\n\n' +
-      'For ratification elections, 1-3 candidates must be specified.\n\n' +
+      'For ratification elections, 2-3 candidates must be specified.\n\n' +
       'Nomination period defaults to 48 hours if not specified.',
     request: {
       params: z.object({
@@ -71,7 +70,7 @@ const createGroupElection = (router: Router) => {
         type: req.body.type, 
         group_id: groupId,
         initiator_id: userId,
-        nomination_ends_at:nominationEndsAt, 
+        nomination_ends_at: nominationEndsAt, 
         candidates_ids: req.body.type === 'Ratification' ? req.body.candidates_ids : null
       }).exec().catch(err => {
         if (err.code === 'P0004') {
