@@ -36,6 +36,7 @@ const validateSchema = (schema: ZodSchema, data: unknown, section: 'body' | 'que
       message: err.message,
       params: err.params,
       keyword: err.keyword,
+      dataPath: err.dataPath,
       schemaPath: err.schemaPath
     }));
     throw new HttpError(400, errors);
