@@ -20,7 +20,7 @@ export const electionSchema= z.object({
   status: ElectionStatus.default("Open"),
   created_at: z.string().datetime(),
   closed_at: z.string().datetime().nullable(),
-  nomination_ends_at: z.string().datetime()
+  nomination_ends_at: z.string().datetime().optional()
 });
 export type Election = z.infer<typeof electionSchema>;
 
