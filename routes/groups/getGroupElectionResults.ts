@@ -24,7 +24,7 @@ const SQL_GET_ELECTION_RESULTS = sql<ElectionParams, Candidates>(`
 const getGroupElectionResults = (router: Router) => {
   router.route({
     method: 'get',
-    path: '/:group_id/:election_id/results',
+    path: '/:group_id/elections/:election_id/results',
     summary: 'View an election result progress',
     request: {
         params: z.object({

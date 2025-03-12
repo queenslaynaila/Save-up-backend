@@ -17,7 +17,7 @@ const SQL_CREATE_BALLOT = sql< {
 const createBallot = (router: Router) => {
   router.route({
     method: 'post',
-    path: '/:group_id/:election_id/ballots',
+    path: '/:group_id/elections/:election_id/ballots',
     summary: 'Submit a vote for a candidate in an election',
     request: {
       params: z.object({

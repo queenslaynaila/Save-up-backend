@@ -24,7 +24,7 @@ const SQL_GET_CANDIDATES = sql<
 const getCandidates = (router: Router) => {
   router.route({
     method: 'get',
-    path: '/:group_id/:election_id/candidates',
+    path: '/:group_id/elections/:election_id/candidates',
     summary: 'Retrieves all candidates nominated for a specific election.',
     request: {
       params: z.object({

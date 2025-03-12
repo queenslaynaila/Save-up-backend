@@ -1,6 +1,7 @@
 import Router from '../../router';
 import { sql } from '../../db';
 import { Group, groupsSchema } from './schema';
+import logger from '../../logger';
 
 const SQL_CREATE_GROUP = sql<
 Pick<Group, 'name' | 'creator_id'>,
@@ -29,6 +30,7 @@ const createGroup = (router:Router) => {
     },
     authMiddlewareOptions: {},
     handler: async (req, res) => {
+      logger.info(`Creating group for user_id: ${req.user!.id}`);
       const group = await SQL_CREATE_GROUP({
         creator_id: req.user!.id,
         name: req.body.name

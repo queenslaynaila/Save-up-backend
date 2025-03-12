@@ -13,6 +13,7 @@ import updateGroupElections from './updateElection';
 import getGroupElectionResults from './getGroupElectionResults';
 import ratifyElection from './ratifyElection';
 import createBallot from './createBallot';
+import getElectionCandidates from './getElectionCandidates';
 
 const router = Router.getRouterInstance('/groups', 'Groups');
 
@@ -25,6 +26,7 @@ createGroupInvite(router);
 getGroupActivities(router);
 createGroupElection(router);
 createGroupElectionCandidates(router);
+getElectionCandidates(router);
 getGroupElectionList(router);
 updateGroupElections(router);
 createBallot(router);

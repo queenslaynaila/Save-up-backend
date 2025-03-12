@@ -22,7 +22,7 @@ const SQL_CREATE_CANDIDATE = sql<CandidatesParams, Record<string, never>>(`
 const createCandidates = (router: Router) => {
   router.route({
     method: 'post',
-    path: '/:group_id/:election_id/candidates',
+    path: '/:group_id/elections/:election_id/candidates',
     summary: 'Create candidates for an open election',
     request: {
       params: z.object ({
