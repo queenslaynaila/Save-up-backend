@@ -3,20 +3,20 @@ CREATE OR REPLACE FUNCTION create_saving(
   p_user_id     INT,
   p_pocket_id   INT,
   p_amount      NUMERIC
-) RETURNS VOID AS $$
+) 
+RETURNS VOID AS $$
 DECLARE
   v_current_balance      NUMERIC;
   v_new_balance          NUMERIC;
   v_reference_id         INT;
+  v_transaction_id       INT;
   v_is_group             BOOLEAN;
   v_transaction_type_id  INT;
 BEGIN
-  SELECT EXISTS (
-    SELECT 1 
-    FROM entities 
-    WHERE id = p_entity_id 
-      AND entity_type = 'Group'
-  ) INTO v_is_group;
+  SELECT entity_type = 'Group' 
+  INTO STRICT v_is_group 
+  FROM entities
+  WHERE id = p_entity_id;
 
   v_current_balance := get_transaction_info(p_entity_id, p_pocket_id);
   v_new_balance := v_current_balance + p_amount;
@@ -30,7 +30,8 @@ BEGIN
     AND status = 'In Progress'::enum_status
     AND v_current_balance >= pockets.target_amount;
 
-  SELECT id INTO v_transaction_type_id
+  SELECT id 
+  INTO STRICT v_transaction_type_id
   FROM transaction_types
   WHERE slug = 'Saving';
 
@@ -40,7 +41,7 @@ BEGIN
       ERRCODE = 'P0005';
   END IF;
 
-  PERFORM insert_transaction_log(
+  v_transaction_id := insert_transaction_log(
     p_entity_id,
     v_transaction_type_id,
     p_pocket_id,
@@ -56,7 +57,7 @@ BEGIN
       user_id
     ) VALUES (
       p_entity_id,
-      v_reference_id,
+      v_transaction_id,
       p_user_id
     );
   END IF;

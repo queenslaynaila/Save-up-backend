@@ -39,11 +39,10 @@ const createSaving = (router: Router) => {
     handler: async (req, res) => {
       const entityId = Number(req.params.entity_id);
       const pocketId = Number(req.params.pocket_id);
-      const { amount } = req.body;
-      
+
       await SQL_CREATE_SAVING({
         entity_id: entityId,
-        amount,
+        amount:req.body.amount,
         pocket_id: pocketId,
         user_id: req.user!.id
       }).exec();
