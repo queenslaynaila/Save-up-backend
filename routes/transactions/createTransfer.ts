@@ -60,11 +60,6 @@ const createTransfer = (router: Router) => {
         amount: req.body.amount,
         entity_id: Number(req.params.entity_id)
       }).exec().catch((err) => {
-        if (err.code === 'P0004') {
-          throw new HttpError(401, { 
-            message: 'ERR_NOT_ADMIN' 
-          });
-        }
         if (err.code === 'P0005') {
           throw new HttpError(400, { 
             message: 'ERR_FUNDS_LOCKED' 
