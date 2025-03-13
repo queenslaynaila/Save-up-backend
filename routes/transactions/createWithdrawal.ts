@@ -3,33 +3,30 @@ import HttpError from '../../httpError';
 import Router from '../../router';
 import { z } from 'zod';
 import { verifyPin } from '../../utils';
+import { userIdParamsSchema } from '../users/schema';
 
 const withdrawalPayload = z.object({
   pocket_id: z.number().min(1),
   amount: z.number().min(50),
-  entity_id: z.number()
+  user_id: z.number()
 });
 
 type Withdrawal = z.infer<typeof withdrawalPayload>
 
 const SQL_CREATE_WITHDRAWAL = sql<Withdrawal, Record<string, never>>(`
-  SELECT withdraw_from_user_pocket(:entity_id, :pocket_id, :amount);
+  SELECT withdraw_from_user_pocket(:user_id, :pocket_id, :amount);
 `);
 
 const createWithdrawal = (router: Router) => {
   router.route({
     method: 'post',
-    path: '/:user_id/withdraw',
-    summary: 'Withdraw from a pocket',
+    path: '/:user_id/:pocket_id/withdraw',
+    summary: 'Withdraw from a user pocket',
     request: {
-      params: z.object({
-        entity_id: z.union([
-          z.string().regex(/^[1-9]\d*$/, "Must be a positive integer string"),
-          z.literal("me"), 
-        ]).default('me' )
+      params: userIdParamsSchema.extend({
+        pocket_id: z.string().regex(/^[1-9]\d*$/)
       }),
       body: withdrawalPayload.pick({
-        pocket_id: true,
         amount: true
       }).extend({
         pin: z.string().regex(/^\d{4}$/)
@@ -41,20 +38,28 @@ const createWithdrawal = (router: Router) => {
     authMiddlewareOptions: {},
     middlewares: [verifyPin],
     handler: async (req, res) => {
-      const { pocket_id, amount } = req.body;
+      const userId = Number(req.params.user_id);
+      const pocketId = Number(req.params.pocket_id);
+
       await SQL_CREATE_WITHDRAWAL({
-        pocket_id,
-        amount,
-        entity_id: Number(req.params.entity_id)
+        pocket_id: pocketId,
+        amount: req.body.amount,
+        user_id: userId
       }).exec().catch((err) => {
         if (err.code === 'P0004') {
-          throw new HttpError(400, { message: 'ERR_INSUFFICIENT_FUNDS' });
+          throw new HttpError(400, { 
+            message: 'ERR_INSUFFICIENT_FUNDS' 
+          });
         }
         if (err.code === 'P0005') {
-          throw new HttpError(400, { message: 'ERR_FUNDS_LOCKED' });
+          throw new HttpError(400, { 
+            message: 'ERR_FUNDS_LOCKED' 
+          });
         }
+        throw err;
       });
-      res.sendStatus(201);
+
+      res.sendStatus(200);
     }
   });
 };

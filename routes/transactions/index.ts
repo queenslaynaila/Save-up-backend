@@ -1,14 +1,14 @@
 import Router from '../../router';
+import getTransactions from './getTransactions';
 import createSaving from './createSaving';
 import createTransfer from './createTransfer';
 import createWithdrawal from './createWithdrawal';
-import getTransactions from './getTransactions';
 
 const router = Router.getRouterInstance('/transactions', 'Transactions');
 
-createSaving(router);
-createTransfer(router);
-createWithdrawal(router);
 getTransactions(router);
+createSaving(router);    
+createTransfer(router);   
+createWithdrawal(router);  
 
 export default router;

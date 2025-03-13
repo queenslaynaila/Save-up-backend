@@ -3,46 +3,52 @@ import { sql } from '../../db';
 import { z } from 'zod';
 import verifyGroupMembership from '../../utils';
 
-const SQL_CREATE_SAVING = sql<{
-  entity_id: number, 
-  amount:number, 
-  pocket_id:number, 
-  user_id:number
-}, Record<string, never>>(`
+const SQL_CREATE_SAVING = sql<
+  {
+    entity_id: number,
+    amount: number,
+    pocket_id: number,
+    user_id: number
+  },
+  Record<string, never>
+>(`
   SELECT create_saving(:entity_id, :user_id, :pocket_id, :amount)
 `);
 
 const createSaving = (router: Router) => {
   router.route({
     method: 'post',
-    path: '/:entity_id/save',
-    summary: 'Create a saving',
+    path: '/:entity_id/:pocket_id/deposit',
+    summary: 'Deposit money to a pocket',
     request: {
       params: z.object({
         entity_id: z.union([
-          z.string().regex(/^[1-9]\d*$/, "Must be a positive integer string"),
-          z.literal("me"), 
-        ]).default('me' )
+          z.string().regex(/^[1-9]\d*$/),
+          z.literal("me")
+        ]).default('me'),
+        pocket_id: z.string().regex(/^[1-9]\d*$/)
       }),
       body: z.object({
-        amount: z.number().min(50),
-        pocket_id: z.number().min(1)
+        amount: z.number().min(50)
       })
     },
-    response: {
-      201: {}
-    },
     authMiddlewareOptions: {},
-    middlewares: [verifyGroupMembership()],
+    middlewares: [
+      verifyGroupMembership()
+    ],
     handler: async (req, res) => {
-      const { amount, pocket_id } = req.body;
+      const entityId = Number(req.params.entity_id);
+      const pocketId = Number(req.params.pocket_id);
+      const { amount } = req.body;
+      
       await SQL_CREATE_SAVING({
-        entity_id:Number(req.params.entity_id),
+        entity_id: entityId,
         amount,
-        pocket_id,
+        pocket_id: pocketId,
         user_id: req.user!.id
       }).exec();
-      res.sendStatus(201);
+
+      res.sendStatus(200);
     }
   });
 };

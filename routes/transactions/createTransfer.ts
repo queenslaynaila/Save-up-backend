@@ -27,50 +27,57 @@ const SQL_CREATE_TRANSFER = sql<TransferPayload, Record<string, never>>(`
 const createTransfer = (router: Router) => {
   router.route({
     method: 'post',
-    path: '/:entity_id/transfer',
-    summary: 'Create a transfer',
+    path: '/:entity_id/:source_pocket_id/transfer/:destination_pocket_id',
+    summary: 'Transfer money between pockets',
     request: {
       params: z.object({
         entity_id: z.union([
-          z.string().regex(/^[1-9]\d*$/, "Must be a positive integer string"),
-          z.literal("me"), 
-        ]).default('me' )
+          z.string().regex(/^[1-9]\d*$/),
+          z.literal("me")
+        ]).default('me'),
+        source_pocket_id: z.string().regex(/^[1-9]\d*$/),
+        destination_pocket_id: z.string().regex(/^[1-9]\d*$/)
       }),
       body: transferPayload.pick({
-        source_pocket_id: true,
-        destination_pocket_id: true,
         amount: true
       }).extend({
         pin: z.string().regex(/^\d{4}$/)
       })
     },
-    response: {
-      201: {}
-    },
     authMiddlewareOptions: {},
-    middlewares: [verifyPin, verifyGroupMembership({requiredGroupRole:'Admin'})],
+    middlewares: [
+      verifyPin, 
+      verifyGroupMembership({ requiredGroupRole: 'Admin' })
+    ],
     handler: async (req, res) => {
-      const { source_pocket_id, destination_pocket_id, amount } = req.body;
+      const sourcePocketId = Number(req.params.source_pocket_id);
+      const destinationPocketId = Number(req.params.destination_pocket_id);
 
       await SQL_CREATE_TRANSFER({
-        source_pocket_id,
-        destination_pocket_id,
+        source_pocket_id: sourcePocketId,
+        destination_pocket_id: destinationPocketId,
         user_id: req.user!.id,
-        amount,
+        amount: req.body.amount,
         entity_id: Number(req.params.entity_id)
       }).exec().catch((err) => {
         if (err.code === 'P0004') {
-          throw new HttpError(401, { message: 'ERR_NOT_ADMIN' });
+          throw new HttpError(401, { 
+            message: 'ERR_NOT_ADMIN' 
+          });
         }
         if (err.code === 'P0005') {
-          throw new HttpError(400, { message: 'ERR_FUNDS_LOCKED' });
+          throw new HttpError(400, { 
+            message: 'ERR_FUNDS_LOCKED' 
+          });
         }
         if (err.code === 'P0004') {
-          throw new HttpError(400, { message: 'ERR_INSUFFICIENT_FUNDS' });
+          throw new HttpError(400, { 
+            message: 'ERR_INSUFFICIENT_FUNDS' 
+          });
         }
       });
 
-      res.sendStatus(201);
+      res.sendStatus(200);
     }
   });
 };

@@ -15,9 +15,20 @@ const transaction = transactionSchema.pick({
   destination_pocket_name: z.string().optional().nullable(),
   source_pocket_name: z.string().optional().nullable()
 });
+
 type Transaction = z.infer<typeof transaction>;
 
-const SQL_GET_TRANSACTIONS = sql<{ entity_id: number, pocket_id?: number, slug?: string, start_date?: string, end_date?: string, limit: number }, Transaction>(`
+const SQL_GET_TRANSACTIONS = sql<
+  { 
+    entity_id: number, 
+    pocket_id?: number, 
+    slug?: string, 
+    start_date?: string, 
+    end_date?: string, 
+    limit: number 
+  }, 
+  Transaction
+>(`
   SELECT 
     transactions.xid, 
     transaction_types.slug,
@@ -89,12 +100,12 @@ const getTransactions = (router: Router) => {
   router.route({
     method: 'get',
     path: '/:entity_id',
-    summary: 'Get all transactions by a user, for a pocket, and groups',
+    summary: 'Get all transactions by a system entity',
     request: {
       params: z.object({
         entity_id: z.union([
-          z.string().regex(/^[1-9]\d*$/, "Must be a positive integer string"),
-          z.literal("me"), 
+          z.string().regex(/^[1-9]\d*$/),
+          z.literal("me")
         ]).default('me')
       }),
       query: z.object({
@@ -111,7 +122,9 @@ const getTransactions = (router: Router) => {
       }
     },
     authMiddlewareOptions: {},
-    middlewares: [verifyGroupMembership({allowModeratorAccess: true})],
+    middlewares: [
+      verifyGroupMembership({ allowModeratorAccess: true })
+    ],
     handler: async (req, res) => {
       const entity_id = Number(req.params.entity_id);
       const pocket_id = Number(req.query.pocket_id);
