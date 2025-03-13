@@ -1,5 +1,5 @@
 import Router from '../../router';
-import getTransactions from './getTransactions';
+import getTransactions from './getTransactionsByEntity';
 import createSaving from './createSaving';
 import createTransfer from './createTransfer';
 import createWithdrawal from './createWithdrawal';

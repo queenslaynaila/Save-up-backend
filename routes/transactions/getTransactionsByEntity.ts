@@ -3,6 +3,7 @@ import { sql } from '../../db';
 import Router from '../../router';
 import verifyGroupMembership from '../../utils';
 import { transactionSchema, transactionTypeSchema } from './schema';
+import logger from '../../logger';
 
 const transaction = transactionSchema.pick({
   xid: true,
@@ -127,7 +128,10 @@ const getTransactions = (router: Router) => {
     ],
     handler: async (req, res) => {
       const entity_id = Number(req.params.entity_id);
-      const pocket_id = Number(req.query.pocket_id);
+      const pocket_id = req.query.pocket_id 
+      ? Number(req.query.pocket_id) 
+      : undefined;
+
       const { slug, from, to, limit = '10' } = req.query;
 
       const transactions = await SQL_GET_TRANSACTIONS({
