@@ -6,7 +6,7 @@ import updatePocket from './updatePocket';
 import getBalanceForAnEntity from './getPocketBalance';
 import getTotalSavings from './getTotalSavings';
 
-const router = Router.getRouterInstance('', 'Pockets');
+const router = Router.getRouterInstance('/', 'Pockets');
 
 createPocket(router);
 getPocketsByEntity(router);

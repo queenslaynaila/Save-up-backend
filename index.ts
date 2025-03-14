@@ -11,6 +11,7 @@ import './routes/auth/index';
 import './routes/users/index';
 import './routes/nextOfKin/index';
 import './routes/groups/index';
+import './routes/elections/index';
 import './routes/expenses/index';
 import './routes/pockets/index';
 import './routes/transactions/index';

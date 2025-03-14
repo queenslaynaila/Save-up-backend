@@ -17,7 +17,6 @@ import HttpError from './httpError';
 import Config from './config';
 import {authMiddleware, AuthMiddlewareOptions } from './utils';
 import logger from './logger';
-import { loadavg } from 'os';
 
 const ajv = new Ajv();
 
@@ -271,7 +270,9 @@ registry.registerComponent(
     type: 'apiKey',
     name: 'Authorization',
     in: 'header',
-    description: 'JWT Bearer token used for user authentication. The token must be included in the "Authorization" header as "Bearer <token>" for secure access to protected routes.'
+    description: 'JWT Bearer token used for user authentication.\n\n'
+      + 'The token must be included in the "Authorization" header as:\n\n'
+      + 'Bearer <token> for secure access to protected routes.'
   }
 );
 
@@ -282,9 +283,13 @@ registry.registerComponent(
     type: 'apiKey',
     name: 'Reset',
     in: 'header',
-    description: 'JWT token used to manage the multi-step password reset process. The token is generated at each step, and its payload indicates the user\'s current step. It ensures the user cannot skip steps and is required for every request in the reset process.'
+    description: 'JWT token used to manage the multi-step password reset process.\n\n'
+      + 'The token is generated at each step, and its payload indicates the user\'s current step.\n\n'
+      + 'It ensures the user cannot skip steps and is required for every request in the reset process.'
   }
 );
+
+
 
 export const generateOpenApiSpec = () => {
   const generator = new OpenApiGeneratorV3(registry.definitions);
@@ -292,8 +297,7 @@ export const generateOpenApiSpec = () => {
     openapi: '3.0.0',
     info: {
       title: 'API Documentation for Saveup',
-      version: '1.0.0',
-      description: 'This is the API documentation for Saveup.'
+      version: '1.0.0'
     },
     security: [
       {

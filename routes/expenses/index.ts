@@ -5,7 +5,7 @@ import updateExpense from './updateExpense';
 import deleteExpense from './deleteExpense';
 import getTotalUserExpenditure from './getTotalUserExpenditure';
 
-const expenseRouter = Router.getRouterInstance('', 'Expenses');
+const expenseRouter = Router.getRouterInstance('/', 'Expenses');
 
 createExpense(expenseRouter);
 getExpensesByEntity(expenseRouter);

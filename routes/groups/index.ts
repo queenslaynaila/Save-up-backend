@@ -6,14 +6,6 @@ import getGroupsByUserId from './getGroupsByUserId';
 import getGroupMembers from './getGroupMembers';
 import handleGroupExit from './removeGroupMember';
 import getGroupActivities from './getGroupActivities';
-import createGroupElection from './createGroupElection';
-import createGroupElectionCandidates from './createGrpElectionCandidates';
-import getGroupElectionList from './getGroupElectionList';
-import updateGroupElections from './updateElection';
-import getGroupElectionResults from './getGroupElectionResults';
-import ratifyElection from './ratifyElection';
-import createBallot from './createBallot';
-import getElectionCandidates from './getElectionCandidates';
 
 const router = Router.getRouterInstance('/groups', 'Groups');
 
@@ -24,13 +16,5 @@ getGroupMembers(router);
 handleGroupExit(router);
 createGroupInvite(router);
 getGroupActivities(router);
-createGroupElection(router);
-createGroupElectionCandidates(router);
-getElectionCandidates(router);
-getGroupElectionList(router);
-updateGroupElections(router);
-createBallot(router);
-getGroupElectionResults(router);
-ratifyElection(router);
 
 export default router;
