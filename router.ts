@@ -16,7 +16,8 @@ import cors from 'cors';
 import HttpError from './httpError';
 import Config from './config';
 import {authMiddleware, AuthMiddlewareOptions } from './utils';
-
+import logger from './logger';
+import { loadavg } from 'os';
 
 const ajv = new Ajv();
 
@@ -39,6 +40,7 @@ const validateSchema = (schema: ZodSchema, data: unknown, section: 'body' | 'que
       dataPath: err.dataPath,
       schemaPath: err.schemaPath
     }));
+
     throw new HttpError(400, errors);
   }
 };
@@ -104,6 +106,7 @@ class Router {
 
   private constructor(routePrefix: string, apiTag?: string) {
     this.router = ExpressRouter();
+    logger.info(`Creating router with prefix: ${routePrefix}`);
     this.routePrefix = `/saveup${routePrefix}`;
     this.apiTag = apiTag;
 
@@ -140,11 +143,15 @@ class Router {
   }
 
   public static getRouterInstance(routePrefix: string, apiTag?: string): Router {
-    if (!Router.routerInstances.has(routePrefix)) {
-      Router.routerInstances.set(routePrefix, new Router(routePrefix, apiTag));
+    const key = `${routePrefix}::${apiTag}`;  
+
+    if (!Router.routerInstances.has(key)) {
+        Router.routerInstances.set(key, new Router(routePrefix, apiTag));
     }
-    return Router.routerInstances.get(routePrefix)!;
-  }
+
+    return Router.routerInstances.get(key)!;
+}
+
 
   public route<
     Params extends AnyZodObject | typeof emptyObjectSchema = typeof emptyObjectSchema,
@@ -208,11 +215,12 @@ class Router {
       }, {} as Record<string, any>);
 
     const transformedPath = path.replace(/:([^/]+)/g, '{$1}');
+    const fullPath = `${this.routePrefix}${transformedPath}`.replace(/\/+/g, '/');
 
     registry.registerPath({
       tags: this.apiTag ? [this.apiTag] : undefined,
       method,
-      path: `${this.routePrefix}${transformedPath}`,
+      path: fullPath,
       summary: options.summary,
       description: options.description,
       security,
