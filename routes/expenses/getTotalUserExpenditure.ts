@@ -24,13 +24,13 @@ const SQL_GET_TOTAL_EXPENSES = sql<{
 const getTotalUserExpenditure = (router: Router) => {
   router.route({
     method: 'get',
-    path: '/:entity_id/total',
+    path: '/:entity_id/expenses/total',
     summary: 'Get total user/group expenditure',
     request: {
       params: z.object({
         entity_id: z.union([
           z.string().regex(/^[1-9]\d*$/, "Must be a positive integer string"),
-          z.literal("me"), 
+          z.literal("me"),
         ]).default('me')
       }),
       query: z.object({

@@ -33,13 +33,13 @@ Expense>(`
 const updateExpense = (router: Router) => {
   router.route({
     method: 'patch',
-    path: '/:entity_id/:xid',
+    path: '/:entity_id/expenses/:xid',
     summary: 'Update an expense',
     request: {
       params: z.object({
         entity_id: z.union([
           z.string().regex(/^[1-9]\d*$/, "Must be a positive integer string"),
-          z.literal("me"), 
+          z.literal("me"),
         ]).default('me' ),
         xid: z.string()
       }),

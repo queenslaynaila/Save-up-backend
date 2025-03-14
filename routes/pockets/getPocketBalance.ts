@@ -4,11 +4,11 @@ import Router from '../../router';
 import verifyGroupMembership from '../../utils';
 
 const SQL_GET_BALANCE = sql<
-  { 
+  {
     entity_id: number;
     pocket_id?: number;
     from?: string;
-    to?: string 
+    to?: string
   },
   { balance: number }
 >(`
@@ -27,7 +27,7 @@ const SQL_GET_BALANCE = sql<
 const getBalanceForAnEntity = (router: Router) => {
   router.route({
     method: 'get',
-    path: '/:entity_id/balance',
+    path: '/:entity_id/pockets/balance',
     summary: 'Retrieve current balance for an entity across pockets',
     request: {
       params: z.object({
@@ -44,8 +44,8 @@ const getBalanceForAnEntity = (router: Router) => {
     },
     response: {
       200: {
-        schema: z.object({ 
-          balance: z.number() 
+        schema: z.object({
+          balance: z.number()
         })
       }
     },

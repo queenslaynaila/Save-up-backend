@@ -36,12 +36,12 @@ const SQL_GET_EXPENSES = sql<{
 const getExpensesByEntity = (router: Router) => {
   router.route({
     method: 'get',
-    path: '/:entity_id',
+    path: '/:entity_id/expenses',
     summary: 'Get list of expenses by criteria',
     request: {
       params: z.object({
         entity_id: z.union([
-          z.string().regex(/^[1-9]\d*$/, 'Must be a positive integer string'),
+          z.string().regex(/^[1-9]\d*$/),
           z.literal('me')
         ]).default('me')
       }),

@@ -4,14 +4,14 @@ import Router from '../../router';
 import verifyGroupMembership from '../../utils';
 
 const SQL_TOTAL_SAVINGS = sql<
-  { 
-    entity_id: number; 
-    from?: string; 
-    to?: string; 
-    limit: number 
+  {
+    entity_id: number;
+    from?: string;
+    to?: string;
+    limit: number
   },
-  { 
-    name: string; 
+  {
+    name: string;
     total_savings: number
   }
 >(`
@@ -35,7 +35,7 @@ const SQL_TOTAL_SAVINGS = sql<
 const getTotalSavings = (router: Router) => {
   router.route({
     method: 'get',
-    path: '/:entity_id/total-savings',
+    path: '/:entity_id/pockets/total-savings',
     summary: 'Get total savings across all pockets for an entity',
     request: {
       params: z.object({

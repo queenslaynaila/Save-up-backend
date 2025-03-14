@@ -59,7 +59,7 @@ const SQL_UPDATE_POCKET = sql<PocketPatchParams, Pocket>(`
 const updatePocket = (router: Router) => {
   router.route({
     method: 'patch',
-    path: '/:entity_id/:xid',
+    path: '/:entity_id/pockets/:xid',
     summary: 'Update pocket',
     request: {
       params: z.object({
@@ -80,15 +80,15 @@ const updatePocket = (router: Router) => {
     middlewares: [verifyGroupMembership({ requiredGroupRole: 'Admin' })],
     handler: async (req, res) => {
       const entity_id = Number(req.params.entity_id);
-      const { 
+      const {
         name,
         category_id,
         target_amount,
         priority,
         target_at,
-        pocket_type 
+        pocket_type
       } = req.body;
-  
+
       const goal = await SQL_UPDATE_POCKET({
         xid: Number(req.params.xid),
         entity_id,

@@ -14,13 +14,13 @@ const SQL_DELETE_EXPENSE = sql<{xid:number, entity_id:number}, Record<string, ne
 const deleteExpense = (router: Router) => {
   router.route({
     method: 'delete',
-    path: '/:entity_id/:xid',
+    path: '/:entity_id/expenses/:xid',
     summary: 'Delete an expense',
     request: {
       params: z.object({
         entity_id: z.union([
           z.string().regex(/^[1-9]\d*$/, "Must be a positive integer string"),
-          z.literal("me"), 
+          z.literal("me"),
         ]).default('me' ),
         xid: z.string().min(1)
       }),

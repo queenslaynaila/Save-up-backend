@@ -14,7 +14,7 @@ const SQL_DELETE_POCKET = sql<
 const deletePocket = (router: Router) => {
   router.route({
     method: 'delete',
-    path: '/:entity_id/:xid',
+    path: '/:entity_id/pockets/:xid',
     summary: 'Delete a pocket',
     request: {
       params: z.object({
@@ -24,8 +24,8 @@ const deletePocket = (router: Router) => {
         ]).default('me'),
         xid: z.string().min(1)
       }),
-      body: z.object({ 
-        entity_id: z.number() 
+      body: z.object({
+        entity_id: z.number()
       }).partial()
     },
     authMiddlewareOptions: {},

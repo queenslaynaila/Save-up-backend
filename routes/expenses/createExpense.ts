@@ -13,9 +13,9 @@ const expenseCreationParams = expenseSchema.pick({
   amount: true,
   spent_at: true
 });
-type ExpenseCreationParams = z.infer<typeof expenseCreationParams>;
+type ExpenseCreationParams = z.infer<typeof expenseCreationParams> & {entity_id:number};
 
-const SQL_CREATE_EXPENSES = sql<ExpenseCreationParams & {entity_id:number}, Expense>(`
+const SQL_CREATE_EXPENSES = sql<ExpenseCreationParams, Expense>(`
   INSERT INTO expenses (entity_id, xid, category_id, description, amount, spent_at)
   SELECT 
       :entity_id,
@@ -23,7 +23,7 @@ const SQL_CREATE_EXPENSES = sql<ExpenseCreationParams & {entity_id:number}, Expe
       :category_id, 
       :description, 
       :amount, 
-      COALESCE(:spent_at::DATE, NULL)
+      :spent_at::DATE
   FROM expenses 
   WHERE entity_id = :entity_id
   RETURNING entity_id, xid, category_id, description, amount, spent_at, created_at;
@@ -32,13 +32,13 @@ const SQL_CREATE_EXPENSES = sql<ExpenseCreationParams & {entity_id:number}, Expe
 const createExpense = (router: Router) => {
   router.route({
     method: 'post',
-    path: '/:entity_id/',
+    path: '/:entity_id/expenses',
     summary: 'Create an expense',
     request: {
       params: z.object({
         entity_id: z.union([
-          z.string().regex(/^[1-9]\d*$/, "Must be a positive integer string"),
-          z.literal("me"), 
+          z.string().regex(/^[1-9]\d*$/),
+          z.literal("me"),
         ]).default('me' )
       }),
       body: expenseCreationParams,

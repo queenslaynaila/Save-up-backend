@@ -1,15 +1,16 @@
 import Router from '../../router';
 import createExpense from './createExpense';
-import deleteExpense from './deleteExpense';
 import getExpensesByEntity from './getExpensesByEntity';
 import updateExpense from './updateExpense';
+import deleteExpense from './deleteExpense';
 import getTotalUserExpenditure from './getTotalUserExpenditure';
 
-const router = Router.getRouterInstance('/expenses', 'Expenses');
-createExpense(router);
-getExpensesByEntity(router);
-updateExpense(router);
-deleteExpense(router);
-getTotalUserExpenditure(router);
+const expenseRouter = Router.getRouterInstance('', 'Expenses');
 
-export default router;
+createExpense(expenseRouter);
+getExpensesByEntity(expenseRouter);
+updateExpense(expenseRouter);
+deleteExpense(expenseRouter);
+getTotalUserExpenditure(expenseRouter);
+
+export default expenseRouter;

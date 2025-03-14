@@ -70,7 +70,7 @@ const SQL_CREATE_POCKET = sql<PocketParams & { entity_id: number }, Pocket>(`
 const createPocket = (router: Router) => {
   router.route({
     method: 'post',
-    path: '/:entity_id',
+    path: '/:entity_id/pockets',
     summary: 'Create a pocket',
     request: {
       params: z.object({
@@ -95,7 +95,7 @@ const createPocket = (router: Router) => {
         ...req.body,
         entity_id: Number(req.params.entity_id)
       }).one();
-      
+
       return res.json(newPocket);
     }
   });

@@ -34,14 +34,14 @@ const pocketQueryParams = pocketSchema
   }).partial();
 
 const SQL_GET_POCKETS = sql<
-  { 
-    entity_id: number; 
-    xid?: string; 
-    category_id?: string; 
-    priority?: string; 
-    status?: string; 
-    start_date?: string; 
-    end_date?: string 
+  {
+    entity_id: number;
+    xid?: string;
+    category_id?: string;
+    priority?: string;
+    status?: string;
+    start_date?: string;
+    end_date?: string
   },
   Pocket
 >(`
@@ -73,7 +73,7 @@ const SQL_GET_POCKETS = sql<
 const getPocketsByEntity = (router: Router) => {
   router.route({
     method: 'get',
-    path: '/:entity_id',
+    path: '/:entity_id/pockets',
     summary: 'Get pockets for a system entity',
     request: {
       params: z.object({
