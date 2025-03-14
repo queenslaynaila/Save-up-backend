@@ -5,7 +5,6 @@ import { sql } from './db';
 import HttpError from './httpError';
 import Config from './config';
 import { AuthenticatedUser, PinResetState, Role } from './routes/users/schema';
-import logger from './logger';
 
 export interface AuthMiddlewareOptions {
   roles?: Role[] | Role;
@@ -89,7 +88,7 @@ export function authMiddleware(options: AuthMiddlewareOptions = {}) {
     if (req.params.entity_id === 'me') {
       req.params.entity_id = req.user.id.toString();
     }
-  
+
     if (req.params.user_id && parseInt(req.params.user_id, 10) !== req.user.id) {
       if (!allowModeratorAccess || !['Admin', 'Moderator'].includes(req.user.role)) {
         throw new HttpError(403);
@@ -182,7 +181,7 @@ export default function verifyGroupMembership({
   return async (req: Request, _res: Response, next: NextFunction) => {
     const entityId = Number(req.params.entity_id ?? req.params.group_id);
     const userId = req.user!.id;
-    
+
     if (entityId === userId) {
       return next();
     }
@@ -204,8 +203,8 @@ export default function verifyGroupMembership({
       throw new HttpError(403);
     }
 
-    if (req.params.member_id && 
-        userId !== parseInt(req.params.member_id) && 
+    if (req.params.member_id &&
+        userId !== parseInt(req.params.member_id) &&
         !is_admin_member) {
       throw new HttpError(403);
     }
