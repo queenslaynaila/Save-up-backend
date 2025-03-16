@@ -135,7 +135,7 @@ const getGrpDebitRequests = (router: Router) => {
   router.route({
     method: 'get',
     path: '/:group_id/:pocket_id',
-    summary: 'Get withdrawal requests for a group pocket',
+    summary: 'Get debit requests(loan or withdrawal) for a group pocket',
     description: 'Retrieves a list of all debit requests with their approval status.',
     request: {
       params: z.object({
