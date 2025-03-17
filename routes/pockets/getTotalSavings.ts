@@ -60,9 +60,9 @@ const getTotalSavings = (router: Router) => {
         )
       }
     },
-    authMiddlewareOptions: {},
+    authMiddlewareOptions: {'allowedRoles': ['Moderator']},
     middlewares: [
-      verifyGroupMembership({ allowModeratorAccess: true })
+      verifyGroupMembership({ privilegedRoles: 'all' })
     ],
     handler: async (req, res) => {
       const entityId = Number(req.params.entity_id);

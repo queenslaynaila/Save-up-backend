@@ -51,7 +51,7 @@ const getBalanceForAnEntity = (router: Router) => {
     },
     authMiddlewareOptions: {},
     middlewares: [
-      verifyGroupMembership({ allowModeratorAccess: true })
+      verifyGroupMembership({ privilegedRoles: 'all' })
     ],
     handler: async (req, res) => {
       const entity_id = Number(req.params.entity_id);
