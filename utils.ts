@@ -118,10 +118,12 @@ export function authMiddleware(options: AuthMiddlewareOptions = {}) {
     
     replaceMeWithUserId(req, ['user_id', 'entity_id']);
 
-    if (req.params.user_id && parseInt(req.params.user_id, 10) !== req.user.id) {
-      if (!hasPrivilegedAccess(req.user.role, options.privilegedRoles)) {
-        throw new HttpError(403);
-      }
+    const isAccessingAnotherUser = req.params.user_id && 
+                                  parseInt(req.params.user_id, 10) !== req.user.id;
+
+    if (isAccessingAnotherUser && 
+        !hasPrivilegedAccess(req.user.role, options.privilegedRoles)) {
+      throw new HttpError(403);
     }
     
     next();
