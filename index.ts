@@ -15,7 +15,8 @@ import './routes/elections/index';
 import './routes/expenses/index';
 import './routes/pockets/index';
 import './routes/transactions/index';
-import './routes/groupDebits/index';
+import './routes/groupWithdrawals/index';
+import './routes/loans/index';
 import './routes/loanGuarantees/index';
 import './routes/donations/index';
 import './routes/securityQuestions/index';
@@ -39,7 +40,8 @@ app.use(() => {
 });
 
 app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
-  if (error instanceof HttpError) {
+  logger.info(`Error: ${error.message}`); 
+ if (error instanceof HttpError) {
     return res.status(error.status).json(error);
   }
   return res.sendStatus(500);
