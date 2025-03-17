@@ -51,8 +51,8 @@ const SQL_GET_TRANSACTIONS = sql<
     entity_id: number, 
     pocket_id?: number, 
     slug?: string, 
-    start_date?: string, 
-    end_date?: string, 
+    from?: string, 
+    to?: string, 
     limit: number 
   }, 
   Transaction
@@ -62,7 +62,6 @@ const SQL_GET_TRANSACTIONS = sql<
     transaction_types.slug,
     transactions.delta,
     transactions.balance,
-    
     CASE 
       WHEN (SELECT entity_type FROM entities WHERE id = transactions.entity_id) = 'Group' THEN
         COALESCE(
@@ -118,8 +117,8 @@ const SQL_GET_TRANSACTIONS = sql<
   WHERE transactions.entity_id = :entity_id
     AND (:pocket_id::INT IS NULL OR transactions.pocket_id = :pocket_id)
     AND (:slug::TEXT IS NULL OR transaction_types.slug = :slug)
-    AND (:start_date::DATE IS NULL OR DATE(transactions.created_at) >= :start_date)
-    AND (:end_date::DATE IS NULL OR DATE(transactions.created_at) <= :end_date)
+    AND (:from::DATE IS NULL OR DATE(transactions.created_at) >= :from)
+    AND (:to::DATE IS NULL OR DATE(transactions.created_at) <= :to)
   ORDER BY transactions.created_at DESC
   LIMIT :limit
 `);
@@ -139,8 +138,8 @@ const getTransactions = (router: Router) => {
       query: z.object({
         slug: transactionTypeSchema.shape.slug,
         pocket_id: z.string().optional(),
-        from: z.string().optional(),
-        to: z.string().optional(),
+        from: z.string().date().optional(),
+        to: z.string().date().optional(),
         limit: z.string().default('10')
       }).partial()
     },
@@ -151,7 +150,9 @@ const getTransactions = (router: Router) => {
     },
     authMiddlewareOptions: {},
     middlewares: [
-      verifyGroupMembership({ allowModeratorAccess: true })
+      verifyGroupMembership({
+        privilegedRoles: 'all'
+      })
     ],
     handler: async (req, res) => {
       const entity_id = Number(req.params.entity_id);
@@ -165,8 +166,8 @@ const getTransactions = (router: Router) => {
         entity_id,
         pocket_id,
         slug,
-        start_date: from,
-        end_date: to,
+        from,
+        to,
         limit: Number(limit)
       }).many();
 

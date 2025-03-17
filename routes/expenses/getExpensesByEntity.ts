@@ -58,8 +58,10 @@ const getExpensesByEntity = (router: Router) => {
         schema: z.array(expenseSchema)
       }
     },
-    authMiddlewareOptions: { allowModeratorAccess: true },
-    middlewares: [verifyGroupMembership({ allowModeratorAccess: true })],
+    authMiddlewareOptions: {},
+    middlewares: [verifyGroupMembership({
+      privilegedRoles: 'all'
+    })],
     handler: async (req, res) => {
       const entity_id = Number(req.params.entity_id);
       const { category_id, spent_from, spent_to, start_date, end_date } = req.query;

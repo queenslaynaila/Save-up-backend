@@ -47,7 +47,9 @@ const getTotalUserExpenditure = (router: Router) => {
       }
     },
     authMiddlewareOptions: {},
-    middlewares: [verifyGroupMembership({ allowModeratorAccess: true })],
+    middlewares: [verifyGroupMembership({
+      privilegedRoles: 'all'
+    })],
     handler: async (req, res) => {
       const entity_id = Number(req.params.entity_id);
       const { category_id, spent_from, spent_to, start_date, end_date } = req.query;

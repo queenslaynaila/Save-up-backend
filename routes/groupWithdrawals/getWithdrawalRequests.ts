@@ -151,8 +151,9 @@ const getGrpDebitRequests = (router: Router) => {
       }
     },
     authMiddlewareOptions: {},
-    middlewares: [
-      verifyGroupMembership({ allowModeratorAccess: true })
+    middlewares: [verifyGroupMembership(
+      {privilegedRoles: 'all'}
+    )
     ],
     handler: async (req, res) => {
       logger.info('Fetching group debit requests');

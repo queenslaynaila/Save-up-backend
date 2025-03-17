@@ -38,7 +38,7 @@ const getUsersBySearchCriteria = (router: Router) => {
       }
     },
     authMiddlewareOptions: {
-      roles: [UserRole.Enum.Admin, UserRole.Enum.Moderator]
+      allowedRoles: [UserRole.Enum.Admin, UserRole.Enum.Moderator]
     },
     handler: async (req, res) => {
       const { value } = req.query;

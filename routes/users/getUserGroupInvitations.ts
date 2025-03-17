@@ -41,7 +41,7 @@ const getInvites = (router: Router) => {
         schema: pendingInvitations.array()
       }
     },
-    authMiddlewareOptions: {allowModeratorAccess: true},
+    authMiddlewareOptions: {privilegedRoles: 'all'},
     handler: async (req, res) => {
       const userId = Number(req.params.user_id);
       const receivedInvites = await SQL_GET_PENDING_INVITATIONS({

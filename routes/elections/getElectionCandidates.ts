@@ -42,7 +42,7 @@ const getCandidates = (router: Router) => {
     authMiddlewareOptions: {},
     middlewares: [
       verifyGroupMembership({ 
-        allowModeratorAccess: true 
+        privilegedRoles: 'all'
       })
     ],
     handler: async (req, res) => {

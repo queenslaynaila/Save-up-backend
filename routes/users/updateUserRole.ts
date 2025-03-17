@@ -30,7 +30,7 @@ const updateUserRole = (router: Router) => {
       })
     },
     authMiddlewareOptions: {
-      roles: [UserRole.Enum.Admin]
+      allowedRoles: [UserRole.Enum.Admin]
     },
     handler: async (req, res) => {
       const role = convertToTitleCase(req.body.role);

@@ -71,7 +71,9 @@ const getGroupElectionList = (router: Router) => {
       }
     },
     authMiddlewareOptions: {},
-    middlewares: [verifyGroupMembership({allowModeratorAccess: true})],
+    middlewares: [
+      verifyGroupMembership({privilegedRoles: 'all'})
+    ],
     handler: async (req, res) => {
       const election = await SQL_GET_ONGOING_ELECTION({
         group_id: parseInt(req.params.group_id),

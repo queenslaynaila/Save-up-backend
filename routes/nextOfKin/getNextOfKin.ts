@@ -44,7 +44,7 @@ const getNextOfKin = (router: Router) => {
         schema: z.array(nextOfKinPublicViewSchema)
       }
     },
-    authMiddlewareOptions: { allowModeratorAccess: true },
+    authMiddlewareOptions: {privilegedRoles: 'all'},
     handler: async (req, res) => {
       const user_id = parseInt(req.params.user_id, 10);
       const { include_history = 'false' } = req.query;

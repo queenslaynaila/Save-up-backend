@@ -33,9 +33,7 @@ const createSaving = (router: Router) => {
       })
     },
     authMiddlewareOptions: {},
-    middlewares: [
-      verifyGroupMembership()
-    ],
+    middlewares: [verifyGroupMembership()],
     handler: async (req, res) => {
       const entityId = Number(req.params.entity_id);
       const pocketId = Number(req.params.pocket_id);
