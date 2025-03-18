@@ -1,52 +1,53 @@
 import 'express-async-errors';
 import { NextFunction, Request, Response } from 'express';
-import Router, { generateOpenApiSpec } from './router';
 import swaggerUi from 'swagger-ui-express';
-import HttpError from './httpError';
 import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
 import { z } from 'zod';
+import Router, { generateOpenApiSpec } from './router';
+import HttpError from './httpError';
 import logger from './logger';
-import './routes/categories/index';
-import './routes/auth/index';
-import './routes/users/index';
-import './routes/nextOfKin/index';
-import './routes/groups/index';
-import './routes/elections/index';
-import './routes/expenses/index';
-import './routes/pockets/index';
-import './routes/transactions/index';
-import './routes/groupWithdrawals/index';
-import './routes/loans/index';
-import './routes/loanGuarantees/index';
-import './routes/donations/index';
-import './routes/securityQuestions/index';
-
 import Config from './config';
+import './routes/auth/index';  
+import './routes/securityQuestions/index';  
+import './routes/users/index'; 
+import './routes/nextOfKin/index';  
+import './routes/groups/index'; 
+import './routes/elections/index';  
+import './routes/donations/index';  
+import './routes/loans/index';  
+import './routes/loanGuarantees/index';
+import './routes/categories/index';  
+import './routes/pockets/index'; 
+import './routes/expenses/index';  
+import './routes/transactions/index';  
+import './routes/groupWithdrawals/index';
 
 extendZodWithOpenApi(z);
 
 const app = Router.getAppInstance();
 
 const openApiSpec = generateOpenApiSpec();
+
 app.use('/saveup/docs', swaggerUi.serve, swaggerUi.setup(openApiSpec));
 
-app.use((_, res, next) => {
-  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
+app.use((_req: Request, res: Response, next: NextFunction): void => {
+  res.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload");
   next();
 });
 
-app.use(() => {
+app.use((_req: Request, _res: Response, _next: NextFunction): void => {
   throw new HttpError(404);
 });
 
-app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
-  logger.info(`Error: ${error.message}`); 
- if (error instanceof HttpError) {
-    return res.status(error.status).json(error);
+app.use((error: Error, _req: Request, res: Response, _next: NextFunction): void => {
+  if (error instanceof HttpError) {
+    res.status(error.status).json(error);
+  } else {
+    logger.error(error.stack);
+    res.sendStatus(500);
   }
-  return res.sendStatus(500);
 });
 
-app.listen(Config.PORT, () => {
+app.listen(Config.PORT, (): void => {
   logger.info(`Server running on port ${Config.PORT}`);
 });
