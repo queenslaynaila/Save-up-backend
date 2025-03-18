@@ -18,3 +18,5 @@ export const pocketSchema = z.object({
   created_at: z.string().datetime(),
   deleted_at: z.string().datetime().optional()
 });
+
+export type Pocket = z.infer<typeof pocketSchema>;

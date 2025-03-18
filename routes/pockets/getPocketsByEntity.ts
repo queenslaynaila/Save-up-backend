@@ -89,7 +89,7 @@ const getPocketsByEntity = (router: Router) => {
         schema: z.array(pocketSchema)
       }
     },
-    authMiddlewareOptions: {},
+    auth: true,
     middlewares: [
       verifyGroupMembership({ privilegedRoles:'all' })
     ],

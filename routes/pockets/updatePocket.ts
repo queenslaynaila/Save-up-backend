@@ -2,7 +2,8 @@ import Router from '../../router';
 import { sql } from '../../db';
 import { z } from 'zod';
 import { pocketSchema } from './schema';
-import verifyGroupMembership from '../../utils';
+import verifyGroupMembership, { decodeEntityOrUserId } from '../../utils';
+import { entityIdParamsSchema } from '../users/schema';
 
 const pocketParams = pocketSchema
   .pick({
@@ -31,7 +32,9 @@ const pocket = pocketParams
 
 type Pocket = z.infer<typeof pocket>;
 
-const SQL_UPDATE_POCKET = sql<PocketPatchParams, Pocket>(`
+const SQL_UPDATE_POCKET = sql<
+PocketPatchParams, 
+Pocket>(`
   UPDATE pockets
   SET name = COALESCE(:name, name),
       category_id = COALESCE(:category_id, category_id),
@@ -63,46 +66,45 @@ const updatePocket = (router: Router) => {
     summary: 'Update pocket',
     request: {
       params: z.object({
-        entity_id: z.union([
-          z.string().regex(/^[1-9]\d*$/),
-          z.literal("me")
-        ]).default('me'),
-        xid: z.string().min(1)
+        entity_id: entityIdParamsSchema,
+        xid: z.number()
       }),
-      body: pocketParams
+      body: pocketSchema.pick({
+        category_id: true,
+        name: true,
+        priority: true,
+        pocket_type: true,
+        target_amount: true,
+        target_at: true
+      }).partial()
     },
     response: {
       200: {
-        schema: pocket
+        schema:pocketSchema
+        .pick({
+          category_id: true,
+          entity_id: true,
+          name: true,
+          priority: true,
+          pocket_type: true,
+          target_amount: true,
+          target_at: true
+        }).partial()
       }
     },
-    authMiddlewareOptions: {},
+    auth: true,
     middlewares: [
-      verifyGroupMembership({ requiredGroupRole: 'Admin' })
+      verifyGroupMembership({ requiresGrpAdmin: true })
     ],
     handler: async (req, res) => {
-      const entity_id = Number(req.params.entity_id);
-      const {
-        name,
-        category_id,
-        target_amount,
-        priority,
-        target_at,
-        pocket_type
-      } = req.body;
-
-      const goal = await SQL_UPDATE_POCKET({
-        xid: Number(req.params.xid),
-        entity_id,
-        name,
-        category_id,
-        target_amount,
-        priority,
-        target_at,
-        pocket_type
+      const entityId = decodeEntityOrUserId(req, true);
+      const pocket = await SQL_UPDATE_POCKET({
+        xid: req.params.xid,
+        entity_id: entityId,
+        ...req.body
       }).one();
 
-      return res.json(goal);
+      return res.json(pocket);
     }
   });
 };

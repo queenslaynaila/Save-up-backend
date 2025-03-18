@@ -1,14 +1,15 @@
 import { z } from 'zod';
 import { sql } from '../../db';
 import Router from '../../router';
-import verifyGroupMembership from '../../utils';
+import verifyGroupMembership, { decodeEntityOrUserId } from '../../utils';
+import { entityIdParamsSchema } from '../users/schema';
 
 const SQL_GET_BALANCE = sql<
   {
     entity_id: number;
     pocket_id?: number;
     from?: string;
-    to?: string
+    to?: string;
   },
   { balance: number }
 >(`
@@ -31,15 +32,12 @@ const getBalanceForAnEntity = (router: Router) => {
     summary: 'Retrieve current balance for an entity across pockets',
     request: {
       params: z.object({
-        entity_id: z.union([
-          z.string().regex(/^[1-9]\d*$/),
-          z.literal("me")
-        ]).default('me')
+        entity_id: entityIdParamsSchema
       }),
       query: z.object({
         from: z.string().optional(),
-        to: z.string().optional(),
-        pocket_id: z.string().optional()
+        to: z.string().optional()
+        // pocket_id: z.string().optional()
       }).partial()
     },
     response: {
@@ -49,21 +47,16 @@ const getBalanceForAnEntity = (router: Router) => {
         })
       }
     },
-    authMiddlewareOptions: {},
+    auth: true,
     middlewares: [
-      verifyGroupMembership({ privilegedRoles: 'all' })
+      verifyGroupMembership({ isOwnerOrAdminMod: true })
     ],
     handler: async (req, res) => {
-      const entity_id = Number(req.params.entity_id);
-      const pocket_id  = Number(req.query.pocket_id);
-      const { from, to } = req.query;
-
-      const { balance } = await SQL_GET_BALANCE({
-        entity_id,
-        pocket_id: pocket_id,
-        from,
-        to
-      }).one();
+      const entityId = decodeEntityOrUserId(req, true);
+      const balance = await SQL_GET_BALANCE({
+        entity_id: entityId,
+        ...req.query
+      }).oneFirst();
 
       res.json({ balance });
     }

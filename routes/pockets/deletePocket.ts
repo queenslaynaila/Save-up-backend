@@ -2,7 +2,8 @@ import Router from '../../router';
 import { sql } from '../../db';
 import HttpError from '../../httpError';
 import { z } from 'zod';
-import verifyGroupMembership from '../../utils';
+import verifyGroupMembership, { decodeEntityOrUserId } from '../../utils';
+import { entityIdParamsSchema } from '../users/schema';
 
 const SQL_DELETE_POCKET = sql<
   { pocket_id: number; entity_id: number },
@@ -18,24 +19,20 @@ const deletePocket = (router: Router) => {
     summary: 'Delete a pocket',
     request: {
       params: z.object({
-        entity_id: z.union([
-          z.string().regex(/^[1-9]\d*$/),
-          z.literal("me")
-        ]).default('me'),
-        xid: z.string().min(1)
-      }),
-      body: z.object({
-        entity_id: z.number()
-      }).partial()
+        entity_id: entityIdParamsSchema,
+        xid: z.number()
+      })
     },
-    authMiddlewareOptions: {},
+    auth: true,
     middlewares: [
-      verifyGroupMembership({ requiredGroupRole: 'Admin' })
+      verifyGroupMembership({ requiresGrpAdmin: true })
     ],
     handler: async (req, res) => {
+      const entityId = decodeEntityOrUserId(req);
+      
       await SQL_DELETE_POCKET({
-        entity_id: Number(req.params.entity_id),
-        pocket_id: Number(req.params.xid)
+        entity_id: entityId,
+        pocket_id: req.params.xid
       }).exec().catch(err => {
         if (err.code === 'P0006') {
           throw new HttpError(409, {

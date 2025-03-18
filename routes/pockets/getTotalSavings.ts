@@ -1,7 +1,8 @@
 import { z } from 'zod';
 import { sql } from '../../db';
 import Router from '../../router';
-import verifyGroupMembership from '../../utils';
+import verifyGroupMembership, { decodeEntityOrUserId } from '../../utils';
+import { entityIdParamsSchema } from '../users/schema';
 
 const SQL_TOTAL_SAVINGS = sql<
   {
@@ -39,15 +40,12 @@ const getTotalSavings = (router: Router) => {
     summary: 'Get total savings across all pockets for an entity',
     request: {
       params: z.object({
-        entity_id: z.union([
-          z.string().regex(/^[1-9]\d*$/, "Must be a positive integer string"),
-          z.literal("me")
-        ]).default('me')
+        entity_id: entityIdParamsSchema
       }),
       query: z.object({
         from: z.string().optional(),
         to: z.string().optional(),
-        limit: z.string().default("15")
+        limit: z.string()
       })
     },
     response: {
@@ -60,12 +58,12 @@ const getTotalSavings = (router: Router) => {
         )
       }
     },
-    authMiddlewareOptions: {'allowedRoles': ['Moderator']},
+    auth: true,
     middlewares: [
-      verifyGroupMembership({ privilegedRoles: 'all' })
+      verifyGroupMembership({ isOwnerOrAdminMod: true })
     ],
     handler: async (req, res) => {
-      const entityId = Number(req.params.entity_id);
+      const entityId = decodeEntityOrUserId(req, true);
       const limit = Number(req.query.limit);
       const { from, to } = req.query;
 

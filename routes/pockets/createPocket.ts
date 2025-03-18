@@ -1,37 +1,37 @@
 import Router from '../../router';
 import { sql } from '../../db';
-import { pocketSchema } from './schema';
+import { pocketSchema, Pocket } from './schema';
 import { z } from 'zod';
-import verifyGroupMembership from '../../utils';
+import verifyGroupMembership, { decodeEntityOrUserId } from '../../utils';
+import { entityIdParamsSchema } from '../users/schema';
 
-const pocketParamsSchema = pocketSchema.pick({
-  category_id: true,
-  name: true,
-  priority: true,
-  pocket_type: true,
-  target_amount: true,
-  target_at: true
-});
+type PocketCreationParams = Pick<
+  Pocket,
+  | 'entity_id'
+  | 'category_id'
+  | 'name'
+  | 'priority'
+  | 'pocket_type'
+  | 'target_amount'
+  | 'target_at'
+>;
 
-type PocketParams = z.infer<typeof pocketParamsSchema>;
+type CreatedPocket = Pick<
+  Pocket,
+  | 'entity_id'
+  | 'xid'
+  | 'category_id'
+  | 'name'
+  | 'priority'
+  | 'status'
+  | 'pocket_type'
+  | 'target_amount'
+  | 'target_at'
+  | 'created_at'
+  | 'completed_at'
+>;
 
-export const newPocketSchema = pocketSchema.pick({
-  entity_id: true,
-  xid: true,
-  category_id: true,
-  name: true,
-  priority: true,
-  status: true,
-  pocket_type: true,
-  target_amount: true,
-  target_at: true,
-  created_at: true,
-  completed_at: true
-});
-
-type Pocket = z.infer<typeof newPocketSchema>;
-
-const SQL_CREATE_POCKET = sql<PocketParams & { entity_id: number }, Pocket>(`
+const SQL_CREATE_POCKET = sql<PocketCreationParams, CreatedPocket>(`
   INSERT INTO pockets (
     entity_id,
     xid,
@@ -74,29 +74,46 @@ const createPocket = (router: Router) => {
     summary: 'Create a pocket',
     request: {
       params: z.object({
-        entity_id: z.union([
-          z.string().regex(/^[1-9]\d*$/),
-          z.literal("me")
-        ]).default('me')
+        entity_id: entityIdParamsSchema
       }),
-      body: pocketParamsSchema
+      body: pocketSchema.pick({
+        category_id: true,
+        name: true,
+        priority: true,
+        pocket_type: true,
+        target_amount: true,
+        target_at: true
+      })
     },
     response: {
       201: {
-        schema: newPocketSchema
+        schema: pocketSchema.pick({
+          entity_id: true,
+          xid: true,
+          category_id: true,
+          name: true,
+          priority: true,
+          status: true,
+          pocket_type: true,
+          target_amount: true,
+          target_at: true,
+          created_at: true,
+          completed_at: true
+        })
       }
     },
-    authMiddlewareOptions: {},
+    auth: true,
     middlewares: [
-      verifyGroupMembership({ requiredGroupRole: 'Admin' })
+      verifyGroupMembership({ requiresGrpAdmin: true })
     ],
     handler: async (req, res) => {
-      const newPocket = await SQL_CREATE_POCKET({
+      const entityId = decodeEntityOrUserId(req);
+      const pocket = await SQL_CREATE_POCKET({
         ...req.body,
-        entity_id: Number(req.params.entity_id)
+        entity_id: entityId
       }).one();
 
-      return res.json(newPocket);
+      return res.json(pocket);
     }
   });
 };
