@@ -3,7 +3,8 @@ import { sql } from '../../db';
 import { NextOfKin, nextOfKinPublicViewSchema } from './createNextOfKin';
 import { z } from 'zod';
 import HttpError from '../../httpError';
-import { userIdParamsSchema, UserRole } from '../users/schema';
+import { entityIdParamsSchema, userIdParamsSchema, UserRole } from '../users/schema';
+import { decodeEntityOrUserId } from '../../utils';
 
 const SQL_GET_KIN = sql<
   { 
@@ -34,7 +35,9 @@ const getNextOfKin = (router: Router) => {
     summary: 'Retrieve next of kin details',
     description: 'Fetches next of kin details for a user. Standard users can only view active records.',
     request: {
-      params: userIdParamsSchema,
+      params: z.object({
+        user_id: entityIdParamsSchema
+      }),
       query: z.object({
         include_history: z.string().default('false')
       }).partial()
@@ -44,9 +47,9 @@ const getNextOfKin = (router: Router) => {
         schema: z.array(nextOfKinPublicViewSchema)
       }
     },
-    authMiddlewareOptions: {privilegedRoles: 'all'},
+    auth: true,
     handler: async (req, res) => {
-      const user_id = parseInt(req.params.user_id, 10);
+      const userId = decodeEntityOrUserId(req, true);;
       const { include_history = 'false' } = req.query;
 
       if (req.user!.role === UserRole.Enum.Standard && include_history === 'true') {
@@ -54,7 +57,7 @@ const getNextOfKin = (router: Router) => {
       }
 
       const nextOfKins = await SQL_GET_KIN({
-        user_id,
+        user_id: userId,
         include_history: include_history === 'true'
       }).many();
 

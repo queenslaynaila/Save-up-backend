@@ -72,7 +72,7 @@ const getGroupElectionList = (router: Router) => {
     },
     auth: true,
     middlewares: [
-      verifyGroupMembership({privilegedRoles: 'all'})
+      verifyGroupMembership({isOwnerOrAdminMod: true})
     ],
     handler: async (req, res) => {
       const election = await SQL_GET_ONGOING_ELECTION({

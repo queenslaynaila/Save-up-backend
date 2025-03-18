@@ -67,7 +67,7 @@ const getGroupsByUserId = (router: Router) => {
       }
     },
     authMiddlewareOptions: { 
-      privilegedRoles: 'all' 
+      isOwnerOrAdminMod: true 
     },
     handler: async (req, res) => {
       const user_id = Number(req.params.user_id);
