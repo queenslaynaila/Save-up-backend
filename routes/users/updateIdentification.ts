@@ -38,7 +38,7 @@ const updateIdDetails = (router: Router) => {
         })
       },
     },
-    authMiddlewareOptions: {},
+    auth: true,
     handler: async (req, res) => {
       const userId = Number(req.params.user_id);
       const {id_number}= await SQL_UPDATE_ID_NUMBER({

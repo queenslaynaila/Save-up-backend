@@ -7,6 +7,14 @@ export const userIdParamsSchema = z.object({
   ]).default('me' )
 });
 
+export const entityIdParamsSchema = z.union([
+  z.number().int(),
+  z.literal('me').describe(
+    "Identifier for user/group whose expense is being fetched. Can be:\n\n" +
+    "- `me`:Special user id `me`to rep the currently loged in user.\n" +
+    "- `A positive integer`: Represents a specific user's./ group ID."
+  )])
+
 export const UserRole = z.enum(['Admin', 'Standard', 'Moderator']);
 export type Role = z.infer<typeof UserRole>;
 export const IdType = z.enum(['National', 'Passport']);

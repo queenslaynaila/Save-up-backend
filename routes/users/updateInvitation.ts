@@ -23,7 +23,7 @@ const updateInvites = (router: Router) => {
         status: true
       })
     },
-    authMiddlewareOptions: {},
+    auth: true,
     handler: async (req, res) => {
       const { group_id, status } = req.body;
       const receiver_id = req.user!.id;

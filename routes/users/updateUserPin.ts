@@ -22,7 +22,7 @@ const updateUserPin = (router: Router) => {
         new_pin: z.string().regex(/^\d{4}$/)
       })
     },
-    authMiddlewareOptions: {},
+    auth: true,
     middlewares: [verifyPin],
     handler: async (req, res) => {
       const hashedNewPin = await bcrypt.hash(req.body.new_pin, 10);
