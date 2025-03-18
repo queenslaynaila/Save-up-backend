@@ -1,7 +1,8 @@
 import { z } from 'zod';
 import { sql } from '../../db';
 import Router from '../../router';
-import verifyGroupMembership from '../../utils';
+import verifyGroupMembership, { decodeEntityOrUserId } from '../../utils';
+import { entityIdParamsSchema } from '../users/schema';
 
 const SQL_GET_TOTAL_EXPENSES = sql<{
   entity_id: number;
@@ -28,10 +29,7 @@ const getTotalUserExpenditure = (router: Router) => {
     summary: 'Get total user/group expenditure',
     request: {
       params: z.object({
-        entity_id: z.union([
-          z.string().regex(/^[1-9]\d*$/, "Must be a positive integer string"),
-          z.literal("me"),
-        ]).default('me')
+        entity_id: entityIdParamsSchema
       }),
       query: z.object({
         start_date: z.string().date().optional(),
@@ -46,24 +44,19 @@ const getTotalUserExpenditure = (router: Router) => {
         schema: z.object({ total_expenses: z.number() })
       }
     },
-    authMiddlewareOptions: {},
-    middlewares: [verifyGroupMembership({
-      privilegedRoles: 'all'
-    })],
+    auth: true,
+    middlewares: [
+      verifyGroupMembership({isOwnerOrAdminMod: true})
+    ],
     handler: async (req, res) => {
-      const entity_id = Number(req.params.entity_id);
-      const { category_id, spent_from, spent_to, start_date, end_date } = req.query;
+      const entityId = decodeEntityOrUserId(req, true);
 
       const { total_expenses } = await SQL_GET_TOTAL_EXPENSES({
-        entity_id,
-        category_id,
-        spent_from,
-        spent_to,
-        start_date,
-        end_date
+        entity_id: entityId,
+        ...req.query
       }).one();
 
-      res.json({ total_expenses });
+      res.json({total_expenses});
     }
   });
 };

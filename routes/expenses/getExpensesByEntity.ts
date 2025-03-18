@@ -5,7 +5,8 @@ import {
   expenseSchema
 } from './schema';
 import { z } from 'zod';
-import verifyGroupMembership from '../../utils';
+import verifyGroupMembership, { decodeEntityOrUserId } from '../../utils';
+import { entityIdParamsSchema } from '../users/schema';
 
 const SQL_GET_EXPENSES = sql<{
   entity_id: number;
@@ -14,7 +15,8 @@ const SQL_GET_EXPENSES = sql<{
   spent_to?: string;
   start_date?: string;
   end_date?: string;
-}, Expense>(`
+}, 
+Pick<Expense, 'entity_id'|'xid'|'category_id'|'description'|'amount'|'created_at'|'xid'>>(`
   SELECT entity_id, 
          xid, 
          category_id, 
@@ -40,10 +42,7 @@ const getExpensesByEntity = (router: Router) => {
     summary: 'Get list of expenses by criteria',
     request: {
       params: z.object({
-        entity_id: z.union([
-          z.string().regex(/^[1-9]\d*$/),
-          z.literal('me')
-        ]).default('me')
+        entity_id: entityIdParamsSchema
       }),
       query: z.object({
         category_id: z.string().regex(/^\d+$/).optional(),
@@ -58,21 +57,15 @@ const getExpensesByEntity = (router: Router) => {
         schema: z.array(expenseSchema)
       }
     },
-    authMiddlewareOptions: {},
+    auth: true,
     middlewares: [verifyGroupMembership({
-      privilegedRoles: 'all'
+      isOwnerOrAdminMod: true
     })],
     handler: async (req, res) => {
-      const entity_id = Number(req.params.entity_id);
-      const { category_id, spent_from, spent_to, start_date, end_date } = req.query;
-
+      const entityId = decodeEntityOrUserId(req, true);
       const expenses = await SQL_GET_EXPENSES({
-        entity_id,
-        category_id,
-        spent_from,
-        spent_to,
-        start_date,
-        end_date
+        entity_id: entityId,
+        ...req.query
       }).many();
 
       res.json(expenses);

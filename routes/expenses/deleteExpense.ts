@@ -1,7 +1,8 @@
 import Router from '../../router';
 import { sql } from '../../db';
 import { z } from 'zod';
-import verifyGroupMembership from '../../utils';
+import verifyGroupMembership, { decodeEntityOrUserId } from '../../utils';
+import { entityIdParamsSchema } from '../users/schema';
 
 const SQL_DELETE_EXPENSE = sql<{xid:number, entity_id:number}, Record<string, never>>(`
   UPDATE expenses
@@ -18,26 +19,22 @@ const deleteExpense = (router: Router) => {
     summary: 'Delete an expense',
     request: {
       params: z.object({
-        entity_id: z.union([
-          z.string().regex(/^[1-9]\d*$/, "Must be a positive integer string"),
-          z.literal("me"),
-        ]).default('me' ),
-        xid: z.string().min(1)
-      }),
-      query: z.object({
-        entity_id: z.string().min(1).optional()
+        entity_id: entityIdParamsSchema,
+        xid: z.number()
       })
     },
     response: {
       204: {}
     },
-    authMiddlewareOptions: {},
-    middlewares: [verifyGroupMembership({requiredGroupRole: 'Admin'})],
+    auth: true,
+    middlewares: [
+      verifyGroupMembership({requiresGrpAdmin:true})
+    ],
     handler: async (req, res) => {
-      const entity_id = Number(req.params.entity_id);
+      const entityId = decodeEntityOrUserId(req);
       await SQL_DELETE_EXPENSE({
-        xid: Number(req.params.xid),
-        entity_id
+        xid: req.params.xid,
+        entity_id: entityId
       }).exec();
       res.sendStatus(204);
     }

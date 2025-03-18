@@ -15,8 +15,8 @@ import basicAuth from 'express-basic-auth';
 import cors from 'cors';
 import HttpError from './httpError';
 import Config from './config';
-import {authMiddleware, AuthMiddlewareOptions } from './utils';
-import logger from './logger';
+import {authMiddleware } from './utils';
+import { Role } from './routes/users/schema';
 
 const ajv = new Ajv();
 
@@ -85,7 +85,7 @@ interface RouterOptions<
     query?: QueryParams;
   };
   response?: ResponseMap<ResBody>;
-  authMiddlewareOptions?: AuthMiddlewareOptions;
+  auth?: true | Role | Role[];
   middlewares?: Array<(req: Request, res: Response, next: NextFunction) => void>;
   handler: RequestHandler<z.infer<Params>, ResBody, ReqBody, z.infer<QueryParams>>;
 }
@@ -104,8 +104,7 @@ class Router {
   private readonly apiTag?: string;
 
   private constructor(routePrefix: string, apiTag?: string) {
-    this.router = ExpressRouter();
-    logger.info(`Creating router with prefix: ${routePrefix}`);
+    this.router = ExpressRouter();;
     this.routePrefix = `/saveup${routePrefix}`;
     this.apiTag = apiTag;
 
@@ -151,7 +150,6 @@ class Router {
     return Router.routerInstances.get(key)!;
 }
 
-
   public route<
     Params extends AnyZodObject | typeof emptyObjectSchema = typeof emptyObjectSchema,
     ResBody = ZodSchema | ZodNever,
@@ -163,7 +161,7 @@ class Router {
       path,
       request,
       response = { 204: { schema: undefined } },
-      authMiddlewareOptions,
+      auth,
       middlewares = [],
       handler
     } = options;
@@ -172,13 +170,12 @@ class Router {
       middlewares.unshift(validateRequest(request));
     }
 
-    if (authMiddlewareOptions) {
-      middlewares.splice(1, 0,  authMiddleware(authMiddlewareOptions));
+    if (auth) {
+      middlewares.splice(1, 0, authMiddleware(auth));
     }
 
-
     const security = [];
-    if (authMiddlewareOptions) {
+    if (auth) {
       security.push({ Authorization: [] });
     }
     if (middlewares?.some(m => m.name === "resetStepValidator")) {

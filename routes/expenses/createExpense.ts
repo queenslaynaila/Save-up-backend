@@ -1,11 +1,9 @@
 import Router from '../../router';
 import { sql } from '../../db';
-import {
-  Expense,
-  expenseSchema
-} from './schema';
+import { Expense, expenseSchema } from './schema';
 import { z } from 'zod';
-import verifyGroupMembership from '../../utils';
+import verifyGroupMembership, { decodeEntityOrUserId } from '../../utils';
+import { entityIdParamsSchema } from '../users/schema';
 
 const expenseCreationParams = expenseSchema.pick({
   category_id: true,
@@ -13,17 +11,22 @@ const expenseCreationParams = expenseSchema.pick({
   amount: true,
   spent_at: true
 });
-type ExpenseCreationParams = z.infer<typeof expenseCreationParams> & {entity_id:number};
 
-const SQL_CREATE_EXPENSES = sql<ExpenseCreationParams, Expense>(`
+export type ExpenseCreationParams = z.infer<typeof expenseCreationParams> 
+& { entity_id: number };
+
+const SQL_CREATE_EXPENSES = sql<
+  ExpenseCreationParams,
+  Pick<Expense, 'entity_id' | 'xid' | 'category_id' | 'description' | 'amount' | 'spent_at' | 'created_at'>
+>(`
   INSERT INTO expenses (entity_id, xid, category_id, description, amount, spent_at)
   SELECT 
-      :entity_id,
-      COALESCE(MAX(xid), 0) + 1,
-      :category_id, 
-      :description, 
-      :amount, 
-      :spent_at::DATE
+    :entity_id,
+    COALESCE(MAX(xid), 0) + 1,
+    :category_id, 
+    :description, 
+    :amount, 
+    :spent_at
   FROM expenses 
   WHERE entity_id = :entity_id
   RETURNING entity_id, xid, category_id, description, amount, spent_at, created_at;
@@ -36,30 +39,32 @@ const createExpense = (router: Router) => {
     summary: 'Create an expense',
     request: {
       params: z.object({
-        entity_id: z.union([
-          z.string().regex(/^[1-9]\d*$/),
-          z.literal("me"),
-        ]).default('me' )
+        entity_id: entityIdParamsSchema
       }),
-      body: expenseCreationParams,
+      body: expenseSchema.pick({
+        category_id: true,
+        description: true,
+        amount: true,
+        spent_at: true
+      })
     },
     response: {
       201: {
         schema: expenseSchema
       }
     },
-    authMiddlewareOptions: {},
-    middlewares: [verifyGroupMembership({requiredGroupRole: 'Admin'})],
+    auth: true,
+    middlewares: [
+      verifyGroupMembership({ requiresGrpAdmin: true })
+    ],
     handler: async (req, res) => {
-      const entity_id = Number(req.params.entity_id);
-      const { category_id, description, amount, spent_at } = req.body;
+      const entityId = decodeEntityOrUserId(req);
       const expense = await SQL_CREATE_EXPENSES({
-        category_id,
-        description,
-        amount,
-        spent_at,
-        entity_id
-      }).one()
+        ...req.body,
+        entity_id: entityId
+      }).one().catch((err) => {
+        throw  err;
+      });
       return res.json(expense);
     }
   });

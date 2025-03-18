@@ -6,19 +6,12 @@ import {
   Expense
 } from './schema';
 import { z } from 'zod';
-import verifyGroupMembership from '../../utils';
+import verifyGroupMembership, { decodeEntityOrUserId } from '../../utils';
+import { ExpenseCreationParams } from './createExpense';
 
-const expenseUpdateParams = expenseSchema.pick({
-  category_id: true,
-  description: true,
-  amount: true,
-  spent_at: true
-}).partial();
-
-type ExpenseInterface = z.infer<typeof expenseUpdateParams>;
-
-const SQL_UPDATE_EXPENSE = sql<ExpenseInterface & {entity_id:number, xid:number},
-Expense>(`
+const SQL_UPDATE_EXPENSE = sql<
+ExpenseCreationParams & {xid:number},
+Pick<Expense, 'entity_id'|'xid'|'category_id'|'description'|'amount'|'spent_at'|'created_at'>>(`
   UPDATE expenses
   SET description = COALESCE(:description, expenses.description),
       category_id = COALESCE(:category_id, expenses.category_id),
@@ -37,29 +30,33 @@ const updateExpense = (router: Router) => {
     summary: 'Update an expense',
     request: {
       params: z.object({
-        entity_id: z.union([
-          z.string().regex(/^[1-9]\d*$/, "Must be a positive integer string"),
-          z.literal("me"),
-        ]).default('me' ),
-        xid: z.string()
+        entity_id: z.number().int(),
+        xid: z.number().int()
       }),
-      body: expenseUpdateParams
+      body:expenseSchema.pick({
+        category_id: true,
+        description: true,
+        amount: true,
+        spent_at: true
+      })
     },
     response: {
       200: {
         schema: expenseSchema
       }
     },
-    authMiddlewareOptions: {},
-    middlewares: [verifyGroupMembership({requiredGroupRole: 'Admin'})],
+    auth: true,
+    middlewares: [
+      verifyGroupMembership({requiresGrpAdmin:true})
+    ],
     handler: async (req, res) => {
-      const entity_id = Number(req.params.entity_id);
-      const xid = Number(req.params.xid);
-      const { description, category_id, amount, spent_at } = req.body;
-      const result = await SQL_UPDATE_EXPENSE({
-        description, category_id, amount, spent_at, entity_id, xid
+      const entityId = decodeEntityOrUserId(req);
+      const expense = await SQL_UPDATE_EXPENSE({
+        ...req.body,
+        entity_id: entityId, 
+        xid: req.params.xid 
       }).one(new HttpError(404));
-      res.json(result);
+      res.json(expense);
     }
   });
 };

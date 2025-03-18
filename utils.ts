@@ -7,15 +7,11 @@ import Config from './config';
 import { 
   AuthenticatedUser, 
   PinResetState, 
-  Role 
+  Role
 } from './routes/users/schema';
 import logger from './logger';
 
-type PrivilegedRole = Extract<Role, 'Admin' | 'Moderator'>;
-export interface AuthMiddlewareOptions {
-  allowedRoles?: Role | Role[];
-  privilegedRoles?: PrivilegedRole | 'all';
-}
+const ADMIN_LIKE_ROLES: Role[] = ['Admin', 'Moderator'];
 
 declare module 'express-serve-static-core' {
   interface Request {
@@ -65,70 +61,47 @@ function validateAndDecodeJwt(headerValue: string): JwtPayload {
   return decoded;
 }
 
-function replaceMeWithUserId(req: Request, params: string[]) {
-  params.forEach(param => {
-    if (req.params[param] === 'me') {
-      req.params[param] = req.user!.id.toString();
-    }
-  });
+export function decodeEntityOrUserId(
+  req: Request<{ entity_id?: number | "me"; user_id?: number | "me" }>,
+  isOwnerOrAdminMod: boolean = false
+): number {
+  const entityId = req.params.user_id ?? req.params.entity_id;
+
+  if (entityId === "me" || Number(entityId) === req.user!.id) {
+    return req.user!.id; 
+  }
+  
+  if (isOwnerOrAdminMod && ADMIN_LIKE_ROLES.includes(req.user!.role)) {
+    return Number(entityId);
+  }
+
+  throw new HttpError(403);
 }
 
-function hasRequiredRole({
-  userRole,
-  allowedRoles
-}: {
-  userRole: Role;
-  allowedRoles?: Role | Role[];
-}): boolean {
-  const allowAllRoles = !allowedRoles || (Array.isArray(allowedRoles) && allowedRoles.length === 0);
-  const allowedRolesArray = allowAllRoles ? ['Admin', 'Moderator', 'Standard'] : 
-    (Array.isArray(allowedRoles) ? allowedRoles : [allowedRoles]);
-
-  return allowedRolesArray.includes(userRole);
-}
-
-function hasPrivilegedAccess(userRole: Role, privilegedRoles?: PrivilegedRole | 'all'): boolean {
-  if (!privilegedRoles) return false;
-  const privilegedRolesArray = privilegedRoles === 'all' ? ['Admin', 'Moderator'] : 
-    [privilegedRoles].filter(Boolean);
-
-  return privilegedRolesArray.includes(userRole as PrivilegedRole);
-}
-
-
-
-export function authMiddleware(options: AuthMiddlewareOptions = {}) {
-  return function(req: Request, _res: Response, next: NextFunction) {
+export function authMiddleware(auth: true | Role | Role[] = true) {
+  return function (req: Request, _res: Response, next: NextFunction) {
     if (!req.headers.authorization) {
       throw new HttpError(401);
     }
+
     const decoded = validateAndDecodeJwt(req.headers.authorization);
     if (!decoded.id || !decoded.role) {
       throw new HttpError(400);
     }
 
     req.user = { id: decoded.id, role: decoded.role };
-   
-    if (!hasRequiredRole({ 
-      userRole: req.user.role, 
-      allowedRoles: options.allowedRoles
-    })) {
-      throw new HttpError(403);
-    }
-    
-    replaceMeWithUserId(req, ['user_id', 'entity_id']);
 
-    const isAccessingAnotherUser = req.params.user_id && 
-                                  parseInt(req.params.user_id, 10) !== req.user.id;
-
-    if (isAccessingAnotherUser && 
-        !hasPrivilegedAccess(req.user.role, options.privilegedRoles)) {
-      throw new HttpError(403);
+    if (auth !== true) {
+      const allowedRoles = Array.isArray(auth) ? auth : [auth];
+      if (!allowedRoles.includes(req.user.role)) {
+        throw new HttpError(403);
+      }
     }
-    
+
     next();
   };
 }
+
 
 export function checkResetTokenValidity(requiredStep: number) {
   return function(req: Request, _res: Response, next: NextFunction) {
@@ -167,7 +140,7 @@ export async function verifyPin(req: Request, _res: Response, next: NextFunction
   next();
 }
 
-const SQL_CHECK_GROUP_VALIDITY = sql<{
+const SQL_GET_GROUP_MEMBERSHIP_STATUS = sql<{
   entity_id: number;
   user_id: number;
 }, {
@@ -176,38 +149,31 @@ const SQL_CHECK_GROUP_VALIDITY = sql<{
 }>(`
   SELECT 
     EXISTS (
-      SELECT 1 
-      FROM group_members 
-      WHERE user_id = :user_id     
+      SELECT 1 FROM group_members 
+      WHERE user_id = :user_id 
         AND group_id = :entity_id
         AND is_active = TRUE
     ) AS is_member,
     EXISTS (
-      SELECT 1
-      FROM group_admins 
-      JOIN elections 
-        ON group_admins.group_id = elections.group_id 
-        AND group_admins.election_id = elections.xid
-      WHERE group_admins.group_id = :entity_id
-        AND group_admins.user_id = :user_id
-        AND elections.status = 'Closed'
-        AND elections.xid = (
-          SELECT MAX(xid) 
-          FROM elections 
-          WHERE group_id = :entity_id
+      SELECT 1 FROM group_admins
+      WHERE group_id = :entity_id
+        AND user_id = :user_id
+        AND election_id = (
+          SELECT MAX(xid) FROM elections 
+          WHERE group_id = :entity_id 
             AND status = 'Closed'
         )
-    ) AS is_admin_member;
+    ) AS is_admin_member
 `);
 
 interface GroupMembershipOptions {
-  privilegedRoles?: PrivilegedRole | 'all';
-  requiredGroupRole?: 'Admin' | 'Member';
+  isOwnerOrAdminMod?: boolean;
+  requiresGrpAdmin?: boolean;
 }
 
 export default function verifyGroupMembership({
-  privilegedRoles,
-  requiredGroupRole = 'Member'
+  isOwnerOrAdminMod = false,
+  requiresGrpAdmin = false
 }: GroupMembershipOptions = {}) {
   return async (req: Request, _res: Response, next: NextFunction) => {
     const entityId = Number(req.params.entity_id ?? req.params.group_id)
@@ -217,11 +183,11 @@ export default function verifyGroupMembership({
       return next()
     }
 
-    if (hasPrivilegedAccess(req.user!.role, privilegedRoles)) {
+    if (isOwnerOrAdminMod && ADMIN_LIKE_ROLES.includes(req.user!.role)) {
       return next();
     }
     
-    const { is_admin_member, is_member } = await SQL_CHECK_GROUP_VALIDITY({
+    const { is_admin_member, is_member } = await SQL_GET_GROUP_MEMBERSHIP_STATUS({
       entity_id: entityId,
       user_id: userId 
     }).one()
@@ -230,7 +196,9 @@ export default function verifyGroupMembership({
       throw new HttpError(403)
     }
 
-    replaceMeWithUserId(req, ['member_id'])
+    if (req.params.member_id === 'me') {
+      req.params.member_id = req.user!.id.toString()
+    }
 
     const isRequestingOtherMember = req.params.member_id && 
                                   userId !== parseInt(req.params.member_id)
@@ -239,7 +207,7 @@ export default function verifyGroupMembership({
       throw new HttpError(403)
     }
 
-    if (requiredGroupRole === 'Admin' && !is_admin_member) {
+    if (requiresGrpAdmin && !is_admin_member) {
       throw new HttpError(403)
     }
 
