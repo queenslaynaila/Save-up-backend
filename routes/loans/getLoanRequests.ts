@@ -53,7 +53,7 @@ const getLoanRequests = (router: Router) => {
     auth: true,
     middlewares: [
       verifyGroupMembership({
-        privilegedRoles: 'all'
+        isOwnerOrAdminMod: true
       })
     ],
     handler: async (req, res) => {

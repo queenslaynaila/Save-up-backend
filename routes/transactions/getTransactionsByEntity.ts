@@ -149,9 +149,9 @@ const getTransactions = (router: Router) => {
       }
     },
     auth: true,
-    middlewares: [
+     middlewares: [
       verifyGroupMembership({
-        privilegedRoles: 'all'
+        isOwnerOrAdminMod: true
       })
     ],
     handler: async (req, res) => {
