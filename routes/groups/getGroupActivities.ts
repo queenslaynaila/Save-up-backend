@@ -342,7 +342,7 @@ const getGroupActivities = (router:Router) => {
         }
       },
       summary: 'Get group activities',
-      authMiddlewareOptions: {},
+      auth: true,
       middlewares: [
         verifyGroupMembership({privilegedRoles: 'all'})
      ],

@@ -50,7 +50,7 @@ const getLoanRequests = (router: Router) => {
         schema: z.array(loanRequestSchema)
       }
     },
-    authMiddlewareOptions: {},
+    auth: true,
     middlewares: [
       verifyGroupMembership({
         privilegedRoles: 'all'

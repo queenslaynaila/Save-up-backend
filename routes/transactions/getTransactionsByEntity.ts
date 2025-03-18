@@ -148,7 +148,7 @@ const getTransactions = (router: Router) => {
         schema: z.array(transaction)
       }
     },
-    authMiddlewareOptions: {},
+    auth: true,
     middlewares: [
       verifyGroupMembership({
         privilegedRoles: 'all'

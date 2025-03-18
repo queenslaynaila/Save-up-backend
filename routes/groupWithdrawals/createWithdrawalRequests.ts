@@ -42,7 +42,7 @@ const createWithdrawalRequest = (router: Router) => {
       }),
       body: withdrawalSchema
     },
-    authMiddlewareOptions: {},
+    auth: true,
     middlewares: [
       verifyGroupMembership(
         {

@@ -25,7 +25,7 @@ const deleteNextOfKin = (router: Router) => {
     response: {
       204: {}
     },
-    authMiddlewareOptions: {},
+    auth: true,
     middlewares: [verifyPin],
     handler: async (req, res) => {
       await SQL_DELETE_KIN({

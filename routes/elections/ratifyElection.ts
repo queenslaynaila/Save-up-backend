@@ -30,7 +30,7 @@ const ratifyElection = (router: Router) => {
     response: {
       201: {}
     },
-    authMiddlewareOptions: {},
+    auth: true,
     middlewares:[verifyGroupMembership()],
     handler: async (req, res) => {
       await SQL_RATIFY_ELECTION({

@@ -56,9 +56,9 @@ const createGroupElection = (router: Router) => {
       }),
       body: electionParams
     },
-    authMiddlewareOptions: {},
-    middlewares: [
-      verifyGroupMembership({ requiredGroupRole: 'Admin' })
+    auth: true,
+       middlewares: [
+      verifyGroupMembership({ requiresGrpAdmin: true })
     ],
     handler: async (req, res) => {
       const groupId = Number(req.params.group_id);

@@ -31,7 +31,7 @@ const handleGroupExit = (router: Router) => {
         ]).default('me')
       })
     },
-    authMiddlewareOptions: {},
+    auth: true,
     middlewares: [verifyGroupMembership()],
     handler: async (req, res) => {
       const target_id = Number(req.params.member_id);

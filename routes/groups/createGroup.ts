@@ -28,7 +28,7 @@ const createGroup = (router:Router) => {
         })
       }
     },
-    authMiddlewareOptions: {},
+    auth: true,
     handler: async (req, res) => {
       logger.info(`Creating group for user_id: ${req.user!.id}`);
       const group = await SQL_CREATE_GROUP({

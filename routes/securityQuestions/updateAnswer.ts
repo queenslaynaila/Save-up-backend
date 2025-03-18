@@ -41,7 +41,7 @@ const updateSecurityAnswer = (router: Router) => {
         questions: z.array(answerSchema)
       })
     },
-    authMiddlewareOptions: {},
+    auth: true,
     middlewares: [verifyPin],
     handler: async (req, res) => {
       const questions = req.body.questions;

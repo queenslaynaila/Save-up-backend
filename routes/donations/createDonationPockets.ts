@@ -89,7 +89,7 @@ const createFundraiser = (router: Router) => {
         }),
       },
     },
-    authMiddlewareOptions: {},
+    auth: true,
     middlewares: [verifyGroupMembership()],
     handler: async (req, res) => {
       const { 

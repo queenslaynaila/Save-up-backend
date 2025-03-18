@@ -5,7 +5,7 @@ const logout = (router: Router) => {
     method: 'delete',
     path: '/logout',
     summary: 'Logout',
-    authMiddlewareOptions: {},
+    auth: true,
     handler: async (_req, res) => {
       res.removeHeader('Authorization');
       res.sendStatus(204);

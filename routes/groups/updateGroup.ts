@@ -44,7 +44,7 @@ const updateGroup = (router: Router) => {
         }),
       }
     },
-    authMiddlewareOptions: {},
+    auth: true,
     middlewares: [
       verifyGroupMembership({
         requiredGroupRole: 'Admin'

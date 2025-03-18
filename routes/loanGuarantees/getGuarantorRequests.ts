@@ -49,7 +49,7 @@ const getGuarantorRequests = (router: Router) => {
         schema: loanRequestSchema.array()
       }
     },
-    authMiddlewareOptions: {},
+    auth: true,
     handler: async (req, res) => {
       const loan_requests = await SQL_GET_UNGUARANTEED_LOAN_REQUESTS({
         user_id: req.user!.id,

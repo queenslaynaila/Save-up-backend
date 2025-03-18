@@ -40,7 +40,7 @@ const reviewDebitRequests = (router: Router) => {
         pin: z.number().min(1000).max(9999)
       })
     },
-    authMiddlewareOptions: {},
+    auth: true,
     middlewares: [
       verifyPin,
       verifyGroupMembership({ 

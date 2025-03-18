@@ -47,7 +47,7 @@ const updateNextOfKin = (router: Router) => {
         schema: nextOfKinUpdatePayload.required()
       }
     },
-    authMiddlewareOptions: {},
+    auth: true,
     middlewares: [verifyPin],
     handler: async (req, res) => {
       const { full_name, relationship, phone_number } = req.body;

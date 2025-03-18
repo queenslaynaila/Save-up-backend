@@ -70,7 +70,7 @@ const getGroupElectionList = (router: Router) => {
         schema: z.array(ongoingElectionSchema)
       }
     },
-    authMiddlewareOptions: {},
+    auth: true,
     middlewares: [
       verifyGroupMembership({privilegedRoles: 'all'})
     ],

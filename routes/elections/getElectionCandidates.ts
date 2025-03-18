@@ -39,7 +39,7 @@ const getCandidates = (router: Router) => {
         schema: z.array(candidatesSchema)
       }
     },
-    authMiddlewareOptions: {},
+    auth: true,
     middlewares: [
       verifyGroupMembership({ 
         privilegedRoles: 'all'

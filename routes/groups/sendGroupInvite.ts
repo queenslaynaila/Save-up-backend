@@ -64,7 +64,7 @@ const createGroupInvite = (router: Router) => {
           .regex(/^\+\d{1,4}\d{9}$/)
       })
     },
-    authMiddlewareOptions: {},
+    auth: true,
     middlewares: [
       verifyGroupMembership({
         requiredGroupRole: 'Admin'

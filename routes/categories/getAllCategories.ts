@@ -26,7 +26,7 @@ const getAllCategories = (router: Router) => {
         schema: z.array(categorySchema)
       }
     },
-    authMiddlewareOptions: {},
+    auth: true,
     handler: async (_req, res) => {
       const categories = await SQL_GET_ALL_CATEGORIES({}).many();
       res.json(categories);

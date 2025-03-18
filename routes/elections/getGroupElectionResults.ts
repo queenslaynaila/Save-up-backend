@@ -37,7 +37,7 @@ const getGroupElectionResults = (router: Router) => {
         schema: z.array(candidatesSchema)
       }
     },
-    authMiddlewareOptions: {},
+    auth: true,
     handler: async (req, res) => {
       const results = await SQL_GET_ELECTION_RESULTS({
         xid: Number(req.params.election_id),

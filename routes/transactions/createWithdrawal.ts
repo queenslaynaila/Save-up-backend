@@ -35,7 +35,7 @@ const createWithdrawal = (router: Router) => {
     response: {
       201: {}
     },
-    authMiddlewareOptions: {},
+    auth: true,
     middlewares: [verifyPin],
     handler: async (req, res) => {
       const userId = Number(req.params.user_id);

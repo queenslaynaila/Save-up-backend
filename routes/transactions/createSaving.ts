@@ -32,7 +32,7 @@ const createSaving = (router: Router) => {
         amount: z.number().min(50)
       })
     },
-    authMiddlewareOptions: {},
+    auth: true,
     middlewares: [verifyGroupMembership()],
     handler: async (req, res) => {
       const entityId = Number(req.params.entity_id);

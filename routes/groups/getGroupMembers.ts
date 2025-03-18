@@ -63,7 +63,7 @@ const getGroupMembers = (router: Router) => {
         schema: z.array(member),
       }
     },
-    authMiddlewareOptions: {},
+    auth: true,
     middlewares: [
       verifyGroupMembership({ 
         privilegedRoles: 'all'

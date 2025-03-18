@@ -150,7 +150,7 @@ const getGrpDebitRequests = (router: Router) => {
         schema: z.array(DebitRequestSchema)
       }
     },
-    authMiddlewareOptions: {},
+    auth: true,
     middlewares: [verifyGroupMembership(
       {privilegedRoles: 'all'}
     )

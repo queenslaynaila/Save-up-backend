@@ -44,7 +44,7 @@ const createTransfer = (router: Router) => {
         pin: z.string().regex(/^\d{4}$/)
       })
     },
-    authMiddlewareOptions: {},
+    auth: true,
     middlewares: [
       verifyPin, 
       verifyGroupMembership({ requiredGroupRole: 'Admin' })

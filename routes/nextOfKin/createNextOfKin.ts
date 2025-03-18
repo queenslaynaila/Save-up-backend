@@ -50,7 +50,7 @@ const createNextOfKin = (router: Router) => {
         schema: nextOfKinPublicViewSchema
       }
     },
-    authMiddlewareOptions: {},
+    auth: true,
     middlewares: [verifyPin],
     handler: async (req, res) => {
       const nextOfKin = await SQL_CREATE_KIN({

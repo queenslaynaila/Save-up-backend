@@ -33,7 +33,7 @@ const createCandidates = (router: Router) => {
         candidate_ids: true
       })
     },
-    authMiddlewareOptions: {},
+    auth: true,
     middlewares: [verifyGroupMembership()],
     handler: async (req, res) => {
       await SQL_CREATE_CANDIDATE({

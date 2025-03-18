@@ -31,7 +31,7 @@ const createBallot = (router: Router) => {
     response: {
       201: {}
     },
-    authMiddlewareOptions: {},
+    auth: true,
     handler: async (req, res) => {
       await SQL_CREATE_BALLOT({
         election_id: Number(req.params.election_id),
