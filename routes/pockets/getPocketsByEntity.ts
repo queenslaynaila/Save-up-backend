@@ -1,10 +1,11 @@
 import Router from '../../router';
 import { sql } from '../../db';
 import { z } from 'zod';
-import { newPocketSchema } from './createPocket';
-import verifyGroupMembership from '../../utils';
+import verifyGroupMembership, { decodeEntityOrUserId } from '../../utils';
+import { entityIdParamsSchema } from '../users/schema';
+import { pocketSchema } from './schema';
 
-const pocketSchema = newPocketSchema
+const pocketParamsSchema = pocketSchema
   .pick({
     xid: true,
     name: true,
@@ -19,9 +20,9 @@ const pocketSchema = newPocketSchema
     category_name: z.string()
   });
 
-type Pocket = z.infer<typeof pocketSchema>;
+type Pocket = z.infer<typeof pocketParamsSchema>;
 
-const pocketQueryParams = pocketSchema
+const pocketQueryParams = pocketParamsSchema
   .pick({
     priority: true,
     status: true
@@ -77,16 +78,13 @@ const getPocketsByEntity = (router: Router) => {
     summary: 'Get pockets for a system entity',
     request: {
       params: z.object({
-        entity_id: z.union([
-          z.string().regex(/^[1-9]\d*$/),
-          z.literal("me")
-        ]).default('me')
+        entity_id: entityIdParamsSchema
       }),
       query: pocketQueryParams
     },
     response: {
       200: {
-        schema: z.array(pocketSchema)
+        schema: z.array(pocketParamsSchema)
       }
     },
     auth: true,
@@ -94,7 +92,7 @@ const getPocketsByEntity = (router: Router) => {
       verifyGroupMembership({ isOwnerOrAdminMod: true })
     ],
     handler: async (req, res) => {
-      const entityId = Number(req.params.entity_id);
+      const entityId = decodeEntityOrUserId(req);
       const { xid, category_id, priority, status, start_date, end_date } = req.query;
 
       const pockets = await SQL_GET_POCKETS({

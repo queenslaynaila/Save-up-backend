@@ -44,7 +44,7 @@ const reviewDebitRequests = (router: Router) => {
     middlewares: [
       verifyPin,
       verifyGroupMembership({ 
-        requiredGroupRole: 'Admin'
+        requiresGrpAdmin:true
      })
     ],
     handler: async (req, res) => {

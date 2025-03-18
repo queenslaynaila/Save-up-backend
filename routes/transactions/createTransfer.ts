@@ -2,7 +2,8 @@ import Router from '../../router';
 import { sql } from '../../db';
 import HttpError from '../../httpError';
 import { z } from 'zod';
-import verifyGroupMembership, { verifyPin } from '../../utils';
+import verifyGroupMembership, { decodeEntityOrUserId, verifyPin } from '../../utils';
+import { entityIdParamsSchema } from '../users/schema';
 
 const transferPayload = z.object({
   entity_id: z.number().min(1),
@@ -31,12 +32,9 @@ const createTransfer = (router: Router) => {
     summary: 'Transfer money between pockets',
     request: {
       params: z.object({
-        entity_id: z.union([
-          z.string().regex(/^[1-9]\d*$/),
-          z.literal("me")
-        ]).default('me'),
-        source_pocket_id: z.string().regex(/^[1-9]\d*$/),
-        destination_pocket_id: z.string().regex(/^[1-9]\d*$/)
+        entity_id: entityIdParamsSchema,
+        source_pocket_id: z.number().int(),
+        destination_pocket_id: z.number().int()
       }),
       body: transferPayload.pick({
         amount: true
@@ -47,18 +45,16 @@ const createTransfer = (router: Router) => {
     auth: true,
     middlewares: [
       verifyPin, 
-      verifyGroupMembership({ requiredGroupRole: 'Admin' })
+      verifyGroupMembership({ requiresGrpAdmin:true })
     ],
     handler: async (req, res) => {
-      const sourcePocketId = Number(req.params.source_pocket_id);
-      const destinationPocketId = Number(req.params.destination_pocket_id);
-
+      const entityId = decodeEntityOrUserId(req);
       await SQL_CREATE_TRANSFER({
-        source_pocket_id: sourcePocketId,
-        destination_pocket_id: destinationPocketId,
+        source_pocket_id: req.params.source_pocket_id,
+        destination_pocket_id: req.params.destination_pocket_id,
         user_id: req.user!.id,
         amount: req.body.amount,
-        entity_id: Number(req.params.entity_id)
+        entity_id: entityId
       }).exec().catch((err) => {
         if (err.code === 'P0005') {
           throw new HttpError(400, { 

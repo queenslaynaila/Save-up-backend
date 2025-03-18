@@ -1,7 +1,8 @@
 import Router from '../../router';
 import { sql } from '../../db';
 import { z } from 'zod';
-import verifyGroupMembership from '../../utils';
+import verifyGroupMembership, { decodeEntityOrUserId } from '../../utils';
+import { entityIdParamsSchema } from '../users/schema';
 
 const SQL_CREATE_SAVING = sql<
   {
@@ -22,11 +23,8 @@ const createSaving = (router: Router) => {
     summary: 'Deposit money to a pocket',
     request: {
       params: z.object({
-        entity_id: z.union([
-          z.string().regex(/^[1-9]\d*$/),
-          z.literal("me")
-        ]).default('me'),
-        pocket_id: z.string().regex(/^[1-9]\d*$/)
+        entity_id: entityIdParamsSchema,
+        pocket_id: z.number()
       }),
       body: z.object({
         amount: z.number().min(50)
@@ -35,14 +33,13 @@ const createSaving = (router: Router) => {
     auth: true,
     middlewares: [verifyGroupMembership()],
     handler: async (req, res) => {
-      const entityId = Number(req.params.entity_id);
-      const pocketId = Number(req.params.pocket_id);
+      const entityId = decodeEntityOrUserId(req);
 
       await SQL_CREATE_SAVING({
         entity_id: entityId,
-        amount:req.body.amount,
-        pocket_id: pocketId,
-        user_id: req.user!.id
+        pocket_id: req.params.pocket_id,
+        user_id: req.user!.id,
+        ...req.body
       }).exec();
 
       res.sendStatus(200);

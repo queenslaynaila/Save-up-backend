@@ -1,7 +1,8 @@
 import { z } from 'zod';
 import { sql } from '../../db';
 import Router from '../../router';
-import verifyGroupMembership from '../../utils';
+import verifyGroupMembership, { decodeEntityOrUserId } from '../../utils';
+import { entityIdParamsSchema } from '../users/schema';
 
 const ENUM_TRANSACTION_TYPE = z.enum([
   'Saving',
@@ -130,10 +131,7 @@ const getTransactions = (router: Router) => {
     summary: 'Get all transactions by a system entity',
     request: {
       params: z.object({
-        entity_id: z.union([
-          z.string().regex(/^[1-9]\d*$/),
-          z.literal("me")
-        ]).default('me')
+        entity_id: entityIdParamsSchema
       }),
       query: z.object({
         slug: transactionTypeSchema.shape.slug,
@@ -155,7 +153,7 @@ const getTransactions = (router: Router) => {
       })
     ],
     handler: async (req, res) => {
-      const entity_id = Number(req.params.entity_id);
+      const entityId = decodeEntityOrUserId(req, true);
       const pocket_id = req.query.pocket_id 
       ? Number(req.query.pocket_id) 
       : undefined;
@@ -163,7 +161,7 @@ const getTransactions = (router: Router) => {
       const { slug, from, to, limit = '10' } = req.query;
 
       const transactions = await SQL_GET_TRANSACTIONS({
-        entity_id,
+        entity_id: entityId,
         pocket_id,
         slug,
         from,

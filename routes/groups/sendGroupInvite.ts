@@ -67,7 +67,7 @@ const createGroupInvite = (router: Router) => {
     auth: true,
     middlewares: [
       verifyGroupMembership({
-        requiredGroupRole: 'Admin'
+        requiresGrpAdmin:true
       })
     ],
     handler: async (req, res) => {
