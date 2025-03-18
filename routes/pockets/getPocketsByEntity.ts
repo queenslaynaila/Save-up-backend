@@ -91,7 +91,7 @@ const getPocketsByEntity = (router: Router) => {
     },
     auth: true,
     middlewares: [
-      verifyGroupMembership({ privilegedRoles:'all' })
+      verifyGroupMembership({ isOwnerOrAdminMod: true })
     ],
     handler: async (req, res) => {
       const entityId = Number(req.params.entity_id);
