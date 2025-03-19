@@ -1,21 +1,14 @@
 import Router from '../../router';
 import { sql } from '../../db';
 import { z } from 'zod';
-import verifyGroupMembership from '../../utils';
+import { decodeEntityAndVerifyAccess } from '../../utils';
 import { groupsSchema } from './schema';
 
 const SQL_UPDATE_GROUP = sql<
-  {
-    group_id: number;
-    name: string;
-    user_id: number;
-  },
-  { 
-    name: string 
-  }
+  { group_id: number; name: string; user_id: number;},
+  { name: string;}
 >(`
-  SELECT * 
-  FROM update_group_name(
+  SELECT * FROM update_group_name(
     :group_id,
     :user_id,
     :name
@@ -28,10 +21,10 @@ const updateGroup = (router: Router) => {
     path: '/:group_id',
     summary: 'Update group details',
     description: 'Update group name. Requires group admin role.',
+    auth: true,
     request: {
       params: z.object({
-        group_id: z.string()
-          .regex(/^[1-9]\d*$/)
+        group_id: z.number()
       }),
       body: groupsSchema.pick({
         name: true
@@ -41,20 +34,16 @@ const updateGroup = (router: Router) => {
       200: {
         schema: groupsSchema.pick({
           name: true
-        }),
+        })
       }
     },
-    auth: true,
-    middlewares: [
-      verifyGroupMembership({
-        requiresGrpAdmin:true
-      })
-    ],
     handler: async (req, res) => {
+      const groupId = await decodeEntityAndVerifyAccess(req);
+      
       const { name } = await SQL_UPDATE_GROUP({
-        group_id: Number(req.params.group_id),
+        group_id: groupId,
         user_id: req.user!.id,
-        name: req.body.name
+        ...req.body
       }).one();
 
       res.json({ name });

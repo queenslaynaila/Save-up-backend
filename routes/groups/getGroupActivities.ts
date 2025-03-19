@@ -1,9 +1,10 @@
 import { z } from 'zod';
 import Router from '../../router';
 import { sql } from '../../db';
-import verifyGroupMembership from '../../utils';
+import { decodeEntityAndVerifyAccess } from '../../utils';
 
 const emptyMetadata = z.object({}).nullable();
+
 const transferMetadata = z.object({
   source_pocket: z.object({
     id: z.number(),
@@ -14,6 +15,7 @@ const transferMetadata = z.object({
     name: z.string()
   })
 });
+
 const withdrawalRequestMetadata = z.object({
   reason: z.string(),
   recipients: z.array(z.object({
@@ -22,6 +24,7 @@ const withdrawalRequestMetadata = z.object({
     amount: z.number()
   }))
 });
+
 const withdrawalStatusMetadata = z.object({
   reason: z.string(),
   status: z.enum(['Approved', 'Rejected'])
@@ -55,10 +58,11 @@ export const activitySchema = z.object({
   ])
 });
 
-
 type Activity = z.infer<typeof activitySchema>;
 
-const SQL_GET_GROUP_ACTIVITIES = sql<{ group_id: number, size: number }, Activity>(`
+const SQL_GET_GROUP_ACTIVITIES = sql<
+{ group_id: number, size: number }, 
+Activity>(`
     SELECT *
     FROM (
         (
@@ -324,38 +328,37 @@ const SQL_GET_GROUP_ACTIVITIES = sql<{ group_id: number, size: number }, Activit
     LIMIT :size;
 `);
 
-const getGroupActivities = (router:Router) => {
-    router.route({
-      method: 'get',
-      path: '/:group_id/activities',
-      request: {
-        params: z.object({
-          group_id: z.string()
-        }),
-        query: z.object({
-            size: z.string().default('200')
-        })
-      },
-      response:{
-        200: {
-          schema: z.array(activitySchema)
-        }
-      },
-      summary: 'Get group activities',
-      auth: true,
-      middlewares: [
-        verifyGroupMembership({isOwnerOrAdminMod: true})
-     ],
-      handler: async (req, res) => {
-        const groupId = Number(req.params.group_id);
-        const size = Number(req.query.size) || 200;
-        const activities = await SQL_GET_GROUP_ACTIVITIES({
-          group_id: groupId,
-          size
-        }).many();
-        res.json(activities);
+const getGroupActivities = (router: Router) => {
+  router.route({
+    method: 'get',
+    path: '/:group_id/activities',
+    summary: 'Get group activities',
+    auth: true,
+    request: {
+      params: z.object({
+        group_id: z.number()
+      }),
+      query: z.object({
+        size: z.number()
+      })
+    },
+    response: {
+      200: {
+        schema: z.array(activitySchema)
       }
-    });
-  };
+    },
+    handler: async (req, res) => {
+      const groupId = await decodeEntityAndVerifyAccess(req, true);
+      const size = req.query.size || 200;
+      
+      const activities = await SQL_GET_GROUP_ACTIVITIES({
+        group_id: groupId,
+        size
+      }).many();
+      
+      res.json(activities);
+    }
+  });
+};
 
-  export default getGroupActivities;
+export default getGroupActivities;

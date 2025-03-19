@@ -2,8 +2,8 @@ import Router from '../../router';
 import { sql } from '../../db';
 import { z } from 'zod';
 import sendSms from '../../services/sms';
-import verifyGroupMembership from '../../utils';
 import HttpError from '../../httpError';
+import { decodeEntityAndVerifyAccess } from '../../utils';
 
 const SQL_SEND_INVITATION = sql<
   {
@@ -54,32 +54,24 @@ const createGroupInvite = (router: Router) => {
       'For non-registered users, the SMS will include a special link to sign up ' +
       'for SaveUP and once they have signed up they will find the invite in ' +
       'their notifications.',
+    auth: true,
     request: {
       params: z.object({
-        group_id: z.string()
-          .regex(/^[1-9]\d*$/)
+        group_id: z.number()
       }),
       body: z.object({
         phone_number: z.string()
           .regex(/^\+\d{1,4}\d{9}$/)
       })
     },
-    auth: true,
-    middlewares: [
-      verifyGroupMembership({
-        requiresGrpAdmin:true
-      })
-    ],
     handler: async (req, res) => {
-      const { 
-        receiver_id, 
-        sender_name, 
-        group_name 
-      } = await SQL_SEND_INVITATION({
-        group_id: Number(req.params.group_id),
-        phone_number: req.body.phone_number,
-        sender_id: req.user!.id
-      }).one().catch((err) => {
+      const groupId = await decodeEntityAndVerifyAccess(req);
+      
+      const { receiver_id,  sender_name,  group_name } = await SQL_SEND_INVITATION({
+        group_id: groupId,
+        sender_id: req.user!.id,
+        ...req.body
+      }).one().catch(err => {
         if (err.code === '23505') {
           throw new HttpError(409);
         }
@@ -94,6 +86,7 @@ const createGroupInvite = (router: Router) => {
 
       const baseMessage = 
         `${sender_name} invited you to join group ${group_name} on SaveUP.`;
+        
       const message = receiver_id === null
         ? `${baseMessage} Sign up here: ${signupLink} to join the group`
         : `${baseMessage} View your invite here: ${inviteLink}`;

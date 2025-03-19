@@ -1,20 +1,20 @@
 import Router from '../../router';
 import { sql } from '../../db';
 import { z } from 'zod';
-import verifyGroupMembership from '../../utils';
+import { decodeEntityAndVerifyAccess } from '../../utils';
 
-const member = z.object({
-  user_id: z.number().min(1),
+const groupMemberSchema = z.object({
+  user_id: z.number().int(),
   full_name: z.string(),
   joined_at: z.string().datetime(),
   is_admin: z.boolean()
 });
 
-type Member = z.infer<typeof member>;
+type Member = z.infer<typeof groupMemberSchema>;
 
 const SQL_GET_GROUP_MEMBERS = sql<
   { group_id: number },
-  Member
+  Pick<Member, 'user_id' | 'full_name' | 'joined_at' | 'is_admin'>
 >(`
   SELECT 
     group_members.user_id,
@@ -52,26 +52,26 @@ const getGroupMembers = (router: Router) => {
     path: '/:group_id/members',
     summary: 'Get group members',
     description: 'Retrieve all active members of a group with their admin status',
+    auth: true,
     request: {
       params: z.object({
-        group_id: z.string()
-          .regex(/^[1-9]\d*$/, 'Must be a positive integer')
+        group_id: z.number()
       })
     },
     response: {
       200: {
-        schema: z.array(member),
+        schema: z.array(groupMemberSchema.pick({
+          user_id: true,
+          full_name: true,
+          is_admin: true,
+          joined_at: true
+        }))
       }
     },
-    auth: true,
-    middlewares: [
-      verifyGroupMembership({ 
-        isOwnerOrAdminMod: true
-      })
-    ],
     handler: async (req, res) => {
+      const groupId = await decodeEntityAndVerifyAccess(req, true);
       const members = await SQL_GET_GROUP_MEMBERS({
-        group_id: Number(req.params.group_id)
+        group_id: groupId
       }).many();
 
       return res.json(members);

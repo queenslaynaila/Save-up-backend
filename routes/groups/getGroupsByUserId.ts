@@ -2,23 +2,21 @@ import Router from '../../router';
 import { sql } from '../../db';
 import { z } from 'zod';
 import { groupsSchema } from './schema';
-import { userIdParamsSchema } from '../users/schema';
+import { entityIdParamsSchema } from '../users/schema';
+import { decodeEntityAndVerifyAccess } from '../../utils';
 
-const group = groupsSchema.pick({
+const groupWithCreatorSchema = groupsSchema.pick({
   id: true,
   name: true,
   created_at: true
 }).extend({
   created_by: z.string()
 });
-type Group = z.infer<typeof group>;
+type Group = z.infer<typeof groupWithCreatorSchema>;
 
 const SQL_FETCH_USER_GROUPS = sql<
-  {
-    user_id: number;
-    other_user_id?: number;
-  },
-  Group
+  { user_id: number; other_user_id?: number},
+  Pick<Group, 'id'|'name'|'created_at'|'created_by'>
 >(`
   SELECT 
     groups.id, 
@@ -53,29 +51,30 @@ const getGroupsByUserId = (router: Router) => {
     description: 
       'Optional `mutual_user_id` filter ' +
       'shows only groups shared with another user.',
+    auth: true,
     request: {
-      params: userIdParamsSchema,
+      params: z.object({
+        user_id: entityIdParamsSchema
+      }),
       query: z.object({
-        mutual_user_id: z.string()
-          .regex(/^[1-9]\d*$/)
-          .optional()
+        mutual_user_id: z.number().optional()
       })
     },
     response: {
       200: {
-        schema: z.array(group)
+        schema: z.array(groupWithCreatorSchema.pick({
+          id: true,
+          name: true,
+          created_at: true,
+          created_by:true
+        }))
       }
     },
-    auth: true,
     handler: async (req, res) => {
-      const user_id = Number(req.params.user_id);
-      const other_user_id = req.query.mutual_user_id
-        ? Number(req.query.mutual_user_id)
-        : undefined;
-
+      const userId = await decodeEntityAndVerifyAccess(req, true);
       const groups = await SQL_FETCH_USER_GROUPS({
-        user_id,
-        other_user_id
+        user_id: userId,
+        ...req.query
       }).many();
 
       return res.json(groups);

@@ -1,15 +1,15 @@
 import Router from '../../router';
 import { sql } from '../../db';
 import { Group, groupsSchema } from './schema';
-import logger from '../../logger';
 
 const SQL_CREATE_GROUP = sql<
-Pick<Group, 'name' | 'creator_id'>,
-Pick<Group, 'id' | 'name'|'created_at'>>(`
+  Pick<Group, 'name' | 'creator_id'>,
+  Pick<Group, 'id' | 'name' | 'created_at'>
+>(`
   SELECT * FROM create_group(:name, :creator_id)
 `);
 
-const createGroup = (router:Router) => {
+const createGroup = (router: Router) => {
   router.route({
     method: 'post',
     path: '/',
@@ -17,7 +17,7 @@ const createGroup = (router:Router) => {
     request: {
       body: groupsSchema.pick({ 
         name: true
-      })
+       }),
     },
     response: {
       201: {
@@ -25,18 +25,18 @@ const createGroup = (router:Router) => {
           id: true, 
           name: true, 
           created_at: true 
-        })
-      }
+        }),
+      },
     },
     auth: true,
     handler: async (req, res) => {
-      logger.info(`Creating group for user_id: ${req.user!.id}`);
       const group = await SQL_CREATE_GROUP({
         creator_id: req.user!.id,
-        name: req.body.name
+        ...req.body,
       }).one();
-      res.status(201).json(group);
-    }
+
+      return res.status(201).json(group);
+    },
   });
 };
 
