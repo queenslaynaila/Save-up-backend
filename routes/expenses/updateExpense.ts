@@ -6,7 +6,7 @@ import {
   Expense
 } from './schema';
 import { z } from 'zod';
-import verifyGroupMembership, { decodeEntityOrUserId } from '../../utils';
+import  { decodeEntityAndVerifyAccess } from '../../utils';
 import { ExpenseCreationParams } from './createExpense';
 
 const SQL_UPDATE_EXPENSE = sql<
@@ -46,11 +46,8 @@ const updateExpense = (router: Router) => {
       }
     },
     auth: true,
-    middlewares: [
-      verifyGroupMembership({requiresGrpAdmin:true})
-    ],
     handler: async (req, res) => {
-      const entityId = decodeEntityOrUserId(req);
+      const entityId = await decodeEntityAndVerifyAccess(req);
       const expense = await SQL_UPDATE_EXPENSE({
         ...req.body,
         entity_id: entityId, 

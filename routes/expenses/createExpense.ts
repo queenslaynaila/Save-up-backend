@@ -2,7 +2,7 @@ import Router from '../../router';
 import { sql } from '../../db';
 import { Expense, expenseSchema } from './schema';
 import { z } from 'zod';
-import verifyGroupMembership, { decodeEntityOrUserId } from '../../utils';
+import  { decodeEntityAndVerifyAccess } from '../../utils';
 import { entityIdParamsSchema } from '../users/schema';
 
 const expenseCreationParams = expenseSchema.pick({
@@ -54,11 +54,8 @@ const createExpense = (router: Router) => {
       }
     },
     auth: true,
-    middlewares: [
-      verifyGroupMembership({ requiresGrpAdmin: true })
-    ],
     handler: async (req, res) => {
-      const entityId = decodeEntityOrUserId(req);
+      const entityId = await decodeEntityAndVerifyAccess(req);
       const expense = await SQL_CREATE_EXPENSES({
         ...req.body,
         entity_id: entityId

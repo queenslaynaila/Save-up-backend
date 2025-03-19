@@ -1,7 +1,7 @@
 import Router from '../../router';
 import { sql } from '../../db';
 import { z } from 'zod';
-import verifyGroupMembership, { decodeEntityOrUserId } from '../../utils';
+import { decodeEntityAndVerifyAccess } from '../../utils';
 import { entityIdParamsSchema } from '../users/schema';
 
 const SQL_DELETE_EXPENSE = sql<{xid:number, entity_id:number}, Record<string, never>>(`
@@ -27,11 +27,8 @@ const deleteExpense = (router: Router) => {
       204: {}
     },
     auth: true,
-    middlewares: [
-      verifyGroupMembership({requiresGrpAdmin:true})
-    ],
     handler: async (req, res) => {
-      const entityId = decodeEntityOrUserId(req);
+      const entityId =  await decodeEntityAndVerifyAccess(req);
       await SQL_DELETE_EXPENSE({
         xid: req.params.xid,
         entity_id: entityId

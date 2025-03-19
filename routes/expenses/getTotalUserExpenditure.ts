@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { sql } from '../../db';
 import Router from '../../router';
-import verifyGroupMembership, { decodeEntityOrUserId } from '../../utils';
+import { decodeEntityAndVerifyAccess } from '../../utils';
 import { entityIdParamsSchema } from '../users/schema';
 
 const SQL_GET_TOTAL_EXPENSES = sql<{
@@ -45,11 +45,8 @@ const getTotalUserExpenditure = (router: Router) => {
       }
     },
     auth: true,
-    middlewares: [
-      verifyGroupMembership({isOwnerOrAdminMod: true})
-    ],
     handler: async (req, res) => {
-      const entityId = decodeEntityOrUserId(req, true);
+      const entityId = await decodeEntityAndVerifyAccess(req, true);
 
       const { total_expenses } = await SQL_GET_TOTAL_EXPENSES({
         entity_id: entityId,
