@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { sql } from '../../db';
 import Router from '../../router';
-import verifyGroupMembership, { decodeEntityOrUserId } from '../../utils';
+import { decodeEntityAndVerifyAccess } from '../../utils';
 import { entityIdParamsSchema } from '../users/schema';
 
 const SQL_GET_BALANCE = sql<
@@ -36,8 +36,8 @@ const getBalanceForAnEntity = (router: Router) => {
       }),
       query: z.object({
         from: z.string().optional(),
-        to: z.string().optional()
-        // pocket_id: z.string().optional()
+        to: z.string().optional(),
+        //pocket_id: z.number.optional()
       }).partial()
     },
     response: {
@@ -48,11 +48,8 @@ const getBalanceForAnEntity = (router: Router) => {
       }
     },
     auth: true,
-    middlewares: [
-      verifyGroupMembership({ isOwnerOrAdminMod: true })
-    ],
     handler: async (req, res) => {
-      const entityId = decodeEntityOrUserId(req, true);
+      const entityId = await decodeEntityAndVerifyAccess(req, true);
       const balance = await SQL_GET_BALANCE({
         entity_id: entityId,
         ...req.query

@@ -2,8 +2,9 @@ import Router from '../../router';
 import { sql } from '../../db';
 import { pocketSchema, Pocket } from './schema';
 import { z } from 'zod';
-import verifyGroupMembership, { decodeEntityOrUserId } from '../../utils';
+import { decodeEntityAndVerifyAccess } from '../../utils';
 import { entityIdParamsSchema } from '../users/schema';
+import { group } from 'node:console';
 
 type PocketCreationParams = Pick<
   Pocket,
@@ -74,7 +75,7 @@ const createPocket = (router: Router) => {
     summary: 'Create a pocket',
     request: {
       params: z.object({
-        entity_id: entityIdParamsSchema
+        entity_id: entityIdParamsSchema,
       }),
       body: pocketSchema.pick({
         category_id: true,
@@ -103,12 +104,8 @@ const createPocket = (router: Router) => {
       }
     },
     auth: true,
-    middlewares: [
-      verifyGroupMembership({ requiresGrpAdmin: true })
-    ],
     handler: async (req, res) => {
-      const m = req.params.entity_id;
-      const entityId = decodeEntityOrUserId(req);
+      const entityId =  await decodeEntityAndVerifyAccess(req);
       const pocket = await SQL_CREATE_POCKET({
         ...req.body,
         entity_id: entityId

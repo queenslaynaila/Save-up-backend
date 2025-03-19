@@ -1,7 +1,7 @@
 import Router from '../../router';
 import { sql } from '../../db';
 import { z } from 'zod';
-import verifyGroupMembership, { decodeEntityOrUserId } from '../../utils';
+import { decodeEntityAndVerifyAccess } from '../../utils';
 import { entityIdParamsSchema } from '../users/schema';
 import { pocketSchema } from './schema';
 
@@ -88,11 +88,8 @@ const getPocketsByEntity = (router: Router) => {
       }
     },
     auth: true,
-    middlewares: [
-      verifyGroupMembership({ isOwnerOrAdminMod: true })
-    ],
     handler: async (req, res) => {
-      const entityId = decodeEntityOrUserId(req);
+      const entityId = await decodeEntityAndVerifyAccess(req);
       const { xid, category_id, priority, status, start_date, end_date } = req.query;
 
       const pockets = await SQL_GET_POCKETS({

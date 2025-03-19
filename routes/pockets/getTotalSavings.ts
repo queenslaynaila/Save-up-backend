@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { sql } from '../../db';
 import Router from '../../router';
-import verifyGroupMembership, { decodeEntityOrUserId } from '../../utils';
+import  { decodeEntityAndVerifyAccess } from '../../utils';
 import { entityIdParamsSchema } from '../users/schema';
 
 const SQL_TOTAL_SAVINGS = sql<
@@ -59,11 +59,8 @@ const getTotalSavings = (router: Router) => {
       }
     },
     auth: true,
-    middlewares: [
-      verifyGroupMembership({ isOwnerOrAdminMod: true })
-    ],
     handler: async (req, res) => {
-      const entityId = decodeEntityOrUserId(req, true);
+      const entityId = await decodeEntityAndVerifyAccess(req, true);
       const limit = Number(req.query.limit);
       const { from, to } = req.query;
 

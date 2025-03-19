@@ -2,7 +2,7 @@ import Router from '../../router';
 import { sql } from '../../db';
 import HttpError from '../../httpError';
 import { z } from 'zod';
-import verifyGroupMembership, { decodeEntityOrUserId } from '../../utils';
+import { decodeEntityAndVerifyAccess } from '../../utils';
 import { entityIdParamsSchema } from '../users/schema';
 
 const SQL_DELETE_POCKET = sql<
@@ -24,11 +24,8 @@ const deletePocket = (router: Router) => {
       })
     },
     auth: true,
-    middlewares: [
-      verifyGroupMembership({ requiresGrpAdmin: true })
-    ],
     handler: async (req, res) => {
-      const entityId = decodeEntityOrUserId(req);
+      const entityId = await decodeEntityAndVerifyAccess(req);
       
       await SQL_DELETE_POCKET({
         entity_id: entityId,
