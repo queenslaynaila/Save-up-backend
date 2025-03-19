@@ -39,7 +39,7 @@ const updateElections = (router: Router) => {
       400: { schema: z.object({ message: z.string() }) }
     },
     auth: true,
-    middlewares: [verifyGroupMembership({requiredGroupRole:'Admin'})],
+    middlewares: [verifyGroupMembership({requiresGrpAdmin: true})],
     handler: async (req, res) => {
       const { election_id } = req.params;
       const { status, nomination_ends_at } = req.body;

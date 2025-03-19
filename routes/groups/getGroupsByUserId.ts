@@ -66,9 +66,7 @@ const getGroupsByUserId = (router: Router) => {
         schema: z.array(group)
       }
     },
-    authMiddlewareOptions: { 
-      isOwnerOrAdminMod: true 
-    },
+    auth: true,
     handler: async (req, res) => {
       const user_id = Number(req.params.user_id);
       const other_user_id = req.query.mutual_user_id

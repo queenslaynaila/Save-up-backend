@@ -46,7 +46,7 @@ const createWithdrawalRequest = (router: Router) => {
     middlewares: [
       verifyGroupMembership(
         {
-          requiredGroupRole: 'Member'
+          requiresGrpAdmin: true,
         }
       )
     ],

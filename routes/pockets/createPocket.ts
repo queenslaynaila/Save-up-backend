@@ -107,6 +107,7 @@ const createPocket = (router: Router) => {
       verifyGroupMembership({ requiresGrpAdmin: true })
     ],
     handler: async (req, res) => {
+      const m = req.params.entity_id;
       const entityId = decodeEntityOrUserId(req);
       const pocket = await SQL_CREATE_POCKET({
         ...req.body,

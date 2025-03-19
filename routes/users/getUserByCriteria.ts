@@ -37,9 +37,7 @@ const getUsersBySearchCriteria = (router: Router) => {
         schema: z.array(publicUserSchema)
       }
     },
-    authMiddlewareOptions: {
-      allowedRoles: [UserRole.Enum.Admin, UserRole.Enum.Moderator]
-    },
+    auth:true,
     handler: async (req, res) => {
       const { value } = req.query;
       const sanitizedValue = value.replace(/^ /, '+');
