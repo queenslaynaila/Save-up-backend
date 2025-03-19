@@ -1,19 +1,24 @@
 import Router from '../../router';
 import { sql } from '../../db';
 import { z } from 'zod';
-import verifyGroupMembership, { decodeEntityOrUserId } from '../../utils';
+import { decodeEntityAndVerifyAccess } from '../../utils';
 import { entityIdParamsSchema } from '../users/schema';
 
 const SQL_CREATE_SAVING = sql<
   {
-    entity_id: number,
-    amount: number,
-    pocket_id: number,
-    user_id: number
+    entity_id: number;
+    amount: number;
+    pocket_id: number;
+    user_id: number;
   },
   Record<string, never>
 >(`
-  SELECT create_saving(:entity_id, :user_id, :pocket_id, :amount)
+  SELECT create_saving(
+    :entity_id,
+    :user_id,
+    :pocket_id,
+    :amount
+  )
 `);
 
 const createSaving = (router: Router) => {
@@ -21,6 +26,7 @@ const createSaving = (router: Router) => {
     method: 'post',
     path: '/:entity_id/:pocket_id/deposit',
     summary: 'Deposit money to a pocket',
+    auth: true,
     request: {
       params: z.object({
         entity_id: entityIdParamsSchema,
@@ -30,10 +36,8 @@ const createSaving = (router: Router) => {
         amount: z.number().min(50)
       })
     },
-    auth: true,
-    middlewares: [verifyGroupMembership()],
     handler: async (req, res) => {
-      const entityId = decodeEntityOrUserId(req);
+      const entityId = await decodeEntityAndVerifyAccess(req);
 
       await SQL_CREATE_SAVING({
         entity_id: entityId,

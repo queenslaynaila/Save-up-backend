@@ -2,19 +2,26 @@ import { sql } from '../../db';
 import HttpError from '../../httpError';
 import Router from '../../router';
 import { z } from 'zod';
-import { verifyPin } from '../../utils';
-import { userIdParamsSchema } from '../users/schema';
+import { decodeEntityAndVerifyAccess, verifyPin } from '../../utils';
+import { entityIdParamsSchema } from '../users/schema';
 
 const withdrawalPayload = z.object({
-  pocket_id: z.number().min(1),
+  pocket_id: z.number().int(),
   amount: z.number().min(50),
-  user_id: z.number()
+  user_id: z.number().int()
 });
 
-type Withdrawal = z.infer<typeof withdrawalPayload>
+type Withdrawal = z.infer<typeof withdrawalPayload>;
 
-const SQL_CREATE_WITHDRAWAL = sql<Withdrawal, Record<string, never>>(`
-  SELECT withdraw_from_user_pocket(:user_id, :pocket_id, :amount);
+const SQL_CREATE_WITHDRAWAL = sql<
+  Pick<Withdrawal, 'user_id'|'pocket_id'|'amount'>,
+  Record<string, never>
+>(`
+  SELECT withdraw_from_user_pocket(
+    :user_id,
+    :pocket_id,
+    :amount
+  );
 `);
 
 const createWithdrawal = (router: Router) => {
@@ -22,38 +29,40 @@ const createWithdrawal = (router: Router) => {
     method: 'post',
     path: '/:user_id/:pocket_id/withdraw',
     summary: 'Withdraw from a user pocket',
+    auth: true,
     request: {
-      params: userIdParamsSchema.extend({
-        pocket_id: z.string().regex(/^[1-9]\d*$/)
+      params: z.object({
+        user_id: entityIdParamsSchema,
+        pocket_id: z.number()
       }),
-      body: withdrawalPayload.pick({
-        amount: true
-      }).extend({
-        pin: z.string().regex(/^\d{4}$/)
-      })
+      body: withdrawalPayload
+        .pick({
+          amount: true
+        })
+        .extend({
+          pin: z.string().regex(/^\d{4}$/)
+        })
     },
     response: {
       201: {}
     },
-    auth: true,
     middlewares: [verifyPin],
     handler: async (req, res) => {
-      const userId = Number(req.params.user_id);
-      const pocketId = Number(req.params.pocket_id);
+      const userId = await decodeEntityAndVerifyAccess(req, false, true);
 
       await SQL_CREATE_WITHDRAWAL({
-        pocket_id: pocketId,
-        amount: req.body.amount,
-        user_id: userId
-      }).exec().catch((err) => {
+        user_id: userId,
+        pocket_id: req.params.pocket_id,
+        amount: req.body.amount
+      }).exec().catch(err => {
         if (err.code === 'P0004') {
-          throw new HttpError(400, { 
-            message: 'ERR_INSUFFICIENT_FUNDS' 
+          throw new HttpError(400, {
+            message: 'ERR_INSUFFICIENT_FUNDS'
           });
         }
         if (err.code === 'P0005') {
-          throw new HttpError(400, { 
-            message: 'ERR_FUNDS_LOCKED' 
+          throw new HttpError(400, {
+            message: 'ERR_FUNDS_LOCKED'
           });
         }
         throw err;

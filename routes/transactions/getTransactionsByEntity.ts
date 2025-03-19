@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { sql } from '../../db';
 import Router from '../../router';
-import verifyGroupMembership, { decodeEntityOrUserId } from '../../utils';
+import  { decodeEntityAndVerifyAccess } from '../../utils';
 import { entityIdParamsSchema } from '../users/schema';
 
 const ENUM_TRANSACTION_TYPE = z.enum([
@@ -135,38 +135,35 @@ const getTransactions = (router: Router) => {
       }),
       query: z.object({
         slug: transactionTypeSchema.shape.slug,
-        pocket_id: z.string().optional(),
+        pocket_id: z.number().optional(),
         from: z.string().date().optional(),
         to: z.string().date().optional(),
-        limit: z.string().default('10')
+        limit: z.number().optional()
       }).partial()
     },
     response: {
       200: {
-        schema: z.array(transaction)
+        schema: z.array(transaction.pick({
+          xid: true,
+          slug:true,
+          member_name: true,
+          delta: true,
+          balance: true,
+          destination_pocket_name: true,
+          source_pocket_name: true,
+          created_at: true
+        }))
       }
     },
     auth: true,
-     middlewares: [
-      verifyGroupMembership({
-        isOwnerOrAdminMod: true
-      })
-    ],
     handler: async (req, res) => {
-      const entityId = decodeEntityOrUserId(req, true);
-      const pocket_id = req.query.pocket_id 
-      ? Number(req.query.pocket_id) 
-      : undefined;
-
-      const { slug, from, to, limit = '10' } = req.query;
-
+      const entityId = await decodeEntityAndVerifyAccess(req, true);
+      
+      const limit = req.query.limit ?? 10
       const transactions = await SQL_GET_TRANSACTIONS({
         entity_id: entityId,
-        pocket_id,
-        slug,
-        from,
-        to,
-        limit: Number(limit)
+        ...req.query,
+        limit
       }).many();
 
       res.json(transactions);
