@@ -4,9 +4,15 @@ import Router from '../../router';
 import { Invitation, invitationSchema } from './schema';
 
 const SQL_RESPOND_TO_INVITE = sql<
-Pick<Invitation, 'xid'|'group_id'|'status'|'receiver_id'>, 
-Record<string, never>>(`
-   SELECT update_invite(:xid, :group_id, :receiver_id, :status)
+  Pick<Invitation, 'xid' | 'group_id' | 'status' | 'receiver_id'>,
+  Record<string, never>
+>(`
+  SELECT update_invite(
+    :xid,
+    :group_id,
+    :receiver_id,
+    :status
+  )
 `);
 
 const updateInvites = (router: Router) => {
@@ -14,25 +20,23 @@ const updateInvites = (router: Router) => {
     method: 'patch',
     path: '/me/invitations/:xid',
     summary: 'Respond to a group invitation',
+    auth: true,
     request: {
       params: z.object({
-        xid: z.string()
+        xid: z.number()
       }),
       body: invitationSchema.pick({
         group_id: true,
         status: true
       })
     },
-    auth: true,
     handler: async (req, res) => {
-      const { group_id, status } = req.body;
-      const receiver_id = req.user!.id;
       await SQL_RESPOND_TO_INVITE({
-        xid: Number(req.params.xid),
-        group_id,
-        status,
-        receiver_id
+        xid: req.params.xid,
+        receiver_id: req.user!.id,
+        ...req.body
       }).exec();
+
       res.sendStatus(204);
     }
   });

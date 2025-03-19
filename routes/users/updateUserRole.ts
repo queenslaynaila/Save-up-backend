@@ -3,43 +3,53 @@ import { sql } from '../../db';
 import { UserRole } from './schema';
 import Router from '../../router';
 import HttpError from '../../httpError';
+import { decodeEntityAndVerifyAccess } from '../../utils';
 
 const convertToTitleCase = (str: string): string => {
   return str.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());
 };
 
-const SQL_UPDATE_ROLE = sql<{
-  targetUserId: number;
-  role: string;
-  adminId: number;
-}, Record<string,never>>(`
-  SELECT update_user_role(:targetUserId, :role, :adminId)
+const SQL_UPDATE_ROLE = sql<
+  {
+    targetUserId: number;
+    role: string;
+    adminId: number;
+  },
+  Record<string, never>
+>(`
+  SELECT update_user_role(
+    :targetUserId,
+    :role,
+    :adminId
+  )
 `);
 
 const updateUserRole = (router: Router) => {
   router.route({
     method: 'patch',
     path: '/:user_id/role',
-    summary: 'Update user role.Admin only',
+    summary: 'Update user role. Admin only',
+    auth: [UserRole.enum.Admin],
     request: {
       params: z.object({
-        user_id: z.string()
+        user_id: z.number()
       }),
       body: z.object({
         role: UserRole
       })
     },
-    auth: [UserRole.enum.Admin],
     handler: async (req, res) => {
+      const userId = await decodeEntityAndVerifyAccess(req, true);
       const role = convertToTitleCase(req.body.role);
-      const targetUserId = Number(req.params.user_id);
 
-      if (req.user!.id === targetUserId) {
-        throw new HttpError(403, { message: 'ERR_CANT_ACT_ON_SELF' });
+      if (req.user!.id === userId) {
+        throw new HttpError(403, {
+          message: 'ERR_CANT_ACT_ON_SELF'
+        });
       }
       
       await SQL_UPDATE_ROLE({
-        targetUserId,
+        targetUserId: userId,
         role,
         adminId: req.user!.id
       }).exec();

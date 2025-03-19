@@ -2,20 +2,26 @@ import Router from '../../router';
 import { sql } from '../../db';
 import { z } from 'zod';
 import { entityIdParamsSchema, invitationSchema } from './schema';
-import { decodeEntityOrUserId } from '../../utils';
+import { decodeEntityAndVerifyAccess } from '../../utils';
 
-const pendingInvitations = invitationSchema.pick({
-  xid: true,
-  group_id: true,
-  sender_id: true
-}).extend({
-  group_name: z.string(),
-  sender_name: z.string()
-});
+const pendingInvitations = invitationSchema
+  .pick({
+    xid: true,
+    group_id: true,
+    sender_id: true
+  })
+  .extend({
+    group_name: z.string(),
+    sender_name: z.string()
+  });
 
 type Invitations = z.infer<typeof pendingInvitations>;
 
-const SQL_GET_PENDING_INVITATIONS = sql<{user_id:number}, Invitations>(`
+const SQL_GET_PENDING_INVITATIONS = sql<
+  { user_id: number },
+  Pick<Invitations,
+    'group_id' | 'xid' | 'group_name' | 'sender_id' | 'sender_name'>
+>(`
   SELECT 
     invitations.xid,
     invitations.group_id,
@@ -23,10 +29,12 @@ const SQL_GET_PENDING_INVITATIONS = sql<{user_id:number}, Invitations>(`
     invitations.sender_id,
     user_contact_details.full_name AS sender_name
   FROM invitations
-  JOIN groups ON invitations.group_id = groups.id
-  JOIN user_contact_details ON invitations.sender_id = user_contact_details.id
+  JOIN groups 
+    ON invitations.group_id = groups.id
+  JOIN user_contact_details 
+    ON invitations.sender_id = user_contact_details.id
   WHERE invitations.receiver_id = :user_id
-  AND invitations.status = 'Pending'
+    AND invitations.status = 'Pending'
 `);
 
 const getInvites = (router: Router) => {
@@ -34,24 +42,33 @@ const getInvites = (router: Router) => {
     method: 'get',
     path: '/:user_id/invitations',
     summary: 'Get pending invitations for a user',
-    request:{
+    auth: true,
+    request: {
       params: z.object({
         user_id: entityIdParamsSchema
-      }),
+      })
     },
     response: {
       200: {
-        schema: pendingInvitations.array()
+        schema: z.array(pendingInvitations.pick({
+          group_id: true,
+          xid: true,
+          sender_id: true,
+          sender_name: true,
+          group_name: true
+        }))
       }
     },
-    auth:true,
     handler: async (req, res) => {
-      const userId = decodeEntityOrUserId(req, true);;
-      const receivedInvites = await SQL_GET_PENDING_INVITATIONS({
+      const userId = await decodeEntityAndVerifyAccess(req, true);
+      
+      const invites = await SQL_GET_PENDING_INVITATIONS({
         user_id: userId
       }).many();
-      return res.json(receivedInvites);
+
+      return res.json(invites);
     }
   });
 };
+
 export default getInvites;

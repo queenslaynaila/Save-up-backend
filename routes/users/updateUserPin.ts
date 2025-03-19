@@ -4,7 +4,13 @@ import { sql } from '../../db';
 import Router from '../../router';
 import { verifyPin } from '../../utils';
 
-const SQL_UPDATE_PIN = sql<{ pin: string; id: number },Record<string, never>>(`
+const SQL_UPDATE_PIN = sql<
+  {
+    pin: string;
+    id: number;
+  },
+  Record<string, never>
+>(`
   UPDATE users 
   SET pin = :pin 
   WHERE id = :id
@@ -16,13 +22,13 @@ const updateUserPin = (router: Router) => {
     path: '/me/pin',
     summary: 'Update user PIN',
     description: 'Update authenticated user\'s PIN',
+    auth: true,
     request: {
       body: z.object({
         pin: z.string().regex(/^\d{4}$/),
         new_pin: z.string().regex(/^\d{4}$/)
       })
     },
-    auth: true,
     middlewares: [verifyPin],
     handler: async (req, res) => {
       const hashedNewPin = await bcrypt.hash(req.body.new_pin, 10);
