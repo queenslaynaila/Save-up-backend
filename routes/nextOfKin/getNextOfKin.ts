@@ -4,7 +4,7 @@ import { NextOfKin, nextOfKinPublicViewSchema } from './createNextOfKin';
 import { z } from 'zod';
 import HttpError from '../../httpError';
 import { entityIdParamsSchema, userIdParamsSchema, UserRole } from '../users/schema';
-import { decodeEntityOrUserId } from '../../utils';
+import { decodeEntityAndVerifyAccess } from '../../utils';
 
 const SQL_GET_KIN = sql<
   { 
@@ -49,7 +49,7 @@ const getNextOfKin = (router: Router) => {
     },
     auth: true,
     handler: async (req, res) => {
-      const userId = decodeEntityOrUserId(req, true);;
+      const userId = await decodeEntityAndVerifyAccess(req, true);;
       const { include_history = 'false' } = req.query;
 
       if (req.user!.role === UserRole.Enum.Standard && include_history === 'true') {
