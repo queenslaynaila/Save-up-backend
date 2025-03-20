@@ -49,9 +49,9 @@ const updateExpense = (router: Router) => {
     handler: async (req, res) => {
       const entityId = await decodeEntityAndVerifyAccess(req);
       const expense = await SQL_UPDATE_EXPENSE({
-        ...req.body,
         entity_id: entityId, 
-        xid: req.params.xid 
+        xid: req.params.xid,
+        ...req.body,
       }).one(new HttpError(404));
       res.json(expense);
     }

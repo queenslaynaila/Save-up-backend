@@ -4,7 +4,9 @@ import { z } from 'zod';
 import { decodeEntityAndVerifyAccess } from '../../utils';
 import { entityIdParamsSchema } from '../users/schema';
 
-const SQL_DELETE_EXPENSE = sql<{xid:number, entity_id:number}, Record<string, never>>(`
+const SQL_DELETE_EXPENSE = sql<
+{xid:number, entity_id:number}, 
+Record<string, never>>(`
   UPDATE expenses
   SET deleted_at = NOW()
   WHERE xid = :xid

@@ -17,7 +17,8 @@ export type ExpenseCreationParams = z.infer<typeof expenseCreationParams>
 
 const SQL_CREATE_EXPENSES = sql<
   ExpenseCreationParams,
-  Pick<Expense, 'entity_id' | 'xid' | 'category_id' | 'description' | 'amount' | 'spent_at' | 'created_at'>
+  Pick<Expense, 'entity_id' | 'xid' | 'category_id' | 'description' 
+  | 'amount' | 'spent_at' | 'created_at'>
 >(`
   INSERT INTO expenses (entity_id, xid, category_id, description, amount, spent_at)
   SELECT 
@@ -59,9 +60,7 @@ const createExpense = (router: Router) => {
       const expense = await SQL_CREATE_EXPENSES({
         ...req.body,
         entity_id: entityId
-      }).one().catch((err) => {
-        throw  err;
-      });
+      }).one();
       return res.json(expense);
     }
   });
