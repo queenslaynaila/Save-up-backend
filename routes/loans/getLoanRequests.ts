@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import Router from '../../router';
 import { sql } from '../../db';
-import verifyGroupMembership from '../../utils';
+import { decodeEntityAndVerifyAccess } from '../../utils';
 
 const guarantorSchema = z.object({
   id: z.number(),
@@ -42,7 +42,7 @@ const getLoanRequests = (router: Router) => {
     summary: 'Get loan request',
     request: {
       params: z.object({
-        group_id: z.string().regex(/^[1-9]\d*$/)
+        group_id: z.number()
       })
     },
     response: {
@@ -51,14 +51,10 @@ const getLoanRequests = (router: Router) => {
       }
     },
     auth: true,
-    middlewares: [
-      verifyGroupMembership({
-        isOwnerOrAdminMod: true
-      })
-    ],
     handler: async (req, res) => {
+      const groupId = await decodeEntityAndVerifyAccess(req, true)
       await SQL_GET_LOANS({
-        group_id: parseInt(req.params.group_id),
+        group_id: groupId,
         ...req.body
       }).exec();
       res.sendStatus(201);
