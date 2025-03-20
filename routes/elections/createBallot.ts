@@ -2,16 +2,26 @@ import Router from '../../router';
 import { sql } from '../../db';
 import { z } from 'zod';
 import HttpError from '../../httpError';
-import { group } from 'console';
-import e from 'express';
+import { decodeEntityAndVerifyAccess } from '../../utils';
 
-const SQL_CREATE_BALLOT = sql< {
-    group_id: number;
-    election_id: number;
-    candidate_ids: number[];
-    user_id: number;
-}, Record<string, never>>(`
-  SELECT create_ballot(:group_id, :election_id, :candidate_ids, :user_id)
+const ballotParamsSchema = z.object({
+  group_id: z.number(),
+  election_id: z.number(),
+  candidate_ids: z.array(z.number()).min(1).max(3),
+  user_id: z.number()
+});
+
+type BallotParams = z.infer<typeof ballotParamsSchema>;
+
+const SQL_CREATE_BALLOT = sql<
+Pick<BallotParams, 'group_id'|'election_id'|'candidate_ids'|'user_id'>, 
+Record<string, never>>(`
+  SELECT create_ballot(
+    :group_id,
+    :election_id,
+    :candidate_ids,
+    :user_id
+  )
 `);
 
 const createBallot = (router: Router) => {
@@ -19,51 +29,46 @@ const createBallot = (router: Router) => {
     method: 'post',
     path: '/:group_id/elections/:election_id/ballots',
     summary: 'Submit a vote for a candidate in an election',
+    auth: true,
     request: {
-      params: z.object({
-        election_id: z.string(),
-        group_id: z.string()
+      params: ballotParamsSchema.pick({
+        group_id: true,
+        election_id: true
       }),
-      body: z.object({
-        candidate_ids: z.array(z.number()).min(1).max(3) 
+      body: ballotParamsSchema.pick({
+        candidate_ids: true
       })
     },
-    response: {
-      201: {}
-    },
-    auth: true,
     handler: async (req, res) => {
+      const groupId = await decodeEntityAndVerifyAccess(req);
+      
       await SQL_CREATE_BALLOT({
-        election_id: Number(req.params.election_id),
-        group_id: Number(req.params.group_id),
-        candidate_ids: req.body.candidate_ids,
-        user_id: req.user!.id
-      }).exec().catch(err=>{
+        group_id: groupId,
+        election_id: req.params.election_id,
+        user_id: req.user!.id,
+        ...req.body
+      }).exec().catch(err => {
         if (err.code === '23505') {
-            throw new HttpError(409, { message: 'ERR_DUPLICATE_VOTE' });
+          throw new HttpError(409, {
+            message: 'ERR_DUPLICATE_VOTE'
+          });
         }
         if (err.code === 'P0007') {
-          throw new HttpError(401, { message: 'ERR_ELECTION_CLOSED' });
+          throw new HttpError(401, {
+            message: 'ERR_ELECTION_CLOSED'
+          });
         }
         if (err.code === 'P0003') {
-          throw new HttpError(401, { message: 'ERR_MAX_VOTE_CAST' });
+          throw new HttpError(401, {
+            message: 'ERR_MAX_VOTE_CAST'
+          });
         }
         throw err;
       });
+
       res.sendStatus(201);
     }
   });
 };
 
 export default createBallot;
-
-
-// /saveup/elections/{group_id}                     Create a new group election 
-// /saveup/elections/{group_id}                       Get list of elections for a group
-// /saveup/elections/{group_id}/{election_id}            Update an existsing group election 
-// /saveup/elections/{group_id}/{election_id}/candidates  Create candidates for an open election
-// /saveup/elections/{group_id}/{election_id}/candidates  Get list of candidates for an election
-
-// /saveup/elections/{group_id}/{election_id}/ballots  Vote for a candidate in an election post
-// /saveup/elections/{group_id}/{election_id}/results  View an election result progress get 
-// /saveup/elections/{group_id}/{election_id}/ratifications  Ratification of election results post 

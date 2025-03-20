@@ -3,7 +3,7 @@ import { sql } from '../../db';
 import { z } from 'zod';
 import HttpError from '../../httpError';
 import { candidateSchema } from './schema';
-import verifyGroupMembership from '../../utils';
+import { decodeEntityAndVerifyAccess } from '../../utils';
 
 const candidateParams = candidateSchema.pick({
   group_id: true,
@@ -15,7 +15,9 @@ const candidateParams = candidateSchema.pick({
 
 type CandidatesParams = z.infer<typeof candidateParams>;
 
-const SQL_CREATE_CANDIDATE = sql<CandidatesParams, Record<string, never>>(`
+const SQL_CREATE_CANDIDATE = sql<
+Pick<CandidatesParams, 'group_id'|'election_id'|'candidate_ids'|'user_id'>, 
+Record<string, never>>(`
   SELECT create_candidates(:group_id, :election_id, :candidate_ids, :user_id);
 `);
 
@@ -26,33 +28,44 @@ const createCandidates = (router: Router) => {
     summary: 'Create candidates for an open election',
     request: {
       params: z.object ({
-        election_id: z.string(),
-        group_id: z.string()
+        group_id: z.number(),
+        election_id: z.number()
       }),
       body: candidateParams.pick({
         candidate_ids: true
       })
     },
     auth: true,
-    middlewares: [verifyGroupMembership()],
     handler: async (req, res) => {
+      const groupId = await decodeEntityAndVerifyAccess(req)
       await SQL_CREATE_CANDIDATE({
-        group_id: Number(req.params.group_id),
-        election_id: Number(req.params.election_id),
-        candidate_ids: req.body.candidate_ids,
-        user_id: req.user!.id
+        group_id: groupId,
+        election_id: req.params.election_id,
+        user_id: req.user!.id,
+        ...req.body
       }).exec().catch(err=>{
         if (err.code === '23505') {
-          throw new HttpError(409, { message: 'ERR_CANDIDATE_ALREADY_NOMINATED' });
+          throw new HttpError(
+            409, 
+            { message: 'ERR_CANDIDATE_ALREADY_NOMINATED' }
+          );
         }
         if (err.code === 'P0007') {
-          throw new HttpError(401, { message: 'ERR_ELECTION_CLOSED' });
+          throw new HttpError(
+            401, 
+            { message: 'ERR_ELECTION_CLOSED' });
         }
         if (err.code === 'P0009') {
-          throw new HttpError(401, { message: 'ERR_NOMINATION_ENDED' });
+          throw new HttpError(
+            401, 
+            { message: 'ERR_NOMINATION_ENDED' }
+          );
         }
         if (err.code === 'P0003') {
-          throw new HttpError(401, { message: 'ERR_NOMINATION_ATTEMPTS_EXHAUSTED' });
+          throw new HttpError(
+            401, 
+            { message: 'ERR_NOMINATION_ATTEMPTS_EXHAUSTED' }
+          );
         }
         throw err;
        });

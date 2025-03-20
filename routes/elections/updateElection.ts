@@ -2,7 +2,7 @@ import Router from '../../router';
 import { sql } from '../../db';
 import { z } from 'zod';
 import HttpError from '../../httpError';
-import verifyGroupMembership from '../../utils';
+import { decodeEntityAndVerifyAccess } from '../../utils';
 
 const updateElectionSchema= z.object({
   group_id: z.number(),
@@ -27,7 +27,7 @@ const updateElections = (router: Router) => {
     request: {
       params: z.object({
         group_id: z.number(),
-        election_id: z.string()
+        election_id: z.number()
       }),
       body: z.object({
         status: z.enum(['Open', 'Cancelled']).optional(),
@@ -39,14 +39,14 @@ const updateElections = (router: Router) => {
       400: { schema: z.object({ message: z.string() }) }
     },
     auth: true,
-    middlewares: [verifyGroupMembership({requiresGrpAdmin: true})],
     handler: async (req, res) => {
+      const groupId = await decodeEntityAndVerifyAccess(req, true)
       const { election_id } = req.params;
       const { status, nomination_ends_at } = req.body;
 
       await SQL_UPDATE_ELECTION({
-        group_id:Number(req.params.group_id),
-        election_id: parseInt(election_id),
+        group_id:groupId,
+        election_id: req.params.election_id,
         status: status ?? null,
         nomination_ends_at: nomination_ends_at ?? null,
         user_id: req.user!.id

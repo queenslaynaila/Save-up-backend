@@ -1,7 +1,7 @@
 import Router from '../../router';
 import { sql } from '../../db';
 import { z } from 'zod';
-import verifyGroupMembership from '../../utils';
+import { decodeEntityAndVerifyAccess } from '../../utils';
 import { ElectionStatus, ElectionType } from './schema';
 
 const adminSchema = z.object({
@@ -52,7 +52,14 @@ const SQL_GET_ONGOING_ELECTION = sql<{group_id:number; user_id:number}, OngoingE
     LEFT JOIN user_contact_details AS admin_details
         ON group_admins.user_id = admin_details.id
     WHERE elections.group_id = p_group_id
-    GROUP BY elections.group_id, elections.xid, elections.type, elections.status, elections.initiator_id, user_contact_details.full_name, elections.nomination_ends_at, elections.created_at;
+    GROUP BY elections.group_id, 
+              elections.xid, 
+              elections.type, 
+              elections.status, 
+              elections.initiator_id, 
+              user_contact_details.full_name, 
+              elections.nomination_ends_at, 
+              elections.created_at;
 `);
 
 const getGroupElectionList = (router: Router) => {
@@ -62,7 +69,7 @@ const getGroupElectionList = (router: Router) => {
     summary: 'Get list of elections for a group',
     request: {
       params: z.object({
-        group_id: z.string()
+        group_id: z.number()
       })
     },
     response: {
@@ -71,12 +78,10 @@ const getGroupElectionList = (router: Router) => {
       }
     },
     auth: true,
-    middlewares: [
-      verifyGroupMembership({isOwnerOrAdminMod: true})
-    ],
     handler: async (req, res) => {
+      const groupId = await decodeEntityAndVerifyAccess(req, true)
       const election = await SQL_GET_ONGOING_ELECTION({
-        group_id: parseInt(req.params.group_id),
+        group_id: groupId,
         user_id: req.user!.id
       }).many();
       res.json(election);

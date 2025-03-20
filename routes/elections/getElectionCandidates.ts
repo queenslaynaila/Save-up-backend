@@ -1,8 +1,11 @@
 import Router from '../../router';
 import { sql } from '../../db';
 import { z } from 'zod';
-import verifyGroupMembership from '../../utils';
-import { candidatesSchema, Candidates } from './getGroupElectionResults';
+import { 
+  candidatesSchema, 
+  Candidates 
+} from './getGroupElectionResults';
+import { decodeEntityAndVerifyAccess } from '../../utils';
 
 const SQL_GET_CANDIDATES = sql<
   {
@@ -28,10 +31,8 @@ const getCandidates = (router: Router) => {
     summary: 'Retrieves all candidates nominated for a specific election.',
     request: {
       params: z.object({
-        election_id: z.string()
-          .regex(/^[1-9]\d*$/),
-        group_id: z.string()
-          .regex(/^[1-9]\d*$/)
+        group_id: z.number(),
+        election_id: z.number(),
       })
     },
     response: {
@@ -40,15 +41,11 @@ const getCandidates = (router: Router) => {
       }
     },
     auth: true,
-    middlewares: [
-      verifyGroupMembership({ 
-        isOwnerOrAdminMod: true
-      })
-    ],
     handler: async (req, res) => {
+      const groupId = await decodeEntityAndVerifyAccess(req, true)
       const candidates = await SQL_GET_CANDIDATES({
-        election_id: Number(req.params.election_id),
-        group_id: Number(req.params.group_id)
+        group_id: groupId,
+        election_id:req.params.election_id,
       }).many();
 
       return res.json(candidates);

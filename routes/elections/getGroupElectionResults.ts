@@ -3,6 +3,7 @@ import { sql } from '../../db';
 import { z } from 'zod';
 import HttpError from '../../httpError';
 import { electionSchema } from './schema';
+import { decodeEntityAndVerifyAccess } from '../../utils';
 
 const electionParams = electionSchema.pick({
   group_id: true,
@@ -28,8 +29,8 @@ const getGroupElectionResults = (router: Router) => {
     summary: 'View an election result progress',
     request: {
         params: z.object({
-            election_id: z.string(),
-            group_id: z.string()
+            election_id: z.number(),
+            group_id: z.number()
         })
     },
     response: {
@@ -39,9 +40,10 @@ const getGroupElectionResults = (router: Router) => {
     },
     auth: true,
     handler: async (req, res) => {
+      const groupId = await decodeEntityAndVerifyAccess(req, true)
       const results = await SQL_GET_ELECTION_RESULTS({
-        xid: Number(req.params.election_id),
-        group_id: Number(req.params.group_id), 
+        xid:req.params.election_id,
+        group_id:groupId, 
         initiator_id: req.user!.id
       }).many().catch((err) => {
          if (err.code === 'P0007') {
