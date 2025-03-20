@@ -5,6 +5,6 @@ export const groupsSchema = z.object({
   name: z.string(),
   creator_id: z.number().int(),
   created_at: z.string().datetime(),
-  deleted_at: z.string().date().optional()
+  deleted_at: z.string().datetime().optional()
 });
 export type Group = z.infer<typeof groupsSchema>;
