@@ -25,9 +25,6 @@ const deleteExpense = (router: Router) => {
         xid: z.number()
       })
     },
-    response: {
-      204: {}
-    },
     auth: true,
     handler: async (req, res) => {
       const entityId =  await decodeEntityAndVerifyAccess(req);

@@ -167,20 +167,15 @@ function hasAdminPermissions(userRole:Role, isOwnerOrAdminMod: boolean): boolean
   return isOwnerOrAdminMod && ADMIN_LIKE_ROLES.includes(userRole);
 }
 
-
 function checkGroupMembership(is_member: boolean, is_admin_member: boolean, requiresGrpAdmin: boolean) {
   if (!is_member) throw new HttpError(403);
   if (requiresGrpAdmin && !is_admin_member) throw new HttpError(403);
 }
 
-type ExactlyOne<T, Keys extends keyof T = keyof T> = {
-  [K in Keys]: Required<Pick<T, K>> & Partial<Record<Exclude<Keys, K>, never>>;
-}[Keys];
-
 type RequestParams =
-  | ExactlyOne<{ entity_id: number | "me"; user_id?: never; group_id?: never; member_id?: never }>
-  | ExactlyOne<{ user_id: number | "me"; entity_id?: never; group_id?: never; member_id?: never }>
-  | ({ group_id: number } & { entity_id?: never; user_id?: never } & { member_id?: number | "me" });
+  | { entity_id: number | "me"; user_id?: never; group_id?: never; member_id?: never }
+  | { user_id: number | "me"; entity_id?: never; group_id?: never; member_id?: never } 
+  | { group_id: number; entity_id?: never; user_id?: never; member_id?: number | "me" };
 
 
 export async function decodeEntityAndVerifyAccess(

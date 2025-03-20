@@ -10,8 +10,10 @@ import  { decodeEntityAndVerifyAccess } from '../../utils';
 import { ExpenseCreationParams } from './createExpense';
 
 const SQL_UPDATE_EXPENSE = sql<
-ExpenseCreationParams & {xid:number},
-Pick<Expense, 'entity_id'|'xid'|'category_id'|'description'|'amount'|'spent_at'|'created_at'>>(`
+Pick<ExpenseCreationParams,'entity_id'|'category_id'|
+'amount'|'description'|'spent_at'> & {xid: number},
+Pick<Expense, 'entity_id'|'xid'|'category_id'|'description'|
+'amount'|'spent_at'|'created_at'>>(`
   UPDATE expenses
   SET description = COALESCE(:description, expenses.description),
       category_id = COALESCE(:category_id, expenses.category_id),

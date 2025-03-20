@@ -40,7 +40,7 @@ const createExpense = (router: Router) => {
     summary: 'Create an expense',
     request: {
       params: z.object({
-        entity_id: entityIdParamsSchema
+        entity_id: entityIdParamsSchema,
       }),
       body: expenseSchema.pick({
         category_id: true,

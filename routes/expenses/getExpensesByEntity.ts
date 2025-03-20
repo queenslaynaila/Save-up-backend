@@ -10,7 +10,7 @@ import { entityIdParamsSchema } from '../users/schema';
 
 const SQL_GET_EXPENSES = sql<{
   entity_id: number;
-  category_id?: string;
+  category_id?:number;
   spent_from?: string;
   spent_to?: string;
   start_date?: string;
@@ -27,11 +27,11 @@ Pick<Expense, 'entity_id'|'xid'|'category_id'|'description'|'amount'|'created_at
   FROM expenses 
   WHERE deleted_at IS NULL
     AND entity_id = :entity_id
-    AND (:category_id::INT IS NULL OR category_id = :category_id)
-    AND (:spent_from::DATE IS NULL OR DATE(spent_at) >= :spent_from)
-    AND (:spent_to::DATE IS NULL OR DATE(spent_at) <= :spent_to)
-    AND (:start_date::DATE IS NULL OR DATE(created_at) >= :start_date)
-    AND (:end_date::DATE IS NULL OR DATE(created_at) <= :end_date)
+    AND (:category_id IS NULL OR category_id = :category_id)
+    AND (:spent_from IS NULL OR DATE(spent_at) >= :spent_from)
+    AND (:spent_to IS NULL OR DATE(spent_at) <= :spent_to)
+    AND (:start_date IS NULL OR DATE(created_at) >= :start_date)
+    AND (:end_date IS NULL OR DATE(created_at) <= :end_date)
   LIMIT 15
 `);
 
@@ -45,7 +45,7 @@ const getExpensesByEntity = (router: Router) => {
         entity_id: entityIdParamsSchema
       }),
       query: z.object({
-        category_id: z.string().regex(/^\d+$/).optional(),
+        category_id: z.number().optional(),
         spent_from: z.string().date().optional(),
         spent_to: z.string().date().optional(),
         start_date: z.string().date().optional(),
