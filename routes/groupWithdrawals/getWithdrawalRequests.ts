@@ -1,8 +1,8 @@
 import Router from '../../router';
 import { sql } from '../../db';
 import { z } from 'zod';
-import verifyGroupMembership from '../../utils';
 import logger from '../../logger';
+import { decodeEntityAndVerifyAccess } from '../../utils';
 
 const Approval = z.object({
   user_id: z.string(),
@@ -139,10 +139,8 @@ const getGrpDebitRequests = (router: Router) => {
     summary: 'Get withdrawal requests for a group pocket',
     request: {
       params: z.object({
-        group_id: z.string()
-          .regex(/^[1-9]\d*$/),
-        pocket_id: z.string()
-          .regex(/^[1-9]\d*$/)
+        group_id: z.number(),
+        pocket_id: z.number()
       })
     },
     response: {
@@ -151,15 +149,11 @@ const getGrpDebitRequests = (router: Router) => {
       }
     },
     auth: true,
-    middlewares: [verifyGroupMembership(
-      {isOwnerOrAdminMod: true}
-    )
-    ],
     handler: async (req, res) => {
-      logger.info('Fetching group debit requests');
+      const groupId = await decodeEntityAndVerifyAccess(req,true)
       const withdrawals = await SQL_GET_GROUP_WITHDRAWALS({
-        group_id: Number(req.params.group_id),
-        pocket_id: Number(req.params.pocket_id),
+        group_id: groupId,
+        pocket_id: req.params.pocket_id,
         user_id: req.user!.id
       }).many();
 

@@ -2,8 +2,8 @@ import Router from '../../router';
 import { sql } from '../../db';
 import HttpError from '../../httpError';
 import { z } from 'zod';
-import verifyGroupMembership from '../../utils';
 import logger from '../../logger';
+import { decodeEntityAndVerifyAccess } from '../../utils';
 
 const withdrawalSchema = z.object({
   reason: z.string(),
@@ -37,27 +37,18 @@ const createWithdrawalRequest = (router: Router) => {
     },
     request: {
       params: z.object({
-        group_id: z.string().regex(/^[1-9]\d*$/),
-        pocket_id: z.string().regex(/^[1-9]\d*$/)
+        group_id: z.number(),
+        pocket_id: z.number()
       }),
       body: withdrawalSchema
     },
     auth: true,
-    middlewares: [
-      verifyGroupMembership(
-        {
-          requiresGrpAdmin: true,
-        }
-      )
-    ],
     handler: async (req, res) => {
-      logger.info('Creating group debit request');
-      const groupId = parseInt(req.params.group_id, 10);
-      const pocketId = parseInt(req.params.pocket_id, 10);
+      const groupId = await decodeEntityAndVerifyAccess(req, false, true)
         await SQL_INITIATE_GRP_WITHDRAWAL({
           ...req.body,
           group_id: groupId,
-          pocket_id: pocketId,
+          pocket_id: req.params.pocket_id,
           initiator_id: req.user!.id
         }).exec().catch (err => {
         if (err.code === 'P0001') {
