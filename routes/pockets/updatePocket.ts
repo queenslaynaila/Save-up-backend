@@ -82,7 +82,7 @@ const updatePocket = (router: Router) => {
     },
     auth: true,
     handler: async (req, res) => {
-      const entityId = await decodeEntityAndVerifyAccess(req, true);
+      const entityId = await decodeEntityAndVerifyAccess(req);
       const pocket = await SQL_UPDATE_POCKET({
         xid: req.params.xid,
         entity_id: entityId,
