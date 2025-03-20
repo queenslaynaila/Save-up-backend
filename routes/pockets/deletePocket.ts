@@ -6,7 +6,10 @@ import { decodeEntityAndVerifyAccess } from '../../utils';
 import { entityIdParamsSchema } from '../users/schema';
 
 const SQL_DELETE_POCKET = sql<
-  { pocket_id: number; entity_id: number },
+  { 
+    pocket_id: number; 
+    entity_id: number 
+  },
   Record<string, never>
 >(`
   SELECT delete_pocket(:entity_id, :pocket_id)
@@ -25,7 +28,7 @@ const deletePocket = (router: Router) => {
     },
     auth: true,
     handler: async (req, res) => {
-      const entityId = await decodeEntityAndVerifyAccess(req);
+      const entityId = await decodeEntityAndVerifyAccess(req, false, true);
       
       await SQL_DELETE_POCKET({
         entity_id: entityId,

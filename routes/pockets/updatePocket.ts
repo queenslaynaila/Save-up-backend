@@ -1,40 +1,28 @@
 import Router from '../../router';
 import { sql } from '../../db';
 import { z } from 'zod';
-import { pocketSchema } from './schema';
+import { Pocket, pocketSchema } from './schema';
 import { decodeEntityAndVerifyAccess } from '../../utils';
 import { entityIdParamsSchema } from '../users/schema';
 
-const pocketParams = pocketSchema
-  .pick({
-    category_id: true,
-    name: true,
-    priority: true,
-    pocket_type: true,
-    target_amount: true,
-    target_at: true
-  })
-  .partial();
-
-const pocketPatchParams = pocketSchema
-  .partial()
-  .extend({
+const pocketPatchParams = pocketSchema.pick({
+  category_id: true,
+  name: true,
+  priority: true,
+  pocket_type: true,
+  target_amount: true,
+  target_at: true
+  }).partial().extend({
     entity_id: z.number().int(),
     xid: z.number().int()
   });
 
 type PocketPatchParams = z.infer<typeof pocketPatchParams>;
 
-const pocket = pocketParams
-  .extend({
-    entity_id: z.number().int()
-  });
-
-type Pocket = z.infer<typeof pocket>;
-
 const SQL_UPDATE_POCKET = sql<
 PocketPatchParams, 
-Pocket>(`
+Pick<Pocket, 'name'|'category_id'|'pocket_type'|'target_amount'|'priority'|'target_at'> 
+& {category_name:string}>(`
   UPDATE pockets
   SET name = COALESCE(:name, name),
       category_id = COALESCE(:category_id, category_id),
@@ -93,7 +81,6 @@ const updatePocket = (router: Router) => {
       }
     },
     auth: true,
-
     handler: async (req, res) => {
       const entityId = await decodeEntityAndVerifyAccess(req, true);
       const pocket = await SQL_UPDATE_POCKET({

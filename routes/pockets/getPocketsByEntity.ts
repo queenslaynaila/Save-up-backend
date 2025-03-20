@@ -5,7 +5,24 @@ import { decodeEntityAndVerifyAccess } from '../../utils';
 import { entityIdParamsSchema } from '../users/schema';
 import { pocketSchema } from './schema';
 
-const pocketParamsSchema = pocketSchema
+const pocketFilterParams = pocketSchema
+  .pick({
+    entity_id: true,
+    xid: true,
+    category_id: true,
+    priority: true,
+    status: true
+  })
+  .extend({
+    start_date: z.string().date().optional(),
+    end_date: z.string().date().optional()
+  })
+  .partial()
+  .required({ entity_id: true });
+
+type PocketFilters = z.infer<typeof pocketFilterParams>;
+
+const pocketReturnSchema = pocketSchema
   .pick({
     xid: true,
     name: true,
@@ -20,32 +37,9 @@ const pocketParamsSchema = pocketSchema
     category_name: z.string()
   });
 
-type Pocket = z.infer<typeof pocketParamsSchema>;
+type PocketReturn = z.infer<typeof pocketReturnSchema>;
 
-const pocketQueryParams = pocketParamsSchema
-  .pick({
-    priority: true,
-    status: true
-  })
-  .extend({
-    xid: z.string(),
-    category_id: z.string(),
-    start_date: z.string(),
-    end_date: z.string()
-  }).partial();
-
-const SQL_GET_POCKETS = sql<
-  {
-    entity_id: number;
-    xid?: string;
-    category_id?: string;
-    priority?: string;
-    status?: string;
-    start_date?: string;
-    end_date?: string
-  },
-  Pocket
->(`
+const SQL_GET_POCKETS = sql<PocketFilters, PocketReturn>(`
   SELECT 
     pockets.xid,
     pockets.name,
@@ -63,12 +57,12 @@ const SQL_GET_POCKETS = sql<
   FROM pockets
   WHERE pockets.deleted_at IS NULL
     AND pockets.entity_id = :entity_id
-    AND (:xid::INT IS NULL OR pockets.xid = :xid)
-    AND (:category_id::INT IS NULL OR pockets.category_id = :category_id)
+    AND (:xid IS NULL OR pockets.xid = :xid)
+    AND (:category_id IS NULL OR pockets.category_id = :category_id)
     AND (:priority::enum_priority IS NULL OR pockets.priority = :priority)
     AND (:status::enum_status IS NULL OR pockets.status = :status)
-    AND (:start_date::DATE IS NULL OR DATE(pockets.created_at) >= :start_date)
-    AND (:end_date::DATE IS NULL OR DATE(pockets.created_at) <= :end_date)
+    AND (:start_date IS NULL OR DATE(pockets.created_at) >= :start_date)
+    AND (:end_date IS NULL OR DATE(pockets.created_at) <= :end_date)
 `);
 
 const getPocketsByEntity = (router: Router) => {
@@ -80,26 +74,28 @@ const getPocketsByEntity = (router: Router) => {
       params: z.object({
         entity_id: entityIdParamsSchema
       }),
-      query: pocketQueryParams
+      query: pocketSchema.pick({
+        priority: true,
+        status: true,
+        xid: true,
+        category_id:true
+      }).extend({
+        start_date: z.string().date(),
+        end_date: z.string().date()
+      }).partial()
     },
     response: {
       200: {
-        schema: z.array(pocketParamsSchema)
+        schema: z.array(pocketReturnSchema)
       }
     },
     auth: true,
     handler: async (req, res) => {
-      const entityId = await decodeEntityAndVerifyAccess(req);
-      const { xid, category_id, priority, status, start_date, end_date } = req.query;
+      const entityId = await decodeEntityAndVerifyAccess(req, true);
 
       const pockets = await SQL_GET_POCKETS({
         entity_id: entityId,
-        xid,
-        category_id,
-        priority,
-        status,
-        start_date,
-        end_date
+        ...req.query
       }).many();
 
       res.json(pockets);

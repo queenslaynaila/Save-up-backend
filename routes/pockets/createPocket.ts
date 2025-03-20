@@ -4,7 +4,6 @@ import { pocketSchema, Pocket } from './schema';
 import { z } from 'zod';
 import { decodeEntityAndVerifyAccess } from '../../utils';
 import { entityIdParamsSchema } from '../users/schema';
-import { group } from 'node:console';
 
 type PocketCreationParams = Pick<
   Pocket,

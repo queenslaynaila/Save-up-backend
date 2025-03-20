@@ -27,8 +27,8 @@ const SQL_TOTAL_SAVINGS = sql<
     AND transactions.pocket_id = pockets.xid
   WHERE transactions.entity_id = :entity_id
     AND transaction_types.slug = 'Saving'
-    AND (:from::DATE IS NULL OR DATE(transactions.created_at) >= :from)
-    AND (:to::DATE IS NULL OR DATE(transactions.created_at) <= :to)
+    AND (:from IS NULL OR transactions.created_at::DATE >= :from)
+    AND (:to IS NULL OR transactions.created_at::DATE <= :to)
   GROUP BY pockets.name
   LIMIT :limit
 `);
@@ -45,7 +45,7 @@ const getTotalSavings = (router: Router) => {
       query: z.object({
         from: z.string().optional(),
         to: z.string().optional(),
-        limit: z.string()
+        limit: z.number().optional()
       })
     },
     response: {
@@ -61,13 +61,11 @@ const getTotalSavings = (router: Router) => {
     auth: true,
     handler: async (req, res) => {
       const entityId = await decodeEntityAndVerifyAccess(req, true);
-      const limit = Number(req.query.limit);
-      const { from, to } = req.query;
+      const limit = req.query.limit ?? 10;
 
       const stats = await SQL_TOTAL_SAVINGS({
         entity_id: entityId,
-        from,
-        to,
+        ...req.query,
         limit
       }).many();
 

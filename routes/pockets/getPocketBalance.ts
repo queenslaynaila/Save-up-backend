@@ -18,9 +18,9 @@ const SQL_GET_BALANCE = sql<
     SELECT DISTINCT ON (pocket_id) balance
     FROM transactions
     WHERE entity_id = :entity_id
-      AND (:pocket_id::INT IS NULL OR pocket_id = :pocket_id)
-      AND (:from::DATE IS NULL OR DATE(created_at) >= :from) 
-      AND (:to::DATE IS NULL OR DATE(created_at) <= :to) 
+      AND (:pocket_id IS NULL OR pocket_id = :pocket_id)
+      AND (:from IS NULL OR created_at::DATE >= :from) 
+      AND (:to IS NULL OR created_at::DATE <= :to) 
     ORDER BY pocket_id, xid DESC
   ) latest_balances
 `);
@@ -30,6 +30,7 @@ const getBalanceForAnEntity = (router: Router) => {
     method: 'get',
     path: '/:entity_id/pockets/balance',
     summary: 'Retrieve current balance for an entity across pockets',
+    auth: true,
     request: {
       params: z.object({
         entity_id: entityIdParamsSchema
@@ -37,7 +38,7 @@ const getBalanceForAnEntity = (router: Router) => {
       query: z.object({
         from: z.string().optional(),
         to: z.string().optional(),
-        //pocket_id: z.number.optional()
+        pocket_id: z.number().optional()
       }).partial()
     },
     response: {
@@ -47,7 +48,6 @@ const getBalanceForAnEntity = (router: Router) => {
         })
       }
     },
-    auth: true,
     handler: async (req, res) => {
       const entityId = await decodeEntityAndVerifyAccess(req, true);
       const balance = await SQL_GET_BALANCE({
