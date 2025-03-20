@@ -1,7 +1,7 @@
 import { z } from "zod";
 import Router from "../../router";
 import { sql } from "../../db";
-import verifyGroupMembership from '../../utils';
+import { decodeEntityAndVerifyAccess } from "../../utils";
 
 const SQL_GET_DONATION_POCKETS = sql<{
   group_id: number;
@@ -51,7 +51,7 @@ const getDonationPockets = (router: Router) => {
     summary: "Get all donation pockets for a group",
     request: {
       params: z.object({
-        group_id: z.string(),
+        group_id: z.number(),
       })
     },
     response: {
@@ -72,11 +72,10 @@ const getDonationPockets = (router: Router) => {
       },
     },
     auth: true,
-    middlewares:[verifyGroupMembership({isOwnerOrAdminMod: true})],
     handler: async (req, res) => {
-      const group_id  = Number(req.params.group_id);
+      const groupId = await decodeEntityAndVerifyAccess(req);
       const pockets = await SQL_GET_DONATION_POCKETS({ 
-        group_id
+        group_id: groupId
       }).many();
       res.json(pockets);
     },

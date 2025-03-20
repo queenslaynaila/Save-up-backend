@@ -1,8 +1,8 @@
 import { z } from "zod";
 import Router from "../../router";
 import { sql } from "../../db";
-import verifyGroupMembership from '../../utils';
 import logger from "../../logger";
+import { decodeEntityAndVerifyAccess } from "../../utils";
 
 const donationParams = z.object({
   group_id: z.number().int(),
@@ -67,10 +67,19 @@ const SQL_LINK_DONATION_DETAILS = sql<{
 const createFundraiser = (router: Router) => {
   router.route({
     method: "post",
-    path: "/",
+    path: "/:group_id",
     summary: "Create a fundraiser",
     request: {
-      body:donationParams
+      params: z.object({
+        group_id: z.number()
+      }),
+      body:donationParams.pick({
+        name: true,
+        description: true,
+        images: true,
+        target_amount: true,
+        target_at: true
+      })
     },
     response: {
       201: {
@@ -90,10 +99,9 @@ const createFundraiser = (router: Router) => {
       },
     },
     auth: true,
-    middlewares: [verifyGroupMembership()],
     handler: async (req, res) => {
+      const groupId = await decodeEntityAndVerifyAccess(req, false, true)
       const { 
-        group_id, 
         name, 
         description, 
         target_amount, 
@@ -103,7 +111,7 @@ const createFundraiser = (router: Router) => {
 
       await sql.transaction(async (trx) => {
         const fundraiser = await SQL_CREATE_DONATION_FUND({
-          group_id,
+          group_id:groupId,
           name,
           target_amount,
           target_at,
@@ -114,7 +122,7 @@ const createFundraiser = (router: Router) => {
 ;
 
         const fundraiserDetails = await SQL_LINK_DONATION_DETAILS({
-          group_id,
+          group_id:groupId,
           pocket_id: fundraiser.xid,
           description,
           images: images ?? [],
