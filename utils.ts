@@ -159,8 +159,8 @@ export function authMiddleware(auth: true | Role | Role[] = true) {
   };
 }
 
-function replaceMeWithUserId(id: number | "me" | undefined, userId: number): number {
-  return id === "me" ? userId : (id ?? userId);
+function replaceMeWithUserId(id: number | "me" | undefined, userId: number): number | undefined {
+  return id === "me" ? userId : id;
 }
 
 function hasAdminPermissions(userRole:Role, isOwnerOrAdminMod: boolean): boolean {
@@ -172,72 +172,146 @@ function checkGroupMembership(is_member: boolean, is_admin_member: boolean, requ
   if (requiresGrpAdmin && !is_admin_member) throw new HttpError(403);
 }
 
-type RequestParams =
-  | { entity_id: number | "me"; user_id?: never; group_id?: never; member_id?: never }
-  | { user_id: number | "me"; entity_id?: never; group_id?: never; member_id?: never } 
-  | { group_id: number; entity_id?: never; user_id?: never; member_id?: number | "me" };
-
-
-export async function decodeEntityAndVerifyAccess(
-  req: Request<RequestParams, any, any, any, any>,
-  isOwnerOrAdminMod: boolean = false,
-  requiresGrpAdmin: boolean = false
-): Promise<number> {
-  if (!req.user) {
-    throw new HttpError(401);
-  }
-
-  const userId = req.user.id
-  const role = req.user.role
-  
-  const params = req.params!; 
-
-  params.user_id = replaceMeWithUserId(params?.user_id, userId);
-  params.member_id = replaceMeWithUserId(params?.member_id, userId);
-  params.entity_id = replaceMeWithUserId(params?.entity_id, userId);
-
-  if (params.user_id === userId || 
-      params.entity_id === userId
-    ){ return userId; }
-
-  if (params.user_id) {
-    if (!hasAdminPermissions(role, isOwnerOrAdminMod)) throw new HttpError(403);
-    return params.user_id;
-  }
-
-  if (params.group_id) {
-    if (hasAdminPermissions(role, isOwnerOrAdminMod)) return userId;
-    
-    const { is_admin_member, is_member } = await SQL_GET_GROUP_MEMBERSHIP_STATUS({
-      entity_id: params.group_id,
-      user_id: userId
-    }).one();
-
-    checkGroupMembership(is_member, is_admin_member, requiresGrpAdmin);
-    return params.group_id;
-  }
-
-  const entityType = await SQL_GET_ENTITY_TYPE({
-     entity_id: params.entity_id
-  }).oneFirst();
-
-  if (entityType === "User" && !hasAdminPermissions(role, isOwnerOrAdminMod)) {
-    throw new HttpError(403);
-  }
-
+async function verifyGroupAccess(groupId: number, userId: number, requiresGrpAdmin: boolean, memberId?: number) {
   const { is_admin_member, is_member } = await SQL_GET_GROUP_MEMBERSHIP_STATUS({
-    entity_id:params.entity_id,
+    entity_id: groupId,
     user_id: userId
   }).one();
 
   checkGroupMembership(is_member, is_admin_member, requiresGrpAdmin);
 
-  const isRequestingOtherMember = params.member_id !== undefined && 
-                                  userId !== params.member_id;
+  if (memberId && userId !== memberId && !is_admin_member) throw new HttpError(403);
 
-  if (isRequestingOtherMember && !is_admin_member) {
-    throw new HttpError(403)
+  return memberId ? { groupId, memberId } : groupId;
+}
+
+type SingleEntityParams = {
+  entity_id: number|"me";
+  user_id?: never;
+  group_id?: never;
+  member_id?: never;
+};
+
+type SingleUserParams = {
+  user_id: number|"me";
+  entity_id?: never;
+  group_id?: never;
+  member_id?: never;
+};
+
+type SingleGroupParams = {
+  group_id: number;
+  entity_id?: never;
+  user_id?: never;
+  member_id?: never;
+};
+
+type GroupWithMemberParams = {
+  group_id: number;
+  member_id: number|"me";
+  entity_id?: never;
+  user_id?: never;
+};
+
+type RequestParams = 
+  | SingleEntityParams 
+  | SingleUserParams 
+  | SingleGroupParams 
+  | GroupWithMemberParams;
+
+type ReturnType<T> = T extends GroupWithMemberParams 
+  ? { groupId: number, memberId: number}
+  : number;
+  
+export async function decodeEntityAndVerifyAccess<T extends RequestParams>(
+  req: Request<T, any, any, any>,
+  isOwnerOrAdminMod = false,
+  requiresGrpAdmin = false
+): Promise<ReturnType<T>> {
+  if (!req.user) {
+    throw new HttpError(401);
   }
- 
-  return params.entity_id;
+
+  const loggedInUserId = req.user.id
+  const loggedInUserRole = req.user.role
+  const params = req.params!; 
+
+  const resolvedParams = {
+    user_id: replaceMeWithUserId(params.user_id, loggedInUserId),
+    member_id: replaceMeWithUserId(params.member_id, loggedInUserId),
+    entity_id: replaceMeWithUserId(params.entity_id, loggedInUserId),
+    group_id: params.group_id
+  };
+
+  if ( 
+    resolvedParams.user_id === loggedInUserId || 
+    resolvedParams.entity_id === loggedInUserId 
+  ) return loggedInUserId as ReturnType<T>;
+
+  if (resolvedParams.user_id){
+    if (!hasAdminPermissions(loggedInUserRole, isOwnerOrAdminMod)) 
+      throw new HttpError(403);
+
+    return resolvedParams.user_id as ReturnType<T>;
+  }
+
+  if (resolvedParams.group_id) {
+    return await verifyGroupAccess(resolvedParams.group_id, loggedInUserId, requiresGrpAdmin, resolvedParams.member_id) as ReturnType<T>;
+  }
+
+  if (resolvedParams.group_id && resolvedParams.member_id) {
+    const isRequestingOtherMember = loggedInUserId !== resolvedParams.member_id;
+
+    const { is_admin_member, is_member } = await SQL_GET_GROUP_MEMBERSHIP_STATUS({
+      entity_id: resolvedParams.group_id,
+      user_id: loggedInUserId
+    }).one();
+
+    if (isRequestingOtherMember && !is_admin_member || !is_member)
+      throw new HttpError(403);
+
+    return {
+      groupId: resolvedParams.group_id,
+      memberId: resolvedParams.member_id
+    } as ReturnType<T>;
+  }
+
+  if (resolvedParams.group_id){
+
+    if (hasAdminPermissions(loggedInUserRole, isOwnerOrAdminMod)) 
+      return loggedInUserId as ReturnType<T>;
+
+    const { is_admin_member, is_member } = await SQL_GET_GROUP_MEMBERSHIP_STATUS({
+      entity_id:resolvedParams.group_id,
+      user_id: loggedInUserId
+    }).one();
+
+    checkGroupMembership(is_member, is_admin_member, requiresGrpAdmin);
+    return params.group_id as ReturnType<T>;;
+  }
+
+  if(resolvedParams.entity_id){
+
+    const entityType = await SQL_GET_ENTITY_TYPE({
+      entity_id: resolvedParams.entity_id
+    }).oneFirst();
+
+    if (entityType === "User" && 
+      !hasAdminPermissions(loggedInUserRole, isOwnerOrAdminMod)) {
+      throw new HttpError(403);
+    }
+
+    if (entityType === "Group") {
+      const { is_admin_member, is_member } = await SQL_GET_GROUP_MEMBERSHIP_STATUS({
+        entity_id: resolvedParams.entity_id,
+        user_id: loggedInUserId
+      }).one();
+      
+      if (!is_member|| requiresGrpAdmin && !is_admin_member){
+        throw new HttpError(403);
+      }
+    }
+    return resolvedParams.entity_id as ReturnType<T>;
+  }
+  throw new HttpError(400);
 }
