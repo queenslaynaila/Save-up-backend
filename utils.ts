@@ -256,25 +256,12 @@ export async function decodeEntityAndVerifyAccess<T extends RequestParams>(
   }
 
   if (resolvedParams.group_id) {
-    return await verifyGroupAccess(resolvedParams.group_id, loggedInUserId, requiresGrpAdmin, resolvedParams.member_id) as ReturnType<T>;
-  }
-
-  if (resolvedParams.group_id && resolvedParams.member_id) {
-    return await verifyGroupAccess(resolvedParams.group_id, loggedInUserId, requiresGrpAdmin, resolvedParams.member_id) as ReturnType<T>;
-  }
-
-  if (resolvedParams.group_id){
-
-    if (hasAdminPermissions(loggedInUserRole, isOwnerOrAdminMod)) 
-      return loggedInUserId as ReturnType<T>;
-
-    const { is_admin_member, is_member } = await SQL_GET_GROUP_MEMBERSHIP_STATUS({
-      entity_id:resolvedParams.group_id,
-      user_id: loggedInUserId
-    }).one();
-
-    checkGroupMembership(is_member, is_admin_member, requiresGrpAdmin);
-    return params.group_id as ReturnType<T>;;
+    return await verifyGroupAccess(
+      resolvedParams.group_id, 
+      loggedInUserId, 
+      requiresGrpAdmin, 
+      resolvedParams.member_id
+    ) as ReturnType<T>;
   }
 
   if(resolvedParams.entity_id){
@@ -300,5 +287,6 @@ export async function decodeEntityAndVerifyAccess<T extends RequestParams>(
     }
     return resolvedParams.entity_id as ReturnType<T>;
   }
+  
   throw new HttpError(400);
 }
