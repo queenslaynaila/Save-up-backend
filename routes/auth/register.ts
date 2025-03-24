@@ -11,8 +11,7 @@ import {
 import {
   AuthenticatedUser,
   getClientInfo,
-  publicUserSchema,
-  recordLoginAttempt
+  publicUserSchema
 } from './login';
 import { generateToken } from '../../utils';
 
@@ -24,11 +23,12 @@ const UserRegistrationSchema = userSchema.pick({
 }).extend({
   full_name: userContactDetailsSchema.shape.full_name,
   phone_number: userContactDetailsSchema.shape.phone_number,
-  role: UserRole.optional()
+  role: UserRole,
+  ip_address: z.string(),
+  user_agent: z.string()
 });
 
 type UserRegistrationParams = z.infer<typeof UserRegistrationSchema>;
-
 const SQL_CREATE_USER = sql<UserRegistrationParams, AuthenticatedUser>(`
   SELECT * 
   FROM create_user(
@@ -38,6 +38,8 @@ const SQL_CREATE_USER = sql<UserRegistrationParams, AuthenticatedUser>(`
     :full_name, 
     :gender, 
     :pin, 
+    :ip_address,
+    :user_agent,
     :role
   )
 `);
@@ -48,17 +50,25 @@ const createUser = (router: Router) => {
     path: '/register',
     summary: 'Create a new user',
     request: {
-      body: UserRegistrationSchema
+      body:userSchema.pick({
+        id_type: true,
+        id_number: true,
+        gender: true,
+        pin: true
+      }).extend({
+        full_name: userContactDetailsSchema.shape.full_name,
+        phone_number: userContactDetailsSchema.shape.phone_number
+      })
     },
     response: {
       201: {
         schema: publicUserSchema.pick({
-            id: true,
-            role: true,
-            full_name: true,
-            phone_number: true,
-            gender: true,
-            created_at: true
+          id: true,
+          role: true,
+          full_name: true,
+          phone_number: true,
+          gender: true,
+          created_at: true
         }),
         headers: z.object({
           Authorization: z.string()
@@ -66,12 +76,15 @@ const createUser = (router: Router) => {
       }
     },
     handler: async (req, res) => {
-      const hashedPin = bcrypt.hashSync(String(req.body.pin), 12);
-      
+      const hashedPin = bcrypt.hashSync(req.body.pin, 12);
+      const { ipAddress, userAgent } = getClientInfo(req);
+
       const user = await SQL_CREATE_USER({
         ...req.body,
-        role: req.body.role || UserRole.Enum.Standard,
-        pin: hashedPin
+        role: UserRole.Enum.Standard,
+        pin: hashedPin,
+        ip_address: ipAddress,
+        user_agent: userAgent
       }).one()
         .catch((err) => {
           if (err.code === '23505') {
@@ -80,18 +93,9 @@ const createUser = (router: Router) => {
           throw err;
         });
 
-      const { ipAddress, userAgent } = getClientInfo(req);
-      await recordLoginAttempt(
-        user.id, 
-        ipAddress, 
-        userAgent, 
-        true, 
-        'First Time'
-      );
-
       const accessToken = generateToken(
         user.id,
-        new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+       '7d',
         user.role
       );
       
