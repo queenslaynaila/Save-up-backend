@@ -3,9 +3,9 @@ import bcrypt from 'bcrypt';
 import { z } from 'zod';
 import { resetPasswordLimiter } from '../../services/rateLimit';
 import { sql } from '../../db';
-import HttpError from '../../httpError';
 import sendSms from '../../services/sms';
 import { generateToken } from '../../utils';
+import { userContactDetailsSchema } from '../users/schema';
 
 const resetTokenSchema = z.object({
   user_id: z.number().min(1),
@@ -19,34 +19,27 @@ const resetTokenSchema = z.object({
 
 export type ResetToken = z.infer<typeof resetTokenSchema>;
 
-const SQL_GET_USER = sql<{ 
-  phone_number: string 
-}, { 
-  id: number 
-}>(`
-  SELECT id 
-  FROM user_contact_details 
-  WHERE phone_number = :phone_number
-`);
-
 const SQL_SAVE_TOKEN = sql<
-  Pick<ResetToken, 'user_id' | 'token' | 'reason'>, 
-  Pick<ResetToken, 'token'>
+  Pick<ResetToken,'token' | 'reason'> & {phone_number:string}, 
+  {user_id: number}
 >(`
-  INSERT INTO reset_tokens (
-    user_id, 
-    xid, 
-    token, 
-    reason
-  )
+ INSERT INTO reset_tokens (
+  user_id, 
+  xid, 
+  token, 
+  reason
+)
   SELECT 
-    :user_id,
-    COALESCE(MAX(xid), 0) + 1,
+    user_contact_details.id,
+    COALESCE(MAX(reset_tokens.xid), 0) + 1,
     :token,
     :reason
-  FROM reset_tokens
-  WHERE user_id = :user_id
-  RETURNING token
+  FROM user_contact_details
+  LEFT JOIN reset_tokens
+    ON user_contact_details.id = reset_tokens.user_id
+  WHERE user_contact_details.phone_number = :phone_number
+  GROUP BY user_contact_details.id
+  RETURNING user_id;
 `);
 
 function generateOtp(): string {
@@ -62,14 +55,13 @@ const initiatePinReset = (router: Router) => {
     path: '/pin-reset-token',
     summary: 'Send PIN reset token',
     request: {
-      body: z.object({
-        phone_number: z.string().regex(/^\+\d{1,4}\d{9}$/)
+      body: userContactDetailsSchema.pick({
+        phone_number: true
       })
     },
     middlewares: [resetPasswordLimiter],
     response: {
       204: {
-        schema: undefined,
         headers: z.object({
           Reset: z.string()
         })
@@ -77,25 +69,14 @@ const initiatePinReset = (router: Router) => {
     },
     handler: async (req, res) => {
       const { phone_number } = req.body;
-      
-      const user = await SQL_GET_USER({ 
-        phone_number 
-      }).one(new HttpError(400));
-
       const resetToken = generateOtp();
       const hashedResetToken = await bcrypt.hash(resetToken, 10);
-
-      await SQL_SAVE_TOKEN({
-        user_id: user.id,
+      
+      const userId = await SQL_SAVE_TOKEN({ 
+        phone_number,
         token: hashedResetToken,
         reason: 'Reset'
-      }).exec();
-
-      const resetTokenHeader = generateToken(
-        user.id,
-        new Date(Date.now() + 15 * 60 * 1000).toISOString(),
-        1,
-      );
+      }).oneFirst();
 
       sendSms(
         phone_number,
@@ -104,7 +85,7 @@ const initiatePinReset = (router: Router) => {
       );
 
       res
-        .setHeader('Reset', resetTokenHeader)
+        .setHeader('Reset', generateToken(userId, "10m", 1,))
         .sendStatus(204);
     }
   });
