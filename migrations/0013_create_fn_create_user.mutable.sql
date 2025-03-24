@@ -5,6 +5,8 @@ CREATE OR REPLACE FUNCTION create_user(
     p_full_name     TEXT,
     p_gender        enum_gender,
     p_pin           TEXT,
+    p_ip_address    TEXT, 
+    p_user_agent    TEXT,
     p_role          enum_user_role DEFAULT 'Standard'
 )
 RETURNS TABLE (
@@ -45,6 +47,17 @@ BEGIN
         AND invitations.receiver_id IS NULL
         AND invitations.status = 'Pending';
 
+    INSERT INTO login_attempts (user_id, xid, ip_address, browser_info, success, reason )
+    SELECT 
+        v_entity_id,
+        COALESCE(MAX(xid), 0) + 1, 
+        p_ip_address, 
+        p_user_agent, 
+        true, 
+        'First time'
+    FROM login_attempts
+    WHERE user_id = v_entity_id;
+
     RETURN QUERY
     SELECT
         users.id,
@@ -71,5 +84,13 @@ END;
 $$ LANGUAGE plpgsql;
 
 GRANT EXECUTE ON FUNCTION create_user(
-    enum_id_type, TEXT, TEXT, TEXT, enum_gender, TEXT, enum_user_role
+    enum_id_type,
+    TEXT,
+    TEXT,
+    TEXT,
+    enum_gender,
+    TEXT,
+    TEXT, 
+    TEXT,
+    enum_user_role
 ) TO saveup_www;
