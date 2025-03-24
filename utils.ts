@@ -167,11 +167,16 @@ function replaceMeWithUserId(id: number | "me" | undefined, userId: number): num
   return id === "me" ? userId : id;
 }
 
-function hasAdminPermissions(userRole:Role, isOwnerOrAdminMod: boolean): boolean {
+function hasSystemAdminPermissions(userRole:Role, isOwnerOrAdminMod: boolean): boolean {
   return isOwnerOrAdminMod && ADMIN_LIKE_ROLES.includes(userRole);
 }
 
-async function verifyGroupAccess(groupId: number, userId: number, requiresGrpAdmin: boolean, memberId?: number) {
+async function verifyGroupMembershipPermissions(
+  groupId: number, 
+  userId: number, 
+  requiresGrpAdmin: boolean, 
+  memberId?: number
+) {
   const { is_admin_member, is_member } = await SQL_GET_GROUP_MEMBERSHIP_STATUS({
     entity_id: groupId,
     user_id: userId
@@ -252,15 +257,15 @@ export async function decodeEntityAndVerifyAccess<T extends RequestParams>(
   ) return loggedInUserId as ReturnType<T>;
 
   if (resolvedParams.user_id){
-    if (!hasAdminPermissions(loggedInUserRole, isOwnerOrAdminMod)) 
+    if (!hasSystemAdminPermissions(loggedInUserRole, isOwnerOrAdminMod)) 
       throw new HttpError(403);
     return resolvedParams.user_id as ReturnType<T>;
   }
 
   if (resolvedParams.group_id) {
-    if (!hasAdminPermissions(loggedInUserRole, isOwnerOrAdminMod)) 
+    if (!hasSystemAdminPermissions(loggedInUserRole, isOwnerOrAdminMod)) 
       throw new HttpError(403);
-    return await verifyGroupAccess(
+    return await verifyGroupMembershipPermissions(
       resolvedParams.group_id, 
       loggedInUserId, 
       requiresGrpAdmin, 
@@ -274,14 +279,14 @@ export async function decodeEntityAndVerifyAccess<T extends RequestParams>(
     }).oneFirst(new HttpError(404));
 
     if (entityType === "User" && 
-      !hasAdminPermissions(loggedInUserRole, isOwnerOrAdminMod)) {
+      !hasSystemAdminPermissions(loggedInUserRole, isOwnerOrAdminMod)) {
       throw new HttpError(403);
     }
 
     if (entityType === "Group") {
-      if (!hasAdminPermissions(loggedInUserRole, isOwnerOrAdminMod)) 
+      if (!hasSystemAdminPermissions(loggedInUserRole, isOwnerOrAdminMod)) 
         throw new HttpError(403);
-      return await verifyGroupAccess(
+      return await verifyGroupMembershipPermissions(
         resolvedParams.entity_id, 
         loggedInUserId, 
         requiresGrpAdmin, 
