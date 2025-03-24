@@ -10,6 +10,7 @@ import {
 } from '../users/schema';
 import Router from '../../router';
 import { generateToken } from '../../utils';
+import logger from '../../logger';
 
 const authenticatedUserSchema = userSchema.pick({
   id: true,
@@ -25,7 +26,17 @@ const authenticatedUserSchema = userSchema.pick({
 });
 
 export type AuthenticatedUser = z.infer<typeof authenticatedUserSchema>;
-export const publicUserSchema = authenticatedUserSchema.omit({ pin: true });
+
+export const publicUserSchema = authenticatedUserSchema.pick({
+  id: true,
+  id_type: true,
+  id_number: true,
+  role: true,
+  gender: true,
+  full_name:true,
+  phone_number:true,
+  created_at: true
+});
 export type UserWithPublicAttributes = z.infer<typeof publicUserSchema>;
 
 const SQL_GET_USER = sql<{ phone_number: string }, AuthenticatedUser>(`
@@ -52,7 +63,6 @@ const loginSchema = loginAttemptSchema.pick({
   success: true,
   reason: true
 });
-
 type LoginAttempt = z.infer<typeof loginSchema>;
 
 const SQL_RECORD_LOGIN_ATTEMPT = sql<LoginAttempt, Record<string, never>>(`
@@ -81,7 +91,6 @@ const loginOutcomeSchema = loginSchema.pick({
 });
 
 type LoginOutcome = z.infer<typeof loginOutcomeSchema>;
-
 const SQL_GET_LAST_THREE_LOGIN_ATTEMPTS = sql<{ id: number }, LoginOutcome>(`
   SELECT success, reason
   FROM login_attempts
@@ -122,32 +131,32 @@ function calculateLoginAttemptsLeft(lastThreeAttempts: LoginOutcome[]) {
     throw new HttpError(423);
   }
 
-  const failedAttempts = lastThreeAttempts.reduce(
-    (count, attempt) => count + (!attempt.success ? 1 : 0),
-    0
-  );
+  const failedAttempts = lastThreeAttempts.filter(attempt => !attempt.success).length;
+
 
   return 4 - failedAttempts;
 }
-
-const authSchema = z.object({
-  phone_number: userContactDetailsSchema.shape.phone_number,
-  pin: userSchema.shape.pin
-});
 
 const login = (router: Router) => {
   router.route({
     method: 'post',
     path: '/login',
-    summary: 'Let an existing user login',
+    summary: 'Login',
     request: {
-      body: authSchema
+      body: z.object({
+        phone_number: userContactDetailsSchema.shape.phone_number,
+        pin: userSchema.shape.pin
+      })
     },
     response: {
       200: {
-        schema: publicUserSchema.omit({
-          id_type: true,
-          id_number: true
+        schema: publicUserSchema.pick({
+          id:true,
+          role:true,
+          gender:true,
+          full_name:true,
+          phone_number:true,
+          created_at:true
         }),
         headers: z.object({
           Authorization: z.string()
@@ -169,6 +178,7 @@ const login = (router: Router) => {
       }).many();
 
       const remainingAttempts = calculateLoginAttemptsLeft(lastThreeAttempts);
+      logger.info(`user has ${remainingAttempts} login attempts left`)
       const { ipAddress, userAgent } = getClientInfo(req);
 
       if (remainingAttempts === 0) {
@@ -203,7 +213,7 @@ const login = (router: Router) => {
 
       const accessToken = generateToken(
         user.id,
-        new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+        '7d',
         user.role
       );
       

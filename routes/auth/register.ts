@@ -27,9 +27,13 @@ const UserRegistrationSchema = userSchema.pick({
   ip_address: z.string(),
   user_agent: z.string()
 });
-
 type UserRegistrationParams = z.infer<typeof UserRegistrationSchema>;
-const SQL_CREATE_USER = sql<UserRegistrationParams, AuthenticatedUser>(`
+
+
+const SQL_CREATE_USER = sql<
+UserRegistrationParams, 
+Pick<AuthenticatedUser, 'id'|'id_type'|'id_number'|'role'|
+'pin'|'full_name'|'phone_number'|'gender'|'created_at'>>(`
   SELECT * 
   FROM create_user(
     :id_type, 
@@ -64,10 +68,10 @@ const createUser = (router: Router) => {
       201: {
         schema: publicUserSchema.pick({
           id: true,
-          role: true,
           full_name: true,
           phone_number: true,
           gender: true,
+          role: true,
           created_at: true
         }),
         headers: z.object({
