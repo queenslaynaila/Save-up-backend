@@ -124,6 +124,10 @@ export function checkResetTokenValidity(requiredStep: number) {
 }
 
 export async function verifyPin(req: Request, _res: Response, next: NextFunction) {
+  if (!req.user) {
+    throw new HttpError(401);
+  }
+
   const { pin: hashedPin } = await SQL_GET_PIN({
     user_id: req.user!.id
   }).one();
@@ -171,12 +175,15 @@ async function verifyGroupAccess(groupId: number, userId: number, requiresGrpAdm
   const { is_admin_member, is_member } = await SQL_GET_GROUP_MEMBERSHIP_STATUS({
     entity_id: groupId,
     user_id: userId
-  }).one();
+  }).one(new HttpError(404));
 
-  if (!is_member) throw new HttpError(403);
-  if (requiresGrpAdmin && !is_admin_member) throw new HttpError(403);
-
-  if (memberId && userId !== memberId && !is_admin_member) throw new HttpError(403);
+  if (
+    !is_member || 
+    (requiresGrpAdmin && !is_admin_member) || 
+    (memberId && userId !== memberId && !is_admin_member)
+  ) {
+    throw new HttpError(403);
+  }
 
   return memberId ? { groupId, memberId } : groupId;
 }
@@ -264,7 +271,7 @@ export async function decodeEntityAndVerifyAccess<T extends RequestParams>(
   if(resolvedParams.entity_id){
     const entityType = await SQL_GET_ENTITY_TYPE({
       entity_id: resolvedParams.entity_id
-    }).oneFirst();
+    }).oneFirst(new HttpError(404));
 
     if (entityType === "User" && 
       !hasAdminPermissions(loggedInUserRole, isOwnerOrAdminMod)) {
