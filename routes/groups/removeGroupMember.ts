@@ -33,13 +33,13 @@ const handleGroupExit = (router: Router) => {
       })
     },
     handler: async (req, res) => {
-      const groupId = await decodeEntityAndVerifyAccess(req);
-      const targetId = Number(req.params.member_id);
+      const entities = await decodeEntityAndVerifyAccess(req);
+      const {groupId, memberId} = entities
       
       await SQL_MANAGE_GROUP_MEMBERSHIP({
         group_id: groupId,
         initiator_id: req.user!.id,
-        target_id: targetId
+        target_id: memberId
       }).exec().catch(err => {
         if (err.code === 'P0006') {
           throw new HttpError(403, {
