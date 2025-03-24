@@ -172,37 +172,25 @@ const login = (router: Router) => {
       const { pin, ...user } = await SQL_GET_USER({
         phone_number: req.body.phone_number
       }).one(new HttpError(401));
-
-      const lastThreeAttempts = await SQL_GET_LAST_THREE_LOGIN_ATTEMPTS({
-        id: user.id
-      }).many();
-
-      const remainingAttempts = calculateLoginAttemptsLeft(lastThreeAttempts);
-      logger.info(`user has ${remainingAttempts} login attempts left`)
+    
       const { ipAddress, userAgent } = getClientInfo(req);
 
+      const lastAttempts = await SQL_GET_LAST_THREE_LOGIN_ATTEMPTS({
+        id: user.id 
+      }).many();
+
+      const remainingAttempts = calculateLoginAttemptsLeft(lastAttempts);
+
       if (remainingAttempts === 0) {
-        await recordLoginAttempt(
-          user.id, 
-          ipAddress, 
-          userAgent, 
-          false, 
-          'Locked'
-        );
+        await recordLoginAttempt(user.id, ipAddress, userAgent, false, 'Locked');
         throw new HttpError(423);
       }
-
+     
       if (!await bcrypt.compare(req.body.pin, pin)) {
-        await recordLoginAttempt(
-          user.id, 
-          ipAddress, 
-          userAgent, 
-          false, 
-          'Incorrect pin'
-        );
-        throw new HttpError(401, { remaining_attempts: remainingAttempts - 1 });
+        await recordLoginAttempt(user.id, ipAddress, userAgent, false, 'Incorrect pin');
+        throw new HttpError(401, { remaining_attempts: remainingAttempts-1 });
       }
-
+    
       await recordLoginAttempt(
         user.id, 
         ipAddress, 
@@ -210,15 +198,9 @@ const login = (router: Router) => {
         true, 
         'Returning'
       );
-
-      const accessToken = generateToken(
-        user.id,
-        '7d',
-        user.role
-      );
       
       res
-        .setHeader('Authorization', accessToken)
+        .setHeader('Authorization', generateToken(user.id, '7d', user.role))
         .json(user);
     }
   });
