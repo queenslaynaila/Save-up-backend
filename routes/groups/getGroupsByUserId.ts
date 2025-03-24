@@ -1,22 +1,13 @@
 import Router from '../../router';
 import { sql } from '../../db';
 import { z } from 'zod';
-import { groupsSchema } from './schema';
+import { Group, groupsSchema } from './schema';
 import { entityIdParamsSchema } from '../users/schema';
 import { decodeEntityAndVerifyAccess } from '../../utils';
 
-const groupWithCreatorSchema = groupsSchema.pick({
-  id: true,
-  name: true,
-  created_at: true
-}).extend({
-  created_by: z.string()
-});
-type Group = z.infer<typeof groupWithCreatorSchema>;
-
 const SQL_FETCH_USER_GROUPS = sql<
-  { user_id: number; other_user_id?: number},
-  Pick<Group, 'id'|'name'|'created_at'|'created_by'>
+  { user_id: number; other_user_id?: number },
+  Pick<Group, 'id' | 'name' | 'created_at'> & { created_by: string }
 >(`
   SELECT 
     groups.id, 
@@ -62,16 +53,20 @@ const getGroupsByUserId = (router: Router) => {
     },
     response: {
       200: {
-        schema: z.array(groupWithCreatorSchema.pick({
-          id: true,
-          name: true,
-          created_at: true,
-          created_by:true
-        }))
+        schema: z.array(
+          groupsSchema.pick({
+            id: true,
+            name: true,
+            created_at: true
+          }).extend({
+            created_by: z.string()
+          })
+        )
       }
     },
     handler: async (req, res) => {
       const userId = await decodeEntityAndVerifyAccess(req, true);
+      
       const groups = await SQL_FETCH_USER_GROUPS({
         user_id: userId,
         ...req.query

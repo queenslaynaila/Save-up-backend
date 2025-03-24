@@ -4,7 +4,10 @@ import { z } from 'zod';
 import { decodeEntityAndVerifyAccess } from '../../utils';
 import { groupsSchema } from './schema';
 
-const SQL_RECORD_OLD_NAME = sql<{ group_id: number }, Record<string, never>>(`
+const SQL_RECORD_OLD_NAME = sql<
+  { group_id: number }, 
+  Record<string, never>
+>(`
   INSERT INTO prev_group_names (group_id, xid, name)
   SELECT 
     groups.id,
@@ -18,10 +21,7 @@ const SQL_RECORD_OLD_NAME = sql<{ group_id: number }, Record<string, never>>(`
 `);
 
 const SQL_UPDATE_GROUP_NAME = sql<
-  { 
-    group_id: number; 
-    name: string;
-  },
+  { group_id: number; name: string },
   { name: string }
 >(`
   UPDATE groups
@@ -57,9 +57,9 @@ const updateGroup = (router: Router) => {
       const groupId = await decodeEntityAndVerifyAccess(req);
 
       const name = await sql.transaction(async (trx) => {
-        await SQL_RECORD_OLD_NAME({ group_id: groupId })
-          .using(trx)
-          .exec();
+        await SQL_RECORD_OLD_NAME({
+          group_id: groupId
+        }).using(trx).exec();
 
         return await SQL_UPDATE_GROUP_NAME({
           group_id: groupId,

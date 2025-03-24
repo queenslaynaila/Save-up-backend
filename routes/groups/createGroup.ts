@@ -6,7 +6,10 @@ const SQL_CREATE_GROUP = sql<
   Pick<Group, 'name' | 'creator_id'>,
   Pick<Group, 'id' | 'name' | 'created_at'>
 >(`
-  SELECT * FROM create_group(:name, :creator_id)
+  SELECT * FROM create_group(
+    :name,
+    :creator_id
+  )
 `);
 
 const createGroup = (router: Router) => {
@@ -14,29 +17,29 @@ const createGroup = (router: Router) => {
     method: 'post',
     path: '/',
     summary: 'Create a group',
+    auth: true,
     request: {
-      body: groupsSchema.pick({ 
+      body: groupsSchema.pick({
         name: true
-       }),
+      })
     },
     response: {
       201: {
-        schema: groupsSchema.pick({ 
-          id: true, 
-          name: true, 
-          created_at: true 
-        }),
-      },
+        schema: groupsSchema.pick({
+          id: true,
+          name: true,
+          created_at: true
+        })
+      }
     },
-    auth: true,
     handler: async (req, res) => {
       const group = await SQL_CREATE_GROUP({
         creator_id: req.user!.id,
-        ...req.body,
+        ...req.body
       }).one();
 
       return res.status(201).json(group);
-    },
+    }
   });
 };
 
