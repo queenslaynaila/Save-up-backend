@@ -2,27 +2,13 @@ import Router from '../../router';
 import { z } from 'zod';
 import { sql } from '../../db';
 import HttpError from '../../httpError';
-import { nextOfKinSchema } from './schema';
+import { NextOfKin, nextOfKinSchema } from './schema';
 import { verifyPin } from '../../utils';
 
-const nextOfKinCreationSchema = nextOfKinSchema.pick({
-  full_name: true,
-  relationship: true,
-  phone_number: true
-});
-type NextOfKinCreationPayLoad = z.infer<typeof nextOfKinCreationSchema>
-& { user_id: number };
-
-export const nextOfKinPublicViewSchema = nextOfKinSchema.pick({
-  xid: true,
-  full_name: true,
-  relationship: true,
-  phone_number: true,
-  created_at: true
-});
-export type NextOfKin = z.infer<typeof nextOfKinPublicViewSchema>;
-
-const SQL_CREATE_KIN = sql<NextOfKinCreationPayLoad, NextOfKin>(`
+const SQL_CREATE_KIN = sql<
+Pick<NextOfKin,'user_id'|'full_name'|'relationship'|'phone_number' >,
+Pick<NextOfKin, 'xid'|'full_name'|'relationship'|'phone_number'|'created_at'>
+>(`
   INSERT INTO next_of_kins (user_id, xid, full_name, relationship, phone_number)
   SELECT 
     :user_id,
@@ -40,23 +26,33 @@ const createNextOfKin = (router: Router) => {
     method: 'post',
     path: '/',
     summary: 'Create next of kin',
+    auth: true,
     request: {
-      body: nextOfKinCreationSchema.extend({
+      body: nextOfKinSchema.pick({
+        full_name: true,
+        relationship: true,
+        phone_number: true
+      }).extend({
         pin: z.string().regex(/^\d{4}$/)
       })
     },
     response: {
       201: {
-        schema: nextOfKinPublicViewSchema
+        schema: nextOfKinSchema.pick({
+          xid: true,
+          full_name: true,
+          relationship: true,
+          phone_number: true,
+          created_at: true
+        })
       }
     },
-    auth: true,
     middlewares: [verifyPin],
     handler: async (req, res) => {
       const nextOfKin = await SQL_CREATE_KIN({
         ...req.body,
         user_id: req.user!.id
-      }).oneOrNull().catch((err) => {
+      }).one().catch((err) => {
         if (err.code === '23505') {
           throw new HttpError(409);
         }

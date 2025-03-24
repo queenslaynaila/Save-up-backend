@@ -3,12 +3,15 @@ import { sql } from '../../db';
 import { z } from 'zod';
 import { verifyPin } from '../../utils';
 
-const SQL_DELETE_KIN = sql<{user_id: number, xid: number}, Record<string, never>>(`
+const SQL_DELETE_KIN = sql<
+  { user_id: number, xid: number },
+  Record<string, never>
+>(`
   UPDATE next_of_kins  
   SET deleted_at = NOW()
   WHERE user_id = :user_id
-  AND xid = :xid
-  AND deleted_at IS NULL
+    AND xid = :xid
+    AND deleted_at IS NULL;
 `);
 
 const deleteNextOfKin = (router: Router) => {
@@ -16,22 +19,22 @@ const deleteNextOfKin = (router: Router) => {
     method: 'delete',
     path: '/:xid',
     summary: 'Delete a next of kin',
-    request: {
-      params: z.object({ xid: z.string() }),
-        body: z.object({
-              pin: z.string().regex(/^\d{4}$/)
-            })
-    },
-    response: {
-      204: {}
-    },
     auth: true,
+    request: {
+      params: z.object({
+        xid: z.number()
+      }),
+      body: z.object({
+        pin: z.string().regex(/^\d{4}$/)
+      })
+    },
     middlewares: [verifyPin],
     handler: async (req, res) => {
       await SQL_DELETE_KIN({
         user_id: req.user!.id,
-        xid: Number(req.params.xid)
+        xid:req.params.xid
       }).exec();
+      
       res.sendStatus(204);
     }
   });

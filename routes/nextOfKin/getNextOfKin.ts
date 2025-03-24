@@ -1,17 +1,14 @@
 import Router from '../../router';
 import { sql } from '../../db';
-import { NextOfKin, nextOfKinPublicViewSchema } from './createNextOfKin';
 import { z } from 'zod';
 import HttpError from '../../httpError';
-import { entityIdParamsSchema, userIdParamsSchema, UserRole } from '../users/schema';
+import { entityIdParamsSchema, UserRole } from '../users/schema';
 import { decodeEntityAndVerifyAccess } from '../../utils';
+import { NextOfKin, nextOfKinSchema } from './schema';
 
 const SQL_GET_KIN = sql<
-  { 
-    user_id: number;
-    include_history: boolean;
-  }, 
-  NextOfKin
+  Pick<NextOfKin, 'user_id'> & { include_history?: boolean }, 
+  Pick<NextOfKin, 'xid' | 'full_name' | 'relationship' | 'phone_number' | 'created_at'>
 >(`
   SELECT 
     xid,
@@ -25,7 +22,7 @@ const SQL_GET_KIN = sql<
       :include_history::boolean = true 
       OR deleted_at IS NULL
     )
-  ORDER BY xid DESC
+  ORDER BY xid DESC;
 `);
 
 const getNextOfKin = (router: Router) => {
@@ -34,31 +31,39 @@ const getNextOfKin = (router: Router) => {
     path: '/:user_id',
     summary: 'Retrieve next of kin details',
     description: 'Fetches next of kin details for a user. Standard users can only view active records.',
+    auth: true,
     request: {
       params: z.object({
         user_id: entityIdParamsSchema
       }),
       query: z.object({
-        include_history: z.string().default('false')
+        include_history: z.boolean()
       }).partial()
     },
     response: {
       200: {
-        schema: z.array(nextOfKinPublicViewSchema)
+        schema: z.array(
+          nextOfKinSchema.pick({
+            xid: true,
+            full_name: true,
+            relationship: true,
+            phone_number: true,
+            created_at: true
+          })
+        )
       }
     },
-    auth: true,
     handler: async (req, res) => {
-      const userId = await decodeEntityAndVerifyAccess(req, true);;
-      const { include_history = 'false' } = req.query;
+      const userId = await decodeEntityAndVerifyAccess(req, true);
+      const { include_history  } = req.query;
 
-      if (req.user!.role === UserRole.Enum.Standard && include_history === 'true') {
+      if (req.user!.role === UserRole.Enum.Standard && include_history) {
         throw new HttpError(403);
       }
 
       const nextOfKins = await SQL_GET_KIN({
         user_id: userId,
-        include_history: include_history === 'true'
+        include_history
       }).many();
 
       return res.json(nextOfKins);

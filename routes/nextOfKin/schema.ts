@@ -19,3 +19,5 @@ export const nextOfKinSchema = z.object({
   created_at: z.string(),
   deleted_at: z.string().optional()
 });
+
+export type NextOfKin = z.infer<typeof nextOfKinSchema>;
