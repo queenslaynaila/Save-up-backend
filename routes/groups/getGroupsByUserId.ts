@@ -47,7 +47,7 @@ const getGroupsByUserId = (router: Router) => {
         user_id: entityIdParamsSchema
       }),
       query: z.object({
-        mutual_user_id: z.number().int().optional()
+        mutual_user_id: z.number().int().min(1).optional()
       })
     },
     response: {

@@ -38,8 +38,8 @@ const createTransfer = (router: Router) => {
     request: {
       params: z.object({
         entity_id: entityIdParamsSchema,
-        source_pocket_id: z.number().int(),
-        destination_pocket_id: z.number().int()
+        source_pocket_id: z.number().int().min(1),
+        destination_pocket_id: z.number().int().min(1)
       }),
       body: transferPayload
         .pick({

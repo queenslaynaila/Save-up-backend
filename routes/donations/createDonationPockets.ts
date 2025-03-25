@@ -5,7 +5,7 @@ import logger from "../../logger";
 import { decodeEntityAndVerifyAccess } from "../../utils";
 
 const donationParams = z.object({
-  group_id: z.number().int(),
+  group_id: z.number().int().min(1),
   name: z.string(),
   description: z.string(),
   images: z.array(z.string()).nullable().optional(),
@@ -71,7 +71,7 @@ const createFundraiser = (router: Router) => {
     summary: "Create a fundraiser",
     request: {
       params: z.object({
-        group_id: z.number().int()
+        group_id: z.number().int().min(1)
       }),
       body:donationParams.pick({
         name: true,
@@ -90,7 +90,7 @@ const createFundraiser = (router: Router) => {
           target_at: true,
           images: true
         }).extend({
-          xid: z.number().int(),
+          xid: z.number().int().min(1),
           pocket_type: z.string(),
           status: z.string(),
           created_at: z.string().datetime(),

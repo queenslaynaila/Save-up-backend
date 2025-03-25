@@ -30,7 +30,7 @@ const createSaving = (router: Router) => {
     request: {
       params: z.object({
         entity_id: entityIdParamsSchema,
-        pocket_id: z.number()
+        pocket_id: z.number().int().min(1)
       }),
       body: z.object({
         amount: z.number().min(50)

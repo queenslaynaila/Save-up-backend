@@ -22,7 +22,7 @@ const deleteNextOfKin = (router: Router) => {
     auth: true,
     request: {
       params: z.object({
-        xid: z.number().int()
+        xid: z.number().int().min(1)
       }),
       body: z.object({
         pin: z.string().regex(/^\d{4}$/)

@@ -6,7 +6,7 @@ import { decodeEntityAndVerifyAccess } from '../../utils';
 const debitApprovalSchema = z.object({
   group_id:z.number().min(1),
   admin_id:z.number(),
-  xid: z.number().int(),
+  xid: z.number().int().min(1),
   status: z.enum(['Rejected', 'Approved', 'Pending']),
   reason: z.string()
 });
@@ -30,8 +30,8 @@ const reviewDebitRequests = (router: Router) => {
     summary: 'Approve or decline a debit request',
     request: {
       params: z.object({
-        group_id: z.number().int(),
-        xid: z.number().int()
+        group_id: z.number().int().min(1),
+        xid: z.number().int().min(1)
       }),
       body: debitApprovalSchema.pick({
         status: true,

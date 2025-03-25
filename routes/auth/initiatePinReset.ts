@@ -8,8 +8,8 @@ import { generateToken } from '../../utils';
 import { userContactDetailsSchema } from '../users/schema';
 
 const resetTokenSchema = z.object({
-  user_id: z.number().int(),
-  xid: z.number().int(),
+  user_id: z.number().int().min(1),
+  xid: z.number().int().min(1),
   token: z.string(),
   reason: z.enum(['Reset', 'Update', 'Unlock']),
   created_at: z.string(),

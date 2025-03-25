@@ -5,9 +5,9 @@ import HttpError from '../../httpError';
 import { decodeEntityAndVerifyAccess } from '../../utils';
 
 const updateElectionSchema= z.object({
-  group_id: z.number().int(),
-  user_id: z.number().int(),
-  election_id: z.number().int(),
+  group_id: z.number().int().min(1),
+  user_id: z.number().int().min(1),
+  election_id: z.number().int().min(1),
   status: z.enum(['Open', 'Cancelled']).optional().nullable(),
   nomination_ends_at: z.string().datetime().optional().nullable()
 });
@@ -26,8 +26,8 @@ const updateElections = (router: Router) => {
     description: 'Allows updating election status and nomination end date if not closed',
     request: {
       params: z.object({
-        group_id: z.number().int(),
-        election_id: z.number().int()
+        group_id: z.number().int().min(1),
+        election_id: z.number().int().min(1)
       }),
       body: z.object({
         status: z.enum(['Open', 'Cancelled']).optional(),

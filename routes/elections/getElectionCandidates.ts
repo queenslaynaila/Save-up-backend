@@ -31,7 +31,7 @@ const getCandidates = (router: Router) => {
     summary: 'Retrieves all candidates nominated for a specific election.',
     request: {
       params: z.object({
-        group_id: z.number().int(),
+        group_id: z.number().int().min(1),
         election_id: z.number(),
       })
     },

@@ -6,8 +6,8 @@ import bcrypt from 'bcrypt';
 import { verifyPin } from '../../utils';
 
 export const securityAnswerSchema = z.object({
-  user_id: z.number().int(),
-  question_id: z.number().int(),
+  user_id: z.number().int().min(1),
+  question_id: z.number().int().min(1),
   answer: z.string(),
   created_at: z.string()
 });

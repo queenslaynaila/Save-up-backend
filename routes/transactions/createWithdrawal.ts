@@ -6,9 +6,9 @@ import { decodeEntityAndVerifyAccess, verifyPin } from '../../utils';
 import { entityIdParamsSchema } from '../users/schema';
 
 const withdrawalPayload = z.object({
-  pocket_id: z.number().int(),
+  pocket_id: z.number().int().min(1),
   amount: z.number().min(50),
-  user_id: z.number().int()
+  user_id: z.number().int().min(1)
 });
 
 type Withdrawal = z.infer<typeof withdrawalPayload>;
@@ -33,7 +33,7 @@ const createWithdrawal = (router: Router) => {
     request: {
       params: z.object({
         user_id: entityIdParamsSchema,
-        pocket_id: z.number()
+        pocket_id: z.number().int().min(1)
       }),
       body: withdrawalPayload
         .pick({

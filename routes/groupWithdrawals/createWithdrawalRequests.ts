@@ -9,7 +9,7 @@ const withdrawalSchema = z.object({
   reason: z.string(),
   recipients: z.array(
     z.object({
-      recipient_id: z.number().int(),
+      recipient_id: z.number().int().min(1),
       amount: z.number() 
     })
   )
@@ -37,8 +37,8 @@ const createWithdrawalRequest = (router: Router) => {
     },
     request: {
       params: z.object({
-        group_id: z.number().int(),
-        pocket_id: z.number().int()
+        group_id: z.number().int().min(1),
+        pocket_id: z.number().int().min(1)
       }),
       body: withdrawalSchema
     },

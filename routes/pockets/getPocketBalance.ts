@@ -38,7 +38,7 @@ const getBalanceForAnEntity = (router: Router) => {
       query: z.object({
         from: z.string().optional(),
         to: z.string().optional(),
-        pocket_id: z.number().optional()
+        pocket_id: z.number().int().min(1).optional()
       }).partial()
     },
     response: {

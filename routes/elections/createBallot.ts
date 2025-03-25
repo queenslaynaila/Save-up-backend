@@ -5,10 +5,10 @@ import HttpError from '../../httpError';
 import { decodeEntityAndVerifyAccess } from '../../utils';
 
 const ballotParamsSchema = z.object({
-  group_id: z.number().int(),
-  election_id: z.number().int(),
-  candidate_ids: z.array(z.number().int()).min(1).max(3),
-  user_id: z.number().int()
+  group_id: z.number().int().min(1),
+  election_id: z.number().int().min(1),
+  candidate_ids: z.array(z.number().int().min(1)).min(1).max(3),
+  user_id: z.number().int().min(1)
 });
 
 type BallotParams = z.infer<typeof ballotParamsSchema>;

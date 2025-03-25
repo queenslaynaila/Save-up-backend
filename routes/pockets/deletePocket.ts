@@ -23,7 +23,7 @@ const deletePocket = (router: Router) => {
     request: {
       params: z.object({
         entity_id: entityIdParamsSchema,
-        xid: z.number().int()      
+        xid: z.number().int().min(1)      
       })
     },
     auth: true,

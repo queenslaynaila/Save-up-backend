@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const entityIdParamsSchema = z.union([
-  z.number().int(),
+  z.number().int().min(1),
   z.literal('me').describe(
     "Identifier for user/group whose data is being fetched. Can be:\n\n" +
     "- `me`:Special id `me`to rep the currently loged in user.\n" +
@@ -14,26 +14,26 @@ export const IdType = z.enum(['National', 'Passport']);
 const Gender = z.enum(['Male', 'Female']);
 
 const authenticatedUser = z.object({
-  id: z.number().int(),
+  id: z.number().int().min(1),
   role: UserRole
 });
 export type AuthenticatedUser = z.infer<typeof authenticatedUser>;
 
 const pinResetSchema = z.object({
-  userId: z.number().int(),
-  step: z.number().int()
+  userId: z.number().int().min(1),
+  step: z.number().int().min(1)
 });
 export type PinResetState = z.infer<typeof pinResetSchema>;
 
 export const userContactDetailsSchema = z.object({
-  id: z.number().int(),
+  id: z.number().int().min(1),
   full_name: z.string(),
   phone_number: z.string().regex(/^\+\d{1,4}\d{9}$/),
   created_at: z.string().datetime()
 });
 
 export const userSchema = z.object({
-  id: z.number().int(),
+  id: z.number().int().min(1),
   id_type: IdType,
   id_number: z.string().regex(/^(?:[A-Z]{1,2}\d{6,9}|\d{8,10}|\d{13}|\d{16})$/),
   role: UserRole,
@@ -44,8 +44,8 @@ export const userSchema = z.object({
 
 
 export const loginAttemptSchema = z.object({
-  user_id: z.number().int(),
-  xid: z.number().int(),
+  user_id: z.number().int().min(1),
+  xid: z.number().int().min(1),
   ip_address: z.string().optional(),
   browser_info: z.string().optional(),
   success: z.boolean(),
@@ -54,25 +54,25 @@ export const loginAttemptSchema = z.object({
 });
 
 export const userPhoneHistorySchema = z.object({
-  user_id: z.number().int(),
-  xid: z.number().int(),
+  user_id: z.number().int().min(1),
+  xid: z.number().int().min(1),
   phone_number: z.string(),
   created_at: z.string().datetime()
 });
 
 export const userIdHistorySchema = z.object({
-  user_id: z.number().int(),
-  xid: z.number().int(),
+  user_id: z.number().int().min(1),
+  xid: z.number().int().min(1),
   id_type: IdType,
   id_number: z.string().regex(/^[0-9]+$/),
   created_at: z.string().datetime()
 });
 
 export const invitationSchema = z.object({
-  group_id: z.number().int(),
-  receiver_id: z.number().int(),
-  sender_id: z.number().int(),
-  xid: z.number().int(),
+  group_id: z.number().int().min(1),
+  receiver_id: z.number().int().min(1),
+  sender_id: z.number().int().min(1),
+  xid: z.number().int().min(1),
   status: z.enum(['Pending', 'Accept', 'Decline']),
   created_at: z.string().datetime(),
   deleted_at: z.string().datetime()

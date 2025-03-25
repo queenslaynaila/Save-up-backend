@@ -5,9 +5,9 @@ const ENUM_PRIORITY = z.enum(['Low', 'Intermediate', 'High']);
 const ENUM_STATUS = z.enum(['In Progress', 'Completed']);
 
 export const pocketSchema = z.object({
-  entity_id: z.number().int(),
-  xid: z.number().int(),
-  category_id: z.number().int(),
+  entity_id: z.number().int().min(1),
+  xid: z.number().int().min(1),
+  category_id: z.number().int().min(1),
   name: z.string(),
   pocket_type: ENUM_POCKET_TYPE,
   priority: ENUM_PRIORITY,

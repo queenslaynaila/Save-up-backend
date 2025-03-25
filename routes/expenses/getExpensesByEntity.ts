@@ -45,7 +45,7 @@ const getExpensesByEntity = (router: Router) => {
         entity_id: entityIdParamsSchema
       }),
       query: z.object({
-        category_id: z.number().optional(),
+        category_id: z.number().int().min(1).optional(),
         spent_from: z.string().date().optional(),
         spent_to: z.string().date().optional(),
         start_date: z.string().date().optional(),

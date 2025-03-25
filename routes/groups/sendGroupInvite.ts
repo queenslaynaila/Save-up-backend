@@ -57,7 +57,7 @@ const createGroupInvite = (router: Router) => {
     auth: true,
     request: {
       params: z.object({
-        group_id: z.number().int()
+        group_id: z.number().int().min(1)
       }),
       body: z.object({
         phone_number: z.string()

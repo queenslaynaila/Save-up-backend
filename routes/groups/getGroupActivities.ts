@@ -32,12 +32,12 @@ const withdrawalStatusMetadata = z.object({
 
 export const activitySchema = z.object({
   id: z.number(),
-  actor_id: z.number(),
+  actor_id: z.number().int().min(1),
   actor_name: z.string(),
   created_at: z.string().datetime(),
-  target_id: z.number().nullable(),
+  target_id: z.number().int().min(1).nullable(),
   target_name: z.string().nullable(),
-  pocket_id: z.number().nullable(),
+  pocket_id: z.number().int().min(1).nullable(),
   pocket_name: z.string().nullable(),
   amount: z.number().nullable(),
   type: z.enum([
@@ -336,7 +336,7 @@ const getGroupActivities = (router: Router) => {
     auth: true,
     request: {
       params: z.object({
-        group_id: z.number().int()
+        group_id: z.number().int().min(1)
       }),
       query: z.object({
         size: z.number()

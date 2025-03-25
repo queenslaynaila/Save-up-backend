@@ -13,8 +13,8 @@ const pocketPatchParams = pocketSchema.pick({
   target_amount: true,
   target_at: true
   }).partial().extend({
-    entity_id: z.number().int(),
-    xid: z.number().int()
+    entity_id: z.number().int().min(1),
+    xid: z.number().int().min(1)
   });
 
 type PocketPatchParams = z.infer<typeof pocketPatchParams>;
@@ -55,7 +55,7 @@ const updatePocket = (router: Router) => {
     request: {
       params: z.object({
         entity_id: entityIdParamsSchema,
-        xid: z.number().int()
+        xid: z.number().int().min(1)
       }),
       body: pocketSchema.pick({
         category_id: true,

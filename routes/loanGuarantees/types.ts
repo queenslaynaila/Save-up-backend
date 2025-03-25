@@ -1,9 +1,9 @@
 import { z } from 'zod';
 
 const baseGuaranteeSchema = z.object({
-  group_id: z.number().int(),
-  request_id: z.number().int(),
-  user_id: z.number().int(),
+  group_id: z.number().int().min(1),
+  request_id: z.number().int().min(1),
+  user_id: z.number().int().min(1),
   approval: z.boolean()
 });
 
@@ -17,9 +17,9 @@ export const guaranteeLoanBodySchema = baseGuaranteeSchema.omit({
 export const loanRequestSchema = baseGuaranteeSchema.pick({
   group_id: true
 }).extend({
-  request_id: z.number().int(),
+  request_id: z.number().int().min(1),
   group_name: z.string(),
-  borrower_id: z.number().int(),
+  borrower_id: z.number().int().min(1),
   borrower_name: z.string().min(1),
   amount: z.number(),
   purpose: z.string(),

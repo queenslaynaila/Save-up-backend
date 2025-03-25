@@ -1,9 +1,9 @@
 import { z } from 'zod';
 
 export const expenseSchema = z.object({
-  entity_id: z.number().int(),
-  xid: z.number().int(),
-  category_id: z.number().int(),
+  entity_id: z.number().int().min(1),
+  xid: z.number().int().min(1),
+  category_id: z.number().int().min(1),
   description: z.string(),
   amount: z.number().min(10),
   spent_at: z.string()

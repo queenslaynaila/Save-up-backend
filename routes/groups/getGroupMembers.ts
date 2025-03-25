@@ -4,7 +4,7 @@ import { z } from 'zod';
 import { decodeEntityAndVerifyAccess } from '../../utils';
 
 const groupMemberSchema = z.object({
-  user_id: z.number().int(),
+  user_id: z.number().int().min(1),
   full_name: z.string(),
   joined_at: z.string().datetime(),
   is_admin: z.boolean()
@@ -58,7 +58,7 @@ const getGroupMembers = (router: Router) => {
     auth: true,
     request: {
       params: z.object({
-        group_id: z.number().int()
+        group_id: z.number().int().min(1)
       })
     },
     response: {

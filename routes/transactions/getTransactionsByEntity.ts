@@ -23,10 +23,10 @@ export const transactionTypeSchema = z.object({
 });
 
 export const transactionSchema = z.object({
-  entity_id: z.number().int(),
-  xid: z.number().int(),
-  type_id: z.number(),
-  pocket_id: z.number().int(),
+  entity_id: z.number().int().min(1),
+  xid: z.number().int().min(1),
+  type_id: z.number().int().min(1),
+  pocket_id: z.number().int().min(1),
   reference_id: z.number(),
   delta: z.number().min(5),
   balance: z.number(),
@@ -135,10 +135,10 @@ const getTransactions = (router: Router) => {
       }),
       query: z.object({
         slug: transactionTypeSchema.shape.slug,
-        pocket_id: z.number().optional(),
+        pocket_id: z.number().int().min(1).optional(),
         from: z.string().date().optional(),
         to: z.string().date().optional(),
-        limit: z.number().optional()
+        limit: z.number().int().min(1).optional()
       }).partial()
     },
     response: {

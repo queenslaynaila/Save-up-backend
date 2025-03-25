@@ -32,8 +32,8 @@ const updateExpense = (router: Router) => {
     summary: 'Update an expense',
     request: {
       params: z.object({
-        entity_id: z.number().int(),
-        xid: z.number().int()
+        entity_id: z.number().int().min(1),
+        xid: z.number().int().min(1)
       }),
       body:expenseSchema.pick({
         category_id: true,
