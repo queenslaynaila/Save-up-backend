@@ -40,7 +40,7 @@ const updateGroup = (router: Router) => {
     auth: true,
     request: {
       params: z.object({
-        group_id: z.number()
+        group_id: z.number().int()
       }),
       body: groupsSchema.pick({
         name: true
@@ -59,12 +59,16 @@ const updateGroup = (router: Router) => {
       const name = await sql.transaction(async (trx) => {
         await SQL_RECORD_OLD_NAME({
           group_id: groupId
-        }).using(trx).exec();
+        })
+          .using(trx)
+          .exec();
 
         return await SQL_UPDATE_GROUP_NAME({
           group_id: groupId,
           ...req.body
-        }).using(trx).oneFirst();
+        })
+          .using(trx)
+          .oneFirst();
       });
 
       res.json({ name });

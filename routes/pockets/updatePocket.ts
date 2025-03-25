@@ -55,7 +55,7 @@ const updatePocket = (router: Router) => {
     request: {
       params: z.object({
         entity_id: entityIdParamsSchema,
-        xid: z.number()
+        xid: z.number().int()
       }),
       body: pocketSchema.pick({
         category_id: true,

@@ -10,11 +10,11 @@ const adminSchema = z.object({
 });
 
 const ongoingElectionSchema= z.object({
-  group_id: z.number(),
-  election_id: z.number(),
+  group_id: z.number().int(),
+  election_id: z.number().int(),
   type: ElectionType,
   status: ElectionStatus,
-  initiator_id: z.number(),
+  initiator_id: z.number().int(),
   initiator_name: z.string(),
   nomination_ends_at: z.string().datetime({ offset: true }),
   admins: z.array(adminSchema).nullable(),
@@ -69,7 +69,7 @@ const getGroupElectionList = (router: Router) => {
     summary: 'Get list of elections for a group',
     request: {
       params: z.object({
-        group_id: z.number()
+        group_id: z.number().int()
       })
     },
     response: {

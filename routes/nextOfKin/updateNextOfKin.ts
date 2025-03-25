@@ -30,7 +30,7 @@ const updateNextOfKin = (router: Router) => {
     summary: 'Update a next of kin details',
     request: {
       params: z.object({ 
-        xid: z.number() 
+        xid: z.number().int()
       }),
       body: nextOfKinSchema.pick({
         full_name: true,

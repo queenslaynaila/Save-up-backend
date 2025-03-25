@@ -16,13 +16,14 @@ const SQL_FETCH_USER_GROUPS = sql<
     user_contact_details.full_name AS created_by
   FROM groups
   LEFT JOIN group_members 
-    ON groups.id = group_members.group_id
+      ON groups.id = group_members.group_id
   LEFT JOIN user_contact_details 
-    ON groups.creator_id = user_contact_details.id
+      ON groups.creator_id = user_contact_details.id
   WHERE group_members.user_id = :user_id
     AND group_members.is_active = TRUE
     AND groups.deleted_at IS NULL
-    AND (:other_user_id::INT IS NULL 
+    AND (
+      :other_user_id::INT IS NULL 
       OR EXISTS (
         SELECT 1 
         FROM group_members 
@@ -31,7 +32,7 @@ const SQL_FETCH_USER_GROUPS = sql<
           AND group_members.is_active = TRUE
       )
     )
-  ORDER BY groups.created_at DESC
+  ORDER BY groups.created_at DESC;
 `);
 
 const getGroupsByUserId = (router: Router) => {
@@ -39,16 +40,14 @@ const getGroupsByUserId = (router: Router) => {
     method: 'get',
     path: '/:user_id',
     summary: 'Get a user\'s active groups',
-    description: 
-      'Optional `mutual_user_id` filter ' +
-      'shows only groups shared with another user.',
+    description: 'Optional `mutual_user_id` filter shows only groups shared with another user.',
     auth: true,
     request: {
       params: z.object({
         user_id: entityIdParamsSchema
       }),
       query: z.object({
-        mutual_user_id: z.number().optional()
+        mutual_user_id: z.number().int().optional()
       })
     },
     response: {

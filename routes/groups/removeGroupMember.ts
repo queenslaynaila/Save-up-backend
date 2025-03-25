@@ -13,7 +13,11 @@ const SQL_MANAGE_GROUP_MEMBERSHIP = sql<
   },
   Record<string, never>
 >(`
-  SELECT exit_or_remove_group_member(:group_id, :initiator_id, :target_id);
+  SELECT exit_or_remove_group_member(
+    :group_id, 
+    :initiator_id, 
+    :target_id
+  );
 `);
 
 const handleGroupExit = (router: Router) => {
@@ -21,20 +25,20 @@ const handleGroupExit = (router: Router) => {
     method: 'delete',
     path: '/:group_id/members/:member_id',
     summary: 'Self-removal or Admin removal from group',
-    description: 
-      'Allows:\n' +
-      '1. Self-removal: Members can leave using `/{group_id}/members/me`\n' +
-      '2. Admin removal: Admins can remove others using `/{group_id}/members/{user_id}`',
+    description: [
+      'Allows:',
+      '1. Self-removal: Members can leave using `/{group_id}/members/me`',
+      '2. Admin removal: Admins can remove others using `/{group_id}/members/{user_id}`'
+    ].join('\n'),
     auth: true,
     request: {
       params: z.object({
-        group_id: z.number(),
+        group_id: z.number().int(),
         member_id: entityIdParamsSchema
       })
     },
     handler: async (req, res) => {
-      const entities = await decodeEntityAndVerifyAccess(req);
-      const {groupId, memberId} = entities
+      const { groupId, memberId } = await decodeEntityAndVerifyAccess(req);
       
       await SQL_MANAGE_GROUP_MEMBERSHIP({
         group_id: groupId,

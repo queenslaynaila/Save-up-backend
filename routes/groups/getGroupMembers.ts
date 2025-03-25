@@ -19,31 +19,35 @@ const SQL_GET_GROUP_MEMBERS = sql<
   SELECT 
     group_members.user_id,
     user_contact_details.full_name,
-    EXISTS(
-      SELECT 1 
-      FROM group_admins
-      WHERE group_admins.group_id = :group_id
-        AND group_admins.user_id = group_members.user_id
-        AND group_admins.election_id = (
-          SELECT MAX(latest_admin.election_id) 
-          FROM group_admins latest_admin
-          WHERE latest_admin.group_id = :group_id
-        )
+    COALESCE(
+        (
+          SELECT TRUE 
+            FROM group_admins 
+            WHERE group_admins.group_id = group_members.group_id
+              AND group_admins.user_id = group_members.user_id
+              AND group_admins.election_id = (
+                SELECT MAX(election_id) 
+                FROM group_admins 
+                WHERE group_id = group_members.group_id
+                AND status = 'Closed')
+            LIMIT 1
+        ), 
+        FALSE
     ) AS is_admin,
     (
-      SELECT DISTINCT ON (group_joins.user_id) 
-        group_joins.created_at 
-      FROM group_joins
-      WHERE group_joins.group_id = :group_id
+      SELECT created_at 
+      FROM group_joins 
+      WHERE group_joins.group_id = group_members.group_id
         AND group_joins.user_id = group_members.user_id
-      ORDER BY group_joins.user_id, group_joins.xid DESC
+      ORDER BY xid DESC
+      LIMIT 1
     ) AS joined_at
   FROM group_members
   LEFT JOIN user_contact_details 
     ON user_contact_details.id = group_members.user_id
   WHERE group_members.group_id = :group_id
     AND group_members.is_active = TRUE
-  ORDER BY is_admin DESC, joined_at ASC
+  ORDER BY is_admin DESC, joined_at ASC;
 `);
 
 const getGroupMembers = (router: Router) => {
@@ -51,11 +55,10 @@ const getGroupMembers = (router: Router) => {
     method: 'get',
     path: '/:group_id/members',
     summary: 'Get group members',
-    description: 'Retrieve all active members of a group with their admin status',
     auth: true,
     request: {
       params: z.object({
-        group_id: z.number()
+        group_id: z.number().int()
       })
     },
     response: {

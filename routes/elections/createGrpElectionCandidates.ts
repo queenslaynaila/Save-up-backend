@@ -28,7 +28,7 @@ const createCandidates = (router: Router) => {
     summary: 'Create candidates for an open election',
     request: {
       params: z.object ({
-        group_id: z.number(),
+        group_id: z.number().int(),
         election_id: z.number()
       }),
       body: candidateParams.pick({

@@ -4,21 +4,21 @@ import { sql } from '../../db';
 import { decodeEntityAndVerifyAccess } from '../../utils';
 
 const guarantorSchema = z.object({
-  id: z.number(),
+  id: z.number().int(),
   name: z.string(),
   status: z.enum(['pending', 'approved', 'rejected'])
 });
 
 const adminReviewSchema = z.object({
-  id: z.number(),
+  id: z.number().int(),
   name: z.string(),
   status: z.enum(['pending', 'approved', 'rejected']),
   reason: z.string()
 });
 
 const loanRequestSchema = z.object({
-  xid: z.number(),
-  requested_by_id: z.number(),
+  xid: z.number().int(),
+  requested_by_id: z.number().int(),
   requested_by_name: z.string(),
   amount: z.number(),
   reason: z.string(),
@@ -42,7 +42,7 @@ const getLoanRequests = (router: Router) => {
     summary: 'Get loan request',
     request: {
       params: z.object({
-        group_id: z.number()
+        group_id: z.number().int()
       })
     },
     response: {

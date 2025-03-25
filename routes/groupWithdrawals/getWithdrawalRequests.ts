@@ -1,29 +1,28 @@
 import Router from '../../router';
 import { sql } from '../../db';
 import { z } from 'zod';
-import logger from '../../logger';
 import { decodeEntityAndVerifyAccess } from '../../utils';
 
 const Approval = z.object({
-  user_id: z.string(),
+  user_id: z.number().int(),
   full_name: z.string(),
   status: z.string(),
   reason: z.string()
 });
 
 const Recipient = z.object({
-  recipient_id: z.number(),
+  recipient_id: z.number().int(),
   recipient_name: z.string()
 });
 
 const Guarantor = z.object({
-  guarantor_id: z.number(),
+  guarantor_id: z.number().int(),
   full_name: z.string(),
   approved: z.enum(['Pending', 'Approved', 'Declined'])
 });
 
 const BaseRequest = z.object({
-  xid: z.number(),
+  xid: z.number().int(),
   requested_by: z.string(),
   amount: z.number(),
   reason: z.string(),
@@ -139,8 +138,8 @@ const getGrpDebitRequests = (router: Router) => {
     summary: 'Get withdrawal requests for a group pocket',
     request: {
       params: z.object({
-        group_id: z.number(),
-        pocket_id: z.number()
+        group_id: z.number().int(),
+        pocket_id: z.number().int()
       })
     },
     response: {

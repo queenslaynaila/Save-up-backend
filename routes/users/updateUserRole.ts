@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { sql } from '../../db';
-import { UserRole } from './schema';
+import { entityIdParamsSchema, UserRole } from './schema';
 import Router from '../../router';
 import HttpError from '../../httpError';
 import { decodeEntityAndVerifyAccess } from '../../utils';
@@ -32,7 +32,7 @@ const updateUserRole = (router: Router) => {
     auth: [UserRole.enum.Admin],
     request: {
       params: z.object({
-        user_id: z.number()
+        user_id: entityIdParamsSchema
       }),
       body: z.object({
         role: UserRole

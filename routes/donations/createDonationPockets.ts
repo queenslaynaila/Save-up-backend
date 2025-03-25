@@ -71,7 +71,7 @@ const createFundraiser = (router: Router) => {
     summary: "Create a fundraiser",
     request: {
       params: z.object({
-        group_id: z.number()
+        group_id: z.number().int()
       }),
       body:donationParams.pick({
         name: true,
@@ -90,7 +90,7 @@ const createFundraiser = (router: Router) => {
           target_at: true,
           images: true
         }).extend({
-          xid: z.number(),
+          xid: z.number().int(),
           pocket_type: z.string(),
           status: z.string(),
           created_at: z.string().datetime(),

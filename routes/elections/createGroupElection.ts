@@ -7,10 +7,10 @@ import { decodeEntityAndVerifyAccess } from '../../utils';
 
 const electionsPayload = z.object({
   type: ElectionType,
-  group_id: z.number(),
-  initiator_id: z.number(),
+  group_id: z.number().int(),
+  initiator_id: z.number().int(),
   nomination_ends_at: z.string(),
-  candidates_ids: z.array(z.number()).nullable()
+  candidates_ids: z.array(z.number().int()).nullable()
 });
 
 type ElectionParams = z.infer<typeof electionsPayload>;
@@ -42,13 +42,13 @@ const createGroupElection = (router: Router) => {
     auth: true,
     request: {
       params: z.object({
-        group_id: z.number()
+        group_id: z.number().int()
       }),
       body:z.discriminatedUnion("type", [
         z.object({
           type: z.literal("Ratification"),
           nomination_ends_at: z.string().optional(),
-          candidates_ids: z.array(z.number()).min(2).max(3)
+          candidates_ids: z.array(z.number().int()).min(2).max(3)
         }).strict(),
         z.object({
           type: z.literal("Ballot"),

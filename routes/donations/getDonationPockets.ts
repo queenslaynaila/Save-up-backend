@@ -51,14 +51,14 @@ const getDonationPockets = (router: Router) => {
     summary: "Get all donation pockets for a group",
     request: {
       params: z.object({
-        group_id: z.number(),
+        group_id: z.number().int(),
       })
     },
     response: {
       200: {
         schema: z.array(
           z.object({
-            xid: z.number(),
+            xid: z.number().int(),
             category_name: z.string(),
             name: z.string(),
             description: z.string(),

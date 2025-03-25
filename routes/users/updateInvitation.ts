@@ -23,7 +23,7 @@ const updateInvites = (router: Router) => {
     auth: true,
     request: {
       params: z.object({
-        xid: z.number()
+        xid: z.number().int()
       }),
       body: invitationSchema.pick({
         group_id: true,

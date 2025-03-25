@@ -1,10 +1,11 @@
 import Router from '../../router';
 import { sql } from '../../db';
 import { Group, groupsSchema } from './schema';
+import { z } from 'zod';
 
 const SQL_CREATE_GROUP = sql<
   Pick<Group, 'name' | 'creator_id'>,
-  Pick<Group, 'id' | 'name' | 'created_at'>
+  Pick<Group, 'id' | 'name' | 'created_at'> & {created_by:string}
 >(`
   SELECT * FROM create_group(
     :name,
@@ -29,6 +30,8 @@ const createGroup = (router: Router) => {
           id: true,
           name: true,
           created_at: true
+        }).extend({
+          created_by: z.string()
         })
       }
     },

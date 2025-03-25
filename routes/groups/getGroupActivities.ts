@@ -336,7 +336,7 @@ const getGroupActivities = (router: Router) => {
     auth: true,
     request: {
       params: z.object({
-        group_id: z.number()
+        group_id: z.number().int()
       }),
       query: z.object({
         size: z.number()

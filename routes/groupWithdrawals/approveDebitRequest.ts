@@ -1,12 +1,12 @@
 import Router from '../../router';
 import { sql } from '../../db';
 import { z } from 'zod';
-import verifyGroupMembership, { verifyPin } from '../../utils';
+import { decodeEntityAndVerifyAccess } from '../../utils';
 
 const debitApprovalSchema = z.object({
   group_id:z.number().min(1),
   admin_id:z.number(),
-  xid: z.number(),
+  xid: z.number().int(),
   status: z.enum(['Rejected', 'Approved', 'Pending']),
   reason: z.string()
 });
@@ -30,8 +30,8 @@ const reviewDebitRequests = (router: Router) => {
     summary: 'Approve or decline a debit request',
     request: {
       params: z.object({
-        group_id: z.string().regex(/^[1-9]\d*$/),
-        xid: z.string().regex(/^[1-9]\d*$/)
+        group_id: z.number().int(),
+        xid: z.number().int()
       }),
       body: debitApprovalSchema.pick({
         status: true,
@@ -40,22 +40,14 @@ const reviewDebitRequests = (router: Router) => {
         pin: z.number().min(1000).max(9999)
       })
     },
-    auth: true,
-    middlewares: [
-      verifyPin,
-      verifyGroupMembership({ 
-        requiresGrpAdmin:true
-     })
-    ],
+    auth: true, 
     handler: async (req, res) => {
-      const { group_id, xid } = req.params;
-      const { status, reason } = req.body;
+      const groupId = await decodeEntityAndVerifyAccess(req);
 
       await SQL_APPROVE_GRP_WITHDRAWAL({
-        group_id:Number(group_id),
-        xid:Number(xid),
-        status,
-        reason,
+        group_id:groupId,
+        xid:req.params.xid,
+        ...req.body,
         admin_id:req.user!.id
       }).exec();
 

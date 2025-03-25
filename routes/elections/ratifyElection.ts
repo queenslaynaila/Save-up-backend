@@ -19,8 +19,8 @@ const ratifyElection = (router: Router) => {
     summary: 'Ratify an election results',
     request: {
         params: z.object({
-            election_id: z.number(),
-            group_id: z.number()
+            election_id: z.number().int(),
+            group_id: z.number().int()
         }),
       body: z.object({
         is_ratified: z.boolean()

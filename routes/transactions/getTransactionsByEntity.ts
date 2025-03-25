@@ -23,10 +23,10 @@ export const transactionTypeSchema = z.object({
 });
 
 export const transactionSchema = z.object({
-  entity_id: z.number().min(1),
-  xid: z.number().min(1),
+  entity_id: z.number().int(),
+  xid: z.number().int(),
   type_id: z.number(),
-  pocket_id: z.number().min(1),
+  pocket_id: z.number().int(),
   reference_id: z.number(),
   delta: z.number().min(5),
   balance: z.number(),
