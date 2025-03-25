@@ -278,9 +278,10 @@ export async function decodeEntityAndVerifyAccess<T extends RequestParams>(
       entity_id: resolvedParams.entity_id
     }).oneFirst(new HttpError(404));
 
-    if (entityType === "User" && 
-      !hasSystemAdminPermissions(loggedInUserRole, isOwnerOrAdminMod)) {
-      throw new HttpError(403);
+    if (entityType === "User"){
+      if (!hasSystemAdminPermissions(loggedInUserRole, isOwnerOrAdminMod)) 
+        throw new HttpError(403);
+      return resolvedParams.entity_id as ReturnType<T>;
     }
 
     if (entityType === "Group") {
