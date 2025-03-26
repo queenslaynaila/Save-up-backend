@@ -16,7 +16,8 @@ const electionsPayload = z.object({
 type ElectionParams = z.infer<typeof electionsPayload>;
 
 const SQL_CREATE_ELECTION = sql<
-  Pick<ElectionParams,
+  Pick<
+    ElectionParams,
     'group_id' | 'initiator_id' | 'type' | 'candidates_ids' | 'nomination_ends_at'
   >,
   Record<string, never>
@@ -35,23 +36,26 @@ const createGroupElection = (router: Router) => {
     method: 'post',
     path: '/:group_id/elections',
     summary: 'Create a new group election',
-    description: 
-      'Creates an election for group admin positions.\n\n' +
-      'For ratification elections, 2-3 candidates must be specified.\n\n' +
-      'Nomination period defaults to 48 hours if not specified.',
+    description: [
+      'Creates an election for group admin positions.',
+      '',
+      'For ratification elections, 2-3 candidates must be specified.',
+      '',
+      'Nomination period defaults to 48 hours if not specified.'
+    ].join('\n'),
     auth: true,
     request: {
       params: z.object({
         group_id: z.number().int().min(1)
       }),
-      body:z.discriminatedUnion("type", [
+      body: z.discriminatedUnion('type', [
         z.object({
-          type: z.literal("Ratification"),
+          type: z.literal('Ratification'),
           nomination_ends_at: z.string().optional(),
           candidates_ids: z.array(z.number().int().min(1)).min(2).max(3)
         }).strict(),
         z.object({
-          type: z.literal("Ballot"),
+          type: z.literal('Ballot'),
           nomination_ends_at: z.string().optional()
         }).strict()
       ])

@@ -3,62 +3,54 @@ CREATE OR REPLACE FUNCTION create_candidates(
     p_election_id  INT,
     p_candidate_ids INT[],
     p_user_id      INT
-)
-RETURNS VOID AS $$
+) RETURNS VOID AS $$
 DECLARE
-    nomination_count INT;
-    candidate_id INT;
+    v_nomination_count INT;
 BEGIN
     PERFORM check_grp_membership(p_group_id, p_user_id);
 
     IF NOT EXISTS (
-        SELECT 1
-        FROM elections
-        WHERE group_id = p_group_id
-          AND xid = p_election_id
-          AND status = 'Open'
-          AND closed_at IS NULL
+        SELECT 1 FROM elections 
+        WHERE group_id = p_group_id 
+          AND xid = p_election_id 
+          AND status = 'Open' 
+          AND nomination_ends_at > NOW()
     ) THEN
-        RAISE EXCEPTION USING
-            MESSAGE = 'ERR_ELECTION_CLOSED',
+        RAISE EXCEPTION USING 
+            MESSAGE = 'ERR_ELECTION_CLOSED_OR_NOMINATION_ENDED', 
             ERRCODE = 'P0007';
     END IF;
 
-    IF EXISTS (
-        SELECT 1
-        FROM elections
-        WHERE group_id = p_group_id
-          AND xid = p_election_id
-          AND nomination_ends_at <= NOW()
-    ) THEN
-        RAISE EXCEPTION USING
-            MESSAGE = 'ERR_NOMINATION_ENDED',
-            ERRCODE = 'P0009';
-    END IF;
-
-    SELECT COUNT(*) INTO nomination_count
+    SELECT COUNT(*) INTO v_nomination_count
     FROM candidates
-    WHERE group_id = p_group_id
-      AND election_id = p_election_id
+    WHERE group_id = p_group_id 
+      AND election_id = p_election_id 
       AND chosen_by = p_user_id;
 
-    IF nomination_count + array_length(p_candidate_ids, 1) > 3 THEN
-        RAISE EXCEPTION USING
-            MESSAGE = 'ERR_NOMINATION_LIMIT_REACHED',
+    IF v_nomination_count + array_length(p_candidate_ids, 1) > 3 THEN
+        RAISE EXCEPTION USING 
+            MESSAGE = 'ERR_NOMINATION_LIMIT_REACHED', 
             ERRCODE = 'P0003';
     END IF;
 
-    FOREACH candidate_id IN ARRAY p_candidate_ids LOOP
-        INSERT INTO candidates (group_id, election_id, candidate_id, chosen_by)
-        VALUES (p_group_id, p_election_id, candidate_id, p_user_id)
-        ON CONFLICT DO NOTHING;
-    END LOOP;
+    INSERT INTO candidates (group_id, election_id, candidate_id, chosen_by)
+    SELECT p_group_id, p_election_id, unnest(p_candidate_ids), p_user_id
+    ON CONFLICT DO NOTHING;
 
     RETURN;
 END;
 $$ LANGUAGE plpgsql;
 
-GRANT EXECUTE ON FUNCTION create_candidates(INT, INT, INT[], INT) TO api_user;
+GRANT EXECUTE ON FUNCTION create_candidates(
+    INT, 
+    INT, 
+    INT[], 
+    INT
+) TO saveup_www;
 SELECT create_distributed_function(
-    'create_candidates(INT, INT, INT[], INT)w'
-);
+    'create_candidates(
+        INT, 
+        INT, 
+        INT[], 
+        INT
+    )');

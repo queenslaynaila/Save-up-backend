@@ -8,7 +8,6 @@ DECLARE
     v_ballot_count  INT;
     v_total_members INT;
     v_total_voters  INT;
-    v_top_candidate RECORD;
 BEGIN
     IF NOT EXISTS (
         SELECT 1
@@ -46,15 +45,20 @@ BEGIN
         unnest(p_candidate_ids),
         p_user_id;
 
-    SELECT COUNT(*) INTO v_total_members
-    FROM group_members
-    WHERE group_id = p_group_id
-      AND is_active = TRUE;
-
-    SELECT COUNT(DISTINCT user_id) INTO v_total_voters
-    FROM ballots
-    WHERE group_id = p_group_id
-      AND election_id = p_election_id;
+    SELECT 
+        (
+            SELECT COUNT(*) 
+            FROM group_members 
+                WHERE group_id = p_group_id 
+                AND is_active = TRUE
+        ),
+        (
+            SELECT COUNT(DISTINCT user_id) 
+            FROM ballots 
+                WHERE group_id = p_group_id 
+                AND election_id = p_election_id
+        )
+    INTO v_total_members, v_total_voters;
 
     IF v_total_voters >= (v_total_members / 2) THEN
         UPDATE elections
@@ -63,26 +67,18 @@ BEGIN
         WHERE group_id = p_group_id
           AND xid = p_election_id;
 
-        FOR v_top_candidate IN (
-            SELECT candidate_id
+        INSERT INTO group_admins (group_id, election_id, user_id)
+        SELECT p_group_id, p_election_id, candidate_id
+        FROM (
+            SELECT candidate_id 
             FROM ballots
-            WHERE group_id = p_group_id
-              AND election_id = p_election_id
+            WHERE group_id = p_group_id 
+                AND election_id = p_election_id
             GROUP BY candidate_id
             ORDER BY COUNT(*) DESC
             LIMIT 3
-        ) LOOP
-            INSERT INTO group_admins (
-                group_id,
-                election_id,
-                user_id
-            ) VALUES (
-                p_group_id,
-                p_election_id,
-                v_top_candidate.candidate_id
-            ) ON CONFLICT (group_id, election_id, user_id) 
-              DO NOTHING;
-        END LOOP;
+        ) AS top_candidates
+        ON CONFLICT (group_id, election_id, user_id) DO NOTHING;
     END IF;
 END;
 $$ LANGUAGE plpgsql;

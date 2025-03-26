@@ -47,27 +47,33 @@ const createGroupInvite = (router: Router) => {
     method: 'post',
     path: '/:group_id/invitations',
     summary: 'Send a group invitation via phone number',
-    description: 
-      'Allows a group admin member to send an invitation to a registered user or ' +
-      'non-registered user to join group.\n\n' +
-      'The invitees will receive an SMS with a link to join the group.\n\n' +
-      'For non-registered users, the SMS will include a special link to sign up ' +
-      'for SaveUP and once they have signed up they will find the invite in ' +
-      'their notifications.',
+    description: [
+      'Allows a group admin member to send an invitation to a registered user or',
+      'non-registered user to join group.',
+      '',
+      'The invitees will receive an SMS with a link to join the group.',
+      '',
+      'For non-registered users, the SMS will include a special link to sign up',
+      'for SaveUP and once they have signed up they will find the invite in',
+      'their notifications.'
+    ].join('\n'),
     auth: true,
     request: {
       params: z.object({
         group_id: z.number().int().min(1)
       }),
       body: z.object({
-        phone_number: z.string()
-          .regex(/^\+\d{1,4}\d{9}$/)
+        phone_number: z.string().regex(/^\+\d{1,4}\d{9}$/)
       })
     },
     handler: async (req, res) => {
       const groupId = await decodeEntityAndVerifyAccess(req);
       
-      const { receiver_id,  sender_name,  group_name } = await SQL_SEND_INVITATION({
+      const { 
+        receiver_id, 
+        sender_name, 
+        group_name 
+      } = await SQL_SEND_INVITATION({
         group_id: groupId,
         sender_id: req.user!.id,
         ...req.body

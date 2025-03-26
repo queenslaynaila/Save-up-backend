@@ -8,30 +8,27 @@ CREATE OR REPLACE FUNCTION create_election(
 RETURNS VOID AS $$
 DECLARE
     v_election_id    INT;
-    v_member_count   INT;
 BEGIN
-    IF EXISTS (
-        SELECT 1 
-        FROM elections
-        WHERE group_id = p_group_id
-          AND status = 'Open'
-          AND closed_at IS NULL
-    ) THEN
+    IF (
+            SELECT COUNT(*) 
+            FROM group_members 
+            WHERE group_id = p_group_id 
+            AND is_active = TRUE
+        ) < 3 THEN
         RAISE EXCEPTION USING 
-            MESSAGE = 'ERR_ELECTION_IN_PROGRESS',
-            ERRCODE = 'P0004';
+            MESSAGE = 'ERR_MIN_MEMBERS_NOT_MET', 
+            ERRCODE = 'P0002';
     END IF;
 
-    SELECT COUNT(*)
-    INTO v_member_count
-    FROM group_members
-    WHERE group_id = p_group_id
-      AND is_active = TRUE;
-
-    IF v_member_count < 3 THEN
+    IF EXISTS (
+        SELECT 1 FROM elections 
+        WHERE group_id = p_group_id 
+            AND status = 'Open' 
+            AND closed_at IS NULL
+    ) THEN
         RAISE EXCEPTION USING 
-            MESSAGE = 'ERR_MIN_MEMBERS_NOT_MET',
-            ERRCODE = 'P0002';
+            MESSAGE = 'ERR_ELECTION_IN_PROGRESS', 
+            ERRCODE = 'P0004';
     END IF;
 
     INSERT INTO elections (

@@ -4,7 +4,7 @@ import { z } from 'zod';
 import HttpError from '../../httpError';
 import { decodeEntityAndVerifyAccess } from '../../utils';
 
-const updateElectionSchema= z.object({
+const electionSchema = z.object({
   group_id: z.number().int().min(1),
   user_id: z.number().int().min(1),
   election_id: z.number().int().min(1),
@@ -12,10 +12,19 @@ const updateElectionSchema= z.object({
   nomination_ends_at: z.string().datetime().optional().nullable()
 });
 
-type UpdateElectionParams = z.infer<typeof updateElectionSchema>;
+type ElectionParams = z.infer<typeof electionSchema>;
 
-const SQL_UPDATE_ELECTION = sql<UpdateElectionParams, Record<string, never>>(`
-  SELECT update_election(:user_id, :group_id, :election_id, :status::enum_election_status, :nomination_ends_at)
+const SQL_UPDATE_ELECTION = sql<
+  ElectionParams,
+  Record<string, never>
+>(`
+  SELECT update_election(
+    :user_id,
+    :group_id,
+    :election_id,
+    :status::enum_election_status,
+    :nomination_ends_at
+  )
 `);
 
 const updateElections = (router: Router) => {
@@ -24,6 +33,7 @@ const updateElections = (router: Router) => {
     path: '/:group_id/elections/:election_id',
     summary: 'Update an existing group election',
     description: 'Allows updating election status and nomination end date if not closed',
+    auth: true,
     request: {
       params: z.object({
         group_id: z.number().int().min(1),
@@ -34,27 +44,21 @@ const updateElections = (router: Router) => {
         nomination_ends_at: z.string().datetime().optional()
       })
     },
-    response: {
-      200: {},
-      400: { schema: z.object({ message: z.string() }) }
-    },
-    auth: true,
     handler: async (req, res) => {
-      const groupId = await decodeEntityAndVerifyAccess(req, true)
-      const { election_id } = req.params;
-      const { status, nomination_ends_at } = req.body;
+      const groupId = await decodeEntityAndVerifyAccess(req, true);
 
       await SQL_UPDATE_ELECTION({
-        group_id:groupId,
+        group_id: groupId,
         election_id: req.params.election_id,
-        status: status ?? null,
-        nomination_ends_at: nomination_ends_at ?? null,
-        user_id: req.user!.id
+        user_id: req.user!.id,
+        ...req.body
       }).exec().catch(err => {
-          if (err.code === 'P0001') {
-            throw new HttpError(401, { message: 'ERR_NOT_GRP_MBR' });
-          }
-          throw err;
+        if (err.code === 'P0001') {
+          throw new HttpError(401, {
+            message: 'ERR_NOT_GRP_MBR'
+          });
+        }
+        throw err;
       });
 
       res.sendStatus(200);
