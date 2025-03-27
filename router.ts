@@ -6,7 +6,7 @@ import express, {
   Application,
   RequestHandler
 } from 'express';
-import { AnyZodObject, z, ZodNever, ZodSchema, ZodUndefined } from 'zod';
+import { AnyZodObject, TypeOf, z, ZodNever, ZodRecord, ZodSchema, ZodUndefined, ZodUnion } from 'zod';
 import { OpenApiGeneratorV3, OpenAPIRegistry } from '@asteasolutions/zod-to-openapi';
 import fastJson from 'fast-json-stringify';
 import zodToJsonSchema from 'zod-to-json-schema';
@@ -17,6 +17,7 @@ import HttpError from './httpError';
 import Config from './config';
 import {authMiddleware } from './utils';
 import { Role } from './routes/users/schema';
+
 
 const ajv = new Ajv();
 
@@ -57,16 +58,8 @@ const validateRequest = (schema: {
   };
 };
 
-type HttpStatusCodes = 200 | 201 | 204 | 400 | 401 | 403 | 409 | 422 | 423 | 429;
-
-type ResponseDefinition<ResBody, StatusCode extends HttpStatusCodes> = {
-  schema?: StatusCode extends 204 ? ZodUndefined : ZodSchema<ResBody>;
-  headers?: AnyZodObject;
-};
-
-type ResponseMap<ResBody> = { [StatusCode in HttpStatusCodes]?:
-  ResponseDefinition<StatusCode extends 200 | 201 | 204 ? ResBody : any, StatusCode>;
-};
+type HttpMethod = 'get' | 'post' | 'patch' | 'delete' | 'put';
+const emptyObjectSchema = z.object({}).strict();
 
 interface RouterOptions<
   Params extends AnyZodObject | ZodNever = ZodNever,
@@ -74,33 +67,34 @@ interface RouterOptions<
   ReqBody = ZodSchema | ZodNever,
   QueryParams extends AnyZodObject = AnyZodObject
 > {
-  method: 'get' | 'post' | 'patch' | 'delete';
+  method: HttpMethod;
   path: string;
+  hidden?: boolean;
   summary?: string;
   description?: string;
-  request?: {
-    headers?: AnyZodObject;
+  schema?: {
     params?: Params;
     body?: ZodSchema<ReqBody>;
     query?: QueryParams;
   };
-  response?: ResponseMap<ResBody>;
+  response?: {
+    statusCode?: number;
+    schema?: ZodSchema<ResBody> | ZodUndefined;
+    description?: string;
+  };
   auth?: true | Role | Role[];
   middlewares?: Array<(req: Request, res: Response, next: NextFunction) => void>;
-  handler: RequestHandler<z.infer<Params>, ResBody, ReqBody, z.infer<QueryParams>>;
+  handler: RequestHandler<TypeOf<Params>, ResBody, ReqBody, TypeOf<QueryParams>>;
 }
-const emptyObjectSchema = z.object({}).strict();
+
 const registry = new OpenAPIRegistry();
 
 class Router {
   private static app: Application = express();
-
   private static routerInstances: Map<string, Router> = new Map();
 
   private readonly router: ExpressRouter;
-
   private readonly routePrefix: string;
-
   private readonly apiTag?: string;
 
   private constructor(routePrefix: string, apiTag?: string) {
@@ -159,95 +153,61 @@ class Router {
     const {
       method,
       path,
-      request,
-      response = { 204: { schema: undefined } },
+      schema,
+      response = { statusCode: 200, schema: z.never() },
       auth,
       middlewares = [],
       handler
     } = options;
 
-    if (request) {
-      middlewares.unshift(validateRequest(request));
-    }
-
-    if (auth) {
-      middlewares.splice(1, 0, authMiddleware(auth));
-    }
-
+    if (schema) middlewares.unshift(validateRequest(schema));
+    if (auth) middlewares.splice(1, 0, authMiddleware(auth));
+    
     const security = [];
-    if (auth) {
-      security.push({ Authorization: [] });
-    }
-    if (middlewares?.some(m => m.name === "resetStepValidator")) {
+    if (auth) security.push({ Authorization: [] });
+    if (middlewares.some(m => m.name === "resetStepValidator")) {
       security.push({ Reset: [] });
     }
 
-    const responseSchemas = Object.entries(response)
-      .reduce((acc, [statusCode, { schema, headers }]) => {
-        acc[statusCode] = {
-          description: statusCode.startsWith('2') ? 'Success' : 'Error',
-          content: schema ? {
-            'application/json': {
-              schema: zodToJsonSchema(schema, { target: 'openApi3' })
+    const responseSchemas  = response.schema ? {
+        [response.statusCode || 200]:{
+          description: response.statusCode?.toString().startsWith("2") ? "Success" : "Error",
+          content:{
+            "application/json":{
+              schema: zodToJsonSchema(response.schema, { target: "openApi3" })
             }
-          } : undefined,
-          headers: headers ? Object.keys(headers.shape).reduce((headerAcc, key) => {
-            return {
-              ...headerAcc,
-              [key]: {
-                description: 'Response headers',
-                schema: zodToJsonSchema(headers.shape[key], { target: 'openApi3' })
-              }
-            };
-          }, {}) : undefined
-        };
-        return acc;
-      }, {} as Record<string, any>);
+          }
+        }
+      } : {}
 
-    const transformedResponses = Object.entries(responseSchemas)
-      .reduce((acc, [statusCode, schema]) => {
-        acc[statusCode] = schema;
-        return acc;
-      }, {} as Record<string, any>);
 
     const transformedPath = path.replace(/:([^/]+)/g, '{$1}');
     const fullPath = `${this.routePrefix}${transformedPath}`.replace(/\/+/g, '/');
 
-    registry.registerPath({
-      tags: this.apiTag ? [this.apiTag] : undefined,
-      method,
-      path: fullPath,
-      summary: options.summary,
-      description: options.description,
-      security,
-      request: {
-        params: request?.params,
-        body: request?.body ? { content: { 'application/json': { schema: request.body } } } : undefined,
-        query: request?.query,
-        headers: request?.headers
-      },
-      responses: transformedResponses
-    });
+    if(!options.hidden){
+      registry.registerPath({
+        tags: this.apiTag ? [this.apiTag] : undefined,
+        method,
+        path: fullPath,
+        summary: options.summary,
+        description: options.description,
+        security,
+        request: {
+          params: schema?.params,
+          body: schema?.body ? { content: { 'application/json': { schema: schema.body } } } : undefined,
+          query: schema?.query
+        },
+        responses: responseSchemas
+      });
+    }
 
-    const successResponseSchema = response[200]?.schema || response[201]?.schema;
-
-    if (successResponseSchema) {
-      const jsonResponseSchema: any = zodToJsonSchema(successResponseSchema, { target: 'openApi3' });
+    if (response.schema) {
+      const jsonResponseSchema: any = zodToJsonSchema(response.schema, { target: "openApi3" });
       const stringify = fastJson(jsonResponseSchema);
-
-      const errorSchema = z.union([
-        z.record(z.unknown()),
-        z.array(z.record(z.unknown()))
-      ]);
-      const jsonErrorSchema: any = zodToJsonSchema(errorSchema, { target: 'openApi3' });
-      const errStringify = fastJson(jsonErrorSchema);
-
+      
       middlewares.push((_req: Request, res: Response, next: NextFunction) => {
         res.json = <T extends object>(data: T) => {
-          res.setHeader('Content-Type', 'application/json');
-          if (data instanceof HttpError) {
-            return res.send(errStringify(data.errors));
-          }
+          res.setHeader("Content-Type", "application/json");
           return res.send(stringify(data));
         };
         next();
