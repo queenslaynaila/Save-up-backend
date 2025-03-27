@@ -23,7 +23,7 @@ const updateUserPin = (router: Router) => {
     summary: 'Update user PIN',
     description: 'Update authenticated user\'s PIN',
     auth: true,
-    request: {
+    schema: {
       body: z.object({
         pin: z.string().regex(/^\d{4}$/),
         new_pin: z.string().regex(/^\d{4}$/)

@@ -43,13 +43,12 @@ const getInvites = (router: Router) => {
     path: '/:user_id/invitations',
     summary: 'Get pending invitations for a user',
     auth: true,
-    request: {
+    schema: {
       params: z.object({
         user_id: entityIdParamsSchema
       })
     },
     response: {
-      200: {
         schema: z.array(pendingInvitations.pick({
           group_id: true,
           xid: true,
@@ -57,7 +56,6 @@ const getInvites = (router: Router) => {
           sender_name: true,
           group_name: true
         }))
-      }
     },
     handler: async (req, res) => {
       const userId = await decodeEntityAndVerifyAccess(req, true);

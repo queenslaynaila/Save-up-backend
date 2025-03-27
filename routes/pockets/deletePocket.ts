@@ -20,7 +20,7 @@ const deletePocket = (router: Router) => {
     method: 'delete',
     path: '/:entity_id/pockets/:xid',
     summary: 'Delete a pocket',
-    request: {
+    schema: {
       params: z.object({
         entity_id: entityIdParamsSchema,
         xid: z.number().int().min(1)      

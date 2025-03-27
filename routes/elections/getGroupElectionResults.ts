@@ -30,21 +30,19 @@ const getGroupElectionResults = (router: Router) => {
     path: '/:group_id/elections/:election_id/results',
     summary: 'View an election result progress',
     auth: true,
-    request: {
+    schema: {
       params: z.object({
         group_id: z.number().int(),
         election_id: z.number().int()
       })
     },
     response: {
-      200: {
         schema: z.array(
           z.object({
             candidate_id: z.number(),
             full_name: z.string()
           })
         )
-      }
     },
     handler: async (req, res) => {
       const groupId = await decodeEntityAndVerifyAccess(req, true);

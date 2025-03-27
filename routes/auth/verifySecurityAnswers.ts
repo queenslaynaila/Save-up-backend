@@ -26,7 +26,7 @@ const verifySecurityAnswers = (router: Router) => {
     method: 'post',
     path: '/verify-answers',
     summary: 'Verify security answers',
-    request: {
+    schema: {
       body: verifyAnswerSchema.array()
     },
     middlewares: [checkResetTokenValidity(2)],

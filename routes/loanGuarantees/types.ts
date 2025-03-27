@@ -23,7 +23,7 @@ export const loanRequestSchema = baseGuaranteeSchema.pick({
   borrower_name: z.string().min(1),
   amount: z.number(),
   purpose: z.string(),
-  repayment_period: z.string() // Assuming INTERVAL is represented as a string in the request
+  repayment_period: z.string() // Assuming INTERVAL is represented as a string in the schema
 });
 
 export type LoanRequest = z.infer<typeof loanRequestSchema>;

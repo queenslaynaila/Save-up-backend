@@ -35,7 +35,7 @@ const createTransfer = (router: Router) => {
     path: '/:entity_id/:source_pocket_id/transfer/:destination_pocket_id',
     summary: 'Transfer money between pockets',
     auth: true,
-    request: {
+    schema: {
       params: z.object({
         entity_id: entityIdParamsSchema,
         source_pocket_id: z.number().int().min(1),

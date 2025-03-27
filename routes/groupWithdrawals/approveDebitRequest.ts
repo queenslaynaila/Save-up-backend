@@ -27,8 +27,8 @@ const reviewDebitRequests = (router: Router) => {
   router.route({
     method: 'patch',
     path: '/:group_id/:xid',
-    summary: 'Approve or decline a debit request',
-    request: {
+    summary: 'Approve or decline a debit schema',
+    schema: {
       params: z.object({
         group_id: z.number().int().min(1),
         xid: z.number().int().min(1)

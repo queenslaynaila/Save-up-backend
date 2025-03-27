@@ -39,16 +39,14 @@ const getLoanRequests = (router: Router) => {
   router.route({
     method: 'get',
     path: '/:group_id',
-    summary: 'Get loan request',
-    request: {
+    summary: 'Get loan schema',
+    schema: {
       params: z.object({
         group_id: z.number().int().min(1)
       })
     },
     response: {
-      200: {
         schema: z.array(loanRequestSchema)
-      }
     },
     auth: true,
     handler: async (req, res) => {

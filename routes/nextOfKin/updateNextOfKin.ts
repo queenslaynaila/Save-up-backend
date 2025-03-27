@@ -28,7 +28,7 @@ const updateNextOfKin = (router: Router) => {
     path: '/:xid',
     auth: true,
     summary: 'Update a next of kin details',
-    request: {
+    schema: {
       params: z.object({ 
         xid: z.number().int().min(1)
       }),
@@ -41,13 +41,11 @@ const updateNextOfKin = (router: Router) => {
       })
     },
     response: {
-      200: {
         schema: nextOfKinSchema.pick({
           full_name: true,
           relationship: true,
           phone_number: true
         }).partial().required()
-      }
     },
     middlewares: [verifyPin],
     handler: async (req, res) => {

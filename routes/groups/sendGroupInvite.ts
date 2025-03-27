@@ -58,7 +58,7 @@ const createGroupInvite = (router: Router) => {
       'their notifications.'
     ].join('\n'),
     auth: true,
-    request: {
+    schema: {
       params: z.object({
         group_id: z.number().int().min(1)
       }),

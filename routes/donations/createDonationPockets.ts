@@ -69,7 +69,7 @@ const createFundraiser = (router: Router) => {
     method: "post",
     path: "/:group_id",
     summary: "Create a fundraiser",
-    request: {
+    schema: {
       params: z.object({
         group_id: z.number().int().min(1)
       }),
@@ -82,7 +82,6 @@ const createFundraiser = (router: Router) => {
       })
     },
     response: {
-      201: {
         schema: donationParams.pick({
           name: true,
           description: true,
@@ -96,7 +95,6 @@ const createFundraiser = (router: Router) => {
           created_at: z.string().datetime(),
           category_id: z.number()
         }),
-      },
     },
     auth: true,
     handler: async (req, res) => {

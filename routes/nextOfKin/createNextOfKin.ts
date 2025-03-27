@@ -27,7 +27,7 @@ const createNextOfKin = (router: Router) => {
     path: '/',
     summary: 'Create next of kin',
     auth: true,
-    request: {
+    schema: {
       body: nextOfKinSchema.pick({
         full_name: true,
         relationship: true,
@@ -37,7 +37,6 @@ const createNextOfKin = (router: Router) => {
       })
     },
     response: {
-      201: {
         schema: nextOfKinSchema.pick({
           xid: true,
           full_name: true,
@@ -45,7 +44,6 @@ const createNextOfKin = (router: Router) => {
           phone_number: true,
           created_at: true
         })
-      }
     },
     middlewares: [verifyPin],
     handler: async (req, res) => {

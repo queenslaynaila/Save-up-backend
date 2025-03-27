@@ -31,7 +31,7 @@ const getBalanceForAnEntity = (router: Router) => {
     path: '/:entity_id/pockets/balance',
     summary: 'Retrieve current balance for an entity across pockets',
     auth: true,
-    request: {
+    schema: {
       params: z.object({
         entity_id: entityIdParamsSchema
       }),
@@ -42,11 +42,9 @@ const getBalanceForAnEntity = (router: Router) => {
       }).partial()
     },
     response: {
-      200: {
         schema: z.object({
           balance: z.number()
         })
-      }
     },
     handler: async (req, res) => {
       const entityId = await decodeEntityAndVerifyAccess(req, true);

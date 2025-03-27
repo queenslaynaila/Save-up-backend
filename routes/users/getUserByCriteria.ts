@@ -27,15 +27,13 @@ const getUsersBySearchCriteria = (router: Router) => {
     summary: 'Search for users based on various criteria.',
     description: 'Allows searching for users based on a single query criterion: ' +
                 'phone number, ID number, or user ID.',
-    request: {
+    schema: {
       query: z.object({
         value: z.string()
       })
     },
     response: {
-      200: {
         schema: z.array(publicUserSchema)
-      }
     },
     auth:true,
     handler: async (req, res) => {

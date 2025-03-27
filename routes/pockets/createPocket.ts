@@ -72,7 +72,7 @@ const createPocket = (router: Router) => {
     method: 'post',
     path: '/:entity_id/pockets',
     summary: 'Create a pocket',
-    request: {
+    schema: {
       params: z.object({
         entity_id: entityIdParamsSchema,
       }),
@@ -86,7 +86,6 @@ const createPocket = (router: Router) => {
       })
     },
     response: {
-      201: {
         schema: pocketSchema.pick({
           entity_id: true,
           xid: true,
@@ -100,7 +99,6 @@ const createPocket = (router: Router) => {
           created_at: true,
           completed_at: true
         })
-      }
     },
     auth: true,
     handler: async (req, res) => {

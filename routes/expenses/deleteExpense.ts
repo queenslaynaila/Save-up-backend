@@ -19,7 +19,7 @@ const deleteExpense = (router: Router) => {
     method: 'delete',
     path: '/:entity_id/expenses/:xid',
     summary: 'Delete an expense',
-    request: {
+    schema: {
       params: z.object({
         entity_id: entityIdParamsSchema,
         xid: z.number().int().min(1)

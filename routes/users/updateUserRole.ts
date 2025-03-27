@@ -30,7 +30,7 @@ const updateUserRole = (router: Router) => {
     path: '/:user_id/role',
     summary: 'Update user role. Admin only',
     auth: [UserRole.enum.Admin],
-    request: {
+    schema: {
       params: z.object({
         user_id: entityIdParamsSchema
       }),

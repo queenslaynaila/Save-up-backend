@@ -27,7 +27,7 @@ const getTotalUserExpenditure = (router: Router) => {
     method: 'get',
     path: '/:entity_id/expenses/total',
     summary: 'Get total user/group expenditure',
-    request: {
+    schema: {
       params: z.object({
         entity_id: entityIdParamsSchema
       }),
@@ -40,11 +40,9 @@ const getTotalUserExpenditure = (router: Router) => {
       })
     },
     response: {
-      200: {
         schema: z.object({
            total_expenses: z.number() 
         })
-      }
     },
     auth: true,
     handler: async (req, res) => {

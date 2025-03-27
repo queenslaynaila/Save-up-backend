@@ -38,7 +38,7 @@ const createExpense = (router: Router) => {
     method: 'post',
     path: '/:entity_id/expenses',
     summary: 'Create an expense',
-    request: {
+    schema: {
       params: z.object({
         entity_id: entityIdParamsSchema,
       }),
@@ -50,9 +50,8 @@ const createExpense = (router: Router) => {
       })
     },
     response: {
-      201: {
-        schema: expenseSchema
-      }
+      statusCode: 201,
+      schema: expenseSchema
     },
     auth: true,
     handler: async (req, res) => {

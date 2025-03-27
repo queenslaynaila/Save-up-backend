@@ -33,7 +33,7 @@ const createCandidates = (router: Router) => {
     path: '/:group_id/elections/:election_id/candidates',
     summary: 'Create candidates for an open election',
     auth: true,
-    request: {
+    schema: {
       params: z.object({
         group_id: z.number().int().min(1),
         election_id: z.number().int().min(1)

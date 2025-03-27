@@ -129,7 +129,7 @@ const getTransactions = (router: Router) => {
     method: 'get',
     path: '/:entity_id',
     summary: 'Get all transactions by a system entity',
-    request: {
+    schema: {
       params: z.object({
         entity_id: entityIdParamsSchema
       }),
@@ -142,7 +142,6 @@ const getTransactions = (router: Router) => {
       }).partial()
     },
     response: {
-      200: {
         schema: z.array(transaction.pick({
           xid: true,
           slug:true,
@@ -153,7 +152,6 @@ const getTransactions = (router: Router) => {
           source_pocket_name: true,
           created_at: true
         }))
-      }
     },
     auth: true,
     handler: async (req, res) => {

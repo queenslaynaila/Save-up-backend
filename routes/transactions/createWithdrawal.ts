@@ -30,7 +30,7 @@ const createWithdrawal = (router: Router) => {
     path: '/:user_id/:pocket_id/withdraw',
     summary: 'Withdraw from a user pocket',
     auth: true,
-    request: {
+    schema: {
       params: z.object({
         user_id: entityIdParamsSchema,
         pocket_id: z.number().int().min(1)
@@ -42,9 +42,6 @@ const createWithdrawal = (router: Router) => {
         .extend({
           pin: z.string().regex(/^\d{4}$/)
         })
-    },
-    response: {
-      201: {}
     },
     middlewares: [verifyPin],
     handler: async (req, res) => {

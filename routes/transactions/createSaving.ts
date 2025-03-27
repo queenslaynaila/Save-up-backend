@@ -27,7 +27,7 @@ const createSaving = (router: Router) => {
     path: '/:entity_id/:pocket_id/deposit',
     summary: 'Deposit money to a pocket',
     auth: true,
-    request: {
+    schema: {
       params: z.object({
         entity_id: entityIdParamsSchema,
         pocket_id: z.number().int().min(1)

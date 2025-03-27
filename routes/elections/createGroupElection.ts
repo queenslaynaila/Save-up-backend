@@ -44,7 +44,7 @@ const createGroupElection = (router: Router) => {
       'Nomination period defaults to 48 hours if not specified.'
     ].join('\n'),
     auth: true,
-    request: {
+    schema: {
       params: z.object({
         group_id: z.number().int().min(1)
       }),

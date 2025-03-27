@@ -30,7 +30,7 @@ const createBallot = (router: Router) => {
     path: '/:group_id/elections/:election_id/ballots',
     summary: 'Submit a vote for a candidate in an election',
     auth: true,
-    request: {
+    schema: {
       params: ballotParamsSchema.pick({
         group_id: true,
         election_id: true

@@ -334,7 +334,7 @@ const getGroupActivities = (router: Router) => {
     path: '/:group_id/activities',
     summary: 'Get group activities',
     auth: true,
-    request: {
+    schema: {
       params: z.object({
         group_id: z.number().int().min(1)
       }),
@@ -343,9 +343,7 @@ const getGroupActivities = (router: Router) => {
       })
     },
     response: {
-      200: {
         schema: z.array(activitySchema)
-      }
     },
     handler: async (req, res) => {
       const groupId = await decodeEntityAndVerifyAccess(req, true);

@@ -58,24 +58,13 @@ const verifyPinResetToken = (router: Router) => {
     path: '/verify-reset-token',
     summary: 'Verify PIN reset token',
     description: 'Verify the PIN reset token provided by the user',
-    request: {
+    schema: {
       body: z.object({
         reset_token: z.string().regex(/^\d{4}$/)
       })
     },
     response: {
-      200: {
-        schema: z.array(questionsSchema),
-        headers: z.object({
-          Reset: z.string()
-        })
-      },
-      204: {
-        schema: undefined,
-        headers: z.object({
-          Reset: z.string()
-        })
-      }
+      schema: z.array(questionsSchema)
     },
     middlewares: [checkResetTokenValidity(1)],
     handler: async (req, res) => {

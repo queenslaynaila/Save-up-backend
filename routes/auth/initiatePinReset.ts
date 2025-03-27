@@ -54,19 +54,12 @@ const initiatePinReset = (router: Router) => {
     method: 'post',
     path: '/pin-reset-token',
     summary: 'Send PIN reset token',
-    request: {
+    schema: {
       body: userContactDetailsSchema.pick({
         phone_number: true
       })
     },
     middlewares: [resetPasswordLimiter],
-    response: {
-      204: {
-        headers: z.object({
-          Reset: z.string()
-        })
-      }
-    },
     handler: async (req, res) => {
       const { phone_number } = req.body;
       const resetToken = generateOtp();

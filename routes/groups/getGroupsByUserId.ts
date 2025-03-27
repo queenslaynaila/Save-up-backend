@@ -42,7 +42,7 @@ const getGroupsByUserId = (router: Router) => {
     summary: 'Get a user\'s active groups',
     description: 'Optional `mutual_user_id` filter shows only groups shared with another user.',
     auth: true,
-    request: {
+    schema: {
       params: z.object({
         user_id: entityIdParamsSchema
       }),
@@ -51,7 +51,6 @@ const getGroupsByUserId = (router: Router) => {
       })
     },
     response: {
-      200: {
         schema: z.array(
           groupsSchema.pick({
             id: true,
@@ -61,7 +60,6 @@ const getGroupsByUserId = (router: Router) => {
             created_by: z.string()
           })
         )
-      }
     },
     handler: async (req, res) => {
       const userId = await decodeEntityAndVerifyAccess(req, true);

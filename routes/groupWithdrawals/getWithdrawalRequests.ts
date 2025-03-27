@@ -136,16 +136,14 @@ const getGrpDebitRequests = (router: Router) => {
     method: 'get',
     path: '/:group_id/:pocket_id',
     summary: 'Get withdrawal requests for a group pocket',
-    request: {
+    schema: {
       params: z.object({
         group_id: z.number().int().min(1),
         pocket_id: z.number().int().min(1)
       })
     },
     response: {
-      200: {
         schema: z.array(DebitRequestSchema)
-      }
     },
     auth: true,
     handler: async (req, res) => {

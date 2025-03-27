@@ -34,7 +34,7 @@ const updateElections = (router: Router) => {
     summary: 'Update an existing group election',
     description: 'Allows updating election status and nomination end date if not closed',
     auth: true,
-    request: {
+    schema: {
       params: z.object({
         group_id: z.number().int().min(1),
         election_id: z.number().int().min(1)

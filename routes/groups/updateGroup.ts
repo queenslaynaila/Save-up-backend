@@ -38,7 +38,7 @@ const updateGroup = (router: Router) => {
     summary: 'Update group details',
     description: 'Update group name',
     auth: true,
-    request: {
+    schema: {
       params: z.object({
         group_id: z.number().int().min(1)
       }),
@@ -47,11 +47,9 @@ const updateGroup = (router: Router) => {
       })
     },
     response: {
-      200: {
         schema: groupsSchema.pick({
           name: true
         })
-      }
     },
     handler: async (req, res) => {
       const groupId = await decodeEntityAndVerifyAccess(req);

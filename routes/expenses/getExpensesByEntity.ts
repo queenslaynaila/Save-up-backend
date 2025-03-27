@@ -40,7 +40,7 @@ const getExpensesByEntity = (router: Router) => {
     method: 'get',
     path: '/:entity_id/expenses',
     summary: 'Get list of expenses by criteria',
-    request: {
+    schema: {
       params: z.object({
         entity_id: entityIdParamsSchema
       }),
@@ -53,9 +53,7 @@ const getExpensesByEntity = (router: Router) => {
       })
     },
     response: {
-      200: {
-        schema: z.array(expenseSchema)
-      }
+      schema: z.array(expenseSchema)
     },
     auth: true,
     handler: async (req, res) => {

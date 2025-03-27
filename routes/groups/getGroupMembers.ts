@@ -56,20 +56,18 @@ const getGroupMembers = (router: Router) => {
     path: '/:group_id/members',
     summary: 'Get group members',
     auth: true,
-    request: {
+    schema: {
       params: z.object({
         group_id: z.number().int().min(1)
       })
     },
     response: {
-      200: {
         schema: z.array(groupMemberSchema.pick({
           user_id: true,
           full_name: true,
           is_admin: true,
           joined_at: true
         }))
-      }
     },
     handler: async (req, res) => {
       const groupId = await decodeEntityAndVerifyAccess(req, true);

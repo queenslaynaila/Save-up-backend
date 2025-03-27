@@ -53,7 +53,7 @@ const createUser = (router: Router) => {
     method: 'post',
     path: '/register',
     summary: 'Create a new user',
-    request: {
+    schema: {
       body:userSchema.pick({
         id_type: true,
         id_number: true,
@@ -65,19 +65,15 @@ const createUser = (router: Router) => {
       })
     },
     response: {
-      201: {
-        schema: publicUserSchema.pick({
-          id: true,
-          full_name: true,
-          phone_number: true,
-          gender: true,
-          role: true,
-          created_at: true
-        }),
-        headers: z.object({
-          Authorization: z.string()
-        })
-      }
+      statusCode: 201,
+      schema: publicUserSchema.pick({
+        id: true,
+        full_name: true,
+        phone_number: true,
+        gender: true,
+        role: true,
+        created_at: true
+      })
     },
     handler: async (req, res) => {
       const hashedPin = bcrypt.hashSync(req.body.pin, 12);

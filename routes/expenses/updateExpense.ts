@@ -30,7 +30,7 @@ const updateExpense = (router: Router) => {
     method: 'patch',
     path: '/:entity_id/expenses/:xid',
     summary: 'Update an expense',
-    request: {
+    schema: {
       params: z.object({
         entity_id: z.number().int().min(1),
         xid: z.number().int().min(1)
@@ -43,9 +43,7 @@ const updateExpense = (router: Router) => {
       })
     },
     response: {
-      200: {
         schema: expenseSchema
-      }
     },
     auth: true,
     handler: async (req, res) => {

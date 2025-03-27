@@ -70,15 +70,13 @@ const getGroupElectionList = (router: Router) => {
     path: '/:group_id/elections',
     summary: 'Get list of elections for a group',
     auth: true,
-    request: {
+    schema: {
       params: z.object({
         group_id: z.number().int().min(1)
       })
     },
     response: {
-      200: {
-        schema: z.array(ongoingElectionSchema)
-      }
+      schema: z.array(ongoingElectionSchema)
     },
     handler: async (req, res) => {
       const groupId = await decodeEntityAndVerifyAccess(req, true);

@@ -21,7 +21,7 @@ const updateInvites = (router: Router) => {
     path: '/me/invitations/:xid',
     summary: 'Respond to a group invitation',
     auth: true,
-    request: {
+    schema: {
       params: z.object({
         xid: z.number().int().min(1)
       }),

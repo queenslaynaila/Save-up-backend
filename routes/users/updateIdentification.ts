@@ -34,7 +34,7 @@ const updateIdDetails = (router: Router) => {
     path: '/:user_id/id-details',
     summary: 'Update ID type and number',
     auth: true,
-    request: {
+    schema: {
       params: z.object({
         user_id: entityIdParamsSchema
       }),
@@ -44,11 +44,9 @@ const updateIdDetails = (router: Router) => {
       })
     },
     response: {
-      200: {
         schema: z.object({
           id_number: userSchema.shape.id_number
         })
-      }
     },
     handler: async (req, res) => {
       const userId = await decodeEntityAndVerifyAccess(req);

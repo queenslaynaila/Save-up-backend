@@ -20,7 +20,7 @@ const deleteNextOfKin = (router: Router) => {
     path: '/:xid',
     summary: 'Delete a next of kin',
     auth: true,
-    request: {
+    schema: {
       params: z.object({
         xid: z.number().int().min(1)
       }),

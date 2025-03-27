@@ -29,21 +29,19 @@ const getCandidates = (router: Router) => {
     path: '/:group_id/elections/:election_id/candidates',
     summary: 'Retrieves all candidates nominated for an election.',
     auth: true,
-    request: {
+    schema: {
       params: z.object({
         group_id: z.number().int().min(1),
         election_id: z.number().int().min(1)
       })
     },
     response: {
-      200: {
-        schema: z.array(
-          z.object({
+      schema: z.array(
+        z.object({
             candidate_id: z.number(),
             full_name: z.string()
           })
         )
-      }
     },
     handler: async (req, res) => {
       const groupId = await decodeEntityAndVerifyAccess(req, true);

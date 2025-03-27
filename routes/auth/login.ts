@@ -122,7 +122,7 @@ export function getClientInfo(req: Request) {
   };
 }
 
-function calculateLoginAttemptsLeft(lastThreeAttempts: LoginOutcome[]) {
+export function calculateLoginAttemptsLeft(lastThreeAttempts: LoginOutcome[]) {
   if (lastThreeAttempts.length === 0 || lastThreeAttempts[0].success) {
     return 4;
   }
@@ -142,31 +142,22 @@ const login = (router: Router) => {
     method: 'post',
     path: '/login',
     summary: 'Login',
-    request: {
+    schema: {
       body: z.object({
         phone_number: userContactDetailsSchema.shape.phone_number,
         pin: userSchema.shape.pin
       })
     },
     response: {
-      200: {
-        schema: publicUserSchema.pick({
-          id:true,
-          role:true,
-          gender:true,
-          full_name:true,
-          phone_number:true,
-          created_at:true
-        }),
-        headers: z.object({
-          Authorization: z.string()
-        })
-      },
-      401: {
-        schema: z.object({
-          remaining_attempts: z.number().min(0).max(3)
-        })
-      }
+      statusCode: 200,
+      schema:  publicUserSchema.pick({
+        id:true,
+        role:true,
+        gender:true,
+        full_name:true,
+        phone_number:true,
+        created_at:true
+      })
     },
     handler: async (req, res) => {
       const { pin, ...user } = await SQL_GET_USER({

@@ -19,13 +19,13 @@ const createGroup = (router: Router) => {
     path: '/',
     summary: 'Create a group',
     auth: true,
-    request: {
+    schema: {
       body: groupsSchema.pick({
         name: true
       })
     },
     response: {
-      201: {
+        statusCode: 201,
         schema: groupsSchema.pick({
           id: true,
           name: true,
@@ -33,7 +33,6 @@ const createGroup = (router: Router) => {
         }).extend({
           created_by: z.string()
         })
-      }
     },
     handler: async (req, res) => {
       const group = await SQL_CREATE_GROUP({

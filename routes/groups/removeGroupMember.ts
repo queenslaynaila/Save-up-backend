@@ -31,7 +31,7 @@ const handleGroupExit = (router: Router) => {
       '2. Admin removal: Admins can remove others using `/{group_id}/members/{user_id}`'
     ].join('\n'),
     auth: true,
-    request: {
+    schema: {
       params: z.object({
         group_id: z.number().int().min(1),
         member_id: entityIdParamsSchema

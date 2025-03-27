@@ -32,7 +32,7 @@ const requestLoan = (router: Router) => {
     method: 'post',
     path: '/:group_id/:pocket_id/',
     summary: 'Request a loan',
-    request: {
+    schema: {
       params: z.object({
         group_id: z.string().regex(/^[1-9]\d*$/),
         pocket_id: z.string().regex(/^[1-9]\d*$/)

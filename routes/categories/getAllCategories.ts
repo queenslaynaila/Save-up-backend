@@ -24,14 +24,13 @@ const getAllCategories = (router: Router) => {
     path: '/',
     summary: 'Get list of categories',
     response: {
-      200: {
-        schema: z.array(categorySchema.pick({
-          id:true,
-          name:true,
-          description:true,
-          image_url:true
-        }))
-      }
+      schema: z.array(categorySchema.pick({
+        id:true,
+        name:true,
+        description:true,
+        image_url:true
+      }))
+      
     },
     auth: true,
     handler: async (_req, res) => {

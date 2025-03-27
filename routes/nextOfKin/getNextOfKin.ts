@@ -32,7 +32,7 @@ const getNextOfKin = (router: Router) => {
     summary: 'Retrieve next of kin details',
     description: 'Fetches next of kin details for a user. Standard users can only view active records.',
     auth: true,
-    request: {
+    schema: {
       params: z.object({
         user_id: entityIdParamsSchema
       }),
@@ -41,7 +41,6 @@ const getNextOfKin = (router: Router) => {
       }).partial()
     },
     response: {
-      200: {
         schema: z.array(
           nextOfKinSchema.pick({
             xid: true,
@@ -51,7 +50,6 @@ const getNextOfKin = (router: Router) => {
             created_at: true
           })
         )
-      }
     },
     handler: async (req, res) => {
       const userId = await decodeEntityAndVerifyAccess(req, true);

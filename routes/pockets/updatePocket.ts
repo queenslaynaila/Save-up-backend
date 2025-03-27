@@ -52,7 +52,7 @@ const updatePocket = (router: Router) => {
     method: 'patch',
     path: '/:entity_id/pockets/:xid',
     summary: 'Update pocket',
-    request: {
+    schema: {
       params: z.object({
         entity_id: entityIdParamsSchema,
         xid: z.number().int().min(1)
@@ -67,7 +67,6 @@ const updatePocket = (router: Router) => {
       }).partial()
     },
     response: {
-      200: {
         schema:pocketSchema
         .pick({
           category_id: true,
@@ -78,7 +77,6 @@ const updatePocket = (router: Router) => {
           target_amount: true,
           target_at: true
         }).partial()
-      }
     },
     auth: true,
     handler: async (req, res) => {

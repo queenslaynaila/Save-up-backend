@@ -18,7 +18,7 @@ const resetPin = (router: Router) => {
     method: 'patch',
     path: '/reset-pin',
     summary: 'Reset pin',
-    request: {
+    schema: {
       body: z.object({
         new_pin: z.string().regex(/^\d{4}$/)
       })

@@ -24,13 +24,10 @@ const createSecurityAnswer = (router: Router) => {
     method: 'post',
     path: '/answers',
     summary: 'Create a security answer',
-    request: {
+    schema: {
       body: securityAnswerCreationSchema.extend({
         pin: z.string().regex(/^\d{4}$/)
       })
-    },
-    response: {
-      201: {}
     },
     auth: true,
     middlewares: [verifyPin],

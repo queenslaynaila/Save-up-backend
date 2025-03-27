@@ -12,11 +12,8 @@ const guaranteeLoan = (router: Router) => {
     method: 'post',
     path: '/',
     summary: 'Guarantee a loan',
-    request: {
+    schema: {
       body: guaranteeLoanBodySchema
-    },
-    response: {
-      201: {}
     },
     auth: true,
     handler: async (req, res) => {

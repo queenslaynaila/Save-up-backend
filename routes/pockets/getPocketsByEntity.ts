@@ -70,7 +70,7 @@ const getPocketsByEntity = (router: Router) => {
     method: 'get',
     path: '/:entity_id/pockets',
     summary: 'Get pockets for a system entity',
-    request: {
+    schema: {
       params: z.object({
         entity_id: entityIdParamsSchema
       }),
@@ -85,9 +85,7 @@ const getPocketsByEntity = (router: Router) => {
       }).partial()
     },
     response: {
-      200: {
         schema: z.array(pocketReturnSchema)
-      }
     },
     auth: true,
     handler: async (req, res) => {

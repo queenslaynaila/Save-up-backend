@@ -49,13 +49,12 @@ const getDonationPockets = (router: Router) => {
     method: "get",
     path: "/:group_id",
     summary: "Get all donation pockets for a group",
-    request: {
+    schema: {
       params: z.object({
         group_id: z.number().int().min(1),
       })
     },
     response: {
-      200: {
         schema: z.array(
           z.object({
             xid: z.number().int().min(1),
@@ -69,7 +68,6 @@ const getDonationPockets = (router: Router) => {
             created_at: z.string()
           })
         ),
-      },
     },
     auth: true,
     handler: async (req, res) => {

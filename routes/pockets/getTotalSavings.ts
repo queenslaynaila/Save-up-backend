@@ -38,7 +38,7 @@ const getTotalSavings = (router: Router) => {
     method: 'get',
     path: '/:entity_id/pockets/total-savings',
     summary: 'Get total savings across all pockets for an entity',
-    request: {
+    schema: {
       params: z.object({
         entity_id: entityIdParamsSchema
       }),
@@ -49,14 +49,12 @@ const getTotalSavings = (router: Router) => {
       })
     },
     response: {
-      200: {
         schema: z.array(
           z.object({
             name: z.string(),
             total_savings: z.number()
           })
         )
-      }
     },
     auth: true,
     handler: async (req, res) => {

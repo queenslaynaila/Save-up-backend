@@ -31,11 +31,8 @@ const createWithdrawalRequest = (router: Router) => {
   router.route({
     method: 'post',
     path: '/:group_id/:pocket_id',
-    summary: 'Create a group debit request for Withdrawal',
-    response: {
-      201: {}
-    },
-    request: {
+    summary: 'Create a group debit schema for Withdrawal',
+    schema: {
       params: z.object({
         group_id: z.number().int().min(1),
         pocket_id: z.number().int().min(1)
@@ -60,7 +57,7 @@ const createWithdrawalRequest = (router: Router) => {
         if (err.code === 'P0004') {
           throw new HttpError(400, { message: 'ERR_INSUFFICIENT_FUNDS' });
         }
-        logger.info(`Error creating group debit request: ${err}`);
+        logger.info(`Error creating group debit schema: ${err}`);
         throw err;
       });
       res.sendStatus(201);
