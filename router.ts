@@ -6,7 +6,7 @@ import express, {
   Application,
   RequestHandler
 } from 'express';
-import { AnyZodObject, TypeOf, z, ZodNever, ZodRecord, ZodSchema, ZodUndefined, ZodUnion } from 'zod';
+import { AnyZodObject, TypeOf, z, ZodBoolean, ZodNever, ZodNumber, ZodRecord, ZodSchema, ZodUndefined, ZodUnion } from 'zod';
 import { OpenApiGeneratorV3, OpenAPIRegistry } from '@asteasolutions/zod-to-openapi';
 import fastJson from 'fast-json-stringify';
 import zodToJsonSchema from 'zod-to-json-schema';
@@ -26,6 +26,27 @@ const swaggerConfig = {
   password: Config.SWAGGER_PASSWORD
 };
 
+const coerceParams = (schema: AnyZodObject, data: Record<string, any>): Record<string, any> => {
+  const parsedData: Record<string, any> = {};
+
+  for (const key in schema.shape) {
+    const fieldSchema = schema.shape[key];
+
+    if (fieldSchema instanceof ZodNumber && 
+      typeof data[key] === "string" && !isNaN(data[key] as any)) 
+    {
+      parsedData[key] = Number(data[key]);
+    } else if (fieldSchema instanceof ZodBoolean && 
+        typeof data[key] === "string") {
+      parsedData[key] = data[key] === "true";  
+    } else {
+      parsedData[key] = data[key];
+    }
+  }
+
+  return parsedData;
+};
+
 const validateSchema = (schema: ZodSchema, data: unknown, section: 'body' | 'query' | 'params') => {
   const jsonSchema = zodToJsonSchema(schema, { target: 'openApi3' });
   const validate = ajv.compile(jsonSchema);
@@ -43,6 +64,8 @@ const validateSchema = (schema: ZodSchema, data: unknown, section: 'body' | 'que
 
     throw new HttpError(400, errors);
   }
+
+  return schema.parse(data);
 };
 
 const validateRequest = (schema: {
@@ -51,9 +74,10 @@ const validateRequest = (schema: {
   params?: AnyZodObject;
 }) => {
   return (req: Request, _res: Response, next: NextFunction) => {
+    
     if (schema.body) validateSchema(schema.body, req.body, 'body');
     if (schema.query) validateSchema(schema.query, req.query, 'query');
-    if (schema.params) validateSchema(schema.params, req.params, 'params');
+    if (schema.params) req.params = coerceParams(schema.params, req.params);
     next();
   };
 };
