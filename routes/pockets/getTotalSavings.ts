@@ -7,9 +7,9 @@ import { entityIdParamsSchema } from '../users/schema';
 const SQL_TOTAL_SAVINGS = sql<
   {
     entity_id: number;
+    limit: number;
     from?: string;
     to?: string;
-    limit: number
   },
   {
     name: string;
@@ -27,8 +27,8 @@ const SQL_TOTAL_SAVINGS = sql<
     AND transactions.pocket_id = pockets.xid
   WHERE transactions.entity_id = :entity_id
     AND transaction_types.slug = 'Saving'
-    AND (:from IS NULL OR transactions.created_at::DATE >= :from)
-    AND (:to IS NULL OR transactions.created_at::DATE <= :to)
+    AND (:from::DATE IS NULL OR transactions.created_at::DATE >= :from)
+    AND (:to::DATE IS NULL OR transactions.created_at::DATE <= :to)
   GROUP BY pockets.name
   LIMIT :limit
 `);
@@ -59,11 +59,12 @@ const getTotalSavings = (router: Router) => {
     auth: true,
     handler: async (req, res) => {
       const entityId = await decodeEntityAndVerifyAccess(req, true);
-      const limit = req.query.limit ?? 10;
+      const { from, to, limit=10 } = req.query;
 
       const stats = await SQL_TOTAL_SAVINGS({
         entity_id: entityId,
-        ...req.query,
+        from,
+        to,
         limit
       }).many();
 

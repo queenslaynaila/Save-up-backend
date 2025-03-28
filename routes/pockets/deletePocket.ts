@@ -6,10 +6,7 @@ import { decodeEntityAndVerifyAccess } from '../../utils';
 import { entityIdParamsSchema } from '../users/schema';
 
 const SQL_DELETE_POCKET = sql<
-  { 
-    pocket_id: number; 
-    entity_id: number 
-  },
+  { pocket_id: number; entity_id: number },
   Record<string, never>
 >(`
   SELECT delete_pocket(:entity_id, :pocket_id)

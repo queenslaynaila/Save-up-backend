@@ -57,12 +57,12 @@ const SQL_GET_POCKETS = sql<PocketFilters, PocketReturn>(`
   FROM pockets
   WHERE pockets.deleted_at IS NULL
     AND pockets.entity_id = :entity_id
-    AND (:xid IS NULL OR pockets.xid = :xid)
-    AND (:category_id IS NULL OR pockets.category_id = :category_id)
+    AND (:xid::INT IS NULL OR pockets.xid = :xid)
+    AND (:category_id::INT IS NULL OR pockets.category_id = :category_id)
     AND (:priority::enum_priority IS NULL OR pockets.priority = :priority)
     AND (:status::enum_status IS NULL OR pockets.status = :status)
-    AND (:start_date IS NULL OR DATE(pockets.created_at) >= :start_date)
-    AND (:end_date IS NULL OR DATE(pockets.created_at) <= :end_date)
+    AND (:start_date::DATE IS NULL OR DATE(pockets.created_at) >= :start_date)
+    AND (:end_date::DATE IS NULL OR DATE(pockets.created_at) <= :end_date)
 `);
 
 const getPocketsByEntity = (router: Router) => {
@@ -85,15 +85,28 @@ const getPocketsByEntity = (router: Router) => {
       }).partial()
     },
     response: {
-        schema: z.array(pocketReturnSchema)
+      schema: z.array(pocketReturnSchema)
     },
     auth: true,
     handler: async (req, res) => {
       const entityId = await decodeEntityAndVerifyAccess(req, true);
+      const {
+        xid, 
+        category_id, 
+        priority, 
+        status, 
+        start_date, 
+        end_date
+      } = req.query;
 
       const pockets = await SQL_GET_POCKETS({
         entity_id: entityId,
-        ...req.query
+        xid,
+        category_id,
+        priority,
+        status,
+        start_date,
+        end_date
       }).many();
 
       res.json(pockets);

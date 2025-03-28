@@ -4,25 +4,30 @@ import { z } from 'zod';
 import { Pocket, pocketSchema } from './schema';
 import { decodeEntityAndVerifyAccess } from '../../utils';
 import { entityIdParamsSchema } from '../users/schema';
+import HttpError from '../../httpError';
 
 const pocketPatchParams = pocketSchema.pick({
+  entity_id:true,
+  xid:true,
   category_id: true,
   name: true,
   priority: true,
   pocket_type: true,
   target_amount: true,
   target_at: true
-  }).partial().extend({
-    entity_id: z.number().int().min(1),
-    xid: z.number().int().min(1)
-  });
+  })
+  .partial()
+  .required({
+    entity_id: true,
+    xid:true
+  })
 
 type PocketPatchParams = z.infer<typeof pocketPatchParams>;
 
 const SQL_UPDATE_POCKET = sql<
 PocketPatchParams, 
-Pick<Pocket, 'name'|'category_id'|'pocket_type'|'target_amount'|'priority'|'target_at'> 
-& {category_name:string}>(`
+Pick<Pocket, 'name'|'category_id'|'pocket_type'|'target_amount'|'priority'|'target_at'> & {category_name:string}
+>(`
   UPDATE pockets
   SET name = COALESCE(:name, name),
       category_id = COALESCE(:category_id, category_id),
@@ -67,25 +72,40 @@ const updatePocket = (router: Router) => {
       }).partial()
     },
     response: {
-        schema:pocketSchema
-        .pick({
+        schema:pocketSchema.pick({
           category_id: true,
-          entity_id: true,
           name: true,
           priority: true,
           pocket_type: true,
           target_amount: true,
           target_at: true
-        }).partial()
+        }).extend({
+          category_name: z.string()
+        })
     },
     auth: true,
     handler: async (req, res) => {
       const entityId = await decodeEntityAndVerifyAccess(req);
+
+      const {
+        name,
+        category_id, 
+        target_amount, 
+        priority, 
+        pocket_type, 
+        target_at
+      } = req.body;
+
       const pocket = await SQL_UPDATE_POCKET({
         xid: req.params.xid,
         entity_id: entityId,
-        ...req.body
-      }).one();
+        name,
+        category_id,
+        target_amount,
+        priority,
+        pocket_type,
+        target_at
+      }).one(new HttpError(404));
 
       return res.json(pocket);
     }
