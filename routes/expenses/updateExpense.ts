@@ -7,13 +7,14 @@ import {
 } from './schema';
 import { z } from 'zod';
 import  { decodeEntityAndVerifyAccess } from '../../utils';
-import { ExpenseCreationParams } from './createExpense';
+import { entityIdParamsSchema } from '../users/schema';
+
+type ExpenseParams = Pick<Expense, 'entity_id'|'xid'> & 
+  Partial<Pick<Expense, 'description'|'category_id'|'amount'|'spent_at'>>
 
 const SQL_UPDATE_EXPENSE = sql<
-Pick<ExpenseCreationParams,'entity_id'|'category_id'|
-'amount'|'description'|'spent_at'> & {xid: number},
-Pick<Expense, 'entity_id'|'xid'|'category_id'|'description'|
-'amount'|'spent_at'|'created_at'>>(`
+ExpenseParams,
+Pick<Expense, 'category_id'|'description'|'amount'|'spent_at'>>(`
   UPDATE expenses
   SET description = COALESCE(:description, expenses.description),
       category_id = COALESCE(:category_id, expenses.category_id),
@@ -22,7 +23,11 @@ Pick<Expense, 'entity_id'|'xid'|'category_id'|'description'|
   WHERE entity_id = :entity_id 
   AND xid = :xid
   AND deleted_at IS NULL
-  RETURNING entity_id, xid, category_id, description, amount, spent_at, created_at;
+  RETURNING 
+    category_id, 
+    description, 
+    amount, 
+    spent_at;
 `);
 
 const updateExpense = (router: Router) => {
@@ -32,7 +37,7 @@ const updateExpense = (router: Router) => {
     summary: 'Update an expense',
     schema: {
       params: z.object({
-        entity_id: z.number().int().min(1),
+        entity_id:entityIdParamsSchema,
         xid: z.number().int().min(1)
       }),
       body:expenseSchema.pick({
@@ -40,18 +45,27 @@ const updateExpense = (router: Router) => {
         description: true,
         amount: true,
         spent_at: true
-      })
+      }).partial()
     },
     response: {
-        schema: expenseSchema
+      schema: expenseSchema.pick({
+        category_id:true,
+        description:true,
+        amount:true,
+        spent_at:true
+      })
     },
     auth: true,
     handler: async (req, res) => {
       const entityId = await decodeEntityAndVerifyAccess(req);
+      const {category_id, description, amount, spent_at} = req.body;
       const expense = await SQL_UPDATE_EXPENSE({
         entity_id: entityId, 
         xid: req.params.xid,
-        ...req.body,
+        category_id,
+        description,
+        amount,
+        spent_at
       }).one(new HttpError(404));
       res.json(expense);
     }

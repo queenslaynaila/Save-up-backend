@@ -16,7 +16,8 @@ const SQL_GET_EXPENSES = sql<{
   start_date?: string;
   end_date?: string;
 }, 
-Pick<Expense, 'entity_id'|'xid'|'category_id'|'description'|'amount'|'created_at'|'xid'>>(`
+Pick<Expense, 'entity_id'|'xid'|'category_id'|'description'|
+  'amount'|'created_at'|'xid'>>(`
   SELECT entity_id, 
          xid, 
          category_id, 
@@ -27,11 +28,11 @@ Pick<Expense, 'entity_id'|'xid'|'category_id'|'description'|'amount'|'created_at
   FROM expenses 
   WHERE deleted_at IS NULL
     AND entity_id = :entity_id
-    AND (:category_id IS NULL OR category_id = :category_id)
-    AND (:spent_from IS NULL OR DATE(spent_at) >= :spent_from)
-    AND (:spent_to IS NULL OR DATE(spent_at) <= :spent_to)
-    AND (:start_date IS NULL OR DATE(created_at) >= :start_date)
-    AND (:end_date IS NULL OR DATE(created_at) <= :end_date)
+    AND (:category_id::INT IS NULL OR category_id = :category_id)
+    AND (:spent_from::DATE IS NULL OR DATE(spent_at) >= :spent_from)
+    AND (:spent_to::DATE IS NULL OR DATE(spent_at) <= :spent_to)
+    AND (:start_date::DATE IS NULL OR DATE(created_at) >= :start_date)
+    AND (:end_date::DATE IS NULL OR DATE(created_at) <= :end_date)
   LIMIT 15
 `);
 
@@ -45,12 +46,12 @@ const getExpensesByEntity = (router: Router) => {
         entity_id: entityIdParamsSchema
       }),
       query: z.object({
-        category_id: z.number().int().min(1).optional(),
-        spent_from: z.string().date().optional(),
-        spent_to: z.string().date().optional(),
-        start_date: z.string().date().optional(),
-        end_date: z.string().date().optional()
-      })
+        category_id: z.number().int().min(1),
+        spent_from: z.string().date(),
+        spent_to: z.string().date(),
+        start_date: z.string().date(),
+        end_date: z.string().date()
+      }).partial()
     },
     response: {
       schema: z.array(expenseSchema)
@@ -58,9 +59,22 @@ const getExpensesByEntity = (router: Router) => {
     auth: true,
     handler: async (req, res) => {
       const entityId = await decodeEntityAndVerifyAccess(req, true);
+
+      const {
+        category_id, 
+        spent_from, 
+        spent_to, 
+        start_date, 
+        end_date
+      } = req.query;
+      
       const expenses = await SQL_GET_EXPENSES({
         entity_id: entityId,
-        ...req.query
+        category_id,
+        spent_from,
+        spent_to,
+        start_date,
+        end_date
       }).many();
 
       res.json(expenses);
