@@ -54,12 +54,19 @@ const getExpensesByEntity = (router: Router) => {
       }).partial()
     },
     response: {
-      schema: z.array(expenseSchema)
+      schema: z.array(expenseSchema.pick({
+        entity_id:true,
+        xid:true,
+        category_id:true,
+        description:true,
+        amount:true,
+        spent_at:true,
+        created_at:true
+      }))
     },
     auth: true,
     handler: async (req, res) => {
       const entityId = await decodeEntityAndVerifyAccess(req, true);
-
       const {
         category_id, 
         spent_from, 
