@@ -17,7 +17,7 @@ const SQL_GET_EXPENSES = sql<{
   end_date?: string;
 }, 
 Pick<Expense, 'entity_id'|'xid'|'category_id'|'description'|
-  'amount'|'created_at'|'xid'>>(`
+  'amount'|'spent_at'|'created_at'>>(`
   SELECT entity_id, 
          xid, 
          category_id, 
