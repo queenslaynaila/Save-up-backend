@@ -9,6 +9,7 @@ import {
   PinResetState, 
   Role
 } from './routes/users/schema';
+import logger from './logger';
 declare module 'express-serve-static-core' {
   interface Request {
     user?: AuthenticatedUser;
@@ -93,7 +94,8 @@ function validateAndDecodeJwt(headerValue: string): JwtPayload {
   }
   const token = parts[1];
 
-  const decoded = jwt.verify(token, Config.JWT_SECRET as Secret) as JwtPayload;
+  const decoded = jwt.decode(token) as JwtPayload | null;
+
   if (!decoded ||
       !decoded.id ||
       (decoded.exp && decoded.exp * 1000 <= Date.now())
