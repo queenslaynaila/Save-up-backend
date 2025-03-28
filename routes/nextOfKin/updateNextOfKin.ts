@@ -49,10 +49,14 @@ const updateNextOfKin = (router: Router) => {
     },
     middlewares: [verifyPin],
     handler: async (req, res) => {
+      const { full_name, relationship, phone_number } = req.body;
+
       const kin = await SQL_UPDATE_KIN({
         user_id: req.user!.id,
         xid: req.params.xid,
-        ...req.body
+        full_name,
+        relationship,
+        phone_number
       }).one();
       
       return res.json(kin);

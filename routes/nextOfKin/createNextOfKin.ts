@@ -4,6 +4,7 @@ import { sql } from '../../db';
 import HttpError from '../../httpError';
 import { NextOfKin, nextOfKinSchema } from './schema';
 import { verifyPin } from '../../utils';
+import logger from '../../logger';
 
 const SQL_CREATE_KIN = sql<
 Pick<NextOfKin,'user_id'|'full_name'|'relationship'|'phone_number' >,
