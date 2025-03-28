@@ -128,7 +128,7 @@ const getTransactions = (router: Router) => {
   router.route({
     method: 'get',
     path: '/:entity_id',
-    summary: 'Get all transactions by a system entity',
+    summary: 'Get all transactions associated with a useror grps',
     schema: {
       params: z.object({
         entity_id: entityIdParamsSchema
@@ -156,11 +156,14 @@ const getTransactions = (router: Router) => {
     auth: true,
     handler: async (req, res) => {
       const entityId = await decodeEntityAndVerifyAccess(req, true);
+      const {slug, pocket_id, from, to, limit = 10} = req.query
       
-      const limit = req.query.limit ?? 10
       const transactions = await SQL_GET_TRANSACTIONS({
         entity_id: entityId,
-        ...req.query,
+        slug,
+        pocket_id,
+        from,
+        to,
         limit
       }).many();
 
