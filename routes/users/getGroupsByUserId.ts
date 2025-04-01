@@ -1,9 +1,9 @@
 import Router from '../../router';
 import { sql } from '../../db';
 import { z } from 'zod';
-import { Group, groupsSchema } from './schema';
 import { entityIdParamsSchema } from '../users/schema';
 import { decodeEntityAndVerifyAccess } from '../../utils';
+import { Group, groupsSchema } from '../groups/schema';
 
 const SQL_FETCH_USER_GROUPS = sql<
   { user_id: number; other_user_id?: number },
@@ -38,7 +38,7 @@ const SQL_FETCH_USER_GROUPS = sql<
 const getGroupsByUserId = (router: Router) => {
   router.route({
     method: 'get',
-    path: '/:user_id',
+    path: '/:user_id/groups',
     summary: 'Get a user\'s active groups',
     description: 'Optional `mutual_user_id` filter shows only groups shared with another user.',
     auth: true,
