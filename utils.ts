@@ -265,8 +265,9 @@ export async function decodeEntityAndVerifyAccess<T extends RequestParams>(
   }
 
   if (resolvedParams.group_id) {
-    if (!hasSystemAdminPermissions(loggedInUserRole, isOwnerOrAdminMod)) 
-      throw new HttpError(403);
+    if (hasSystemAdminPermissions(loggedInUserRole, isOwnerOrAdminMod)) {
+      return resolvedParams.group_id as ReturnType<T>;
+    }
     return await verifyGroupMembershipPermissions(
       resolvedParams.group_id, 
       loggedInUserId, 
