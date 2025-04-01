@@ -244,13 +244,12 @@ export async function decodeEntityAndVerifyAccess<T extends RequestParams>(
 
   const loggedInUserId = req.user.id
   const loggedInUserRole = req.user.role
-  const params = req.params!; 
 
   const resolvedParams = {
-    user_id: replaceMeWithUserId(params.user_id, loggedInUserId),
-    member_id: replaceMeWithUserId(params.member_id, loggedInUserId),
-    entity_id: replaceMeWithUserId(params.entity_id, loggedInUserId),
-    group_id: params.group_id
+    user_id: replaceMeWithUserId(req.params.user_id, loggedInUserId),
+    member_id: replaceMeWithUserId(req.params.member_id, loggedInUserId),
+    entity_id: replaceMeWithUserId(req.params.entity_id, loggedInUserId),
+    group_id: req.params.group_id
   };
 
   if ( 
@@ -288,8 +287,9 @@ export async function decodeEntityAndVerifyAccess<T extends RequestParams>(
     }
 
     if (entityType === "Group") {
-      if (!hasSystemAdminPermissions(loggedInUserRole, isOwnerOrAdminMod)) 
-        throw new HttpError(403);
+      if (hasSystemAdminPermissions(loggedInUserRole, isOwnerOrAdminMod)) {
+        return resolvedParams.entity_id as ReturnType<T>;
+      }
       return await verifyGroupMembershipPermissions(
         resolvedParams.entity_id, 
         loggedInUserId, 
