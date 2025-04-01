@@ -32,18 +32,18 @@ const SQL_CREATE_TRANSFER = sql<
 const createTransfer = (router: Router) => {
   router.route({
     method: 'post',
-    path: '/:entity_id/:source_pocket_id/transfer/:destination_pocket_id',
+    path: '/:entity_id/transactions/transfers',
     summary: 'Transfer money between pockets',
     auth: true,
     schema: {
       params: z.object({
-        entity_id: entityIdParamsSchema,
-        source_pocket_id: z.number().int().min(1),
-        destination_pocket_id: z.number().int().min(1)
+        entity_id: entityIdParamsSchema
       }),
       body: transferPayload
         .pick({
-          amount: true
+          amount: true,
+          source_pocket_id:true,
+          destination_pocket_id:true
         })
         .extend({
           pin: z.string().regex(/^\d{4}$/)
@@ -54,10 +54,8 @@ const createTransfer = (router: Router) => {
       const entityId = await decodeEntityAndVerifyAccess(req, false, true);
 
       await SQL_CREATE_TRANSFER({
-        source_pocket_id: req.params.source_pocket_id,
-        destination_pocket_id: req.params.destination_pocket_id,
+        ...req.body,
         user_id: req.user!.id,
-        amount: req.body.amount,
         entity_id: entityId
       }).exec().catch(err => {
         if (err.code === 'P0005') {

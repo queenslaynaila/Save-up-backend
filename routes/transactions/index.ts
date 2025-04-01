@@ -4,11 +4,11 @@ import createSaving from './createSaving';
 import createTransfer from './createTransfer';
 import createWithdrawal from './createWithdrawal';
 
-const router = Router.getRouterInstance('/transactions', 'Transactions');
+const router = Router.getRouterInstance('/', 'Transactions');
 
-getTransactions(router);
 createSaving(router);    
 createTransfer(router);   
 createWithdrawal(router);  
+getTransactions(router);
 
 export default router;

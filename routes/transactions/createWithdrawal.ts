@@ -27,17 +27,17 @@ const SQL_CREATE_WITHDRAWAL = sql<
 const createWithdrawal = (router: Router) => {
   router.route({
     method: 'post',
-    path: '/:user_id/:pocket_id/withdraw',
+    path: '/:user_id/transactions/withdrawals',
     summary: 'Withdraw from a user pocket',
     auth: true,
     schema: {
       params: z.object({
-        user_id: entityIdParamsSchema,
-        pocket_id: z.number().int().min(1)
+        user_id: entityIdParamsSchema
       }),
       body: withdrawalPayload
         .pick({
-          amount: true
+          amount: true,
+          pocket_id:true,
         })
         .extend({
           pin: z.string().regex(/^\d{4}$/)
@@ -48,9 +48,8 @@ const createWithdrawal = (router: Router) => {
       const userId = await decodeEntityAndVerifyAccess(req, false, true);
 
       await SQL_CREATE_WITHDRAWAL({
-        user_id: userId,
-        pocket_id: req.params.pocket_id,
-        amount: req.body.amount
+        ...req.body,
+        user_id: userId
       }).exec().catch(err => {
         if (err.code === 'P0004') {
           throw new HttpError(400, {

@@ -127,8 +127,8 @@ const SQL_GET_TRANSACTIONS = sql<
 const getTransactions = (router: Router) => {
   router.route({
     method: 'get',
-    path: '/:entity_id',
-    summary: 'Get all transactions associated with a useror grps',
+    path: '/:entity_id/transactions',
+    summary: 'Get all transactions associated with a user or grps',
     schema: {
       params: z.object({
         entity_id: entityIdParamsSchema

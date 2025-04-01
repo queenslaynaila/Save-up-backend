@@ -24,26 +24,25 @@ const SQL_CREATE_SAVING = sql<
 const createSaving = (router: Router) => {
   router.route({
     method: 'post',
-    path: '/:entity_id/:pocket_id/deposit',
+    path: '/:entity_id/transactions/deposits',
     summary: 'Deposit money to a pocket',
     auth: true,
     schema: {
       params: z.object({
-        entity_id: entityIdParamsSchema,
-        pocket_id: z.number().int().min(1)
+        entity_id: entityIdParamsSchema
       }),
       body: z.object({
-        amount: z.number().min(50)
+        amount: z.number().min(50),
+        pocket_id:z.number().int().min(1)
       })
     },
     handler: async (req, res) => {
       const entityId = await decodeEntityAndVerifyAccess(req);
 
       await SQL_CREATE_SAVING({
+        ...req.body,
         entity_id: entityId,
-        pocket_id: req.params.pocket_id,
-        user_id: req.user!.id,
-        ...req.body
+        user_id: req.user!.id
       }).exec();
 
       res.sendStatus(200);
