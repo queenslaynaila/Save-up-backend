@@ -28,7 +28,7 @@ const handleGroupExit = (router: Router) => {
     description: [
       'Allows:',
       '1. Self-removal: Members can leave using `/{group_id}/members/me`',
-      '2. Admin removal: Admins can remove others using `/{group_id}/members/{user_id}`'
+      '2. Admin removal: Admins can remove others using `/{group_id}/members/{member_id}`'
     ].join('\n'),
     auth: true,
     schema: {
