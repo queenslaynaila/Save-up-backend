@@ -8,19 +8,21 @@ import { entityIdParamsSchema } from '../users/schema';
 const withdrawalPayload = z.object({
   pocket_id: z.number().int().min(1),
   amount: z.number().min(50),
-  user_id: z.number().int().min(1)
+  user_id: z.number().int().min(1),
+  accept_penalty: z.boolean().default(false)
 });
 
 type Withdrawal = z.infer<typeof withdrawalPayload>;
 
 const SQL_CREATE_WITHDRAWAL = sql<
-  Pick<Withdrawal, 'user_id'|'pocket_id'|'amount'>,
+  Pick<Withdrawal, 'user_id'|'pocket_id'|'amount'|'accept_penalty'>,
   Record<string, never>
 >(`
   SELECT withdraw_from_user_pocket(
     :user_id,
     :pocket_id,
     :amount
+    :accept_penalty
   );
 `);
 
@@ -38,6 +40,7 @@ const createWithdrawal = (router: Router) => {
         .pick({
           amount: true,
           pocket_id:true,
+          accept_penalty:true
         })
         .extend({
           pin: z.string().regex(/^\d{4}$/)
@@ -45,11 +48,12 @@ const createWithdrawal = (router: Router) => {
     },
     middlewares: [verifyPin],
     handler: async (req, res) => {
-      const userId = await decodeEntityAndVerifyAccess(req, false, true);
+      const userId = await decodeEntityAndVerifyAccess(req);
 
       await SQL_CREATE_WITHDRAWAL({
         ...req.body,
-        user_id: userId
+        user_id: userId,
+        accept_penalty: req.body.accept_penalty ?? false
       }).exec().catch(err => {
         if (err.code === 'P0004') {
           throw new HttpError(400, {
