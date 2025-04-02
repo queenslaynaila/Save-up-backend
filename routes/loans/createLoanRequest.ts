@@ -1,21 +1,16 @@
 import { z } from 'zod';
 import Router from '../../router';
 import { sql } from '../../db';
+import { decodeEntityAndVerifyAccess, verifyPin } from '../../utils';
 
-const loanSchema = z.object({
-  reason: z.string(),
-  repayment_period: z.string(),
-  guarantors: z.array(z.number()),
-  amount: z.number()
-});
-
-type LoanRequest = z.infer<typeof loanSchema> & {
+const SQL_CREATE_LOAN_REQUEST = sql<{
+  reason: string;
+  repayment_period: string;
+  amount: number;
   group_id: number;
   pocket_id: number;
   initiator_id: number;
-};
-
-const SQL_CREATE_LOAN_REQUEST = sql<LoanRequest, Record<string, never>>(`
+}, Record<string, never>>(`
   SELECT create_loan_request(
     :group_id,
     :initiator_id,
@@ -30,21 +25,28 @@ const SQL_CREATE_LOAN_REQUEST = sql<LoanRequest, Record<string, never>>(`
 const requestLoan = (router: Router) => {
   router.route({
     method: 'post',
-    path: '/:group_id/:pocket_id/',
+    path: '/:group_id/loans/',
     summary: 'Request a loan',
+    auth: true,
     schema: {
       params: z.object({
-        group_id: z.string().regex(/^[1-9]\d*$/),
-        pocket_id: z.string().regex(/^[1-9]\d*$/)
+        group_id: z.number()
       }),
-      body: loanSchema
+      body:z.object({
+        pocket_id: z.number(),
+        reason: z.string(),
+        repayment_period: z.string(),
+        amount: z.number(),
+        pin: z.number()
+      })
     },
+    middlewares:[verifyPin],
     handler: async (req, res) => {
+      const groupId = await decodeEntityAndVerifyAccess(req)
       await SQL_CREATE_LOAN_REQUEST({
-        group_id: parseInt(req.params.group_id),
-        pocket_id: parseInt(req.params.pocket_id),
-        initiator_id: req.user!.id,
-        ...req.body
+        ...req.body,
+        group_id: groupId,
+        initiator_id: req.user!.id
       }).exec();
       res.sendStatus(201);
     }

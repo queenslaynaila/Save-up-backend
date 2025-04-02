@@ -62,8 +62,8 @@ const updateGroup = (router: Router) => {
           .exec();
 
         return await SQL_UPDATE_GROUP_NAME({
-          group_id: groupId,
-          ...req.body
+          ...req.body,
+          group_id: groupId
         })
           .using(trx)
           .oneFirst();

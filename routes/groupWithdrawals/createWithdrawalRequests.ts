@@ -30,14 +30,15 @@ const SQL_INITIATE_GRP_WITHDRAWAL = sql<WithdrawalParams, Record<string, never>>
 const createWithdrawalRequest = (router: Router) => {
   router.route({
     method: 'post',
-    path: '/:group_id/:pocket_id',
-    summary: 'Create a group debit request for Withdrawal',
+    path: '/:group_id/withdrawal-requests',
+    summary: 'Create a group withdrawal request',
     schema: {
       params: z.object({
-        group_id: z.number().int().min(1),
-        pocket_id: z.number().int().min(1)
+        group_id: z.number().int().min(1)
       }),
-      body: withdrawalSchema
+      body: withdrawalSchema.extend({
+        pocket_id: z.number()
+      })
     },
     auth: true,
     handler: async (req, res) => {
@@ -45,7 +46,6 @@ const createWithdrawalRequest = (router: Router) => {
         await SQL_INITIATE_GRP_WITHDRAWAL({
           ...req.body,
           group_id: groupId,
-          pocket_id: req.params.pocket_id,
           initiator_id: req.user!.id
         }).exec().catch (err => {
         if (err.code === 'P0001') {

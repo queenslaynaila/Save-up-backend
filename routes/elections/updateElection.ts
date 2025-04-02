@@ -48,10 +48,10 @@ const updateElections = (router: Router) => {
       const groupId = await decodeEntityAndVerifyAccess(req, true);
 
       await SQL_UPDATE_ELECTION({
+        ...req.body,
         group_id: groupId,
         election_id: req.params.election_id,
-        user_id: req.user!.id,
-        ...req.body
+        user_id: req.user!.id
       }).exec().catch(err => {
         if (err.code === 'P0001') {
           throw new HttpError(401, {

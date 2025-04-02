@@ -32,9 +32,9 @@ const updateInvites = (router: Router) => {
     },
     handler: async (req, res) => {
       await SQL_RESPOND_TO_INVITE({
+        ...req.body,
         xid: req.params.xid,
-        receiver_id: req.user!.id,
-        ...req.body
+        receiver_id: req.user!.id
       }).exec();
 
       res.sendStatus(204);

@@ -111,11 +111,13 @@ ORDER BY debit_requests.created_at DESC;
 const getGrpDebitRequests = (router: Router) => {
   router.route({
     method: 'get',
-    path: '/:group_id/:pocket_id',
-    summary: 'Get withdrawal requests for a group pocket',
+    path: '/:group_id/withdrawal-requests',
+    summary: 'Get all withdrawal requests made for a group',
     schema: {
       params: z.object({
-        group_id: z.number().int().min(1),
+        group_id: z.number().int().min(1)
+      }),
+      query: z.object({
         pocket_id: z.number().int().min(1)
       })
     },
@@ -128,7 +130,7 @@ const getGrpDebitRequests = (router: Router) => {
       const groupId = await decodeEntityAndVerifyAccess(req,true)
       const withdrawals = await SQL_GET_GROUP_WITHDRAWALS({
         group_id: groupId,
-        pocket_id: req.params.pocket_id,
+        pocket_id: req.query.pocket_id,
         user_id: req.user!.id
       }).many();
 

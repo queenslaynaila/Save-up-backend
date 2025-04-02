@@ -52,8 +52,8 @@ const updateIdDetails = (router: Router) => {
       const userId = await decodeEntityAndVerifyAccess(req);
 
       const { id_number } = await SQL_UPDATE_ID_NUMBER({
-        user_id: userId,
-        ...req.body
+        ...req.body,
+        user_id: userId
       }).one();
       res.json({ id_number });
     }

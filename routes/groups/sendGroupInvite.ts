@@ -74,9 +74,9 @@ const createGroupInvite = (router: Router) => {
         sender_name, 
         group_name 
       } = await SQL_SEND_INVITATION({
+        ...req.body,
         group_id: groupId,
-        sender_id: req.user!.id,
-        ...req.body
+        sender_id: req.user!.id
       }).one().catch(err => {
         if (err.code === '23505') {
           throw new HttpError(409);

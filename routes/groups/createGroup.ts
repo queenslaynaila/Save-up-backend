@@ -36,8 +36,8 @@ const createGroup = (router: Router) => {
     },
     handler: async (req, res) => {
       const group = await SQL_CREATE_GROUP({
-        creator_id: req.user!.id,
-        ...req.body
+        ...req.body,
+        creator_id: req.user!.id
       }).one();
 
       return res.status(201).json(group);

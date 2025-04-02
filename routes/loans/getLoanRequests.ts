@@ -2,6 +2,7 @@ import { z } from 'zod';
 import Router from '../../router';
 import { sql } from '../../db';
 import { decodeEntityAndVerifyAccess } from '../../utils';
+import { truncate } from 'fs/promises';
 
 const guarantorSchema = z.object({
   id: z.number().int().min(1),
@@ -39,6 +40,7 @@ const getLoanRequests = (router: Router) => {
   router.route({
     method: 'get',
     path: '/:group_id',
+    auth:true,
     summary: 'Get loan schema',
     schema: {
       params: z.object({
@@ -48,12 +50,11 @@ const getLoanRequests = (router: Router) => {
     response: {
         schema: z.array(loanRequestSchema)
     },
-    auth: true,
     handler: async (req, res) => {
       const groupId = await decodeEntityAndVerifyAccess(req, true)
       await SQL_GET_LOANS({
-        group_id: groupId,
-        ...req.body
+        ...req.body,
+        group_id: groupId
       }).exec();
       res.sendStatus(201);
     }

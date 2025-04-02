@@ -45,9 +45,9 @@ const reviewDebitRequests = (router: Router) => {
       const groupId = await decodeEntityAndVerifyAccess(req);
 
       await SQL_APPROVE_GRP_WITHDRAWAL({
+        ...req.body,
         group_id:groupId,
         xid:req.params.xid,
-        ...req.body,
         admin_id:req.user!.id
       }).exec();
 

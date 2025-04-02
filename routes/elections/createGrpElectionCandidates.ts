@@ -46,10 +46,10 @@ const createCandidates = (router: Router) => {
       const groupId = await decodeEntityAndVerifyAccess(req);
 
       await SQL_CREATE_CANDIDATE({
+        ...req.body,
         group_id: groupId,
         election_id: req.params.election_id,
-        user_id: req.user!.id,
-        ...req.body
+        user_id: req.user!.id
       }).exec().catch(err => {
         if (err.code === '23505') {
           throw new HttpError(409, {
