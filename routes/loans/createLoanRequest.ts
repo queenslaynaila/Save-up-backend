@@ -2,23 +2,25 @@ import { z } from 'zod';
 import Router from '../../router';
 import { sql } from '../../db';
 import { decodeEntityAndVerifyAccess, verifyPin } from '../../utils';
+import logger from '../../logger';
 
 const SQL_CREATE_LOAN_REQUEST = sql<{
-  reason: string;
-  repayment_period: string;
-  amount: number;
   group_id: number;
   pocket_id: number;
-  initiator_id: number;
+  initiator_id:number;
+  amount:number;
+  reason:string;
+  repayment_period:string;
+  recipients:null
 }, Record<string, never>>(`
-  SELECT create_loan_request(
+  SELECT create_group_debit_request(
     :group_id,
-    :initiator_id,
     :pocket_id,
+    :initiator_id,
     :amount,
     :reason,
     :repayment_period,
-    :guarantors
+    :recipients
   )
 `);
 
@@ -37,7 +39,7 @@ const requestLoan = (router: Router) => {
         amount: z.number(),
         reason: z.string(),
         repayment_period: z.string(),
-        pin: z.number()
+        pin: z.string().regex(/^\d{4}$/)
       })
     },
     middlewares:[verifyPin],
@@ -46,7 +48,8 @@ const requestLoan = (router: Router) => {
       await SQL_CREATE_LOAN_REQUEST({
         ...req.body,
         group_id: groupId,
-        initiator_id: req.user!.id
+        initiator_id: req.user!.id,
+        recipients:null
       }).exec();
       res.sendStatus(201);
     }
