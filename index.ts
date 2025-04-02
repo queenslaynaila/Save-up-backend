@@ -13,14 +13,17 @@ import './routes/users/index';
 import './routes/nextOfKin/index';  
 import './routes/groups/index'; 
 import './routes/elections/index';  
-//import './routes/donations/index';  
-//import './routes/loans/index';  
+
 //import './routes/loanGuarantees/index';
 import './routes/categories/index';  
 import './routes/pockets/index'; 
 import './routes/expenses/index';  
+import './routes/donations/index';  
 import './routes/transactions/index';  
 import './routes/groupWithdrawals/index';
+
+import './routes/loans/index';  
+import './routes/stats/index'
 
 extendZodWithOpenApi(z);
 

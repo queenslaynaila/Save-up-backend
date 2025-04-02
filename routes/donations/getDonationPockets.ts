@@ -2,9 +2,10 @@ import { z } from "zod";
 import Router from "../../router";
 import { sql } from "../../db";
 import { decodeEntityAndVerifyAccess } from "../../utils";
+import { entityIdParamsSchema } from "../users/schema";
 
 const SQL_GET_DONATION_POCKETS = sql<{
-  group_id: number;
+  entity_id: number;
 }, {
   xid: number;
   category_name: string;
@@ -39,7 +40,7 @@ const SQL_GET_DONATION_POCKETS = sql<{
       AND donation_pockets.pocket_id = pockets.xid
   JOIN categories 
       ON pockets.category_id = categories.id
-  WHERE pockets.entity_id = :group_id
+  WHERE pockets.entity_id = :entity_id
   ORDER BY pockets.created_at DESC
 `);
 
@@ -47,11 +48,11 @@ const SQL_GET_DONATION_POCKETS = sql<{
 const getDonationPockets = (router: Router) => {
   router.route({
     method: "get",
-    path: "/:group_id",
+    path:  "/:entity_id/donations",
     summary: "Get all donation pockets for a group",
     schema: {
       params: z.object({
-        group_id: z.number().int().min(1),
+        entity_id: entityIdParamsSchema,
       })
     },
     response: {
@@ -73,8 +74,8 @@ const getDonationPockets = (router: Router) => {
     handler: async (req, res) => {
       const groupId = await decodeEntityAndVerifyAccess(req);
       const pockets = await SQL_GET_DONATION_POCKETS({ 
-        group_id: groupId
-      }).many();
+        entity_id: groupId
+      }).many()
       res.json(pockets);
     },
   });

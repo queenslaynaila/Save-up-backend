@@ -3,18 +3,19 @@ import Router from "../../router";
 import { sql } from "../../db";
 import logger from "../../logger";
 import { decodeEntityAndVerifyAccess } from "../../utils";
+import { entityIdParamsSchema } from "../users/schema";
 
 const donationParams = z.object({
-  group_id: z.number().int().min(1),
+  entity_id: z.number().int().min(1),
   name: z.string(),
   description: z.string(),
   images: z.array(z.string()).nullable().optional(),
   target_amount: z.number(),
-  target_at: z.string(),
+  target_at: z.string().date(),
 });
 
 const SQL_CREATE_DONATION_FUND = sql<{
-  group_id: number;
+  entity_id: number;
   name: string;
   target_amount: number;
   target_at: string;
@@ -30,14 +31,14 @@ const SQL_CREATE_DONATION_FUND = sql<{
 }>(`
   INSERT INTO pockets(entity_id, xid, category_id, name, target_amount, target_at)
   SELECT 
-      :group_id,
+      :entity_id,
       COALESCE(MAX(xid), 0) + 1,
       (SELECT id FROM categories WHERE name = 'Donations' LIMIT 1),
       :name,
       :target_amount,
       :target_at
   FROM pockets
-  WHERE entity_id = :group_id
+  WHERE entity_id = :entity_id
   RETURNING 
       xid, 
       category_id, 
@@ -51,7 +52,7 @@ const SQL_CREATE_DONATION_FUND = sql<{
 `);
 
 const SQL_LINK_DONATION_DETAILS = sql<{
-  group_id: number;
+  entity_id: number;
   pocket_id: number;
   description: string;
   images: string[];
@@ -60,18 +61,18 @@ const SQL_LINK_DONATION_DETAILS = sql<{
   images: string[];
 }>(`
   INSERT INTO donation_pockets (entity_id, pocket_id, description, images)
-  VALUES (:group_id, :pocket_id, :description, :images)
+  VALUES (:entity_id, :pocket_id, :description, :images)
   RETURNING description, images
 `);
 
 const createFundraiser = (router: Router) => {
   router.route({
     method: "post",
-    path: "/:group_id",
-    summary: "Create a fundraiser",
+    path: "/:entity_id/donations",
+    summary: "Create a donation pocket/fundraiser",
     schema: {
       params: z.object({
-        group_id: z.number().int().min(1)
+        entity_id: entityIdParamsSchema
       }),
       body:donationParams.pick({
         name: true,
@@ -98,7 +99,7 @@ const createFundraiser = (router: Router) => {
     },
     auth: true,
     handler: async (req, res) => {
-      const groupId = await decodeEntityAndVerifyAccess(req, false, true)
+      const entityId = await decodeEntityAndVerifyAccess(req)
       const { 
         name, 
         description, 
@@ -109,7 +110,7 @@ const createFundraiser = (router: Router) => {
 
       await sql.transaction(async (trx) => {
         const fundraiser = await SQL_CREATE_DONATION_FUND({
-          group_id:groupId,
+          entity_id:entityId,
           name,
           target_amount,
           target_at,
@@ -117,10 +118,9 @@ const createFundraiser = (router: Router) => {
           logger.info(`error one is ${err}`)
           throw err
         });
-;
-
+        
         const fundraiserDetails = await SQL_LINK_DONATION_DETAILS({
-          group_id:groupId,
+          entity_id:entityId,
           pocket_id: fundraiser.xid,
           description,
           images: images ?? [],
