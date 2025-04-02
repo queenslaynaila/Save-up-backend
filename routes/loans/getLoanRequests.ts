@@ -39,9 +39,9 @@ const SQL_GET_LOANS = sql<{ group_id: number }, LoanRequest>(`
 const getLoanRequests = (router: Router) => {
   router.route({
     method: 'get',
-    path: '/:group_id',
+    path: '/:group_id/loans',
     auth:true,
-    summary: 'Get loan schema',
+    summary: 'Get loans request made to a group',
     schema: {
       params: z.object({
         group_id: z.number().int().min(1)
