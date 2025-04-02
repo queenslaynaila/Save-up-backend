@@ -31,7 +31,7 @@ const createWithdrawalRequest = (router: Router) => {
   router.route({
     method: 'post',
     path: '/:group_id/:pocket_id',
-    summary: 'Create a group debit schema for Withdrawal',
+    summary: 'Create a group debit request for Withdrawal',
     schema: {
       params: z.object({
         group_id: z.number().int().min(1),

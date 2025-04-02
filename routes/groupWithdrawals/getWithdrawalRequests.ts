@@ -15,42 +15,19 @@ const Recipient = z.object({
   recipient_name: z.string()
 });
 
-const Guarantor = z.object({
-  guarantor_id: z.number().int().min(1),
-  full_name: z.string(),
-  approved: z.enum(['Pending', 'Approved', 'Declined'])
-});
-
-const BaseRequest = z.object({
+const withdrawalRequestSchema = z.object({
   xid: z.number().int().min(1),
   requested_by: z.string(),
   amount: z.number(),
   reason: z.string(),
   requested_at: z.string(),
   status: z.string(),
-  reviews: z.array(Approval).nullable()
+  reviews: z.array(Approval).nullable(),
+  recipients: z.array(Recipient).min(1)
 });
 
-const LoanRequest = BaseRequest.extend({
-  type: z.literal('Loan'),
-  repayment_period: z.string(),
-  recipients: z.array(Recipient).max(0).nullable(),
-  guarantors: z.array(Guarantor)
-});
-
-const WithdrawalRequest = BaseRequest.extend({
-  type: z.literal('Withdrawal'),
-  repayment_period: z.string().nullish(),
-  recipients: z.array(Recipient).min(1),
-  guarantors: z.array(Guarantor).max(0).nullable()
-});
-
-export const DebitRequestSchema = z.discriminatedUnion('type', [
-  LoanRequest,
-  WithdrawalRequest
-]);
-
-export type DebitRequest = z.infer<typeof DebitRequestSchema>;
+ 
+export type WithdrawalRequest = z.infer<typeof withdrawalRequestSchema>;
 
 const SQL_GET_GROUP_WITHDRAWALS = sql<
   {
@@ -58,7 +35,7 @@ const SQL_GET_GROUP_WITHDRAWALS = sql<
     user_id: number;
     pocket_id: number;
   },
-  DebitRequest
+  WithdrawalRequest
 >(`
 SELECT  
     debit_requests.xid,  
@@ -143,7 +120,8 @@ const getGrpDebitRequests = (router: Router) => {
       })
     },
     response: {
-        schema: z.array(DebitRequestSchema)
+        statusCode: 200,
+        schema: z.array(withdrawalRequestSchema)
     },
     auth: true,
     handler: async (req, res) => {
