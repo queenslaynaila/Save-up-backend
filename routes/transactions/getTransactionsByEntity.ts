@@ -6,7 +6,7 @@ import { entityIdParamsSchema } from '../users/schema';
 
 const ENUM_TRANSACTION_TYPE = z.enum([
   'Saving',
-  'ExternalSaving',
+  'Donations',
   'Interest',
   'Withdrawal',
   'Penalty',
@@ -142,6 +142,7 @@ const getTransactions = (router: Router) => {
       }).partial()
     },
     response: {
+        statusCode:200,
         schema: z.array(transaction.pick({
           xid: true,
           slug:true,
