@@ -1,84 +1,76 @@
 import Router from '../../router';
 import { sql } from '../../db';
 import { z } from 'zod';
-import { group } from 'console';
 import { entityIdParamsSchema } from '../users/schema';
 import { decodeEntityAndVerifyAccess } from '../../utils';
 
-
-export const loanRequestSchema = z.object({
-  group_id: z.number().int(),
-  request_id: z.number().int().min(1),
-  group_name: z.string(),
-  borrower_id: z.number().int().min(1),
-  borrower_name: z.string().min(1),
-  amount: z.number(),
-  purpose: z.string(),
-  repayment_period: z.string()
-});
-
-export type LoanRequest = z.infer<typeof loanRequestSchema>;
-interface GuarantorRequest {
-  type_id: number;
-  user_id: number;
-}
-
-const SQL_GET_UNGUARANTEED_LOAN_REQUESTS = sql<GuarantorRequest, LoanRequest>(`
-    SELECT
-        debit_requests.xid AS request_id,
-        debit_requests.group_id,
-        groups.name AS group_name,
-        debit_requests.initiator_id,
-        initiator_details.full_name AS initiator_name,
-        debit_requests.amount,
-        debit_requests.reason,
-        debit_requests.status,
-        debit_requests.created_at,
-        loan_details.guarantor_id,
-        loan_details.repayment_period,
-        guarantor_approvals.approval
-    FROM debit_requests
-    JOIN groups 
-        ON debit_requests.group_id = groups.id
-    JOIN user_contact_details AS initiator_details
-        ON debit_requests.initiator_id = initiator_details.id
-    JOIN loan_details
-        ON debit_requests.group_id = loan_details.group_id
-        AND debit_requests.xid = loan_details.request_id
-    JOIN user_contact_details AS guarantor_details
-        ON loan_details.guarantor_id = guarantor_details.id
-    LEFT JOIN guarantor_approvals
-        ON debit_requests.group_id = guarantor_approvals.group_id
-        AND debit_requests.xid = guarantor_approvals.request_id
-        AND loan_details.guarantor_id = guarantor_approvals.guarantor_id
-    WHERE loan_details.guarantor_id = :user_id
-      AND debit_requests.type_id = :type_id;
+const SQL_GET_GUARANTOR_REQUESTS = sql<{
+  group_id:number;
+  user_id:number
+},
+{
+  xid: number,
+  borrower_id: number,
+  borrower_name:string,
+  amount: number,
+  reason: string,
+  repayment_period: string
+}>(`
+  SELECT 
+    debit_requests.xid,
+    debit_requests.initiator_id AS borrower_id,
+    user_contact_details.full_name AS borrower_name,
+    debit_requests.amount,
+    debit_requests.reason,
+    loan_requests.repayment_period
+  FROM loan_guarantors
+  JOIN debit_requests 
+    ON loan_guarantors.group_id = debit_requests.group_id 
+    AND loan_guarantors.request_id = debit_requests.xid
+  JOIN loan_requests 
+      ON debit_requests.group_id = loan_requests.group_id 
+      AND debit_requests.xid = loan_requests.request_id
+  JOIN user_contact_details 
+      ON debit_requests.initiator_id = user_contact_details.id
+  JOIN groups 
+    ON debit_requests.group_id = groups.id
+  WHERE loan_guarantors.group_id = :group_id
+    AND loan_guarantors.guarantor_id = :user_id;
 `);
 
 const getGuarantorRequests = (router: Router) => {
   router.route({
     method: 'get',
-    path: '/:group_id/loans/guarantors/:member_id',
-    summary: 'Get list of loan requests that require guarantor approval',
+    path: '/:group_id/loans/guarantor-requests/:member_id',
+    summary: 'Get all guarantor requests made to a grp member',
     schema: {
-        params: z.object({
-            group_id: z.number(),
-            member_id: entityIdParamsSchema
-        })
+      params: z.object({
+        group_id: z.number(),
+        member_id: entityIdParamsSchema
+      })
     },
     response: {
-        statusCode:200,
-        schema: loanRequestSchema.array()
+      statusCode: 200,
+      schema: z.array(z.object({
+        xid: z.number(),
+        borrower_id: z.number(),
+        borrower_name: z.string(),
+        amount: z.number(),
+        reason: z.string(),
+        repayment_period: z.string()
+      }))
     },
     auth: true,
     handler: async (req, res) => {
-      const entities = await decodeEntityAndVerifyAccess(req,true);
-      const {groupId, memberId} = entities
-      const loan_requests = await SQL_GET_UNGUARANTEED_LOAN_REQUESTS({
-        user_id: req.user!.id,
-        type_id: 1
+      const entities = await decodeEntityAndVerifyAccess(req, true);
+      const { groupId, memberId } = entities;
+      
+      const loanRequests = await SQL_GET_GUARANTOR_REQUESTS ({
+        group_id: groupId,
+        user_id: memberId,
       }).many();
-      res.json(loan_requests);
+        
+      res.json(loanRequests);
     }
   });
 };

@@ -37,7 +37,7 @@ const reviewDebitRequests = (router: Router) => {
         status: true,
         reason: true
       }).extend({
-        pin: z.number().min(1000).max(9999)
+      pin: z.string().regex(/^\d{4}$/)
       })
     },
     auth: true, 

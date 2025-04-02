@@ -2,7 +2,6 @@ import { z } from 'zod';
 import Router from '../../router';
 import { sql } from '../../db';
 import { decodeEntityAndVerifyAccess, verifyPin } from '../../utils';
-import logger from '../../logger';
 
 const SQL_CREATE_LOAN_REQUEST = sql<{
   group_id: number;

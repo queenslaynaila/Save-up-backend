@@ -3,24 +3,20 @@ import Router from '../../router';
 import { sql } from '../../db';
 import { decodeEntityAndVerifyAccess, verifyPin } from '../../utils';
 
-const SQL_APPROVE_LOAN_GUARANTORS = sql<{
+const SQL_INSERT_APPROVAL = sql<{
   group_id: number;
-  request_id:number;
-  initiator_id: number; 
-  approval: boolean
+  request_id: number;
+  guarantor_id: number;
+  approval: boolean;
 }, Record<string, never>>(`
-  SELECT approve_loan_guarantor(
-    :group_id,
-    :request_id,
-    :initiator_id,
-    :approval
-  )
+  INSERT INTO guarantor_approvals (group_id, request_id, guarantor_id, approval)
+  VALUES (:group_id, :request_id, :guarantor_id, :approval)
 `);
 
 const approveGuarantorRequest = (router: Router) => {
   router.route({
     method: 'post',
-    path: '/:group_id/loans/:loan_id/guarantors/approve',
+    path: '/:group_id/loans/:loan_id/guarantors/approval',
     summary: 'Approve or deny a loan guarantor request',
     auth: true,
     schema: {
@@ -30,17 +26,17 @@ const approveGuarantorRequest = (router: Router) => {
       }),
       body: z.object({
         approval: z.boolean(), 
-        pin: z.number()
+        pin: z.string().regex(/^\d{4}$/)
       })
     },
     middlewares: [verifyPin],
     handler: async (req, res) => {
       const groupId = await decodeEntityAndVerifyAccess(req); 
 
-      await SQL_APPROVE_LOAN_GUARANTORS({
+      await SQL_INSERT_APPROVAL({
         group_id: groupId,
         request_id: req.params.loan_id,
-        initiator_id: req.user!.id,
+        guarantor_id: req.user!.id,
         approval: req.body.approval
       }).exec();
 
