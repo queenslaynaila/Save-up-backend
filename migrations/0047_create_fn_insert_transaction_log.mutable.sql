@@ -2,7 +2,7 @@ CREATE OR REPLACE FUNCTION insert_transaction_log(
     p_entity_id             INT,
     p_type_id               INT,
     p_pocket_id             INT,
-    p_reference_id          INT,
+    p_reference_id          TEXT,
     p_amount                NUMERIC,
     p_current_balance       NUMERIC
 )
@@ -34,9 +34,13 @@ END;
 $$ LANGUAGE plpgsql;
 
 GRANT EXECUTE ON FUNCTION insert_transaction_log(
-    INT, INT, INT, INT, NUMERIC, NUMERIC
+    INT, INT, INT, TEXT, NUMERIC, NUMERIC
 ) TO saveup_www;
 SELECT create_distributed_function(
-  'insert_transaction_log(INT, INT, INT, INT, NUMERIC, NUMERIC)', 
+  'insert_transaction_log(INT, INT, INT, TEXT, NUMERIC, NUMERIC)', 
   'p_entity_id'
 );
+
+
+-- --insert ttansaction log will habdle all transaction related ,eyafaya feych od...chekin amt, calculating new balanve
+-- collapse pocket type check
