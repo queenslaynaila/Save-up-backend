@@ -8,7 +8,7 @@ RETURNS VOID AS $$
 DECLARE
   v_current_balance      NUMERIC;
   v_new_balance          NUMERIC;
-  v_reference_id         INT;
+  v_reference_id         TEXT;
   v_transaction_id       INT;
   v_is_group             BOOLEAN;
   v_transaction_type_id  INT;
@@ -20,7 +20,8 @@ BEGIN
 
   v_current_balance := get_transaction_info(p_entity_id, p_pocket_id);
   v_new_balance := v_current_balance + p_amount;
-  v_reference_id := floor(random() * 1000000 + 1)::INT;
+
+  v_reference_id := 'TXN' || floor(random() * 1000000 + 1)::TEXT;
 
   UPDATE pockets
   SET status = 'Completed'::enum_status,
@@ -45,7 +46,7 @@ BEGIN
     p_entity_id,
     v_transaction_type_id,
     p_pocket_id,
-    v_reference_id,
+    v_reference_id, 
     p_amount,
     v_new_balance
   );
@@ -63,6 +64,7 @@ BEGIN
   END IF;
 END;
 $$ LANGUAGE plpgsql;
+
 
 GRANT EXECUTE ON FUNCTION create_saving(
   INT, INT, INT, NUMERIC

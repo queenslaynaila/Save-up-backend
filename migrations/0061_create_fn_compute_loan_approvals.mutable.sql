@@ -11,7 +11,7 @@ DECLARE
     v_pocket_id INT;
     v_recipient_id INT;
     v_amount NUMERIC(30, 2);
-    v_reference_id INT;
+    v_reference_id TEXT;
     v_transaction_id INT;
     v_current_balance NUMERIC(30, 2);
     v_new_balance NUMERIC(30, 2);
@@ -72,7 +72,7 @@ BEGIN
             WHERE group_id = p_group_id
               AND request_id = p_request_id
         LOOP
-            v_reference_id := floor(random() * 1000000 + 1)::INT;
+            v_reference_id := 'TXN' || floor(random() * 1000000 + 1)::TEXT;
             
             v_new_balance := v_current_balance - v_recipient_record.amount;
 

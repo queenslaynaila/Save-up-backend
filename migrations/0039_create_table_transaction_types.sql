@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS transaction_types (
 );
 INSERT INTO transaction_types (slug)
 VALUES  ('Saving'),
-        ('ExternalSaving'),
+        ('Donations'),
         ('Interest'),
         ('Withdrawal'),
         ('Penalty'),

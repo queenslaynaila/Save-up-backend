@@ -1,10 +1,11 @@
 CREATE OR REPLACE FUNCTION create_group(
-    p_name         TEXT,
-    p_creator_id   INT
+    p_name       TEXT,
+    p_creator_id INT
 ) RETURNS TABLE (
-    id            INT,
-    name          TEXT,
-    created_at    TIMESTAMP WITH TIME ZONE
+    id              INT,
+    name            TEXT,
+    created_by      TEXT,
+    created_at      TIMESTAMP WITH TIME ZONE
 ) AS $$
 DECLARE
     v_entity_id   INT;
@@ -21,18 +22,18 @@ BEGIN
     PERFORM join_group(v_entity_id, p_creator_id);
     
     INSERT INTO pockets (
-        entity_id, 
+        entity_id,
         xid,
-        category_id, 
-        name, 
+        category_id,
+        name,
         priority,
         pocket_type
     )
-    SELECT
+    SELECT 
         v_entity_id,
         COALESCE(MAX(xid), 0) + 1,
-        12, 
-        'Group Wallet', 
+        12,
+        'Group Wallet',
         'Intermediate'::enum_priority,
         'Standard'::enum_pocket_type
     FROM pockets
@@ -40,8 +41,8 @@ BEGIN
     RETURNING xid INTO STRICT v_pocket_id;
 
     INSERT INTO default_pockets (entity_id, pocket_id)
-    VALUES(v_entity_id, v_pocket_id);
-  
+    VALUES (v_entity_id, v_pocket_id);
+
     INSERT INTO elections (
         group_id,
         xid,
@@ -91,8 +92,11 @@ BEGIN
     SELECT 
         groups.id,
         groups.name,
+        user_contact_details.full_name AS created_by,
         groups.created_at
     FROM groups
+    LEFT JOIN user_contact_details 
+        ON groups.creator_id = user_contact_details.id
     WHERE groups.id = v_entity_id;
 END;
 $$ LANGUAGE plpgsql;

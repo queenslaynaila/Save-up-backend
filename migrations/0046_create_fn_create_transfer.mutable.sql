@@ -11,7 +11,7 @@ DECLARE
     v_destination_balance     NUMERIC(30, 2);
     v_new_source_balance      NUMERIC(30, 2);
     v_new_destination_balance NUMERIC(30, 2);
-    v_reference_id           INT;
+    v_reference_id           TEXT;
     v_is_group               BOOLEAN;
     v_pocket_type            TEXT;
     v_target_at              TIMESTAMP WITH TIME ZONE;
@@ -53,7 +53,7 @@ BEGIN
     v_destination_balance := get_transaction_info(p_entity_id, p_destination_pocket_id);
     v_new_source_balance := v_source_balance - p_amount;
     v_new_destination_balance := v_destination_balance + p_amount;
-    v_reference_id := floor(random() * 1000000 + 1)::INT;
+    v_reference_id := 'TXN' || floor(random() * 1000000 + 1)::TEXT;
 
     v_source_transaction_id := insert_transaction_log(
         p_entity_id,

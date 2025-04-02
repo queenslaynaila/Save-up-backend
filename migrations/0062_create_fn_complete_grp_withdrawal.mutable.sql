@@ -8,7 +8,7 @@ DECLARE
     v_amount              NUMERIC;
     v_current_balance     NUMERIC;
     v_new_balance         NUMERIC;
-    v_reference_id        INT;
+    v_reference_id        TEXT;
     v_transaction_id      INT;
 BEGIN
     SELECT pocket_id, amount
@@ -25,7 +25,8 @@ BEGIN
     END IF;
 
     v_new_balance := v_current_balance - v_amount;
-    v_reference_id := floor(random() * 1000000 + 1)::INT;
+    v_reference_id := 'TXN' || floor(random() * 1000000 + 1)::TEXT;
+
     v_transaction_id := insert_transaction_log(
          p_group_id,
          4,

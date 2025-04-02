@@ -7,8 +7,6 @@ CREATE OR REPLACE FUNCTION create_candidates(
 DECLARE
     v_nomination_count INT;
 BEGIN
-    PERFORM check_grp_membership(p_group_id, p_user_id);
-
     IF NOT EXISTS (
         SELECT 1 FROM elections 
         WHERE group_id = p_group_id 
