@@ -18,13 +18,13 @@ const SQL_UPDATE_ELECTION = sql<
   ElectionParams,
   Record<string, never>
 >(`
-  SELECT update_election(
-    :user_id,
-    :group_id,
-    :election_id,
-    :status::enum_election_status,
-    :nomination_ends_at
-  )
+  
+    UPDATE elections
+    SET status = COALESCE(:status::enum_election_status, status),
+        nomination_ends_at = COALESCE(:nomination_ends_at, nomination_ends_at)
+    WHERE group_id = :group_id
+      AND xid = :election_id
+      AND status != 'Closed'::enum_election_status; 
 `);
 
 const updateElections = (router: Router) => {

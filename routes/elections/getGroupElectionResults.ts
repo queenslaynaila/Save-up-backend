@@ -2,26 +2,36 @@ import Router from '../../router';
 import { sql } from '../../db';
 import { z } from 'zod';
 import HttpError from '../../httpError';
-import { electionSchema } from './schema';
 import { decodeEntityAndVerifyAccess } from '../../utils';
-import { String40 } from 'aws-sdk/clients/sagemaker';
 
 const SQL_GET_ELECTION_RESULTS = sql<
   {
-    group_id:number; 
-    xid:number; 
+    group_id:number;
+    xid:number;
     initiator_id:number
-  }, 
+  },
   {
-    candidate_id:number; 
+    candidate_id:number;
     full_name:string
   }
 >(`
-  SELECT * FROM get_election_results(
-    :group_id, 
-    :election_id, 
-    :user_id
-  )
+  SELECT
+    group_admins.user_id AS candidate_id,
+    user_contact_details.full_name
+  FROM group_admins
+         JOIN user_contact_details
+              ON user_contact_details.id = group_admins.user_id
+  WHERE group_admins.group_id =:group_id   
+    AND group_admins.election_id = :election_id
+    AND EXISTS (
+    SELECT 1
+    FROM elections
+    WHERE group_id = :group_id
+      AND xid = :election_id
+      AND status = 'Closed'
+      AND closed_at IS NOT NULL
+  );
+
 `);
 
 const getGroupElectionResults = (router: Router) => {
@@ -46,7 +56,7 @@ const getGroupElectionResults = (router: Router) => {
     },
     handler: async (req, res) => {
       const groupId = await decodeEntityAndVerifyAccess(req, true);
-      
+
       const results = await SQL_GET_ELECTION_RESULTS({
         xid: req.params.election_id,
         group_id: groupId,
