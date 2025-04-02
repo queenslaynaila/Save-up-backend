@@ -2,8 +2,7 @@ DO $$
 BEGIN
   CREATE TYPE enum_entity_type AS ENUM (
     'User',
-    'Group',
-    'Donor'
+    'Group'
   );
 EXCEPTION
   WHEN DUPLICATE_OBJECT THEN NULL;
