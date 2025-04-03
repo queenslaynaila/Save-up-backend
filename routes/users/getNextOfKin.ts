@@ -2,9 +2,9 @@ import Router from '../../router';
 import { sql } from '../../db';
 import { z } from 'zod';
 import HttpError from '../../httpError';
-import { entityIdParamsSchema, UserRole } from '../users/schema';
+import { entityIdParamsSchema, UserRole } from './schema';
 import { decodeEntityAndVerifyAccess } from '../../utils';
-import { NextOfKin, nextOfKinSchema } from './schema';
+import { NextOfKin, nextOfKinSchema } from '../nextOfKin/schema';
 
 const SQL_GET_KIN = sql<
   Pick<NextOfKin, 'user_id'> & { include_history?: boolean }, 
@@ -28,9 +28,9 @@ const SQL_GET_KIN = sql<
 const getNextOfKin = (router: Router) => {
   router.route({
     method: 'get',
-    path: '/:user_id',
+    path: '/:user_id/next-of-kins',
     summary: 'Retrieve next of kin details',
-    description: 'Fetches next of kin details for a user. Standard users can only view active records.',
+    description: 'Standard users can only view active records.',
     auth: true,
     schema: {
       params: z.object({
