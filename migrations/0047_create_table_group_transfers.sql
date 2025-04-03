@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS group_transfers (
     group_id                  INT NOT NULL,
-    source_transaction_id     INT NOT NULL,  -- Reference to the transfer out
-    destination_transaction_id INT NOT NULL,  -- Reference to the transfer in
+    source_transaction_id     INT NOT NULL,
+    destination_transaction_id INT NOT NULL,
     election_id               INT NOT NULL,
     admin_id                  INT NOT NULL,
     created_at                TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),

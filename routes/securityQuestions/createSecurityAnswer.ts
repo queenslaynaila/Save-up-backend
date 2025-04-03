@@ -2,9 +2,15 @@ import Router from '../../router';
 import bcrypt from 'bcrypt';
 import { sql } from '../../db';
 import { z } from 'zod';
-import { securityAnswerSchema } from './updateAnswer';
 import HttpError from '../../httpError';
 import { verifyPin } from '../../utils';
+
+export const securityAnswerSchema = z.object({
+  user_id: z.number().int().min(1),
+  question_id: z.number().int().min(1),
+  answer: z.string(),
+  created_at: z.string()
+});
 
 const securityAnswerCreationSchema = z.object({
   answers: z.array(securityAnswerSchema.pick({

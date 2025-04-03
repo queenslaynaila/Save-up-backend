@@ -90,3 +90,8 @@ $$ LANGUAGE plpgsql;
 GRANT EXECUTE ON FUNCTION create_group_debit_request(
     INT, INT, INT, NUMERIC, TEXT, INTERVAL, JSON[]
 ) TO saveup_www;
+
+SELECT create_distributed_function(
+       'create_group_debit_request(INT, INT, INT, NUMERIC, TEXT, INTERVAL, JSON[])',
+        'p_group_id'
+);
