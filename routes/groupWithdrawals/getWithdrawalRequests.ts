@@ -17,13 +17,14 @@ const Recipient = z.object({
 
 const withdrawalRequestSchema = z.object({
   xid: z.number().int().min(1),
-  requested_by: z.string(),
+  initiator_id: z.number().int().min(1),
+  initiator_name: z.string(),
   amount: z.number(),
   reason: z.string(),
-  requested_at: z.string(),
   status: z.string(),
   reviews: z.array(Approval).nullable(),
-  recipients: z.array(Recipient).min(1)
+  recipients: z.array(Recipient).min(1),
+  requested_at: z.string()
 });
 
  
@@ -39,7 +40,8 @@ const SQL_GET_GROUP_WITHDRAWALS = sql<
 >(`
 SELECT  
     debit_requests.xid,  
-    user_contact_details.full_name AS requested_by,
+    debit_requests.initiator_id,
+    user_contact_details.full_name AS initiator_name,
     debit_requests.amount, 
     debit_requests.reason,
     debit_requests.status,
