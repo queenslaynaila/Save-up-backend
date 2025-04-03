@@ -1,8 +1,23 @@
 import { z } from "zod";
 import { sql } from "../../db";
-import router from "../auth";
 import { decodeEntityAndVerifyAccess } from "../../utils";
 import Router from "../../router";
+
+const SQL_REVIEW_DEBIT = sql<{
+  group_id:number;
+  debit_id:number,
+  admin_id:number;
+  status:'Approved'|'Rejected';
+  reason:string
+}, Record<string, never>>(`
+  SELECT review_debit_request(
+    :group_id, 
+    :debit_id, 
+    :admin_id, 
+    :status,
+    :reason
+  )
+`);
 
 const reviewDebitRequests = (router: Router) => {
 router.route({
@@ -16,16 +31,21 @@ router.route({
         debit_id: z.number().int().min(1)
       }),
       body: z.object({
-        status: z.enum(['approved', 'rejected']),
-        reason: z.string().optional()
+        status: z.enum(['Approved', 'Rejected']),
+        reason: z.string()
       })
     },
     handler: async (req, res) => {
       const groupId = await decodeEntityAndVerifyAccess(req,false,true)
-      const { status, reason } = req.body;
   
-    
-
+      await SQL_REVIEW_DEBIT({
+        ...req.body,
+        group_id: groupId,
+        debit_id: req.params.debit_id,
+        admin_id:req.user!.id
+      }).exec()
+  
+      res.sendStatus(200);
     }
   });
 } 
