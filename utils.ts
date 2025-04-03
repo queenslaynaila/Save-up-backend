@@ -4,12 +4,12 @@ import jwt, { Secret, JwtPayload } from 'jsonwebtoken';
 import { sql } from './db';
 import HttpError from './httpError';
 import Config from './config';
-import { 
-  AuthenticatedUser, 
-  PinResetState, 
+import {
+  AuthenticatedUser,
+  PinResetState,
   Role
 } from './routes/users/schema';
-import logger from './logger';
+
 declare module 'express-serve-static-core' {
   interface Request {
     user?: AuthenticatedUser;
@@ -30,7 +30,7 @@ const SQL_GET_ENTITY_TYPE = sql<{
 `);
 
 const SQL_GET_PIN = sql<
-  { user_id: number }, 
+  { user_id: number },
   { pin: string }
 >(`
   SELECT pin 
@@ -174,9 +174,9 @@ function hasSystemAdminPermissions(userRole:Role, isOwnerOrAdminMod: boolean): b
 }
 
 async function verifyGroupMembershipPermissions(
-  groupId: number, 
-  userId: number, 
-  requiresGrpAdmin: boolean, 
+  groupId: number,
+  userId: number,
+  requiresGrpAdmin: boolean,
   memberId?: number
 ) {
   const { is_admin_member, is_member } = await SQL_GET_GROUP_MEMBERSHIP_STATUS({
@@ -185,8 +185,8 @@ async function verifyGroupMembershipPermissions(
   }).one(new HttpError(404));
 
   if (
-    !is_member || 
-    (requiresGrpAdmin && !is_admin_member) || 
+    !is_member ||
+    (requiresGrpAdmin && !is_admin_member) ||
     (memberId && userId !== memberId && !is_admin_member)
   ) {
     throw new HttpError(403);
@@ -223,16 +223,16 @@ type GroupWithMemberParams = {
   user_id?: never;
 };
 
-type RequestParams = 
-  | SingleEntityParams 
-  | SingleUserParams 
-  | SingleGroupParams 
+type RequestParams =
+  | SingleEntityParams
+  | SingleUserParams
+  | SingleGroupParams
   | GroupWithMemberParams;
 
-type ReturnType<T> = T extends GroupWithMemberParams 
+type ReturnType<T> = T extends GroupWithMemberParams
   ? { groupId: number, memberId: number}
   : number;
-  
+
 export async function decodeEntityAndVerifyAccess<T extends RequestParams>(
   req: Request<T, any, any, any>,
   isOwnerOrAdminMod = false,
@@ -252,13 +252,13 @@ export async function decodeEntityAndVerifyAccess<T extends RequestParams>(
     group_id: req.params.group_id
   };
 
-  if ( 
-    resolvedParams.user_id === loggedInUserId || 
-    resolvedParams.entity_id === loggedInUserId 
+  if (
+    resolvedParams.user_id === loggedInUserId ||
+    resolvedParams.entity_id === loggedInUserId
   ) return loggedInUserId as ReturnType<T>;
 
   if (resolvedParams.user_id){
-    if (!hasSystemAdminPermissions(loggedInUserRole, isOwnerOrAdminMod)) 
+    if (!hasSystemAdminPermissions(loggedInUserRole, isOwnerOrAdminMod))
       throw new HttpError(403);
     return resolvedParams.user_id as ReturnType<T>;
   }
@@ -268,9 +268,9 @@ export async function decodeEntityAndVerifyAccess<T extends RequestParams>(
       return resolvedParams.group_id as ReturnType<T>;
     }
     return await verifyGroupMembershipPermissions(
-      resolvedParams.group_id, 
-      loggedInUserId, 
-      requiresGrpAdmin, 
+      resolvedParams.group_id,
+      loggedInUserId,
+      requiresGrpAdmin,
       resolvedParams.member_id
     ) as ReturnType<T>;
   }
@@ -281,7 +281,7 @@ export async function decodeEntityAndVerifyAccess<T extends RequestParams>(
     }).oneFirst(new HttpError(404));
 
     if (entityType === "User"){
-      if (!hasSystemAdminPermissions(loggedInUserRole, isOwnerOrAdminMod)) 
+      if (!hasSystemAdminPermissions(loggedInUserRole, isOwnerOrAdminMod))
         throw new HttpError(403);
       return resolvedParams.entity_id as ReturnType<T>;
     }
@@ -291,9 +291,9 @@ export async function decodeEntityAndVerifyAccess<T extends RequestParams>(
         return resolvedParams.entity_id as ReturnType<T>;
       }
       return await verifyGroupMembershipPermissions(
-        resolvedParams.entity_id, 
-        loggedInUserId, 
-        requiresGrpAdmin, 
+        resolvedParams.entity_id,
+        loggedInUserId,
+        requiresGrpAdmin,
         resolvedParams.member_id
       ) as ReturnType<T>;
     }

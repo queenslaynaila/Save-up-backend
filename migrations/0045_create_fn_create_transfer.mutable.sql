@@ -4,51 +4,49 @@ CREATE OR REPLACE FUNCTION create_transfer(
     p_user_id                INT,
     p_amount                 NUMERIC(30, 2),
     p_entity_id              INT
-) 
+)
 RETURNS VOID AS $$
 DECLARE
     v_source_balance          NUMERIC(30, 2);
     v_destination_balance     NUMERIC(30, 2);
     v_new_source_balance      NUMERIC(30, 2);
     v_new_destination_balance NUMERIC(30, 2);
-    v_reference_id           TEXT;
-    v_is_group               BOOLEAN;
-    v_pocket_type            TEXT;
-    v_target_at              TIMESTAMP WITH TIME ZONE;
+    v_reference_id            TEXT;
+    v_is_locked              BOOLEAN;
     v_source_transaction_id  INT;
     v_destination_transaction_id INT;
     v_transaction_out_type_id INT;
     v_transaction_in_type_id  INT;
     v_latest_election_id      INT;
 BEGIN
-    SELECT entity_type = 'Group' 
-    INTO STRICT v_is_group 
-    FROM entities
-    WHERE id = p_entity_id;
-
-    SELECT pocket_type, target_at
-    INTO STRICT v_pocket_type, v_target_at
+    SELECT (pocket_type = 'Locked' AND target_at > NOW())
+    INTO STRICT v_is_locked
     FROM pockets
-    WHERE xid = p_source_pocket_id
-      AND entity_id = p_entity_id;
+    WHERE pockets.xid = p_source_pocket_id
+      AND pockets.entity_id = p_entity_id;
 
-    IF v_pocket_type = 'Locked' AND v_target_at > NOW() THEN
-        RAISE EXCEPTION USING 
+    IF v_is_locked THEN
+        RAISE EXCEPTION USING
             MESSAGE = 'ERR_FUNDS_LOCKED',
             ERRCODE = 'P0005';
     END IF;
 
     v_source_balance := get_transaction_info(p_entity_id, p_source_pocket_id);
     IF v_source_balance < p_amount THEN
-        RAISE EXCEPTION USING 
+        RAISE EXCEPTION USING
             MESSAGE = 'ERR_INSUFFICIENT_FUNDS',
             ERRCODE = 'P0004';
     END IF;
 
-    SELECT 
-        (SELECT id FROM transaction_types WHERE slug = 'TransferOut'),
-        (SELECT id FROM transaction_types WHERE slug = 'TransferIn')
-    INTO STRICT v_transaction_out_type_id, v_transaction_in_type_id;
+    SELECT id
+    INTO STRICT v_transaction_out_type_id
+    FROM transaction_types
+    WHERE slug = 'TransferOut';
+
+    SELECT id
+    INTO STRICT v_transaction_in_type_id
+    FROM transaction_types
+    WHERE slug = 'TransferIn';
 
     v_destination_balance := get_transaction_info(p_entity_id, p_destination_pocket_id);
     v_new_source_balance := v_source_balance - p_amount;
@@ -73,7 +71,12 @@ BEGIN
         v_new_destination_balance
     );
 
-    IF v_is_group THEN
+    IF EXISTS (
+        SELECT 1
+        FROM entities
+        WHERE id = p_entity_id
+          AND entity_type = 'Group'
+    ) THEN
         SELECT MAX(xid)
         INTO STRICT v_latest_election_id
         FROM elections

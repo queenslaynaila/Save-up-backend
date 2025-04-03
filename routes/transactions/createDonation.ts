@@ -5,11 +5,13 @@ import HttpError from '../../httpError';
 
 const simulatePaymentRequest = async (phone_number: string, amount: number) => {
   if (Math.random() > 0.5) {
-    throw new HttpError(400, {message:'Payment request failed'}) 
+    throw new HttpError(400, {message:'Payment request failed'})
   }
   return {
+    amount,
+    phone_number,
     reference_no: `TXN${Date.now()}`,
-    donor_name: 'John Doe' 
+    donor_name: 'John Doe'
   };
 };
 
@@ -36,7 +38,7 @@ const createDonation = (router: Router) => {
   router.route({
     method: 'post',
     path: '/:entity_id/transactions/donations',
-    summary: 'Deposit money to a donation pocket/fundrauser',
+    summary: 'Deposit money to a donation pocket/fundraiser',
     schema: {
       params: z.object({
         entity_id: z.number()

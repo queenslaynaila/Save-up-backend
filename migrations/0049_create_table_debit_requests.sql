@@ -6,6 +6,21 @@ EXCEPTION
 END
 $$;
 
+DO $$
+    BEGIN
+        CREATE TYPE enum_approval_status AS ENUM (
+            'Pending Guarantors',
+            'Pending Admin Approval',
+            'Approved',
+            'Rejected',
+            'Cancelled'
+            );
+    EXCEPTION
+        WHEN DUPLICATE_OBJECT THEN
+            NULL;
+    END
+$$;
+
 CREATE TABLE IF NOT EXISTS debit_requests (
     group_id              INT NOT NULL,
     xid                   INT NOT NULL,

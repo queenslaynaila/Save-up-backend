@@ -4,26 +4,20 @@ import HttpError from '../../httpError';
 import { z } from 'zod';
 import { decodeEntityAndVerifyAccess } from '../../utils';
 
-const withdrawalSchema = z.object({
-  reason: z.string(),
-  recipients: z.array(
-    z.object({
-      recipient_id: z.number().int().min(1),
-      amount: z.number()
-    })
-  )
-})
-
-export type WithdrawalParams = z.infer<typeof withdrawalSchema> & {
+type WithdrawalParams = {
   group_id: number;
   initiator_id: number;
   pocket_id: number;
-  repayment_period:null
-};
+  reason: string;
+  recipients: {
+      recipient_id: number;
+      amount: number;
+  }[];
+}
 
 const SQL_INITIATE_GRP_WITHDRAWAL = sql<WithdrawalParams, Record<string, never>>(`
-  SELECT  create_group_debit_request(
-    :group_id, :pocket_id, :initiator_id, :amount, :reason, :repayment_period, :recipients
+  SELECT create_withdrawal_request(
+    :group_id, :pocket_id, :initiator_id, :reason, :recipients
   )
 `);
 
@@ -36,16 +30,21 @@ const createWithdrawalRequest = (router: Router) => {
       params: z.object({
         group_id: z.number().int().min(1)
       }),
-      body: withdrawalSchema.extend({
-        pocket_id: z.number()
-      })
+      body: z.object({
+        pocket_id: z.number(),
+        reason: z.string(),
+        recipients: z.array(
+          z.object({
+            recipient_id: z.number().int().min(1),
+            amount: z.number()
+          })
+      )})
     },
     auth: true,
     handler: async (req, res) => {
       const groupId = await decodeEntityAndVerifyAccess(req, false, true)
         await SQL_INITIATE_GRP_WITHDRAWAL({
           ...req.body,
-          repayment_period:null,
           group_id: groupId,
           initiator_id: req.user!.id
         }).exec().catch (err => {
