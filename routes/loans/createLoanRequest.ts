@@ -10,16 +10,14 @@ const SQL_CREATE_LOAN_REQUEST = sql<{
   amount:number;
   reason:string;
   repayment_period:string;
-  recipients:null
 }, Record<string, never>>(`
-  SELECT create_group_debit_request(
+  SELECT create_loan_request(
     :group_id,
     :pocket_id,
     :initiator_id,
     :amount,
     :reason,
-    :repayment_period,
-    :recipients
+    :repayment_period
   )
 `);
 
@@ -47,8 +45,7 @@ const requestLoan = (router: Router) => {
       await SQL_CREATE_LOAN_REQUEST({
         ...req.body,
         group_id: groupId,
-        initiator_id: req.user!.id,
-        recipients:null
+        initiator_id: req.user!.id
       }).exec();
       res.sendStatus(201);
     }

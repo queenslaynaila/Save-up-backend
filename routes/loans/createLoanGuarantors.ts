@@ -21,13 +21,13 @@ const SQL_CREATE_LOAN_GUARANTORS = sql<{
 const addLoanGuarantors = (router: Router) => {
   router.route({
     method: 'post',
-    path: '/:group_id/loans/:loan_id/guarantors',
+    path: '/:group_id/loans/:xid/guarantors',
     summary: 'Add guarantors for a loan',
     auth: true,
     schema: {
       params: z.object({
         group_id: z.number(),
-        loan_id: z.number()
+        xid: z.number()
       }),
       body: z.object({
         guarantor_ids: z.array(z.number()),
@@ -40,37 +40,37 @@ const addLoanGuarantors = (router: Router) => {
 
       await SQL_CREATE_LOAN_GUARANTORS({
         group_id: groupId,
-        request_id: req.params.loan_id,
+        request_id: req.params.xid,
         user_id: req.user!.id,
         guarantor_ids: req.body.guarantor_ids
       }).exec().catch((err)=>{
         if(err.code === 'P0001'){
           throw new HttpError(
-            400, 
+            400,
             {message:'ERR_CANT_ADD_SELF'}
           )
         }
         if(err.code === 'P0002'){
           throw new HttpError(
-            400, 
+            400,
             {message:'ERR_INVALID_GUARANTOR'}
           )
         }
         if(err.code === 'P0003'){
           throw new HttpError(
-            400, 
+            400,
             {message:'ERR_GUARANTOR_NO_DEPOSIT'}
           )
         }
         if(err.code === 'P0004'){
           throw new HttpError(
-            400, 
+            400,
             {message:'ERR_NOT_LOAN_INITIATOR'}
           )
         }
         throw err
       });
-      
+
       res.sendStatus(201);
     }
   });

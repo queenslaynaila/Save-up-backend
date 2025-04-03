@@ -3,6 +3,8 @@ import { sql } from '../../db';
 import { z } from 'zod';
 import { decodeEntityAndVerifyAccess } from '../../utils';
 
+export const DebitType = z.enum(['Loan', 'Withdrawal']);
+
 const withdrawalRequestSchema = z.object({
   xid: z.number().int().min(1),
   initiator: z.object({
@@ -40,6 +42,7 @@ const SQL_GET_GROUP_WITHDRAWALS = sql<
   {
     group_id: number;
     pocket_id: number;
+    debit_type: string;
   },
   WithdrawalRequest
 >(`
@@ -92,7 +95,7 @@ const SQL_GET_GROUP_WITHDRAWALS = sql<
   WHERE 
     debit_requests.group_id = :group_id
     AND debit_requests.pocket_id = :pocket_id
-    AND debit_requests.debit_type = 'Withdrawal'
+    AND debit_requests.debit_type = :debit_type
   ORDER BY 
     debit_requests.created_at DESC;
 `);
@@ -120,6 +123,7 @@ const getGrpDebitRequests = (router: Router) => {
       const withdrawals = await SQL_GET_GROUP_WITHDRAWALS({
         group_id: groupId,
         pocket_id: req.query.pocket_id,
+        debit_type:DebitType.Enum.Withdrawal
       }).many();
 
       res.json(withdrawals);

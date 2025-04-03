@@ -24,6 +24,7 @@ BEGIN
     END IF;
 
     v_current_balance := get_transaction_info(p_group_id, p_pocket_id);
+
     IF v_current_balance < p_amount THEN
         RAISE EXCEPTION USING
             MESSAGE = 'ERR_INSUFFICIENT_FUNDS',
@@ -46,18 +47,14 @@ BEGIN
     WHERE group_id = p_group_id
     RETURNING xid INTO v_debit_id;
 
-
-        INSERT INTO loan_requests(group_id, request_id, repayment_period)
-        VALUES(p_group_id, v_debit_id, p_repayment_period);
+    INSERT INTO loan_requests(group_id, request_id, repayment_period)
+    VALUES(p_group_id, v_debit_id, p_repayment_period);
 
 END;
 $$ LANGUAGE plpgsql;
 
-GRANT EXECUTE ON FUNCTION create_group_debit_request(
-    INT, INT, INT, NUMERIC, TEXT, INTERVAL, JSON[]
+GRANT EXECUTE ON FUNCTION create_loan_request(
+    INT, INT, INT, NUMERIC(30,2), TEXT, INTERVAL
 ) TO saveup_www;
 
-SELECT create_distributed_function(
-    'create_group_debit_request(INT, INT, INT, NUMERIC, TEXT, INTERVAL, JSON[])',
-    'p_group_id'
-);
+SELECT create_distributed_function('create_loan_request', 'p_group_id');

@@ -3,55 +3,65 @@ CREATE OR REPLACE FUNCTION add_loan_guarantors(
     p_request_id        INT,
     p_user_id           INT,
     p_guarantor_ids     INT[]
-)
+) 
 RETURNS VOID AS $$
 DECLARE
-    v_guarantor_id INT;
     v_initiator_id INT;
+    v_invalid_members INT[];
+    v_no_deposit_members INT[];
 BEGIN
-    SELECT initiator_id
+    SELECT debit_requests.initiator_id
     INTO STRICT v_initiator_id
     FROM debit_requests
-    WHERE group_id = p_group_id
-      AND xid = p_request_id;
-
+    WHERE debit_requests.group_id = p_group_id
+      AND debit_requests.xid = p_request_id;
+    
     IF p_user_id != v_initiator_id THEN
         RAISE EXCEPTION USING
             MESSAGE = 'ERR_NOT_LOAN_INITIATOR',
             ERRCODE = 'P0004';
     END IF;
-
+    
     IF p_user_id = ANY(p_guarantor_ids) THEN
         RAISE EXCEPTION USING
             MESSAGE = 'ERR_CANNOT_SELF_GUARANTEE',
             ERRCODE = 'P0001';
     END IF;
-
-    FOR v_guarantor_id IN SELECT unnest(p_guarantor_ids) LOOP
-        IF NOT EXISTS (
-            SELECT 1
-            FROM group_members
-            WHERE group_id = p_group_id
-              AND user_id = v_guarantor_id
-              AND is_active = TRUE
-        ) THEN
-            RAISE EXCEPTION USING
-                MESSAGE = 'ERR_INVALID_GUARANTOR',
-                ERRCODE = 'P0002';
-        END IF;
-
-        IF NOT EXISTS (
-            SELECT 1
-            FROM group_deposits
-            WHERE group_id = p_group_id
-              AND user_id = v_guarantor_id
-        ) THEN
-            RAISE EXCEPTION USING
-                MESSAGE = 'ERR_GUARANTOR_NO_DEPOSIT',
-                ERRCODE = 'P0003';
-        END IF;
-    END LOOP;
-
+    
+ 
+    SELECT array_agg(unnested_ids.id)
+    INTO v_invalid_members
+    FROM unnest(p_guarantor_ids) AS unnested_ids(id)
+    WHERE NOT EXISTS (
+        SELECT 1
+        FROM group_members
+        WHERE group_members.group_id = p_group_id
+          AND group_members.user_id = unnested_ids.id
+          AND group_members.is_active = TRUE
+    );
+    
+    IF v_invalid_members IS NOT NULL THEN
+        RAISE EXCEPTION USING
+            MESSAGE = 'ERR_INVALID_GUARANTOR',
+            ERRCODE = 'P0002';
+    END IF;
+    
+    SELECT array_agg(unnested_ids.id)
+    INTO v_no_deposit_members
+    FROM unnest(p_guarantor_ids) AS unnested_ids(id)
+    WHERE NOT EXISTS (
+        SELECT 1
+        FROM group_deposits
+        WHERE group_deposits.group_id = p_group_id
+          AND group_deposits.user_id = unnested_ids.id
+    );
+    
+    IF v_no_deposit_members IS NOT NULL THEN
+        RAISE EXCEPTION USING
+            MESSAGE = 'ERR_GUARANTOR_NO_DEPOSIT',
+            ERRCODE = 'P0003';
+    END IF;
+    
     INSERT INTO loan_guarantors (group_id, request_id, guarantor_id)
     SELECT p_group_id, p_request_id, unnest(p_guarantor_ids);
 END;
@@ -61,7 +71,7 @@ GRANT EXECUTE ON FUNCTION add_loan_guarantors(
     INT, INT, INT, INT[]
 ) TO saveup_www;
 
-SELECT create_distributed_fuction(
-       'add_loan_guarantors(INT, INT, INT, INT[])',
-       'p_group_id'
+SELECT create_distributed_function(
+    'add_loan_guarantors(INT, INT, INT, INT[])',
+    'p_group_id'
 );

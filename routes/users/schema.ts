@@ -42,7 +42,6 @@ export const userSchema = z.object({
   created_at: z.string().datetime()
 });
 
-
 export const loginAttemptSchema = z.object({
   user_id: z.number().int().min(1),
   xid: z.number().int().min(1),

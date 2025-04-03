@@ -3,6 +3,7 @@ import { sql } from '../../db';
 import { z } from 'zod';
 import { entityIdParamsSchema } from '../users/schema';
 import { decodeEntityAndVerifyAccess } from '../../utils';
+import logger from "../../logger";
 
 const SQL_GET_GUARANTOR_REQUESTS = sql<{
   group_id:number;
@@ -22,7 +23,7 @@ const SQL_GET_GUARANTOR_REQUESTS = sql<{
     user_contact_details.full_name AS borrower_name,
     debit_requests.amount,
     debit_requests.reason,
-    loan_requests.repayment_period
+    loan_requests.repayment_period::text AS repayment_period
   FROM loan_guarantors
   JOIN debit_requests 
     ON loan_guarantors.group_id = debit_requests.group_id 
@@ -64,12 +65,12 @@ const getGuarantorRequests = (router: Router) => {
     handler: async (req, res) => {
       const entities = await decodeEntityAndVerifyAccess(req, true);
       const { groupId, memberId } = entities;
-      
+
       const loanRequests = await SQL_GET_GUARANTOR_REQUESTS ({
         group_id: groupId,
         user_id: memberId,
       }).many();
-        
+
       res.json(loanRequests);
     }
   });
