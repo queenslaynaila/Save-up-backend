@@ -5,7 +5,7 @@ import { decodeEntityAndVerifyAccess } from '../../utils';
 import { DebitType } from '../groupWithdrawals/getWithdrawalRequests';
 
 const loanRequestSchema = z.object({
-  request_id: z.number().int().min(1),
+  xid: z.number().int().min(1),
   initiator_id: z.number().int().min(1),
   initiator_name: z.string(),
   amount: z.number(),
@@ -15,7 +15,7 @@ const loanRequestSchema = z.object({
     z.object({
       guarantor_id: z.number().int().min(1),
       guarantor_name: z.string(),
-      approval: z.boolean(),
+      approval:z.boolean().nullable(),
     })
   ),
   admin_approvals: z.array(
@@ -39,7 +39,7 @@ const SQL_GET_LOANS = sql<{
   debit_type:string
  }, LoanRequest>(`
   SELECT 
-    debit_requests.xid AS request_id,
+    debit_requests.xid,
     debit_requests.initiator_id,
     initiator_user_contact_details.full_name AS initiator_name,
     debit_requests.amount,
@@ -53,8 +53,8 @@ const SQL_GET_LOANS = sql<{
         json_build_object(
           'guarantor_id', loan_guarantors.guarantor_id,
           'guarantor_name', guarantor_user_contact_details.full_name,
-          'approval', COALESCE(guarantor_approvals.approval, false)
-        ) ORDER BY loan_guarantors.guarantor_id)
+          'approval', guarantor_approvals.approval
+        ))
       FROM loan_guarantors
       JOIN user_contact_details AS guarantor_user_contact_details 
         ON guarantor_user_contact_details.id = loan_guarantors.guarantor_id
