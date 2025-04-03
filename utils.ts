@@ -148,6 +148,7 @@ export function authMiddleware(auth: true | Role | Role[] = true) {
     }
 
     const decoded = validateAndDecodeJwt(req.headers.authorization);
+
     if (!decoded.id || !decoded.role) {
       throw new HttpError(400);
     }
@@ -265,6 +266,9 @@ export async function decodeEntityAndVerifyAccess<T extends RequestParams>(
 
   if (resolvedParams.group_id) {
     if (hasSystemAdminPermissions(loggedInUserRole, isOwnerOrAdminMod)) {
+      if (resolvedParams.member_id) {
+        return { groupId: resolvedParams.group_id, memberId: resolvedParams.member_id } as ReturnType<T>;
+      }
       return resolvedParams.group_id as ReturnType<T>;
     }
     return await verifyGroupMembershipPermissions(
