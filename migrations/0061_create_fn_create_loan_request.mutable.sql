@@ -30,6 +30,18 @@ BEGIN
             MESSAGE = 'ERR_INSUFFICIENT_FUNDS',
             ERRCODE = 'P0004';
     END IF;
+    
+    IF NOT EXISTS (
+        SELECT 1
+        FROM group_deposits
+        WHERE group_deposits.group_id = p_group_id
+        AND group_deposits.user_id = p_initiator_id
+    ) THEN
+        RAISE EXCEPTION USING
+            MESSAGE = 'ERR_NO_DEPOSIT_MADE',
+            ERRCODE = 'P0006';
+    END IF;
+
 
     INSERT INTO debit_requests (
         group_id, xid, initiator_id, debit_type, pocket_id, amount, reason, status

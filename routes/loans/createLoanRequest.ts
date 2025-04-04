@@ -2,6 +2,8 @@ import { z } from 'zod';
 import Router from '../../router';
 import { sql } from '../../db';
 import { decodeEntityAndVerifyAccess, verifyPin } from '../../utils';
+import { Http } from 'winston/lib/winston/transports';
+import HttpError from '../../httpError';
 
 const SQL_CREATE_LOAN_REQUEST = sql<{
   group_id: number;
@@ -46,7 +48,18 @@ const requestLoan = (router: Router) => {
         ...req.body,
         group_id: groupId,
         initiator_id: req.user!.id
-      }).exec();
+      }).exec().catch(err=>{
+        if(err.code === 'P0005') {
+         throw new HttpError(400, {message:'ERR_FUNDS_LOCKED'})
+        };
+        if(err.code === 'P0004') {
+          throw new HttpError(400, {message:'ERR_INSUFFICIENT_FUNDS'})
+        };
+        if(err.code === 'P0006') {
+          throw new HttpError(400, {message:'ERR_NO_DEPOSIT_MADE'})
+        };
+        throw err;
+      });
       res.sendStatus(201);
     }
   });
