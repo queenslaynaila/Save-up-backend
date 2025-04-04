@@ -23,7 +23,14 @@ BEGIN
             ERRCODE = 'P0005';
     END IF;
 
-    v_current_balance := get_transaction_info(p_group_id, p_pocket_id);
+    SELECT
+        COALESCE((SELECT balance
+                FROM transactions
+                WHERE pocket_id = p_pocket_id
+                AND entity_id = p_group_id
+                ORDER BY xid DESC
+                LIMIT 1), 0)
+    INTO STRICT v_current_balance;
 
     SELECT SUM((recipients ->> 'amount')::NUMERIC)
     INTO STRICT v_total_amount
