@@ -243,8 +243,7 @@ export async function decodeEntityAndVerifyAccess<T extends RequestParams>(
     throw new HttpError(401);
   }
 
-  const loggedInUserId = req.user.id
-  const loggedInUserRole = req.user.role
+  const { id: loggedInUserId, role: loggedInUserRole } = req.user;
 
   const resolvedParams = {
     user_id: replaceMeWithUserId(req.params.user_id, loggedInUserId),
@@ -266,10 +265,9 @@ export async function decodeEntityAndVerifyAccess<T extends RequestParams>(
 
   if (resolvedParams.group_id) {
     if (hasSystemAdminPermissions(loggedInUserRole, isOwnerOrAdminMod)) {
-      if (resolvedParams.member_id) {
-        return { groupId: resolvedParams.group_id, memberId: resolvedParams.member_id } as ReturnType<T>;
-      }
-      return resolvedParams.group_id as ReturnType<T>;
+      return resolvedParams.member_id 
+        ? { groupId: resolvedParams.group_id, memberId: resolvedParams.member_id } as ReturnType<T>
+        : resolvedParams.group_id as ReturnType<T>;
     }
     return await verifyGroupMembershipPermissions(
       resolvedParams.group_id,
