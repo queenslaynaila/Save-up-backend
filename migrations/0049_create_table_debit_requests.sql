@@ -44,8 +44,3 @@ SELECT create_distributed_table('debit_requests', 'group_id');
 
 
 
-
-
-
-
-
