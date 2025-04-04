@@ -10,7 +10,6 @@ const simulatePaymentRequest = async (phone_number: string, amount: number) => {
   return {
     amount,
     phone_number,
-    reference_no: `TXN${Date.now()}`,
     donor_name: 'John Doe'
   };
 };
@@ -20,7 +19,6 @@ const SQL_CREATE_SAVING = sql<
     entity_id: number;
     amount: number;
     pocket_id: number;
-    reference_no: string;
     donor_name: string
   },
   Record<string, never>
@@ -28,7 +26,6 @@ const SQL_CREATE_SAVING = sql<
   SELECT create_donation(
     :entity_id,
     :pocket_id,
-    :reference_no,
     :donor_name,
     :amount
   )
@@ -59,7 +56,6 @@ const createDonation = (router: Router) => {
         entity_id: entityId,
         pocket_id,
         amount,
-        reference_no: paymentResponse.reference_no,
         donor_name: paymentResponse.donor_name
       }).exec();
 
