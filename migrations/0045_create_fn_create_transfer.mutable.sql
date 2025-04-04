@@ -1,29 +1,21 @@
 CREATE OR REPLACE FUNCTION create_transfer(
     p_source_pocket_id        INT,
     p_destination_pocket_id   INT,
-    p_user_id                INT,
-    p_amount                 NUMERIC(30, 2),
-    p_entity_id              INT
-)
-RETURNS VOID AS $$
+    p_user_id                 INT,
+    p_amount                  NUMERIC(30, 2),
+    p_entity_id               INT
+) RETURNS VOID AS $$
 DECLARE
-    v_source_balance          NUMERIC(30, 2);
-    v_destination_balance     NUMERIC(30, 2);
-    v_new_source_balance      NUMERIC(30, 2);
-    v_new_destination_balance NUMERIC(30, 2);
-    v_reference_id            TEXT;
-    v_is_locked              BOOLEAN;
-    v_source_transaction_id  INT;
-    v_destination_transaction_id INT;
-    v_transaction_out_type_id INT;
-    v_transaction_in_type_id  INT;
-    v_latest_election_id      INT;
+    v_is_locked                   BOOLEAN;
+    v_source_transaction_id        INT;
+    v_destination_transaction_id   INT;
+    v_latest_election_id           INT;
 BEGIN
     SELECT (pocket_type = 'Locked' AND target_at > NOW())
-    INTO STRICT v_is_locked
+    INTO v_is_locked
     FROM pockets
-    WHERE pockets.xid = p_source_pocket_id
-      AND pockets.entity_id = p_entity_id;
+    WHERE xid = p_source_pocket_id
+      AND entity_id = p_entity_id;
 
     IF v_is_locked THEN
         RAISE EXCEPTION USING
@@ -31,44 +23,18 @@ BEGIN
             ERRCODE = 'P0005';
     END IF;
 
-    v_source_balance := get_transaction_info(p_entity_id, p_source_pocket_id);
-    IF v_source_balance < p_amount THEN
-        RAISE EXCEPTION USING
-            MESSAGE = 'ERR_INSUFFICIENT_FUNDS',
-            ERRCODE = 'P0004';
-    END IF;
-
-    SELECT id
-    INTO STRICT v_transaction_out_type_id
-    FROM transaction_types
-    WHERE slug = 'TransferOut';
-
-    SELECT id
-    INTO STRICT v_transaction_in_type_id
-    FROM transaction_types
-    WHERE slug = 'TransferIn';
-
-    v_destination_balance := get_transaction_info(p_entity_id, p_destination_pocket_id);
-    v_new_source_balance := v_source_balance - p_amount;
-    v_new_destination_balance := v_destination_balance + p_amount;
-    v_reference_id := 'TXN' || floor(random() * 1000000 + 1)::TEXT;
-
-    v_source_transaction_id := insert_transaction_log(
+    v_source_transaction_id := process_transaction(
         p_entity_id,
-        v_transaction_out_type_id,
+        'TransferOut',
         p_source_pocket_id,
-        v_reference_id,
-        p_amount * -1,
-        v_new_source_balance
+        p_amount * -1
     );
 
-    v_destination_transaction_id := insert_transaction_log(
+    v_destination_transaction_id := process_transaction(
         p_entity_id,
-        v_transaction_in_type_id,
+        'TransferIn',
         p_destination_pocket_id,
-        v_reference_id,
-        p_amount,
-        v_new_destination_balance
+        p_amount
     );
 
     IF EXISTS (
