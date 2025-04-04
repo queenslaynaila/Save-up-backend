@@ -2,7 +2,6 @@ import { z } from 'zod';
 import Router from '../../router';
 import { sql } from '../../db';
 import { decodeEntityAndVerifyAccess, verifyPin } from '../../utils';
-import { Http } from 'winston/lib/winston/transports';
 import HttpError from '../../httpError';
 
 const SQL_CREATE_LOAN_REQUEST = sql<{
