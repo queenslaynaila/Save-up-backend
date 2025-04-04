@@ -3,7 +3,6 @@ import { sql } from '../../db';
 import { z } from 'zod';
 import { entityIdParamsSchema } from '../users/schema';
 import { decodeEntityAndVerifyAccess } from '../../utils';
-import logger from "../../logger";
 
 const SQL_GET_GUARANTOR_REQUESTS = sql<{
   group_id: number;
@@ -97,7 +96,6 @@ const getGuarantorRequests = (router: Router) => {
         group_id: groupId,
         user_id: memberId,
       }).many();
-      logger.info(`gg ${JSON.stringify(loanRequests)}`);
 
       res.json(loanRequests);
     }
