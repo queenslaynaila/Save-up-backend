@@ -48,14 +48,14 @@ const transaction = transactionSchema.pick({
 type Transaction = z.infer<typeof transaction>;
 
 const SQL_GET_TRANSACTIONS = sql<
-  { 
-    entity_id: number, 
-    pocket_id?: number, 
-    slug?: string, 
-    from?: string, 
-    to?: string, 
-    limit: number 
-  }, 
+  {
+    entity_id: number,
+    pocket_id?: number,
+    slug?: string,
+    from?: string,
+    to?: string,
+    limit: number
+  },
   Transaction
 >(`
   SELECT 
@@ -73,11 +73,11 @@ const SQL_GET_TRANSACTIONS = sql<
            WHERE group_deposits.group_id = transactions.entity_id 
              AND group_deposits.deposit_id = transactions.xid),
           (SELECT user_contact_details.full_name 
-           FROM disbursements 
+           FROM group_debit_disbursements 
            JOIN user_contact_details 
-             ON disbursements.user_id = user_contact_details.id
-           WHERE disbursements.group_id = transactions.entity_id 
-             AND disbursements.transaction_id = transactions.xid),
+             ON group_debit_disbursements.recipient_id = user_contact_details.id
+           WHERE group_debit_disbursements.group_id = transactions.entity_id 
+             AND group_debit_disbursements.transaction_id = transactions.xid),
           (SELECT user_contact_details.full_name 
            FROM group_transfers 
            JOIN user_contact_details 
@@ -158,7 +158,7 @@ const getTransactions = (router: Router) => {
     handler: async (req, res) => {
       const entityId = await decodeEntityAndVerifyAccess(req, true);
       const {slug, pocket_id, from, to, limit = 10} = req.query
-      
+
       const transactions = await SQL_GET_TRANSACTIONS({
         entity_id: entityId,
         slug,
