@@ -26,6 +26,11 @@ const Config = cleanEnv(process.env, {
   API_KEY: str(),
   BASE_URL: str(),
   SENDER: str(),
+
+  AWS_REGION: str(),
+  AWS_ACCESS_KEY_ID: str(),
+  AWS_SECRET_ACCESS_KEY: str(),
+  AWS_BUCKET_NAME: str()
 })
 
 export default Config
