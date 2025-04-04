@@ -36,7 +36,7 @@ const SQL_TOTAL_SAVINGS = sql<
 const getTotalSavings = (router: Router) => {
   router.route({
     method: 'get',
-    path: '/:entity_id/pockets/total-savings',
+    path: '/:entity_id/pockets/savings',
     summary: 'Get total savings across all pockets for an entity',
     schema: {
       params: z.object({

@@ -47,8 +47,8 @@ const getGroupsByUserId = (router: Router) => {
         user_id: entityIdParamsSchema
       }),
       query: z.object({
-        mutual_user_id: z.number().int().min(1).optional()
-      })
+        mutual_user_id: z.number().int().min(1)
+      }).partial(),
     },
     response: {
         schema: z.array(
@@ -66,7 +66,7 @@ const getGroupsByUserId = (router: Router) => {
       
       const groups = await SQL_FETCH_USER_GROUPS({
         user_id: userId,
-        ...req.query
+        other_user_id: req.query.mutual_user_id 
       }).many();
 
       return res.json(groups);
