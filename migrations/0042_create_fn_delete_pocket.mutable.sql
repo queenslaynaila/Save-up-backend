@@ -6,7 +6,14 @@ RETURNS VOID AS $$
 DECLARE
     v_current_balance NUMERIC;
 BEGIN
-    v_current_balance := get_transaction_info(p_entity_id, p_pocket_id);
+    SELECT
+        COALESCE((SELECT balance
+                FROM transactions
+                WHERE pocket_id = p_pocket_id
+                AND entity_id = p_entity_id
+                ORDER BY xid DESC
+                LIMIT 1), 0)
+    INTO STRICT v_current_balance;
 
     IF v_current_balance > 0 THEN
         RAISE EXCEPTION USING
