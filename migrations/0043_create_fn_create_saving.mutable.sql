@@ -6,37 +6,13 @@ CREATE OR REPLACE FUNCTION create_saving(
 )
 RETURNS VOID AS $$
 DECLARE
-  v_current_balance      NUMERIC;
-  v_new_balance          NUMERIC;
-  v_reference_id         TEXT;
   v_transaction_id       INT;
-  v_transaction_type_id  INT;
 BEGIN
-  v_current_balance := get_transaction_info(p_entity_id, p_pocket_id);
-  v_new_balance := v_current_balance + p_amount;
-
-  v_reference_id := 'TXN' || floor(random() * 1000000 + 1)::TEXT;
-
-  UPDATE pockets
-  SET status = 'Completed'::enum_status,
-      completed_at = NOW()
-  WHERE entity_id = p_entity_id
-    AND xid = p_pocket_id
-    AND status = 'In Progress'::enum_status
-    AND v_current_balance >= pockets.target_amount;
-
-  SELECT id
-  INTO STRICT v_transaction_type_id
-  FROM transaction_types
-  WHERE slug = 'Saving';
-
-  v_transaction_id := insert_transaction_log(
+  v_transaction_id := process_transaction(
     p_entity_id,
-    v_transaction_type_id,
+    'Saving',
     p_pocket_id,
-    v_reference_id,
-    p_amount,
-    v_new_balance
+    p_amount
   );
 
   IF EXISTS (
