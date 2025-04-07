@@ -49,6 +49,7 @@ const updateElections = (router: Router) => {
 
       await SQL_UPDATE_ELECTION({
         ...req.body,
+        nomination_ends_at: req.body.nomination_ends_at,
         group_id: groupId,
         election_id: req.params.election_id,
         user_id: req.user!.id
