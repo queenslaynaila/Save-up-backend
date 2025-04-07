@@ -1,14 +1,14 @@
 import Router from '../../router';
 import { sql } from '../../db';
 import { z } from 'zod';
-import HttpError from '../../httpError';
 import { decodeEntityAndVerifyAccess } from '../../utils';
 
 const SQL_GET_ELECTION_RESULTS = sql<
   {
     group_id:number;
-    xid:number;
+    election_id:number;
     initiator_id:number
+    status: 'Closed'
   },
   {
     candidate_id:number;
@@ -28,7 +28,7 @@ const SQL_GET_ELECTION_RESULTS = sql<
     FROM elections
     WHERE group_id = :group_id
       AND xid = :election_id
-      AND status = 'Closed'
+      AND status = :status
       AND closed_at IS NOT NULL
   );
 
@@ -58,17 +58,11 @@ const getGroupElectionResults = (router: Router) => {
       const groupId = await decodeEntityAndVerifyAccess(req, true);
 
       const results = await SQL_GET_ELECTION_RESULTS({
-        xid: req.params.election_id,
+        election_id: req.params.election_id,
         group_id: groupId,
-        initiator_id: req.user!.id
-      }).many().catch(err => {
-        if (err.code === 'P0007') {
-          throw new HttpError(400, {
-            message: 'ERR_ELECTION_ONGOING'
-          });
-        }
-        throw err;
-      });
+        initiator_id: req.user!.id,
+        status: 'Closed'
+      }).many();
 
       return res.json(results);
     }
