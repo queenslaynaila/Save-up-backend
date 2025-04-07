@@ -5,7 +5,7 @@ import { decodeEntityAndVerifyAccess } from '../../utils';
 import { groupsSchema } from './schema';
 
 const SQL_RECORD_OLD_NAME = sql<
-  { group_id: number }, 
+  { group_id: number },
   Record<string, never>
 >(`
   INSERT INTO prev_group_names (group_id, xid, name)
@@ -35,7 +35,7 @@ const updateGroup = (router: Router) => {
   router.route({
     method: 'patch',
     path: '/:group_id',
-    summary: 'Update group details',
+    summary: 'Update group name',
     description: 'Update group name',
     auth: true,
     schema: {
