@@ -20,8 +20,8 @@ import './routes/donations/index';
 import './routes/transactions/index';  
 import './routes/groupWithdrawals/index';
 import './routes/loans/index';  
-import './routes/groupDebits/index'
-import './routes/stats/index'
+import './routes/groupDebits/index';
+import './routes/stats/index';
 
 extendZodWithOpenApi(z);
 
