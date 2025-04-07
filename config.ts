@@ -23,9 +23,8 @@ const Config = cleanEnv(process.env, {
   JWT_ISSUER: str(),
   JWT_SECRET: str(),
 
-  API_KEY: str(),
-  BASE_URL: str(),
-  SENDER: str(),
+  SMSLEOPARD_API_KEY: str(),
+  SMSLEOPARD_API_SECRET: str(),
 
   AWS_REGION: str(),
   AWS_ACCESS_KEY_ID: str(),

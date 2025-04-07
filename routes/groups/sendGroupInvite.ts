@@ -4,6 +4,7 @@ import { z } from 'zod';
 import sendSms from '../../services/sms';
 import HttpError from '../../httpError';
 import { decodeEntityAndVerifyAccess } from '../../utils';
+import logger from "../../logger";
 
 const SQL_SEND_INVITATION = sql<
   {
@@ -68,11 +69,11 @@ const createGroupInvite = (router: Router) => {
     },
     handler: async (req, res) => {
       const groupId = await decodeEntityAndVerifyAccess(req);
-      
-      const { 
-        receiver_id, 
-        sender_name, 
-        group_name 
+
+      const {
+        receiver_id,
+        sender_name,
+        group_name
       } = await SQL_SEND_INVITATION({
         ...req.body,
         group_id: groupId,
@@ -90,14 +91,16 @@ const createGroupInvite = (router: Router) => {
         encodeURIComponent(req.body.phone_number)
       }`;
 
-      const baseMessage = 
+      const baseMessage =
         `${sender_name} invited you to join group ${group_name} on SaveUP.`;
-        
+
       const message = receiver_id === null
         ? `${baseMessage} Sign up here: ${signupLink} to join the group`
         : `${baseMessage} View your invite here: ${inviteLink}`;
 
-      sendSms(req.body.phone_number, message);
+      logger.info(message);
+
+      await sendSms('+254740327116', message);
 
       res.sendStatus(204);
     }
