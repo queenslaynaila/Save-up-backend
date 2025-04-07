@@ -21,17 +21,17 @@ const approveGuarantorRequest = (router: Router) => {
     auth: true,
     schema: {
       params: z.object({
-        group_id: z.number(),
-        loan_id: z.number()
+        group_id: z.number().int().min(1),
+        loan_id: z.number().int().min(1)
       }),
       body: z.object({
-        approval: z.boolean(), 
+        approval: z.boolean(),
         pin: z.string().regex(/^\d{4}$/)
       })
     },
     middlewares: [verifyPin],
     handler: async (req, res) => {
-      const groupId = await decodeEntityAndVerifyAccess(req); 
+      const groupId = await decodeEntityAndVerifyAccess(req);
 
       await SQL_INSERT_APPROVAL({
         group_id: groupId,
