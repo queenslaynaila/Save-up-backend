@@ -33,6 +33,7 @@ const createWithdrawalRequest = (router: Router) => {
       body: z.object({
         pocket_id: z.number(),
         reason: z.string(),
+        pin: z.string().regex(/^\d{4}$/),
         recipients: z.array(
           z.object({
             recipient_id: z.number().int().min(1),
