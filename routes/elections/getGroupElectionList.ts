@@ -62,6 +62,7 @@ const SQL_GET_ONGOING_ELECTION = sql<
     user_contact_details.full_name,
     elections.nomination_ends_at,
     elections.created_at
+  ORDER BY elections.xid DESC
 `);
 
 const getGroupElectionList = (router: Router) => {
@@ -80,7 +81,7 @@ const getGroupElectionList = (router: Router) => {
     },
     handler: async (req, res) => {
       const groupId = await decodeEntityAndVerifyAccess(req, true);
-      
+
       const elections = await SQL_GET_ONGOING_ELECTION({
         group_id: groupId
       }).many();
