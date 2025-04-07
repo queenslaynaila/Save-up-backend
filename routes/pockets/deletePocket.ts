@@ -57,7 +57,7 @@ const deletePocket = (router: Router) => {
             message: 'ERR_CANT_DELETE_PKT_WITH_BALANCE'
           });
         }
-         
+
         await SQL_DELETE_POCKET({
           entity_id: entityId,
           pocket_id: req.params.xid
