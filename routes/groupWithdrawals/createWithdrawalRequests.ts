@@ -24,7 +24,7 @@ const SQL_INITIATE_GRP_WITHDRAWAL = sql<WithdrawalParams, Record<string, never>>
 const createWithdrawalRequest = (router: Router) => {
   router.route({
     method: 'post',
-    path: '/:group_id/withdrawal-requests',
+    path: '/groups/:group_id/withdrawal-requests',
     summary: 'Create a group withdrawal request',
     schema: {
       params: z.object({
