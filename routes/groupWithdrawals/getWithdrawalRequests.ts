@@ -7,10 +7,10 @@ export const DebitType = z.enum(['Loan', 'Withdrawal']);
 
 const withdrawalRequestSchema = z.object({
   xid: z.number().int().min(1),
-  initiator: z.object({
-    initiator_id: z.number().int().min(1),
-    initiator_name: z.string(),
-  }),
+  initiator_id: z.number().int().min(1),
+  initiator_name: z.string(),
+  pocket_id: z.number().int().min(1),
+  pocket_name: z.string(),
   reason: z.string(),
   total_amount: z.number(),
   status: z.string(),
@@ -41,17 +41,17 @@ type WithdrawalRequest = z.infer<typeof withdrawalRequestSchema>;
 const SQL_GET_GROUP_WITHDRAWALS = sql<
   {
     group_id: number;
-    pocket_id: number;
+    pocket_id?: number;
     debit_type: string;
   },
   WithdrawalRequest
 >(`
   SELECT 
     debit_requests.xid,
-    json_build_object(
-        'initiator_id', debit_requests.initiator_id,
-        'initiator_name', initiator_user_contact_details.full_name
-    ) AS initiator,
+    debit_requests.initiator_id,
+    initiator_user_contact_details.full_name AS initiator_name,
+    pockets.xid AS pocket_id,
+    pockets.name AS pocket_name,
     debit_requests.reason,
     debit_requests.amount AS total_amount,
     debit_requests.status,
@@ -89,12 +89,14 @@ const SQL_GET_GROUP_WITHDRAWALS = sql<
     ) AS recipients
   FROM 
     debit_requests
-  JOIN 
-    user_contact_details AS initiator_user_contact_details 
-  ON initiator_user_contact_details.id = debit_requests.initiator_id
+  JOIN user_contact_details AS initiator_user_contact_details 
+    ON initiator_user_contact_details.id = debit_requests.initiator_id
+  LEFT JOIN pockets
+    ON pockets.entity_id = debit_requests.group_id
+    AND pockets.xid = debit_requests.pocket_id
   WHERE 
     debit_requests.group_id = :group_id
-    AND debit_requests.pocket_id = :pocket_id
+    AND (:pocket_id::INT IS NULL OR debit_requests.pocket_id = :pocket_id)
     AND debit_requests.debit_type = :debit_type
   ORDER BY 
     debit_requests.created_at DESC;
@@ -103,7 +105,7 @@ const SQL_GET_GROUP_WITHDRAWALS = sql<
 const getGrpDebitRequests = (router: Router) => {
   router.route({
     method: 'get',
-    path: '/:group_id/withdrawal-requests',
+    path: '/groups/:group_id/withdrawal-requests',
     summary: 'Get all withdrawal requests made for a group',
     schema: {
       params: z.object({
@@ -111,7 +113,7 @@ const getGrpDebitRequests = (router: Router) => {
       }),
       query:z.object({
         pocket_id: z.number().int().min(1)
-      })
+      }).partial()
     },
     response: {
       statusCode: 200,
