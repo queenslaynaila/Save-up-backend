@@ -26,10 +26,13 @@ const SQL_GET_GROUP_MEMBERS = sql<
             WHERE group_admins.group_id = group_members.group_id
               AND group_admins.user_id = group_members.user_id
               AND group_admins.election_id = (
-                SELECT MAX(election_id) 
-                FROM group_admins 
+                SELECT election_id
+                FROM elections 
                 WHERE group_id = group_members.group_id
-                AND status = 'Closed')
+                AND status = 'Closed'
+                ORDER BY election_id DESC
+                LIMIT 1
+             )
             LIMIT 1
         ), 
         FALSE
@@ -47,7 +50,7 @@ const SQL_GET_GROUP_MEMBERS = sql<
     ON user_contact_details.id = group_members.user_id
   WHERE group_members.group_id = :group_id
     AND group_members.is_active = TRUE
-  ORDER BY is_admin DESC, joined_at ASC;
+  ORDER BY is_admin DESC, full_name ASC;
 `);
 
 const getGroupMembers = (router: Router) => {
