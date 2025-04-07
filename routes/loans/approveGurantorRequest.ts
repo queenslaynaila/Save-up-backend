@@ -11,7 +11,6 @@ const SQL_INSERT_APPROVAL = sql<{
 }, Record<string, never>>(`
   INSERT INTO guarantor_approvals (group_id, request_id, guarantor_id, approval)
   VALUES (:group_id, :request_id, :guarantor_id, :approval)
-  ON CONFLICT DO NOTHING
 `);
 
 const SQL_COMPUTE_RESPONSE = sql<{
