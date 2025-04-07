@@ -97,10 +97,9 @@ const createGroupInvite = (router: Router) => {
       const message = receiver_id === null
         ? `${baseMessage} Sign up here: ${signupLink} to join the group`
         : `${baseMessage} View your invite here: ${inviteLink}`;
-
-      logger.info(message);
-
-      await sendSms('+254740327116', message);
+      
+      const cleanedPhoneNumber = req.body.phone_number.replace('+', '');
+      await sendSms(cleanedPhoneNumber, message);
 
       res.sendStatus(204);
     }
