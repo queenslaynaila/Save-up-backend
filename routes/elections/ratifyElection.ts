@@ -2,6 +2,7 @@ import Router from '../../router';
 import { sql } from '../../db';
 import { z } from 'zod';
 import { decodeEntityAndVerifyAccess } from '../../utils';
+import HttpError from '../../httpError';
 
 const SQL_RATIFY_ELECTION = sql<
   {
@@ -22,9 +23,9 @@ const SQL_RATIFY_ELECTION = sql<
 
 const ratifyElection = (router: Router) => {
   router.route({
-    method: 'post', 
+    method: 'post',
     path: '/:group_id/elections/:election_id/ratify',
-    summary: 'Ratify an election results',
+    summary: 'Ratify an election',
     auth: true,
     schema: {
       params: z.object({
@@ -37,13 +38,18 @@ const ratifyElection = (router: Router) => {
     },
     handler: async (req, res) => {
       const groupId = await decodeEntityAndVerifyAccess(req);
-      
+
       await SQL_RATIFY_ELECTION({
         group_id: groupId,
         election_id: req.params.election_id,
         user_id: req.user!.id,
         is_ratified: req.body.is_ratified
-      }).exec();
+      }).exec().catch((err) => {
+        if (err.code === 'P0007') {
+           throw new HttpError(400, {message: 'ERR_ELECTION_CLOSED_OR_CANCELLED'})
+        }
+        throw err;
+      });
 
       return res.sendStatus(201);
     }
