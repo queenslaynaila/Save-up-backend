@@ -21,7 +21,7 @@ const SQL_CREATE_LOAN_GUARANTORS = sql<{
 const addLoanGuarantors = (router: Router) => {
   router.route({
     method: 'post',
-    path: '/:group_id/loans/:xid/guarantors',
+    path: '/groups/:group_id/loans/:xid/guarantors',
     summary: 'Add guarantors for a loan',
     auth: true,
     schema: {

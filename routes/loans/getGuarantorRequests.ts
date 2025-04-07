@@ -12,6 +12,7 @@ const SQL_GET_GUARANTOR_REQUESTS = sql<{
   xid: number;
   borrower_id: number;
   borrower_name: string;
+  status:"Pending Guarantors"| "Pending Guarantor Approval"| "Pending Admin Approval"| "Approved"| "Rejected" |"Cancelled";
   amount: number;
   reason: string;
   repayment_period: string;
@@ -27,6 +28,7 @@ const SQL_GET_GUARANTOR_REQUESTS = sql<{
     borrower_details.full_name AS borrower_name,
     debit_requests.amount,
     debit_requests.reason,
+    debit_requests.status,
     loan_requests.repayment_period::text AS repayment_period,
     ARRAY(
       SELECT 
@@ -59,11 +61,19 @@ const SQL_GET_GUARANTOR_REQUESTS = sql<{
     AND current_guarantor.guarantor_id = :user_id;
 `);
 
+const approval_enum = z.enum([
+  'Pending Guarantors',
+  'Pending Guarantor Approval',
+  'Pending Admin Approval',
+  'Approved',
+  'Rejected',
+  'Cancelled'
+])
 
 const getGuarantorRequests = (router: Router) => {
   router.route({
     method: 'get',
-    path: '/:group_id/loans/guarantor-requests/:member_id',
+    path: '/groups/:group_id/loans/guarantor-requests/:member_id',
     summary: 'Get all guarantor requests made to a grp member',
     schema: {
       params: z.object({
@@ -77,6 +87,7 @@ const getGuarantorRequests = (router: Router) => {
         xid: z.number(),
         borrower_id: z.number(),
         borrower_name: z.string(),
+        status: approval_enum,
         amount: z.number(),
         reason: z.string(),
         repayment_period: z.string(),

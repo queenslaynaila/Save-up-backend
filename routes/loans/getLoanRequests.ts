@@ -8,6 +8,8 @@ const loanRequestSchema = z.object({
   xid: z.number().int().min(1),
   initiator_id: z.number().int().min(1),
   initiator_name: z.string(),
+  pocket_id: z.number().int().min(1),
+  pocket_name: z.string(),
   amount: z.number(),
   reason: z.string(),
   repayment_period: z.string(),
@@ -27,7 +29,14 @@ const loanRequestSchema = z.object({
       approval_date: z.string().datetime(),
     })
   ),
-  status: z.enum(['Approved', 'Rejected', 'Pending Guarantors', 'Pending Admin Approval', 'Cancelled']),
+  status: z.enum([
+      'Approved',
+      'Rejected',
+      'Cancelled',
+      'Pending Guarantors',
+      'Pending Guarantor Approval' ,
+      'Pending Admin Approval'
+  ]),
   created_at: z.string().datetime(),
 });
 
@@ -35,13 +44,15 @@ export type LoanRequest = z.infer<typeof loanRequestSchema>;
 
 const SQL_GET_LOANS = sql<{
   group_id: number,
-  pocket_id: number,
+  pocket_id?: number,
   debit_type:string
  }, LoanRequest>(`
   SELECT 
     debit_requests.xid,
     debit_requests.initiator_id,
     initiator_user_contact_details.full_name AS initiator_name,
+    pockets.xid AS pocket_id,
+    pockets.name AS pocket_name,
     debit_requests.amount,
     debit_requests.reason,
     loan_requests.repayment_period::text AS repayment_period,
@@ -85,16 +96,17 @@ const SQL_GET_LOANS = sql<{
     ) AS admin_approvals
   FROM 
     debit_requests
-  JOIN 
-    user_contact_details AS initiator_user_contact_details 
+  JOIN user_contact_details AS initiator_user_contact_details 
     ON initiator_user_contact_details.id = debit_requests.initiator_id
-  JOIN
-    loan_requests
+  JOIN loan_requests
     ON loan_requests.group_id = debit_requests.group_id 
     AND loan_requests.request_id = debit_requests.xid
+  LEFT JOIN pockets  
+    ON pockets.entity_id = debit_requests.group_id
+    AND pockets.xid = debit_requests.pocket_id
   WHERE 
-    debit_requests.group_id = :group_id  
-    AND debit_requests.pocket_id = :pocket_id   
+    debit_requests.group_id = :group_id
+    AND (:pocket_id::INT IS NULL OR debit_requests.pocket_id = :pocket_id)
     AND debit_requests.debit_type = :debit_type
   ORDER BY 
     debit_requests.created_at DESC;
@@ -103,7 +115,7 @@ const SQL_GET_LOANS = sql<{
 const getLoanRequests = (router: Router) => {
   router.route({
     method: 'get',
-    path: '/:group_id/loans',
+    path: '/groups/:group_id/loans',
     auth: true,
     summary: 'Get loans request made to a group',
     schema: {
@@ -112,7 +124,7 @@ const getLoanRequests = (router: Router) => {
       }),
       query: z.object({
         pocket_id: z.number().int().min(1),
-      }),
+      }).partial(),
     },
     response: {
       statusCode: 200,

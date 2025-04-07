@@ -10,6 +10,7 @@ DO $$
     BEGIN
         CREATE TYPE enum_approval_status AS ENUM (
             'Pending Guarantors',
+            'Pending Guarantor Approval',
             'Pending Admin Approval',
             'Approved',
             'Rejected',
