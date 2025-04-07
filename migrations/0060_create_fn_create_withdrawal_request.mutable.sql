@@ -32,15 +32,15 @@ BEGIN
                 LIMIT 1), 0)
     INTO STRICT v_current_balance;
 
-    SELECT SUM((recipients ->> 'amount')::NUMERIC)
-    INTO STRICT v_total_amount
-    FROM UNNEST(p_recipient_object) AS recipients;
-
     IF v_current_balance < v_total_amount THEN
         RAISE EXCEPTION USING
             MESSAGE = 'ERR_INSUFFICIENT_FUNDS',
             ERRCODE = 'P0004';
     END IF;
+
+    SELECT SUM((recipients ->> 'amount')::NUMERIC)
+    INTO STRICT v_total_amount
+    FROM UNNEST(p_recipient_object) AS recipients;
 
     INSERT INTO debit_requests (
         group_id, xid, initiator_id, debit_type, pocket_id, amount, reason, status
