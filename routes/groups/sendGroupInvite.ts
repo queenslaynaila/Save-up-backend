@@ -4,7 +4,6 @@ import { z } from 'zod';
 import sendSms from '../../services/sms';
 import HttpError from '../../httpError';
 import { decodeEntityAndVerifyAccess } from '../../utils';
-import logger from "../../logger";
 
 const SQL_SEND_INVITATION = sql<
   {
@@ -97,7 +96,7 @@ const createGroupInvite = (router: Router) => {
       const message = receiver_id === null
         ? `${baseMessage} Sign up here: ${signupLink} to join the group`
         : `${baseMessage} View your invite here: ${inviteLink}`;
-      
+
       const cleanedPhoneNumber = req.body.phone_number.replace('+', '');
       await sendSms(cleanedPhoneNumber, message);
 
