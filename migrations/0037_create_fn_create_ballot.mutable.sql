@@ -17,11 +17,11 @@ BEGIN
           AND status = 'Open'
     ) THEN
         RAISE EXCEPTION USING
-            MESSAGE = 'ERR_ELECTION_CLOSED',
+            MESSAGE = 'ERR_ELECTION_CLOSED_OR_CANCELLED',
             ERRCODE = 'P0007';
     END IF;
 
-    SELECT COUNT(DISTINCT candidate_id) INTO v_ballot_count
+    SELECT COUNT(*) INTO v_ballot_count
     FROM ballots
     WHERE user_id = p_user_id
       AND group_id = p_group_id
@@ -39,26 +39,23 @@ BEGIN
         candidate_id,
         user_id
     )
-    SELECT 
+    SELECT
         p_group_id,
         p_election_id,
         unnest(p_candidate_ids),
         p_user_id;
 
-    SELECT 
-        (
-            SELECT COUNT(*) 
-            FROM group_members 
-                WHERE group_id = p_group_id 
-                AND is_active = TRUE
-        ),
-        (
-            SELECT COUNT(DISTINCT user_id) 
-            FROM ballots 
-                WHERE group_id = p_group_id 
-                AND election_id = p_election_id
-        )
-    INTO v_total_members, v_total_voters;
+    SELECT COUNT(*)
+    INTO v_total_members
+    FROM group_members
+    WHERE group_id = p_group_id
+      AND is_active = TRUE;
+
+    SELECT COUNT(DISTINCT user_id)
+    INTO v_total_voters
+    FROM ballots
+    WHERE group_id = p_group_id
+      AND election_id = p_election_id;
 
     IF v_total_voters >= (v_total_members / 2) THEN
         UPDATE elections
@@ -70,21 +67,20 @@ BEGIN
         INSERT INTO group_admins (group_id, election_id, user_id)
         SELECT p_group_id, p_election_id, candidate_id
         FROM (
-            SELECT candidate_id 
-            FROM ballots
-            WHERE group_id = p_group_id 
-                AND election_id = p_election_id
-            GROUP BY candidate_id
-            ORDER BY COUNT(*) DESC
-            LIMIT 3
-        ) AS top_candidates
-        ON CONFLICT (group_id, election_id, user_id) DO NOTHING;
+                 SELECT candidate_id
+                 FROM ballots
+                 WHERE group_id = p_group_id
+                   AND election_id = p_election_id
+                 GROUP BY candidate_id
+                 ORDER BY COUNT(*) DESC
+                 LIMIT 3
+             ) AS top_candidates;
     END IF;
 END;
 $$ LANGUAGE plpgsql;
 
 GRANT EXECUTE ON FUNCTION create_ballot(INT, INT, INT[], INT) TO saveup_www;
 SELECT create_distributed_function(
-    'create_ballot(INT, INT, INT[], INT)', 
+    'create_ballot(INT, INT, INT[], INT)',
     'p_group_id'
 );
