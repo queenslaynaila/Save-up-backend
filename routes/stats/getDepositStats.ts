@@ -13,7 +13,7 @@ export const statsQuerySchema = z.object({
 
 export type Stats = z.infer<typeof statsQuerySchema>;
 
-const SQL_GET_AGGREGATED_DEPOSITS = sql<Stats, { aggregated_deposits: number }>(`
+const SQL_GET_AGGREGATED_SAVINGS = sql<Stats, { aggregated_deposits: number }>(`
   SELECT
     CASE
       WHEN :agg = 'avg' THEN AVG(delta)
@@ -35,7 +35,7 @@ const SQL_GET_AGGREGATED_DEPOSITS = sql<Stats, { aggregated_deposits: number }>(
 const getDepositStats = (router: Router) => {
     router.route({
         method: 'get',
-        path: '/transactions/stats/deposits',
+        path: '/transactions/stats/savings',
         summary: 'Get deposit stats',
         auth: true,
         schema: {
@@ -44,12 +44,12 @@ const getDepositStats = (router: Router) => {
         response: {
             statusCode:200,
             schema: z.object({
-                aggregated_deposits: z.number()
+                aggregated_savings: z.number()
             })
         },
         handler: async (req, res) => {
             const { entity_id, agg, start_date, end_date, pocket_id } = req.query;
-            const aggregated_deposits = await SQL_GET_AGGREGATED_DEPOSITS({
+            const aggregated_savings = await SQL_GET_AGGREGATED_SAVINGS({
                 slug:'Savings',
                 entity_id,
                 pocket_id,
@@ -57,7 +57,7 @@ const getDepositStats = (router: Router) => {
                 start_date,
                 end_date
             }).oneFirst()
-            res.json({aggregated_deposits});
+            res.json({aggregated_savings});
         }
     });
 };
