@@ -3,7 +3,7 @@ import { sql } from '../../db';
 import { z } from 'zod';
 import { NextOfKin, nextOfKinSchema } from './schema';
 import { verifyPin } from '../../utils';
- 
+
 const SQL_UPDATE_KIN = sql<
   Partial<Pick<NextOfKin, 'full_name' | 'relationship' | 'phone_number'>> &
   Pick<NextOfKin, 'user_id' | 'xid'>,
@@ -25,11 +25,11 @@ const SQL_UPDATE_KIN = sql<
 const updateNextOfKin = (router: Router) => {
   router.route({
     method: 'patch',
-    path: '/:xid',
+    path: '/users/me/next-of-kins/:xid',
     auth: true,
     summary: 'Update a next of kin details',
     schema: {
-      params: z.object({ 
+      params: z.object({
         xid: z.number().int().min(1)
       }),
       body: nextOfKinSchema.pick({
@@ -58,7 +58,7 @@ const updateNextOfKin = (router: Router) => {
         relationship,
         phone_number
       }).one();
-      
+
       return res.json(kin);
     }
   });
