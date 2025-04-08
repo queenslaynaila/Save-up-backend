@@ -39,7 +39,7 @@ const getWithdrawalStats = (router: Router) => {
         handler: async (req, res) => {
             const { entity_id, agg, start_date, end_date, pocket_id } = req.query;
             const aggregated_withdrawals = await SQL_GET_AGGREGATED_WITHDRAWALS({
-                slug:'Withdrawals',
+                slug:'Withdrawal',
                 entity_id,
                 pocket_id,
                 agg,
