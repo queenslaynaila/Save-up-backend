@@ -17,6 +17,18 @@ DECLARE
     v_transaction_id          INT;
     v_recipient_record        RECORD;
 BEGIN
+    IF NOT EXISTS (
+        SELECT 1
+        FROM debit_requests
+        WHERE group_id = p_group_id
+          AND xid = p_debit_id
+          AND status = 'Pending Admin Approval'
+    ) THEN
+        RAISE EXCEPTION USING
+            MESSAGE = 'ERR_INVALID_DEBIT_REQUEST',
+            ERRCODE = 'P0005';
+    END IF;
+
     SELECT MAX(xid)
     INTO STRICT v_latest_election_id
     FROM elections
@@ -42,6 +54,7 @@ BEGIN
       NOW()
     );
 
+    -- All admins must agree to the debit for it to be approved, any refusal is overall rejection
     IF p_status = 'Rejected' THEN
         UPDATE debit_requests
         SET status = 'Rejected'
@@ -50,12 +63,14 @@ BEGIN
         RETURN;
     END IF;
 
-    SELECT COUNT(*) INTO v_total_admins
+    SELECT COUNT(*)
+    INTO STRICT v_total_admins
     FROM group_admins
     WHERE group_id = p_group_id
       AND election_id = v_latest_election_id;
 
-    SELECT COUNT(*) INTO v_approved_count
+    SELECT COUNT(*)
+    INTO STRICT v_approved_count
     FROM debit_approvals
     WHERE group_id = p_group_id
       AND request_id = p_debit_id
@@ -97,9 +112,10 @@ BEGIN
         p_group_id,
         'Loan',
         v_pocket_id,
-        -v_amount
+        v_amount * -1
       );
 
+      -- Credit loan amount to the initiator's wallet
       v_transaction_id := process_transaction(
         v_initiator_id,
         'Loan',
@@ -130,7 +146,7 @@ BEGIN
           p_group_id,
           'Withdrawal',
           v_pocket_id,
-          -v_recipient_record.amount
+          v_recipient_record.amount * -1
         );
 
         INSERT INTO group_debit_disbursements (
@@ -156,3 +172,8 @@ GRANT EXECUTE ON FUNCTION review_debit_request(
     enum_approval_status,
     TEXT
 ) TO saveup_www;
+
+SELECT create_distributed_function(
+    'review_debit_request',
+    'INT, INT, INT, enum_approval_status, TEXT'
+);
