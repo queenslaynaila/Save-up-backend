@@ -6,41 +6,20 @@ CREATE OR REPLACE FUNCTION create_withdrawal_request(
     p_recipient_object      JSON[]
 ) RETURNS VOID AS $$
 DECLARE
-    v_current_balance   NUMERIC(30,2);
     v_total_amount      NUMERIC(30,2);
     v_debit_id          INT;
-    v_is_locked         BOOLEAN;
 BEGIN
-    SELECT (pocket_type = 'Locked' AND target_at > NOW())
-    INTO STRICT v_is_locked
-    FROM pockets
-    WHERE pockets.xid = p_pocket_id
-      AND pockets.entity_id = p_group_id;
-
-    IF v_is_locked THEN
-        RAISE EXCEPTION USING
-            MESSAGE = 'ERR_FUNDS_LOCKED',
-            ERRCODE = 'P0005';
-    END IF;
-
-    SELECT
-        COALESCE((SELECT balance
-                FROM transactions
-                WHERE pocket_id = p_pocket_id
-                AND entity_id = p_group_id
-                ORDER BY xid DESC
-                LIMIT 1), 0)
-    INTO STRICT v_current_balance;
-
-    IF v_current_balance < v_total_amount THEN
-        RAISE EXCEPTION USING
-            MESSAGE = 'ERR_INSUFFICIENT_FUNDS',
-            ERRCODE = 'P0004';
-    END IF;
-
     SELECT SUM((recipients ->> 'amount')::NUMERIC)
     INTO STRICT v_total_amount
     FROM UNNEST(p_recipient_object) AS recipients;
+
+    PERFORM validate_pocket_before_debit(
+        p_group_id,
+        p_pocket_id,
+        v_total_amount,
+        p_initiator_id,
+        FALSE
+    );
 
     INSERT INTO debit_requests (
         group_id, xid, initiator_id, debit_type, pocket_id, amount, reason, status
@@ -78,6 +57,6 @@ GRANT EXECUTE ON FUNCTION create_withdrawal_request(
 ) TO saveup_www;
 
 SELECT create_distributed_function(
-       'create_withdrawal_request(INT, INT, INT, TEXT, JSON[])',
-       'p_group_id'
+    'create_withdrawal_request(INT, INT, INT, TEXT, JSON[])',
+    'p_group_id'
 );
