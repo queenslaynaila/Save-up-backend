@@ -50,7 +50,7 @@ const getDepositStats = (router: Router) => {
         handler: async (req, res) => {
             const { entity_id, agg, start_date, end_date, pocket_id } = req.query;
             const aggregated_savings = await SQL_GET_AGGREGATED_SAVINGS({
-                slug:'Savings',
+                slug:'Saving',
                 entity_id,
                 pocket_id,
                 agg,
