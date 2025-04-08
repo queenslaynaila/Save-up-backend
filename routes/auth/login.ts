@@ -3,14 +3,13 @@ import bcrypt from 'bcrypt';
 import { z } from 'zod';
 import { sql } from '../../db';
 import HttpError from '../../httpError';
-import { 
-  userSchema, 
-  loginAttemptSchema, 
+import {
+  userSchema,
+  loginAttemptSchema,
   userContactDetailsSchema
 } from '../users/schema';
 import Router from '../../router';
 import { generateToken } from '../../utils';
-import logger from '../../logger';
 
 const authenticatedUserSchema = userSchema.pick({
   id: true,
@@ -91,12 +90,12 @@ const loginOutcomeSchema = loginSchema.pick({
 });
 
 type LoginOutcome = z.infer<typeof loginOutcomeSchema>;
-const SQL_GET_LAST_THREE_LOGIN_ATTEMPTS = sql<{ id: number }, LoginOutcome>(`
+const SQL_GET_LAST_FOUR_LOGIN_ATTEMPTS = sql<{ id: number }, LoginOutcome>(`
   SELECT success, reason
   FROM login_attempts
   WHERE user_id = :id
   ORDER BY xid DESC
-  LIMIT 3
+  LIMIT 4
 `);
 
 export async function recordLoginAttempt(
@@ -122,17 +121,12 @@ export function getClientInfo(req: Request) {
   };
 }
 
-export function calculateLoginAttemptsLeft(lastThreeAttempts: LoginOutcome[]) {
-  if (lastThreeAttempts.length === 0 || lastThreeAttempts[0].success) {
-    return 4;
+export function calculateLoginAttemptsLeft(lastFourAttempts: LoginOutcome[]) {
+  const failedAttempts = lastFourAttempts.filter(attempt => !attempt.success).length;
+
+  if (failedAttempts >= 4) {
+    return 0;
   }
-
-  if (lastThreeAttempts[0].reason === 'Locked') {
-    throw new HttpError(423);
-  }
-
-  const failedAttempts = lastThreeAttempts.filter(attempt => !attempt.success).length;
-
 
   return 4 - failedAttempts;
 }
@@ -163,11 +157,11 @@ const login = (router: Router) => {
       const { pin, ...user } = await SQL_GET_USER({
         phone_number: req.body.phone_number
       }).one(new HttpError(401));
-    
+
       const { ipAddress, userAgent } = getClientInfo(req);
 
-      const lastAttempts = await SQL_GET_LAST_THREE_LOGIN_ATTEMPTS({
-        id: user.id 
+      const lastAttempts = await SQL_GET_LAST_FOUR_LOGIN_ATTEMPTS({
+        id: user.id
       }).many();
 
       const remainingAttempts = calculateLoginAttemptsLeft(lastAttempts);
@@ -176,20 +170,20 @@ const login = (router: Router) => {
         await recordLoginAttempt(user.id, ipAddress, userAgent, false, 'Locked');
         throw new HttpError(423);
       }
-     
+
       if (!await bcrypt.compare(req.body.pin, pin)) {
         await recordLoginAttempt(user.id, ipAddress, userAgent, false, 'Incorrect pin');
         throw new HttpError(401, { remaining_attempts: remainingAttempts-1 });
       }
-    
+
       await recordLoginAttempt(
-        user.id, 
-        ipAddress, 
-        userAgent, 
-        true, 
+        user.id,
+        ipAddress,
+        userAgent,
+        true,
         'Returning'
       );
-      
+
       res
         .setHeader('Authorization', generateToken(user.id, '7d', user.role))
         .json(user);
