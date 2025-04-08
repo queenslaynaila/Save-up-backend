@@ -6,7 +6,7 @@ import express, {
   Application,
   RequestHandler
 } from 'express';
-import { AnyZodObject, TypeOf, z, ZodBoolean, ZodNever, ZodNumber, ZodRecord, ZodSchema, ZodUndefined, ZodUnion } from 'zod';
+import { AnyZodObject, TypeOf, z, ZodBoolean, ZodNever, ZodNumber,ZodSchema, ZodUndefined } from 'zod';
 import { OpenApiGeneratorV3, OpenAPIRegistry } from '@asteasolutions/zod-to-openapi';
 import fastJson from 'fast-json-stringify';
 import zodToJsonSchema from 'zod-to-json-schema';
@@ -17,7 +17,7 @@ import HttpError from './httpError';
 import Config from './config';
 import {authMiddleware } from './utils';
 import { Role } from './routes/users/schema';
-
+import logger from "./logger";
 
 const ajv = new Ajv();
 
@@ -32,13 +32,13 @@ const coerceParams = (schema: AnyZodObject, data: Record<string, any>): Record<s
   for (const key in schema.shape) {
     const fieldSchema = schema.shape[key];
 
-    if (fieldSchema instanceof ZodNumber && 
-      typeof data[key] === "string" && !isNaN(data[key] as any)) 
+    if (fieldSchema instanceof ZodNumber &&
+      typeof data[key] === "string" && !isNaN(data[key] as any))
     {
       parsedData[key] = Number(data[key]);
-    } else if (fieldSchema instanceof ZodBoolean && 
+    } else if (fieldSchema instanceof ZodBoolean &&
         typeof data[key] === "string") {
-      parsedData[key] = data[key] === "true";  
+      parsedData[key] = data[key] === "true";
     } else {
       parsedData[key] = data[key];
     }
@@ -74,7 +74,7 @@ const validateRequest = (schema: {
   params?: AnyZodObject;
 }) => {
   return (req: Request, _res: Response, next: NextFunction) => {
-    
+
     if (schema.body) validateSchema(schema.body, req.body, 'body');
     if (schema.query) validateSchema(schema.query, req.query, 'query');
     if (schema.params) req.params = coerceParams(schema.params, req.params);
@@ -122,7 +122,7 @@ class Router {
   private readonly apiTag?: string;
 
   private constructor(routePrefix: string, apiTag?: string) {
-    this.router = ExpressRouter();;
+    this.router = ExpressRouter();
     this.routePrefix = `/saveup${routePrefix}`;
     this.apiTag = apiTag;
 
@@ -159,7 +159,7 @@ class Router {
   }
 
   public static getRouterInstance(routePrefix: string, apiTag?: string): Router {
-    const key = `${routePrefix}::${apiTag}`;  
+    const key = `${routePrefix}::${apiTag}`;
 
     if (!Router.routerInstances.has(key)) {
         Router.routerInstances.set(key, new Router(routePrefix, apiTag));
@@ -186,7 +186,7 @@ class Router {
 
     if (schema) middlewares.unshift(validateRequest(schema));
     if (auth) middlewares.splice(1, 0, authMiddleware(auth));
-    
+
     const security = [];
     if (auth) security.push({ Authorization: [] });
     if (middlewares.some(m => m.name === "resetStepValidator")) {
@@ -228,10 +228,20 @@ class Router {
     if (response.schema) {
       const jsonResponseSchema: any = zodToJsonSchema(response.schema, { target: "openApi3" });
       const stringify = fastJson(jsonResponseSchema);
-      
+
+      const errorSchema = z.union([
+        z.record(z.unknown()),
+        z.array(z.record(z.unknown()))
+      ]);
+      const jsonErrorSchema: any = zodToJsonSchema(errorSchema, { target: 'openApi3' });
+      const errStringify = fastJson(jsonErrorSchema);
+
       middlewares.push((_req: Request, res: Response, next: NextFunction) => {
         res.json = <T extends object>(data: T) => {
           res.setHeader("Content-Type", "application/json");
+          if (data instanceof HttpError) {
+            return res.send(errStringify(data.errors));
+          }
           return res.send(stringify(data));
         };
         next();
