@@ -1,8 +1,12 @@
 import Router from '../../router';
-import getTransactionStats from './getTransactionStats'
+import getExpenseStats from './getExpenseStats'
+import getDepositStats from "./getDepositStats";
+import getWithdrawalStats from "./getWithdrawalStats";
 
 const router = Router.getRouterInstance('/', 'Stats');
 
-getTransactionStats(router)
+getDepositStats(router)
+getWithdrawalStats(router)
+getExpenseStats(router)
 
 export default router;
