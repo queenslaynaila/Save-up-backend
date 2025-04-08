@@ -10,6 +10,7 @@ import {
 } from '../users/schema';
 import Router from '../../router';
 import { generateToken } from '../../utils';
+import logger from "../../logger";
 
 const authenticatedUserSchema = userSchema.pick({
   id: true,
@@ -89,6 +90,20 @@ const loginOutcomeSchema = loginSchema.pick({
   reason: true
 });
 
+const SQL_CHECK_ACCOUNT_UNLOCKED = sql<{ user_id: number }, { unlocked: boolean }>(`
+  SELECT EXISTS (
+    SELECT 1 FROM account_unlocks
+    WHERE user_id = :user_id 
+    AND locked_attempt_id = (
+      SELECT MAX(xid) 
+      FROM login_attempts 
+      WHERE user_id = :user_id 
+        AND success = false 
+        AND reason = 'Locked'
+    )
+  ) as unlocked
+`);
+
 type LoginOutcome = z.infer<typeof loginOutcomeSchema>;
 const SQL_GET_LAST_FOUR_LOGIN_ATTEMPTS = sql<{ id: number }, LoginOutcome>(`
   SELECT success, reason
@@ -121,15 +136,22 @@ export function getClientInfo(req: Request) {
   };
 }
 
-export function calculateLoginAttemptsLeft(lastFourAttempts: LoginOutcome[]) {
-  const failedAttempts = lastFourAttempts.filter(attempt => !attempt.success).length;
+const SQL_GET_FAILED_LOGIN_ATTEMPTS = sql<{ user_id: number }, { failed_attempts: number }>(`
+  SELECT COALESCE(
+    (SELECT COUNT(*) 
+     FROM (
+       SELECT success
+       FROM login_attempts
+       WHERE user_id = :user_id
+       ORDER BY xid DESC
+       LIMIT 4
+     ) AS last_four_attempts
+     WHERE success = false), 
+    0
+  ) AS failed_attempts
+`);
 
-  if (failedAttempts >= 4) {
-    return 0;
-  }
 
-  return 4 - failedAttempts;
-}
 
 const login = (router: Router) => {
   router.route({
@@ -160,15 +182,21 @@ const login = (router: Router) => {
 
       const { ipAddress, userAgent } = getClientInfo(req);
 
-      const lastAttempts = await SQL_GET_LAST_FOUR_LOGIN_ATTEMPTS({
-        id: user.id
-      }).many();
+      const failed_attempts = await SQL_GET_FAILED_LOGIN_ATTEMPTS({
+        user_id: user.id
+      }).oneFirst();
 
-      const remainingAttempts = calculateLoginAttemptsLeft(lastAttempts);
+      const  unlocked  = await SQL_CHECK_ACCOUNT_UNLOCKED({
+        user_id: user.id
+      }).oneFirst();
+
+      const remainingAttempts = unlocked && failed_attempts >=4
+          ? 4
+          : 4 - failed_attempts;
 
       if (remainingAttempts === 0) {
-        await recordLoginAttempt(user.id, ipAddress, userAgent, false, 'Locked');
-        throw new HttpError(423);
+          await recordLoginAttempt(user.id, ipAddress, userAgent, false, 'Locked');
+          throw new HttpError(423);
       }
 
       if (!await bcrypt.compare(req.body.pin, pin)) {
