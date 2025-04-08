@@ -7,7 +7,7 @@ const SQL_REVIEW_DEBIT = sql<{
   group_id:number;
   debit_id:number,
   admin_id:number;
-  status:'Approved'|'Rejected';
+  status:'Approved'|'Rejected'|'Cancelled';
   reason:string
 }, Record<string, never>>(`
   SELECT review_debit_request(
@@ -31,7 +31,7 @@ router.route({
         debit_id: z.number().int().min(1)
       }),
       body: z.object({
-        status: z.enum(['Approved', 'Rejected']),
+        status: z.enum([ 'Approved','Rejected','Cancelled']),
         reason: z.string()
       })
     },

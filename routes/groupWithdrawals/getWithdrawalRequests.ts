@@ -14,13 +14,13 @@ const withdrawalRequestSchema = z.object({
   reason: z.string(),
   total_amount: z.number(),
   status: z.string(),
-  created_at: z.string().datetime(),
   admin_reviews: z
     .array(
       z.object({
         admin_id: z.number().int().min(1),
         admin_name: z.string(),
-        status: z.string(),
+        status: z.enum([ 'Approved','Rejected','Cancelled']),
+        reason:z.string(),
         approval_date: z.string().datetime(),
       })
     )
@@ -34,6 +34,7 @@ const withdrawalRequestSchema = z.object({
       })
     )
     .min(1),
+    created_at: z.string().datetime()
 });
 
 type WithdrawalRequest = z.infer<typeof withdrawalRequestSchema>;
@@ -63,6 +64,7 @@ const SQL_GET_GROUP_WITHDRAWALS = sql<
                 'admin_id', debit_approvals.admin_id,
                 'admin_name', admin_user_contact_details.full_name,
                 'status', debit_approvals.status,
+                'reason', debit_approvals.reason,
                 'approval_date', debit_approvals.created_at
             ) ORDER BY debit_approvals.created_at
         )
