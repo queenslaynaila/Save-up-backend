@@ -1,14 +1,9 @@
 import Router from '../../router';
 import { sql } from '../../db';
 import { z } from 'zod';
+import {statsQuerySchema, Stats} from "./getDepositStats";
 
-const SQL_GET_AGGREGATED_WITHDRAWALS = sql<{
-    agg: 'avg'|'sum'|'count'|'min'|'max';
-    entity_id?: number;
-    start_date?: string;
-    end_date?: string;
-    slug:string
-}, { aggregated_deposits: number }>(`
+const SQL_GET_AGGREGATED_WITHDRAWALS = sql<Stats, { aggregated_deposits: number }>(`
   SELECT
     CASE
       WHEN :agg = 'avg' THEN AVG(delta)
@@ -33,12 +28,7 @@ const getWithdrawalStats = (router: Router) => {
         summary: 'Get withdrawal stats',
         auth: true,
         schema: {
-            query: z.object({
-                entity_id: z.number().int().min(1).optional(),
-                agg: z.enum(['avg', 'sum', 'count', 'min', 'max']),
-                start_date: z.string().datetime().optional(),
-                end_date: z.string().datetime().optional()
-            })
+            query: statsQuerySchema
         },
         response: {
             statusCode:200,
@@ -47,10 +37,11 @@ const getWithdrawalStats = (router: Router) => {
             })
         },
         handler: async (req, res) => {
-            const { entity_id, agg, start_date, end_date } = req.query;
+            const { entity_id, agg, start_date, end_date, pocket_id } = req.query;
             const aggregated_withdrawals = await SQL_GET_AGGREGATED_WITHDRAWALS({
                 slug:'Withdrawals',
                 entity_id,
+                pocket_id,
                 agg,
                 start_date,
                 end_date

@@ -2,13 +2,18 @@ import Router from '../../router';
 import { sql } from '../../db';
 import { z } from 'zod';
 
-const SQL_GET_AGGREGATED_DEPOSITS = sql<{
-    agg: 'avg'|'sum'|'count'|'min'|'max';
-    entity_id?: number;
-    start_date?: string;
-    end_date?: string;
-    slug:string
-}, { aggregated_deposits: number }>(`
+export const statsQuerySchema = z.object({
+    pocket_id: z.number().int().min(1).optional(),
+    entity_id: z.number().int().min(1).optional(),
+    agg: z.enum(['avg', 'sum', 'count', 'min', 'max']),
+    slug: z.string().optional(),
+    start_date: z.string().datetime().optional(),
+    end_date: z.string().datetime().optional()
+});
+
+export type Stats = z.infer<typeof statsQuerySchema>;
+
+const SQL_GET_AGGREGATED_DEPOSITS = sql<Stats, { aggregated_deposits: number }>(`
   SELECT
     CASE
       WHEN :agg = 'avg' THEN AVG(delta)
@@ -21,7 +26,8 @@ const SQL_GET_AGGREGATED_DEPOSITS = sql<{
   JOIN transaction_types 
       ON transactions.type_id = transaction_types.id
   WHERE transaction_types.slug = :slug
-  AND (:entity_id::INT IS NULL OR transactions.entity_id = :entity_id)
+    AND (:entity_id::INT IS NULL OR transactions.entity_id = :entity_id)
+    AND(:pocket_id::INT IS NULL OR transactions.pocket_id = :pocket_id)
     AND (:start_date::DATE IS NULL OR transactions.created_at >= :start_date::DATE)
     AND (:end_date::DATE IS NULL OR transactions.created_at <= :end_date::DATE)
 `);
@@ -33,12 +39,7 @@ const getDepositStats = (router: Router) => {
         summary: 'Get deposit stats',
         auth: true,
         schema: {
-            query: z.object({
-                entity_id: z.number().int().min(1).optional(),
-                agg: z.enum(['avg', 'sum', 'count', 'min', 'max']),
-                start_date: z.string().datetime().optional(),
-                end_date: z.string().datetime().optional()
-            })
+            query: statsQuerySchema
         },
         response: {
             statusCode:200,
@@ -47,10 +48,11 @@ const getDepositStats = (router: Router) => {
             })
         },
         handler: async (req, res) => {
-            const { entity_id, agg, start_date, end_date } = req.query;
+            const { entity_id, agg, start_date, end_date, pocket_id } = req.query;
             const aggregated_deposits = await SQL_GET_AGGREGATED_DEPOSITS({
                 slug:'Savings',
                 entity_id,
+                pocket_id,
                 agg,
                 start_date,
                 end_date
