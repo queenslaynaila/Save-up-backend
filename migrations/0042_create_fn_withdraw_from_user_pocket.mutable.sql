@@ -11,7 +11,7 @@ BEGIN
   SELECT (pocket_type = 'Locked' AND target_at > NOW())
   INTO STRICT v_is_locked
   FROM pockets
-  WHERE xid = p_pocket_id 
+  WHERE xid = p_pocket_id
     AND entity_id = p_user_id;
 
   IF v_is_locked AND NOT p_accept_penalty THEN
@@ -29,7 +29,7 @@ BEGIN
 
   IF v_is_locked AND p_accept_penalty THEN
     v_penalty_amount := p_amount * 0.05;
-    
+
     PERFORM process_transaction(
       p_user_id,
       'Penalty',
