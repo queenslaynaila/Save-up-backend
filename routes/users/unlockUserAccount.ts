@@ -52,14 +52,17 @@ const unlockUserAccount = (router: Router) => {
                 const locked_attempt_id = await SQL_GET_RECENT_UNLOCK({
                     user_id: req.params.user_id
                 }).using(trx)
-                    .oneFirst(new HttpError(404, { message: 'ERR_ACCOUNT_IS_NOT_LOCKED' }));
+                    .oneFirst(new HttpError(
+                        404, { message: 'ERR_ACCOUNT_IS_NOT_LOCKED' }
+                    ));
 
                 await SQL_UNLOCK_USER_ACCOUNT({
                     user_id: req.params.user_id,
                     admin_id: req.user!.id,
                     locked_attempt_id,
                     reason: req.body.notes
-                }).using(trx).exec()
+                }).using(trx)
+                    .exec()
             });
             res.status(200);
         }
