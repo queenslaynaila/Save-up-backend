@@ -85,33 +85,6 @@ const SQL_RECORD_LOGIN_ATTEMPT = sql<LoginAttempt, Record<string, never>>(`
   WHERE user_id = :user_id
 `);
 
-const loginOutcomeSchema = loginSchema.pick({
-  success: true,
-  reason: true
-});
-
-const SQL_CHECK_ACCOUNT_UNLOCKED = sql<{ user_id: number }, { unlocked: boolean }>(`
-  SELECT EXISTS (
-    SELECT 1 FROM account_unlocks
-    WHERE user_id = :user_id 
-    AND locked_attempt_id = (
-      SELECT MAX(xid) 
-      FROM login_attempts 
-      WHERE user_id = :user_id 
-        AND success = false 
-        AND reason = 'Locked'
-    )
-  ) as unlocked
-`);
-
-type LoginOutcome = z.infer<typeof loginOutcomeSchema>;
-const SQL_GET_LAST_FOUR_LOGIN_ATTEMPTS = sql<{ id: number }, LoginOutcome>(`
-  SELECT success, reason
-  FROM login_attempts
-  WHERE user_id = :id
-  ORDER BY xid DESC
-  LIMIT 4
-`);
 
 export async function recordLoginAttempt(
   userId: number,
@@ -136,21 +109,54 @@ export function getClientInfo(req: Request) {
   };
 }
 
-const SQL_GET_FAILED_LOGIN_ATTEMPTS = sql<{ user_id: number }, { failed_attempts: number }>(`
-  SELECT COALESCE(
-    (SELECT COUNT(*) 
-     FROM (
-       SELECT success
-       FROM login_attempts
-       WHERE user_id = :user_id
-       ORDER BY xid DESC
-       LIMIT 4
-     ) AS last_four_attempts
-     WHERE success = false), 
-    0
-  ) AS failed_attempts
+const SQL_GET_LOGIN_STATUS = sql<{ user_id: number }, {
+  is_locked: boolean,
+  is_unlocked: boolean,
+  failed_attempts: number
+}>(`
+  SELECT 
+    EXISTS (
+      SELECT 1
+      FROM login_attempts
+      WHERE user_id = :user_id
+        AND xid = (
+        SELECT MAX(xid)
+        FROM login_attempts
+        WHERE user_id = :user_id
+      )
+        AND success = false
+        AND reason = 'Locked'
+    ) AS is_locked,
+    
+    EXISTS (
+      SELECT 1
+      FROM account_unlocks
+      WHERE user_id = :user_id
+      AND locked_attempt_id = (
+        SELECT MAX(xid) 
+        FROM login_attempts 
+        WHERE user_id = :user_id 
+          AND success = false
+          AND reason = 'Locked'
+      )
+    ) AS is_unlocked,
+    
+    COALESCE((
+        SELECT CASE
+            WHEN MAX(CASE WHEN success THEN 1 ELSE 0 END) = 1  THEN 
+                0 
+            ELSE COUNT(*)
+            END
+        FROM login_attempts
+        WHERE user_id = :user_id
+        AND success = false
+        AND xid > (
+            SELECT COALESCE(MAX(locked_attempt_id), 0)
+            FROM account_unlocks
+            WHERE user_id = :user_id
+        )
+    ), 0) AS failed_attempts
 `);
-
 
 
 const login = (router: Router) => {
@@ -182,17 +188,19 @@ const login = (router: Router) => {
 
       const { ipAddress, userAgent } = getClientInfo(req);
 
-      const failed_attempts = await SQL_GET_FAILED_LOGIN_ATTEMPTS({
+      const { is_locked, is_unlocked, failed_attempts } = await SQL_GET_LOGIN_STATUS({
         user_id: user.id
-      }).oneFirst();
+      }).one();
 
-      const  unlocked  = await SQL_CHECK_ACCOUNT_UNLOCKED({
-        user_id: user.id
-      }).oneFirst();
 
-      const remainingAttempts = unlocked && failed_attempts >=4
+      logger.info(`Failed attempts: ${failed_attempts} is_locked: ${is_locked} is_unlocked: ${is_unlocked}`);
+
+      const remainingAttempts = is_locked && is_unlocked
           ? 4
           : 4 - failed_attempts;
+
+
+      logger.info(`Remaining attempts: ${remainingAttempts}`);
 
       if (remainingAttempts === 0) {
           await recordLoginAttempt(user.id, ipAddress, userAgent, false, 'Locked');
@@ -200,6 +208,7 @@ const login = (router: Router) => {
       }
 
       if (!await bcrypt.compare(req.body.pin, pin)) {
+        logger.info(`user has entered incorrect pin therefore remaining attempts are ${remainingAttempts-1}`);
         await recordLoginAttempt(user.id, ipAddress, userAgent, false, 'Incorrect pin');
         throw new HttpError(401, { remaining_attempts: remainingAttempts-1 });
       }
