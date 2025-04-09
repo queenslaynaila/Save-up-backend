@@ -3,7 +3,7 @@ import { sql } from '../../db';
 import HttpError from '../../httpError';
 import Router from '../../router';
 import { publicUserSchema, UserWithPublicAttributes } from '../auth/login';
-import { UserRole } from './schema';
+import {UserRole} from "./schema";
 
 const SQL_GET_USER_BY_CRITERIA = sql<Record<string, never>,UserWithPublicAttributes>(`
   SELECT 
@@ -33,9 +33,10 @@ const getUsersBySearchCriteria = (router: Router) => {
       })
     },
     response: {
-        schema: z.array(publicUserSchema)
+      statusCode: 200,
+      schema: z.array(publicUserSchema)
     },
-    auth:true,
+    auth:[UserRole.enum.Admin, UserRole.enum.Moderator],
     handler: async (req, res) => {
       const { value } = req.query;
       const sanitizedValue = value.replace(/^ /, '+');
@@ -47,7 +48,7 @@ const getUsersBySearchCriteria = (router: Router) => {
         filters.push('user_contact_details.phone_number = :phone_number');
         filterArgs.phone_number = sanitizedValue;
       } else if (/^(?:[A-Z]{1,2}\d{6,9}|\d{8,10}|\d{13}|\d{16})$/
-        .test(sanitizedValue)) { 
+        .test(sanitizedValue)) {
         filters.push('users.id_number = :id_number');
         filterArgs.id_number = sanitizedValue;
       }
@@ -57,10 +58,10 @@ const getUsersBySearchCriteria = (router: Router) => {
       } else {
         throw new HttpError(400);
       }
-      
+
       const query = SQL_GET_USER_BY_CRITERIA({});
       query.extend(`WHERE ${filters}`, filterArgs);
-      
+
       const users = await query.many();
       res.json(users);
     }
