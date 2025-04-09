@@ -8,9 +8,9 @@ DECLARE
 BEGIN
     IF p_target_id != p_initiator_id THEN
         IF EXISTS (
-            SELECT 1 
+            SELECT 1
             FROM group_deposits
-            WHERE group_id = p_group_id 
+            WHERE group_id = p_group_id
               AND user_id = p_target_id
         ) THEN
             RAISE EXCEPTION USING
@@ -21,30 +21,29 @@ BEGIN
 
     UPDATE group_members
     SET is_active = FALSE
-    WHERE group_id = p_group_id 
+    WHERE group_id = p_group_id
       AND user_id = p_target_id
       AND is_active = TRUE;
 
     INSERT INTO group_lefts (
-        group_id, 
-        user_id, 
-        xid, 
-        admin_id, 
+        group_id,
+        user_id,
+        xid,
+        admin_id,
         reason
     )
-    SELECT 
-        p_group_id, 
+    SELECT
+        p_group_id,
         p_target_id,
-        COALESCE(MAX(xid), 0) + 1, 
-        CASE 
-            WHEN p_target_id != p_initiator_id THEN p_initiator_id 
-            ELSE NULL 
-        END,
-        CASE 
-            WHEN p_target_id != p_initiator_id THEN 'Admin removal'::enum_exit_reason
-            ELSE 'Self removal'::enum_exit_reason
+        COALESCE(MAX(xid), 0) + 1,
+        NULLIF(p_initiator_id, p_target_id),
+        CASE
+            WHEN p_target_id != p_initiator_id THEN
+                'Admin removal'::enum_exit_reason
+            ELSE
+                'Self removal'::enum_exit_reason
         END
-    FROM group_lefts      
+    FROM group_lefts
     WHERE group_id = p_group_id;
 
     IF p_target_id = p_initiator_id THEN
@@ -53,7 +52,7 @@ BEGIN
         FROM group_members
         WHERE group_id = p_group_id
           AND is_active = TRUE;
-          
+
         IF v_member_count = 0 THEN
             UPDATE groups
             SET deleted_at = NOW()
@@ -65,8 +64,8 @@ END;
 $$ LANGUAGE plpgsql;
 
 GRANT EXECUTE ON FUNCTION exit_or_remove_group_member(
-    INT, 
-    INT, 
+    INT,
+    INT,
     INT
 ) TO saveup_www;
 
