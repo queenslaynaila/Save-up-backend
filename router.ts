@@ -17,7 +17,6 @@ import HttpError from './httpError';
 import Config from './config';
 import {authMiddleware } from './utils';
 import { Role } from './routes/users/schema';
-import logger from "./logger";
 
 const ajv = new Ajv();
 
