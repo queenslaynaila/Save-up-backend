@@ -4,7 +4,7 @@ export const entityIdParamsSchema = z.union([
   z.number().int().min(1),
   z.literal('me').describe(
     "Identifier for user/group whose data is being fetched. Can be:\n\n" +
-    "- `me`:Special id `me`to rep the currently loged in user.\n" +
+    "- `me`:Special id `me`to rep the currently logged in user.\n" +
     "- `A positive integer`: Represents a specific user's./ group ID."
   )])
 
