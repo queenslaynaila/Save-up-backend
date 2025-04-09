@@ -20,7 +20,7 @@ const resetTokenSchema = z.object({
 export type ResetToken = z.infer<typeof resetTokenSchema>;
 
 const SQL_SAVE_TOKEN = sql<
-  Pick<ResetToken,'token' | 'reason'> & {phone_number:string}, 
+  Pick<ResetToken,'token' | 'reason'> & {phone_number:string},
   {user_id: number}
 >(`
  INSERT INTO reset_tokens (
@@ -64,8 +64,8 @@ const initiatePinReset = (router: Router) => {
       const { phone_number } = req.body;
       const resetToken = generateOtp();
       const hashedResetToken = await bcrypt.hash(resetToken, 10);
-      
-      const userId = await SQL_SAVE_TOKEN({ 
+
+      const userId = await SQL_SAVE_TOKEN({
         phone_number,
         token: hashedResetToken,
         reason: 'Reset'
@@ -75,7 +75,7 @@ const initiatePinReset = (router: Router) => {
         phone_number,
         'Hello, your PIN reset verification code is: ' + resetToken +
         '. It expires in 10 minutes. Do not share with anyone.'
-      );
+      ).catch(console.error);
 
       res
         .setHeader('Reset', generateToken(userId, "10m", 1,))

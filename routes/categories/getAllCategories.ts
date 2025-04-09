@@ -2,16 +2,16 @@ import { z } from 'zod';
 import { sql } from '../../db';
 import Router from '../../router';
 
-const categorySchema = z.object({
+export const categorySchema = z.object({
   id: z.number().min(1),
   name: z.string(),
   description: z.string(),
   image_url: z.string()
 });
-type Category = z.infer<typeof categorySchema>;
+export type Category = z.infer<typeof categorySchema>;
 
 const SQL_GET_ALL_CATEGORIES = sql<
-Record<string, never>, 
+Record<string, never>,
 Pick<Category, 'id'|'name'|'description'|'image_url'>>(`
   SELECT id, name, description, image_url 
   FROM categories 
@@ -30,7 +30,7 @@ const getAllCategories = (router: Router) => {
         description:true,
         image_url:true
       }))
-      
+
     },
     auth: true,
     handler: async (_req, res) => {
