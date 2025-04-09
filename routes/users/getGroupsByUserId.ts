@@ -1,7 +1,7 @@
 import Router from '../../router';
 import { sql } from '../../db';
 import { z } from 'zod';
-import { entityIdParamsSchema } from '../users/schema';
+import { entityIdParamsSchema } from './schema';
 import { decodeEntityAndVerifyAccess } from '../../utils';
 import { Group, groupsSchema } from '../groups/schema';
 
@@ -63,10 +63,10 @@ const getGroupsByUserId = (router: Router) => {
     },
     handler: async (req, res) => {
       const userId = await decodeEntityAndVerifyAccess(req, true);
-      
+
       const groups = await SQL_FETCH_USER_GROUPS({
         user_id: userId,
-        other_user_id: req.query.mutual_user_id 
+        other_user_id: req.query.mutual_user_id
       }).many();
 
       return res.json(groups);
