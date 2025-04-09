@@ -128,7 +128,7 @@ const getTransactions = (router: Router) => {
   router.route({
     method: 'get',
     path: '/:entity_id/transactions',
-    summary: 'Get all transactions associated with a user or grps',
+    summary: 'Get all transactions associated with a user or groups',
     schema: {
       params: z.object({
         entity_id: entityIdParamsSchema
