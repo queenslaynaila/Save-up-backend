@@ -15,7 +15,7 @@ const SQL_GET_EXPENSES = sql<{
   spent_to?: string;
   start_date?: string;
   end_date?: string;
-}, 
+},
 Pick<Expense, 'entity_id'|'xid'|'category_id'|'description'|
   'amount'|'spent_at'|'created_at'>>(`
   SELECT entity_id, 
@@ -37,8 +37,7 @@ Pick<Expense, 'entity_id'|'xid'|'category_id'|'description'|
 `);
 
 const getExpensesByEntity = (router: Router) => {
-  router.route({
-    method: 'get',
+  router.get({
     path: '/:entity_id/expenses',
     summary: 'Get list of expenses by criteria',
     schema: {
@@ -68,13 +67,13 @@ const getExpensesByEntity = (router: Router) => {
     handler: async (req, res) => {
       const entityId = await decodeEntityAndVerifyAccess(req, true);
       const {
-        category_id, 
-        spent_from, 
-        spent_to, 
-        start_date, 
+        category_id,
+        spent_from,
+        spent_to,
+        start_date,
         end_date
       } = req.query;
-      
+
       const expenses = await SQL_GET_EXPENSES({
         entity_id: entityId,
         category_id,

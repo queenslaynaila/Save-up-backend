@@ -12,12 +12,12 @@ const expenseCreationParams = expenseSchema.pick({
   spent_at: true
 });
 
-export type ExpenseCreationParams = z.infer<typeof expenseCreationParams> 
+export type ExpenseCreationParams = z.infer<typeof expenseCreationParams>
 & { entity_id: number };
 
 const SQL_CREATE_EXPENSES = sql<
   ExpenseCreationParams,
-  Pick<Expense, 'entity_id' | 'xid' | 'category_id' | 'description' 
+  Pick<Expense, 'entity_id' | 'xid' | 'category_id' | 'description'
   | 'amount' | 'spent_at' | 'created_at'>
 >(`
   INSERT INTO expenses (entity_id, xid, category_id, description, amount, spent_at)
@@ -34,8 +34,7 @@ const SQL_CREATE_EXPENSES = sql<
 `);
 
 const createExpense = (router: Router) => {
-  router.route({
-    method: 'post',
+  router.post({
     path: '/:entity_id/expenses',
     summary: 'Create an expense',
     schema: {

@@ -368,8 +368,7 @@ Activity>(`
 `);
 
 const getGroupActivities = (router: Router) => {
-  router.route({
-    method: 'get',
+  router.get({
     path: '/:group_id/activities',
     summary: 'Get group activities',
     auth: true,

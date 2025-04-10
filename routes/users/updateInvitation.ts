@@ -16,8 +16,7 @@ const SQL_RESPOND_TO_INVITE = sql<
 `);
 
 const updateInvites = (router: Router) => {
-  router.route({
-    method: 'patch',
+  router.patch({
     path: '/me/invitations/:xid',
     summary: 'Respond to a group invitation',
     auth: true,

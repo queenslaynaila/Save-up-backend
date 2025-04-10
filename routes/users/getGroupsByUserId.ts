@@ -36,8 +36,7 @@ const SQL_FETCH_USER_GROUPS = sql<
 `);
 
 const getGroupsByUserId = (router: Router) => {
-  router.route({
-    method: 'get',
+  router.get({
     path: '/:user_id/groups',
     summary: 'Get a user\'s active groups',
     description: 'Optional `mutual_user_id` filter shows only groups shared with another user.',

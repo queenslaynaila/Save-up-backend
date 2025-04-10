@@ -105,8 +105,7 @@ const SQL_GET_GROUP_WITHDRAWALS = sql<
 `);
 
 const getGrpDebitRequests = (router: Router) => {
-  router.route({
-    method: 'get',
+  router.get({
     path: '/groups/:group_id/withdrawal-requests',
     summary: 'Get all withdrawal requests made for a group',
     schema: {

@@ -25,8 +25,7 @@ const SQL_UPDATE_ROLE = sql<
 `);
 
 const updateUserRole = (router: Router) => {
-  router.route({
-    method: 'patch',
+  router.patch({
     path: '/:user_id/role',
     summary: 'Update user role. Admin only',
     auth: [UserRole.enum.Admin],
@@ -47,7 +46,7 @@ const updateUserRole = (router: Router) => {
           message: 'ERR_CANT_ACT_ON_SELF'
         });
       }
-      
+
       await SQL_UPDATE_ROLE({
         targetUserId: userId,
         role,

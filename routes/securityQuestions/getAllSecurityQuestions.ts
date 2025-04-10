@@ -19,8 +19,7 @@ const SQL_GET_SECURITY_QUESTIONS = sql<Record<string, never>, SecurityQuestions>
 `);
 
 const getAllSecurityQuestions = (router: Router) => {
-  router.route({
-    method: 'get',
+  router.get({
     path: '/',
     summary: 'Get list of system defined security questions',
     response: {

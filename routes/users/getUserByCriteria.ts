@@ -21,8 +21,7 @@ const SQL_GET_USER_BY_CRITERIA = sql<Record<string, never>,UserWithPublicAttribu
 `);
 
 const getUsersBySearchCriteria = (router: Router) => {
-  router.route({
-    method: 'get',
+  router.get({
     path: '/search',
     summary: 'Search for users based on various criteria.',
     description: 'Allows searching for users based on a single query criterion: ' +

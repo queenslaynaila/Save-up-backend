@@ -22,8 +22,7 @@ const SQL_GET_AGGREGATED_WITHDRAWALS = sql<Stats, { aggregated_deposits: number 
 `);
 
 const getWithdrawalStats = (router: Router) => {
-    router.route({
-        method: 'get',
+    router.get({
         path: '/transactions/stats/withdrawals',
         summary: 'Get withdrawal stats',
         auth: true,

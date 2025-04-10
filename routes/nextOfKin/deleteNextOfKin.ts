@@ -15,8 +15,7 @@ const SQL_DELETE_KIN = sql<
 `);
 
 const deleteNextOfKin = (router: Router) => {
-  router.route({
-    method: 'delete',
+  router.delete({
     path: '/users/me/next-of-kins/:xid',
     summary: 'Delete a next of kin',
     auth: true,

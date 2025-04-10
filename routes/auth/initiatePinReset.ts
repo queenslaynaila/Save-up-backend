@@ -50,8 +50,7 @@ function generateOtp(): string {
 }
 
 const initiatePinReset = (router: Router) => {
-  router.route({
-    method: 'post',
+  router.post({
     path: '/pin-reset-token',
     summary: 'Send PIN reset token',
     schema: {

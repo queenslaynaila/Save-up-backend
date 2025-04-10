@@ -23,8 +23,7 @@ const SQL_CREATE_LOAN_REQUEST = sql<{
 `);
 
 const requestLoan = (router: Router) => {
-  router.route({
-    method: 'post',
+  router.post({
     path: '/groups/:group_id/loans',
     summary: 'Request a loan',
     auth: true,

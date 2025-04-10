@@ -22,8 +22,7 @@ const SQL_CREATE_SAVING = sql<
 `);
 
 const createSaving = (router: Router) => {
-  router.route({
-    method: 'post',
+  router.post({
     path: '/:entity_id/transactions/deposits',
     summary: 'Deposit money to a pocket',
     auth: true,

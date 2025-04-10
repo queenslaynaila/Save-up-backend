@@ -24,8 +24,7 @@ const SQL_GET_CANDIDATES = sql<
 `);
 
 const getCandidates = (router: Router) => {
-  router.route({
-    method: 'get',
+  router.get({
     path: '/:group_id/elections/:election_id/candidates',
     summary: 'Retrieves all candidates nominated for an election.',
     auth: true,
@@ -45,7 +44,7 @@ const getCandidates = (router: Router) => {
     },
     handler: async (req, res) => {
       const groupId = await decodeEntityAndVerifyAccess(req, true);
-      
+
       const candidates = await SQL_GET_CANDIDATES({
         group_id: groupId,
         election_id: req.params.election_id

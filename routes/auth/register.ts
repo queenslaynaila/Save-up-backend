@@ -3,10 +3,10 @@ import { z } from 'zod';
 import { sql } from '../../db';
 import Router from '../../router';
 import HttpError from '../../httpError';
-import { 
-  UserRole, 
-  userContactDetailsSchema, 
-  userSchema 
+import {
+  UserRole,
+  userContactDetailsSchema,
+  userSchema
 } from '../users/schema';
 import {
   AuthenticatedUser,
@@ -31,7 +31,7 @@ type UserRegistrationParams = z.infer<typeof UserRegistrationSchema>;
 
 
 const SQL_CREATE_USER = sql<
-UserRegistrationParams, 
+UserRegistrationParams,
 Pick<AuthenticatedUser, 'id'|'id_type'|'id_number'|'role'|
 'pin'|'full_name'|'phone_number'|'gender'|'created_at'>>(`
   SELECT * 
@@ -49,8 +49,7 @@ Pick<AuthenticatedUser, 'id'|'id_type'|'id_number'|'role'|
 `);
 
 const createUser = (router: Router) => {
-  router.route({
-    method: 'post',
+  router.post({
     path: '/register',
     summary: 'Create a new user',
     schema: {
@@ -98,7 +97,7 @@ const createUser = (router: Router) => {
        '7d',
         user.role
       );
-      
+
       res
         .status(201)
         .setHeader('Authorization', accessToken)

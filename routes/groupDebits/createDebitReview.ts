@@ -20,8 +20,7 @@ const SQL_REVIEW_DEBIT = sql<{
 `);
 
 const reviewDebitRequests = (router: Router) => {
-router.route({
-    method: 'patch',
+router.patch({
     path: '/groups/:group_id/admins/review/:debit_id',
     summary: 'Approve or reject a loan/withdrawal request',
     auth: true,

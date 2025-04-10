@@ -14,7 +14,7 @@ const ballotParamsSchema = z.object({
 type BallotParams = z.infer<typeof ballotParamsSchema>;
 
 const SQL_CREATE_BALLOT = sql<
-Pick<BallotParams, 'group_id'|'election_id'|'candidate_ids'|'user_id'>, 
+Pick<BallotParams, 'group_id'|'election_id'|'candidate_ids'|'user_id'>,
 Record<string, never>>(`
   SELECT create_ballot(
     :group_id,
@@ -25,8 +25,7 @@ Record<string, never>>(`
 `);
 
 const createBallot = (router: Router) => {
-  router.route({
-    method: 'post',
+  router.post({
     path: '/:group_id/elections/:election_id/ballots',
     summary: 'Submit a vote for a candidate in an election',
     auth: true,
@@ -41,7 +40,7 @@ const createBallot = (router: Router) => {
     },
     handler: async (req, res) => {
       const groupId = await decodeEntityAndVerifyAccess(req);
-      
+
       await SQL_CREATE_BALLOT({
         ...req.body,
         group_id: groupId,

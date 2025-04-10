@@ -162,8 +162,7 @@ const SQL_GET_LOGIN_STATUS = sql<{ user_id: number }, {
 `);
 
 const login = (router: Router) => {
-  router.route({
-    method: 'post',
+  router.post({
     path: '/login',
     summary: 'Login',
     schema: {

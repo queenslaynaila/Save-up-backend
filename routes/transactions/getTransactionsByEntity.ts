@@ -125,8 +125,7 @@ const SQL_GET_TRANSACTIONS = sql<
 `);
 
 const getTransactions = (router: Router) => {
-  router.route({
-    method: 'get',
+  router.get({
     path: '/:entity_id/transactions',
     summary: 'Get all transactions associated with a user or groups',
     schema: {

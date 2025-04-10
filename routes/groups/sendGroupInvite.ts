@@ -43,8 +43,7 @@ const SQL_SEND_INVITATION = sql<
 `);
 
 const createGroupInvite = (router: Router) => {
-  router.route({
-    method: 'post',
+  router.post({
     path: '/:group_id/invitations',
     summary: 'Send a group invitation via phone number',
     description: [

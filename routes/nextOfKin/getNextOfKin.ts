@@ -26,8 +26,7 @@ const SQL_GET_KIN = sql<
 `);
 
 const getNextOfKin = (router: Router) => {
-  router.route({
-    method: 'get',
+  router.get({
     path: '/users/:user_id/next-of-kins',
     summary: 'Retrieve next of kin details',
     description: 'Standard users can only view active records.',

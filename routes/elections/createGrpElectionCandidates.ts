@@ -28,8 +28,7 @@ const SQL_CREATE_CANDIDATE = sql<
 `);
 
 const createCandidates = (router: Router) => {
-  router.route({
-    method: 'post',
+  router.post({
     path: '/:group_id/elections/:election_id/candidates',
     summary: 'Create candidates for an open election',
     auth: true,

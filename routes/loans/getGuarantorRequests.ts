@@ -71,8 +71,7 @@ const approval_enum = z.enum([
 ])
 
 const getGuarantorRequests = (router: Router) => {
-  router.route({
-    method: 'get',
+  router.get({
     path: '/groups/:group_id/loans/guarantor-requests/:member_id',
     summary: 'Get all guarantor requests made to a grp member',
     schema: {

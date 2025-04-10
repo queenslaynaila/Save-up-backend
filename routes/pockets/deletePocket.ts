@@ -32,8 +32,7 @@ const SQL_DELETE_POCKET = sql<
 
 
 const deletePocket = (router: Router) => {
-  router.route({
-    method: 'delete',
+  router.post({
     path: '/:entity_id/pockets/:xid',
     summary: 'Delete a pocket',
     schema: {

@@ -84,13 +84,12 @@ const validateRequest = (schema: {
 type HttpMethod = 'get' | 'post' | 'patch' | 'delete' | 'put';
 const emptyObjectSchema = z.object({}).strict();
 
-interface RouterOptions<
-  Params extends AnyZodObject | ZodNever = ZodNever,
-  ResBody = ZodSchema | ZodNever,
-  ReqBody = ZodSchema | ZodNever,
-  QueryParams extends AnyZodObject = AnyZodObject
+interface RouteOptions<
+    Params extends AnyZodObject | typeof emptyObjectSchema = typeof emptyObjectSchema,
+    ResBody = ZodSchema | ZodNever,
+    ReqBody = ZodSchema | ZodNever,
+    Query extends AnyZodObject | typeof emptyObjectSchema = typeof emptyObjectSchema
 > {
-  method: HttpMethod;
   path: string;
   hidden?: boolean;
   summary?: string;
@@ -98,7 +97,7 @@ interface RouterOptions<
   schema?: {
     params?: Params;
     body?: ZodSchema<ReqBody>;
-    query?: QueryParams;
+    query?: Query;
   };
   response?: {
     statusCode?: number;
@@ -107,14 +106,27 @@ interface RouterOptions<
   };
   auth?: true | Role | Role[];
   middlewares?: Array<(req: Request, res: Response, next: NextFunction) => void>;
-  handler: RequestHandler<TypeOf<Params>, ResBody, ReqBody, TypeOf<QueryParams>>;
+  handler: RequestHandler<TypeOf<Params>, ResBody, ReqBody, TypeOf<Query>>;
 }
+
+type SpecificRouteMethodHandler = <
+    Params extends AnyZodObject | typeof emptyObjectSchema = typeof emptyObjectSchema,
+    ResBody = ZodSchema | ZodNever,
+    ReqBody = ZodSchema | ZodNever,
+    Query extends AnyZodObject | typeof emptyObjectSchema = typeof emptyObjectSchema
+>(options: RouteOptions<Params, ResBody, ReqBody, Query>) => void;
 
 const registry = new OpenAPIRegistry();
 
 class Router {
   private static app: Application = express();
   private static routerInstances: Map<string, Router> = new Map();
+
+  public readonly get: SpecificRouteMethodHandler;
+  public readonly post: SpecificRouteMethodHandler;
+  public readonly put: SpecificRouteMethodHandler;
+  public readonly patch: SpecificRouteMethodHandler;
+  public readonly delete: SpecificRouteMethodHandler;
 
   private readonly router: ExpressRouter;
   private readonly routePrefix: string;
@@ -125,7 +137,103 @@ class Router {
     this.routePrefix = `/saveup${routePrefix}`;
     this.apiTag = apiTag;
 
+    this.get = this.createMethodHandler('get');
+    this.post = this.createMethodHandler('post');
+    this.put = this.createMethodHandler('put');
+    this.patch = this.createMethodHandler('patch');
+    this.delete = this.createMethodHandler('delete');
+
     Router.app.use(this.routePrefix, this.router);
+  }
+
+  private createMethodHandler(method: HttpMethod): SpecificRouteMethodHandler {
+    return <
+        Params extends AnyZodObject | typeof emptyObjectSchema,
+        ResBody,
+        ReqBody,
+        Query extends AnyZodObject | typeof emptyObjectSchema
+    >(options: RouteOptions<Params, ResBody, ReqBody, Query>) => {
+      const {
+        path,
+        schema,
+        response = { statusCode: 200, schema: z.never() },
+        auth,
+        middlewares = [],
+        handler
+      } = options;
+
+      const processedMiddlewares = [...middlewares];
+      if (schema) processedMiddlewares.unshift(validateRequest(schema));
+      if (auth) processedMiddlewares.splice(1, 0, authMiddleware(auth));
+
+      const security = [];
+      if (auth) security.push({ Authorization: [] });
+      if (processedMiddlewares.some(m => m.name === "resetStepValidator")) {
+        security.push({ Reset: [] });
+      }
+
+      const responseSchemas = response.schema ? {
+        [response.statusCode || 200]: {
+          description: response.statusCode?.toString().startsWith("2") ? "Success" : "Error",
+          content: {
+            "application/json": {
+              schema: zodToJsonSchema(response.schema, { target: "openApi3" })
+            }
+          }
+        }
+      } : {};
+
+      const transformedPath = path.replace(/:([^/]+)/g, '{$1}');
+      const fullPath = `${this.routePrefix}${transformedPath}`.replace(/\/+/g, '/');
+
+      if (!options.hidden) {
+        registry.registerPath({
+          tags: this.apiTag ? [this.apiTag] : undefined,
+          method,
+          path: fullPath,
+          summary: options.summary,
+          description: options.description,
+          security,
+          request: {
+            params: schema?.params,
+            body: schema?.body ? {
+              content: {
+                'application/json': {
+                  schema: schema.body
+                }
+              }
+            } : undefined,
+            query: schema?.query
+          },
+          responses: responseSchemas
+        });
+      }
+
+      if (response.schema) {
+        const jsonResponseSchema: any = zodToJsonSchema(response.schema, { target: "openApi3" });
+        const stringify = fastJson(jsonResponseSchema);
+
+        const errorSchema = z.union([
+          z.record(z.unknown()),
+          z.array(z.record(z.unknown()))
+        ]);
+        const jsonErrorSchema: any = zodToJsonSchema(errorSchema, { target: 'openApi3' });
+        const errStringify = fastJson(jsonErrorSchema);
+
+        processedMiddlewares.push((_req: Request, res: Response, next: NextFunction) => {
+          res.json = <T extends object>(data: T) => {
+            res.setHeader("Content-Type", "application/json");
+            if (data instanceof HttpError) {
+              return res.send(errStringify(data.errors));
+            }
+            return res.send(stringify(data));
+          };
+          next();
+        });
+      }
+
+      this.router[method](path, ...processedMiddlewares, handler as RequestHandler);
+    };
   }
 
   public static initialize() {
@@ -167,88 +275,6 @@ class Router {
     return Router.routerInstances.get(key)!;
 }
 
-  public route<
-    Params extends AnyZodObject | typeof emptyObjectSchema = typeof emptyObjectSchema,
-    ResBody = ZodSchema | ZodNever,
-    ReqBody = ZodSchema | ZodNever,
-    Query extends AnyZodObject | typeof emptyObjectSchema = typeof emptyObjectSchema
-  >(options: RouterOptions<Params, ResBody, ReqBody, Query>) {
-    const {
-      method,
-      path,
-      schema,
-      response = { statusCode: 200, schema: z.never() },
-      auth,
-      middlewares = [],
-      handler
-    } = options;
-
-    if (schema) middlewares.unshift(validateRequest(schema));
-    if (auth) middlewares.splice(1, 0, authMiddleware(auth));
-
-    const security = [];
-    if (auth) security.push({ Authorization: [] });
-    if (middlewares.some(m => m.name === "resetStepValidator")) {
-      security.push({ Reset: [] });
-    }
-
-    const responseSchemas  = response.schema ? {
-        [response.statusCode || 200]:{
-          description: response.statusCode?.toString().startsWith("2") ? "Success" : "Error",
-          content:{
-            "application/json":{
-              schema: zodToJsonSchema(response.schema, { target: "openApi3" })
-            }
-          }
-        }
-      } : {}
-
-
-    const transformedPath = path.replace(/:([^/]+)/g, '{$1}');
-    const fullPath = `${this.routePrefix}${transformedPath}`.replace(/\/+/g, '/');
-
-    if(!options.hidden){
-      registry.registerPath({
-        tags: this.apiTag ? [this.apiTag] : undefined,
-        method,
-        path: fullPath,
-        summary: options.summary,
-        description: options.description,
-        security,
-        request: {
-          params: schema?.params,
-          body: schema?.body ? { content: { 'application/json': { schema: schema.body } } } : undefined,
-          query: schema?.query
-        },
-        responses: responseSchemas
-      });
-    }
-
-    if (response.schema) {
-      const jsonResponseSchema: any = zodToJsonSchema(response.schema, { target: "openApi3" });
-      const stringify = fastJson(jsonResponseSchema);
-
-      const errorSchema = z.union([
-        z.record(z.unknown()),
-        z.array(z.record(z.unknown()))
-      ]);
-      const jsonErrorSchema: any = zodToJsonSchema(errorSchema, { target: 'openApi3' });
-      const errStringify = fastJson(jsonErrorSchema);
-
-      middlewares.push((_req: Request, res: Response, next: NextFunction) => {
-        res.json = <T extends object>(data: T) => {
-          res.setHeader("Content-Type", "application/json");
-          if (data instanceof HttpError) {
-            return res.send(errStringify(data.errors));
-          }
-          return res.send(stringify(data));
-        };
-        next();
-      });
-    }
-
-    this.router[method](path, ...middlewares, handler as RequestHandler);
-  }
 }
 
 Router.initialize();

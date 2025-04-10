@@ -50,12 +50,11 @@ const SQL_GET_GROUP_MEMBERS = sql<
     ON user_contact_details.id = group_members.user_id
   WHERE group_members.group_id = :group_id
     AND group_members.is_active = TRUE
-  ORDER BY is_admin DESC, full_name ASC;
+  ORDER BY is_admin DESC;
 `);
 
 const getGroupMembers = (router: Router) => {
-  router.route({
-    method: 'get',
+  router.get({
     path: '/:group_id/members',
     summary: 'Get group members',
     auth: true,

@@ -14,8 +14,7 @@ const SQL_CREATE_GROUP = sql<
 `);
 
 const createGroup = (router: Router) => {
-  router.route({
-    method: 'post',
+  router.post({
     path: '/',
     summary: 'Create a group',
     auth: true,

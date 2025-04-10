@@ -32,8 +32,7 @@ const SQL_UPDATE_GROUP_NAME = sql<
 `);
 
 const updateGroup = (router: Router) => {
-  router.route({
-    method: 'patch',
+  router.patch({
     path: '/:group_id',
     summary: 'Update group name',
     description: 'Update group name',

@@ -24,8 +24,7 @@ const generatePresignedUrl = async (key: string): Promise<string> => {
 };
 
 const generateUrl = (router: Router) => {
-    router.route({
-        method: "get",
+    router.get({
         path: "/s3-presigned-url",
         auth: UserRole.enum.Admin,
         summary: "Generate a presigned URL for uploading an image",

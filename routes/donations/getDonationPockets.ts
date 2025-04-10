@@ -46,8 +46,7 @@ const SQL_GET_DONATION_POCKETS = sql<{
 
 
 const getDonationPockets = (router: Router) => {
-  router.route({
-    method: "get",
+  router.get({
     path:  "/:entity_id/donations",
     summary: "Get all donation pockets for a group",
     schema: {
@@ -73,7 +72,7 @@ const getDonationPockets = (router: Router) => {
     auth: true,
     handler: async (req, res) => {
       const groupId = await decodeEntityAndVerifyAccess(req);
-      const pockets = await SQL_GET_DONATION_POCKETS({ 
+      const pockets = await SQL_GET_DONATION_POCKETS({
         entity_id: groupId
       }).many()
       res.json(pockets);

@@ -5,7 +5,7 @@ import { decodeEntityAndVerifyAccess } from '../../utils';
 import { entityIdParamsSchema } from '../users/schema';
 
 const SQL_DELETE_EXPENSE = sql<
-{xid:number, entity_id:number}, 
+{xid:number, entity_id:number},
 Record<string, never>>(`
   UPDATE expenses
   SET deleted_at = NOW()
@@ -15,8 +15,7 @@ Record<string, never>>(`
 `);
 
 const deleteExpense = (router: Router) => {
-  router.route({
-    method: 'delete',
+  router.delete({
     path: '/:entity_id/expenses/:xid',
     summary: 'Delete an expense',
     schema: {

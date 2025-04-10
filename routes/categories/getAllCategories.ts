@@ -19,8 +19,7 @@ Pick<Category, 'id'|'name'|'description'|'image_url'>>(`
 `);
 
 const getAllCategories = (router: Router) => {
-  router.route({
-    method: 'get',
+  router.get({
     path: '/',
     summary: 'Get list of categories',
     response: {

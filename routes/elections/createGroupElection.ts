@@ -32,8 +32,7 @@ const SQL_CREATE_ELECTION = sql<
 `);
 
 const createGroupElection = (router: Router) => {
-  router.route({
-    method: 'post',
+  router.post({
     path: '/:group_id/elections',
     summary: 'Create a new group election',
     description: [
@@ -63,7 +62,7 @@ const createGroupElection = (router: Router) => {
     handler: async (req, res) => {
       const groupId = await decodeEntityAndVerifyAccess(req, false, true);
 
-      const nominationEndsAt = req.body.nomination_ends_at ?? 
+      const nominationEndsAt = req.body.nomination_ends_at ??
         new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString();
 
       await SQL_CREATE_ELECTION({
@@ -71,8 +70,8 @@ const createGroupElection = (router: Router) => {
         group_id: groupId,
         initiator_id: req.user!.id,
         nomination_ends_at: nominationEndsAt,
-        candidates_ids: req.body.type === 'Ratification' 
-          ? req.body.candidates_ids 
+        candidates_ids: req.body.type === 'Ratification'
+          ? req.body.candidates_ids
           : null
       }).exec().catch(err => {
         if (err.code === 'P0004') {

@@ -28,8 +28,7 @@ const SQL_UPDATE_ELECTION = sql<
 `);
 
 const updateElections = (router: Router) => {
-  router.route({
-    method: 'patch',
+  router.patch({
     path: '/:group_id/elections/:election_id',
     summary: 'Update an existing group election',
     description: 'Allows updating election status and nomination end date if not closed',

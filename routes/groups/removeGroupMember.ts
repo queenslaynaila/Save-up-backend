@@ -21,8 +21,7 @@ const SQL_MANAGE_GROUP_MEMBERSHIP = sql<
 `);
 
 const handleGroupExit = (router: Router) => {
-  router.route({
-    method: 'delete',
+  router.delete({
     path: '/:group_id/members/:member_id',
     summary: 'Self-removal or Admin removal from group',
     description: [
@@ -39,7 +38,7 @@ const handleGroupExit = (router: Router) => {
     },
     handler: async (req, res) => {
       const { groupId, memberId } = await decodeEntityAndVerifyAccess(req);
-      
+
       await SQL_MANAGE_GROUP_MEMBERSHIP({
         group_id: groupId,
         initiator_id: req.user!.id,

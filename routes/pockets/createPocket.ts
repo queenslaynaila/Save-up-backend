@@ -68,8 +68,7 @@ const SQL_CREATE_POCKET = sql<PocketCreationParams, CreatedPocket>(`
 `);
 
 const createPocket = (router: Router) => {
-  router.route({
-    method: 'post',
+  router.post({
     path: '/:entity_id/pockets',
     summary: 'Create a pocket',
     schema: {

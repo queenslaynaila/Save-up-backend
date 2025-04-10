@@ -22,8 +22,7 @@ const SQL_GET_SECURITY_ANSWERS = sql<{
 `);
 
 const verifySecurityAnswers = (router: Router) => {
-  router.route({
-    method: 'post',
+  router.post({
     path: '/verify-answers',
     summary: 'Verify security answers',
     schema: {

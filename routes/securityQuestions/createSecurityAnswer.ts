@@ -26,8 +26,7 @@ const SQL_CREATE_ANSWERS = sql<
 `);
 
 const createSecurityAnswer = (router: Router) => {
-  router.route({
-    method: 'post',
+  router.post({
     path: '/answers',
     summary: 'Create a security answer',
     schema: {

@@ -22,8 +22,7 @@ const SQL_RATIFY_ELECTION = sql<
 `);
 
 const ratifyElection = (router: Router) => {
-  router.route({
-    method: 'post',
+  router.post({
     path: '/:group_id/elections/:election_id/ratify',
     summary: 'Ratify an election',
     auth: true,

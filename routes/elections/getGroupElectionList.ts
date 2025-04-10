@@ -66,8 +66,7 @@ const SQL_GET_ONGOING_ELECTION = sql<
 `);
 
 const getGroupElectionList = (router: Router) => {
-  router.route({
-    method: 'get',
+  router.get({
     path: '/:group_id/elections',
     summary: 'Get list of elections for a group',
     auth: true,

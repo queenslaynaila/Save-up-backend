@@ -30,8 +30,7 @@ const SQL_CREATE_TRANSFER = sql<
 `);
 
 const createTransfer = (router: Router) => {
-  router.route({
-    method: 'post',
+  router.post({
     path: '/:entity_id/transactions/transfers',
     summary: 'Transfer money between pockets',
     auth: true,

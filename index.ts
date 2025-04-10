@@ -8,9 +8,9 @@ import HttpError from './httpError';
 import logger from './logger';
 import Config from './config';
 import './generatePresignedUrl'
+import './routes/securityQuestions/index';
 import './routes/categories/index';
 import './routes/auth/index';
-import './routes/securityQuestions/index';
 import './routes/users/index';
 import './routes/nextOfKin/index';
 import './routes/groups/index';

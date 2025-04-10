@@ -70,8 +70,7 @@ const SQL_GET_POCKETS = sql<PocketFilters, PocketReturn>(`
 `);
 
 const getPocketsByEntity = (router: Router) => {
-  router.route({
-    method: 'get',
+  router.get({
     path: '/:entity_id/pockets',
     summary: 'Get pockets for a system entity',
     schema: {
@@ -95,11 +94,11 @@ const getPocketsByEntity = (router: Router) => {
     handler: async (req, res) => {
       const entityId = await decodeEntityAndVerifyAccess(req, true);
       const {
-        xid, 
-        category_id, 
-        priority, 
-        status, 
-        start_date, 
+        xid,
+        category_id,
+        priority,
+        status,
+        start_date,
         end_date
       } = req.query;
 

@@ -25,7 +25,7 @@ const pocketPatchParams = pocketSchema.pick({
 type PocketPatchParams = z.infer<typeof pocketPatchParams>;
 
 const SQL_UPDATE_POCKET = sql<
-PocketPatchParams, 
+PocketPatchParams,
 Pick<Pocket, 'name'|'category_id'|'pocket_type'|'target_amount'|'priority'|'target_at'> & {category_name:string}
 >(`
   UPDATE pockets
@@ -53,8 +53,7 @@ Pick<Pocket, 'name'|'category_id'|'pocket_type'|'target_amount'|'priority'|'targ
 `);
 
 const updatePocket = (router: Router) => {
-  router.route({
-    method: 'patch',
+  router.patch({
     path: '/:entity_id/pockets/:xid',
     summary: 'Update pocket',
     schema: {
@@ -89,10 +88,10 @@ const updatePocket = (router: Router) => {
 
       const {
         name,
-        category_id, 
-        target_amount, 
-        priority, 
-        pocket_type, 
+        category_id,
+        target_amount,
+        priority,
+        pocket_type,
         target_at
       } = req.body;
 

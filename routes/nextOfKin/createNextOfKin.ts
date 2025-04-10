@@ -22,8 +22,7 @@ Pick<NextOfKin, 'xid'|'full_name'|'relationship'|'phone_number'|'created_at'>
 `);
 
 const createNextOfKin = (router: Router) => {
-  router.route({
-    method: 'post',
+  router.post({
     path: '/users/me/next-of-kins',
     summary: 'Create next of kin',
     auth: true,

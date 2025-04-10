@@ -53,8 +53,7 @@ const questionsSchema = z.object({
 });
 
 const verifyPinResetToken = (router: Router) => {
-  router.route({
-    method: 'patch',
+  router.patch({
     path: '/verify-reset-token',
     summary: 'Verify PIN reset token',
     description: 'Verify the PIN reset token provided by the user',

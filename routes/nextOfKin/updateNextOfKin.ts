@@ -23,8 +23,7 @@ const SQL_UPDATE_KIN = sql<
 `);
 
 const updateNextOfKin = (router: Router) => {
-  router.route({
-    method: 'patch',
+  router.patch({
     path: '/users/me/next-of-kins/:xid',
     auth: true,
     summary: 'Update a next of kin details',

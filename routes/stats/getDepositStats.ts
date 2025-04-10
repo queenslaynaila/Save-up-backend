@@ -33,8 +33,7 @@ const SQL_GET_AGGREGATED_SAVINGS = sql<Stats, { aggregated_deposits: number }>(`
 `);
 
 const getDepositStats = (router: Router) => {
-    router.route({
-        method: 'get',
+    router.get({
         path: '/transactions/stats/savings',
         summary: 'Get deposit stats',
         auth: true,

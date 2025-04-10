@@ -27,8 +27,7 @@ const SQL_CREATE_WITHDRAWAL = sql<
 `);
 
 const createWithdrawal = (router: Router) => {
-  router.route({
-    method: 'post',
+  router.post({
     path: '/:user_id/transactions/withdrawals',
     summary: 'Withdraw from a user pocket',
     auth: true,

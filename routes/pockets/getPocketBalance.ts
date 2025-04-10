@@ -26,8 +26,7 @@ const SQL_GET_BALANCE = sql<
 `);
 
 const getBalanceForAnEntity = (router: Router) => {
-  router.route({
-    method: 'get',
+  router.get({
     path: '/:entity_id/pockets/balance',
     summary: 'Retrieve current balance for an entity across pockets',
     auth: true,

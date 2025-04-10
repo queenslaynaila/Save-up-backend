@@ -9,7 +9,7 @@ import { z } from 'zod';
 import  { decodeEntityAndVerifyAccess } from '../../utils';
 import { entityIdParamsSchema } from '../users/schema';
 
-type ExpenseParams = Pick<Expense, 'entity_id'|'xid'> & 
+type ExpenseParams = Pick<Expense, 'entity_id'|'xid'> &
   Partial<Pick<Expense, 'description'|'category_id'|'amount'|'spent_at'>>
 
 const SQL_UPDATE_EXPENSE = sql<
@@ -31,8 +31,7 @@ Pick<Expense, 'category_id'|'description'|'amount'|'spent_at'>>(`
 `);
 
 const updateExpense = (router: Router) => {
-  router.route({
-    method: 'patch',
+  router.patch({
     path: '/:entity_id/expenses/:xid',
     summary: 'Update an expense',
     schema: {
@@ -60,7 +59,7 @@ const updateExpense = (router: Router) => {
       const entityId = await decodeEntityAndVerifyAccess(req);
       const {category_id, description, amount, spent_at} = req.body;
       const expense = await SQL_UPDATE_EXPENSE({
-        entity_id: entityId, 
+        entity_id: entityId,
         xid: req.params.xid,
         category_id,
         description,

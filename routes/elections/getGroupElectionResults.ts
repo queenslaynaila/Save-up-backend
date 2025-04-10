@@ -35,8 +35,7 @@ const SQL_GET_ELECTION_RESULTS = sql<
 `);
 
 const getGroupElectionResults = (router: Router) => {
-  router.route({
-    method: 'get',
+  router.get({
     path: '/:group_id/elections/:election_id/results',
     summary: 'View an election result progress',
     auth: true,

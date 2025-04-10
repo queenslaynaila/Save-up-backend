@@ -14,8 +14,7 @@ const SQL_RESET_PASSWORD = sql<{
 `);
 
 const resetPin = (router: Router) => {
-  router.route({
-    method: 'patch',
+  router.patch({
     path: '/reset-pin',
     summary: 'Reset pin',
     schema: {
@@ -27,7 +26,7 @@ const resetPin = (router: Router) => {
     handler: async (req, res) => {
       const newPin = req.body.new_pin;
       const hashPassword = bcrypt.hashSync(newPin, 10);
-      
+
       await SQL_RESET_PASSWORD({
         id: req.user!.id,
         pin: hashPassword

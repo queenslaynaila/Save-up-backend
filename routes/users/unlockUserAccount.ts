@@ -31,8 +31,7 @@ const SQL_UNLOCK_USER_ACCOUNT = sql<{
 `);
 
 const unlockUserAccount = (router: Router) => {
-    router.route({
-        method: 'patch',
+    router.patch({
         path: '/:user_id/unlock',
         summary: 'Unlock a locked user account.',
         auth: [UserRole.Enum.Moderator, UserRole.Enum.Admin],

@@ -1,9 +1,9 @@
 import { z } from 'zod';
 import { sql } from '../../db';
 import Router from '../../router';
-import { 
+import {
   entityIdParamsSchema,
-  IdType, 
+  IdType,
   userSchema
 } from './schema';
 import { decodeEntityAndVerifyAccess } from '../../utils';
@@ -13,8 +13,8 @@ const IdParams = z.object({
   id_number: userSchema.shape.id_number
 });
 
-type UserIdParams = z.infer<typeof IdParams> & { 
-  user_id: number 
+type UserIdParams = z.infer<typeof IdParams> & {
+  user_id: number
 };
 
 const SQL_UPDATE_ID_NUMBER = sql<
@@ -29,8 +29,7 @@ const SQL_UPDATE_ID_NUMBER = sql<
 `);
 
 const updateIdDetails = (router: Router) => {
-  router.route({
-    method: 'patch',
+  router.patch({
     path: '/:user_id/id-details',
     summary: 'Update ID type and number',
     auth: true,

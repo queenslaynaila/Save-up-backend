@@ -66,8 +66,7 @@ const SQL_LINK_DONATION_DETAILS = sql<{
 `);
 
 const createFundraiser = (router: Router) => {
-  router.route({
-    method: "post",
+  router.post({
     path: "/:entity_id/donations",
     summary: "Create a donation pocket/fundraiser",
     schema: {
@@ -100,11 +99,11 @@ const createFundraiser = (router: Router) => {
     auth: true,
     handler: async (req, res) => {
       const entityId = await decodeEntityAndVerifyAccess(req)
-      const { 
-        name, 
-        description, 
-        target_amount, 
-        target_at, 
+      const {
+        name,
+        description,
+        target_amount,
+        target_at,
         images
       } = req.body;
 
@@ -118,7 +117,7 @@ const createFundraiser = (router: Router) => {
           logger.info(`error one is ${err}`)
           throw err
         });
-        
+
         const fundraiserDetails = await SQL_LINK_DONATION_DETAILS({
           entity_id:entityId,
           pocket_id: fundraiser.xid,

@@ -113,8 +113,7 @@ const SQL_GET_LOANS = sql<{
 `);
 
 const getLoanRequests = (router: Router) => {
-  router.route({
-    method: 'get',
+  router.get({
     path: '/groups/:group_id/loans',
     auth: true,
     summary: 'Get loans request made to a group',

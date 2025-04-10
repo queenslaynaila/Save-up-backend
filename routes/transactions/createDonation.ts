@@ -32,8 +32,7 @@ const SQL_CREATE_SAVING = sql<
 `);
 
 const createDonation = (router: Router) => {
-  router.route({
-    method: 'post',
+  router.post({
     path: '/:entity_id/transactions/donations',
     summary: 'Deposit money to a donation pocket/fundraiser',
     schema: {

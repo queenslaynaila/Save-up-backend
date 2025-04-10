@@ -38,8 +38,7 @@ const SQL_GET_PENDING_INVITATIONS = sql<
 `);
 
 const getInvites = (router: Router) => {
-  router.route({
-    method: 'get',
+  router.get({
     path: '/:user_id/invitations',
     summary: 'Get pending invitations for a user',
     auth: true,
@@ -59,7 +58,7 @@ const getInvites = (router: Router) => {
     },
     handler: async (req, res) => {
       const userId = await decodeEntityAndVerifyAccess(req, true);
-      
+
       const invites = await SQL_GET_PENDING_INVITATIONS({
         user_id: userId
       }).many();

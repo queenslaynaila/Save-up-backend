@@ -12,8 +12,7 @@ const SQL_CREATE_CATEGORY = sql<
 `);
 
 const createCategory = (router: Router) => {
-    router.route({
-        method: 'post',
+    router.post({
         path: '/',
         summary: 'Create a new category',
         schema: {

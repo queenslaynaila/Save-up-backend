@@ -1,8 +1,7 @@
 import Router from '../../router';
 
 const logout = (router: Router) => {
-  router.route({
-    method: 'delete',
+  router.delete({
     path: '/logout',
     summary: 'Logout',
     auth: true,

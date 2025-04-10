@@ -17,8 +17,7 @@ const SQL_UPDATE_PIN = sql<
 `);
 
 const updateUserPin = (router: Router) => {
-  router.route({
-    method: 'patch',
+  router.patch({
     path: '/me/pin',
     summary: 'Update user PIN',
     description: 'Update authenticated user\'s PIN',
@@ -32,12 +31,12 @@ const updateUserPin = (router: Router) => {
     middlewares: [verifyPin],
     handler: async (req, res) => {
       const hashedNewPin = await bcrypt.hash(req.body.new_pin, 10);
-      
+
       await SQL_UPDATE_PIN({
         id: req.user!.id,
         pin: hashedNewPin
       }).exec();
-      
+
       res.sendStatus(204);
     }
   });

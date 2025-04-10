@@ -47,8 +47,7 @@ const SQL_UPDATE_DEBIT = sql<{
 `);
 
 const approveGuarantorRequest = (router: Router) => {
-  router.route({
-    method: 'post',
+  router.post({
     path: '/groups/:group_id/loans/:xid/guarantors/approval',
     summary: 'Approve or deny a loan guarantor request',
     auth: true,
