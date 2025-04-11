@@ -50,9 +50,9 @@ Pick<AuthenticatedUser, 'id'|'id_type'|'id_number'|'role'|
 `);
 
 const countries = [
-  { currency: 'KES', name: 'ke', code: '+255' },
-  { currency: 'UGX', name: 'ug', code:'+256' },
-  { currency: 'TZS', name: 'tz', code: '+255' }
+  { currency: 'KES', name: 'ke', code: '+255'},
+  { currency: 'UGX', name: 'ug', code:'+256'},
+  { currency: 'TZS', name: 'tz', code: '+255'}
 ];
 
 const getCountryFromPhoneNumber = (phoneNumber: string): string | null => {

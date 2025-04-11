@@ -53,21 +53,6 @@ export const loginAttemptSchema = z.object({
   created_at: z.string().datetime()
 });
 
-export const userPhoneHistorySchema = z.object({
-  user_id: z.number().int().min(1),
-  xid: z.number().int().min(1),
-  phone_number: z.string(),
-  created_at: z.string().datetime()
-});
-
-export const userIdHistorySchema = z.object({
-  user_id: z.number().int().min(1),
-  xid: z.number().int().min(1),
-  id_type: IdType,
-  id_number: z.string().regex(/^[0-9]+$/),
-  created_at: z.string().datetime()
-});
-
 export const invitationSchema = z.object({
   group_id: z.number().int().min(1),
   receiver_id: z.number().int().min(1),
