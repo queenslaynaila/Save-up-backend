@@ -3,18 +3,6 @@ import { z } from 'zod';
 export const ElectionType = z.enum(["Ballot", "Ratification", "Default"]);
 export const ElectionStatus = z.enum(["Open", "Closed", "Cancelled"]);
 
-export const electionSchema= z.object({
-  group_id: z.number().int().min(1),
-  xid: z.number().int().min(1),
-  initiator_id: z.number().int().min(1),
-  type: ElectionType,
-  status: ElectionStatus.default("Open"),
-  created_at: z.string().datetime(),
-  closed_at: z.string().datetime().nullable(),
-  nomination_ends_at: z.string().datetime().optional()
-});
-export type Election = z.infer<typeof electionSchema>;
-
 export const ratificationSchema = z.object({
   group_id: z.number().int().min(1),
   election_id: z.number().int().min(1),
@@ -31,7 +19,6 @@ export const candidateSchema = z.object({
   chosen_by: z.number().int().min(1),
   created_at: z.string().datetime()
 });
-export type Candidate = z.infer<typeof candidateSchema>;
 
 export const ballotSchema = z.object({
   group_id: z.number().int().min(1),
