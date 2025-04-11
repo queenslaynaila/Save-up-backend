@@ -19,7 +19,8 @@ const UserRegistrationSchema = userSchema.pick({
   pin: true,
   id_type: true,
   id_number: true,
-  gender: true
+  gender: true,
+  country:true
 }).extend({
   full_name: userContactDetailsSchema.shape.full_name,
   phone_number: userContactDetailsSchema.shape.phone_number,
@@ -33,7 +34,7 @@ type UserRegistrationParams = z.infer<typeof UserRegistrationSchema>;
 const SQL_CREATE_USER = sql<
 UserRegistrationParams,
 Pick<AuthenticatedUser, 'id'|'id_type'|'id_number'|'role'|
-'pin'|'full_name'|'phone_number'|'gender'|'created_at'>>(`
+'pin'|'full_name'|'phone_number'|'gender'|'created_at'|'country'>>(`
   SELECT * 
   FROM create_user(
     :id_type, 
@@ -47,6 +48,20 @@ Pick<AuthenticatedUser, 'id'|'id_type'|'id_number'|'role'|
     :role
   )
 `);
+
+const countries = [
+  { currency: 'KES', name: 'ke', code: '+255' },
+  { currency: 'UGX', name: 'ug', code:'+256' },
+  { currency: 'TZS', name: 'tz', code: '+255' }
+];
+
+const getCountryFromPhoneNumber = (phoneNumber: string): string | null => {
+  const countryCode = phoneNumber.slice(0, 4);
+
+  const country = countries.find(c => c.code === countryCode);
+
+  return country ? country.name : null;
+};
 
 const createUser = (router: Router) => {
   router.post({
@@ -71,15 +86,20 @@ const createUser = (router: Router) => {
         phone_number: true,
         gender: true,
         role: true,
-        created_at: true
+        created_at: true,
+        country: true
       })
     },
     handler: async (req, res) => {
       const hashedPin = bcrypt.hashSync(req.body.pin, 12);
       const { ipAddress, userAgent } = getClientInfo(req);
 
+      const country = getCountryFromPhoneNumber(req.body.phone_number)
+      if(!country) throw new HttpError(404);
+
       const user = await SQL_CREATE_USER({
         ...req.body,
+        country,
         role: UserRole.Enum.Standard,
         pin: hashedPin,
         ip_address: ipAddress,

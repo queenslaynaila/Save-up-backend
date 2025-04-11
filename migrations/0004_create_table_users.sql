@@ -9,10 +9,11 @@ END
 $$;
 
 CREATE TABLE IF NOT EXISTS users (
-  id              INT PRIMARY KEY,  
+  id              INT PRIMARY KEY,
   id_type         enum_id_type NOT NULL DEFAULT 'National',
   id_number       TEXT NOT NULL CHECK (id_number ~ '^[0-9]+$'),
   role            enum_user_role NOT NULL DEFAULT 'Standard',
+  country         TEXT NOT NULL,
   gender          enum_gender,
   pin             TEXT NOT NULL,
   created_at      TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
@@ -20,4 +21,4 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 GRANT INSERT, SELECT, UPDATE ON users TO saveup_www;
-SELECT create_distributed_table('users', 'id');  
+SELECT create_distributed_table('users', 'id');

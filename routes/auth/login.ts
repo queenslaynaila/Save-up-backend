@@ -18,7 +18,8 @@ const authenticatedUserSchema = userSchema.pick({
   role: true,
   gender: true,
   pin: true,
-  created_at: true
+  created_at: true,
+  country: true
 }).extend({
   full_name: userContactDetailsSchema.shape.full_name,
   phone_number: userContactDetailsSchema.shape.phone_number
@@ -30,6 +31,7 @@ export const publicUserSchema = authenticatedUserSchema.pick({
   id: true,
   id_type: true,
   id_number: true,
+  country: true,
   role: true,
   gender: true,
   full_name:true,
@@ -43,6 +45,7 @@ const SQL_GET_USER = sql<{ phone_number: string }, AuthenticatedUser>(`
     users.id, 
     users.id_type, 
     users.id_number,
+    users.country,
     user_contact_details.phone_number, 
     user_contact_details.full_name, 
     users.role, 
@@ -179,7 +182,8 @@ const login = (router: Router) => {
         gender:true,
         full_name:true,
         phone_number:true,
-        created_at:true
+        created_at:true,
+        country:true
       })
     },
     handler: async (req, res) => {
