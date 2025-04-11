@@ -24,7 +24,7 @@ const SQL_GET_AGGREGATED_EXPENSES = sql<{
 
 const getExpenseStats = (router: Router) => {
   router.get({
-    path: '/transactions/stats/expenses',
+    path: '/stats/expenses',
     summary: 'Get aggregated expenses',
     schema: {
       query:z.object({
