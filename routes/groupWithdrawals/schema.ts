@@ -13,5 +13,3 @@ const withdrawalRequest = z.object({
   reason: z.string(),
   recipients: z.array(Recipient)
 });
-
-export type WithdrawalRequest = z.infer<typeof withdrawalRequest>;

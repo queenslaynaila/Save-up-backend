@@ -40,7 +40,7 @@ const loanRequestSchema = z.object({
   created_at: z.string().datetime(),
 });
 
-export type LoanRequest = z.infer<typeof loanRequestSchema>;
+type LoanRequest = z.infer<typeof loanRequestSchema>;
 
 const SQL_GET_LOANS = sql<{
   group_id: number,

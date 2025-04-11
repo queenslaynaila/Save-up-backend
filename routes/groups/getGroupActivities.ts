@@ -36,7 +36,7 @@ const loanMetadata = z.object({
   status: z.enum(['Approved', 'Rejected', 'Pending Guarantors'])
 }).nullable();
 
-export const activitySchema = z.object({
+const activitySchema = z.object({
   id: z.number(),
   actor_id: z.number().int().min(1),
   actor_name: z.string(),

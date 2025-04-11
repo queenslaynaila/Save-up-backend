@@ -12,7 +12,7 @@ const expenseCreationParams = expenseSchema.pick({
   spent_at: true
 });
 
-export type ExpenseCreationParams = z.infer<typeof expenseCreationParams>
+type ExpenseCreationParams = z.infer<typeof expenseCreationParams>
 & { entity_id: number };
 
 const SQL_CREATE_EXPENSES = sql<

@@ -16,13 +16,13 @@ const ENUM_TRANSACTION_TYPE = z.enum([
   'Repayment'
 ]);
 
-export const transactionTypeSchema = z.object({
+const transactionTypeSchema = z.object({
   id: z.number(),
   slug: ENUM_TRANSACTION_TYPE,
   created_at: z.string().datetime()
 });
 
-export const transactionSchema = z.object({
+const transactionSchema = z.object({
   entity_id: z.number().int().min(1),
   xid: z.number().int().min(1),
   type_id: z.number().int().min(1),

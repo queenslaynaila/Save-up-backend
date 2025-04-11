@@ -5,7 +5,7 @@ import { z } from 'zod';
 import HttpError from '../../httpError';
 import { verifyPin } from '../../utils';
 
-export const securityAnswerSchema = z.object({
+const securityAnswerSchema = z.object({
   user_id: z.number().int().min(1),
   question_id: z.number().int().min(1),
   answer: z.string(),
