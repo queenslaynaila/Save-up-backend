@@ -67,7 +67,8 @@ const SQL_GET_GROUP_MEMBERSHIP_STATUS = sql<{
 export function generateToken(
   id: number,
   expiresIn: string,
-  roleOrStep: Role | number
+  roleOrStep: Role | number,
+  isAccess?: boolean,
 ): string {
   const payload: { id: number; role?: Role; step?: number } = { id };
 
@@ -77,9 +78,13 @@ export function generateToken(
     payload.role = roleOrStep;
   }
 
+  const secret = isAccess
+      ? Config.JWT_SECRET
+      : Config.JWT_REFRESH_SECRET;
+
   return jwt.sign(
     payload,
-    Config.JWT_SECRET as Secret,
+    secret,
     {
       expiresIn,
       issuer: Config.JWT_ISSUER
@@ -265,7 +270,7 @@ export async function decodeEntityAndVerifyAccess<T extends RequestParams>(
 
   if (resolvedParams.group_id) {
     if (hasSystemAdminPermissions(loggedInUserRole, isOwnerOrAdminMod)) {
-      return resolvedParams.member_id 
+      return resolvedParams.member_id
         ? { groupId: resolvedParams.group_id, memberId: resolvedParams.member_id } as ReturnType<T>
         : resolvedParams.group_id as ReturnType<T>;
     }

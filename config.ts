@@ -22,6 +22,7 @@ const Config = cleanEnv(process.env, {
 
   JWT_ISSUER: str(),
   JWT_SECRET: str(),
+  JWT_REFRESH_SECRET: str(),
 
   SMSLEOPARD_API_KEY: str(),
   SMSLEOPARD_API_SECRET: str(),

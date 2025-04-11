@@ -6,11 +6,14 @@ import initiatePinReset from './initiatePinReset';
 import verifyPinResetToken from './verifyPinResetToken';
 import  verifySecurityAnswers from './verifySecurityAnswers';
 import resetPin from './resetPin';
+import getRefreshToken from "./refreshToken";
 
 const router = Router.getRouterInstance('/auth', 'Auth');
 
 register(router);
 login(router);
+register(router);
+getRefreshToken(router);
 logout(router);
 initiatePinReset(router);
 verifyPinResetToken(router);

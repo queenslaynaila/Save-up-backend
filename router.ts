@@ -7,7 +7,7 @@ import express, {
   RequestHandler
 } from 'express';
 import { AnyZodObject, TypeOf, z, ZodBoolean, ZodNever, ZodNumber,ZodSchema, ZodUndefined } from 'zod';
-import { OpenApiGeneratorV3, OpenAPIRegistry } from '@asteasolutions/zod-to-openapi';
+import {extendZodWithOpenApi, OpenApiGeneratorV3, OpenAPIRegistry} from '@asteasolutions/zod-to-openapi';
 import fastJson from 'fast-json-stringify';
 import zodToJsonSchema from 'zod-to-json-schema';
 import Ajv, { ErrorObject } from 'ajv';
@@ -83,6 +83,7 @@ const validateRequest = (schema: {
 
 type HttpMethod = 'get' | 'post' | 'patch' | 'delete' | 'put';
 const emptyObjectSchema = z.object({}).strict();
+extendZodWithOpenApi(z);
 
 interface RouteOptions<
     Params extends AnyZodObject | typeof emptyObjectSchema = typeof emptyObjectSchema,
@@ -105,7 +106,7 @@ interface RouteOptions<
     description?: string;
   };
   auth?: true | Role | Role[];
-  middlewares?: Array<(req: Request, res: Response, next: NextFunction) => void>;
+  middlewares?: RequestHandler[];
   handler: RequestHandler<TypeOf<Params>, ResBody, ReqBody, TypeOf<Query>>;
 }
 
@@ -304,8 +305,6 @@ registry.registerComponent(
       + 'It ensures the user cannot skip steps and is required for every request in the reset process.'
   }
 );
-
-
 
 export const generateOpenApiSpec = () => {
   const generator = new OpenApiGeneratorV3(registry.definitions);

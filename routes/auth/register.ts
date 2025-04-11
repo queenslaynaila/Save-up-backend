@@ -92,16 +92,11 @@ const createUser = (router: Router) => {
           throw err;
         });
 
-      const accessToken = generateToken(
-        user.id,
-       '7d',
-        user.role
-      );
-
       res
-        .status(201)
-        .setHeader('Authorization', accessToken)
-        .json(user);
+          .setHeader('RefreshToken', generateToken(user.id, '7d', user.role, false))
+          .setHeader('Authorization', generateToken(user.id, '1h', user.role, true))
+          .status(201)
+          .json(user);
     }
   });
 };
