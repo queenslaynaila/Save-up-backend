@@ -8,6 +8,7 @@ import { entityIdParamsSchema } from '../users/schema';
 const expenseCreationParams = expenseSchema.pick({
   category_id: true,
   description: true,
+  currency: true,
   amount: true,
   spent_at: true
 });
@@ -18,14 +19,15 @@ type ExpenseCreationParams = z.infer<typeof expenseCreationParams>
 const SQL_CREATE_EXPENSES = sql<
   ExpenseCreationParams,
   Pick<Expense, 'entity_id' | 'xid' | 'category_id' | 'description'
-  | 'amount' | 'spent_at' | 'created_at'>
+  |'currency'| 'amount' | 'spent_at' | 'created_at'>
 >(`
-  INSERT INTO expenses (entity_id, xid, category_id, description, amount, spent_at)
+  INSERT INTO expenses (entity_id, xid, category_id, description, currency, amount, spent_at)
   SELECT 
     :entity_id,
     COALESCE(MAX(xid), 0) + 1,
     :category_id, 
     :description, 
+    :currency,
     :amount, 
     :spent_at
   FROM expenses 
@@ -44,6 +46,7 @@ const createExpense = (router: Router) => {
       body: expenseSchema.pick({
         category_id: true,
         description: true,
+        currency:true,
         amount: true,
         spent_at: true
       })

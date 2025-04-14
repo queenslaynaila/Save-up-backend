@@ -29,6 +29,7 @@ const pocketReturnSchema = pocketSchema
     pocket_type: true,
     priority: true,
     status: true,
+    currency:true,
     target_amount: true,
     target_at: true,
     created_at: true
@@ -48,6 +49,7 @@ const SQL_GET_POCKETS = sql<PocketFilters, PocketReturn>(`
       FROM categories 
       WHERE categories.id = pockets.category_id
     ) AS category_name,
+    pockets.currency,  
     pockets.target_amount,
     pockets.priority,
     pockets.status,

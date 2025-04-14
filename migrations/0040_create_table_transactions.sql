@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS transactions (
   type_id                 INT NOT NULL,
   pocket_id               INT NOT NULL,
   reference_id            TEXT NOT NULL,
+  currency                 TEXT NOT NULL,
   delta                   NUMERIC(30, 2) NOT NULL,
   balance                 NUMERIC(30, 2) NOT NULL CHECK (balance >= 0),
   created_at              TIMESTAMP WITH TIME ZONE DEFAULT NOW(),

@@ -28,6 +28,7 @@ const transactionSchema = z.object({
   type_id: z.number().int().min(1),
   pocket_id: z.number().int().min(1),
   reference_id: z.number(),
+  currency:z.string().length(3),
   delta: z.number().min(5),
   balance: z.number(),
   created_at: z.string().datetime()
@@ -36,6 +37,7 @@ const transactionSchema = z.object({
 const transaction = transactionSchema.pick({
   xid: true,
   delta: true,
+  currency: true,
   balance: true,
   created_at: true
 }).extend({
@@ -61,6 +63,7 @@ const SQL_GET_TRANSACTIONS = sql<
   SELECT 
     transactions.xid, 
     transaction_types.slug,
+    transactions.currency,
     transactions.delta,
     transactions.balance,
     CASE 
@@ -146,6 +149,7 @@ const getTransactions = (router: Router) => {
           xid: true,
           slug:true,
           member_name: true,
+          currency: true,
           delta: true,
           balance: true,
           destination_pocket_name: true,

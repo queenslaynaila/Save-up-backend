@@ -17,11 +17,12 @@ const SQL_GET_EXPENSES = sql<{
   end_date?: string;
 },
 Pick<Expense, 'entity_id'|'xid'|'category_id'|'description'|
-  'amount'|'spent_at'|'created_at'>>(`
+  'amount'|'currency'|'spent_at'|'created_at'>>(`
   SELECT entity_id, 
          xid, 
          category_id, 
          description, 
+         currency,
          amount, 
          spent_at, 
          created_at
@@ -58,6 +59,7 @@ const getExpensesByEntity = (router: Router) => {
         xid:true,
         category_id:true,
         description:true,
+        currency:true,
         amount:true,
         spent_at:true,
         created_at:true
