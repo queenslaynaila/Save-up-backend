@@ -45,11 +45,8 @@ const validateSchema = (schema: ZodSchema, data: unknown, section: 'body' | 'que
       dataPath: err.dataPath,
       schemaPath: err.schemaPath
     }));
-
     throw new HttpError(400, errors);
   }
-
-  return schema.parse(data);
 };
 
 const validateRequest = (schema: {
@@ -58,9 +55,9 @@ const validateRequest = (schema: {
   params?: AnyZodObject;
 }) => {
   return (req: Request, _res: Response, next: NextFunction) => {
-    if (schema.body) req.body = validateSchema(schema.body, req.body, 'body');
-    if (schema.query) req.query = validateSchema(schema.query, req.query, 'query');
-    if (schema.params) req.params = validateSchema(schema.params, req.params, 'params')
+    if (schema.body) validateSchema(schema.body, req.body, 'body');
+    if (schema.query) validateSchema(schema.query, req.query, 'query');
+    if (schema.params) validateSchema(schema.params, req.params, 'params')
     next();
   };
 };
