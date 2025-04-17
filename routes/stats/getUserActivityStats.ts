@@ -52,10 +52,13 @@ const SQL_GET_AGGREGATED_REGISTRATION = sql<
 `);
 
 
-const getRegistrationStats = (router: Router) => {
+const getUserActivityStats = (router: Router) => {
     router.get({
-        path: '/stats/registrations',
-        summary: 'Get registration stats',
+        path: '/stats/auth-metrics',
+        summary: 'Get user activity stats',
+        description: 'Returns aggregated user statistics within a given date range, ' +
+            'including total registrations, total login attempts, failed logins, ' +
+            'and  locked accounts. ',
         auth:[UserRole.enum.Admin, UserRole.enum.Moderator],
         schema: {
             query: statsQuerySchema.pick({
@@ -86,4 +89,4 @@ const getRegistrationStats = (router: Router) => {
     });
 };
 
-export default getRegistrationStats;
+export default getUserActivityStats;
