@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { sql } from '../../db';
 import Router from '../../router';
 import {Category, categorySchema} from './getAllCategories';
+import {UserRole} from "../users/schema";
 
 const SQL_CREATE_CATEGORY = sql<
     Record<string, never>,
@@ -33,7 +34,7 @@ const createCategory = (router: Router) => {
                 created_at: z.string().datetime()
             })
         },
-        auth: true,
+        auth: [UserRole.Enum.Admin],
         handler: async (_req, res) => {
             const category = await SQL_CREATE_CATEGORY({}).one();
             res.json(category);

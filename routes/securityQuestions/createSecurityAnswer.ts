@@ -4,6 +4,7 @@ import { sql } from '../../db';
 import { z } from 'zod';
 import HttpError from '../../httpError';
 import { verifyPin } from '../../utils';
+import {UserRole} from "../users/schema";
 
 const securityAnswerSchema = z.object({
   user_id: z.number().int().min(1),
@@ -34,7 +35,7 @@ const createSecurityAnswer = (router: Router) => {
         pin: z.string().regex(/^\d{4}$/)
       })
     },
-    auth: true,
+    auth: [UserRole.enum.Admin],
     middlewares: [verifyPin],
     handler: async (req, res) => {
       const hashedAnswers = await Promise.all(
