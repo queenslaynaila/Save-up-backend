@@ -55,7 +55,7 @@ const SQL_GET_AGGREGATED_REGISTRATION = sql<
 const getUserActivityStats = (router: Router) => {
     router.get({
         path: '/stats/auth-metrics',
-        summary: 'Get user activity stats',
+        summary: 'Get aggregated user authentication metrics',
         description: 'Returns aggregated user statistics within a given date range, ' +
             'including total registrations, total login attempts, failed logins, ' +
             'and  locked accounts. ',
