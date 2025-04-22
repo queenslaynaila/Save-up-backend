@@ -30,7 +30,6 @@ const swaggerConfig = {
   password: Config.SWAGGER_PASSWORD
 };
 
-
 const validateSchema = (schema: ZodSchema, data: unknown, section: 'body' | 'query' | 'params') => {
   const jsonSchema = zodToJsonSchema(schema, { target: 'openApi3' });
   const validate = ajv.compile(jsonSchema);

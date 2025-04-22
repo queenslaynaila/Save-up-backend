@@ -26,7 +26,8 @@ const UserRegistrationSchema = userSchema.pick({
   phone_number: userContactDetailsSchema.shape.phone_number,
   role: UserRole,
   ip_address: z.string(),
-  user_agent: z.string()
+  user_agent: z.string(),
+  currency: z.string()
 });
 type UserRegistrationParams = z.infer<typeof UserRegistrationSchema>;
 
@@ -39,6 +40,8 @@ Pick<AuthenticatedUser, 'id'|'id_type'|'id_number'|'role'|
   FROM create_user(
     :id_type, 
     :id_number, 
+    :country,
+    :currency,
     :phone_number, 
     :full_name, 
     :gender, 
@@ -55,12 +58,12 @@ const countries = [
   { currency: 'TZS', name: 'tz', code: '+255'}
 ];
 
-const getCountryFromPhoneNumber = (phoneNumber: string): string | null => {
+const getCountryAndCurrencyFromPhoneNumber = (phoneNumber: string): { country: string | null, currency: string | null } => {
   const countryCode = phoneNumber.slice(0, 4);
 
   const country = countries.find(c => c.code === countryCode);
 
-  return country ? country.name : null;
+  return country ? { country: country.name, currency: country.currency } : { country: null, currency: null };
 };
 
 const createUser = (router: Router) => {
@@ -94,12 +97,13 @@ const createUser = (router: Router) => {
       const hashedPin = bcrypt.hashSync(req.body.pin, 12);
       const { ipAddress, userAgent } = getClientInfo(req);
 
-      const country = getCountryFromPhoneNumber(req.body.phone_number)
-      if(!country) throw new HttpError(404);
+      const {country, currency} = getCountryAndCurrencyFromPhoneNumber(req.body.phone_number)
+      if(!country || !currency) throw new HttpError(404);
 
       const user = await SQL_CREATE_USER({
         ...req.body,
         country,
+        currency,
         role: UserRole.Enum.Standard,
         pin: hashedPin,
         ip_address: ipAddress,
