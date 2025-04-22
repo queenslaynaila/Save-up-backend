@@ -13,7 +13,7 @@ DECLARE
     v_transaction_id  INT;
     v_target_amount   NUMERIC;
 BEGIN
-    SELECT id 
+    SELECT id
     INTO STRICT v_type_id
     FROM transaction_types
     WHERE slug = p_type_slug;
@@ -45,7 +45,8 @@ BEGIN
         pocket_id,
         reference_id,
         delta,
-        balance
+        balance,
+        currency
     )
     SELECT
         p_entity_id,
@@ -54,10 +55,11 @@ BEGIN
         p_pocket_id,
         v_reference_id,
         p_amount,
-        v_new_balance
+        v_new_balance,
+        (SELECT currency FROM pockets WHERE entity_id = p_entity_id AND xid = p_pocket_id)
     RETURNING xid INTO v_transaction_id;
 
-    SELECT target_amount 
+    SELECT target_amount
     INTO STRICT v_target_amount
     FROM pockets
     WHERE xid = p_pocket_id
