@@ -16,41 +16,42 @@ const SQL_GET_GROUP_MEMBERS = sql<
   { group_id: number },
   Pick<Member, 'user_id' | 'full_name' | 'joined_at' | 'is_admin'>
 >(`
-  SELECT 
+  SELECT
     group_members.user_id,
     user_contact_details.full_name,
-    COALESCE(
-        (
-          SELECT TRUE 
-            FROM group_admins 
-            WHERE group_admins.group_id = group_members.group_id
-              AND group_admins.user_id = group_members.user_id
-              AND group_admins.election_id = (
-                SELECT election_id
-                FROM elections 
-                WHERE group_id = group_members.group_id
-                AND status = 'Closed'
-                ORDER BY election_id DESC
-                LIMIT 1
-             )
-            LIMIT 1
-        ), 
-        FALSE
+
+    EXISTS (
+      SELECT 1
+      FROM group_admins
+      WHERE group_admins.group_id = group_members.group_id
+        AND group_admins.user_id = group_members.user_id
+        AND group_admins.election_id = (
+          SELECT election_id
+          FROM elections
+          WHERE elections.group_id = group_members.group_id
+            AND elections.status = 'Closed'
+          ORDER BY elections.xid DESC
+          LIMIT 1
+        )
     ) AS is_admin,
+
     (
-      SELECT created_at 
-      FROM group_joins 
+      SELECT group_joins.created_at
+      FROM group_joins
       WHERE group_joins.group_id = group_members.group_id
         AND group_joins.user_id = group_members.user_id
-      ORDER BY xid DESC
+      ORDER BY group_joins.xid DESC
       LIMIT 1
     ) AS joined_at
-  FROM group_members
-  LEFT JOIN user_contact_details 
-    ON user_contact_details.id = group_members.user_id
-  WHERE group_members.group_id = :group_id
+  FROM
+    group_members
+      JOIN
+    user_contact_details ON group_members.user_id = user_contact_details.id
+  WHERE
+    group_members.group_id = :group_id
     AND group_members.is_active = TRUE
-  ORDER BY is_admin DESC;
+  ORDER BY
+    is_admin DESC;
 `);
 
 const getGroupMembers = (router: Router) => {
