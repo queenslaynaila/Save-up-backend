@@ -172,7 +172,9 @@ class Router {
       };
 
       const transformedPath = path.replace(/:([^/]+)/g, '{$1}');
-      const fullPath = `${this.routePrefix}${transformedPath}`.replace(/\/+/g, '/');
+      const fullPath = `${this.routePrefix}${transformedPath}`
+        .replace(/\/+/g, '/')
+        .replace(/\/$/, '');
 
       if (!options.hidden) {
         registry.registerPath({
