@@ -14,7 +14,7 @@ type PocketCreationParams = Pick<
   | 'pocket_type'
   | 'target_amount'
   | 'target_at'
->;
+>  & {wallet_id: number};
 
 type CreatedPocket = Pick<
   Pocket,
@@ -25,6 +25,7 @@ type CreatedPocket = Pick<
   | 'priority'
   | 'status'
   | 'pocket_type'
+  | 'currency'
   | 'target_amount'
   | 'target_at'
   | 'created_at'
@@ -40,7 +41,8 @@ const SQL_CREATE_POCKET = sql<PocketCreationParams, CreatedPocket>(`
     priority,
     pocket_type,
     target_amount,
-    target_at
+    target_at,
+    currency
   )
   SELECT 
     :entity_id,
@@ -50,7 +52,8 @@ const SQL_CREATE_POCKET = sql<PocketCreationParams, CreatedPocket>(`
     :priority,
     :pocket_type,
     :target_amount,
-    :target_at
+    :target_at,
+    (SELECT currency FROM pockets WHERE entity_id = :entity_id AND xid = :wallet_id)
   FROM pockets 
   WHERE entity_id = :entity_id
   RETURNING 
@@ -61,6 +64,7 @@ const SQL_CREATE_POCKET = sql<PocketCreationParams, CreatedPocket>(`
     priority,
     status,
     pocket_type,
+    currency,
     target_amount,
     target_at,
     created_at,
@@ -93,6 +97,7 @@ const createPocket = (router: Router) => {
           priority: true,
           status: true,
           pocket_type: true,
+          currency:true,
           target_amount: true,
           target_at: true,
           created_at: true,
@@ -104,7 +109,8 @@ const createPocket = (router: Router) => {
       const entityId =  await decodeEntityAndVerifyAccess(req);
       const pocket = await SQL_CREATE_POCKET({
         ...req.body,
-        entity_id: entityId
+        entity_id: entityId,
+        wallet_id:1
       }).one();
 
       return res.json(pocket);

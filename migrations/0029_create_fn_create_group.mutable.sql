@@ -15,27 +15,29 @@ BEGIN
     INSERT INTO entities (entity_type)
     VALUES ('Group')
     RETURNING entities.id INTO STRICT v_entity_id;
-  
+
     INSERT INTO groups (id, name, creator_id)
     VALUES (v_entity_id, p_name, p_creator_id);
-    
+
     PERFORM join_group(v_entity_id, p_creator_id);
-    
+
     INSERT INTO pockets (
         entity_id,
         xid,
         category_id,
         name,
         priority,
-        pocket_type
+        pocket_type,
+        currency
     )
-    SELECT 
+    SELECT
         v_entity_id,
         COALESCE(MAX(xid), 0) + 1,
         12,
         'Group Wallet',
         'Intermediate'::enum_priority,
-        'Standard'::enum_pocket_type
+        'Standard'::enum_pocket_type,
+        (SELECT currency FROM pockets WHERE entity_id = p_creator_id AND xid = 1)
     FROM pockets
     WHERE entity_id = v_entity_id
     RETURNING xid INTO STRICT v_pocket_id;
@@ -76,7 +78,7 @@ BEGIN
         p_creator_id,
         p_creator_id
     );
-    
+
     INSERT INTO group_admins (
         group_id,
         election_id,
@@ -87,15 +89,15 @@ BEGIN
         v_election_id,
         p_creator_id
     );
-  
+
     RETURN QUERY
-    SELECT 
+    SELECT
         groups.id,
         groups.name,
         user_contact_details.full_name AS created_by,
         groups.created_at
     FROM groups
-    LEFT JOIN user_contact_details 
+    LEFT JOIN user_contact_details
         ON groups.creator_id = user_contact_details.id
     WHERE groups.id = v_entity_id;
 END;
