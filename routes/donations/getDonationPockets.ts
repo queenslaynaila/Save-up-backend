@@ -11,6 +11,7 @@ const SQL_GET_DONATION_POCKETS = sql<{
   category_name: string;
   name: string;
   description: string;
+  currency: string;
   target_amount: number;
   amount_raised: number;
   target_at: string;
@@ -22,6 +23,7 @@ const SQL_GET_DONATION_POCKETS = sql<{
       categories.name AS category_name,
       pockets.name,
       donation_pockets.description,
+      pockets.currency,
       pockets.target_amount,
       pockets.target_at,
       COALESCE((
@@ -62,6 +64,7 @@ const getDonationPockets = (router: Router) => {
             name: z.string(),
             description: z.string(),
             images: z.array(z.string()),
+            currency: z.string(),
             target_amount: z.number(),
             amount_raised: z.number(),
             target_at: z.string(),

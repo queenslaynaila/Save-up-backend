@@ -10,6 +10,7 @@ const donationParams = z.object({
   name: z.string(),
   description: z.string(),
   images: z.array(z.string()).nullable().optional(),
+  currency: z.string(),
   target_amount: z.number(),
   target_at: z.string().date(),
 });
@@ -19,24 +20,27 @@ const SQL_CREATE_DONATION_FUND = sql<{
   name: string;
   target_amount: number;
   target_at: string;
+  wallet_id:number;
 }, {
   xid: number;
   category_id: number;
   name: string;
   status: "In Progress" | "Completed";
   pocket_type: "Standard" | "Locked";
+  currency: string;
   target_amount: number;
   target_at: string;
   created_at: string;
 }>(`
-  INSERT INTO pockets(entity_id, xid, category_id, name, target_amount, target_at)
+  INSERT INTO pockets(entity_id, xid, category_id, name, target_amount, target_at, currency)
   SELECT 
       :entity_id,
       COALESCE(MAX(xid), 0) + 1,
       (SELECT id FROM categories WHERE name = 'Donations' LIMIT 1),
       :name,
       :target_amount,
-      :target_at
+      :target_at,
+      (SELECT currency FROM pockets WHERE entity_id = :entity_id AND xid = :wallet_id)
   FROM pockets
   WHERE entity_id = :entity_id
   RETURNING 
@@ -46,6 +50,7 @@ const SQL_CREATE_DONATION_FUND = sql<{
       priority, 
       status, 
       pocket_type, 
+      currency,
       target_amount,  
       target_at, 
       created_at
@@ -85,6 +90,7 @@ const createFundraiser = (router: Router) => {
         schema: donationParams.pick({
           name: true,
           description: true,
+          currency: true,
           target_amount: true,
           target_at: true,
           images: true
@@ -110,6 +116,7 @@ const createFundraiser = (router: Router) => {
       await sql.transaction(async (trx) => {
         const fundraiser = await SQL_CREATE_DONATION_FUND({
           entity_id:entityId,
+          wallet_id:1,
           name,
           target_amount,
           target_at,
@@ -136,6 +143,7 @@ const createFundraiser = (router: Router) => {
           images: fundraiserDetails.images,
           pocket_type: fundraiser.pocket_type,
           status: fundraiser.status,
+          currency:fundraiser.currency,
           target_amount: fundraiser.target_amount,
           target_at: fundraiser.target_at,
           created_at: fundraiser.created_at
