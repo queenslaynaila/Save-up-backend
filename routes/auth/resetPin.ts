@@ -24,8 +24,7 @@ const resetPin = (router: Router) => {
     },
     middlewares: [checkResetTokenValidity(3)],
     handler: async (req, res) => {
-      const newPin = req.body.new_pin;
-      const hashPassword = bcrypt.hashSync(newPin, 10);
+      const hashPassword = bcrypt.hashSync(req.body.new_pin, 10);
 
       await SQL_RESET_PASSWORD({
         id: req.user!.id,
