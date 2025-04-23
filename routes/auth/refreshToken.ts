@@ -45,7 +45,7 @@ const getRefreshToken = (router: Router) => {
             })
         },
         handler: async (req, res) => {
-            const decoded = jwt.verify(req.body.token, Config.JWT_SECRET) as { id: number, role: string };
+            const decoded = jwt.verify(req.body.token, Config.JWT_REFRESH_SECRET) as { id: number, role: string };
             const user = await SQL_GET_USER({ id: decoded.id }).one(
                 new HttpError(404)
             );
