@@ -19,8 +19,6 @@ import {authMiddleware } from './utils';
 import { Role } from './routes/users/schema';
 
 const ajv = new Ajv({
-    allErrors: true,
-    removeAdditional: true,
     coerceTypes: true,
     useDefaults: true
 });
@@ -225,7 +223,7 @@ class Router {
           'http://localhost:5173',
           'https://save-up-seven.vercel.app'
         ],
-        methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
+        methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS', 'PUT'],
         credentials: true,
         exposedHeaders: ['Authorization', 'Reset'],
         allowedHeaders: ['Content-Type', 'Authorization', 'Reset']
