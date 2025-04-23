@@ -21,7 +21,7 @@ const SQL_REVIEW_DEBIT = sql<{
 
 const reviewDebitRequests = (router: Router) => {
 router.patch({
-    path: '/groups/:group_id/admins/review/:debit_id',
+    path: '/groups/:group_id/debits/:debit_id/review',
     summary: 'Approve or reject a loan/withdrawal request',
     auth: true,
     schema: {
