@@ -5,6 +5,7 @@ CREATE OR REPLACE FUNCTION exit_or_remove_group_member(
 ) RETURNS VOID AS $$
 DECLARE
     v_member_count INT;
+    v_exit_reason  enum_exit_reason;
 BEGIN
     IF p_target_id != p_initiator_id THEN
         IF EXISTS (
@@ -25,6 +26,12 @@ BEGIN
       AND user_id = p_target_id
       AND is_active = TRUE;
 
+    v_exit_reason := CASE
+        WHEN p_target_id != p_initiator_id
+            THEN 'Admin removal'::enum_exit_reason
+        ELSE 'Self removal'::enum_exit_reason
+    END;
+
     INSERT INTO group_lefts (
         group_id,
         user_id,
@@ -37,12 +44,7 @@ BEGIN
         p_target_id,
         COALESCE(MAX(xid), 0) + 1,
         NULLIF(p_initiator_id, p_target_id),
-        CASE
-            WHEN p_target_id != p_initiator_id THEN
-                'Admin removal'::enum_exit_reason
-            ELSE
-                'Self removal'::enum_exit_reason
-        END
+        v_exit_reason
     FROM group_lefts
     WHERE group_id = p_group_id;
 
