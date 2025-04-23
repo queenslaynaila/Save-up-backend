@@ -136,11 +136,19 @@ class Router {
       const {
         path,
         schema,
-        response = { statusCode: 200, schema: z.never() },
         auth,
         middlewares = [],
-        handler
+        handler,
+        response: resOpt
       } = options;
+
+      const response = {
+        statusCode: resOpt?.statusCode ?? (resOpt?.schema ? 200 : 204),
+        schema: resOpt?.schema ?? z.never()
+      };
+      const responseDescription = response.statusCode.toString().startsWith('2')
+          ? 'Success'
+          : 'Error'
 
       const processedMiddlewares = [...middlewares];
       if (schema) processedMiddlewares.unshift(validateRequest(schema));
@@ -152,16 +160,16 @@ class Router {
         security.push({ Reset: [] });
       }
 
-      const responseSchemas = response.schema ? {
-        [response.statusCode || 200]: {
-          description: response.statusCode?.toString().startsWith("2") ? "Success" : "Error",
+      const responseSchemas = {
+        [response.statusCode]: {
+          description: responseDescription,
           content: {
-            "application/json": {
-              schema: zodToJsonSchema(response.schema, { target: "openApi3" })
+            'application/json': {
+              schema: zodToJsonSchema(response.schema, { target: 'openApi3' })
             }
           }
         }
-      } : {};
+      };
 
       const transformedPath = path.replace(/:([^/]+)/g, '{$1}');
       const fullPath = `${this.routePrefix}${transformedPath}`.replace(/\/+/g, '/');
