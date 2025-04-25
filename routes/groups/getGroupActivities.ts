@@ -2,7 +2,6 @@ import { z } from 'zod';
 import Router from '../../router';
 import { sql } from '../../db';
 import { decodeEntityAndVerifyAccess } from '../../utils';
-import logger from "../../logger";
 
 const emptyMetadata = z.object({}).nullable();
 
@@ -391,8 +390,6 @@ const getGroupActivities = (router: Router) => {
         group_id: groupId,
         size
       }).many();
-
-      logger.info(`${JSON.stringify(activities)}`);
 
       res.json(activities);
     }
