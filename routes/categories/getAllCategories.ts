@@ -24,10 +24,10 @@ const getAllCategories = (router: Router) => {
     summary: 'Get list of categories',
     response: {
       schema: z.array(categorySchema.pick({
-        id:true,
-        name:true,
-        description:true,
-        image_url:true
+        id: true,
+        name: true,
+        description: true,
+        image_url: true
       }))
 
     },

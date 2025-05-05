@@ -1,8 +1,8 @@
-import { z } from "zod";
-import Router from "../../router";
-import { sql } from "../../db";
-import { decodeEntityAndVerifyAccess } from "../../utils";
-import { entityIdParamsSchema } from "../users/schema";
+import { z } from 'zod';
+import Router from '../../router';
+import { sql } from '../../db';
+import { decodeEntityAndVerifyAccess } from '../../utils';
+import { entityIdParamsSchema } from '../users/schema';
 
 const SQL_GET_DONATION_POCKETS = sql<{
   entity_id: number;
@@ -46,40 +46,39 @@ const SQL_GET_DONATION_POCKETS = sql<{
   ORDER BY pockets.created_at DESC
 `);
 
-
 const getDonationPockets = (router: Router) => {
   router.get({
-    path:  "/:entity_id/donations",
-    summary: "Get all donation pockets for a group",
+    path: '/:entity_id/donations',
+    summary: 'Get all donation pockets for a group',
     schema: {
       params: z.object({
-        entity_id: entityIdParamsSchema,
+        entity_id: entityIdParamsSchema
       })
     },
     response: {
-        schema: z.array(
-          z.object({
-            xid: z.number().int().min(1),
-            category_name: z.string(),
-            name: z.string(),
-            description: z.string(),
-            images: z.array(z.string()),
-            currency: z.string(),
-            target_amount: z.number(),
-            amount_raised: z.number(),
-            target_at: z.string(),
-            created_at: z.string()
-          })
-        ),
+      schema: z.array(
+        z.object({
+          xid: z.number().int().min(1),
+          category_name: z.string(),
+          name: z.string(),
+          description: z.string(),
+          images: z.array(z.string()),
+          currency: z.string(),
+          target_amount: z.number(),
+          amount_raised: z.number(),
+          target_at: z.string(),
+          created_at: z.string()
+        })
+      )
     },
     auth: true,
     handler: async (req, res) => {
       const groupId = await decodeEntityAndVerifyAccess(req);
       const pockets = await SQL_GET_DONATION_POCKETS({
         entity_id: groupId
-      }).many()
+      }).many();
       res.json(pockets);
-    },
+    }
   });
 };
 

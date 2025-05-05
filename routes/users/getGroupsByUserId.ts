@@ -6,8 +6,8 @@ import { decodeEntityAndVerifyAccess } from '../../utils';
 import { Group, groupsSchema } from '../groups/schema';
 
 const SQL_FETCH_USER_GROUPS = sql<
-  { user_id: number; other_user_id?: number },
-  Pick<Group, 'id' | 'name' | 'created_at'> & { created_by: string }
+{ user_id: number; other_user_id?: number },
+Pick<Group, 'id' | 'name' | 'created_at'> & { created_by: string }
 >(`
   SELECT 
     groups.id, 
@@ -47,18 +47,18 @@ const getGroupsByUserId = (router: Router) => {
       }),
       query: z.object({
         mutual_user_id: z.number().int().min(1)
-      }).partial(),
+      }).partial()
     },
     response: {
-        schema: z.array(
-          groupsSchema.pick({
-            id: true,
-            name: true,
-            created_at: true
-          }).extend({
-            created_by: z.string()
-          })
-        )
+      schema: z.array(
+        groupsSchema.pick({
+          id: true,
+          name: true,
+          created_at: true
+        }).extend({
+          created_by: z.string()
+        })
+      )
     },
     handler: async (req, res) => {
       const userId = await decodeEntityAndVerifyAccess(req, true);

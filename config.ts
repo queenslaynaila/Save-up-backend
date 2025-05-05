@@ -1,23 +1,25 @@
-require('dotenv').config()
-import {bool, cleanEnv, host, port, str} from 'envalid'
+import dotenv from 'dotenv';
+import { bool, cleanEnv, host, port, str } from 'envalid';
+
+dotenv.config();
 
 const Config = cleanEnv(process.env, {
-  LOG_LEVEL: str({default: 'debug'}),
+  LOG_LEVEL: str({ default: 'debug' }),
 
-  PORT: port({default: 3003 }),
+  PORT: port({ default: 3003 }),
 
   DB_HOST: host(),
-  DB_PORT: port({default: 5432}),
+  DB_PORT: port({ default: 5432 }),
   DB_DATABASE: str(),
   DB_USER: str(),
   DB_PASSWORD: str(),
-  DB_BOUNCER_ENABLED: bool({default: false}),
+  DB_BOUNCER_ENABLED: bool({ default: false }),
 
   SWAGGER_USERNAME: str({
-    default: 'admin',
+    default: 'admin'
   }),
   SWAGGER_PASSWORD: str({
-    default: 'password',
+    default: 'password'
   }),
 
   JWT_ISSUER: str(),
@@ -31,6 +33,6 @@ const Config = cleanEnv(process.env, {
   AWS_ACCESS_KEY_ID: str(),
   AWS_SECRET_ACCESS_KEY: str(),
   AWS_BUCKET_NAME: str()
-})
+});
 
-export default Config
+export default Config;

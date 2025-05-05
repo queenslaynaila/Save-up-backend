@@ -16,11 +16,11 @@ const electionsPayload = z.object({
 type ElectionParams = z.infer<typeof electionsPayload>;
 
 const SQL_CREATE_ELECTION = sql<
-  Pick<
-    ElectionParams,
-    'group_id' | 'initiator_id' | 'type' | 'candidates_ids' | 'nomination_ends_at'
-  >,
-  Record<string, never>
+Pick<
+ElectionParams,
+'group_id' | 'initiator_id' | 'type' | 'candidates_ids' | 'nomination_ends_at'
+>,
+Record<string, never>
 >(`
   SELECT create_election(
     :group_id,
@@ -62,8 +62,8 @@ const createGroupElection = (router: Router) => {
     handler: async (req, res) => {
       const groupId = await decodeEntityAndVerifyAccess(req, false, true);
 
-      const nominationEndsAt = req.body.nomination_ends_at ??
-        new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString();
+      const nominationEndsAt = req.body.nomination_ends_at
+        ?? new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString();
 
       await SQL_CREATE_ELECTION({
         type: req.body.type,

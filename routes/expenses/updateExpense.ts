@@ -6,11 +6,11 @@ import {
   Expense
 } from './schema';
 import { z } from 'zod';
-import  { decodeEntityAndVerifyAccess } from '../../utils';
+import { decodeEntityAndVerifyAccess } from '../../utils';
 import { entityIdParamsSchema } from '../users/schema';
 
 type ExpenseParams = Pick<Expense, 'entity_id'|'xid'> &
-  Partial<Pick<Expense, 'description'|'category_id'|'amount'|'spent_at'>>
+Partial<Pick<Expense, 'description'|'category_id'|'amount'|'spent_at'>>
 
 const SQL_UPDATE_EXPENSE = sql<
 ExpenseParams,
@@ -36,10 +36,10 @@ const updateExpense = (router: Router) => {
     summary: 'Update an expense',
     schema: {
       params: z.object({
-        entity_id:entityIdParamsSchema,
+        entity_id: entityIdParamsSchema,
         xid: z.number().int().min(1)
       }),
-      body:expenseSchema.pick({
+      body: expenseSchema.pick({
         category_id: true,
         description: true,
         amount: true,
@@ -48,16 +48,16 @@ const updateExpense = (router: Router) => {
     },
     response: {
       schema: expenseSchema.pick({
-        category_id:true,
-        description:true,
-        amount:true,
-        spent_at:true
+        category_id: true,
+        description: true,
+        amount: true,
+        spent_at: true
       })
     },
     auth: true,
     handler: async (req, res) => {
       const entityId = await decodeEntityAndVerifyAccess(req);
-      const {category_id, description, amount, spent_at} = req.body;
+      const { category_id, description, amount, spent_at } = req.body;
       const expense = await SQL_UPDATE_EXPENSE({
         entity_id: entityId,
         xid: req.params.xid,

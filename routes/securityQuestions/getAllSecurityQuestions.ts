@@ -23,7 +23,7 @@ const getAllSecurityQuestions = (router: Router) => {
     path: '/',
     summary: 'Get list of system defined security questions',
     response: {
-        schema: z.array(securityQuestions)
+      schema: z.array(securityQuestions)
     },
     handler: async (req, res) => {
       const questions = await SQL_GET_SECURITY_QUESTIONS({}).many();

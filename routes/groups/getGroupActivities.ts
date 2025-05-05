@@ -380,7 +380,7 @@ const getGroupActivities = (router: Router) => {
       }).partial()
     },
     response: {
-        schema: z.array(activitySchema)
+      schema: z.array(activitySchema)
     },
     handler: async (req, res) => {
       const groupId = await decodeEntityAndVerifyAccess(req, true);

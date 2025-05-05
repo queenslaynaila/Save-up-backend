@@ -69,7 +69,7 @@ const approveGuarantorRequest = (router: Router) => {
         await SQL_INSERT_APPROVAL({
           group_id: groupId,
           request_id: req.params.xid,
-          guarantor_id:211,
+          guarantor_id: 211,
           approval: req.body.approval
         }).using(trx).exec();
 
@@ -78,7 +78,7 @@ const approveGuarantorRequest = (router: Router) => {
           request_id: req.params.xid
         }).using(trx).one();
 
-        if(total_guarantors === approvals_given && all_approved){
+        if (total_guarantors === approvals_given && all_approved) {
           await SQL_UPDATE_DEBIT({
             group_id: groupId,
             request_id: req.params.xid,

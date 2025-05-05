@@ -1,5 +1,4 @@
 set -e
-container=chat
 
 # Download migrations script
 rm -f ./run-migrations

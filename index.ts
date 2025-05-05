@@ -7,7 +7,7 @@ import Router, { generateOpenApiSpec } from './router';
 import HttpError from './httpError';
 import logger from './logger';
 import Config from './config';
-import './generatePresignedUrl'
+import './generatePresignedUrl';
 import './routes/securityQuestions/index';
 import './routes/categories/index';
 import './routes/auth/index';
@@ -33,7 +33,7 @@ const openApiSpec = generateOpenApiSpec();
 app.use('/saveup/docs', swaggerUi.serve, swaggerUi.setup(openApiSpec));
 
 app.use((_req: Request, res: Response, next: NextFunction): void => {
-  res.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload");
+  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
   next();
 });
 
@@ -41,7 +41,7 @@ app.use((_req: Request, _res: Response, _next: NextFunction): void => {
   throw new HttpError(404);
 });
 
-app.use((error: Error, _req: Request, res: Response, _next: NextFunction): void => {
+app.use(function (error: Error, _req: Request, res: Response, _next: NextFunction): void {
   if (error instanceof HttpError) {
     res.status(error.status).json(error);
   } else {

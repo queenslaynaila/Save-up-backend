@@ -7,9 +7,9 @@ import createDonation from './createDonation';
 
 const router = Router.getRouterInstance('/', 'Transactions');
 
-createSaving(router);    
-createTransfer(router);   
-createWithdrawal(router); 
+createSaving(router);
+createTransfer(router);
+createWithdrawal(router);
 createDonation(router);
 getTransactions(router);
 

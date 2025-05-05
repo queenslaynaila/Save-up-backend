@@ -5,7 +5,7 @@ import {
   expenseSchema
 } from './schema';
 import { z } from 'zod';
-import  { decodeEntityAndVerifyAccess } from '../../utils';
+import { decodeEntityAndVerifyAccess } from '../../utils';
 import { entityIdParamsSchema } from '../users/schema';
 
 const SQL_GET_EXPENSES = sql<{
@@ -17,7 +17,7 @@ const SQL_GET_EXPENSES = sql<{
   end_date?: string;
 },
 Pick<Expense, 'entity_id'|'xid'|'category_id'|'description'|
-  'amount'|'currency'|'spent_at'|'created_at'>>(`
+'amount'|'currency'|'spent_at'|'created_at'>>(`
   SELECT entity_id, 
          xid, 
          category_id, 
@@ -55,14 +55,14 @@ const getExpensesByEntity = (router: Router) => {
     },
     response: {
       schema: z.array(expenseSchema.pick({
-        entity_id:true,
-        xid:true,
-        category_id:true,
-        description:true,
-        currency:true,
-        amount:true,
-        spent_at:true,
-        created_at:true
+        entity_id: true,
+        xid: true,
+        category_id: true,
+        description: true,
+        currency: true,
+        amount: true,
+        spent_at: true,
+        created_at: true
       }))
     },
     auth: true,

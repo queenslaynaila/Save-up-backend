@@ -5,8 +5,8 @@ import { decodeEntityAndVerifyAccess } from '../../utils';
 import { groupsSchema } from './schema';
 
 const SQL_RECORD_OLD_NAME = sql<
-  { group_id: number },
-  Record<string, never>
+{ group_id: number },
+Record<string, never>
 >(`
   INSERT INTO prev_group_names (group_id, xid, name)
   SELECT 
@@ -21,8 +21,8 @@ const SQL_RECORD_OLD_NAME = sql<
 `);
 
 const SQL_UPDATE_GROUP_NAME = sql<
-  { group_id: number; name: string },
-  { name: string }
+{ group_id: number; name: string },
+{ name: string }
 >(`
   UPDATE groups
   SET name = :name
@@ -46,9 +46,9 @@ const updateGroup = (router: Router) => {
       })
     },
     response: {
-        schema: groupsSchema.pick({
-          name: true
-        })
+      schema: groupsSchema.pick({
+        name: true
+      })
     },
     handler: async (req, res) => {
       const groupId = await decodeEntityAndVerifyAccess(req);

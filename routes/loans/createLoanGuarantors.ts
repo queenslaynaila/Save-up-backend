@@ -43,31 +43,31 @@ const addLoanGuarantors = (router: Router) => {
         user_id: req.user!.id,
         guarantor_ids: req.body.guarantor_ids
       }).exec().catch((err)=>{
-        if(err.code === 'P0001'){
+        if (err.code === 'P0001') {
           throw new HttpError(
             400,
-            {message:'ERR_CANT_ADD_SELF'}
-          )
+            { message: 'ERR_CANT_ADD_SELF' }
+          );
         }
-        if(err.code === 'P0002'){
+        if (err.code === 'P0002') {
           throw new HttpError(
             400,
-            {message:'ERR_INVALID_GUARANTOR'}
-          )
+            { message: 'ERR_INVALID_GUARANTOR' }
+          );
         }
-        if(err.code === 'P0003'){
+        if (err.code === 'P0003') {
           throw new HttpError(
             400,
-            {message:'ERR_GUARANTOR_NO_DEPOSIT'}
-          )
+            { message: 'ERR_GUARANTOR_NO_DEPOSIT' }
+          );
         }
-        if(err.code === 'P0004'){
+        if (err.code === 'P0004') {
           throw new HttpError(
             400,
-            {message:'ERR_NOT_LOAN_INITIATOR'}
-          )
+            { message: 'ERR_NOT_LOAN_INITIATOR' }
+          );
         }
-        throw err
+        throw err;
       });
 
       res.sendStatus(201);

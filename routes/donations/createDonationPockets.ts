@@ -1,9 +1,9 @@
-import { z } from "zod";
-import Router from "../../router";
-import { sql } from "../../db";
-import logger from "../../logger";
-import { decodeEntityAndVerifyAccess } from "../../utils";
-import { entityIdParamsSchema } from "../users/schema";
+import { z } from 'zod';
+import Router from '../../router';
+import { sql } from '../../db';
+import logger from '../../logger';
+import { decodeEntityAndVerifyAccess } from '../../utils';
+import { entityIdParamsSchema } from '../users/schema';
 
 const donationParams = z.object({
   entity_id: z.number().int().min(1),
@@ -12,7 +12,7 @@ const donationParams = z.object({
   images: z.array(z.string()).nullable().optional(),
   currency: z.string(),
   target_amount: z.number(),
-  target_at: z.string().date(),
+  target_at: z.string().date()
 });
 
 const SQL_CREATE_DONATION_FUND = sql<{
@@ -25,8 +25,8 @@ const SQL_CREATE_DONATION_FUND = sql<{
   xid: number;
   category_id: number;
   name: string;
-  status: "In Progress" | "Completed";
-  pocket_type: "Standard" | "Locked";
+  status: 'In Progress' | 'Completed';
+  pocket_type: 'Standard' | 'Locked';
   currency: string;
   target_amount: number;
   target_at: string;
@@ -72,13 +72,13 @@ const SQL_LINK_DONATION_DETAILS = sql<{
 
 const createFundraiser = (router: Router) => {
   router.post({
-    path: "/:entity_id/donations",
-    summary: "Create a donation pocket/fundraiser",
+    path: '/:entity_id/donations',
+    summary: 'Create a donation pocket/fundraiser',
     schema: {
       params: z.object({
         entity_id: entityIdParamsSchema
       }),
-      body:donationParams.pick({
+      body: donationParams.pick({
         name: true,
         description: true,
         images: true,
@@ -87,24 +87,24 @@ const createFundraiser = (router: Router) => {
       })
     },
     response: {
-        schema: donationParams.pick({
-          name: true,
-          description: true,
-          currency: true,
-          target_amount: true,
-          target_at: true,
-          images: true
-        }).extend({
-          xid: z.number().int().min(1),
-          pocket_type: z.string(),
-          status: z.string(),
-          created_at: z.string().datetime(),
-          category_id: z.number()
-        }),
+      schema: donationParams.pick({
+        name: true,
+        description: true,
+        currency: true,
+        target_amount: true,
+        target_at: true,
+        images: true
+      }).extend({
+        xid: z.number().int().min(1),
+        pocket_type: z.string(),
+        status: z.string(),
+        created_at: z.string().datetime(),
+        category_id: z.number()
+      })
     },
     auth: true,
     handler: async (req, res) => {
-      const entityId = await decodeEntityAndVerifyAccess(req)
+      const entityId = await decodeEntityAndVerifyAccess(req);
       const {
         name,
         description,
@@ -115,24 +115,24 @@ const createFundraiser = (router: Router) => {
 
       await sql.transaction(async (trx) => {
         const fundraiser = await SQL_CREATE_DONATION_FUND({
-          entity_id:entityId,
-          wallet_id:1,
+          entity_id: entityId,
+          wallet_id: 1,
           name,
           target_amount,
-          target_at,
+          target_at
         }).using(trx).one().catch((err) => {
-          logger.info(`error one is ${err}`)
-          throw err
+          logger.info(`error one is ${err}`);
+          throw err;
         });
 
         const fundraiserDetails = await SQL_LINK_DONATION_DETAILS({
-          entity_id:entityId,
+          entity_id: entityId,
           pocket_id: fundraiser.xid,
           description,
-          images: images ?? [],
+          images: images ?? []
         }).using(trx).one().catch((err) => {
-          logger.info(`error is ${err}`)
-          throw err
+          logger.info(`error is ${err}`);
+          throw err;
         });
 
         res.json({
@@ -143,13 +143,13 @@ const createFundraiser = (router: Router) => {
           images: fundraiserDetails.images,
           pocket_type: fundraiser.pocket_type,
           status: fundraiser.status,
-          currency:fundraiser.currency,
+          currency: fundraiser.currency,
           target_amount: fundraiser.target_amount,
           target_at: fundraiser.target_at,
           created_at: fundraiser.created_at
         });
       });
-    },
+    }
   });
 };
 

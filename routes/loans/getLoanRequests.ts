@@ -17,7 +17,7 @@ const loanRequestSchema = z.object({
     z.object({
       guarantor_id: z.number().int().min(1),
       guarantor_name: z.string(),
-      approval:z.boolean().nullable(),
+      approval: z.boolean().nullable()
     })
   ),
   admin_approvals: z.array(
@@ -26,18 +26,18 @@ const loanRequestSchema = z.object({
       admin_name: z.string(),
       status: z.enum(['Approved', 'Rejected']),
       reason: z.string(),
-      approval_date: z.string().datetime(),
+      approval_date: z.string().datetime()
     })
   ),
   status: z.enum([
-      'Approved',
-      'Rejected',
-      'Cancelled',
-      'Pending Guarantors',
-      'Pending Guarantor Approval' ,
-      'Pending Admin Approval'
+    'Approved',
+    'Rejected',
+    'Cancelled',
+    'Pending Guarantors',
+    'Pending Guarantor Approval',
+    'Pending Admin Approval'
   ]),
-  created_at: z.string().datetime(),
+  created_at: z.string().datetime()
 });
 
 type LoanRequest = z.infer<typeof loanRequestSchema>;
@@ -46,7 +46,7 @@ const SQL_GET_LOANS = sql<{
   group_id: number,
   pocket_id?: number,
   debit_type:string
- }, LoanRequest>(`
+}, LoanRequest>(`
   SELECT 
     debit_requests.xid,
     debit_requests.initiator_id,
@@ -119,25 +119,25 @@ const getLoanRequests = (router: Router) => {
     summary: 'Get loans request made to a group',
     schema: {
       params: z.object({
-        group_id: z.number().int().min(1),
+        group_id: z.number().int().min(1)
       }),
       query: z.object({
-        pocket_id: z.number().int().min(1),
-      }).partial(),
+        pocket_id: z.number().int().min(1)
+      }).partial()
     },
     response: {
       statusCode: 200,
-      schema: z.array(loanRequestSchema),
+      schema: z.array(loanRequestSchema)
     },
     handler: async (req, res) => {
       const groupId = await decodeEntityAndVerifyAccess(req, true);
       const loans = await SQL_GET_LOANS({
         group_id: groupId,
         pocket_id: req.query.pocket_id,
-        debit_type:DebitType.Enum.Loan
+        debit_type: DebitType.Enum.Loan
       }).many();
       res.json(loans);
-    },
+    }
   });
 };
 

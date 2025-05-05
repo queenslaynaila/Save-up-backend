@@ -6,7 +6,7 @@ import { NextOfKin, nextOfKinSchema } from './schema';
 import { verifyPin } from '../../utils';
 
 const SQL_CREATE_KIN = sql<
-Pick<NextOfKin,'user_id'|'full_name'|'relationship'|'phone_number' >,
+Pick<NextOfKin, 'user_id'|'full_name'|'relationship'|'phone_number' >,
 Pick<NextOfKin, 'xid'|'full_name'|'relationship'|'phone_number'|'created_at'>
 >(`
   INSERT INTO next_of_kins (user_id, xid, full_name, relationship, phone_number)
@@ -36,13 +36,13 @@ const createNextOfKin = (router: Router) => {
       })
     },
     response: {
-        schema: nextOfKinSchema.pick({
-          xid: true,
-          full_name: true,
-          relationship: true,
-          phone_number: true,
-          created_at: true
-        })
+      schema: nextOfKinSchema.pick({
+        xid: true,
+        full_name: true,
+        relationship: true,
+        phone_number: true,
+        created_at: true
+      })
     },
     middlewares: [verifyPin],
     handler: async (req, res) => {

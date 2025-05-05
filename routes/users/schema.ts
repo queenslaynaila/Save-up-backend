@@ -3,10 +3,10 @@ import { z } from 'zod';
 export const entityIdParamsSchema = z.union([
   z.number().int().min(1),
   z.literal('me').describe(
-    "Identifier for user/group whose data is being fetched. Can be:\n\n" +
-    "- `me`:Special id `me`to rep the currently logged in user.\n" +
-    "- `A positive integer`: Represents a specific user's./ group ID."
-  )])
+    'Identifier for user/group whose data is being fetched. Can be:\n\n'
+    + '- `me`:Special id `me`to rep the currently logged in user.\n'
+    + "- `A positive integer`: Represents a specific user's./ group ID."
+  )]);
 
 export const UserRole = z.enum(['Admin', 'Standard', 'Moderator']);
 export type Role = z.infer<typeof UserRole>;
@@ -36,7 +36,7 @@ export const userSchema = z.object({
   id: z.number().int().min(1),
   id_type: IdType,
   id_number: z.string().regex(/^(?:[A-Z]{1,2}\d{6,9}|\d{8,10}|\d{13}|\d{16})$/),
-  country:z.string(),
+  country: z.string(),
   role: UserRole,
   gender: Gender.optional(),
   pin: z.string().regex(/^\d{4}$/),

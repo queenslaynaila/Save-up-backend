@@ -5,13 +5,13 @@ import { decodeEntityAndVerifyAccess } from '../../utils';
 import HttpError from '../../httpError';
 
 const SQL_RATIFY_ELECTION = sql<
-  {
-    group_id: number;
-    election_id: number;
-    user_id: number;
-    is_ratified: boolean;
-  },
-  Record<string, never>
+{
+  group_id: number;
+  election_id: number;
+  user_id: number;
+  is_ratified: boolean;
+},
+Record<string, never>
 >(`
   SELECT ratify_election(
     :group_id,
@@ -45,7 +45,7 @@ const ratifyElection = (router: Router) => {
         is_ratified: req.body.is_ratified
       }).exec().catch((err) => {
         if (err.code === 'P0007') {
-           throw new HttpError(400, {message: 'ERR_ELECTION_CLOSED_OR_CANCELLED'})
+          throw new HttpError(400, { message: 'ERR_ELECTION_CLOSED_OR_CANCELLED' });
         }
         throw err;
       });

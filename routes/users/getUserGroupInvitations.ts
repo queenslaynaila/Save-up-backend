@@ -18,9 +18,9 @@ const pendingInvitations = invitationSchema
 type Invitations = z.infer<typeof pendingInvitations>;
 
 const SQL_GET_PENDING_INVITATIONS = sql<
-  { user_id: number },
-  Pick<Invitations,
-    'group_id' | 'xid' | 'group_name' | 'sender_id' | 'sender_name'>
+{ user_id: number },
+Pick<Invitations,
+'group_id' | 'xid' | 'group_name' | 'sender_id' | 'sender_name'>
 >(`
   SELECT 
     invitations.xid,
@@ -48,13 +48,13 @@ const getInvites = (router: Router) => {
       })
     },
     response: {
-        schema: z.array(pendingInvitations.pick({
-          group_id: true,
-          xid: true,
-          sender_id: true,
-          sender_name: true,
-          group_name: true
-        }))
+      schema: z.array(pendingInvitations.pick({
+        group_id: true,
+        xid: true,
+        sender_id: true,
+        sender_name: true,
+        group_name: true
+      }))
     },
     handler: async (req, res) => {
       const userId = await decodeEntityAndVerifyAccess(req, true);

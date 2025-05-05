@@ -20,8 +20,8 @@ const resetTokenSchema = z.object({
 export type ResetToken = z.infer<typeof resetTokenSchema>;
 
 const SQL_SAVE_TOKEN = sql<
-  Pick<ResetToken,'token' | 'reason'> & {phone_number:string},
-  {user_id: number}
+Pick<ResetToken, 'token' | 'reason'> & {phone_number:string},
+{user_id: number}
 >(`
  INSERT INTO reset_tokens (
   user_id, 
@@ -72,12 +72,12 @@ const initiatePinReset = (router: Router) => {
 
       sendSms(
         phone_number,
-        'Hello, your PIN reset verification code is: ' + resetToken +
-        '. It expires in 10 minutes. Do not share with anyone.'
+        'Hello, your PIN reset verification code is: ' + resetToken
+        + '. It expires in 10 minutes. Do not share with anyone.'
       ).catch(console.error);
 
       res
-        .setHeader('Reset', generateToken(userId, "10m", 1,))
+        .setHeader('Reset', generateToken(userId, '10m', 1))
         .sendStatus(204);
     }
   });

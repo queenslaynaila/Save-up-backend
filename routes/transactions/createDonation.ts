@@ -5,7 +5,7 @@ import HttpError from '../../httpError';
 
 const simulatePaymentRequest = async (phone_number: string, amount: number) => {
   if (Math.random() > 0.5) {
-    throw new HttpError(400, {message:'Payment request failed'})
+    throw new HttpError(400, { message: 'Payment request failed' });
   }
   return {
     amount,
@@ -15,13 +15,13 @@ const simulatePaymentRequest = async (phone_number: string, amount: number) => {
 };
 
 const SQL_CREATE_SAVING = sql<
-  {
-    entity_id: number;
-    amount: number;
-    pocket_id: number;
-    donor_name: string
-  },
-  Record<string, never>
+{
+  entity_id: number;
+  amount: number;
+  pocket_id: number;
+  donor_name: string
+},
+Record<string, never>
 >(`
   SELECT create_donation(
     :entity_id,
@@ -41,13 +41,13 @@ const createDonation = (router: Router) => {
       }),
       body: z.object({
         amount: z.number().min(50),
-        pocket_id:z.number().int().min(1),
-        phone_number:z.string().regex(/^\+\d{1,4}\d{9}$/),
+        pocket_id: z.number().int().min(1),
+        phone_number: z.string().regex(/^\+\d{1,4}\d{9}$/)
       })
     },
     handler: async (req, res) => {
       const entityId = req.params.entity_id;
-      const { amount, pocket_id, phone_number} = req.body;
+      const { amount, pocket_id, phone_number } = req.body;
 
       const paymentResponse = await simulatePaymentRequest(phone_number, amount);
 

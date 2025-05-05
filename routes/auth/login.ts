@@ -34,8 +34,8 @@ export const publicUserSchema = authenticatedUserSchema.pick({
   country: true,
   role: true,
   gender: true,
-  full_name:true,
-  phone_number:true,
+  full_name: true,
+  phone_number: true,
   created_at: true
 });
 export type UserWithPublicAttributes = z.infer<typeof publicUserSchema>;
@@ -86,8 +86,6 @@ const SQL_RECORD_LOGIN_ATTEMPT = sql<LoginAttempt, Record<string, never>>(`
   FROM login_attempts
   WHERE user_id = :user_id
 `);
-
-
 export async function recordLoginAttempt(
   userId: number,
   ipAddress: string,
@@ -176,14 +174,14 @@ const login = (router: Router) => {
     },
     response: {
       statusCode: 200,
-      schema:  publicUserSchema.pick({
-        id:true,
-        role:true,
-        gender:true,
-        full_name:true,
-        phone_number:true,
-        created_at:true,
-        country:true
+      schema: publicUserSchema.pick({
+        id: true,
+        role: true,
+        gender: true,
+        full_name: true,
+        phone_number: true,
+        created_at: true,
+        country: true
       })
     },
     handler: async (req, res) => {
@@ -198,17 +196,17 @@ const login = (router: Router) => {
       }).one();
 
       const remainingAttempts = is_locked && is_unlocked
-          ? 4
-          : 4 - failed_attempts;
+        ? 4
+        : 4 - failed_attempts;
 
       if (remainingAttempts === 0) {
-          await recordLoginAttempt(user.id, ipAddress, userAgent, false, 'Locked');
-          throw new HttpError(423);
+        await recordLoginAttempt(user.id, ipAddress, userAgent, false, 'Locked');
+        throw new HttpError(423);
       }
 
       if (!await bcrypt.compare(req.body.pin, pin)) {
         await recordLoginAttempt(user.id, ipAddress, userAgent, false, 'Incorrect pin');
-        throw new HttpError(401, { remaining_attempts: remainingAttempts-1 });
+        throw new HttpError(401, { remaining_attempts: remainingAttempts - 1 });
       }
 
       await recordLoginAttempt(

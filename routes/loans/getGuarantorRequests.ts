@@ -12,7 +12,7 @@ const SQL_GET_GUARANTOR_REQUESTS = sql<{
   xid: number;
   borrower_id: number;
   borrower_name: string;
-  status:"Pending Guarantors"| "Pending Guarantor Approval"| "Pending Admin Approval"| "Approved"| "Rejected" |"Cancelled";
+  status:'Pending Guarantors'| 'Pending Guarantor Approval'| 'Pending Admin Approval'| 'Approved'| 'Rejected' |'Cancelled';
   amount: number;
   reason: string;
   repayment_period: string;
@@ -68,7 +68,7 @@ const approval_enum = z.enum([
   'Approved',
   'Rejected',
   'Cancelled'
-])
+]);
 
 const getGuarantorRequests = (router: Router) => {
   router.get({
@@ -102,9 +102,9 @@ const getGuarantorRequests = (router: Router) => {
       const entities = await decodeEntityAndVerifyAccess(req, true);
       const { groupId, memberId } = entities;
 
-      const loanRequests = await SQL_GET_GUARANTOR_REQUESTS ({
+      const loanRequests = await SQL_GET_GUARANTOR_REQUESTS({
         group_id: groupId,
-        user_id: memberId,
+        user_id: memberId
       }).many();
 
       res.json(loanRequests);

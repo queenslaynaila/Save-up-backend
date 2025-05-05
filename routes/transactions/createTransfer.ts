@@ -16,9 +16,9 @@ const transferPayload = z.object({
 type TransferPayload = z.infer<typeof transferPayload>;
 
 const SQL_CREATE_TRANSFER = sql<
-  Pick<TransferPayload, 'entity_id'|'user_id'|
-  'source_pocket_id'|'destination_pocket_id'|'amount'>,
-  Record<string, never>
+Pick<TransferPayload, 'entity_id'|'user_id'|
+'source_pocket_id'|'destination_pocket_id'|'amount'>,
+Record<string, never>
 >(`
   SELECT create_transfer(
     :source_pocket_id,
@@ -41,8 +41,8 @@ const createTransfer = (router: Router) => {
       body: transferPayload
         .pick({
           amount: true,
-          source_pocket_id:true,
-          destination_pocket_id:true
+          source_pocket_id: true,
+          destination_pocket_id: true
         })
         .extend({
           pin: z.string().regex(/^\d{4}$/)

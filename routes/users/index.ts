@@ -6,7 +6,7 @@ import updateUserPin from './updateUserPin';
 import updateInvites from './updateInvitation';
 import getInvites from './getUserGroupInvitations';
 import getGroupsByUserId from './getGroupsByUserId';
-import unlockUserAccount from './unlockUserAccount'
+import unlockUserAccount from './unlockUserAccount';
 
 const router = Router.getRouterInstance('/users', 'Users');
 
@@ -16,7 +16,7 @@ updateIdDetails(router);
 updateUserRole(router);
 getInvites(router);
 updateInvites(router);
-getGroupsByUserId(router)
+getGroupsByUserId(router);
 unlockUserAccount(router);
 
 export default router;

@@ -5,13 +5,13 @@ import { decodeEntityAndVerifyAccess } from '../../utils';
 import { entityIdParamsSchema } from '../users/schema';
 
 const SQL_GET_BALANCE = sql<
-  {
-    entity_id: number;
-    pocket_id?: number;
-    from?: string;
-    to?: string;
-  },
-  { balance: number }
+{
+  entity_id: number;
+  pocket_id?: number;
+  from?: string;
+  to?: string;
+},
+{ balance: number }
 >(`
   SELECT COALESCE(SUM(balance), 0) as balance
   FROM (
@@ -47,7 +47,7 @@ const getBalanceForAnEntity = (router: Router) => {
     },
     handler: async (req, res) => {
       const entityId = await decodeEntityAndVerifyAccess(req, true);
-      const { from, to, pocket_id} = req.query
+      const { from, to, pocket_id } = req.query;
       const balance = await SQL_GET_BALANCE({
         entity_id: entityId,
         from,

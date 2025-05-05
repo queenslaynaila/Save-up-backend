@@ -4,8 +4,8 @@ import { Group, groupsSchema } from './schema';
 import { z } from 'zod';
 
 const SQL_CREATE_GROUP = sql<
-  Pick<Group, 'name' | 'creator_id'>,
-  Pick<Group, 'id' | 'name' | 'created_at'> & {created_by:string}
+Pick<Group, 'name' | 'creator_id'>,
+Pick<Group, 'id' | 'name' | 'created_at'> & {created_by:string}
 >(`
   SELECT * FROM create_group(
     :name,
@@ -24,14 +24,14 @@ const createGroup = (router: Router) => {
       })
     },
     response: {
-        statusCode: 201,
-        schema: groupsSchema.pick({
-          id: true,
-          name: true,
-          created_at: true
-        }).extend({
-          created_by: z.string()
-        })
+      statusCode: 201,
+      schema: groupsSchema.pick({
+        id: true,
+        name: true,
+        created_at: true
+      }).extend({
+        created_by: z.string()
+      })
     },
     handler: async (req, res) => {
       const group = await SQL_CREATE_GROUP({

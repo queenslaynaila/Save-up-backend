@@ -27,7 +27,7 @@ const getExpenseStats = (router: Router) => {
     path: '/stats/expenses',
     summary: 'Get aggregated expenses',
     schema: {
-      query:z.object({
+      query: z.object({
         entity_id: z.number().int().min(1).optional(),
         agg: z.enum(['avg', 'sum', 'count', 'min', 'max']),
         start_date: z.string().date().optional(),
@@ -35,7 +35,7 @@ const getExpenseStats = (router: Router) => {
       })
     },
     response: {
-      statusCode:200,
+      statusCode: 200,
       schema: z.object({
         aggregated_expenses: z.number()
       })
@@ -47,8 +47,8 @@ const getExpenseStats = (router: Router) => {
         agg,
         start_date,
         end_date
-      }).oneFirst()
-      res.json({aggregated_expenses});
+      }).oneFirst();
+      res.json({ aggregated_expenses });
     }
   });
 };

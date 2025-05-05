@@ -16,8 +16,8 @@ const candidateParams = candidateSchema.pick({
 type CandidatesParams = z.infer<typeof candidateParams>;
 
 const SQL_CREATE_CANDIDATE = sql<
-  Pick<CandidatesParams, 'group_id' | 'election_id' | 'candidate_ids' | 'user_id'>,
-  Record<string, never>
+Pick<CandidatesParams, 'group_id' | 'election_id' | 'candidate_ids' | 'user_id'>,
+Record<string, never>
 >(`
   SELECT create_candidates(
     :group_id,

@@ -22,8 +22,8 @@ const SQL_GET_SECURITY_QUESTIONS = sql<{
 `);
 
 const SQL_GET_RESET_TOKEN = sql<
-  Pick<ResetToken, 'reason' | 'user_id'>,
-  Pick<ResetToken, 'token'>
+Pick<ResetToken, 'reason' | 'user_id'>,
+Pick<ResetToken, 'token'>
 >(`
   SELECT token
   FROM reset_tokens 
@@ -36,8 +36,8 @@ const SQL_GET_RESET_TOKEN = sql<
 `);
 
 const SQL_UPDATE_TOKEN_USAGE = sql<
-  Pick<ResetToken, 'reason' | 'user_id' | 'token'>,
-  Record<string, never>
+Pick<ResetToken, 'reason' | 'user_id' | 'token'>,
+Record<string, never>
 >(`
   UPDATE reset_tokens 
   SET used_at = NOW() 
@@ -92,7 +92,7 @@ const verifyPinResetToken = (router: Router) => {
       if (securityQuestions.length === 0) {
         const resetTokenHeader = generateToken(
           user_id,
-         '15m',
+          '15m',
           3
         );
 

@@ -19,9 +19,9 @@ const withdrawalRequestSchema = z.object({
       z.object({
         admin_id: z.number().int().min(1),
         admin_name: z.string(),
-        status: z.enum([ 'Approved','Rejected','Cancelled']),
-        reason:z.string(),
-        approval_date: z.string().datetime(),
+        status: z.enum(['Approved', 'Rejected', 'Cancelled']),
+        reason: z.string(),
+        approval_date: z.string().datetime()
       })
     )
     .nullable(),
@@ -30,22 +30,22 @@ const withdrawalRequestSchema = z.object({
       z.object({
         recipient_id: z.number().int().min(1),
         recipient_name: z.string(),
-        amount: z.number(),
+        amount: z.number()
       })
     )
     .min(1),
-    created_at: z.string().datetime()
+  created_at: z.string().datetime()
 });
 
 type WithdrawalRequest = z.infer<typeof withdrawalRequestSchema>;
 
 const SQL_GET_GROUP_WITHDRAWALS = sql<
-  {
-    group_id: number;
-    pocket_id?: number;
-    debit_type: string;
-  },
-  WithdrawalRequest
+{
+  group_id: number;
+  pocket_id?: number;
+  debit_type: string;
+},
+WithdrawalRequest
 >(`
   SELECT 
     debit_requests.xid,
@@ -112,13 +112,13 @@ const getGrpDebitRequests = (router: Router) => {
       params: z.object({
         group_id: z.number().int().min(1)
       }),
-      query:z.object({
+      query: z.object({
         pocket_id: z.number().int().min(1)
       }).partial()
     },
     response: {
       statusCode: 200,
-      schema: z.array(withdrawalRequestSchema),
+      schema: z.array(withdrawalRequestSchema)
     },
     auth: true,
     handler: async (req, res) => {
@@ -126,11 +126,11 @@ const getGrpDebitRequests = (router: Router) => {
       const withdrawals = await SQL_GET_GROUP_WITHDRAWALS({
         group_id: groupId,
         pocket_id: req.query.pocket_id,
-        debit_type:DebitType.Enum.Withdrawal
+        debit_type: DebitType.Enum.Withdrawal
       }).many();
 
       res.json(withdrawals);
-    },
+    }
   });
 };
 

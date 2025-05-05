@@ -6,12 +6,12 @@ import { entityIdParamsSchema } from '../users/schema';
 import { decodeEntityAndVerifyAccess } from '../../utils';
 
 const SQL_MANAGE_GROUP_MEMBERSHIP = sql<
-  {
-    group_id: number;
-    initiator_id: number;
-    target_id: number;
-  },
-  Record<string, never>
+{
+  group_id: number;
+  initiator_id: number;
+  target_id: number;
+},
+Record<string, never>
 >(`
   SELECT exit_or_remove_group_member(
     :group_id, 

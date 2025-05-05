@@ -3,9 +3,9 @@ import { sql } from '../../db';
 import HttpError from '../../httpError';
 import Router from '../../router';
 import { publicUserSchema, UserWithPublicAttributes } from '../auth/login';
-import {UserRole} from "./schema";
+import { UserRole } from './schema';
 
-const SQL_GET_USER_BY_CRITERIA = sql<Record<string, never>,UserWithPublicAttributes>(`
+const SQL_GET_USER_BY_CRITERIA = sql<Record<string, never>, UserWithPublicAttributes>(`
   SELECT 
     users.id,
     users.id_type,
@@ -24,8 +24,8 @@ const getUsersBySearchCriteria = (router: Router) => {
   router.get({
     path: '/search',
     summary: 'Search for users based on various criteria.',
-    description: 'Allows searching for users based on a single query criterion: ' +
-                'phone number, ID number, or user ID.',
+    description: 'Allows searching for users based on a single query criterion: '
+                + 'phone number, ID number, or user ID.',
     schema: {
       query: z.object({
         value: z.string()
@@ -35,7 +35,7 @@ const getUsersBySearchCriteria = (router: Router) => {
       statusCode: 200,
       schema: z.array(publicUserSchema)
     },
-    auth:[UserRole.enum.Admin, UserRole.enum.Moderator],
+    auth: [UserRole.enum.Admin, UserRole.enum.Moderator],
     handler: async (req, res) => {
       const { value } = req.query;
       const sanitizedValue = value.replace(/^ /, '+');
@@ -50,8 +50,7 @@ const getUsersBySearchCriteria = (router: Router) => {
         .test(sanitizedValue)) {
         filters.push('users.id_number = :id_number');
         filterArgs.id_number = sanitizedValue;
-      }
-       else if (/^\d+$/.test(sanitizedValue)) {
+      } else if (/^\d+$/.test(sanitizedValue)) {
         filters.push('users.id = :user_id');
         filterArgs.user_id = parseInt(sanitizedValue, 10);
       } else {

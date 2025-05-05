@@ -31,7 +31,7 @@ const requestLoan = (router: Router) => {
       params: z.object({
         group_id: z.number()
       }),
-      body:z.object({
+      body: z.object({
         pocket_id: z.number(),
         amount: z.number(),
         reason: z.string(),
@@ -39,22 +39,22 @@ const requestLoan = (router: Router) => {
         pin: z.string().regex(/^\d{4}$/)
       })
     },
-    middlewares:[verifyPin],
+    middlewares: [verifyPin],
     handler: async (req, res) => {
-      const groupId = await decodeEntityAndVerifyAccess(req)
+      const groupId = await decodeEntityAndVerifyAccess(req);
       await SQL_CREATE_LOAN_REQUEST({
         ...req.body,
         group_id: groupId,
         initiator_id: req.user!.id
       }).exec().catch(err=>{
-        if(err.code === 'P0005') {
-         throw new HttpError(400, {message:'ERR_FUNDS_LOCKED'})
+        if (err.code === 'P0005') {
+          throw new HttpError(400, { message: 'ERR_FUNDS_LOCKED' });
         }
-        if(err.code === 'P0004') {
-          throw new HttpError(400, {message:'ERR_INSUFFICIENT_FUNDS'})
+        if (err.code === 'P0004') {
+          throw new HttpError(400, { message: 'ERR_INSUFFICIENT_FUNDS' });
         }
-        if(err.code === 'P0006') {
-          throw new HttpError(400, {message:'ERR_NO_DEPOSIT_MADE'})
+        if (err.code === 'P0006') {
+          throw new HttpError(400, { message: 'ERR_NO_DEPOSIT_MADE' });
         }
         throw err;
       });

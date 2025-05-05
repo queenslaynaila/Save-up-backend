@@ -15,8 +15,8 @@ const withdrawalPayload = z.object({
 type Withdrawal = z.infer<typeof withdrawalPayload>;
 
 const SQL_CREATE_WITHDRAWAL = sql<
-  Pick<Withdrawal, 'user_id'|'pocket_id'|'amount'|'accept_penalty'>,
-  Record<string, never>
+Pick<Withdrawal, 'user_id'|'pocket_id'|'amount'|'accept_penalty'>,
+Record<string, never>
 >(`
   SELECT withdraw_from_user_pocket(
     :user_id,
@@ -38,8 +38,8 @@ const createWithdrawal = (router: Router) => {
       body: withdrawalPayload
         .pick({
           amount: true,
-          pocket_id:true,
-          accept_penalty:true
+          pocket_id: true,
+          accept_penalty: true
         })
         .extend({
           pin: z.string().regex(/^\d{4}$/)

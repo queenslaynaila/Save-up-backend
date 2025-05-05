@@ -23,8 +23,8 @@ const ongoingElectionSchema = z.object({
 type OngoingElection = z.infer<typeof ongoingElectionSchema>;
 
 const SQL_GET_ONGOING_ELECTION = sql<
-  { group_id: number },
-  OngoingElection
+{ group_id: number },
+OngoingElection
 >(`
   SELECT 
     elections.group_id,

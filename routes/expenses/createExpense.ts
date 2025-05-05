@@ -2,7 +2,7 @@ import Router from '../../router';
 import { sql } from '../../db';
 import { Expense, expenseSchema } from './schema';
 import { z } from 'zod';
-import  { decodeEntityAndVerifyAccess } from '../../utils';
+import { decodeEntityAndVerifyAccess } from '../../utils';
 import { entityIdParamsSchema } from '../users/schema';
 
 const expenseCreationParams = expenseSchema.pick({
@@ -17,9 +17,9 @@ type ExpenseCreationParams = z.infer<typeof expenseCreationParams>
 & { entity_id: number };
 
 const SQL_CREATE_EXPENSES = sql<
-  ExpenseCreationParams,
-  Pick<Expense, 'entity_id' | 'xid' | 'category_id' | 'description'
-  |'currency'| 'amount' | 'spent_at' | 'created_at'>
+ExpenseCreationParams,
+Pick<Expense, 'entity_id' | 'xid' | 'category_id' | 'description'
+|'currency'| 'amount' | 'spent_at' | 'created_at'>
 >(`
   INSERT INTO expenses (entity_id, xid, category_id, description, currency, amount, spent_at)
   SELECT 
@@ -41,12 +41,12 @@ const createExpense = (router: Router) => {
     summary: 'Create an expense',
     schema: {
       params: z.object({
-        entity_id: entityIdParamsSchema,
+        entity_id: entityIdParamsSchema
       }),
       body: expenseSchema.pick({
         category_id: true,
         description: true,
-        currency:true,
+        currency: true,
         amount: true,
         spent_at: true
       })

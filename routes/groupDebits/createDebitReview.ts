@@ -1,7 +1,7 @@
-import { z } from "zod";
-import { sql } from "../../db";
-import { decodeEntityAndVerifyAccess } from "../../utils";
-import Router from "../../router";
+import { z } from 'zod';
+import { sql } from '../../db';
+import { decodeEntityAndVerifyAccess } from '../../utils';
+import Router from '../../router';
 
 const SQL_REVIEW_DEBIT = sql<{
   group_id:number;
@@ -20,7 +20,7 @@ const SQL_REVIEW_DEBIT = sql<{
 `);
 
 const reviewDebitRequests = (router: Router) => {
-router.patch({
+  router.patch({
     path: '/groups/:group_id/debits/:debit_id/review',
     summary: 'Approve or reject a loan/withdrawal request',
     auth: true,
@@ -30,23 +30,23 @@ router.patch({
         debit_id: z.number().int().min(1)
       }),
       body: z.object({
-        status: z.enum([ 'Approved','Rejected','Cancelled']),
+        status: z.enum(['Approved', 'Rejected', 'Cancelled']),
         reason: z.string()
       })
     },
     handler: async (req, res) => {
-      const groupId = await decodeEntityAndVerifyAccess(req,false,true)
+      const groupId = await decodeEntityAndVerifyAccess(req, false, true);
 
       await SQL_REVIEW_DEBIT({
         ...req.body,
         group_id: groupId,
         debit_id: req.params.debit_id,
-        admin_id:req.user!.id
-      }).exec()
+        admin_id: req.user!.id
+      }).exec();
 
       res.sendStatus(200);
     }
   });
-}
+};
 
 export default reviewDebitRequests;

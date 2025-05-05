@@ -18,8 +18,8 @@ type UserIdParams = z.infer<typeof IdParams> & {
 };
 
 const SQL_UPDATE_ID_NUMBER = sql<
-  Pick<UserIdParams, 'user_id' | 'id_type' | 'id_number'>,
-  Pick<UserIdParams, 'id_number'>
+Pick<UserIdParams, 'user_id' | 'id_type' | 'id_number'>,
+Pick<UserIdParams, 'id_number'>
 >(`
   SELECT * FROM update_id_number(
     :user_id,
@@ -43,9 +43,9 @@ const updateIdDetails = (router: Router) => {
       })
     },
     response: {
-        schema: z.object({
-          id_number: userSchema.shape.id_number
-        })
+      schema: z.object({
+        id_number: userSchema.shape.id_number
+      })
     },
     handler: async (req, res) => {
       const userId = await decodeEntityAndVerifyAccess(req);

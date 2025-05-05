@@ -4,9 +4,9 @@ import logout from './logout';
 import register from './register';
 import initiatePinReset from './initiatePinReset';
 import verifyPinResetToken from './verifyPinResetToken';
-import  verifySecurityAnswers from './verifySecurityAnswers';
+import verifySecurityAnswers from './verifySecurityAnswers';
 import resetPin from './resetPin';
-import getRefreshToken from "./refreshToken";
+import getRefreshToken from './refreshToken';
 
 const router = Router.getRouterInstance('/auth', 'Auth');
 

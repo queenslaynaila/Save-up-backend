@@ -13,8 +13,8 @@ const groupMemberSchema = z.object({
 type Member = z.infer<typeof groupMemberSchema>;
 
 const SQL_GET_GROUP_MEMBERS = sql<
-  { group_id: number },
-  Pick<Member, 'user_id' | 'full_name' | 'joined_at' | 'is_admin'>
+{ group_id: number },
+Pick<Member, 'user_id' | 'full_name' | 'joined_at' | 'is_admin'>
 >(`
   SELECT
     group_members.user_id,
@@ -65,12 +65,12 @@ const getGroupMembers = (router: Router) => {
       })
     },
     response: {
-        schema: z.array(groupMemberSchema.pick({
-          user_id: true,
-          full_name: true,
-          is_admin: true,
-          joined_at: true
-        }))
+      schema: z.array(groupMemberSchema.pick({
+        user_id: true,
+        full_name: true,
+        is_admin: true,
+        joined_at: true
+      }))
     },
     handler: async (req, res) => {
       const groupId = await decodeEntityAndVerifyAccess(req, true);

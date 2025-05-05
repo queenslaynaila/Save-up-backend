@@ -15,8 +15,8 @@ const electionSchema = z.object({
 type ElectionParams = z.infer<typeof electionSchema>;
 
 const SQL_UPDATE_ELECTION = sql<
-  ElectionParams,
-  Record<string, never>
+ElectionParams,
+Record<string, never>
 >(`
   
     UPDATE elections

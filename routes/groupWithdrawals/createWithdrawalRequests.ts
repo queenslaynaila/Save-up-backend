@@ -10,8 +10,8 @@ type WithdrawalParams = {
   pocket_id: number;
   reason: string;
   recipients: {
-      recipient_id: number;
-      amount: number;
+    recipient_id: number;
+    amount: number;
   }[];
 }
 
@@ -38,17 +38,17 @@ const createWithdrawalRequest = (router: Router) => {
             recipient_id: z.number().int().min(1),
             amount: z.number()
           })
-      )})
+        ) })
     },
     auth: true,
-    middlewares:[verifyPin],
+    middlewares: [verifyPin],
     handler: async (req, res) => {
-      const groupId = await decodeEntityAndVerifyAccess(req, false, true)
-        await SQL_INITIATE_GRP_WITHDRAWAL({
-          ...req.body,
-          group_id: groupId,
-          initiator_id: req.user!.id
-        }).exec().catch (err => {
+      const groupId = await decodeEntityAndVerifyAccess(req, false, true);
+      await SQL_INITIATE_GRP_WITHDRAWAL({
+        ...req.body,
+        group_id: groupId,
+        initiator_id: req.user!.id
+      }).exec().catch(err => {
         if (err.code === 'P0004') {
           throw new HttpError(400, { message: 'ERR_INSUFFICIENT_FUNDS' });
         }
@@ -58,7 +58,7 @@ const createWithdrawalRequest = (router: Router) => {
         throw err;
       });
       res.sendStatus(201);
-}});
+    } });
 };
 
 export default createWithdrawalRequest;

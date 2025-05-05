@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { decodeEntityAndVerifyAccess } from '../../utils';
 import { entityIdParamsSchema } from '../users/schema';
 
-const SQL_GET_BALANCE =  sql<
+const SQL_GET_BALANCE = sql<
 { pocket_id: number, entity_id: number }, { balance:number }
 >(`
   SELECT COALESCE(
@@ -20,8 +20,8 @@ const SQL_GET_BALANCE =  sql<
 `);
 
 const SQL_DELETE_POCKET = sql<
-    { pocket_id: number; entity_id: number },
-    Record<string, never>
+{ pocket_id: number; entity_id: number },
+Record<string, never>
 >(`
    UPDATE pockets
     SET deleted_at = NOW()
@@ -29,7 +29,6 @@ const SQL_DELETE_POCKET = sql<
       AND entity_id = :entity_id
       AND deleted_at IS NULL;
 `);
-
 
 const deletePocket = (router: Router) => {
   router.post({
@@ -61,7 +60,7 @@ const deletePocket = (router: Router) => {
           entity_id: entityId,
           pocket_id: req.params.xid
         }).using(trx).exec();
-      })
+      });
       res.sendStatus(204);
     }
   });

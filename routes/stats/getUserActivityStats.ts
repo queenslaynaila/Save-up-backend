@@ -1,22 +1,21 @@
 import Router from '../../router';
 import { sql } from '../../db';
 import { z } from 'zod';
-import {UserRole} from "../users/schema";
-import {statsQuerySchema} from "./getDepositStats";
-
+import { UserRole } from '../users/schema';
+import { statsQuerySchema } from './getDepositStats';
 
 const SQL_GET_AGGREGATED_REGISTRATION = sql<
-    {
-        start_date?: string;
-        end_date?: string;
-        user_id?: number;
-    },
-    {
-        total_registrations: number;
-        total_logins: number;
-        total_failed_logins: number;
-        locked_accounts: number;
-    }
+{
+  start_date?: string;
+  end_date?: string;
+  user_id?: number;
+},
+{
+  total_registrations: number;
+  total_logins: number;
+  total_failed_logins: number;
+  locked_accounts: number;
+}
 >(`
   WITH filtered_users AS (
     SELECT id
@@ -51,42 +50,41 @@ const SQL_GET_AGGREGATED_REGISTRATION = sql<
     (SELECT COUNT(*) FROM locked_users) AS locked_accounts
 `);
 
-
 const getUserActivityStats = (router: Router) => {
-    router.get({
-        path: '/stats/auth-metrics',
-        summary: 'Get aggregated user authentication metrics',
-        description: 'Returns aggregated user statistics within a given date range, ' +
-            'including total registrations, total login attempts, failed logins, ' +
-            'and  locked accounts. ',
-        auth:[UserRole.enum.Admin, UserRole.enum.Moderator],
-        schema: {
-            query: statsQuerySchema.pick({
-                start_date: true,
-                end_date: true
-            }).extend({
-                user_id: z.number().int().min(1).optional()
-            })
-        },
-        response: {
-            statusCode:200,
-            schema: z.object({
-                total_registrations: z.number().int(),
-                total_logins: z.number().int(),
-                total_failed_logins: z.number().int(),
-                locked_accounts: z.number().int(),
-            })
-        },
-        handler: async (req, res) => {
-            const { user_id,  start_date, end_date } = req.query
-            const results = await SQL_GET_AGGREGATED_REGISTRATION({
-                user_id,
-                start_date,
-                end_date
-            }).one();
-            res.json(results);
-        }
-    });
+  router.get({
+    path: '/stats/auth-metrics',
+    summary: 'Get aggregated user authentication metrics',
+    description: 'Returns aggregated user statistics within a given date range, '
+            + 'including total registrations, total login attempts, failed logins, '
+            + 'and  locked accounts. ',
+    auth: [UserRole.enum.Admin, UserRole.enum.Moderator],
+    schema: {
+      query: statsQuerySchema.pick({
+        start_date: true,
+        end_date: true
+      }).extend({
+        user_id: z.number().int().min(1).optional()
+      })
+    },
+    response: {
+      statusCode: 200,
+      schema: z.object({
+        total_registrations: z.number().int(),
+        total_logins: z.number().int(),
+        total_failed_logins: z.number().int(),
+        locked_accounts: z.number().int()
+      })
+    },
+    handler: async (req, res) => {
+      const { user_id, start_date, end_date } = req.query;
+      const results = await SQL_GET_AGGREGATED_REGISTRATION({
+        user_id,
+        start_date,
+        end_date
+      }).one();
+      res.json(results);
+    }
+  });
 };
 
 export default getUserActivityStats;

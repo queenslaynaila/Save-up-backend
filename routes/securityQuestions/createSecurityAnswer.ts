@@ -4,7 +4,7 @@ import { sql } from '../../db';
 import { z } from 'zod';
 import HttpError from '../../httpError';
 import { verifyPin } from '../../utils';
-import {UserRole} from "../users/schema";
+import { UserRole } from '../users/schema';
 
 const securityAnswerSchema = z.object({
   user_id: z.number().int().min(1),
@@ -47,7 +47,7 @@ const createSecurityAnswer = (router: Router) => {
 
       await SQL_CREATE_ANSWERS({
         user_id: req.user!.id,
-        answers:hashedAnswers
+        answers: hashedAnswers
       }).exec().catch((err) => {
         if (err.code === 'P0003') {
           throw new HttpError(400, { message: 'ERR_MAX_ANSWERS_EXCEEDED' });

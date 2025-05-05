@@ -4,8 +4,8 @@ import { z } from 'zod';
 import { verifyPin } from '../../utils';
 
 const SQL_DELETE_KIN = sql<
-  { user_id: number, xid: number },
-  Record<string, never>
+{ user_id: number, xid: number },
+Record<string, never>
 >(`
   UPDATE next_of_kins  
   SET deleted_at = NOW()
@@ -31,7 +31,7 @@ const deleteNextOfKin = (router: Router) => {
     handler: async (req, res) => {
       await SQL_DELETE_KIN({
         user_id: req.user!.id,
-        xid:req.params.xid
+        xid: req.params.xid
       }).exec();
 
       res.sendStatus(204);

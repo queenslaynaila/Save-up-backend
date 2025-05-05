@@ -3,12 +3,12 @@ import { sql } from '../../db';
 import { z } from 'zod';
 
 export const statsQuerySchema = z.object({
-    pocket_id: z.number().int().min(1).optional(),
-    entity_id: z.number().int().min(1).optional(),
-    agg: z.enum(['avg', 'sum', 'count', 'min', 'max']),
-    slug: z.string().optional(),
-    start_date: z.string().datetime().optional(),
-    end_date: z.string().datetime().optional()
+  pocket_id: z.number().int().min(1).optional(),
+  entity_id: z.number().int().min(1).optional(),
+  agg: z.enum(['avg', 'sum', 'count', 'min', 'max']),
+  slug: z.string().optional(),
+  start_date: z.string().datetime().optional(),
+  end_date: z.string().datetime().optional()
 });
 
 export type Stats = z.infer<typeof statsQuerySchema>;
@@ -33,32 +33,32 @@ const SQL_GET_AGGREGATED_SAVINGS = sql<Stats, { aggregated_deposits: number }>(`
 `);
 
 const getDepositStats = (router: Router) => {
-    router.get({
-        path: '/transactions/stats/savings',
-        summary: 'Get deposit stats',
-        auth: true,
-        schema: {
-            query: statsQuerySchema
-        },
-        response: {
-            statusCode:200,
-            schema: z.object({
-                aggregated_savings: z.number()
-            })
-        },
-        handler: async (req, res) => {
-            const { entity_id, agg, start_date, end_date, pocket_id } = req.query;
-            const aggregated_savings = await SQL_GET_AGGREGATED_SAVINGS({
-                slug:'Saving',
-                entity_id,
-                pocket_id,
-                agg,
-                start_date,
-                end_date
-            }).oneFirst()
-            res.json({aggregated_savings});
-        }
-    });
+  router.get({
+    path: '/transactions/stats/savings',
+    summary: 'Get deposit stats',
+    auth: true,
+    schema: {
+      query: statsQuerySchema
+    },
+    response: {
+      statusCode: 200,
+      schema: z.object({
+        aggregated_savings: z.number()
+      })
+    },
+    handler: async (req, res) => {
+      const { entity_id, agg, start_date, end_date, pocket_id } = req.query;
+      const aggregated_savings = await SQL_GET_AGGREGATED_SAVINGS({
+        slug: 'Saving',
+        entity_id,
+        pocket_id,
+        agg,
+        start_date,
+        end_date
+      }).oneFirst();
+      res.json({ aggregated_savings });
+    }
+  });
 };
 
 export default getDepositStats;

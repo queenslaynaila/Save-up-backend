@@ -4,16 +4,16 @@ import { z } from 'zod';
 import { decodeEntityAndVerifyAccess } from '../../utils';
 
 const SQL_GET_ELECTION_RESULTS = sql<
-  {
-    group_id:number;
-    election_id:number;
-    initiator_id:number
-    status: 'Closed'
-  },
-  {
-    candidate_id:number;
-    full_name:string
-  }
+{
+  group_id:number;
+  election_id:number;
+  initiator_id:number
+  status: 'Closed'
+},
+{
+  candidate_id:number;
+  full_name:string
+}
 >(`
   SELECT
     group_admins.user_id AS candidate_id,
@@ -46,12 +46,12 @@ const getGroupElectionResults = (router: Router) => {
       })
     },
     response: {
-        schema: z.array(
-          z.object({
-            candidate_id: z.number(),
-            full_name: z.string()
-          })
-        )
+      schema: z.array(
+        z.object({
+          candidate_id: z.number(),
+          full_name: z.string()
+        })
+      )
     },
     handler: async (req, res) => {
       const groupId = await decodeEntityAndVerifyAccess(req, true);

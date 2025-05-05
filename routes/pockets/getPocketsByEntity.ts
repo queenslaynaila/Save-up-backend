@@ -29,7 +29,7 @@ const pocketReturnSchema = pocketSchema
     pocket_type: true,
     priority: true,
     status: true,
-    currency:true,
+    currency: true,
     target_amount: true,
     target_at: true,
     created_at: true
@@ -83,7 +83,7 @@ const getPocketsByEntity = (router: Router) => {
         priority: true,
         status: true,
         xid: true,
-        category_id:true
+        category_id: true
       }).extend({
         start_date: z.string().date(),
         end_date: z.string().date()

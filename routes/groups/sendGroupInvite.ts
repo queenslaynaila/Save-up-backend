@@ -6,16 +6,16 @@ import HttpError from '../../httpError';
 import { decodeEntityAndVerifyAccess } from '../../utils';
 
 const SQL_SEND_INVITATION = sql<
-  {
-    group_id: number;
-    sender_id: number;
-    phone_number: string;
-  },
-  {
-    receiver_id: number | null;
-    sender_name: string;
-    group_name: string;
-  }
+{
+  group_id: number;
+  sender_id: number;
+  phone_number: string;
+},
+{
+  receiver_id: number | null;
+  sender_name: string;
+  group_name: string;
+}
 >(`
   INSERT INTO invitations (
     group_id,
@@ -89,8 +89,7 @@ const createGroupInvite = (router: Router) => {
         encodeURIComponent(req.body.phone_number)
       }`;
 
-      const baseMessage =
-        `${sender_name} invited you to join group ${group_name} on SaveUP.`;
+      const baseMessage = `${sender_name} invited you to join group ${group_name} on SaveUP.`;
 
       const message = receiver_id === null
         ? `${baseMessage} Sign up here: ${signupLink} to join the group`

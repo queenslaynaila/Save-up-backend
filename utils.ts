@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcrypt';
-import jwt, {JwtPayload } from 'jsonwebtoken';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 import { sql } from './db';
 import HttpError from './httpError';
 import Config from './config';
@@ -30,8 +30,8 @@ const SQL_GET_ENTITY_TYPE = sql<{
 `);
 
 const SQL_GET_PIN = sql<
-  { user_id: number },
-  { pin: string }
+{ user_id: number },
+{ pin: string }
 >(`
   SELECT pin 
   FROM users 
@@ -72,15 +72,15 @@ export function generateToken(
 ): string {
   const payload: { id: number; role?: Role; step?: number } = { id };
 
-  if (typeof roleOrStep === "number") {
+  if (typeof roleOrStep === 'number') {
     payload.step = roleOrStep;
   } else {
     payload.role = roleOrStep;
   }
 
   const secret = isAccess
-      ? Config.JWT_SECRET
-      : Config.JWT_REFRESH_SECRET;
+    ? Config.JWT_SECRET
+    : Config.JWT_REFRESH_SECRET;
 
   return jwt.sign(
     payload,

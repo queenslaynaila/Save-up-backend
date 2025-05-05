@@ -5,13 +5,13 @@ import { decodeEntityAndVerifyAccess } from '../../utils';
 import { entityIdParamsSchema } from '../users/schema';
 
 const SQL_CREATE_SAVING = sql<
-  {
-    entity_id: number;
-    amount: number;
-    pocket_id: number;
-    user_id: number;
-  },
-  Record<string, never>
+{
+  entity_id: number;
+  amount: number;
+  pocket_id: number;
+  user_id: number;
+},
+Record<string, never>
 >(`
   SELECT create_saving(
     :entity_id,
@@ -32,7 +32,7 @@ const createSaving = (router: Router) => {
       }),
       body: z.object({
         amount: z.number().min(50),
-        pocket_id:z.number().int().min(1)
+        pocket_id: z.number().int().min(1)
       })
     },
     handler: async (req, res) => {

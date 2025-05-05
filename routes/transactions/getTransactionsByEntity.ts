@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { sql } from '../../db';
 import Router from '../../router';
-import  { decodeEntityAndVerifyAccess } from '../../utils';
+import { decodeEntityAndVerifyAccess } from '../../utils';
 import { entityIdParamsSchema } from '../users/schema';
 
 const ENUM_TRANSACTION_TYPE = z.enum([
@@ -28,7 +28,7 @@ const transactionSchema = z.object({
   type_id: z.number().int().min(1),
   pocket_id: z.number().int().min(1),
   reference_id: z.number(),
-  currency:z.string().length(3),
+  currency: z.string().length(3),
   delta: z.number().min(5),
   balance: z.number(),
   created_at: z.string().datetime()
@@ -50,15 +50,15 @@ const transaction = transactionSchema.pick({
 type Transaction = z.infer<typeof transaction>;
 
 const SQL_GET_TRANSACTIONS = sql<
-  {
-    entity_id: number,
-    pocket_id?: number,
-    slug?: string,
-    from?: string,
-    to?: string,
-    limit: number
-  },
-  Transaction
+{
+  entity_id: number,
+  pocket_id?: number,
+  slug?: string,
+  from?: string,
+  to?: string,
+  limit: number
+},
+Transaction
 >(`
   SELECT 
     transactions.xid, 
@@ -144,23 +144,23 @@ const getTransactions = (router: Router) => {
       }).partial()
     },
     response: {
-        statusCode:200,
-        schema: z.array(transaction.pick({
-          xid: true,
-          slug:true,
-          member_name: true,
-          currency: true,
-          delta: true,
-          balance: true,
-          destination_pocket_name: true,
-          source_pocket_name: true,
-          created_at: true
-        }))
+      statusCode: 200,
+      schema: z.array(transaction.pick({
+        xid: true,
+        slug: true,
+        member_name: true,
+        currency: true,
+        delta: true,
+        balance: true,
+        destination_pocket_name: true,
+        source_pocket_name: true,
+        created_at: true
+      }))
     },
     auth: true,
     handler: async (req, res) => {
       const entityId = await decodeEntityAndVerifyAccess(req, true);
-      const {slug, pocket_id, from, to, limit = 10} = req.query
+      const { slug, pocket_id, from, to, limit = 10 } = req.query;
 
       const transactions = await SQL_GET_TRANSACTIONS({
         entity_id: entityId,

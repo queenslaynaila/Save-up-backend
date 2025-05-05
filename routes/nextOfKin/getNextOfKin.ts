@@ -7,8 +7,8 @@ import { decodeEntityAndVerifyAccess } from '../../utils';
 import { NextOfKin, nextOfKinSchema } from './schema';
 
 const SQL_GET_KIN = sql<
-  Pick<NextOfKin, 'user_id'> & { include_history?: boolean },
-  Pick<NextOfKin, 'xid' | 'full_name' | 'relationship' | 'phone_number' | 'created_at'>
+Pick<NextOfKin, 'user_id'> & { include_history?: boolean },
+Pick<NextOfKin, 'xid' | 'full_name' | 'relationship' | 'phone_number' | 'created_at'>
 >(`
   SELECT 
     xid,
@@ -40,19 +40,19 @@ const getNextOfKin = (router: Router) => {
       }).partial()
     },
     response: {
-        schema: z.array(
-          nextOfKinSchema.pick({
-            xid: true,
-            full_name: true,
-            relationship: true,
-            phone_number: true,
-            created_at: true
-          })
-        )
+      schema: z.array(
+        nextOfKinSchema.pick({
+          xid: true,
+          full_name: true,
+          relationship: true,
+          phone_number: true,
+          created_at: true
+        })
+      )
     },
     handler: async (req, res) => {
       const userId = await decodeEntityAndVerifyAccess(req, true);
-      const { include_history  } = req.query;
+      const { include_history } = req.query;
 
       if (req.user!.role === UserRole.Enum.Standard && include_history) {
         throw new HttpError(403);

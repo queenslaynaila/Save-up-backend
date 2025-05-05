@@ -20,7 +20,7 @@ const UserRegistrationSchema = userSchema.pick({
   id_type: true,
   id_number: true,
   gender: true,
-  country:true
+  country: true
 }).extend({
   full_name: userContactDetailsSchema.shape.full_name,
   phone_number: userContactDetailsSchema.shape.phone_number,
@@ -30,7 +30,6 @@ const UserRegistrationSchema = userSchema.pick({
   currency: z.string()
 });
 type UserRegistrationParams = z.infer<typeof UserRegistrationSchema>;
-
 
 const SQL_CREATE_USER = sql<
 UserRegistrationParams,
@@ -53,9 +52,9 @@ Pick<AuthenticatedUser, 'id'|'id_type'|'id_number'|'role'|
 `);
 
 const countries = [
-  { currency: 'KES', name: 'ke', code: '+255'},
-  { currency: 'UGX', name: 'ug', code:'+256'},
-  { currency: 'TZS', name: 'tz', code: '+255'}
+  { currency: 'KES', name: 'ke', code: '+255' },
+  { currency: 'UGX', name: 'ug', code: '+256' },
+  { currency: 'TZS', name: 'tz', code: '+255' }
 ];
 
 const getCountryAndCurrencyFromPhoneNumber = (phoneNumber: string): { country: string | null, currency: string | null } => {
@@ -71,7 +70,7 @@ const createUser = (router: Router) => {
     path: '/register',
     summary: 'Create a new user',
     schema: {
-      body:userSchema.pick({
+      body: userSchema.pick({
         id_type: true,
         id_number: true,
         gender: true,
@@ -97,8 +96,8 @@ const createUser = (router: Router) => {
       const hashedPin = bcrypt.hashSync(req.body.pin, 12);
       const { ipAddress, userAgent } = getClientInfo(req);
 
-      const {country, currency} = getCountryAndCurrencyFromPhoneNumber(req.body.phone_number)
-      if(!country || !currency) throw new HttpError(404);
+      const { country, currency } = getCountryAndCurrencyFromPhoneNumber(req.body.phone_number);
+      if (!country || !currency) throw new HttpError(404);
 
       const user = await SQL_CREATE_USER({
         ...req.body,
@@ -117,10 +116,10 @@ const createUser = (router: Router) => {
         });
 
       res
-          .setHeader('RefreshToken', generateToken(user.id, '7d', user.role, false))
-          .setHeader('Authorization', generateToken(user.id, '1h', user.role, true))
-          .status(201)
-          .json(user);
+        .setHeader('RefreshToken', generateToken(user.id, '7d', user.role, false))
+        .setHeader('Authorization', generateToken(user.id, '1h', user.role, true))
+        .status(201)
+        .json(user);
     }
   });
 };
