@@ -68,7 +68,7 @@ export function generateToken(
   id: number,
   expiresIn: string,
   roleOrStep: Role | number,
-  isAccess?: boolean,
+  isAccess?: boolean
 ): string {
   const payload: { id: number; role?: Role; step?: number } = { id };
 
@@ -101,9 +101,9 @@ function validateAndDecodeJwt(headerValue: string): JwtPayload {
 
   const decoded = jwt.decode(token) as JwtPayload | null;
 
-  if (!decoded ||
-      !decoded.id ||
-      (decoded.exp && decoded.exp * 1000 <= Date.now())
+  if (!decoded
+      || !decoded.id
+      || (decoded.exp && decoded.exp * 1000 <= Date.now())
   ) {
     throw new HttpError(401);
   }
@@ -112,7 +112,7 @@ function validateAndDecodeJwt(headerValue: string): JwtPayload {
 }
 
 export function checkResetTokenValidity(requiredStep: number) {
-  return function(req: Request, _res: Response, next: NextFunction) {
+  return (req: Request, _res: Response, next: NextFunction) => {
     const resetToken = req.headers.reset as string;
     const decoded = validateAndDecodeJwt(resetToken);
 
@@ -147,7 +147,7 @@ export async function verifyPin(req: Request, _res: Response, next: NextFunction
 }
 
 export function authMiddleware(auth: true | Role | Role[] = true) {
-  return function (req: Request, _res: Response, next: NextFunction) {
+  return (req: Request, _res: Response, next: NextFunction) => {
     if (!req.headers.authorization) {
       throw new HttpError(401);
     }
@@ -171,8 +171,8 @@ export function authMiddleware(auth: true | Role | Role[] = true) {
   };
 }
 
-function replaceMeWithUserId(id: number | "me" | undefined, userId: number): number | undefined {
-  return id === "me" ? userId : id;
+function replaceMeWithUserId(id: number | 'me' | undefined, userId: number): number | undefined {
+  return id === 'me' ? userId : id;
 }
 
 function hasSystemAdminPermissions(userRole:Role, isOwnerOrAdminMod: boolean): boolean {
@@ -191,9 +191,9 @@ async function verifyGroupMembershipPermissions(
   }).one(new HttpError(404));
 
   if (
-    !is_member ||
-    (requiresGrpAdmin && !is_admin_member) ||
-    (memberId && userId !== memberId && !is_admin_member)
+    !is_member
+    || (requiresGrpAdmin && !is_admin_member)
+    || (memberId && userId !== memberId && !is_admin_member)
   ) {
     throw new HttpError(403);
   }
@@ -202,14 +202,14 @@ async function verifyGroupMembershipPermissions(
 }
 
 type SingleEntityParams = {
-  entity_id: number|"me";
+  entity_id: number|'me';
   user_id?: never;
   group_id?: never;
   member_id?: never;
 };
 
 type SingleUserParams = {
-  user_id: number|"me";
+  user_id: number|'me';
   entity_id?: never;
   group_id?: never;
   member_id?: never;
@@ -224,7 +224,7 @@ type SingleGroupParams = {
 
 type GroupWithMemberParams = {
   group_id: number;
-  member_id: number|"me";
+  member_id: number|'me';
   entity_id?: never;
   user_id?: never;
 };
@@ -240,7 +240,7 @@ type ReturnType<T> = T extends GroupWithMemberParams
   : number;
 
 export async function decodeEntityAndVerifyAccess<T extends RequestParams>(
-  req: Request<T, any, any, any>,
+  req:Request<T, unknown, unknown, unknown>,
   isOwnerOrAdminMod = false,
   requiresGrpAdmin = false
 ): Promise<ReturnType<T>> {
@@ -258,13 +258,14 @@ export async function decodeEntityAndVerifyAccess<T extends RequestParams>(
   };
 
   if (
-    resolvedParams.user_id === loggedInUserId ||
-    resolvedParams.entity_id === loggedInUserId
+    resolvedParams.user_id === loggedInUserId
+    || resolvedParams.entity_id === loggedInUserId
   ) return loggedInUserId as ReturnType<T>;
 
-  if (resolvedParams.user_id){
-    if (!hasSystemAdminPermissions(loggedInUserRole, isOwnerOrAdminMod))
+  if (resolvedParams.user_id) {
+    if (!hasSystemAdminPermissions(loggedInUserRole, isOwnerOrAdminMod)) {
       throw new HttpError(403);
+    }
     return resolvedParams.user_id as ReturnType<T>;
   }
 
@@ -282,18 +283,19 @@ export async function decodeEntityAndVerifyAccess<T extends RequestParams>(
     ) as ReturnType<T>;
   }
 
-  if(resolvedParams.entity_id){
+  if (resolvedParams.entity_id) {
     const entityType = await SQL_GET_ENTITY_TYPE({
       entity_id: resolvedParams.entity_id
     }).oneFirst(new HttpError(404));
 
-    if (entityType === "User"){
-      if (!hasSystemAdminPermissions(loggedInUserRole, isOwnerOrAdminMod))
+    if (entityType === 'User') {
+      if (!hasSystemAdminPermissions(loggedInUserRole, isOwnerOrAdminMod)) {
         throw new HttpError(403);
+      }
       return resolvedParams.entity_id as ReturnType<T>;
     }
 
-    if (entityType === "Group") {
+    if (entityType === 'Group') {
       if (hasSystemAdminPermissions(loggedInUserRole, isOwnerOrAdminMod)) {
         return resolvedParams.entity_id as ReturnType<T>;
       }
