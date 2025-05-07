@@ -100,6 +100,7 @@ const registry = new OpenAPIRegistry();
 class Router {
   private static app: Application = express();
 
+  // eslint-disable-next-line no-use-before-define
   private static routerInstances: Map<string, Router> = new Map();
 
   public readonly get: SpecificRouteMethodHandler;
@@ -205,6 +206,7 @@ class Router {
       }
 
       if (response.schema) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const jsonResponseSchema: any = zodToJsonSchema(response.schema, { target: 'openApi3' });
         const stringify = fastJson(jsonResponseSchema);
 
@@ -212,6 +214,7 @@ class Router {
           z.record(z.unknown()),
           z.array(z.record(z.unknown()))
         ]);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const jsonErrorSchema: any = zodToJsonSchema(errorSchema, { target: 'openApi3' });
         const errStringify = fastJson(jsonErrorSchema);
 
