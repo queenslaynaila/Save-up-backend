@@ -239,8 +239,13 @@ type ReturnType<T> = T extends GroupWithMemberParams
   ? { groupId: number, memberId: number}
   : number;
 
-export async function decodeEntityAndVerifyAccess<T extends RequestParams>(
-  req:Request<T, unknown, unknown, unknown>,
+export async function decodeEntityAndVerifyAccess<
+  T extends RequestParams,
+  ResBody = unknown,
+  ReqBody = unknown,
+  Query = unknown
+>(
+  req:Request<T, ResBody, ReqBody, Query>,
   isOwnerOrAdminMod = false,
   requiresGrpAdmin = false
 ): Promise<ReturnType<T>> {
@@ -263,9 +268,7 @@ export async function decodeEntityAndVerifyAccess<T extends RequestParams>(
   ) return loggedInUserId as ReturnType<T>;
 
   if (resolvedParams.user_id) {
-    if (!hasSystemAdminPermissions(loggedInUserRole, isOwnerOrAdminMod)) {
-      throw new HttpError(403);
-    }
+    if (!hasSystemAdminPermissions(loggedInUserRole, isOwnerOrAdminMod)) throw new HttpError(403);
     return resolvedParams.user_id as ReturnType<T>;
   }
 
@@ -289,9 +292,7 @@ export async function decodeEntityAndVerifyAccess<T extends RequestParams>(
     }).oneFirst(new HttpError(404));
 
     if (entityType === 'User') {
-      if (!hasSystemAdminPermissions(loggedInUserRole, isOwnerOrAdminMod)) {
-        throw new HttpError(403);
-      }
+      if (!hasSystemAdminPermissions(loggedInUserRole, isOwnerOrAdminMod)) throw new HttpError(403);
       return resolvedParams.entity_id as ReturnType<T>;
     }
 
