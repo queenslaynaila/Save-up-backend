@@ -5,11 +5,11 @@ import Router from '../../router';
 import { verifyPin } from '../../utils';
 
 const SQL_UPDATE_PIN = sql<
-  {
-    pin: string;
-    id: number;
-  },
-  Record<string, never>
+{
+  pin: string;
+  id: number;
+},
+Record<string, never>
 >(`
   UPDATE users 
   SET pin = :pin 
