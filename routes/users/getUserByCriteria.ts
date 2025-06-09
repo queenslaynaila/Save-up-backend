@@ -12,6 +12,7 @@ const SQL_GET_USER_BY_CRITERIA = sql<Record<string, never>, UserWithPublicAttrib
     users.id_number,
     user_contact_details.full_name,
     users.role,
+    users.country,
     users.gender,
     user_contact_details.phone_number,
     users.created_at
