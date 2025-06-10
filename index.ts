@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import 'express-async-errors';
 import { NextFunction, Request, Response } from 'express';
 import swaggerUi from 'swagger-ui-express';
@@ -32,6 +33,28 @@ const openApiSpec = generateOpenApiSpec();
 
 app.use('/saveup/docs', swaggerUi.serve, swaggerUi.setup(openApiSpec));
 
+app.get('/saveup/openapi.json', (_req, res) => {
+  res.json(openApiSpec);
+});
+app.use('/saveup/docsi', (_req, res) => {
+  const redocHtml = `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title>Saveup API</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,700|Roboto:300,400,700" rel="stylesheet"/>
+      </head>
+      <body>
+         <redoc spec-url='/saveup/openapi.json'></redoc>
+        <script src="https://cdn.redoc.ly/redoc/latest/bundles/redoc.standalone.js"></script>
+      </body>
+    </html>
+  `;
+  res.send(redocHtml);
+});
+
 app.use((_req: Request, res: Response, next: NextFunction): void => {
   res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
   next();
@@ -41,6 +64,7 @@ app.use((_req: Request, _res: Response, _next: NextFunction): void => {
   throw new HttpError(404);
 });
 
+// eslint-disable-next-line func-names
 app.use(function (error: Error, _req: Request, res: Response, _next: NextFunction): void {
   if (error instanceof HttpError) {
     res.status(error.status).json(error);
