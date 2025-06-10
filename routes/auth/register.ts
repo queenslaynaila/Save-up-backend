@@ -57,12 +57,14 @@ const countries = [
   { currency: 'TZS', name: 'tz', code: '+255' }
 ];
 
-const getCountryAndCurrencyFromPhoneNumber = (phoneNumber: string): { country: string | null, currency: string | null } => {
+const getCountryAndCurrencyFromPhoneNumber = (phoneNumber: string):
+{ country: string | null, currency: string | null } => {
   const countryCode = phoneNumber.slice(0, 4);
 
   const country = countries.find(c => c.code === countryCode);
 
-  return country ? { country: country.name, currency: country.currency } : { country: null, currency: null };
+  return country ? { country: country.name, currency: country.currency }
+    : { country: null, currency: null };
 };
 
 const createUser = (router: Router) => {
