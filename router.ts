@@ -239,7 +239,8 @@ class Router {
       cors({
         origin: [
           'http://localhost:5173',
-          'https://save-up-seven.vercel.app'
+          'https://save-up-seven.vercel.app',
+          'http://localhost:3003/'
         ],
         methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS', 'PUT'],
         credentials: true,
@@ -249,7 +250,7 @@ class Router {
     );
     Router.app.use(express.json());
     Router.app.use(
-      ['/docs'],
+      ['/saveup/docs'],
       basicAuth({
         challenge: true,
         users: {
@@ -308,7 +309,10 @@ export const generateOpenApiSpec = () => {
     openapi: '3.0.0',
     info: {
       title: 'API Documentation for Saveup',
-      version: '1.0.0'
+      version: '1.0.0',
+      'x-logo': {
+        url: './signin_tree.jpeg'
+      }
     },
     security: [
       {
