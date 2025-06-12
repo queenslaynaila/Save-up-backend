@@ -240,7 +240,7 @@ class Router {
         origin: [
           'http://localhost:5173',
           'https://save-up-seven.vercel.app',
-          'http://localhost:3003/'
+          'http://localhost:3003'
         ],
         methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS', 'PUT'],
         credentials: true,
