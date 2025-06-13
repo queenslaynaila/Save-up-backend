@@ -5,7 +5,10 @@ import Router from '../../router';
 import { publicUserSchema, UserWithPublicAttributes } from '../auth/login';
 import { UserRole } from './schema';
 
-const SQL_GET_USER_BY_CRITERIA = sql<Record<string, never>, UserWithPublicAttributes>(`
+const SQL_GET_USER_BY_CRITERIA = sql<
+Record<string, never>,
+UserWithPublicAttributes & {last_login: string}
+>(`
   SELECT 
     users.id,
     users.id_type,
@@ -44,7 +47,9 @@ const getUsersBySearchCriteria = (router: Router) => {
     },
     response: {
       statusCode: 200,
-      schema: z.array(publicUserSchema)
+      schema: z.array(publicUserSchema.extend({
+        last_login: z.string()
+      }))
     },
     auth: [UserRole.enum.Admin, UserRole.enum.Moderator],
     handler: async (req, res) => {
