@@ -15,10 +15,20 @@ const SQL_GET_USER_BY_CRITERIA = sql<Record<string, never>, UserWithPublicAttrib
     users.country,
     users.gender,
     user_contact_details.phone_number,
-    users.created_at
+    users.created_at,
+    login_attempts.created_at AS last_login
   FROM users
   LEFT JOIN user_contact_details 
     ON users.id = user_contact_details.id
+  LEFT JOIN (
+    SELECT user_id, MAX(xid) AS max_xid
+    FROM login_attempts
+    GROUP BY user_id
+  ) AS latest
+    ON users.id = latest.user_id
+  LEFT JOIN login_attempts
+    ON login_attempts.user_id = latest.user_id 
+    AND login_attempts.xid = latest.max_xid
 `);
 
 const getUsersBySearchCriteria = (router: Router) => {
