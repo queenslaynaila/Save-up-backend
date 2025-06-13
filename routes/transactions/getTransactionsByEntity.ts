@@ -36,6 +36,7 @@ const transactionSchema = z.object({
 
 const transaction = transactionSchema.pick({
   xid: true,
+  reference_id: true,
   delta: true,
   currency: true,
   balance: true,
@@ -58,11 +59,14 @@ const SQL_GET_TRANSACTIONS = sql<
   to?: string,
   limit: number
 },
-Transaction
+Transaction & {pocket_name: string}
 >(`
   SELECT 
     transactions.xid, 
+    transactions.reference_id,
     transaction_types.slug,
+    transactions.pocket_id,
+    pockets.name AS pocket_name,
     transactions.currency,
     transactions.delta,
     transactions.balance,
@@ -118,6 +122,9 @@ Transaction
   FROM transactions
   JOIN transaction_types 
     ON transactions.type_id = transaction_types.id
+  JOIN pockets 
+    ON transactions.pocket_id = pockets.xid
+    AND pockets.entity_id = transactions.entity_id
   WHERE transactions.entity_id = :entity_id
     AND (:pocket_id::INT IS NULL OR transactions.pocket_id = :pocket_id)
     AND (:slug::TEXT IS NULL OR transaction_types.slug = :slug)
@@ -147,6 +154,7 @@ const getTransactions = (router: Router) => {
       statusCode: 200,
       schema: z.array(transaction.pick({
         xid: true,
+        reference_id: true,
         slug: true,
         member_name: true,
         currency: true,
@@ -155,6 +163,8 @@ const getTransactions = (router: Router) => {
         destination_pocket_name: true,
         source_pocket_name: true,
         created_at: true
+      }).extend({
+        pocket_name: z.string()
       }))
     },
     auth: true,
