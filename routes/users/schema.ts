@@ -1,9 +1,9 @@
 import { z } from 'zod';
 
 export const entityIdParamsSchema = z.union([
-  z.number().int().min(1),
+  z.number().int().min(1).describe('Numeric user Id'),
   z.literal('me').describe(
-    'Identifier for user/group whose data is being fetched. Can be:\n\n'
+    'Identifier for user/group whose data is being fet6tched. Can be:\n\n'
     + '- `me`:Special id `me`to rep the currently logged in user.\n'
     + "- `A positive integer`: Represents a specific user's./ group ID."
   )]);
