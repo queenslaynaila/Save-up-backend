@@ -3,6 +3,7 @@ import { sql } from '../../db';
 import Router from '../../router';
 import { decodeEntityAndVerifyAccess } from '../../utils';
 import { entityIdParamsSchema } from '../users/schema';
+import logger from '../../logger';
 
 const ENUM_TRANSACTION_TYPE = z.enum([
   'Saving',
@@ -27,7 +28,7 @@ const transactionSchema = z.object({
   xid: z.number().int().min(1),
   type_id: z.number().int().min(1),
   pocket_id: z.number().int().min(1),
-  reference_id: z.number(),
+  reference_id: z.string(),
   currency: z.string().length(3),
   delta: z.number().min(5),
   balance: z.number(),
@@ -45,7 +46,9 @@ const transaction = transactionSchema.pick({
   slug: transactionTypeSchema.shape.slug,
   member_name: z.string().optional().nullable(),
   destination_pocket_name: z.string().optional().nullable(),
-  source_pocket_name: z.string().optional().nullable()
+  source_pocket_name: z.string().optional().nullable(),
+  pocket_id: z.number().int(),
+  pocket_name: z.string()
 });
 
 type Transaction = z.infer<typeof transaction>;
@@ -59,7 +62,7 @@ const SQL_GET_TRANSACTIONS = sql<
   to?: string,
   limit: number
 },
-Transaction & {pocket_name: string}
+Transaction
 >(`
   SELECT 
     transactions.xid, 
@@ -154,6 +157,7 @@ const getTransactions = (router: Router) => {
       statusCode: 200,
       schema: z.array(transaction.pick({
         xid: true,
+        pocket_id: true,
         reference_id: true,
         slug: true,
         member_name: true,
@@ -164,8 +168,7 @@ const getTransactions = (router: Router) => {
         source_pocket_name: true,
         created_at: true
       }).extend({
-        pocket_name: z.string()
-      }))
+        pocket_name: z.string() }))
     },
     auth: true,
     handler: async (req, res) => {
@@ -180,6 +183,8 @@ const getTransactions = (router: Router) => {
         to,
         limit
       }).many();
+
+      logger.info(`Fetched ${transactions.length} transactions ${JSON.stringify(transactions)}`);
 
       res.json(transactions);
     }
