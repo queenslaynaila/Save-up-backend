@@ -84,6 +84,11 @@ export default (router: Router) => {
     summary: 'Get offer configuration',
     description: 'Returns mock data representing offer configuration for testing purposes.',
     auth: true,
+    schema: {
+      body: z.object({
+        sample: z.string().optional().describe('Optional sample parameter for testing.')
+      })
+    },
     response: {
       statusCode: 200,
       schema: OffersListSchema
