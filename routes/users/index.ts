@@ -6,13 +6,16 @@ import Router from '../../router';
 // import getInvites from './getUserGroupInvitations';
 // import getGroupsByUserId from './getGroupsByUserId';
 // import unlockUserAccount from './unlockUserAccount';
+import config from './config';
 import testRoute from './test';
 const router = Router.getRouterInstance('/users', 'Users');
 
 // getUsersBySearchCriteria(router);
 // updateUserPin(router);
 // updateIdDetails(router);
+config(router);
 testRoute(router);
+
 // updateUserRole(router);
 // getInvites(router);
 // updateInvites(router);
