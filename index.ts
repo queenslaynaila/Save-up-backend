@@ -8,22 +8,22 @@ import Router, { generateOpenApiSpec } from './router';
 import HttpError from './httpError';
 import logger from './logger';
 import Config from './config';
-import './generatePresignedUrl';
-import './routes/securityQuestions/index';
-import './routes/categories/index';
-import './routes/auth/index';
+// import './generatePresignedUrl';
+// import './routes/securityQuestions/index';
+// import './routes/categories/index';
+// import './routes/auth/index';
 import './routes/users/index';
-import './routes/nextOfKin/index';
-import './routes/groups/index';
-import './routes/elections/index';
-import './routes/groupWithdrawals/index';
-import './routes/loans/index';
-import './routes/groupDebits/index';
-import './routes/pockets/index';
-import './routes/stats/index';
-import './routes/expenses/index';
-import './routes/donations/index';
-import './routes/transactions/index';
+// import './routes/nextOfKin/index';
+// import './routes/groups/index';
+// import './routes/elections/index';
+// import './routes/groupWithdrawals/index';
+// import './routes/loans/index';
+// import './routes/groupDebits/index';
+// import './routes/pockets/index';
+// import './routes/stats/index';
+// import './routes/expenses/index';
+// import './routes/donations/index';
+// import './routes/transactions/index';
 
 extendZodWithOpenApi(z);
 
@@ -31,12 +31,12 @@ const app = Router.getAppInstance();
 
 const openApiSpec = generateOpenApiSpec();
 
-app.use('/saveup/docs', swaggerUi.serve, swaggerUi.setup(openApiSpec));
+app.use('/saveup/swagger', swaggerUi.serve, swaggerUi.setup(openApiSpec));
 
 app.get('/saveup/openapi.json', (_req, res) => {
   res.json(openApiSpec);
 });
-app.use('/saveup/docsi', (_req, res) => {
+app.use('/saveup/redocly', (_req, res) => {
   const redocHtml = `
     <!DOCTYPE html>
     <html>
@@ -53,6 +53,51 @@ app.use('/saveup/docsi', (_req, res) => {
     </html>
   `;
   res.send(redocHtml);
+});
+
+app.use('/saveup/rapidoc', (_req, res) => {
+  const html = `
+    <!doctype html>
+    <html>
+      <head>
+        <script type="module" src="https://unpkg.com/rapidoc/dist/rapidoc-min.js"></script>
+        <title>SaveUp API - RapiDoc</title>
+      </head>
+      <body>
+        <rapi-doc 
+          spec-url="/saveup/openapi.json"
+          theme="light"
+          show-header="true"
+          allow-authentication="true"
+          allow-server-selection="true"
+          render-style="view"
+        >
+        </rapi-doc>
+      </body>
+    </html>
+  `;
+  res.send(html);
+});
+
+app.use('/saveup/spotlight', (_req, res) => {
+  const spotLightHtml = `
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <script src="https://unpkg.com/@stoplight/elements/web-components.min.js"></script>
+        <link rel="stylesheet" href="https://unpkg.com/@stoplight/elements/styles.min.css">
+        <meta charset="UTF-8" />
+        <title>Stoplight Docs</title>
+      </head>
+      <body>
+        <elements-api
+           apiDescriptionUrl="/saveup/openapi.json"
+          router="hash"
+        />
+      </body>
+    </html>
+  `;
+  res.send(spotLightHtml);
 });
 
 app.use((_req: Request, res: Response, next: NextFunction): void => {
