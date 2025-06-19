@@ -10,12 +10,12 @@ const convertToTitleCase = (str: string): string => {
 };
 
 const SQL_UPDATE_ROLE = sql<
-  {
-    targetUserId: number;
-    role: string;
-    adminId: number;
-  },
-  Record<string, never>
+{
+  targetUserId: number;
+  role: string;
+  adminId: number;
+},
+Record<string, never>
 >(`
   SELECT update_user_role(
     :targetUserId,
