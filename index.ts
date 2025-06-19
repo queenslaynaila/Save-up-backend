@@ -8,6 +8,7 @@ import Router, { generateOpenApiSpec } from './router';
 import HttpError from './httpError';
 import logger from './logger';
 import Config from './config';
+import path from 'path';
 import './generatePresignedUrl';
 import './routes/securityQuestions/index';
 import './routes/categories/index';
@@ -25,23 +26,15 @@ import './routes/expenses/index';
 import './routes/donations/index';
 import './routes/transactions/index';
 
-import path from 'path';
-
 extendZodWithOpenApi(z);
 
 const app = Router.getAppInstance();
 
-const openApiSpec = generateOpenApiSpec();
+app.use('/saveup/docs', swaggerUi.serve, swaggerUi.setup(generateOpenApiSpec()));
 
-app.use('/saveup/docs', swaggerUi.serve, swaggerUi.setup(openApiSpec));
-
-app.get('/saveup/openapi.json', (_req, res) => {
+app.get('/saveup/api.json', (_req, res) => {
   res.sendFile(path.join(__dirname, '', 'openapi.json'));
 });
-
-app.use('/saveup/swagger', swaggerUi.serve, swaggerUi.setup(undefined, {
-  swaggerUrl: '/saveup/openapi.json'
-}));
 
 app.use('/saveup/redocly', (_req, res) => {
   const redocHtml = `
@@ -54,7 +47,7 @@ app.use('/saveup/redocly', (_req, res) => {
         <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,700|Roboto:300,400,700" rel="stylesheet"/>
       </head>
       <body>
-         <redoc spec-url='/saveup/openapi.json'></redoc>
+         <redoc spec-url='/saveup/api.json'></redoc>
         <script src="https://cdn.redoc.ly/redoc/latest/bundles/redoc.standalone.js"></script>
       </body>
     </html>
@@ -72,7 +65,7 @@ app.use('/saveup/rapidoc', (_req, res) => {
       </head>
       <body>
         <rapi-doc 
-          spec-url="/saveup/openapi.json"
+          spec-url="/saveup/api.json"
           theme="light"
           show-header="true"
           allow-authentication="true"
@@ -98,7 +91,7 @@ app.use('/saveup/spotlight', (_req, res) => {
       </head>
       <body>
         <elements-api
-           apiDescriptionUrl="/saveup/openapi.json"
+           apiDescriptionUrl="/saveup/api.json"
           router="hash"
         />
       </body>
