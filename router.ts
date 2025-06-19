@@ -193,6 +193,7 @@ class Router {
           request: {
             params: schema?.params,
             body: schema?.body ? {
+              description: schema.body.description,
               content: {
                 'application/json': {
                   schema: schema.body
