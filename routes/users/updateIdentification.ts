@@ -38,13 +38,13 @@ const updateIdDetails = (router: Router) => {
         user_id: entityIdParamsSchema
       }),
       body: z.object({
-        id_type: IdType,
-        id_number: userSchema.shape.id_number
+        id_type: IdType.describe('Type of identifiction method provided by the user'),
+        id_number: userSchema.shape.id_number.describe('Identification number matching the selected Id type')
       })
     },
     response: {
       schema: z.object({
-        id_number: userSchema.shape.id_number
+        id_number: userSchema.shape.id_number.describe('Updated identification number')
       })
     },
     handler: async (req, res) => {
