@@ -3,6 +3,7 @@ BEGIN
   CREATE TYPE enum_id_type AS ENUM ('National', 'Passport');
   CREATE TYPE enum_user_role AS ENUM ('Admin', 'Standard', 'Moderator');
   CREATE TYPE enum_gender AS ENUM ('Male', 'Female');
+  CREATE TYPE enum_user_status AS ENUM ('Active', 'Inactive', 'Suspended');
 EXCEPTION
   WHEN DUPLICATE_OBJECT THEN NULL;
 END
@@ -16,6 +17,7 @@ CREATE TABLE IF NOT EXISTS users (
   country         TEXT NOT NULL,
   gender          enum_gender,
   pin             TEXT NOT NULL,
+  status          enum_user_status NOT NULL DEFAULT 'Active',
   created_at      TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   FOREIGN KEY     (id) REFERENCES user_contact_details(id)
 );
