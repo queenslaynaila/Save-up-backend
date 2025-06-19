@@ -1,7 +1,7 @@
 import z from 'zod';
 import Router from '../../router';
-import { entityIdParamsSchema } from './schema';
 import { decodeEntityAndVerifyAccess } from '../../utils';
+import { entityIdParamsSchema } from '../users/schema';
 
 const testRoute = (router: Router) => {
   router.post({

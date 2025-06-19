@@ -8,22 +8,24 @@ import Router, { generateOpenApiSpec } from './router';
 import HttpError from './httpError';
 import logger from './logger';
 import Config from './config';
-// import './generatePresignedUrl';
-// import './routes/securityQuestions/index';
-// import './routes/categories/index';
-// import './routes/auth/index';
+import './generatePresignedUrl';
+import './routes/securityQuestions/index';
+import './routes/categories/index';
+import './routes/auth/index';
 import './routes/users/index';
-// import './routes/nextOfKin/index';
-// import './routes/groups/index';
-// import './routes/elections/index';
-// import './routes/groupWithdrawals/index';
-// import './routes/loans/index';
-// import './routes/groupDebits/index';
-// import './routes/pockets/index';
-// import './routes/stats/index';
-// import './routes/expenses/index';
-// import './routes/donations/index';
-// import './routes/transactions/index';
+import './routes/nextOfKin/index';
+import './routes/groups/index';
+import './routes/elections/index';
+import './routes/groupWithdrawals/index';
+import './routes/loans/index';
+import './routes/groupDebits/index';
+import './routes/pockets/index';
+import './routes/stats/index';
+import './routes/expenses/index';
+import './routes/donations/index';
+import './routes/transactions/index';
+
+import path from 'path';
 
 extendZodWithOpenApi(z);
 
@@ -31,11 +33,16 @@ const app = Router.getAppInstance();
 
 const openApiSpec = generateOpenApiSpec();
 
-app.use('/saveup/swagger', swaggerUi.serve, swaggerUi.setup(openApiSpec));
+app.use('/saveup/docs', swaggerUi.serve, swaggerUi.setup(openApiSpec));
 
 app.get('/saveup/openapi.json', (_req, res) => {
-  res.json(openApiSpec);
+  res.sendFile(path.join(__dirname, '', 'openapi.json'));
 });
+
+app.use('/saveup/swagger', swaggerUi.serve, swaggerUi.setup(undefined, {
+  swaggerUrl: '/saveup/openapi.json'
+}));
+
 app.use('/saveup/redocly', (_req, res) => {
   const redocHtml = `
     <!DOCTYPE html>
@@ -109,8 +116,7 @@ app.use((_req: Request, _res: Response, _next: NextFunction): void => {
   throw new HttpError(404);
 });
 
-// eslint-disable-next-line func-names
-app.use(function (error: Error, _req: Request, res: Response, _next: NextFunction): void {
+app.use((error: Error, _req: Request, res: Response, _next: NextFunction): void => {
   if (error instanceof HttpError) {
     res.status(error.status).json(error);
   } else {

@@ -1,5 +1,6 @@
 import z from 'zod';
 import Router from '../../router';
+
 export const DepositBonusConfigSchema = z.object({
   maximum_bonus: z.object({
     scope: z.literal('country').describe('This value varies by country.'),
@@ -78,7 +79,7 @@ const OfferSchema = z.object({
 
 const OffersListSchema = z.array(OfferSchema);
 
-export default (router: Router) => {
+const getConfig = (router: Router) => {
   router.get({
     path: '/config',
     summary: 'Get offer configuration',
@@ -178,3 +179,5 @@ export default (router: Router) => {
     }
   });
 };
+
+export default getConfig;
