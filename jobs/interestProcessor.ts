@@ -66,7 +66,7 @@ const pocketErrorSchema = z.object({
 type PocketError = z.infer<typeof pocketErrorSchema>;
 
 const SQL_LOG_POCKET_INTEREST_ERROR = sql<PocketError, Record<string, never>>(`
-    INSERT INTO pocket_errors (entity_id, pocket_id, error)
+    INSERT INTO interest_job_errors (entity_id, pocket_id, error)
     VALUES (:entity_id, :pocket_id, :error)
 `);
 
