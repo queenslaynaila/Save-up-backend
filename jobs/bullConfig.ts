@@ -2,7 +2,7 @@ import { Job, Queue, Worker } from 'bullmq';
 import { Redis } from 'ioredis';
 import Config from '../config';
 import logger from '../logger';
-import { awardInterest, enqueueInterestJobs, Proccessor } from './interestProccessor';
+import { awardInterest, findEligiblePocketsAndCreateJobs, Processor } from './interestProcessor';
 
 const redis = new Redis({
   host: Config.REDIS_HOST,
@@ -11,7 +11,7 @@ const redis = new Redis({
   maxRetriesPerRequest: null
 });
 
-export const interestQueue = new Queue('interest-queue', {
+export const interestCalculationQueue = new Queue('interest-queue', {
   connection: redis,
   defaultJobOptions: {
     attempts: 3,
@@ -19,38 +19,38 @@ export const interestQueue = new Queue('interest-queue', {
   }
 });
 
-export async function scheduleDailyInterestJob() {
-  await interestQueue.add(
-    'schedule-interest-runner',
+export async function setupDailyInterestSchedule() {
+  await interestCalculationQueue.add(
+    'create-daily-interest-jobs',
     {},
     {
       jobId: 'daily-interest-scheduler',
       repeat: {
-        pattern: '0 2 * * *',
+        pattern: '0 0 2 * * *',
         tz: 'UTC'
       }
     }
   );
-  logger.info('Scheduled daily-interest-scheduler repeatable at 2AM daily');
+  logger.info('Scheduled daily interest job creation at 2AM UTC');
 }
 
-export function startInterestWorker() {
+export function startInterestJobWorker() {
   new Worker(
     'interest-queue',
     async (job: Job) => {
       switch (job.name) {
-        case 'schedule-interest-runner':
-          logger.info('[Scheduler] Running enqueueInterestJobs()');
-          await enqueueInterestJobs();
+        case 'create-daily-interest-jobs':
+          logger.info('[Daily Scheduler] Finding eligible pockets and creating interest jobs');
+          await findEligiblePocketsAndCreateJobs();
           break;
 
-        case 'award-interest':
-          logger.info(`[Processor] awardInterestJob for pocket ${job.data.pocket_id}`);
-          await awardInterest(job as Job<Proccessor>);
+        case 'calculate-pocket-interest':
+          logger.info(`[Interest Calculator] Processing interest for pocket ${job.data.pocket_id}`);
+          await awardInterest(job as Job<Processor>);
           break;
 
         default:
-          logger.warn(`Unknown job name: ${job.name}`);
+          logger.warn(`Unknown job type: ${job.name}`);
       }
     },
     {
