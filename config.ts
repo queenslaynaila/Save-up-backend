@@ -32,7 +32,11 @@ const Config = cleanEnv(process.env, {
   AWS_REGION: str(),
   AWS_ACCESS_KEY_ID: str(),
   AWS_SECRET_ACCESS_KEY: str(),
-  AWS_BUCKET_NAME: str()
+  AWS_BUCKET_NAME: str(),
+
+  REDIS_PORT: port({ default: 6379 }),
+  REDIS_HOST: host({ default: 'localhost' }),
+  REDIS_PASSWORD: str()
 });
 
 export default Config;
