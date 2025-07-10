@@ -14,23 +14,24 @@ const pocketDataSchema = z.object({
 export type Processor = z.infer<typeof pocketDataSchema>;
 
 const SQL_FIND_POCKETS_ELIGIBLE_FOR_INTEREST = sql<Record<string, never>, Processor>(`
-   SELECT
+  SELECT
     pockets.entity_id,
-    pockets.pocket_id,
+    pockets.xid AS pocket_id,
     pockets.pocket_type,
-    transaction_yesterday.balance AS end_of_day_balance
+    latest_transaction.balance AS end_of_day_balance
   FROM pockets
   JOIN LATERAL (
     SELECT balance
     FROM transactions
-    WHERE transactions.pocket_id = pockets.pocket_id
+    WHERE transactions.pocket_id = pockets.xid
       AND transactions.entity_id = pockets.entity_id
-      AND transactions.created_at::date = CURRENT_DATE - 1
+      AND transactions.created_at < CURRENT_DATE
     ORDER BY transactions.created_at DESC
     LIMIT 1
-  ) AS transaction_yesterday ON true
+  ) AS latest_transaction ON true
   WHERE pockets.deleted_at IS NULL
-    AND transaction_yesterday.balance > 0  
+    AND latest_transaction.balance > 0
+  ORDER BY pockets.entity_id, pockets.xid;
 `);
 
 const SQL_AWARD_INTEREST_TO_POCKET = sql<{
