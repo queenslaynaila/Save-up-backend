@@ -2,7 +2,6 @@ import z from 'zod';
 import { ENUM_POCKET_TYPE } from '../routes/pockets/schema';
 import { Job } from 'bullmq';
 import { sql } from '../db';
-import logger from '../logger';
 import { interestCalculationQueue } from './bullConfig';
 
 const pocketDataSchema = z.object({
@@ -81,10 +80,7 @@ export async function awardInterest(job: Job<Processor>) {
     pocket_id
   }).oneFirst();
 
-  if (alreadyAwarded) {
-    logger.info(`Interest already awarded today for pocket ${pocket_id}`);
-    return;
-  }
+  if (alreadyAwarded) return;
 
   const annualInterestRate = pocket_type === 'Locked' ? LOCKED_SAVINGS_RATE : STANDARD_SAVINGS_RATE;
   const dailyInterestAmount = (end_of_day_balance * annualInterestRate) / 365;
@@ -97,7 +93,6 @@ export async function awardInterest(job: Job<Processor>) {
       amount: roundedInterestAmount,
       transaction_type: 'Interest'
     }).exec().catch(async error => {
-      logger.error(`Failed to award interest for pocket ${pocket_id}:`, error);
       await SQL_LOG_POCKET_INTEREST_ERROR({
         entity_id: entity_id,
         pocket_id: pocket_id,
@@ -121,6 +116,4 @@ export async function findEligiblePocketsAndCreateJobs() {
   ));
 
   await Promise.all(jobCreationPromises);
-
-  logger.info(`Created ${eligiblePockets.length} interest calculation jobs`);
 }
