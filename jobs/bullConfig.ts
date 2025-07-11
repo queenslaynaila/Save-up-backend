@@ -1,8 +1,10 @@
-import { Job, Queue, Worker } from 'bullmq';
+import { Job, Queue, QueueEvents, Worker } from 'bullmq';
 import { Redis } from 'ioredis';
 import Config from '../config';
 import logger from '../logger';
 import { awardInterest, findEligiblePocketsAndCreateJobs, Processor } from './interestProcessor';
+import z from 'zod';
+import { sql } from '../db';
 
 const redis = new Redis({
   host: Config.REDIS_HOST,
@@ -45,7 +47,7 @@ export function startInterestJobWorker() {
           break;
 
         case 'calculate-pocket-interest':
-          logger.info(`[Interest Calculator] Processing interest for pocket ${job.data.pocket_id}`);
+          logger.info(`[Interest Calculator] Processing interest for entity ${job.data.entity_id} pocket ${job.data.pocket_id}`);
           await awardInterest(job as Job<Processor>);
           break;
 
@@ -62,3 +64,37 @@ export function startInterestJobWorker() {
       logger.error(`Job "${job!.name}" (id:${job!.id}) failed:`, err);
     });
 }
+
+const queueEvents = new QueueEvents(interestCalculationQueue.name);
+
+const pocketErrorSchema = z.object({
+  entity_id: z.number(),
+  pocket_id: z.number(),
+  error: z.string()
+});
+
+type PocketError = z.infer<typeof pocketErrorSchema>;
+
+const SQL_LOG_POCKET_INTEREST_ERROR = sql<PocketError, Record<string, never>>(`
+  INSERT INTO interest_job_failures (entity_id, xid, pocket_id, error)
+  SELECT
+    :entity_id,
+    COALESCE(MAX(xid), 0) + 1,
+    :pocket_id,
+    :error
+  FROM interest_job_failures 
+  WHERE entity_id = :entity_id
+`);
+
+queueEvents.on('failed', async ({ jobId, failedReason }) => {
+  const job = await interestCalculationQueue.getJob(jobId);
+  if (!job) return;
+
+  const { entity_id, pocket_id } = job.data;
+
+  await SQL_LOG_POCKET_INTEREST_ERROR({
+    entity_id,
+    pocket_id,
+    error: failedReason || 'Unknown failure'
+  }).exec();
+});

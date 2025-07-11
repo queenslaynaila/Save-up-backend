@@ -3,6 +3,7 @@ import { ENUM_POCKET_TYPE } from '../routes/pockets/schema';
 import { Job } from 'bullmq';
 import { sql } from '../db';
 import { interestCalculationQueue } from './bullConfig';
+import logger from '../logger';
 
 const pocketDataSchema = z.object({
   entity_id: z.number(),
@@ -44,30 +45,18 @@ const SQL_AWARD_INTEREST_TO_POCKET = sql<{
 `);
 
 const SQL_CHECK_IF_INTEREST_ALREADY_AWARDED_TODAY = sql<
-Pick<Processor, 'entity_id' | 'pocket_id'>, { already_awarded: boolean }>(`
+Pick<Processor, 'entity_id' | 'pocket_id'>, { already_awarded: boolean }
+>(`
   SELECT EXISTS (
     SELECT 1
-    FROM transactions transactions
-    JOIN transaction_types transaction_types
+    FROM transactions
+    JOIN transaction_types
       ON transactions.type_id = transaction_types.id
     WHERE transactions.entity_id = :entity_id
       AND transactions.pocket_id = :pocket_id
-      AND transactions.slug = 'Interest'
+      AND transaction_types.slug = 'Interest'
       AND transactions.created_at::date = CURRENT_DATE
   ) AS already_awarded
-`);
-
-const pocketErrorSchema = z.object({
-  entity_id: z.number(),
-  pocket_id: z.number(),
-  error: z.string()
-});
-
-type PocketError = z.infer<typeof pocketErrorSchema>;
-
-const SQL_LOG_POCKET_INTEREST_ERROR = sql<PocketError, Record<string, never>>(`
-    INSERT INTO interest_job_errors (entity_id, pocket_id, error)
-    VALUES (:entity_id, :pocket_id, :error)
 `);
 
 const STANDARD_SAVINGS_RATE = 0.06;
@@ -83,28 +72,27 @@ export async function awardInterest(job: Job<Processor>) {
 
   if (alreadyAwarded) return;
 
-  const annualInterestRate = pocket_type === 'Locked' ? LOCKED_SAVINGS_RATE : STANDARD_SAVINGS_RATE;
+  const annualInterestRate = pocket_type === 'Locked'
+    ? LOCKED_SAVINGS_RATE
+    : STANDARD_SAVINGS_RATE;
+
   const dailyInterestAmount = (end_of_day_balance * annualInterestRate) / 365;
   const roundedInterestAmount = Number(dailyInterestAmount.toFixed(2));
 
   if (roundedInterestAmount > 0) {
     await SQL_AWARD_INTEREST_TO_POCKET({
-      entity_id: entity_id,
-      pocket_id: pocket_id,
+      entity_id,
+      pocket_id,
       amount: roundedInterestAmount,
       transaction_type: 'Interest'
-    }).exec().catch(async error => {
-      await SQL_LOG_POCKET_INTEREST_ERROR({
-        entity_id: entity_id,
-        pocket_id: pocket_id,
-        error: error.message
-      }).exec();
-    });
+    }).exec();
   }
 }
 
 export async function findEligiblePocketsAndCreateJobs() {
   const eligiblePockets = await SQL_FIND_POCKETS_ELIGIBLE_FOR_INTEREST({}).many();
+
+  logger.info(`found ${eligiblePockets.length} pockets eligible for interest`);
 
   const jobCreationPromises = eligiblePockets.map(pocket => interestCalculationQueue.add(
     'calculate-pocket-interest',
