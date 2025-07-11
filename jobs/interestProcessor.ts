@@ -32,6 +32,16 @@ const SQL_FIND_POCKETS_ELIGIBLE_FOR_INTEREST = sql<Record<string, never>, Proces
   ) AS latest_transaction ON true
   WHERE pockets.deleted_at IS NULL
     AND latest_transaction.balance > 0
+    AND NOT EXISTS (
+      SELECT 1
+      FROM transactions
+      JOIN transaction_types
+        ON transactions.type_id = transaction_types.id
+      WHERE transaction_types.slug = 'Interest'
+        AND transactions.created_at::date = CURRENT_DATE
+        AND transactions.entity_id = pockets.entity_id
+        AND transactions.pocket_id = pockets.xid
+    )
   ORDER BY pockets.entity_id, pockets.xid;
 `);
 
@@ -44,33 +54,11 @@ const SQL_AWARD_INTEREST_TO_POCKET = sql<{
     SELECT process_transaction(:entity_id, :transaction_type, :pocket_id, :amount)
 `);
 
-const SQL_CHECK_IF_INTEREST_ALREADY_AWARDED_TODAY = sql<
-Pick<Processor, 'entity_id' | 'pocket_id'>, { already_awarded: boolean }
->(`
-  SELECT EXISTS (
-    SELECT 1
-    FROM transactions
-    JOIN transaction_types
-      ON transactions.type_id = transaction_types.id
-    WHERE transactions.entity_id = :entity_id
-      AND transactions.pocket_id = :pocket_id
-      AND transaction_types.slug = 'Interest'
-      AND transactions.created_at::date = CURRENT_DATE
-  ) AS already_awarded
-`);
-
 const STANDARD_SAVINGS_RATE = 0.06;
 const LOCKED_SAVINGS_RATE = 0.08;
 
 export async function awardInterest(job: Job<Processor>) {
   const { entity_id, pocket_id, pocket_type, end_of_day_balance } = job.data;
-
-  const alreadyAwarded = await SQL_CHECK_IF_INTEREST_ALREADY_AWARDED_TODAY({
-    entity_id,
-    pocket_id
-  }).oneFirst();
-
-  if (alreadyAwarded) return;
 
   const annualInterestRate = pocket_type === 'Locked'
     ? LOCKED_SAVINGS_RATE

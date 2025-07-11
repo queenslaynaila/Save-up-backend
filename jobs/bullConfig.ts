@@ -60,8 +60,10 @@ export function startInterestJobWorker() {
       concurrency: 10
     }
   )
-    .on('failed', (job, err) => {
-      logger.error(`Job "${job!.name}" (id:${job!.id}) failed:`, err);
+    .on('completed', (job) => {
+      if (job.name === 'calculate-pocket-interest') {
+        logger.info('the job has been compledted');
+      }
     });
 }
 
