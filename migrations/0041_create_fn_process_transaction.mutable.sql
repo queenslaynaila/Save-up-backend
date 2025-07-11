@@ -13,6 +13,8 @@ DECLARE
     v_transaction_id  INT;
     v_target_amount   NUMERIC;
 BEGIN
+    PERFORM pg_advisory_xact_lock(p_entity_id);
+
     SELECT id
     INTO STRICT v_type_id
     FROM transaction_types
