@@ -28,12 +28,12 @@ export async function setupDailyInterestSchedule() {
     {
       jobId: 'daily-interest-scheduler',
       repeat: {
-        pattern: '0 0 2 * * *',
-        tz: 'UTC'
+        pattern: '* 2 * * *',
+        tz: 'Africa/Nairobi'
       }
     }
   );
-  logger.info('Scheduled daily interest job creation at 2AM UTC');
+  logger.info('Scheduled daily interest job creation');
 }
 
 export function startInterestJobWorker() {
@@ -47,8 +47,7 @@ export function startInterestJobWorker() {
           break;
 
         case 'calculate-pocket-interest':
-          logger.info(`[Interest Calculator] Processing interest for entity ${job.data.entity_id} pocket ${job.data.pocket_id}`);
-          await awardInterest(job as Job<Processor>);
+          await awardInterest(job as Job<Processor & {rate:number}>);
           break;
 
         default:
@@ -88,15 +87,24 @@ const SQL_LOG_POCKET_INTEREST_ERROR = sql<PocketError, Record<string, never>>(`
   WHERE entity_id = :entity_id
 `);
 
+const SQL_LOCK = sql<{entity_id:number}, Record<string, never>>(`
+  SELECT pg_advisory_xact_lock(:entity_id)
+`);
+
 queueEvents.on('failed', async ({ jobId, failedReason }) => {
   const job = await interestCalculationQueue.getJob(jobId);
   if (!job) return;
 
   const { entity_id, pocket_id } = job.data;
 
-  await SQL_LOG_POCKET_INTEREST_ERROR({
-    entity_id,
-    pocket_id,
-    error: failedReason || 'Unknown failure'
-  }).exec();
+  await sql.transaction(async trx=>{
+    await SQL_LOCK({
+      entity_id
+    }).using(trx).exec();
+    await SQL_LOG_POCKET_INTEREST_ERROR({
+      entity_id,
+      pocket_id,
+      error: failedReason || 'Unknown failure'
+    }).using(trx).exec();
+  });
 });
