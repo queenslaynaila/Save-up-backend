@@ -8,7 +8,6 @@ import Router, { generateOpenApiSpec } from './router';
 import HttpError from './httpError';
 import logger from './logger';
 import Config from './config';
-import path from 'path';
 import './generatePresignedUrl';
 import './routes/securityQuestions/index';
 import './routes/categories/index';
