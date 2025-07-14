@@ -13,8 +13,21 @@ export const statsQuerySchema = z.object({
 
 export type Stats = z.infer<typeof statsQuerySchema>;
 
-const SQL_GET_AGGREGATED_SAVINGS = sql<Stats, { aggregated_deposits: number }>(`
-  SELECT
+const savingStatsSchema = z.object({
+  aggregated_savings: z.number(),
+  per_pocket: z.array(
+    z.object({
+      pocket_name: z.string(),
+      total_savings: z.number()
+    })
+  )
+});
+
+type SavingStats = z.infer<typeof savingStatsSchema>
+
+const SQL_GET_AGGREGATED_SAVINGS = sql<Stats, SavingStats>(`
+ queru woll be written later 
+ SELECT
     CASE
       WHEN :agg = 'avg' THEN AVG(delta)
       WHEN :agg = 'sum' THEN SUM(delta)
@@ -42,9 +55,7 @@ const getDepositStats = (router: Router) => {
     },
     response: {
       statusCode: 200,
-      schema: z.object({
-        aggregated_savings: z.number()
-      })
+      schema: z.array(savingStatsSchema)
     },
     handler: async (req, res) => {
       const { entity_id, agg, start_date, end_date, pocket_id } = req.query;
@@ -55,8 +66,8 @@ const getDepositStats = (router: Router) => {
         agg,
         start_date,
         end_date
-      }).oneFirst();
-      res.json({ aggregated_savings });
+      }).many();
+      res.json(aggregated_savings);
     }
   });
 };
