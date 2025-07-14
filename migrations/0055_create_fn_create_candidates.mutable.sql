@@ -1,8 +1,8 @@
 CREATE OR REPLACE FUNCTION create_candidates(
-    p_group_id     INT,
-    p_election_id  INT,
-    p_candidate_ids INT[],
-    p_user_id      INT
+    p_group_id INT,
+    p_election_id INT,
+    p_candidate_ids INT [],
+    p_user_id INT
 ) RETURNS VOID AS $$
 DECLARE
     v_nomination_count INT;
@@ -40,9 +40,9 @@ END;
 $$ LANGUAGE plpgsql;
 
 GRANT EXECUTE ON FUNCTION create_candidates(
-    INT, 
-    INT, 
-    INT[], 
+    INT,
+    INT,
+    INT [],
     INT
 ) TO saveup_www;
 SELECT create_distributed_function(
@@ -51,4 +51,5 @@ SELECT create_distributed_function(
         INT, 
         INT[], 
         INT
-    )');
+    )'
+);

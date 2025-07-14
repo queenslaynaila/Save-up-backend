@@ -1,7 +1,7 @@
 CREATE OR REPLACE FUNCTION exit_or_remove_group_member(
-    p_group_id     INT,
+    p_group_id INT,
     p_initiator_id INT,
-    p_target_id    INT
+    p_target_id INT
 ) RETURNS VOID AS $$
 DECLARE
     v_member_count INT;

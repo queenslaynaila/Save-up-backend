@@ -1,7 +1,7 @@
 CREATE OR REPLACE FUNCTION update_user_role(
-    p_target_user_id            INT,
-    p_new_role                  enum_user_role,
-    p_admin_id                  INT
+    p_target_user_id INT,
+    p_new_role enum_user_role,
+    p_admin_id INT
 )
 RETURNS VOID AS $$
 DECLARE
@@ -28,8 +28,10 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-GRANT EXECUTE ON FUNCTION update_user_role(INT, enum_user_role, INT) TO saveup_www;
+GRANT EXECUTE ON FUNCTION update_user_role(
+    INT, enum_user_role, INT
+) TO saveup_www;
 SELECT create_distributed_function(
     'update_user_role(INT, enum_user_role, INT)',
-     'p_target_user_id'
+    'p_target_user_id'
 );

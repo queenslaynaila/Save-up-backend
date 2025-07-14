@@ -1,9 +1,9 @@
 CREATE OR REPLACE FUNCTION validate_pocket_before_debit(
-    p_group_id                      INT,
-    p_pocket_id                     INT,
-    p_amount                        NUMERIC(30,2),
-    p_user_id                       INT,
-    p_require_user_deposit_check    BOOLEAN DEFAULT FALSE
+    p_group_id INT,
+    p_pocket_id INT,
+    p_amount NUMERIC(30, 2),
+    p_user_id INT,
+    p_require_user_deposit_check BOOLEAN DEFAULT FALSE
 ) RETURNS VOID AS $$
 DECLARE
     v_is_locked        BOOLEAN;
@@ -55,7 +55,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 GRANT EXECUTE ON FUNCTION validate_pocket_before_debit(
-    INT, INT, NUMERIC(30,2), INT, BOOLEAN
+    INT, INT, NUMERIC(30, 2), INT, BOOLEAN
 ) TO saveup_www;
 
 SELECT create_distributed_function(

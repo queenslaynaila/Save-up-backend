@@ -1,8 +1,8 @@
 CREATE OR REPLACE FUNCTION withdraw_from_user_pocket(
-  p_user_id       INT,
-  p_pocket_id     INT,
-  p_amount        NUMERIC,
-  p_accept_penalty BOOLEAN DEFAULT FALSE
+    p_user_id INT,
+    p_pocket_id INT,
+    p_amount NUMERIC,
+    p_accept_penalty BOOLEAN DEFAULT FALSE
 ) RETURNS VOID AS $$
 DECLARE
   v_is_locked       BOOLEAN;
@@ -41,10 +41,10 @@ END;
 $$ LANGUAGE plpgsql;
 
 GRANT EXECUTE ON FUNCTION withdraw_from_user_pocket(
-  INT, INT, NUMERIC, BOOLEAN
+    INT, INT, NUMERIC, BOOLEAN
 ) TO saveup_www;
 
 SELECT create_distributed_function(
-  'withdraw_from_user_pocket(INT, INT, NUMERIC, BOOLEAN)',
-  'p_user_id'
+    'withdraw_from_user_pocket(INT, INT, NUMERIC, BOOLEAN)',
+    'p_user_id'
 );

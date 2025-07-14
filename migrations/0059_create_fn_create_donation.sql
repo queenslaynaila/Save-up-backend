@@ -1,8 +1,8 @@
 CREATE OR REPLACE FUNCTION create_donation(
-  p_entity_id       INT,
-  p_pocket_id       INT,
-  p_donor_name      TEXT,
-  p_amount          NUMERIC
+    p_entity_id INT,
+    p_pocket_id INT,
+    p_donor_name TEXT,
+    p_amount NUMERIC
 )
 RETURNS VOID AS $$
 DECLARE
@@ -28,10 +28,10 @@ END;
 $$ LANGUAGE plpgsql;
 
 GRANT EXECUTE ON FUNCTION create_donation(
-  INT, INT, TEXT, NUMERIC
+    INT, INT, TEXT, NUMERIC
 ) TO saveup_www;
 
 SELECT create_distributed_function(
-  'create_donation(INT, INT, TEXT, NUMERIC)',
-  'p_entity_id'
+    'create_donation(INT, INT, TEXT, NUMERIC)',
+    'p_entity_id'
 );

@@ -1,9 +1,9 @@
 CREATE OR REPLACE FUNCTION create_withdrawal_request(
-    p_group_id              INT,
-    p_pocket_id             INT,
-    p_initiator_id          INT,
-    p_reason                TEXT,
-    p_recipient_object      JSON[]
+    p_group_id INT,
+    p_pocket_id INT,
+    p_initiator_id INT,
+    p_reason TEXT,
+    p_recipient_object JSON []
 ) RETURNS VOID AS $$
 DECLARE
     v_total_amount      NUMERIC(30,2);
@@ -53,7 +53,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 GRANT EXECUTE ON FUNCTION create_withdrawal_request(
-    INT, INT, INT, TEXT, JSON[]
+    INT, INT, INT, TEXT, JSON []
 ) TO saveup_www;
 
 SELECT create_distributed_function(

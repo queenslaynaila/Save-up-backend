@@ -15,20 +15,20 @@ END
 $$;
 
 CREATE TABLE IF NOT EXISTS next_of_kins (
-    user_id          INT NOT NULL,
-    xid              INT NOT NULL,
-    full_name        TEXT NOT NULL,
-    relationship     enum_relationship NOT NULL,
-    phone_number     TEXT NOT NULL,
-    created_at       TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-    deleted_at       TIMESTAMP WITH TIME ZONE,
-    PRIMARY KEY      (user_id, xid),
-    FOREIGN KEY      (user_id) REFERENCES users(id)
+    user_id INT NOT NULL,
+    xid INT NOT NULL,
+    full_name TEXT NOT NULL,
+    relationship enum_user_role NOT NULL,
+    phone_number TEXT NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    deleted_at TIMESTAMP WITH TIME ZONE,
+    PRIMARY KEY (user_id, xid),
+    FOREIGN KEY (user_id) REFERENCES users (id)
 );
 
-CREATE UNIQUE INDEX next_of_kins_user_id_key 
-    ON next_of_kins (user_id) 
-    WHERE deleted_at IS NULL;
+CREATE UNIQUE INDEX next_of_kins_user_id_key
+ON next_of_kins (user_id)
+WHERE deleted_at IS NULL;
 
 SELECT create_distributed_table('next_of_kins', 'user_id');
 GRANT INSERT, SELECT, UPDATE ON next_of_kins TO saveup_www;

@@ -1,13 +1,13 @@
 CREATE OR REPLACE FUNCTION update_id_number(
-  p_user_id             INT,
-  p_new_id_type         enum_id_type,
-  p_new_id_number       TEXT
-) 
+    p_user_id INT,
+    p_new_id_type enum_id_type ,
+    p_new_id_number TEXT
+)
 RETURNS TABLE (
-  id_number           TEXT
+    id_number TEXT
 ) AS $$
 DECLARE
-  v_old_id_type         enum_id_type;
+  v_old_id_type         enum_id_type ;
   v_old_id_number       TEXT;
   v_new_id_number       TEXT;
 BEGIN
@@ -42,7 +42,9 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-GRANT EXECUTE ON FUNCTION update_id_number(INT, enum_id_type, TEXT) TO saveup_www;
+GRANT EXECUTE ON FUNCTION update_id_number(
+    INT, enum_id_type , TEXT
+) TO saveup_www;
 SELECT create_distributed_function(
-  'update_id_number(INT, enum_id_type, TEXT)', 'p_user_id'
+    'update_id_number(INT, enum_id_type , TEXT)', 'p_user_id'
 );

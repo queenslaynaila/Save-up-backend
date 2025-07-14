@@ -1,6 +1,6 @@
 CREATE OR REPLACE FUNCTION join_group(
-    p_group_id      INT,
-    p_user_id       INT
+    p_group_id INT,
+    p_user_id INT
 )
 RETURNS VOID AS $$
     INSERT INTO group_members (group_id, user_id)

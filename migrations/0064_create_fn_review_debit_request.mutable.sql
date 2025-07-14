@@ -1,9 +1,9 @@
 CREATE OR REPLACE FUNCTION review_debit_request(
-    p_group_id  INT,
-    p_debit_id  INT,
-    p_admin_id  INT,
-    p_status    enum_approval_status,
-    p_reason    TEXT
+    p_group_id INT,
+    p_debit_id INT,
+    p_admin_id INT,
+    p_status enum_approval_status,
+    p_reason TEXT
 ) RETURNS VOID AS $$
 DECLARE
     v_latest_election_id      INT;

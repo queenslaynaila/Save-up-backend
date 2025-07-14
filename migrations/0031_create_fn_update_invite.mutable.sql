@@ -1,8 +1,8 @@
 CREATE OR REPLACE FUNCTION update_invite(
-    p_invite_id     INT,
-    p_group_id      INT,  
-    p_receiver_id   INT,
-    p_status        enum_invite
+    p_invite_id INT,
+    p_group_id INT,
+    p_receiver_id INT,
+    p_status enum_invite
 )
 RETURNS VOID AS $$
 BEGIN
@@ -28,7 +28,9 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-GRANT EXECUTE ON FUNCTION update_invite(INT, INT, INT, enum_invite) TO saveup_www;
+GRANT EXECUTE ON FUNCTION update_invite(
+    INT, INT, INT, enum_invite
+) TO saveup_www;
 SELECT create_distributed_function(
-  'update_invite(INT, INT, INT, enum_invite)', 'p_group_id'
+    'update_invite(INT, INT, INT, enum_invite)', 'p_group_id'
 );

@@ -1,8 +1,8 @@
 CREATE OR REPLACE FUNCTION create_ballot(
-    p_group_id      INT,
-    p_election_id   INT,
-    p_candidate_ids INT[],
-    p_user_id       INT
+    p_group_id INT,
+    p_election_id INT,
+    p_candidate_ids INT [],
+    p_user_id INT
 ) RETURNS VOID AS $$
 DECLARE
     v_ballot_count  INT;
@@ -79,7 +79,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-GRANT EXECUTE ON FUNCTION create_ballot(INT, INT, INT[], INT) TO saveup_www;
+GRANT EXECUTE ON FUNCTION create_ballot(INT, INT, INT [], INT) TO saveup_www;
 SELECT create_distributed_function(
     'create_ballot(INT, INT, INT[], INT)',
     'p_group_id'

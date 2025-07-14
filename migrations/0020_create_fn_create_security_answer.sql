@@ -1,6 +1,6 @@
 CREATE OR REPLACE FUNCTION create_security_answer(
-  p_user_id INT,
-  p_answers JSONB
+    p_user_id INT,
+    p_answers JSONB
 )
 RETURNS VOID AS $$
 DECLARE
@@ -29,5 +29,5 @@ $$ LANGUAGE plpgsql;
 GRANT EXECUTE ON FUNCTION create_security_answer(INT, JSONB) TO saveup_www;
 
 SELECT create_distributed_function(
-  'create_security_answer(INT, JSONB)', 'p_user_id'
+    'create_security_answer(INT, JSONB)', 'p_user_id'
 );

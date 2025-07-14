@@ -1,8 +1,8 @@
 CREATE OR REPLACE FUNCTION ratify_election(
-    p_group_id       INT,
-    p_election_id    INT,
-    p_user_id        INT,
-    p_is_ratified    BOOLEAN
+    p_group_id INT,
+    p_election_id INT,
+    p_user_id INT,
+    p_is_ratified BOOLEAN
 ) RETURNS VOID AS $$
 DECLARE
     v_total_members     INT;

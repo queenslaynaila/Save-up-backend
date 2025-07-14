@@ -1,9 +1,9 @@
 CREATE OR REPLACE FUNCTION create_transfer(
-    p_source_pocket_id        INT,
-    p_destination_pocket_id   INT,
-    p_user_id                 INT,
-    p_amount                  NUMERIC(30, 2),
-    p_entity_id               INT
+    p_source_pocket_id INT,
+    p_destination_pocket_id INT,
+    p_user_id INT,
+    p_amount NUMERIC(30, 2),
+    p_entity_id INT
 ) RETURNS VOID AS $$
 DECLARE
     v_is_locked                   BOOLEAN;

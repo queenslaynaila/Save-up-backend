@@ -1,26 +1,26 @@
 CREATE OR REPLACE FUNCTION create_user(
-    p_id_type       enum_id_type,
-    p_id_number     TEXT,
-    p_country       TEXT,
-    p_currency      TEXT,
-    p_phone_number  TEXT,
-    p_full_name     TEXT,
-    p_gender        enum_gender,
-    p_pin           TEXT,
-    p_ip_address    TEXT,
-    p_user_agent    TEXT,
-    p_role          enum_user_role DEFAULT 'Standard'
+    p_id_type enum_id_type ,
+    p_id_number text,
+    p_country text,
+    p_currency text,
+    p_phone_number text,
+    p_full_name text,
+    p_gender enum_gender,
+    p_pin text,
+    p_ip_address text,
+    p_user_agent text,
+    p_role enum_user_role DEFAULT 'Standard'
 )
 RETURNS TABLE (
-    id              INT,
-    id_type         enum_id_type,
-    id_number       TEXT,
-    phone_number    TEXT,
-    full_name       TEXT,
-    role            enum_user_role,
-    gender          enum_gender,
-    pin             TEXT,
-    created_at      TIMESTAMP WITH TIME ZONE
+    id int,
+    id_type enum_id_type ,
+    id_number text,
+    phone_number text,
+    full_name text,
+    role enum_user_role,
+    gender enum_gender,
+    pin text,
+    created_at timestamp with time zone
 ) AS $$
 DECLARE
     v_entity_id   INT;
@@ -86,13 +86,13 @@ END;
 $$ LANGUAGE plpgsql;
 
 GRANT EXECUTE ON FUNCTION create_user(
-    enum_id_type,
-    TEXT,
-    TEXT,
-    TEXT,
+    enum_id_type ,
+    text,
+    text,
+    text,
     enum_gender,
-    TEXT,
-    TEXT,
-    TEXT,
+    text,
+    text,
+    text,
     enum_user_role
 ) TO saveup_www;

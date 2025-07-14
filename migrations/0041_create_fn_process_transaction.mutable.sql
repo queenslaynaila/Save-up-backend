@@ -1,8 +1,8 @@
 CREATE OR REPLACE FUNCTION process_transaction(
-    p_entity_id     INT,
-    p_type_slug     enum_transaction_type,
-    p_pocket_id     INT,
-    p_amount        NUMERIC
+    p_entity_id INT,
+    p_type_slug enum_transaction_type,
+    p_pocket_id INT,
+    p_amount NUMERIC
 )
 RETURNS INT AS $$
 DECLARE

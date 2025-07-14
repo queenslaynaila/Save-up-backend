@@ -1,11 +1,11 @@
 CREATE OR REPLACE FUNCTION create_group(
-    p_name       TEXT,
+    p_name TEXT,
     p_creator_id INT
 ) RETURNS TABLE (
-    id              INT,
-    name            TEXT,
-    created_by      TEXT,
-    created_at      TIMESTAMP WITH TIME ZONE
+    id INT,
+    name TEXT,
+    created_by TEXT,
+    created_at TIMESTAMP WITH TIME ZONE
 ) AS $$
 DECLARE
     v_entity_id   INT;

@@ -1,8 +1,8 @@
 CREATE OR REPLACE FUNCTION add_loan_guarantors(
-    p_group_id          INT,
-    p_request_id        INT,
-    p_user_id           INT,
-    p_guarantor_ids     INT[]
+    p_group_id INT,
+    p_request_id INT,
+    p_user_id INT,
+    p_guarantor_ids INT []
 )
 RETURNS VOID AS $$
 DECLARE
@@ -69,7 +69,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 GRANT EXECUTE ON FUNCTION add_loan_guarantors(
-    INT, INT, INT, INT[]
+    INT, INT, INT, INT []
 ) TO saveup_www;
 
 SELECT create_distributed_function(

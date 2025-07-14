@@ -1,8 +1,8 @@
 CREATE OR REPLACE FUNCTION create_saving(
-  p_entity_id   INT,
-  p_user_id     INT,
-  p_pocket_id   INT,
-  p_amount      NUMERIC
+    p_entity_id INT,
+    p_user_id INT,
+    p_pocket_id INT,
+    p_amount NUMERIC
 )
 RETURNS VOID AS $$
 DECLARE
@@ -36,10 +36,10 @@ $$ LANGUAGE plpgsql;
 
 
 GRANT EXECUTE ON FUNCTION create_saving(
-  INT, INT, INT, NUMERIC
+    INT, INT, INT, NUMERIC
 ) TO saveup_www;
 
 SELECT create_distributed_function(
-  'create_saving(INT, INT, INT, NUMERIC)',
-  'p_entity_id'
+    'create_saving(INT, INT, INT, NUMERIC)',
+    'p_entity_id'
 );

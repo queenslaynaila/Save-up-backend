@@ -1,10 +1,10 @@
 CREATE OR REPLACE FUNCTION create_loan_request(
-    p_group_id              INT,
-    p_pocket_id             INT,
-    p_initiator_id          INT,
-    p_amount                NUMERIC(30,2),
-    p_reason                TEXT,
-    p_repayment_period      INTERVAL DEFAULT NULL
+    p_group_id INT,
+    p_pocket_id INT,
+    p_initiator_id INT,
+    p_amount NUMERIC(30, 2),
+    p_reason TEXT,
+    p_repayment_period INTERVAL DEFAULT NULL
 ) RETURNS VOID AS $$
 DECLARE
     v_debit_id        INT;
@@ -40,7 +40,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 GRANT EXECUTE ON FUNCTION create_loan_request(
-    INT, INT, INT, NUMERIC(30,2), TEXT, INTERVAL
+    INT, INT, INT, NUMERIC(30, 2), TEXT, INTERVAL
 ) TO saveup_www;
 
 SELECT create_distributed_function(
