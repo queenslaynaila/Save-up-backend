@@ -9,4 +9,3 @@ CREATE TABLE IF NOT EXISTS interest_job_failures (
 );
 
 GRANT INSERT, SELECT ON interest_job_failures TO saveup_www;
-SELECT create_distributed_table('interest_job_failures', 'entity_id');
