@@ -24,7 +24,7 @@ import './routes/stats/index';
 import './routes/expenses/index';
 import './routes/donations/index';
 import './routes/transactions/index';
-import { setupDailyInterestSchedule, startInterestJobWorker } from './jobs/bullConfig';
+import { dailyInterestQueue, scheduleDailyInterestCalculation, startDailyInterestWorker } from './jobs/bullConfig';
 
 extendZodWithOpenApi(z);
 
@@ -50,11 +50,11 @@ app.use((error: Error, _req: Request, res: Response, _next: NextFunction): void 
   }
 });
 
-setupDailyInterestSchedule().catch(err => {
+scheduleDailyInterestCalculation().catch(err => {
   logger.error('Failed to schedule daily interest job:', err);
 });
 
-startInterestJobWorker();
+startDailyInterestWorker();
 
 app.listen(Config.PORT, (): void => {
   logger.info(`Server running on port ${Config.PORT}`);

@@ -2,7 +2,11 @@ import { Job, Queue, QueueEvents, Worker } from 'bullmq';
 import { Redis } from 'ioredis';
 import Config from '../config';
 import logger from '../logger';
-import { awardInterest, findEligiblePocketsAndCreateJobs, Processor } from './interestProcessor';
+import {
+  calculateAndAwardDailyInterestForPocket,
+  findEligiblePocketsAndScheduleInterestJobs,
+  InterestCalculationData
+} from './interestProcessor';
 import z from 'zod';
 import { sql } from '../db';
 
@@ -13,7 +17,7 @@ const redis = new Redis({
   maxRetriesPerRequest: null
 });
 
-export const interestCalculationQueue = new Queue('interest-queue', {
+export const dailyInterestQueue = new Queue('daily-interest-calculation', {
   connection: redis,
   defaultJobOptions: {
     attempts: 3,
@@ -21,33 +25,41 @@ export const interestCalculationQueue = new Queue('interest-queue', {
   }
 });
 
-export async function setupDailyInterestSchedule() {
-  await interestCalculationQueue.add(
-    'create-daily-interest-jobs',
-    {},
-    {
-      jobId: 'daily-interest-scheduler',
-      repeat: {
-        pattern: '* 2 * * *',
-        tz: 'Africa/Nairobi'
+export async function scheduleDailyInterestCalculation() {
+  const schedulers = await dailyInterestQueue.getJobSchedulers();
+
+  const alreadyScheduled = schedulers.some(scheduler => scheduler.name === 'create-daily-interest-jobs'
+    && scheduler.pattern === '* 17 * * *');
+
+  if (!alreadyScheduled) {
+    await dailyInterestQueue.add(
+      'create-daily-interest-jobs',
+      {},
+      {
+        jobId: 'daily-interest-scheduler',
+        repeat: {
+          pattern: '* 17 * * *'
+        },
+        removeOnComplete: true
       }
-    }
-  );
-  logger.info('Scheduled daily interest job creation');
+    );
+    logger.info('Scheduled daily interest job creaetion');
+  }
 }
 
-export function startInterestJobWorker() {
+export function startDailyInterestWorker() {
   new Worker(
-    'interest-queue',
+    'daily-interest-calculation',
     async (job: Job) => {
       switch (job.name) {
         case 'create-daily-interest-jobs':
           logger.info('[Daily Scheduler] Finding eligible pockets and creating interest jobs');
-          await findEligiblePocketsAndCreateJobs();
+          await findEligiblePocketsAndScheduleInterestJobs();
           break;
 
-        case 'calculate-pocket-interest':
-          await awardInterest(job as Job<Processor & {rate:number}>);
+        case 'calculate-interest-for-pocket':
+          logger.info(`Processing interest job for entity: ${job.data.entity_id}, pocket: ${job.data.pocket_id}`);
+          await calculateAndAwardDailyInterestForPocket(job as Job<InterestCalculationData>);
           break;
 
         default:
@@ -60,23 +72,23 @@ export function startInterestJobWorker() {
     }
   )
     .on('completed', (job) => {
-      if (job.name === 'calculate-pocket-interest') {
+      if (job.name === 'calculate-interest-for-pocket') {
         logger.info('the job has been compledted');
       }
     });
 }
 
-const queueEvents = new QueueEvents(interestCalculationQueue.name);
+const queueEvents = new QueueEvents(dailyInterestQueue.name);
 
-const pocketErrorSchema = z.object({
+const pocketInterestFailureSchema = z.object({
   entity_id: z.number(),
   pocket_id: z.number(),
   error: z.string()
 });
 
-type PocketError = z.infer<typeof pocketErrorSchema>;
+type PocketInterestFailure = z.infer<typeof pocketInterestFailureSchema>;
 
-const SQL_LOG_POCKET_INTEREST_ERROR = sql<PocketError, Record<string, never>>(`
+const SQL_LOG_POCKET_INTEREST_ERROR = sql<PocketInterestFailure, Record<string, never>>(`
   INSERT INTO interest_job_failures (entity_id, xid, pocket_id, error)
   SELECT
     :entity_id,
@@ -87,18 +99,27 @@ const SQL_LOG_POCKET_INTEREST_ERROR = sql<PocketError, Record<string, never>>(`
   WHERE entity_id = :entity_id
 `);
 
-const SQL_LOCK = sql<{entity_id:number}, Record<string, never>>(`
+const SQL_ACQUIRE_ENTITY_LOCK = sql<{entity_id:number}, Record<string, never>>(`
   SELECT pg_advisory_xact_lock(:entity_id)
 `);
 
+const SQL_INCREMENT_FAILED_POCKETS_COUNT = sql<
+Record<string, never>, Record<string, never>>(`
+  UPDATE interest_job_summary 
+  SET failed_pockets = skipped_pockets + 1 
+  WHERE interest_date = CURRENT_DATE - INTERVAL '1 day'
+`);
+
 queueEvents.on('failed', async ({ jobId, failedReason }) => {
-  const job = await interestCalculationQueue.getJob(jobId);
+  const job = await dailyInterestQueue.getJob(jobId);
   if (!job) return;
+
+  logger.error(failedReason);
 
   const { entity_id, pocket_id } = job.data;
 
   await sql.transaction(async trx=>{
-    await SQL_LOCK({
+    await SQL_ACQUIRE_ENTITY_LOCK({
       entity_id
     }).using(trx).exec();
     await SQL_LOG_POCKET_INTEREST_ERROR({
@@ -106,5 +127,6 @@ queueEvents.on('failed', async ({ jobId, failedReason }) => {
       pocket_id,
       error: failedReason || 'Unknown failure'
     }).using(trx).exec();
+    await SQL_INCREMENT_FAILED_POCKETS_COUNT({}).using(trx).exec();
   });
 });
