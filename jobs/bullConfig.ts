@@ -29,7 +29,7 @@ export async function scheduleDailyInterestCalculation() {
   const schedulers = await dailyInterestQueue.getJobSchedulers();
 
   const alreadyScheduled = schedulers.some(scheduler => scheduler.name === 'create-daily-interest-jobs'
-    && scheduler.pattern === '* 17 * * *');
+    && scheduler.pattern === '0 2 * * *');
 
   if (!alreadyScheduled) {
     await dailyInterestQueue.add(
@@ -38,8 +38,9 @@ export async function scheduleDailyInterestCalculation() {
       {
         jobId: 'daily-interest-scheduler',
         repeat: {
-          pattern: '* 17 * * *'
+          pattern: '0 2 * * *'
         },
+
         removeOnComplete: true
       }
     );
