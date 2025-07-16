@@ -19,7 +19,7 @@ const SQL_CREATE_CANDIDATE = sql<
 Pick<CandidatesParams, 'group_id' | 'election_id' | 'candidate_ids' | 'user_id'>,
 Record<string, never>
 >(`
-  SELECT create_candidates(
+  SELECT create_election_candidates(
     :group_id,
     :election_id,
     :candidate_ids,
