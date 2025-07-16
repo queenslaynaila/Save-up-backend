@@ -3,7 +3,7 @@ CREATE TABLE interest_job_summary (
     interest_date DATE NOT NULL,
     standard_interest_rate NUMERIC(3, 2) NOT NULL,
     locked_interest_rate NUMERIC(3, 2) NOT NULL,
-    total_eligible_pockets INTEGER NOT NULL,
+    eligible_pockets INTEGER NOT NULL,
     awarded_pockets INTEGER NOT NULL DEFAULT 0, -- Successfully awarded interest
     skipped_pockets INTEGER NOT NULL DEFAULT 0,      -- Eligible but interest was ~0 
     failed_pockets INTEGER NOT NULL DEFAULT 0, -- Errors during processing
