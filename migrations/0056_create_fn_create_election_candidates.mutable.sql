@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION create_candidates(
+CREATE OR REPLACE FUNCTION create_election_candidates(
     p_group_id INT,
     p_election_id INT,
     p_candidate_ids INT [],
