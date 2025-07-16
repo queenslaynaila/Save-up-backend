@@ -120,6 +120,12 @@ calculateAndAwardDailyInterestForPocket(job: Job<InterestCalculationData>) {
 }
 
 export async function findEligiblePocketsAndScheduleInterestJobs() {
+  await redis.del(
+    `interest-results:${interestDate}:awarded`,
+    `interest-results:${interestDate}:skipped`,
+    `interest-results:${interestDate}:failed`
+  );
+
   const interestRates = await SQL_GET_CURRENT_INTEREST_RATES({}).many();
   const eligiblePockets = await SQL_FIND_POCKETS_ELIGIBLE_FOR_INTEREST({}).many();
 
@@ -131,6 +137,7 @@ export async function findEligiblePocketsAndScheduleInterestJobs() {
     [`interest-rates:${interestDate}:Standard`]: interestRateMap.Standard,
     [`interest-rates:${interestDate}:Locked`]: interestRateMap.Locked
   });
+
   await redis.set(`interest-counts:${interestDate}:eligible`, eligiblePockets.length);
 
   const calculationJobs = eligiblePockets.map(pocket => ({
