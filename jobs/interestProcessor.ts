@@ -1,9 +1,9 @@
 import z from 'zod';
-import { ENUM_POCKET_TYPE } from '../routes/pockets/schema';
 import { Job } from 'bullmq';
 import { sql } from '../db';
-import { dailyInterestQueue } from './bullConfig';
 import logger from '../logger';
+import { flowProducer, redis } from './bullConfig';
+import { ENUM_POCKET_TYPE } from '../routes/pockets/schema';
 
 const eligiblePocketSchema = z.object({
   entity_id: z.number(),
@@ -13,6 +13,11 @@ const eligiblePocketSchema = z.object({
 });
 
 export type EligiblePocket = z.infer<typeof eligiblePocketSchema>;
+
+export type InterestCalculationData = Pick<
+EligiblePocket, 'entity_id' | 'pocket_id' | 'end_of_day_balance'> & {
+  interest_rate: number;
+};
 
 const SQL_FIND_POCKETS_ELIGIBLE_FOR_INTEREST = sql<Record<string, never>, EligiblePocket>(`
   SELECT
@@ -59,42 +64,40 @@ Record<string, never>, {pocket_type: 'Standard' | 'Locked', rate: number}>(`
   SELECT pocket_type, rate FROM interest_rates
 `);
 
-const SQL_INCREMENT_AWARDED_POCKETS_COUNT = sql<
-Record<string, never>, Record<string, never>>(`
-  UPDATE interest_job_summary 
-  SET awarded_pockets = awarded_pockets + 1 
-  WHERE interest_date = CURRENT_DATE - INTERVAL '1 day'
-`);
-
-const SQL_INCREMENT_SKIPPED_POCKETS_COUNT = sql<
-Record<string, never>, Record<string, never>>(`
-  UPDATE interest_job_summary 
-  SET skipped_pockets = skipped_pockets + 1 
-  WHERE interest_date = CURRENT_DATE - INTERVAL '1 day'
-`);
-
 const SQL_CREATE_DAILY_INTEREST_SUMMARY = sql<{
   standard_interest_rate: number,
   locked_interest_rate: number,
-  total_eligible_pockets: number
+  eligible: number,
+  awarded:number,
+  skipped:number,
+  failed:number,
 }, Record<string, never>>(`
   INSERT INTO interest_job_summary (
     interest_date, 
     standard_interest_rate, 
     locked_interest_rate, 
-    total_eligible_pockets
+    eligible_pockets,
+    awarded_pockets,
+    skipped_pockets,
+    failed_pockets
   ) VALUES (
     CURRENT_DATE - INTERVAL '1 day',
     :standard_interest_rate,
     :locked_interest_rate,
-    :total_eligible_pockets
+    :eligible,
+    :awarded,
+    :skipped,
+    :failed
   )
 `);
 
-export type InterestCalculationData =
-Pick<EligiblePocket, 'entity_id'|'pocket_id'|'end_of_day_balance'> & {
-  interest_rate: number;
-};
+function getPreviousWorkingDay(): string {
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  return yesterday.toISOString().split('T')[0];
+}
+
+export const interestDate = getPreviousWorkingDay();
 
 export async function
 calculateAndAwardDailyInterestForPocket(job: Job<InterestCalculationData>) {
@@ -110,49 +113,85 @@ calculateAndAwardDailyInterestForPocket(job: Job<InterestCalculationData>) {
       amount: roundedInterestAmount,
       transaction_type: 'Interest'
     }).exec();
-    await SQL_INCREMENT_AWARDED_POCKETS_COUNT({}).exec();
-    logger.info(`awarded in to entity ${entity_id} pocket ${pocket_id}`);
-    return;
+    await redis.sadd(`interest-results:${interestDate}:awarded`, `${entity_id}-${pocket_id}`);
+  } else {
+    await redis.sadd(`interest-results:${interestDate}:skipped`, `${entity_id}-${pocket_id}`);
   }
-  logger.info(`skiped pocket in enrirt${entity_id} pocket ${pocket_id}`);
-  await SQL_INCREMENT_SKIPPED_POCKETS_COUNT({}).exec();
-}
-function getPreviousWorkingDay(): string {
-  const yesterday = new Date();
-  yesterday.setDate(yesterday.getDate() - 1);
-  return yesterday.toISOString().split('T')[0];
 }
 
 export async function findEligiblePocketsAndScheduleInterestJobs() {
   const interestRates = await SQL_GET_CURRENT_INTEREST_RATES({}).many();
   const eligiblePockets = await SQL_FIND_POCKETS_ELIGIBLE_FOR_INTEREST({}).many();
-  const interestDate = getPreviousWorkingDay();
 
   const interestRateMap = Object.fromEntries(
     interestRates.map(r => [r.pocket_type, Number(r.rate)])
   );
 
-  await SQL_CREATE_DAILY_INTEREST_SUMMARY({
-    standard_interest_rate: interestRateMap.Standard,
-    locked_interest_rate: interestRateMap.Locked,
-    total_eligible_pockets: eligiblePockets.length
-  }).exec();
+  await redis.mset({
+    [`interest-rates:${interestDate}:Standard`]: interestRateMap.Standard,
+    [`interest-rates:${interestDate}:Locked`]: interestRateMap.Locked
+  });
+  await redis.set(`interest-counts:${interestDate}:eligible`, eligiblePockets.length);
 
-  logger.info(`found this much pockets eligible for inetrest ${eligiblePockets.length}`);
-
-  const jobSchedulingPromises = eligiblePockets.map(pocket => dailyInterestQueue.add(
-    'calculate-interest-for-pocket',
-    {
+  const calculationJobs = eligiblePockets.map(pocket => ({
+    name: 'calculate-interest-for-pocket',
+    data: {
       entity_id: pocket.entity_id,
       pocket_id: pocket.pocket_id,
       end_of_day_balance: pocket.end_of_day_balance,
       interest_rate: interestRateMap[pocket.pocket_type]
     },
-    {
+    queueName: 'daily-interest-calculation',
+    opts: {
       jobId: `interest-${interestDate}-${pocket.entity_id}-${pocket.pocket_id}`,
       removeOnComplete: true
     }
-  ));
+  }));
 
-  await Promise.all(jobSchedulingPromises);
+  const finalizerJob = {
+    name: 'finalize-interest-summary',
+    data: {},
+    queueName: 'daily-interest-calculation',
+    opts: {
+      jobId: `finalize-interest-summary-${interestDate}`,
+      removeOnComplete: true
+    },
+    children: calculationJobs
+  };
+
+  await flowProducer.add({
+    name: `interest-parent-${interestDate}`,
+    queueName: 'daily-interest-calculation',
+    data: {},
+    children: [finalizerJob]
+  });
+}
+
+export async function finalizeInterestSummary() {
+  const awarded = await redis.scard(`interest-results:${interestDate}:awarded`);
+  const skipped = await redis.scard(`interest-results:${interestDate}:skipped`);
+  const failed = await redis.scard(`interest-results:${interestDate}:failed`);
+  const eligible = Number(await redis.get(`interest-counts:${interestDate}:eligible`)!);
+
+  const [standard_interest_rate, locked_interest_rate] = await redis.mget(
+    `interest-rates:${interestDate}:Standard`,
+    `interest-rates:${interestDate}:Locked`
+  );
+
+  await SQL_CREATE_DAILY_INTEREST_SUMMARY({
+    awarded: awarded,
+    skipped: skipped,
+    failed: failed,
+    eligible: eligible,
+    standard_interest_rate: Number(standard_interest_rate!),
+    locked_interest_rate: Number(locked_interest_rate!)
+  }).exec().catch();
+
+  logger.info(`
+    [Finalizer] Summary updated: 
+      eligible=${eligible},
+      awarded=${awarded}, 
+      skipped=${skipped}, 
+      failed=${failed}
+ `);
 }
