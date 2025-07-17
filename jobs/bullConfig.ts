@@ -98,43 +98,59 @@ export function startDailyInterestWorker() {
 }
 
 const pocketInterestFailureSchema = z.object({
-  entity_id: z.number(),
-  pocket_id: z.number(),
+  job_name: z.string(),
+  standard_interest_rate: z.number(),
+  locked_interest_rate: z.number(),
+  next_attempt_at: z.string().date(),
+  entity_id: z.number().optional(),
+  pocket_id: z.number().optional(),
   error: z.string()
 });
 
 type PocketInterestFailure = z.infer<typeof pocketInterestFailureSchema>;
 
 const SQL_LOG_POCKET_INTEREST_ERROR = sql<PocketInterestFailure, Record<string, never>>(`
-  INSERT INTO interest_job_failures (entity_id, xid, pocket_id, error)
-  SELECT
-    :entity_id,
-    COALESCE(MAX(xid), 0) + 1,
-    :pocket_id,
-    :error
-  FROM interest_job_failures 
-  WHERE entity_id = :entity_id
-`);
-
-const SQL_ACQUIRE_ENTITY_LOCK = sql<{entity_id:number}, Record<string, never>>(`
-  SELECT pg_advisory_xact_lock(:entity_id)
+  INSERT INTO interest_job_failures (
+    job_name, entity_id, pocket_id,  standard_interest_rate, locked_interest_rate, error, next_attempt_at
+  ) VALUES (
+    :job_name, 
+    :entity_id, 
+    :pocket_id, 
+    :standard_interest_rate, 
+    :locked_interest_rate, 
+    :error, 
+    :next_attempt_at
+  )
 `);
 
 queueEvents.on('failed', async ({ jobId, failedReason }) => {
   const job = await dailyInterestQueue.getJob(jobId);
   if (!job) return;
 
-  const { entity_id, pocket_id } = job.data;
-  await redis.sadd(`interest-results:${interestDate}:failed`, `${entity_id}-${pocket_id}`);
+  const [standard_interest_rate, locked_interest_rate] = await redis.mget(
+    `interest-rates:${interestDate}:Standard`,
+    `interest-rates:${interestDate}:Locked`
+  );
 
-  await sql.transaction(async trx=>{
-    await SQL_ACQUIRE_ENTITY_LOCK({
-      entity_id
-    }).using(trx).exec();
+  const commonLogData = {
+    job_name: job.name,
+    standard_interest_rate: Number(standard_interest_rate),
+    locked_interest_rate: Number(locked_interest_rate),
+    error: failedReason,
+    next_attempt_at: new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString()
+  };
+
+  if (job.name === 'calculate-interest-for-pocket') {
+    const { entity_id, pocket_id } = job.data;
+    await redis.sadd(`interest-results:${interestDate}:failed`, `${entity_id}-${pocket_id}`);
     await SQL_LOG_POCKET_INTEREST_ERROR({
+      ...commonLogData,
       entity_id,
-      pocket_id,
-      error: failedReason || 'Unknown failure'
-    }).using(trx).exec();
-  });
+      pocket_id
+    }).exec();
+  } else {
+    await SQL_LOG_POCKET_INTEREST_ERROR({
+      ...commonLogData
+    }).exec();
+  }
 });

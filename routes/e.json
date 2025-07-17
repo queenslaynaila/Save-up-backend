@@ -1,0 +1,378 @@
+[
+    {
+        "jobId": "repeat:f8e8bb121b6c58694aa6a6232853cb14:1752672900000",
+        "failedReason": "relation \"interest_rates\" does not exist"
+    },
+    {
+        "jobId": "repeat:d1d69df5c216e8ae5d2b7e0d47baf1ad:1752673440000",
+        "failedReason": "relation \"interest_rates\" does not exist"
+    },
+    {
+        "jobId": "repeat:b8d4ad48a013eb5b5d3cfff26fe1f579:1752672300000",
+        "failedReason": "relation \"interest_rates\" does not exist"
+    },
+    {
+        "jobId": "repeat:3252ac5120f7142ec80981e72e222162:1752706800000",
+        "failedReason": "relation \"interest_rates\" does not exist"
+    },
+    {
+        "jobId": "repeat:9c26319fbc9a3049e0b8720a3c18e123:1752674400000",
+        "failedReason": "relation \"interest_rates\" does not exist"
+    },
+    {
+        "jobId": "repeat:1b1a26b8a3c88e31dd3b13c3db042b00:1752706800000",
+        "failedReason": "relation \"interest_rates\" does not exist"
+    },
+    {
+        "jobId": "repeat:e5baf03e2f10e220d945a52768d30421:1752706800000",
+        "failedReason": "relation \"interest_rates\" does not exist"
+    },
+    {
+        "jobId": "repeat:8e4f59e90396dc2a81611a3cb68a30e9:1752674040000",
+        "failedReason": "relation \"interest_rates\" does not exist"
+    },
+    {
+        "jobId": "repeat:f4b390f36eecbe94d60fc71549134cb9:1752673560000",
+        "failedReason": "relation \"interest_rates\" does not exist"
+    },
+    {
+        "jobId": "repeat:14aac13d9d6d9f05448a2b346bd78c1b:1752670440000",
+        "failedReason": "relation \"interest_rates\" does not exist"
+    },
+    {
+        "jobId": "repeat:e3d5e7c3b5ee224133edc1659477527f:1752670980000",
+        "failedReason": "relation \"interest_rates\" does not exist"
+    },
+    {
+        "jobId": "repeat:9dd440e11b607c5eb198e3a0c0fc424c:1752671160000",
+        "failedReason": "relation \"interest_rates\" does not exist"
+    },
+    {
+        "jobId": "repeat:8545ad68c5aa67a9b20a445ecbe9cf31:1752671640000",
+        "failedReason": "relation \"interest_rates\" does not exist"
+    },
+    {
+        "jobId": "repeat:e77b58451393c2fd2c9e58fba8f3c899:1752670320000",
+        "failedReason": "relation \"interest_rates\" does not exist"
+    },
+    {
+        "jobId": "repeat:1a67ccac414b2abb8ab82192d71891f9:1752670860000",
+        "failedReason": "relation \"interest_rates\" does not exist"
+    },
+    {
+        "jobId": "repeat:b4fb90b88d2036e97cf16ee0a15a5529:1752670560000",
+        "failedReason": "relation \"interest_rates\" does not exist"
+    },
+    {
+        "jobId": "repeat:5161529523fe7a486b884b3f48b50dec:1752670140000",
+        "failedReason": "relation \"interest_rates\" does not exist"
+    },
+    {
+        "jobId": "repeat:a3e8337d3bdb0532455dd1ec2a5498e5:1752671340000",
+        "failedReason": "relation \"interest_rates\" does not exist"
+    },
+    {
+        "jobId": "repeat:e86441a34dee8b9666b5b4a49b3311e8:1752670800000",
+        "failedReason": "relation \"interest_rates\" does not exist"
+    },
+    {
+        "jobId": "repeat:e86441a34dee8b9666b5b4a49b3311e8:1752586500000",
+        "failedReason": "Missing key for parent job daily-interest-calculation:interest-group-2025-07-14. addJob"
+    },
+    {
+        "jobId": "repeat:f8e8bb121b6c58694aa6a6232853cb14:1752586500000",
+        "failedReason": "Missing key for parent job daily-interest-calculation:interest-group-2025-07-14. addJob"
+    },
+    {
+        "jobId": "repeat:e86441a34dee8b9666b5b4a49b3311e8:1752586260000",
+        "failedReason": "Missing key for parent job daily-interest-calculation:interest-group-2025-07-14. addJob"
+    },
+    {
+        "jobId": "repeat:a3e8337d3bdb0532455dd1ec2a5498e5:1752584940000",
+        "failedReason": "job stalled more than allowable limit"
+    },
+    {
+        "jobId": "repeat:e86441a34dee8b9666b5b4a49b3311e8:1752584880000",
+        "failedReason": "job stalled more than allowable limit"
+    },
+    {
+        "jobId": "repeat:e86441a34dee8b9666b5b4a49b3311e8:1752584700000",
+        "failedReason": "job stalled more than allowable limit"
+    },
+    {
+        "jobId": "repeat:9dd440e11b607c5eb198e3a0c0fc424c:1752584760000",
+        "failedReason": "job stalled more than allowable limit"
+    },
+    {
+        "jobId": "repeat:e86441a34dee8b9666b5b4a49b3311e8:1752584640000",
+        "failedReason": "job stalled more than allowable limit"
+    },
+    {
+        "jobId": "repeat:e86441a34dee8b9666b5b4a49b3311e8:1752584580000",
+        "failedReason": "job stalled more than allowable limit"
+    },
+    {
+        "jobId": "repeat:e3d5e7c3b5ee224133edc1659477527f:1752584580000",
+        "failedReason": "job stalled more than allowable limit"
+    },
+    {
+        "jobId": "repeat:e86441a34dee8b9666b5b4a49b3311e8:1752584520000",
+        "failedReason": "job stalled more than allowable limit"
+    },
+    {
+        "jobId": "repeat:e86441a34dee8b9666b5b4a49b3311e8:1752584460000",
+        "failedReason": "job stalled more than allowable limit"
+    },
+    {
+        "jobId": "repeat:1a67ccac414b2abb8ab82192d71891f9:1752584460000",
+        "failedReason": "job stalled more than allowable limit"
+    },
+    {
+        "jobId": "repeat:e86441a34dee8b9666b5b4a49b3311e8:1752584400000",
+        "failedReason": "job stalled more than allowable limit"
+    },
+    {
+        "jobId": "repeat:e86441a34dee8b9666b5b4a49b3311e8:1752498120000",
+        "failedReason": "job stalled more than allowable limit"
+    },
+    {
+        "jobId": "repeat:e86441a34dee8b9666b5b4a49b3311e8:1752498060000",
+        "failedReason": "job stalled more than allowable limit"
+    },
+    {
+        "jobId": "repeat:1a67ccac414b2abb8ab82192d71891f9:1752498060000",
+        "failedReason": "job stalled more than allowable limit"
+    },
+    {
+        "jobId": "248",
+        "failedReason": "syntax error at or near \",\""
+    },
+    {
+        "jobId": "247",
+        "failedReason": "syntax error at or near \",\""
+    },
+    {
+        "jobId": "234",
+        "failedReason": "syntax error at or near \",\""
+    },
+    {
+        "jobId": "230",
+        "failedReason": "syntax error at or near \",\""
+    },
+    {
+        "jobId": "226",
+        "failedReason": "syntax error at or near \",\""
+    },
+    {
+        "jobId": "232",
+        "failedReason": "syntax error at or near \",\""
+    },
+    {
+        "jobId": "189",
+        "failedReason": "job stalled more than allowable limit"
+    },
+    {
+        "jobId": "213",
+        "failedReason": "job stalled more than allowable limit"
+    },
+    {
+        "jobId": "215",
+        "failedReason": "job stalled more than allowable limit"
+    },
+    {
+        "jobId": "207",
+        "failedReason": "job stalled more than allowable limit"
+    },
+    {
+        "jobId": "209",
+        "failedReason": "job stalled more than allowable limit"
+    },
+    {
+        "jobId": "220",
+        "failedReason": "syntax error at or near \",\""
+    },
+    {
+        "jobId": "228",
+        "failedReason": "syntax error at or near \",\""
+    },
+    {
+        "jobId": "221",
+        "failedReason": "syntax error at or near \",\""
+    },
+    {
+        "jobId": "233",
+        "failedReason": "syntax error at or near \",\""
+    },
+    {
+        "jobId": "231",
+        "failedReason": "syntax error at or near \",\""
+    },
+    {
+        "jobId": "224",
+        "failedReason": "syntax error at or near \",\""
+    },
+    {
+        "jobId": "217",
+        "failedReason": "syntax error at or near \",\""
+    },
+    {
+        "jobId": "227",
+        "failedReason": "syntax error at or near \",\""
+    },
+    {
+        "jobId": "229",
+        "failedReason": "syntax error at or near \",\""
+    },
+    {
+        "jobId": "225",
+        "failedReason": "syntax error at or near \",\""
+    },
+    {
+        "jobId": "198",
+        "failedReason": "syntax error at or near \",\""
+    },
+    {
+        "jobId": "200",
+        "failedReason": "syntax error at or near \",\""
+    },
+    {
+        "jobId": "194",
+        "failedReason": "syntax error at or near \",\""
+    },
+    {
+        "jobId": "190",
+        "failedReason": "syntax error at or near \",\""
+    },
+    {
+        "jobId": "201",
+        "failedReason": "syntax error at or near \",\""
+    },
+    {
+        "jobId": "205",
+        "failedReason": "syntax error at or near \",\""
+    },
+    {
+        "jobId": "204",
+        "failedReason": "syntax error at or near \",\""
+    },
+    {
+        "jobId": "210",
+        "failedReason": "syntax error at or near \",\""
+    },
+    {
+        "jobId": "212",
+        "failedReason": "syntax error at or near \",\""
+    },
+    {
+        "jobId": "208",
+        "failedReason": "syntax error at or near \",\""
+    },
+    {
+        "jobId": "202",
+        "failedReason": "syntax error at or near \",\""
+    },
+    {
+        "jobId": "214",
+        "failedReason": "syntax error at or near \",\""
+    },
+    {
+        "jobId": "211",
+        "failedReason": "syntax error at or near \",\""
+    },
+    {
+        "jobId": "203",
+        "failedReason": "syntax error at or near \",\""
+    },
+    {
+        "jobId": "199",
+        "failedReason": "syntax error at or near \",\""
+    },
+    {
+        "jobId": "218",
+        "failedReason": "syntax error at or near \",\""
+    },
+    {
+        "jobId": "223",
+        "failedReason": "syntax error at or near \",\""
+    },
+    {
+        "jobId": "216",
+        "failedReason": "syntax error at or near \",\""
+    },
+    {
+        "jobId": "222",
+        "failedReason": "syntax error at or near \",\""
+    },
+    {
+        "jobId": "219",
+        "failedReason": "syntax error at or near \",\""
+    },
+    {
+        "jobId": "196",
+        "failedReason": "syntax error at or near \",\""
+    },
+    {
+        "jobId": "188",
+        "failedReason": "syntax error at or near \",\""
+    },
+    {
+        "jobId": "191",
+        "failedReason": "syntax error at or near \",\""
+    },
+    {
+        "jobId": "195",
+        "failedReason": "syntax error at or near \",\""
+    },
+    {
+        "jobId": "192",
+        "failedReason": "syntax error at or near \",\""
+    },
+    {
+        "jobId": "197",
+        "failedReason": "syntax error at or near \",\""
+    },
+    {
+        "jobId": "206",
+        "failedReason": "syntax error at or near \",\""
+    },
+    {
+        "jobId": "193",
+        "failedReason": "syntax error at or near \",\""
+    },
+    {
+        "jobId": "repeat:b4fb90b88d2036e97cf16ee0a15a5529:1752497760000",
+        "failedReason": "connect ENETUNREACH 143.110.177.208:5432 - Local (0.0.0.0:0)"
+    },
+    {
+        "jobId": "repeat:17e7aded64a7ee948ba4de57edbe61e5:1752496920000",
+        "failedReason": "duplicate key value violates unique constraint \"interest_job_summary_interest_date_key\""
+    },
+    {
+        "jobId": "repeat:426da1d99a85d793c0e827de112de69a:1752496680000",
+        "failedReason": "duplicate key value violates unique constraint \"interest_job_summary_interest_date_key\""
+    },
+    {
+        "jobId": "repeat:c4152c80b4b01da9a89539fc409dfe81:1752496440000",
+        "failedReason": "null value in column \"skipped_pockets\" of relation \"interest_job_summary\" violates not-null constraint"
+    },
+    {
+        "jobId": "repeat:9d9e84dbbfb07222aa454bf8c3376d01:1752496140000",
+        "failedReason": "null value in column \"skipped_pockets\" of relation \"interest_job_summary\" violates not-null constraint"
+    },
+    {
+        "jobId": "repeat:48a12640d8c1cee6f1ff30b25504b34d:1752494160000",
+        "failedReason": "relation \"interest_job_summary\" does not exist"
+    },
+    {
+        "jobId": "repeat:ac7af4394bbd5979ca1a35bf70b3472e:1752493860000",
+        "failedReason": "relation \"interest_job_summary\" does not exist"
+    },
+    {
+        "jobId": "repeat:ee06625e95af4cc8a2d9116f8ec1c445:1752493800000",
+        "failedReason": "relation \"interest_job_summary\" does not exist"
+    },
+    {
+        "jobId": "repeat:a12ff2718a84168f1d669371e2d2ca93:1752493800000",
+        "failedReason": "relation \"interest_job_summary\" does not exist"
+    }
+]

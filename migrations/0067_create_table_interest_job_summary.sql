@@ -1,4 +1,4 @@
-CREATE TABLE interest_job_summary (
+CREATE TABLE IF NOT EXISTS interest_job_summary (
     id SERIAL PRIMARY KEY,
     interest_date DATE NOT NULL,
     standard_interest_rate NUMERIC(3, 2) NOT NULL,
