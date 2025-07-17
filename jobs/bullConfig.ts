@@ -1,13 +1,10 @@
 import {
-  FlowProducer,
   Job,
   Queue,
   QueueEvents,
   Worker
 } from 'bullmq';
 import z from 'zod';
-import { Redis } from 'ioredis';
-import Config from '../config';
 import logger from '../logger';
 import { sql } from '../db';
 import {
@@ -16,13 +13,7 @@ import {
   findEligiblePocketsAndScheduleInterestJobs,
   InterestCalculationData, interestDate
 } from './interestProcessor';
-
-export const redis = new Redis({
-  host: Config.REDIS_HOST,
-  port: Config.REDIS_PORT,
-  password: Config.REDIS_PASSWORD,
-  maxRetriesPerRequest: null
-});
+import { redis } from './redis';
 
 export const dailyInterestQueue = new Queue('daily-interest-calculation', {
   connection: redis,
@@ -31,8 +22,6 @@ export const dailyInterestQueue = new Queue('daily-interest-calculation', {
     backoff: { type: 'exponential', delay: 3000 }
   }
 });
-
-export const flowProducer = new FlowProducer({ connection: redis });
 
 const queueEvents = new QueueEvents(dailyInterestQueue.name);
 

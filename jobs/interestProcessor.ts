@@ -1,9 +1,9 @@
 import z from 'zod';
-import { Job } from 'bullmq';
+import { FlowProducer, Job } from 'bullmq';
 import { sql } from '../db';
 import logger from '../logger';
-import { flowProducer, redis } from './bullConfig';
 import { ENUM_POCKET_TYPE } from '../routes/pockets/schema';
+import { redis } from './redis';
 
 const eligiblePocketSchema = z.object({
   entity_id: z.number(),
@@ -12,7 +12,7 @@ const eligiblePocketSchema = z.object({
   end_of_day_balance: z.number()
 });
 
-export type EligiblePocket = z.infer<typeof eligiblePocketSchema>;
+type EligiblePocket = z.infer<typeof eligiblePocketSchema>;
 
 export type InterestCalculationData = Pick<
 EligiblePocket, 'entity_id' | 'pocket_id' | 'end_of_day_balance'> & {
@@ -98,6 +98,8 @@ function getPreviousWorkingDay(): string {
 }
 
 export const interestDate = getPreviousWorkingDay();
+
+const flowProducer = new FlowProducer({ connection: redis });
 
 export async function
 calculateAndAwardDailyInterestForPocket(job: Job<InterestCalculationData>) {
