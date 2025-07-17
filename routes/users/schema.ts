@@ -63,7 +63,7 @@ export const invitationSchema = z.object({
 
 export type Invitation = z.infer<typeof invitationSchema>;
 
-export const accountStatusSchema = z.object({
+const accountStatusSchema = z.object({
   user_id: z.number().int().min(1),
   xid: z.number().int().min(1),
   admin_id: z.number().int().min(1),
