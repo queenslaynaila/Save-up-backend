@@ -180,7 +180,7 @@ export async function finalizeInterestSummary() {
   const awarded = await redis.scard(`interest-results:${interestDate}:awarded`);
   const skipped = await redis.scard(`interest-results:${interestDate}:skipped`);
   const failed = await redis.scard(`interest-results:${interestDate}:failed`);
-  const eligible = Number(await redis.get(`interest-counts:${interestDate}:eligible`)!);
+  const eligible = Number(await redis.get(`interest-counts:${interestDate}:eligible`));
 
   const [standard_interest_rate, locked_interest_rate] = await redis.mget(
     `interest-rates:${interestDate}:Standard`,
