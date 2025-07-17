@@ -192,7 +192,7 @@ export async function finalizeInterestSummary() {
     eligible: eligible,
     standard_interest_rate: Number(standard_interest_rate!),
     locked_interest_rate: Number(locked_interest_rate!)
-  }).exec().catch();
+  }).exec();
 
   logger.info(`
     [Finalizer] Summary updated: 
