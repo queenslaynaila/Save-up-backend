@@ -55,7 +55,6 @@ export async function scheduleDailyInterestCalculation() {
         removeOnComplete: true
       }
     );
-    logger.info('Scheduled daily interest job creation');
   }
 }
 
@@ -132,25 +131,23 @@ queueEvents.on('failed', async ({ jobId, failedReason }) => {
     `interest-rates:${interestDate}:Locked`
   );
 
-  const commonLogData = {
+  const entity_id = job.data?.entity_id;
+  const pocket_id = job.data?.pocket_id;
+
+  if (job.name === 'calculate-interest-for-pocket' && entity_id && pocket_id) {
+    await redis.sadd(
+      `interest-results:${interestDate}:failed`,
+      `${entity_id}-${pocket_id}`
+    );
+  }
+
+  await SQL_LOG_POCKET_INTEREST_ERROR({
     job_name: job.name,
+    entity_id,
+    pocket_id,
     standard_interest_rate: Number(standard_interest_rate),
     locked_interest_rate: Number(locked_interest_rate),
     error: failedReason,
     next_attempt_at: new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString()
-  };
-
-  if (job.name === 'calculate-interest-for-pocket') {
-    const { entity_id, pocket_id } = job.data;
-    await redis.sadd(`interest-results:${interestDate}:failed`, `${entity_id}-${pocket_id}`);
-    await SQL_LOG_POCKET_INTEREST_ERROR({
-      ...commonLogData,
-      entity_id,
-      pocket_id
-    }).exec();
-  } else {
-    await SQL_LOG_POCKET_INTEREST_ERROR({
-      ...commonLogData
-    }).exec();
-  }
+  }).exec();
 });
