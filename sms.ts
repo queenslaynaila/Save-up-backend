@@ -1,6 +1,6 @@
-import Config from '../config';
-import HttpError from '../httpError';
-import logger from '../logger';
+import Config from './config';
+import HttpError from './httpError';
+import logger from './logger';
 
 const BASE_URL = 'https://api.smsleopard.com/v1/sms/send';
 
