@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS account_status_updates (
     status enum_user_status  NOT NULL,
     reason TEXT,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-    FOREIGN KEY (user_id) REFERENCES users (id)
+    FOREIGN KEY (user_id) REFERENCES user_contact_details (id)
 );
 GRANT INSERT, SELECT ON account_status_updates TO saveup_www;
 SELECT create_distributed_table('account_status_updates', 'user_id');
