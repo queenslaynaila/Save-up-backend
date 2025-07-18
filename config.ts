@@ -4,6 +4,8 @@ import { bool, cleanEnv, host, port, str } from 'envalid';
 dotenv.config();
 
 const Config = cleanEnv(process.env, {
+  LOG_LEVEL: str({ default: 'debug' }),
+
   PORT: port({ default: 3003 }),
 
   DB_HOST: host(),
