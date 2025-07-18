@@ -3,7 +3,7 @@ import { FlowProducer, Job } from 'bullmq';
 import { sql } from '../db';
 import logger from '../logger';
 import { ENUM_POCKET_TYPE } from '../routes/pockets/schema';
-import { redis } from './redis';
+import { redis } from './redisConfig';
 
 const eligiblePocketSchema = z.object({
   entity_id: z.number(),

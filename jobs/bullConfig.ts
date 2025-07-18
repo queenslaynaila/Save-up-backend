@@ -13,7 +13,7 @@ import {
   findEligiblePocketsAndScheduleInterestJobs,
   InterestCalculationData, interestDate
 } from './interestProcessor';
-import { redis } from './redis';
+import { redis } from './redisConfig';
 
 export const dailyInterestQueue = new Queue('daily-interest-calculation', {
   connection: redis,
