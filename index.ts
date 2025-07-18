@@ -1,10 +1,13 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import 'express-async-errors';
 import { NextFunction, Request, Response } from 'express';
 import swaggerUi from 'swagger-ui-express';
 import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
 import { z } from 'zod';
 import Router, { generateOpenApiSpec } from './router';
+import {
+  scheduleDailyInterestCalculation,
+  startDailyInterestWorker
+} from './jobs/bullConfig';
 import HttpError from './httpError';
 import logger from './logger';
 import Config from './config';
@@ -24,7 +27,6 @@ import './routes/stats/index';
 import './routes/expenses/index';
 import './routes/donations/index';
 import './routes/transactions/index';
-import { dailyInterestQueue, scheduleDailyInterestCalculation, startDailyInterestWorker } from './jobs/bullConfig';
 
 extendZodWithOpenApi(z);
 
@@ -45,16 +47,21 @@ app.use((error: Error, _req: Request, res: Response, _next: NextFunction): void 
   if (error instanceof HttpError) {
     res.status(error.status).json(error);
   } else {
-    logger.error(error.stack);
     res.sendStatus(500);
   }
 });
 
-scheduleDailyInterestCalculation().catch(err => {
-  logger.error('Failed to schedule daily interest job:', err);
-});
-
-startDailyInterestWorker();
+scheduleDailyInterestCalculation()
+  .then(() => {
+    logger.info('Daily interest job successfully scheduled.');
+  })
+  .catch(err => {
+    logger.error('Failed to schedule daily interest job:', err);
+  })
+  .finally(() => {
+    startDailyInterestWorker();
+    logger.info('Daily interest worker started.');
+  });
 
 app.listen(Config.PORT, (): void => {
   logger.info(`Server running on port ${Config.PORT}`);
