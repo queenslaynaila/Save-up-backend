@@ -9,6 +9,9 @@ EXCEPTION
 END
 $$;
 
+BEGIN;
+
+SET LOCAL citus.multi_shard_modify_mode TO 'sequential';
 CREATE TABLE IF NOT EXISTS group_lefts (
     group_id INT NOT NULL,
     user_id INT NOT NULL,
@@ -26,3 +29,5 @@ CREATE TABLE IF NOT EXISTS group_lefts (
 );
 SELECT create_distributed_table('group_lefts', 'group_id');
 GRANT INSERT, SELECT ON group_lefts TO saveup_www;
+
+COMMIT;

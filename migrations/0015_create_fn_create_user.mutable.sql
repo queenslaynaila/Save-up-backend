@@ -90,6 +90,8 @@ GRANT EXECUTE ON FUNCTION create_user(
     text,
     text,
     text,
+    text,
+    text,
     enum_gender,
     text,
     text,

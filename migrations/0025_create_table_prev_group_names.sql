@@ -1,3 +1,6 @@
+BEGIN;
+
+SET LOCAL citus.multi_shard_modify_mode TO 'sequential';
 CREATE TABLE IF NOT EXISTS prev_group_names (
     group_id INT NOT NULL,
     xid INT NOT NULL,
@@ -8,3 +11,5 @@ CREATE TABLE IF NOT EXISTS prev_group_names (
 );
 SELECT create_distributed_table('prev_group_names', 'group_id');
 GRANT INSERT, SELECT ON prev_group_names TO saveup_www;
+
+COMMIT;

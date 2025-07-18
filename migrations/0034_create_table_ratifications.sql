@@ -1,3 +1,5 @@
+BEGIN;
+SET LOCAL citus.multi_shard_modify_mode TO 'sequential';
 CREATE TABLE IF NOT EXISTS ratifications (
     group_id INT NOT NULL,
     election_id INT NOT NULL,
@@ -12,3 +14,4 @@ CREATE TABLE IF NOT EXISTS ratifications (
 );
 SELECT create_distributed_table('ratifications', 'group_id');
 GRANT INSERT, SELECT ON ratifications TO saveup_www;
+COMMIT;

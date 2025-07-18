@@ -1,3 +1,6 @@
+BEGIN;
+
+SET LOCAL citus.multi_shard_modify_mode TO 'sequential';
 CREATE TABLE IF NOT EXISTS group_joins (
     group_id INT NOT NULL,
     user_id INT NOT NULL,
@@ -8,3 +11,5 @@ CREATE TABLE IF NOT EXISTS group_joins (
 );
 SELECT create_distributed_table('group_joins', 'group_id');
 GRANT INSERT, SELECT ON group_joins TO saveup_www;
+
+COMMIT;
