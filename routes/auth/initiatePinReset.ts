@@ -1,11 +1,11 @@
 import Router from '../../router';
 import bcrypt from 'bcrypt';
 import { z } from 'zod';
-import { resetPasswordLimiter } from '../../services/rateLimit';
 import { sql } from '../../db';
-import sendSms from '../../services/sms';
 import { generateToken } from '../../utils';
 import { userContactDetailsSchema } from '../users/schema';
+import sendSms from '../../sms';
+import logger from '../../logger';
 
 const resetTokenSchema = z.object({
   user_id: z.number().int().min(1),
@@ -58,7 +58,6 @@ const initiatePinReset = (router: Router) => {
         phone_number: true
       })
     },
-    middlewares: [resetPasswordLimiter],
     handler: async (req, res) => {
       const { phone_number } = req.body;
       const resetToken = generateOtp();
@@ -74,7 +73,7 @@ const initiatePinReset = (router: Router) => {
         phone_number,
         'Hello, your PIN reset verification code is: ' + resetToken
         + '. It expires in 10 minutes. Do not share with anyone.'
-      ).catch(console.error);
+      ).catch(logger.error);
 
       res
         .setHeader('Reset', generateToken(userId, '10m', 1))

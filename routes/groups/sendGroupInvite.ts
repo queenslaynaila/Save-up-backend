@@ -1,7 +1,7 @@
 import Router from '../../router';
 import { sql } from '../../db';
 import { z } from 'zod';
-import sendSms from '../../services/sms';
+import sendSms from '../../sms';
 import HttpError from '../../httpError';
 import { decodeEntityAndVerifyAccess } from '../../utils';
 
