@@ -17,6 +17,7 @@ import HttpError from './httpError';
 import Config from './config';
 import { authMiddleware } from './utils';
 import { Role } from './routes/users/schema';
+import rateLimit from 'express-rate-limit';
 
 const ajv = new Ajv({
   coerceTypes: true,
@@ -84,6 +85,12 @@ interface RouteOptions<
     description?: string;
   };
   auth?: true | Role | Role[];
+  rateLimit?: {
+    limit: number;
+    windowMs: number;
+    message?: string;
+    skipForAdmins?: boolean;
+  };
   middlewares?: RequestHandler[];
   handler: RequestHandler<TypeOf<Params>, ResBody, ReqBody, TypeOf<Query>>;
 }
@@ -158,7 +165,18 @@ class Router {
 
       const processedMiddlewares = [...middlewares];
       if (schema) processedMiddlewares.unshift(validateRequest(schema));
-      if (auth) processedMiddlewares.splice(1, 0, authMiddleware(auth));
+      if (auth) processedMiddlewares.push(authMiddleware(auth));
+
+      if (options.rateLimit) {
+        const { limit, windowMs, message, skipForAdmins } = options.rateLimit;
+        const rateLimitOptions = {
+          windowMs,
+          max: limit,
+          message: message || 'Too many requests',
+          skip: (req: Request) => Boolean(skipForAdmins && req.user?.role === 'Admin')
+        };
+        processedMiddlewares.push(rateLimit(rateLimitOptions));
+      }
 
       const security = [];
       if (auth) security.push({ Authorization: [] });
@@ -255,7 +273,7 @@ class Router {
       basicAuth({
         challenge: true,
         users: {
-          [swaggerConfig.username!]: swaggerConfig.password!
+          [swaggerConfig.username]: swaggerConfig.password
         }
       })
     );
