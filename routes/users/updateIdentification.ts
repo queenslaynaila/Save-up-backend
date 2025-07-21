@@ -6,7 +6,7 @@ import {
   IdType,
   userSchema
 } from './schema';
-import { decodeEntityAndVerifyAccess } from '../../utils';
+import { decodeEntityAndVerifyAccess, verifyPin } from '../../utils';
 
 const IdParams = z.object({
   id_type: IdType,
@@ -39,7 +39,8 @@ const updateIdDetails = (router: Router) => {
       }),
       body: z.object({
         id_type: IdType.describe('Type of identifiction method provided by the user'),
-        id_number: userSchema.shape.id_number.describe('Identification number matching the selected Id type')
+        id_number: userSchema.shape.id_number.describe('Identification number matching the selected Id type'),
+        pin: z.string().regex(/^\d{4}$/)
       })
     },
     response: {
@@ -47,6 +48,7 @@ const updateIdDetails = (router: Router) => {
         id_number: userSchema.shape.id_number.describe('Updated identification number')
       })
     },
+    middlewares: [verifyPin],
     handler: async (req, res) => {
       const userId = await decodeEntityAndVerifyAccess(req);
 
