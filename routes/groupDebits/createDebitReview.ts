@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { sql } from '../../db';
-import { decodeEntityAndVerifyAccess } from '../../utils';
+import { decodeEntityAndVerifyAccess, verifyPin } from '../../utils';
 import Router from '../../router';
 
 const SQL_REVIEW_DEBIT = sql<{
@@ -31,9 +31,11 @@ const reviewDebitRequests = (router: Router) => {
       }),
       body: z.object({
         status: z.enum(['Approved', 'Rejected', 'Cancelled']),
-        reason: z.string()
+        reason: z.string(),
+        pin: z.string().regex(/^\d{4}$/)
       })
     },
+    middlewares: [verifyPin],
     handler: async (req, res) => {
       const groupId = await decodeEntityAndVerifyAccess(req, false, true);
 
