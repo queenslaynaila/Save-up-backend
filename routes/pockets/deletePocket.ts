@@ -31,7 +31,7 @@ Record<string, never>
 `);
 
 const deletePocket = (router: Router) => {
-  router.post({
+  router.delete({
     path: '/:entity_id/pockets/:xid',
     summary: 'Delete a pocket',
     schema: {
