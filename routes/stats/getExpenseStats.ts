@@ -31,8 +31,8 @@ const getExpenseStats = (router: Router) => {
       query: z.object({
         entity_id: z.number().int().min(1).optional(),
         agg: z.enum(['avg', 'sum', 'count', 'min', 'max']),
-        start_date: z.string().date().optional(),
-        end_date: z.string().date().optional()
+        start_date: z.string().optional(),
+        end_date: z.string().optional()
       })
     },
     response: {

@@ -148,8 +148,8 @@ const getTransactions = (router: Router) => {
       query: z.object({
         slug: transactionTypeSchema.shape.slug,
         pocket_id: z.number().int().min(1).optional(),
-        from: z.string().date().optional(),
-        to: z.string().date().optional(),
+        from: z.string().optional(),
+        to: z.string().optional(),
         limit: z.number().int().min(1).optional()
       }).partial()
     },

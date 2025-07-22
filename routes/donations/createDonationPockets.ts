@@ -12,7 +12,7 @@ const donationParams = z.object({
   images: z.array(z.string()).nullable().optional(),
   currency: z.string(),
   target_amount: z.number(),
-  target_at: z.string().date()
+  target_at: z.string()
 });
 
 const SQL_CREATE_DONATION_FUND = sql<{

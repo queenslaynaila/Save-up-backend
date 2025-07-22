@@ -14,8 +14,8 @@ const pocketFilterParams = pocketSchema
     status: true
   })
   .extend({
-    start_date: z.string().date().optional(),
-    end_date: z.string().date().optional()
+    start_date: z.string().optional(),
+    end_date: z.string().optional()
   })
   .partial()
   .required({ entity_id: true });
@@ -85,8 +85,8 @@ const getPocketsByEntity = (router: Router) => {
         xid: true,
         category_id: true
       }).extend({
-        start_date: z.string().date(),
-        end_date: z.string().date()
+        start_date: z.string(),
+        end_date: z.string()
       }).partial()
     },
     response: {

@@ -14,7 +14,7 @@ export const pocketSchema = z.object({
   status: ENUM_STATUS,
   currency: z.string(),
   target_amount: z.number(),
-  target_at: z.string().date(),
+  target_at: z.string(),
   completed_at: z.string().datetime().optional(),
   created_at: z.string().datetime(),
   deleted_at: z.string().datetime().optional()

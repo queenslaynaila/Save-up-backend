@@ -47,10 +47,10 @@ const getExpensesByEntity = (router: Router) => {
       }),
       query: z.object({
         category_id: z.number().int().min(1),
-        spent_from: z.string().date(),
-        spent_to: z.string().date(),
-        start_date: z.string().date(),
-        end_date: z.string().date()
+        spent_from: z.string(),
+        spent_to: z.string(),
+        start_date: z.string(),
+        end_date: z.string()
       }).partial()
     },
     response: {
