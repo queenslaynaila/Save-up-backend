@@ -18,10 +18,16 @@ import Config from './config';
 import { authMiddleware } from './utils';
 import { Role } from './routes/users/schema';
 import rateLimit from 'express-rate-limit';
+import addFormats from 'ajv-formats';
 
 const ajv = new Ajv({
   coerceTypes: true,
   useDefaults: true
+});
+
+addFormats(ajv, {
+  mode: 'fast',
+  formats: ['date-time', 'date']
 });
 
 const swaggerConfig = {
@@ -40,7 +46,7 @@ const validateSchema = (schema: ZodSchema, data: unknown, section: 'body' | 'que
       message: err.message,
       params: err.params,
       keyword: err.keyword,
-      dataPath: err.dataPath,
+      dataPath: err.instancePath,
       schemaPath: err.schemaPath
     }));
     throw new HttpError(400, errors);
