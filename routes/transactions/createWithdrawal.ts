@@ -4,6 +4,7 @@ import Router from '../../router';
 import { z } from 'zod';
 import { decodeEntityAndVerifyAccess, verifyPin } from '../../utils';
 import { entityIdParamsSchema } from '../users/schema';
+import logger from '../../logger';
 
 const withdrawalPayload = z.object({
   pocket_id: z.number().int().min(1),
@@ -21,9 +22,9 @@ Record<string, never>
   SELECT withdraw_from_user_pocket(
     :user_id,
     :pocket_id,
-    :amount
+    :amount,
     :accept_penalty
-  );
+  )
 `);
 
 const createWithdrawal = (router: Router) => {
@@ -54,6 +55,13 @@ const createWithdrawal = (router: Router) => {
         user_id: userId,
         accept_penalty: req.body.accept_penalty ?? false
       }).exec().catch(err => {
+        logger.error('Error creating withdrawal', {
+          userId,
+          pocketId: req.body.pocket_id,
+          amount: req.body.amount,
+          acceptPenalty: req.body.accept_penalty,
+          error: err
+        });
         if (err.code === 'P0004') {
           throw new HttpError(400, {
             message: 'ERR_INSUFFICIENT_FUNDS'
