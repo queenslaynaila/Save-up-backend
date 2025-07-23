@@ -169,8 +169,8 @@ class Router {
         ? 'Success'
         : 'Error';
 
-      const processedMiddlewares = [...middlewares];
-      if (schema) processedMiddlewares.unshift(validateRequest(schema));
+      const processedMiddlewares = [];
+      if (schema) processedMiddlewares.push(validateRequest(schema));
       if (auth) processedMiddlewares.push(authMiddleware(auth));
 
       if (options.rateLimit) {
@@ -183,6 +183,8 @@ class Router {
         };
         processedMiddlewares.push(rateLimit(rateLimitOptions));
       }
+
+      processedMiddlewares.push(...middlewares);
 
       const security = [];
       if (auth) security.push({ Authorization: [] });
