@@ -14,35 +14,34 @@ export const statsQuerySchema = z.object({
 export type Stats = z.infer<typeof statsQuerySchema>;
 
 const savingStatsSchema = z.object({
-  aggregated_savings: z.number(),
-  per_pocket: z.array(
-    z.object({
-      pocket_name: z.string(),
-      total_savings: z.number()
-    })
-  )
+  pocket_name: z.string(),
+  aggregated_savings: z.number()
 });
 
 type SavingStats = z.infer<typeof savingStatsSchema>
 
 const SQL_GET_AGGREGATED_SAVINGS = sql<Stats, SavingStats>(`
- queru woll be written later 
  SELECT
-    CASE
-      WHEN :agg = 'avg' THEN AVG(delta)
-      WHEN :agg = 'sum' THEN SUM(delta)
-      WHEN :agg = 'count' THEN COUNT(delta)
-      WHEN :agg = 'min' THEN MIN(delta)
-      WHEN :agg = 'max' THEN MAX(delta)
-    END AS aggregated_deposits
+  pockets.name AS pocket_name,
+  CASE
+    WHEN :agg = 'avg' THEN AVG(delta)
+    WHEN :agg = 'sum' THEN SUM(delta)
+    WHEN :agg = 'count' THEN COUNT(delta)
+    WHEN :agg = 'min' THEN MIN(delta)
+    WHEN :agg = 'max' THEN MAX(delta)
+  END AS aggregated_savings
   FROM transactions
   JOIN transaction_types 
-      ON transactions.type_id = transaction_types.id
+    ON transactions.type_id = transaction_types.id
+  JOIN pockets 
+    ON pockets.entity_id = transactions.entity_id 
+    AND pockets.xid = transactions.pocket_id
   WHERE transaction_types.slug = :slug
     AND (:entity_id::INT IS NULL OR transactions.entity_id = :entity_id)
     AND(:pocket_id::INT IS NULL OR transactions.pocket_id = :pocket_id)
     AND (:start_date::DATE IS NULL OR transactions.created_at >= :start_date::DATE)
     AND (:end_date::DATE IS NULL OR transactions.created_at <= :end_date::DATE)
+  GROUP BY pockets.name
 `);
 
 const getDepositStats = (router: Router) => {
