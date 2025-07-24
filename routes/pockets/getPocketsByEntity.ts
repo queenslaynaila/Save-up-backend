@@ -4,7 +4,6 @@ import { z } from 'zod';
 import { decodeEntityAndVerifyAccess } from '../../utils';
 import { entityIdParamsSchema } from '../users/schema';
 import { pocketSchema } from './schema';
-import logger from '../../logger';
 
 const pocketFilterParams = pocketSchema
   .pick({
@@ -58,7 +57,11 @@ const SQL_GET_POCKETS = sql<PocketFilters, PocketReturn>(`
     pockets.target_at,
     pockets.created_at
   FROM pockets
-  WHERE pockets.deleted_at IS NULL
+  LEFT JOIN donation_pockets 
+    ON pockets.entity_id = donation_pockets.entity_id 
+    AND pockets.xid = donation_pockets.pocket_id
+  WHERE donation_pockets.pocket_id IS NULL
+    AND pockets.deleted_at IS NULL
     AND pockets.entity_id = :entity_id
     AND (:xid::INT IS NULL OR pockets.xid = :xid)
     AND (:category_id::INT IS NULL OR pockets.category_id = :category_id)
@@ -91,7 +94,6 @@ const getPocketsByEntity = (router: Router) => {
     },
     auth: true,
     handler: async (req, res) => {
-      logger.info(`Fetching pockets for entity ${req.params.entity_id}`);
       const entityId = await decodeEntityAndVerifyAccess(req, true);
       const {
         xid,
