@@ -32,7 +32,7 @@ const withdrawalStatusMetadata = z.object({
 
 const loanMetadata = z.object({
   reason: z.string(),
-  status: z.enum(['Approved', 'Rejected', 'Pending Guarantors'])
+  status: z.enum(['Approved', 'Rejected', 'Pending Guarantors', 'Pending Admin Approval'])
 }).nullable();
 
 const activitySchema = z.object({
@@ -390,7 +390,6 @@ const getGroupActivities = (router: Router) => {
         group_id: groupId,
         size
       }).many();
-
       res.json(activities);
     }
   });
