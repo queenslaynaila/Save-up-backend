@@ -7,7 +7,7 @@ import logger from '../../logger';
 
 const ENUM_TRANSACTION_TYPE = z.enum([
   'Saving',
-  'Donations',
+  'Donation',
   'Interest',
   'Withdrawal',
   'Penalty',
