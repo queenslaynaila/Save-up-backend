@@ -27,6 +27,7 @@ import './routes/stats/index';
 import './routes/expenses/index';
 import './routes/donations/index';
 import './routes/transactions/index';
+import './routes/config/index';
 
 extendZodWithOpenApi(z);
 
@@ -47,21 +48,22 @@ app.use((error: Error, _req: Request, res: Response, _next: NextFunction): void 
   if (error instanceof HttpError) {
     res.status(error.status).json(error);
   } else {
+    logger.error(`Unhandled error: ${error.message}`);
     res.sendStatus(500);
   }
 });
 
-scheduleDailyInterestCalculation()
-  .then(() => {
-    logger.info('Daily interest job successfully scheduled.');
-  })
-  .catch(err => {
-    logger.error('Failed to schedule daily interest job:', err);
-  })
-  .finally(() => {
-    startDailyInterestWorker();
-    logger.info('Daily interest worker started.');
-  });
+// scheduleDailyInterestCalculation()
+//   .then(() => {
+//     logger.info('Daily interest job successfully scheduled.');
+//   })
+//   .catch(err => {
+//     logger.error('Failed to schedule daily interest job:', err);
+//   })
+//   .finally(() => {
+//     startDailyInterestWorker();
+//     logger.info('Daily interest worker started.');
+//   });
 
 app.listen(Config.PORT, (): void => {
   logger.info(`Server running on port ${Config.PORT}`);
