@@ -37,7 +37,7 @@ UserWithPublicAttributes & {last_login: string}
 const getUsersBySearchCriteria = (router: Router) => {
   router.get({
     path: '/search',
-    summary: 'Search for users based on various criteria.',
+    summary: 'Search for users based by phone no / id number.',
     description: 'Allows searching for users based on a single query criterion: '
                 + 'phone number, ID number, or user ID.',
     schema: {

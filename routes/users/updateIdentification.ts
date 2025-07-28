@@ -31,7 +31,7 @@ Pick<UserIdParams, 'id_number'>
 const updateIdDetails = (router: Router) => {
   router.patch({
     path: '/:user_id/id-details',
-    summary: 'Update ID type and number',
+    summary: 'Update userID type and number',
     auth: true,
     schema: {
       params: z.object({
