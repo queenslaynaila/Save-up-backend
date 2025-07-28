@@ -8,16 +8,18 @@ import getGroupsByUserId from './getGroupsByUserId';
 import unlockUserAccount from './unlockUserAccount';
 import updateIdDetails from './updateIdentification';
 import updateUserStatus from './updateUserStatus';
+import getModerators from './getModerators';
 
 const router = Router.getRouterInstance('/users', 'Users');
 
+getModerators(router);
 getUsersBySearchCriteria(router);
+getInvites(router);
+getGroupsByUserId(router);
 updateUserPin(router);
 updateIdDetails(router);
 updateUserRole(router);
-getInvites(router);
 updateInvites(router);
-getGroupsByUserId(router);
 unlockUserAccount(router);
 updateUserStatus(router);
 
