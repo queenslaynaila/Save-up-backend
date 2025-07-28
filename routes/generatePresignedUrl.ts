@@ -1,9 +1,9 @@
 import { z } from 'zod';
-import Router from './router';
-import { UserRole } from './routes/users/schema';
+import Router from '../router';
+import { UserRole } from './users/schema';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
-import Config from './config';
+import Config from '../config';
 
 const s3 = new S3Client({
   region: Config.AWS_REGION,
