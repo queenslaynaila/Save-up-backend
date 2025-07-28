@@ -11,7 +11,8 @@ import {
 import HttpError from './httpError';
 import logger from './logger';
 import Config from './config';
-import './generatePresignedUrl';
+import './routes/config/index';
+import './routes/generatePresignedUrl';
 import './routes/securityQuestions/index';
 import './routes/categories/index';
 import './routes/auth/index';
@@ -27,7 +28,6 @@ import './routes/stats/index';
 import './routes/expenses/index';
 import './routes/donations/index';
 import './routes/transactions/index';
-import './routes/config/index';
 
 extendZodWithOpenApi(z);
 
