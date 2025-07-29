@@ -29,7 +29,7 @@ const SQL_GET_ENTITY_TYPE = sql<{
   WHERE id = :entity_id
 `);
 
-const SQL_GET_PIN = sql<
+const SQL_GET_USER_PIN = sql<
 { user_id: number },
 { pin: string }
 >(`
@@ -65,12 +65,12 @@ const SQL_GET_GROUP_MEMBERSHIP_STATUS = sql<{
 `);
 
 export function generateToken(
-  id: number,
+  userId: number,
   expiresIn: string,
   roleOrStep: Role | number,
-  isAccess?: boolean
+  isAccessToken = false
 ): string {
-  const payload: { id: number; role?: Role; step?: number } = { id };
+  const payload: { id: number; role?: Role; step?: number } = { id: userId };
 
   if (typeof roleOrStep === 'number') {
     payload.step = roleOrStep;
@@ -78,18 +78,14 @@ export function generateToken(
     payload.role = roleOrStep;
   }
 
-  const secret = isAccess
+  const secret = isAccessToken
     ? Config.JWT_SECRET
     : Config.JWT_REFRESH_SECRET;
 
-  return jwt.sign(
-    payload,
-    secret,
-    {
-      expiresIn,
-      issuer: Config.JWT_ISSUER
-    }
-  );
+  return jwt.sign(payload, secret, {
+    expiresIn,
+    issuer: Config.JWT_ISSUER
+  });
 }
 
 function validateAndDecodeJwt(headerValue: string): JwtPayload {
@@ -131,15 +127,20 @@ export function checkResetTokenValidity(requiredStep: number) {
 }
 
 export async function verifyPin(req: Request, _res: Response, next: NextFunction) {
+  if (!req.body.pin) {
+    throw new HttpError(400);
+  }
+
   if (!req.user) {
     throw new HttpError(401);
   }
 
-  const { pin: hashedPin } = await SQL_GET_PIN({
+  const { pin: hashedPin } = await SQL_GET_USER_PIN({
     user_id: req.user!.id
   }).one();
 
-  if (!await bcrypt.compare(req.body.pin, hashedPin)) {
+  const isPinValid = await bcrypt.compare(req.body.pin, hashedPin);
+  if (!isPinValid) {
     throw new HttpError(401);
   }
 
@@ -171,34 +172,89 @@ export function authMiddleware(auth: true | Role | Role[] = true) {
   };
 }
 
-function replaceMeWithUserId(id: number | 'me' | undefined, userId: number): number | undefined {
+function resolveUserIdParameter(id: number | 'me' | undefined, userId: number): number | undefined {
   return id === 'me' ? userId : id;
 }
 
-function hasSystemAdminPermissions(userRole:Role, isOwnerOrAdminMod: boolean): boolean {
-  return isOwnerOrAdminMod && ADMIN_LIKE_ROLES.includes(userRole);
+function hasElevatedRole(userRole: Role): boolean {
+  return ADMIN_LIKE_ROLES.includes(userRole);
 }
 
-async function verifyGroupMembershipPermissions(
-  groupId: number,
-  userId: number,
-  requiresGrpAdmin: boolean,
-  memberId?: number
+function authorizeUserAccess(
+  targetUserId: number,
+  loggedInUserId: number,
+  isElevatedUser: boolean
 ) {
-  const { is_admin_member, is_member } = await SQL_GET_GROUP_MEMBERSHIP_STATUS({
+  if (targetUserId === loggedInUserId) return targetUserId;
+
+  if (!isElevatedUser) throw new HttpError(403);
+
+  return targetUserId;
+}
+
+async function authorizeGroupAccess(
+  groupId: number,
+  loggedInUserId: number,
+  isElevatedUser: boolean,
+  requiresGrpAdmin: boolean,
+  targetMemberId?: number
+): Promise<number | { groupId: number; memberId: number }> {
+  if (isElevatedUser) {
+    return targetMemberId
+      ? { groupId, memberId: targetMemberId }
+      : groupId;
+  }
+
+  const membershipStatus = await SQL_GET_GROUP_MEMBERSHIP_STATUS({
     entity_id: groupId,
-    user_id: userId
+    user_id: loggedInUserId
   }).one(new HttpError(404));
 
-  if (
-    !is_member
-    || (requiresGrpAdmin && !is_admin_member)
-    || (memberId && userId !== memberId && !is_admin_member)
-  ) {
+  const { is_admin_member: isGroupAdmin, is_member: isMember } = membershipStatus;
+
+  if (!isMember) {
     throw new HttpError(403);
   }
 
-  return memberId ? { groupId, memberId } : groupId;
+  if (requiresGrpAdmin && !isGroupAdmin) {
+    throw new HttpError(403);
+  }
+
+  const isTargetingSelf = targetMemberId === loggedInUserId;
+
+  if (targetMemberId && !isTargetingSelf && !isGroupAdmin) {
+    throw new HttpError(403);
+  }
+
+  return targetMemberId ? { groupId, memberId: targetMemberId } : groupId;
+}
+
+async function authorizeEntityAccess(
+  entityId: number,
+  loggedInUserId: number,
+  isElevatedUser: boolean,
+  requiresGrpAdmin: boolean,
+  memberId?: number
+) {
+  const entityType = await SQL_GET_ENTITY_TYPE({
+    entity_id: entityId
+  }).oneFirst(new HttpError(404));
+
+  if (entityType === 'User') {
+    return authorizeUserAccess(entityId, loggedInUserId, isElevatedUser);
+  }
+
+  if (entityType === 'Group') {
+    return authorizeGroupAccess(
+      entityId,
+      loggedInUserId,
+      isElevatedUser,
+      requiresGrpAdmin,
+      memberId
+    );
+  }
+
+  throw new HttpError(400);
 }
 
 type SingleEntityParams = {
@@ -246,67 +302,47 @@ export async function decodeEntityAndVerifyAccess<
   Query = unknown
 >(
   req:Request<T, ResBody, ReqBody, Query>,
-  isOwnerOrAdminMod = false,
+  allowAdminOverride = false,
   requiresGrpAdmin = false
 ): Promise<ReturnType<T>> {
-  if (!req.user) {
-    throw new HttpError(401);
-  }
+  if (!req.user) throw new HttpError(401);
 
   const { id: loggedInUserId, role: loggedInUserRole } = req.user;
+  const isElevatedUser = allowAdminOverride && hasElevatedRole(loggedInUserRole);
 
-  const resolvedParams = {
-    user_id: replaceMeWithUserId(req.params.user_id, loggedInUserId),
-    member_id: replaceMeWithUserId(req.params.member_id, loggedInUserId),
-    entity_id: replaceMeWithUserId(req.params.entity_id, loggedInUserId),
+  const params = {
+    user_id: resolveUserIdParameter(req.params.user_id, loggedInUserId),
+    member_id: resolveUserIdParameter(req.params.member_id, loggedInUserId),
+    entity_id: resolveUserIdParameter(req.params.entity_id, loggedInUserId),
     group_id: req.params.group_id
   };
 
-  if (
-    resolvedParams.user_id === loggedInUserId
-    || resolvedParams.entity_id === loggedInUserId
-  ) return loggedInUserId as ReturnType<T>;
-
-  if (resolvedParams.user_id) {
-    if (!hasSystemAdminPermissions(loggedInUserRole, isOwnerOrAdminMod)) throw new HttpError(403);
-    return resolvedParams.user_id as ReturnType<T>;
-  }
-
-  if (resolvedParams.group_id) {
-    if (hasSystemAdminPermissions(loggedInUserRole, isOwnerOrAdminMod)) {
-      return resolvedParams.member_id
-        ? { groupId: resolvedParams.group_id, memberId: resolvedParams.member_id } as ReturnType<T>
-        : resolvedParams.group_id as ReturnType<T>;
-    }
-    return await verifyGroupMembershipPermissions(
-      resolvedParams.group_id,
+  if (params.user_id !== undefined) {
+    return authorizeUserAccess(
+      params.user_id,
       loggedInUserId,
-      requiresGrpAdmin,
-      resolvedParams.member_id
+      isElevatedUser
     ) as ReturnType<T>;
   }
 
-  if (resolvedParams.entity_id) {
-    const entityType = await SQL_GET_ENTITY_TYPE({
-      entity_id: resolvedParams.entity_id
-    }).oneFirst(new HttpError(404));
+  if (params.group_id !== undefined) {
+    return await authorizeGroupAccess(
+      params.group_id,
+      loggedInUserId,
+      isElevatedUser,
+      requiresGrpAdmin,
+      params.member_id
+    ) as ReturnType<T>;
+  }
 
-    if (entityType === 'User') {
-      if (!hasSystemAdminPermissions(loggedInUserRole, isOwnerOrAdminMod)) throw new HttpError(403);
-      return resolvedParams.entity_id as ReturnType<T>;
-    }
-
-    if (entityType === 'Group') {
-      if (hasSystemAdminPermissions(loggedInUserRole, isOwnerOrAdminMod)) {
-        return resolvedParams.entity_id as ReturnType<T>;
-      }
-      return await verifyGroupMembershipPermissions(
-        resolvedParams.entity_id,
-        loggedInUserId,
-        requiresGrpAdmin,
-        resolvedParams.member_id
-      ) as ReturnType<T>;
-    }
+  if (params.entity_id !== undefined) {
+    return await authorizeEntityAccess(
+      params.entity_id,
+      loggedInUserId,
+      isElevatedUser,
+      requiresGrpAdmin,
+      params.member_id
+    ) as ReturnType<T>;
   }
 
   throw new HttpError(400);
