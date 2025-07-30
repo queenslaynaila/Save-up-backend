@@ -15,74 +15,85 @@ import {
 } from './interestProcessor';
 import { redis } from './redisConfig';
 
-export const dailyInterestQueue = new Queue('daily-interest-calculation', {
+export const DAILY_INTEREST_QUEUE_NAME = 'previous-day-interest-calculation';
+const CRON_SCHEDULE_2AM_DAILY = '0 2 * * *';
+const RETRY_DELAY_HOURS = 4;
+
+export const JOB_FIND_POCKETS_ELIGIBLE_FOR_INTEREST = 'find-interest-eligible-pockets';
+export const JOB_CALCULATE_INTEREST_FOR_POCKET = 'calculate-interest-for-pocket';
+export const JOB_FINALIZE_INTEREST_SUMMARY = 'finalize-interest-summary';
+
+export const dailyInterestQueue = new Queue(DAILY_INTEREST_QUEUE_NAME, {
   connection: redis,
   defaultJobOptions: {
     attempts: 3,
-    backoff: { type: 'exponential', delay: 3000 }
+    backoff: {
+      type: 'exponential',
+      delay: 3000
+    }
   }
 });
 
 const queueEvents = new QueueEvents(dailyInterestQueue.name);
 
 export async function scheduleDailyInterestCalculation() {
-  const schedulers = await dailyInterestQueue.getJobSchedulers();
-
-  const alreadyScheduled = schedulers.some(scheduler => scheduler.name === 'create-daily-interest-jobs'
-    && scheduler.pattern === '0 2 * * *');
-
-  if (!alreadyScheduled) {
-    await dailyInterestQueue.add(
-      'create-daily-interest-jobs',
-      {},
-      {
-        jobId: 'daily-interest-scheduler',
-        repeat: {
-          pattern: '0 2 * * *'
-        },
-
+  await dailyInterestQueue.upsertJobScheduler(
+    JOB_FIND_POCKETS_ELIGIBLE_FOR_INTEREST,
+    {
+      pattern: CRON_SCHEDULE_2AM_DAILY
+    },
+    {
+      name: JOB_FIND_POCKETS_ELIGIBLE_FOR_INTEREST,
+      data: {},
+      opts: {
         removeOnComplete: true
       }
-    );
+    }
+  );
+
+  logger.info('[Scheduler] Daily interest calculation scheduled successfully');
+}
+
+async function processJob(job: Job): Promise<void> {
+  switch (job.name) {
+    case JOB_FIND_POCKETS_ELIGIBLE_FOR_INTEREST:
+      logger.info('[Daily Scheduler] Finding eligible pockets and creating interest jobs');
+      await findEligiblePocketsAndScheduleInterestJobs();
+      break;
+
+    case JOB_CALCULATE_INTEREST_FOR_POCKET:
+      await calculateAndAwardDailyInterestForPocket(job as Job<InterestCalculationData>);
+      break;
+
+    case JOB_FINALIZE_INTEREST_SUMMARY:
+      await finalizeInterestSummary();
+      break;
+
+    case `interest-parent-${interestDate}`:
+      break;
+
+    default:
+      logger.warn(`Unknown job type: ${job.name}`);
   }
 }
 
 export function startDailyInterestWorker() {
-  new Worker(
-    'daily-interest-calculation',
-    async (job: Job) => {
-      switch (job.name) {
-        case 'create-daily-interest-jobs':
-          logger.info('[Daily Scheduler] Finding eligible pockets and creating interest jobs');
-          await findEligiblePocketsAndScheduleInterestJobs();
-          break;
-
-        case 'calculate-interest-for-pocket':
-          await calculateAndAwardDailyInterestForPocket(job as Job<InterestCalculationData>);
-          break;
-
-        case 'finalize-interest-summary':
-          logger.info('[Finalizer] Writing summary to database');
-          await finalizeInterestSummary();
-          break;
-
-        case `interest-parent-${interestDate}`:
-          break;
-
-        default:
-          logger.warn(`Unknown job type: ${job.name}`);
-      }
-    },
+  const worker = new Worker(
+    DAILY_INTEREST_QUEUE_NAME,
+    processJob,
     {
       connection: redis,
       concurrency: 10
     }
-  )
-    .on('completed', (job) => {
-      if (job.name === 'finalize-interest-summary') {
-        logger.info('all interest procesed and summary written to db');
-      }
-    });
+  );
+
+  worker.on('completed', (job) => {
+    if (job.name === JOB_FINALIZE_INTEREST_SUMMARY) {
+      logger.info('[Interest Processing] All interest processed and summary written to database');
+    }
+  });
+
+  return worker;
 }
 
 const pocketInterestFailureSchema = z.object({
@@ -97,7 +108,7 @@ const pocketInterestFailureSchema = z.object({
 
 type PocketInterestFailure = z.infer<typeof pocketInterestFailureSchema>;
 
-const SQL_LOG_POCKET_INTEREST_ERROR = sql<PocketInterestFailure, Record<string, never>>(`
+const SQL_INSERT_INTEREST_JOB_FAILURES = sql<PocketInterestFailure, Record<string, never>>(`
   INSERT INTO interest_job_failures (
     job_name, entity_id, pocket_id,  standard_interest_rate, locked_interest_rate, error, next_attempt_at
   ) VALUES (
@@ -111,32 +122,40 @@ const SQL_LOG_POCKET_INTEREST_ERROR = sql<PocketInterestFailure, Record<string, 
   )
 `);
 
-queueEvents.on('failed', async ({ jobId, failedReason }) => {
+async function handleJobFailure({
+  jobId,
+  failedReason
+}: {
+  jobId: string;
+  failedReason: string;
+}): Promise<void> {
   const job = await dailyInterestQueue.getJob(jobId);
   if (!job) return;
 
-  const [standard_interest_rate, locked_interest_rate] = await redis.mget(
+  const [standardInterestRate, lockedInterestRate] = await redis.mget(
     `interest-rates:${interestDate}:Standard`,
     `interest-rates:${interestDate}:Locked`
   );
 
-  const entity_id = job.data?.entity_id;
-  const pocket_id = job.data?.pocket_id;
+  const entityId = job.data?.entity_id;
+  const pocketId = job.data?.pocket_id;
 
-  if (job.name === 'calculate-interest-for-pocket' && entity_id && pocket_id) {
+  if (job.name === JOB_CALCULATE_INTEREST_FOR_POCKET && entityId && pocketId) {
     await redis.sadd(
       `interest-results:${interestDate}:failed`,
-      `${entity_id}-${pocket_id}`
+      `${entityId}-${pocketId}`
     );
   }
 
-  await SQL_LOG_POCKET_INTEREST_ERROR({
+  await SQL_INSERT_INTEREST_JOB_FAILURES({
     job_name: job.name,
-    entity_id,
-    pocket_id,
-    standard_interest_rate: Number(standard_interest_rate),
-    locked_interest_rate: Number(locked_interest_rate),
+    entity_id: entityId,
+    pocket_id: pocketId,
+    standard_interest_rate: Number(standardInterestRate),
+    locked_interest_rate: Number(lockedInterestRate),
     error: failedReason,
-    next_attempt_at: new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString()
+    next_attempt_at: new Date(Date.now() + RETRY_DELAY_HOURS * 60 * 60 * 1000).toISOString()
   }).exec();
-});
+}
+
+queueEvents.on('failed', handleJobFailure);
