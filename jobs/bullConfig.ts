@@ -4,11 +4,10 @@ import {
   QueueEvents,
   Worker
 } from 'bullmq';
-import z from 'zod';
 import logger from '../logger';
 import { sql } from '../db';
 import {
-  calculateAndAwardDailyInterestForPocket,
+  computeAndAllocateInterest,
   finalizeInterestSummary,
   findEligiblePocketsAndScheduleInterestJobs,
   InterestCalculationData, interestDate
@@ -33,8 +32,6 @@ export const dailyInterestQueue = new Queue(DAILY_INTEREST_QUEUE_NAME, {
     }
   }
 });
-
-const queueEvents = new QueueEvents(dailyInterestQueue.name);
 
 export async function scheduleDailyInterestCalculation() {
   await dailyInterestQueue.upsertJobScheduler(
@@ -62,23 +59,20 @@ async function processJob(job: Job): Promise<void> {
       break;
 
     case JOB_CALCULATE_INTEREST_FOR_POCKET:
-      await calculateAndAwardDailyInterestForPocket(job as Job<InterestCalculationData>);
+      await computeAndAllocateInterest(job as Job<InterestCalculationData>);
       break;
 
     case JOB_FINALIZE_INTEREST_SUMMARY:
       await finalizeInterestSummary();
       break;
 
-    case `interest-parent-${interestDate}`:
-      break;
-
     default:
-      logger.warn(`Unknown job type: ${job.name}`);
+      logger.error(`Job: ${job.name} not recognized in ${DAILY_INTEREST_QUEUE_NAME}`);
   }
 }
 
 export function startDailyInterestWorker() {
-  const worker = new Worker(
+  const interestWorker = new Worker(
     DAILY_INTEREST_QUEUE_NAME,
     processJob,
     {
@@ -87,26 +81,24 @@ export function startDailyInterestWorker() {
     }
   );
 
-  worker.on('completed', (job) => {
+  interestWorker.on('completed', (job) => {
     if (job.name === JOB_FINALIZE_INTEREST_SUMMARY) {
       logger.info('[Interest Processing] All interest processed and summary written to database');
     }
   });
 
-  return worker;
+  return interestWorker;
 }
 
-const pocketInterestFailureSchema = z.object({
-  job_name: z.string(),
-  standard_interest_rate: z.number(),
-  locked_interest_rate: z.number(),
-  next_attempt_at: z.string().date(),
-  entity_id: z.number().optional(),
-  pocket_id: z.number().optional(),
-  error: z.string()
-});
-
-type PocketInterestFailure = z.infer<typeof pocketInterestFailureSchema>;
+type PocketInterestFailure = {
+  job_name: string,
+  standard_interest_rate: number,
+  locked_interest_rate: number,
+  next_attempt_at: string,
+  entity_id?: number,
+  pocket_id?: number,
+  error: string
+};
 
 const SQL_INSERT_INTEREST_JOB_FAILURES = sql<PocketInterestFailure, Record<string, never>>(`
   INSERT INTO interest_job_failures (
@@ -157,5 +149,7 @@ async function handleJobFailure({
     next_attempt_at: new Date(Date.now() + RETRY_DELAY_HOURS * 60 * 60 * 1000).toISOString()
   }).exec();
 }
+
+const queueEvents = new QueueEvents(dailyInterestQueue.name);
 
 queueEvents.on('failed', handleJobFailure);
