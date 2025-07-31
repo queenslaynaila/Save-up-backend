@@ -153,3 +153,14 @@ async function handleJobFailure({
 const queueEvents = new QueueEvents(dailyInterestQueue.name);
 
 queueEvents.on('failed', handleJobFailure);
+
+export async function setupInterestJobSystem() {
+  try {
+    await scheduleDailyInterestCalculation();
+    startDailyInterestWorker();
+    logger.info('Interest Job Calculation successfully set up]');
+  } catch (error) {
+    logger.error(`Failed to initialize interest job system: ${error}`);
+    throw error;
+  }
+}
