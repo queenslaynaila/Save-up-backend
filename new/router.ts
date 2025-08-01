@@ -9,7 +9,7 @@ import {
 import z, { AnyZodObject, TypeOf, ZodNever, ZodSchema, ZodUndefined } from 'zod';
 import { Role } from '../routes/users/schema';
 import zodToJsonSchema from 'zod-to-json-schema';
-import { extendZodWithOpenApi, OpenApiGeneratorV3, OpenAPIRegistry } from '@asteasolutions/zod-to-openapi';
+import { extendZodWithOpenApi, OpenAPIRegistry } from '@asteasolutions/zod-to-openapi';
 import HttpError from '../httpError';
 import Ajv, { ErrorObject } from 'ajv';
 import rateLimit from 'express-rate-limit';
@@ -305,26 +305,5 @@ export class Router {
     return Router.registry;
   }
 }
-
-export const generateOpenApiSpec = (config: {
-  title: string;
-  description: string;
-  version?: string;
-}) => {
-  const generator = new OpenApiGeneratorV3(Router.getRegistry().definitions);
-  return generator.generateDocument({
-    openapi: '3.0.0',
-    info: {
-      title: config.title,
-      version: config?.version || '1.0.0',
-      description: config.description
-    },
-    security: [
-      {
-        Authorization: []
-      }
-    ]
-  });
-};
 
 export default Router;

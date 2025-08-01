@@ -20,15 +20,19 @@ import donationsRouter from './routes/donations/index';
 import transactionsRouter from './routes/transactions/index';
 import { Application } from './new/app';
 
-setupInterestJobSystem();
-
 const app = new Application({
   swagger: {
     title: 'Save-up API',
     description: 'API documentation for Save-up backend',
     path: '/saveup/docs',
     password: Config.SWAGGER_PASSWORD || 'admin'
-  }
+  },
+  jobs: [
+    {
+      name: 'Award Interest',
+      setup: setupInterestJobSystem
+    }
+  ]
 });
 
 app.use(configRouter);

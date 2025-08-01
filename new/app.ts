@@ -2,10 +2,11 @@ import express, { Express, NextFunction, Request, Response } from 'express';
 import swaggerUi from 'swagger-ui-express';
 import basicAuth from 'express-basic-auth';
 import cors from 'cors';
-import Router, { generateOpenApiSpec } from './router';
+import Router from './router';
 import HttpError from '../httpError';
 import logger from '../logger';
 import Config from '../config';
+import { OpenApiGeneratorV3 } from '@asteasolutions/zod-to-openapi';
 
 type SwaggerConfig = {
   title: string;
@@ -15,9 +16,14 @@ type SwaggerConfig = {
   version?: string;
 };
 
+export interface JobConfig {
+  name: string;
+  setup: () => Promise<void>;
+}
+
 export interface ApplicationOptions {
   swagger: SwaggerConfig;
-  setup?: (app: Express) => void;
+  jobs?: JobConfig[];
 }
 
 export class Application extends Router {
@@ -35,8 +41,8 @@ export class Application extends Router {
 
     this.configureApp();
 
-    if (options.setup) {
-      options.setup(this.expressApp);
+    if (options.jobs) {
+      this.setupJobs(options.jobs);
     }
   }
 
@@ -101,10 +107,19 @@ export class Application extends Router {
   }
 
   private setupSwagger(config: SwaggerConfig): void {
-    const document = generateOpenApiSpec({
-      title: config.title,
-      description: config.description,
-      version: config.version || '1.0.0'
+    const generator = new OpenApiGeneratorV3(Router.getRegistry().definitions);
+    const document = generator.generateDocument({
+      openapi: '3.0.0',
+      info: {
+        title: config.title,
+        version: config.version || '1.0.0',
+        description: config.description
+      },
+      security: [
+        {
+          Authorization: []
+        }
+      ]
     });
 
     const basePath = config.path.replace(/\/$/, '');
@@ -118,6 +133,22 @@ export class Application extends Router {
     );
 
     this.expressApp.use(basePath, swaggerUi.serve, swaggerUi.setup(document));
+  }
+
+  private async setupJobs(jobs: JobConfig[]): Promise<void> {
+    await Promise.all(
+      jobs.map(async (job) => {
+        try {
+          await job.setup();
+          logger.info(`Job ${job.name} setup successfully`);
+        } catch (error) {
+          logger.error(`Failed to setup ${job.name}: ${error}`);
+          throw error;
+        }
+      })
+    );
+
+    logger.info('Job setup complete', this.constructor.name);
   }
 
   public getExpressApp(): Express {

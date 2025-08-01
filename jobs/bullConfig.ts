@@ -47,8 +47,6 @@ export async function scheduleDailyInterestCalculation() {
       }
     }
   );
-
-  logger.info('[Scheduler] Daily interest calculation scheduled successfully');
 }
 
 async function processJob(job: Job): Promise<void> {
@@ -158,7 +156,6 @@ export async function setupInterestJobSystem() {
   try {
     await scheduleDailyInterestCalculation();
     startDailyInterestWorker();
-    logger.info('Interest Job Calculation successfully set up]');
   } catch (error) {
     logger.error(`Failed to initialize interest job system: ${error}`);
     throw error;
