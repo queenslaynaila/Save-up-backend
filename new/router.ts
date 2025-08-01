@@ -16,6 +16,7 @@ import rateLimit from 'express-rate-limit';
 import addFormats from 'ajv-formats';
 import { authMiddleware } from '../utils';
 import fastJson from 'fast-json-stringify';
+import logger from '../logger';
 
 extendZodWithOpenApi(z);
 
@@ -185,40 +186,56 @@ export class Router {
       ReqBody,
       Query extends AnyZodObject | typeof emptyObjectSchema
     >(options: RouteOptions<Params, ResBody, ReqBody, Query>) => {
-      const { path, schema, auth, middlewares = [], handler, response: resOpt } = options;
+      const { path, handler, response: resOpt } = options;
 
       const response = {
         statusCode: resOpt?.statusCode ?? (resOpt?.schema ? 200 : 204),
         schema: resOpt?.schema ?? z.never()
       };
 
-      const processedMiddlewares = [];
-      if (schema) processedMiddlewares.push(validateRequest(schema));
-      if (auth) processedMiddlewares.push(authMiddleware(auth));
-
-      if (options.rateLimit) {
-        const { limit, windowMs, message, skipForAdmins } = options.rateLimit;
-        const rateLimitOptions = {
-          windowMs,
-          max: limit,
-          message: message || 'Too many requests',
-          skip: (req: Request) => Boolean(skipForAdmins && req.user?.role === 'Admin')
-        };
-        processedMiddlewares.push(rateLimit(rateLimitOptions));
-      }
-
-      processedMiddlewares.push(...middlewares);
+      const middlewares = this.buildMiddlewareStack(options);
 
       if (!options.hidden) {
-        this.registerWithOpenAPI(method, path, options, response, processedMiddlewares);
+        this.registerWithOpenAPI(method, path, options, response, middlewares);
       }
 
       if (response.schema) {
-        processedMiddlewares.push(Router.createResponseFormatter(response.schema));
+        middlewares.push(Router.createResponseFormatter(response.schema));
       }
 
-      this.router[method](path, ...processedMiddlewares, handler as RequestHandler);
+      this.router[method](path, ...middlewares, handler as RequestHandler);
     };
+  }
+
+  private buildMiddlewareStack(options: RouteOptions<any, any, any, any>): RequestHandler[] {
+    const middlewares: RequestHandler[] = [];
+
+    if (options.schema) {
+      middlewares.push(validateRequest(options.schema));
+    }
+
+    if (options.auth) {
+      middlewares.push(authMiddleware(options.auth));
+    }
+
+    if (options.rateLimit) {
+      const { limit, windowMs, message, skipForAdmins } = options.rateLimit;
+      const rateLimitOptions = {
+        windowMs,
+        max: limit,
+        message: message || 'Too many requests',
+        skip: (req: Request) => Boolean(skipForAdmins && req.user?.role === 'Admin')
+      };
+      middlewares.push(rateLimit(rateLimitOptions));
+    }
+
+    if (options.middlewares) {
+      middlewares.push(...options.middlewares);
+    }
+
+    logger.info(`[${this.resourceName}] Built middleware stack with ${middlewares.length} middleware(s)`);
+
+    return middlewares;
   }
 
   static createResponseFormatter(schema: ZodSchema) {
