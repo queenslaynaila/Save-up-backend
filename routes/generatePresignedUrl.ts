@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { Router } from '../new/router';
+import { Router } from '../core/router';
 import { UserRole } from './users/schema';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';

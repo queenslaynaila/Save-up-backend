@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { sql } from '../../db';
 import { Category, categorySchema } from './getAllCategories';
 import { UserRole } from '../users/schema';
-import Router from '../../new/router';
+import Router from '../../core/router';
 
 const SQL_CREATE_CATEGORY = sql<
 Record<string, never>,

@@ -1,4 +1,4 @@
-import Router from '../../new/router';
+import Router from '../../core/router';
 import reviewDebitRequests from './createDebitReview';
 
 const router = Router.createResourceRouter('Group Debit Approval');

@@ -1,4 +1,4 @@
-import Router from '../../new/router';
+import Router from '../../core/router';
 import { z } from 'zod';
 import { AuthenticatedUser, publicUserSchema } from './login';
 import Config from '../../config';

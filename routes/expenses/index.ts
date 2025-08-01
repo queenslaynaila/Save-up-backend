@@ -1,4 +1,4 @@
-import Router from '../../new/router';
+import Router from '../../core/router';
 import createExpense from './createExpense';
 import getExpensesByEntity from './getExpensesByEntity';
 import updateExpense from './updateExpense';

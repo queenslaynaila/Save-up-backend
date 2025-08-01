@@ -1,4 +1,4 @@
-import Router from '../../new/router';
+import Router from '../../core/router';
 import createGroup from './createGroup';
 import updateGroup from './updateGroup';
 import createGroupInvite from './sendGroupInvite';

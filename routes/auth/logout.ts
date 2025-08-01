@@ -1,4 +1,4 @@
-import Router from '../../new/router';
+import Router from '../../core/router';
 
 const logout = (router: Router) => {
   router.delete({

@@ -1,4 +1,4 @@
-import Router from '../../new/router';
+import Router from '../../core/router';
 import getExpenseStats from './getExpenseStats';
 import getDepositStats from './getDepositStats';
 import getWithdrawalStats from './getWithdrawalStats';

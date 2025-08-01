@@ -6,7 +6,7 @@ import getElectionCandidates from './getElectionCandidates';
 import updateGroupElections from './updateElection';
 import ratifyElection from './ratifyElection';
 import createBallot from './createBallot';
-import Router from '../../new/router';
+import Router from '../../core/router';
 
 const router = Router.createResourceRouter('Elections');
 

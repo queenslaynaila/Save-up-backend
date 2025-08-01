@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { sql } from '../../db';
-import Router from '../../new/router';
+import Router from '../../core/router';
 import { decodeEntityAndVerifyAccess } from '../../utils';
 import { entityIdParamsSchema } from '../users/schema';
 import logger from '../../logger';

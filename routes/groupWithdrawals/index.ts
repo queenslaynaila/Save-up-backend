@@ -1,4 +1,4 @@
-import Router from '../../new/router';
+import Router from '../../core/router';
 import createWithdrawalRequest from './createWithdrawalRequests';
 import getGrpDebitRequests from './getWithdrawalRequests';
 

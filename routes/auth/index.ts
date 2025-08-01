@@ -1,4 +1,4 @@
-import Router from '../../new/router';
+import Router from '../../core/router';
 import login from './login';
 import logout from './logout';
 import register from './register';

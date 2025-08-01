@@ -1,4 +1,4 @@
-import Router from '../../new/router';
+import Router from '../../core/router';
 import getConfig from './getConfig';
 
 const router = Router.createResourceRouter('Config');

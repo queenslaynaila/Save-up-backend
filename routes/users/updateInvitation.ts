@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { sql } from '../../db';
-import Router from '../../new/router';
+import Router from '../../core/router';
 import { Invitation, invitationSchema } from './schema';
 
 const SQL_RESPOND_TO_INVITE = sql<

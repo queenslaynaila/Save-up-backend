@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt';
 import { z } from 'zod';
 import { sql } from '../../db';
-import Router from '../../new/router';
+import Router from '../../core/router';
 import { verifyPin } from '../../utils';
 
 const SQL_UPDATE_PIN = sql<

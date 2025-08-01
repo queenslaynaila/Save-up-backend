@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { sql } from '../../db';
-import Router from '../../new/router';
+import Router from '../../core/router';
 
 const configSchema = z.object({
   country_name: z.string(),

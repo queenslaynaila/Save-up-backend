@@ -1,4 +1,4 @@
-import Router from '../../new/router';
+import Router from '../../core/router';
 import { z } from 'zod';
 import { sql } from '../../db';
 import HttpError from '../../httpError';

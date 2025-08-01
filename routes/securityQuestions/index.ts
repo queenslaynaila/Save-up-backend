@@ -1,6 +1,6 @@
 import getAllSecurityQuestions from './getAllSecurityQuestions';
 import createSecurityAnswer from './createSecurityAnswer';
-import Router from '../../new/router';
+import Router from '../../core/router';
 
 const router = Router.createResourceRouter('Security Questions');
 

@@ -1,4 +1,4 @@
-import Router from '../../new/router';
+import Router from '../../core/router';
 import createPocket from './createPocket';
 import deletePocket from './deletePocket';
 import getPocketsByEntity from './getPocketsByEntity';

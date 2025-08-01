@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { sql } from '../../db';
 import { AccountStatus, UserRole } from './schema';
-import Router from '../../new/router';
+import Router from '../../core/router';
 import HttpError from '../../httpError';
 import { decodeEntityAndVerifyAccess } from '../../utils';
 

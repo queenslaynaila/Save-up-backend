@@ -1,5 +1,5 @@
 import getAllCategories from './getAllCategories';
-import Router from '../../new/router';
+import Router from '../../core/router';
 
 const router = Router.createResourceRouter('Categories');
 

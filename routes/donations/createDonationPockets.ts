@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import Router from '../../new/router';
+import Router from '../../core/router';
 import { sql } from '../../db';
 import logger from '../../logger';
 import { decodeEntityAndVerifyAccess } from '../../utils';

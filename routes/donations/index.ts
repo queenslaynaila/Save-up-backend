@@ -1,4 +1,4 @@
-import Router from '../../new/router';
+import Router from '../../core/router';
 import createFundraiser from './createDonationPockets';
 import getDonationPockets from './getDonationPockets';
 

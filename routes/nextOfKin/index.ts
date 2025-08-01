@@ -1,4 +1,4 @@
-import Router from '../../new/router';
+import Router from '../../core/router';
 import createNextOfKin from './createNextOfKin';
 import getNextOfKin from './getNextOfKin';
 import deleteNextOfKin from './deleteNextOfKin';

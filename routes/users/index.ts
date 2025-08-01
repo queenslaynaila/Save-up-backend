@@ -1,4 +1,4 @@
-import Router from '../../new/router';
+import Router from '../../core/router';
 import getUsersBySearchCriteria from './getUserByCriteria';
 import updateUserRole from './updateUserRole';
 import updateUserPin from './updateUserPin';

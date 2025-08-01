@@ -1,4 +1,4 @@
-import Router from '../../new/router';
+import Router from '../../core/router';
 import requestLoan from './createLoanRequest';
 import addLoanGuarantors from './createLoanGuarantors';
 import getGuarantorRequests from './getGuarantorRequests';

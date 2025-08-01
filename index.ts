@@ -18,7 +18,7 @@ import statisticsRouter from './routes/stats/index';
 import expensesRouter from './routes/expenses/index';
 import donationsRouter from './routes/donations/index';
 import transactionsRouter from './routes/transactions/index';
-import { Application } from './new/app';
+import { Application } from './core/app';
 
 const app = new Application({
   swagger: {
