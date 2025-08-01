@@ -25,7 +25,7 @@ const app = new Application({
     title: 'Save-up API',
     description: 'API documentation for Save-up backend',
     path: '/saveup/docs',
-    password: Config.SWAGGER_PASSWORD || 'admin'
+    password: Config.SWAGGER_PASSWORD
   },
   jobs: [
     {
