@@ -1,8 +1,8 @@
 import getAllSecurityQuestions from './getAllSecurityQuestions';
 import createSecurityAnswer from './createSecurityAnswer';
-import Router from '../../router';
+import Router from '../../new/router';
 
-const router = Router.getRouterInstance('/security-questions', 'Security Questions');
+const router = Router.createResourceRouter('Security Questions');
 
 getAllSecurityQuestions(router);
 createSecurityAnswer(router);

@@ -1,6 +1,7 @@
 import Config from './config';
 import HttpError from './httpError';
 import logger from './logger';
+import { Router } from  '@m-pot/backend-utils';
 
 const BASE_URL = 'https://api.smsleopard.com/v1/sms/send';
 

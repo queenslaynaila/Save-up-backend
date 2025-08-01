@@ -1,4 +1,4 @@
-import Router from '../../router';
+import Router from '../../new/router';
 import login from './login';
 import logout from './logout';
 import register from './register';
@@ -8,7 +8,7 @@ import verifySecurityAnswers from './verifySecurityAnswers';
 import resetPin from './resetPin';
 import getRefreshToken from './refreshToken';
 
-const router = Router.getRouterInstance('/auth', 'Auth');
+const router = Router.createResourceRouter('Auth');
 
 register(router);
 login(router);

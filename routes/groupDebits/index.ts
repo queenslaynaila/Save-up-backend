@@ -1,7 +1,7 @@
-import Router from '../../router';
+import Router from '../../new/router';
 import reviewDebitRequests from './createDebitReview';
 
-const router = Router.getRouterInstance('/', 'Group Debit Approval');
+const router = Router.createResourceRouter('Group Debit Approval');
 
 reviewDebitRequests(router);
 

@@ -1,4 +1,4 @@
-import Router from '../../router';
+import Router from '../../new/router';
 import bcrypt from 'bcrypt';
 import { z } from 'zod';
 import { sql } from '../../db';

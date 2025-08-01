@@ -1,4 +1,4 @@
-import Router from '../../router';
+import Router from '../../new/router';
 import getUsersBySearchCriteria from './getUserByCriteria';
 import updateUserRole from './updateUserRole';
 import updateUserPin from './updateUserPin';
@@ -10,7 +10,7 @@ import updateIdDetails from './updateIdentification';
 import updateUserStatus from './updateUserStatus';
 import getModerators from './getModerators';
 
-const router = Router.getRouterInstance('/users', 'Users');
+const router = Router.createResourceRouter('Users');
 
 getModerators(router);
 getUsersBySearchCriteria(router);

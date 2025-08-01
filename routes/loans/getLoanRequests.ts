@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import Router from '../../router';
+import Router from '../../new/router';
 import { sql } from '../../db';
 import { decodeEntityAndVerifyAccess } from '../../utils';
 import { DebitType } from '../groupWithdrawals/getWithdrawalRequests';

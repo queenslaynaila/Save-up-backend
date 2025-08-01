@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { sql } from '../../db';
-import Router from '../../router';
+import Router from '../../new/router';
 
 const SQL_GET_AGGREGATED_EXPENSES = sql<{
   agg: 'avg'|'sum'|'count'|'min'|'max';

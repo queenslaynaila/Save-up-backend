@@ -1,10 +1,10 @@
-import Router from '../../router';
+import Router from '../../new/router';
 import createExpense from './createExpense';
 import getExpensesByEntity from './getExpensesByEntity';
 import updateExpense from './updateExpense';
 import deleteExpense from './deleteExpense';
 
-const expenseRouter = Router.getRouterInstance('/', 'Expenses');
+const expenseRouter = Router.createResourceRouter('Expenses');
 
 createExpense(expenseRouter);
 getExpensesByEntity(expenseRouter);

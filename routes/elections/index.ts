@@ -6,9 +6,9 @@ import getElectionCandidates from './getElectionCandidates';
 import updateGroupElections from './updateElection';
 import ratifyElection from './ratifyElection';
 import createBallot from './createBallot';
-import Router from '../../router';
+import Router from '../../new/router';
 
-const router = Router.getRouterInstance('/groups', 'Elections');
+const router = Router.createResourceRouter('Elections');
 
 createGroupElection(router);
 createGroupElectionCandidates(router);

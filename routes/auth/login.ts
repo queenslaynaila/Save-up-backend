@@ -8,7 +8,7 @@ import {
   loginAttemptSchema,
   userContactDetailsSchema
 } from '../users/schema';
-import Router from '../../router';
+import Router from '../../new/router';
 import { generateToken } from '../../utils';
 
 const authenticatedUserSchema = userSchema.pick({

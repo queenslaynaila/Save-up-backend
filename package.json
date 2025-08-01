@@ -21,6 +21,7 @@
     "@asteasolutions/zod-to-openapi": "github:asteasolutions/zod-to-openapi",
     "@aws-sdk/client-s3": "^3.817.0",
     "@aws-sdk/s3-request-presigner": "^3.817.0",
+    "@m-pot/backend-utils": "^7.0.13",
     "@m-pot/sql-query": "^3.0.4",
     "ajv": "^8.17.1",
     "ajv-formats": "^3.0.1",

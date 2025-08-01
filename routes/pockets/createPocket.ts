@@ -1,4 +1,4 @@
-import Router from '../../router';
+import Router from '../../new/router';
 import { sql } from '../../db';
 import { pocketSchema, Pocket } from './schema';
 import { z } from 'zod';

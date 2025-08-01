@@ -4,6 +4,8 @@ export const ENUM_POCKET_TYPE = z.enum(['Standard', 'Locked']);
 const ENUM_PRIORITY = z.enum(['Low', 'Intermediate', 'High']);
 const ENUM_STATUS = z.enum(['In Progress', 'Completed']);
 
+export type PocketType = z.infer<typeof ENUM_POCKET_TYPE>;
+
 export const pocketSchema = z.object({
   entity_id: z.number().int().min(1),
   xid: z.number().int().min(1),

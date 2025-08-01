@@ -1,4 +1,4 @@
-import Router from '../../router';
+import Router from '../../new/router';
 import createGroup from './createGroup';
 import updateGroup from './updateGroup';
 import createGroupInvite from './sendGroupInvite';
@@ -6,7 +6,7 @@ import getGroupMembers from './getGroupMembers';
 import handleGroupExit from './removeGroupMember';
 import getGroupActivities from './getGroupActivities';
 
-const router = Router.getRouterInstance('/groups', 'Groups');
+const router = Router.createResourceRouter('Groups');
 
 createGroup(router);
 updateGroup(router);

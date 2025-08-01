@@ -1,7 +1,7 @@
-import Router from '../../router';
+import Router from '../../new/router';
 import getConfig from './getConfig';
 
-const router = Router.getRouterInstance('/config', 'Configurations');
+const router = Router.createResourceRouter('Config');
 
 getConfig(router);
 

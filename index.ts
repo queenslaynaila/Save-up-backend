@@ -1,57 +1,52 @@
 import 'express-async-errors';
-import { NextFunction, Request, Response } from 'express';
-import swaggerUi from 'swagger-ui-express';
-import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
-import { z } from 'zod';
-import Router, { generateOpenApiSpec } from './router';
 import { setupInterestJobSystem } from './jobs/bullConfig';
-import HttpError from './httpError';
-import logger from './logger';
 import Config from './config';
-import './routes/config/index';
-import './routes/generatePresignedUrl';
-import './routes/securityQuestions/index';
-import './routes/categories/index';
-import './routes/auth/index';
-import './routes/users/index';
-import './routes/nextOfKin/index';
-import './routes/groups/index';
-import './routes/elections/index';
-import './routes/groupWithdrawals/index';
-import './routes/loans/index';
-import './routes/groupDebits/index';
-import './routes/pockets/index';
-import './routes/stats/index';
-import './routes/expenses/index';
-import './routes/donations/index';
-import './routes/transactions/index';
-
-extendZodWithOpenApi(z);
+import configRouter from './routes/config/index';
+import generatePresignedUrlRouter from './routes/generatePresignedUrl';
+import securityQuestionsRouter from './routes/securityQuestions/index';
+import categoriesRouter from './routes/categories/index';
+import authRouter from './routes/auth/index';
+import usersRouter from './routes/users/index';
+import nextOfKinRouter from './routes/nextOfKin/index';
+import groupsRouter from './routes/groups/index';
+import electionsRouter from './routes/elections/index';
+import groupWithdrawalsRouter from './routes/groupWithdrawals/index';
+import loansRouter from './routes/loans/index';
+import groupDebitsRouter from './routes/groupDebits/index';
+import pocketsRouter from './routes/pockets/index';
+import statisticsRouter from './routes/stats/index';
+import expensesRouter from './routes/expenses/index';
+import donationsRouter from './routes/donations/index';
+import transactionsRouter from './routes/transactions/index';
+import { Application } from './new/app';
 
 setupInterestJobSystem();
 
-const app = Router.getAppInstance();
-
-app.use('/saveup/docs', swaggerUi.serve, swaggerUi.setup(generateOpenApiSpec()));
-
-app.use((_req: Request, res: Response, next: NextFunction): void => {
-  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
-  next();
-});
-
-app.use((_req: Request, _res: Response, _next: NextFunction): void => {
-  throw new HttpError(404);
-});
-
-app.use((error: Error, _req: Request, res: Response, _next: NextFunction): void => {
-  if (error instanceof HttpError) {
-    res.status(error.status).json(error);
-  } else {
-    logger.error(`Unhandled error: ${error.message}`);
-    res.sendStatus(500);
+const app = new Application({
+  swagger: {
+    title: 'Save-up API',
+    description: 'API documentation for Save-up backend',
+    path: '/saveup/docs',
+    password: Config.SWAGGER_PASSWORD || 'admin'
   }
 });
 
-app.listen(Config.PORT, (): void => {
-  logger.info(`Server running on port ${Config.PORT}`);
-});
+app.use(configRouter);
+app.use(generatePresignedUrlRouter);
+app.use(securityQuestionsRouter);
+app.use(categoriesRouter);
+app.use(authRouter);
+app.use(usersRouter);
+app.use(nextOfKinRouter);
+app.use(groupsRouter);
+app.use(electionsRouter);
+app.use(groupWithdrawalsRouter);
+app.use(loansRouter);
+app.use(groupDebitsRouter);
+app.use(pocketsRouter);
+app.use(statisticsRouter);
+app.use(expensesRouter);
+app.use(donationsRouter);
+app.use(transactionsRouter);
+
+app.listen();

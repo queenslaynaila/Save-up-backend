@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { sql } from '../../db';
-import Router from '../../router';
+import Router from '../../new/router';
 
 export const categorySchema = z.object({
   id: z.number().min(1),
@@ -31,7 +31,6 @@ const getAllCategories = (router: Router) => {
       }))
 
     },
-    auth: true,
     handler: async (_req, res) => {
       const categories = await SQL_GET_ALL_CATEGORIES({}).many();
       res.json(categories);

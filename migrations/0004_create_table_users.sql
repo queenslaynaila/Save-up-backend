@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS users (
     pin TEXT NOT NULL,
     status enum_user_status  NOT NULL DEFAULT 'Active',
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-    FOREIGN KEY (id) REFERENCES user_contact_details (id)
+er
 );
 
 GRANT INSERT, SELECT, UPDATE ON users TO saveup_www;

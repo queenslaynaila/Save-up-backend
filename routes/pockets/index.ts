@@ -1,11 +1,11 @@
-import Router from '../../router';
+import Router from '../../new/router';
 import createPocket from './createPocket';
 import deletePocket from './deletePocket';
 import getPocketsByEntity from './getPocketsByEntity';
 import updatePocket from './updatePocket';
 import getBalanceForAnEntity from './getPocketBalance';
 
-const router = Router.getRouterInstance('/', 'Pockets');
+const router = Router.createResourceRouter('Pockets');
 
 createPocket(router);
 getPocketsByEntity(router);

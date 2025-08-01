@@ -1,21 +1,21 @@
 import { z } from 'zod';
-import Router from '../router';
+import { Router } from '../new/router';
 import { UserRole } from './users/schema';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import Config from '../config';
 
 const s3 = new S3Client({
-  region: Config.AWS_REGION,
+  region: Config.S3_REGION,
   credentials: {
-    accessKeyId: Config.AWS_ACCESS_KEY_ID,
-    secretAccessKey: Config.AWS_SECRET_ACCESS_KEY
+    accessKeyId: Config.S3_ACCESS_KEY_ID,
+    secretAccessKey: Config.S3_SECRET_ACCESS_KEY
   }
 });
 
 const generatePresignedUrl = async (key: string): Promise<string> => {
   const command = new PutObjectCommand({
-    Bucket: Config.AWS_BUCKET_NAME,
+    Bucket: Config.S3_BUCKET_NAME,
     Key: key,
     ContentType: 'image/png'
   });
@@ -46,6 +46,6 @@ const generateUrl = (router: Router) => {
   });
 };
 
-const router = Router.getRouterInstance('/', 'S3');
+const router = Router.createResourceRouter('S3');
 generateUrl(router);
 export default router;

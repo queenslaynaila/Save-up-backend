@@ -1,10 +1,8 @@
 import getAllCategories from './getAllCategories';
-import createCategory from './createCategory';
-import Router from '../../router';
+import Router from '../../new/router';
 
-const router = Router.getRouterInstance('/categories', 'Categories');
+const router = Router.createResourceRouter('Categories');
 
-createCategory(router);
 getAllCategories(router);
 
 export default router;
