@@ -2,7 +2,7 @@ import 'express-async-errors';
 import { setupInterestJobSystem } from './jobs/bullConfig';
 import Config from './config';
 import configRouter from './routes/config/index';
-import generatePresignedUrlRouter from './routes/generatePresignedUrl';
+import S3Routes from './routes/generatePresignedUrl';
 import securityQuestionsRouter from './routes/securityQuestions/index';
 import categoriesRouter from './routes/categories/index';
 import authRouter from './routes/auth/index';
@@ -32,11 +32,16 @@ const app = new Application({
       name: 'Award Interest',
       setup: setupInterestJobSystem
     }
+  ],
+  allowedOrigins: [
+    'http://localhost:5173',
+    'https://save-up-seven.vercel.app',
+    'http://localhost:3003'
   ]
 });
 
 app.use(configRouter);
-app.use(generatePresignedUrlRouter);
+app.use(S3Routes);
 app.use(securityQuestionsRouter);
 app.use(categoriesRouter);
 app.use(authRouter);

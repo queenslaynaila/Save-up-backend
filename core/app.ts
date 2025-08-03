@@ -24,36 +24,37 @@ export interface JobConfig {
 export interface ApplicationOptions {
   swagger: SwaggerConfig;
   jobs?: JobConfig[];
+  allowedOrigins: string[];
 }
 
-export class Application extends Router {
+export class Application {
   private readonly expressApp: Express;
 
   private readonly swaggerConfig: SwaggerConfig;
 
+  private readonly allowedOrigins: string[] = [];
+
   private readonly registeredRouters: Router[] = [];
 
-  constructor(options: ApplicationOptions) {
-    super('');
+  private readonly jobs: JobConfig[] = [];
 
+  constructor(options: ApplicationOptions) {
     this.expressApp = express();
     this.swaggerConfig = options.swagger;
+    this.allowedOrigins = options.allowedOrigins;
 
     this.configureApp();
 
     if (options.jobs) {
-      this.setupJobs(options.jobs);
+      this.jobs.push(...options.jobs);
+      this.setupJobs();
     }
   }
 
   private configureApp(): void {
     this.expressApp.use(
       cors({
-        origin: [
-          'http://localhost:5173',
-          'https://save-up-seven.vercel.app',
-          'http://localhost:3003'
-        ],
+        origin: [...this.allowedOrigins],
         methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS', 'PUT'],
         credentials: true,
         exposedHeaders: ['Authorization', 'Reset'],
@@ -73,9 +74,7 @@ export class Application extends Router {
     this.registeredRouters.push(router);
   }
 
-  public listen(port?: number, callback?: () => void): void {
-    const listenPort = port || Config.PORT;
-
+  public listen(): void {
     this.build();
 
     this.expressApp.use((_req: Request, _res: Response, _next: NextFunction): void => {
@@ -91,14 +90,12 @@ export class Application extends Router {
       }
     });
 
-    this.expressApp.listen(listenPort, callback || (() => {
-      logger.info(`Server running on port ${listenPort}`);
-    }));
+    this.expressApp.listen(Config.PORT, () => {
+      logger.info(`Server running on port (http://localhost:${Config.PORT})`);
+    });
   }
 
   private build(): void {
-    this.expressApp.use('/', this.getRouter());
-
     this.registeredRouters.forEach(router => {
       this.expressApp.use(router.getPrefix(), router.getRouter());
     });
@@ -125,7 +122,7 @@ export class Application extends Router {
     const basePath = config.path.replace(/\/$/, '');
 
     this.expressApp.use(
-      [basePath, `${basePath}-json`],
+      basePath,
       basicAuth({
         challenge: true,
         users: { admin: config.password }
@@ -135,9 +132,9 @@ export class Application extends Router {
     this.expressApp.use(basePath, swaggerUi.serve, swaggerUi.setup(document));
   }
 
-  private async setupJobs(jobs: JobConfig[]): Promise<void> {
+  private async setupJobs(): Promise<void> {
     await Promise.all(
-      jobs.map(async (job) => {
+      this.jobs.map(async (job) => {
         try {
           await job.setup();
           logger.info(`Job ${job.name} setup successfully`);
@@ -148,7 +145,7 @@ export class Application extends Router {
       })
     );
 
-    logger.info('Job setup complete', this.constructor.name);
+    logger.info('Job setup complete');
   }
 
   public getExpressApp(): Express {

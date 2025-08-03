@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   Router as ExpressRouter,
   Request,
@@ -15,7 +14,7 @@ import Ajv, { ErrorObject } from 'ajv';
 import rateLimit from 'express-rate-limit';
 import addFormats from 'ajv-formats';
 import { authMiddleware } from '../utils';
-import fastJson from 'fast-json-stringify';
+import fastJson, { Schema } from 'fast-json-stringify';
 import logger from '../logger';
 
 extendZodWithOpenApi(z);
@@ -207,7 +206,12 @@ export class Router {
     };
   }
 
-  private buildMiddlewareStack(options: RouteOptions<any, any, any, any>): RequestHandler[] {
+  private buildMiddlewareStack<
+    Params extends AnyZodObject | typeof emptyObjectSchema = typeof emptyObjectSchema,
+    ResBody = ZodSchema | ZodNever,
+    ReqBody = ZodSchema | ZodNever,
+    Query extends AnyZodObject | typeof emptyObjectSchema = typeof emptyObjectSchema
+  >(options: RouteOptions<Params, ResBody, ReqBody, Query>): RequestHandler[] {
     const middlewares: RequestHandler[] = [];
 
     if (options.schema) {
@@ -233,21 +237,22 @@ export class Router {
       middlewares.push(...options.middlewares);
     }
 
-    logger.info(`[${this.resourceName}] Built middleware stack with ${middlewares.length} middleware(s)`);
+    logger.info(`[${this.resourceName}] Built middleware stack 
+      with ${middlewares.length} middleware(s)`);
 
     return middlewares;
   }
 
   static createResponseFormatter(schema: ZodSchema) {
-    const jsonResponseSchema: any = zodToJsonSchema(schema, { target: 'openApi3' });
-    const stringify = fastJson(jsonResponseSchema);
+    const jsonResponseSchema = zodToJsonSchema(schema, { target: 'openApi3' });
+    const stringify = fastJson(jsonResponseSchema as Schema);
 
     const errorSchema = z.union([
       z.record(z.unknown()),
       z.array(z.record(z.unknown()))
     ]);
-    const jsonErrorSchema: any = zodToJsonSchema(errorSchema, { target: 'openApi3' });
-    const errStringify = fastJson(jsonErrorSchema);
+    const jsonErrorSchema = zodToJsonSchema(errorSchema, { target: 'openApi3' });
+    const errStringify = fastJson(jsonErrorSchema as Schema);
 
     return (_req: Request, res: Response, next: NextFunction) => {
       res.json = <T extends object>(data: T) => {
@@ -271,7 +276,7 @@ export class Router {
     path: string,
     options: RouteOptions<Params, ResBody, ReqBody, Query>,
     response: { statusCode: number, schema: ZodSchema },
-    middlewares: any[]
+    middlewares: RequestHandler[]
   ) {
     const security = [];
     if (options.auth) security.push({ Authorization: [] });
@@ -305,7 +310,7 @@ export class Router {
       request: {
         params: options.schema?.params,
         body: options.schema?.body ? {
-          description: (options.schema.body as any).description,
+          description: (options.schema.body).description,
           content: {
             'application/json': {
               schema: options.schema.body
