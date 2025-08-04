@@ -103,7 +103,7 @@ const verifyPinResetToken = (router: Router) => {
 
       const resetTokenHeader = generateToken(
         user_id,
-        new Date(Date.now() + 15 * 60 * 1000).toISOString(),
+        '15m',
         2
       );
 
