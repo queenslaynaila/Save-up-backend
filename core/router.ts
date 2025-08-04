@@ -5,7 +5,15 @@ import {
   NextFunction,
   RequestHandler
 } from 'express';
-import z, { AnyZodObject, TypeOf, ZodNever, ZodSchema, ZodUndefined } from 'zod';
+import z, {
+  ZodArray,
+  ZodObject,
+  ZodRawShape,
+  ZodRecord,
+  ZodType,
+  ZodUndefined,
+  ZodUnion
+} from 'zod';
 import { Role } from '../routes/users/schema';
 import zodToJsonSchema from 'zod-to-json-schema';
 import { extendZodWithOpenApi, OpenAPIRegistry } from '@asteasolutions/zod-to-openapi';
@@ -29,7 +37,11 @@ addFormats(ajv, {
   formats: ['date-time', 'date']
 });
 
-const validateSchema = (schema: ZodSchema, data: unknown, section: 'body' | 'query' | 'params') => {
+const validateSchema = (
+  schema: ZodType,
+  data: unknown,
+  section: 'body' | 'query' | 'params'
+) => {
   const jsonSchema = zodToJsonSchema(schema, { target: 'openApi3' });
   const validate = ajv.compile(jsonSchema);
   const valid = validate(data);
@@ -48,9 +60,9 @@ const validateSchema = (schema: ZodSchema, data: unknown, section: 'body' | 'que
 };
 
 const validateRequest = (schema: {
-  body?: ZodSchema;
-  query?: AnyZodObject;
-  params?: AnyZodObject;
+  body?:ZodType;
+  query?: ZodType;
+  params?:ZodType;
 }) => {
   return (req: Request, _res: Response, next: NextFunction) => {
     if (schema.body) validateSchema(schema.body, req.body, 'body');
@@ -61,13 +73,14 @@ const validateRequest = (schema: {
 };
 
 type HttpMethod = 'get' | 'post' | 'patch' | 'delete' | 'put';
-const emptyObjectSchema = z.object({}).strict();
+type EmptyObjectSchema = ZodObject<Record<string, never>>;
 
 interface RouteOptions<
-  Params extends AnyZodObject | typeof emptyObjectSchema = typeof emptyObjectSchema,
-  ResBody = ZodSchema | ZodNever,
-  ReqBody = ZodSchema | ZodNever,
-  Query extends AnyZodObject | typeof emptyObjectSchema = typeof emptyObjectSchema
+  Params extends ZodObject<ZodRawShape> = EmptyObjectSchema,
+  ResBody extends ZodType = EmptyObjectSchema,
+  ReqBody extends ZodObject | ZodRecord| ZodArray<ZodType> |
+  ZodUnion<[ZodObject, ZodObject]> | ZodUndefined = EmptyObjectSchema,
+  Query extends ZodObject<ZodRawShape> = EmptyObjectSchema
 > {
   path: string;
   hidden?: boolean;
@@ -75,12 +88,12 @@ interface RouteOptions<
   description?: string;
   schema?: {
     params?: Params;
-    body?: ZodSchema<ReqBody>;
+    body?: ReqBody;
     query?: Query;
   };
   response?: {
     statusCode?: number;
-    schema?: ZodSchema<ResBody> | ZodUndefined;
+    schema?: ResBody;
     description?: string;
   };
   auth?: true | Role | Role[];
@@ -91,14 +104,15 @@ interface RouteOptions<
     skipForAdmins?: boolean;
   };
   middlewares?: RequestHandler[];
-  handler: RequestHandler<TypeOf<Params>, ResBody, ReqBody, TypeOf<Query>>;
+  handler: RequestHandler<z.infer<Params>, z.infer<ResBody>, z.infer<ReqBody>, z.infer<Query>>;
 }
 
 type SpecificRouteMethodHandler = <
-  Params extends AnyZodObject | typeof emptyObjectSchema = typeof emptyObjectSchema,
-  ResBody = ZodSchema | ZodNever,
-  ReqBody = ZodSchema | ZodNever,
-  Query extends AnyZodObject | typeof emptyObjectSchema = typeof emptyObjectSchema
+  Params extends ZodObject<ZodRawShape> = EmptyObjectSchema,
+  ResBody extends ZodType = EmptyObjectSchema,
+  ReqBody extends ZodObject | ZodRecord| ZodArray<ZodType> |
+  ZodUnion<[ZodObject, ZodObject]> | ZodUndefined = EmptyObjectSchema,
+  Query extends ZodObject<ZodRawShape> = EmptyObjectSchema
 >(options: RouteOptions<Params, ResBody, ReqBody, Query>) => void;
 
 export class Router {
@@ -180,10 +194,11 @@ export class Router {
 
   protected createMethodHandler(method: HttpMethod): SpecificRouteMethodHandler {
     return <
-      Params extends AnyZodObject | typeof emptyObjectSchema,
-      ResBody,
-      ReqBody,
-      Query extends AnyZodObject | typeof emptyObjectSchema
+      Params extends ZodObject<ZodRawShape> = EmptyObjectSchema,
+      ResBody extends ZodType = EmptyObjectSchema,
+      ReqBody extends ZodObject | ZodRecord| ZodArray<ZodType> |
+      ZodUnion<[ZodObject, ZodObject]> | ZodUndefined = EmptyObjectSchema,
+      Query extends ZodObject<ZodRawShape> = EmptyObjectSchema
     >(options: RouteOptions<Params, ResBody, ReqBody, Query>) => {
       const { path, handler, response: resOpt } = options;
 
@@ -207,10 +222,11 @@ export class Router {
   }
 
   private buildMiddlewareStack<
-    Params extends AnyZodObject | typeof emptyObjectSchema = typeof emptyObjectSchema,
-    ResBody = ZodSchema | ZodNever,
-    ReqBody = ZodSchema | ZodNever,
-    Query extends AnyZodObject | typeof emptyObjectSchema = typeof emptyObjectSchema
+    Params extends ZodObject<ZodRawShape> = EmptyObjectSchema,
+    ResBody extends ZodType = EmptyObjectSchema,
+    ReqBody extends ZodObject | ZodRecord| ZodArray<ZodType> |
+    ZodUnion<[ZodObject, ZodObject]> | ZodUndefined = EmptyObjectSchema,
+    Query extends ZodObject<ZodRawShape> = EmptyObjectSchema
   >(options: RouteOptions<Params, ResBody, ReqBody, Query>): RequestHandler[] {
     const middlewares: RequestHandler[] = [];
 
@@ -243,13 +259,13 @@ export class Router {
     return middlewares;
   }
 
-  static createResponseFormatter(schema: ZodSchema) {
+  static createResponseFormatter(schema: ZodType) {
     const jsonResponseSchema = zodToJsonSchema(schema, { target: 'openApi3' });
     const stringify = fastJson(jsonResponseSchema as Schema);
 
     const errorSchema = z.union([
-      z.record(z.unknown()),
-      z.array(z.record(z.unknown()))
+      z.record(z.string(), z.unknown()),
+      z.array(z.record(z.string(), z.unknown()))
     ]);
     const jsonErrorSchema = zodToJsonSchema(errorSchema, { target: 'openApi3' });
     const errStringify = fastJson(jsonErrorSchema as Schema);
@@ -267,15 +283,16 @@ export class Router {
   }
 
   private registerWithOpenAPI<
-    Params extends AnyZodObject | typeof emptyObjectSchema,
-    ResBody,
-    ReqBody,
-    Query extends AnyZodObject | typeof emptyObjectSchema
+    Params extends ZodObject<ZodRawShape> = EmptyObjectSchema,
+    ResBody extends ZodType = EmptyObjectSchema,
+    ReqBody extends ZodObject | ZodRecord| ZodArray<ZodType> |
+    ZodUnion<[ZodObject, ZodObject]> | ZodUndefined = EmptyObjectSchema,
+    Query extends ZodObject<ZodRawShape> = EmptyObjectSchema
   >(
     method: HttpMethod,
     path: string,
     options: RouteOptions<Params, ResBody, ReqBody, Query>,
-    response: { statusCode: number, schema: ZodSchema },
+    response: { statusCode: number, schema: ZodType },
     middlewares: RequestHandler[]
   ) {
     const security = [];
