@@ -159,11 +159,25 @@ export class Router {
 
   private static routerInstances = new Map<string, Router>();
 
-  constructor(resourceName: string, isResourceNameSuffixed = false) {
+  /**
+   * @param resourceName The name of the resource for which this router is created.
+   * @param isResourceNameSuffixedInUrl Controls whether the resource name appears as a prefix or suffix in URLs..
+   * 
+   * @example
+   * // Prefix pattern (default): resource name comes first
+   * new Router('Pockets', false) 
+   * // Results in URLs like: /saveup/pockets/me
+   * 
+   * @example
+   * // Suffix pattern: resource name comes after the path
+   * new Router('Pockets', true)
+   * // Results in URLs like: /saveup/me/pockets
+   */
+  constructor(resourceName: string, isResourceNameSuffixedInUrl = false) {
     this.router = ExpressRouter();
     this.resourceName = resourceName;
 
-    if (isResourceNameSuffixed) {
+    if (isResourceNameSuffixedInUrl) {
       this.routePrefix   = '/saveup/'
     } else {
       this.routePrefix = `/saveup/${resourceName
