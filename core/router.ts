@@ -22,7 +22,6 @@ import rateLimit from 'express-rate-limit';
 import addFormats from 'ajv-formats';
 import { authMiddleware } from '../utils';
 import fastJson, { Schema } from 'fast-json-stringify';
-import logger from '../logger';
 
 extendZodWithOpenApi(z);
 
@@ -270,9 +269,6 @@ export class Router {
     if (options.middlewares) {
       middlewares.push(...options.middlewares);
     }
-
-    logger.info(`[${this.resourceName}] Built middleware stack 
-      with ${middlewares.length} middleware(s)`);
 
     return middlewares;
   }
