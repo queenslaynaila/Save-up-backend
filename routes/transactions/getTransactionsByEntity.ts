@@ -20,7 +20,7 @@ const ENUM_TRANSACTION_TYPE = z.enum([
 const transactionTypeSchema = z.object({
   id: z.number(),
   slug: ENUM_TRANSACTION_TYPE,
-  created_at: z.string().datetime()
+  created_at: z.string()
 });
 
 const transactionSchema = z.object({
@@ -32,7 +32,7 @@ const transactionSchema = z.object({
   currency: z.string().length(3),
   delta: z.number().min(5),
   balance: z.number(),
-  created_at: z.string().datetime()
+  created_at: z.string()
 });
 
 const transaction = transactionSchema.pick({

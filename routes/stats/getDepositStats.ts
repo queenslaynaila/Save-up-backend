@@ -7,8 +7,8 @@ export const statsQuerySchema = z.object({
   entity_id: z.number().int().min(1).optional(),
   agg: z.enum(['avg', 'sum', 'count', 'min', 'max']),
   slug: z.string().optional(),
-  start_date: z.string().datetime().optional(),
-  end_date: z.string().datetime().optional()
+  start_date: z.string().optional(),
+  end_date: z.string().optional()
 });
 
 export type Stats = z.infer<typeof statsQuerySchema>;

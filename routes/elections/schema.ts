@@ -8,5 +8,5 @@ export const candidateSchema = z.object({
   election_id: z.number().int().min(1),
   candidate_id: z.number().int().min(1),
   chosen_by: z.number().int().min(1),
-  created_at: z.string().datetime()
+  created_at: z.string()
 });

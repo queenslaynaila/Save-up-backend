@@ -10,7 +10,7 @@ export const expenseSchema = z.object({
   spent_at: z.string()
     .regex(/^(20)\d{2}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/)
     .optional(),
-  created_at: z.string().datetime()
+  created_at: z.string()
 });
 
 export type Expense = z.infer<typeof expenseSchema>;

@@ -40,7 +40,7 @@ const activitySchema = z.object({
   id: z.number(),
   actor_id: z.number().int().min(1),
   actor_name: z.string(),
-  created_at: z.string().datetime(),
+  created_at: z.string(),
   target_id: z.number().int().min(1).nullable(),
   target_name: z.string().nullable(),
   pocket_id: z.number().int().min(1).nullable(),

@@ -21,7 +21,7 @@ const withdrawalRequestSchema = z.object({
         admin_name: z.string(),
         status: z.enum(['Approved', 'Rejected', 'Cancelled']),
         reason: z.string(),
-        approval_date: z.string().datetime()
+        approval_date: z.string()
       })
     )
     .nullable(),
@@ -34,7 +34,7 @@ const withdrawalRequestSchema = z.object({
       })
     )
     .min(1),
-  created_at: z.string().datetime()
+  created_at: z.string()
 });
 
 type WithdrawalRequest = z.infer<typeof withdrawalRequestSchema>;

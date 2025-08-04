@@ -20,7 +20,7 @@ const createCategory = (router: Router) => {
       body: z.object({
         name: z.string(),
         description: z.string(),
-        image_url: z.string().url()
+        image_url: z.string()
       })
     },
     response: {
@@ -31,7 +31,7 @@ const createCategory = (router: Router) => {
         description: true,
         image_url: true
       }).extend({
-        created_at: z.string().datetime()
+        created_at: z.string()
       })
     },
     auth: [UserRole.enum.Admin],

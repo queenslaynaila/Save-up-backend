@@ -98,7 +98,7 @@ const createFundraiser = (router: Router) => {
         xid: z.number().int().min(1),
         pocket_type: z.string(),
         status: z.string(),
-        created_at: z.string().datetime(),
+        created_at: z.string(),
         category_id: z.number()
       })
     },

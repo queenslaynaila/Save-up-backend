@@ -17,9 +17,9 @@ export const pocketSchema = z.object({
   currency: z.string(),
   target_amount: z.number(),
   target_at: z.string(),
-  completed_at: z.string().datetime().optional(),
-  created_at: z.string().datetime(),
-  deleted_at: z.string().datetime().optional()
+  completed_at: z.string().optional(),
+  created_at: z.string(),
+  deleted_at: z.string().optional()
 });
 
 export type Pocket = z.infer<typeof pocketSchema>;

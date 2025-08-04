@@ -6,7 +6,7 @@ import { decodeEntityAndVerifyAccess } from '../../utils';
 const groupMemberSchema = z.object({
   user_id: z.number().int().min(1),
   full_name: z.string(),
-  joined_at: z.string().datetime(),
+  joined_at: z.string(),
   is_admin: z.boolean()
 });
 

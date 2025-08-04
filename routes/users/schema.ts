@@ -27,7 +27,7 @@ export const userContactDetailsSchema = z.object({
   id: z.number().int().min(1),
   full_name: z.string(),
   phone_number: z.string().regex(/^\+\d{1,4}\d{9}$/),
-  created_at: z.string().datetime()
+  created_at: z.string()
 });
 
 export const userSchema = z.object({
@@ -38,7 +38,7 @@ export const userSchema = z.object({
   role: UserRole,
   gender: Gender.optional(),
   pin: z.string().regex(/^\d{4}$/),
-  created_at: z.string().datetime()
+  created_at: z.string()
 });
 
 export const loginAttemptSchema = z.object({
@@ -48,7 +48,7 @@ export const loginAttemptSchema = z.object({
   browser_info: z.string().optional(),
   success: z.boolean(),
   reason: z.string().optional(),
-  created_at: z.string().datetime()
+  created_at: z.string()
 });
 
 export const invitationSchema = z.object({
@@ -57,8 +57,8 @@ export const invitationSchema = z.object({
   sender_id: z.number().int().min(1),
   xid: z.number().int().min(1),
   status: z.enum(['Pending', 'Accept', 'Decline']),
-  created_at: z.string().datetime(),
-  deleted_at: z.string().datetime()
+  created_at: z.string(),
+  deleted_at: z.string()
 });
 
 export type Invitation = z.infer<typeof invitationSchema>;
@@ -69,7 +69,7 @@ const accountStatusSchema = z.object({
   admin_id: z.number().int().min(1),
   status: z.enum(['Active', 'Inactive', 'Suspended']),
   reason: z.string().optional(),
-  created_at: z.string().datetime()
+  created_at: z.string()
 });
 
 export type AccountStatus = z.infer<typeof accountStatusSchema>;

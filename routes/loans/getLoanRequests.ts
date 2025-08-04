@@ -26,7 +26,7 @@ const loanRequestSchema = z.object({
       admin_name: z.string(),
       status: z.enum(['Approved', 'Rejected']),
       reason: z.string(),
-      approval_date: z.string().datetime()
+      approval_date: z.string()
     })
   ),
   status: z.enum([
@@ -37,7 +37,7 @@ const loanRequestSchema = z.object({
     'Pending Guarantor Approval',
     'Pending Admin Approval'
   ]),
-  created_at: z.string().datetime()
+  created_at: z.string()
 });
 
 type LoanRequest = z.infer<typeof loanRequestSchema>;

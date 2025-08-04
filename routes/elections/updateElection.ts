@@ -9,7 +9,7 @@ const electionSchema = z.object({
   user_id: z.number().int().min(1),
   election_id: z.number().int().min(1),
   status: z.enum(['Open', 'Cancelled']).optional().nullable(),
-  nomination_ends_at: z.string().datetime().optional().nullable()
+  nomination_ends_at: z.string().optional().nullable()
 });
 
 type ElectionParams = z.infer<typeof electionSchema>;
@@ -40,7 +40,7 @@ const updateElections = (router: Router) => {
       }),
       body: z.object({
         status: z.enum(['Open', 'Cancelled']).optional(),
-        nomination_ends_at: z.string().datetime().optional()
+        nomination_ends_at: z.string().optional()
       })
     },
     handler: async (req, res) => {
