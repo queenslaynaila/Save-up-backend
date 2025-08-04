@@ -14,6 +14,7 @@ import {
   publicUserSchema
 } from './login';
 import { generateToken } from '../../utils';
+import logger from '../../logger';
 
 const UserRegistrationSchema = userSchema.pick({
   pin: true,
@@ -52,7 +53,7 @@ Pick<AuthenticatedUser, 'id'|'id_type'|'id_number'|'role'|
 `);
 
 const countries = [
-  { currency: 'KES', name: 'ke', code: '+255' },
+  { currency: 'KES', name: 'ke', code: '+254' },
   { currency: 'UGX', name: 'ug', code: '+256' },
   { currency: 'TZS', name: 'tz', code: '+255' }
 ];
