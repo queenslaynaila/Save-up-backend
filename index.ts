@@ -1,7 +1,6 @@
 import { setupInterestJobSystem } from './jobs/bullConfig';
 import Config from './config';
 import { Application } from './core/app';
-
 import configRouter from './routes/config';
 import S3Routes from './routes/generatePresignedUrl';
 import authRoutes from './routes/auth';
@@ -20,6 +19,7 @@ import statisticsRoutes from './routes/stats';
 import transactionsRoutes from './routes/transactions';
 import usersRoutes from './routes/users';
 
+
 const app = new Application({
   swagger: {
     title: 'Save-up API',
@@ -27,12 +27,6 @@ const app = new Application({
     path: '/saveup/docs',
     password: Config.SWAGGER_PASSWORD
   },
-  jobs: [
-    {
-      name: 'Award Interest',
-      setup: setupInterestJobSystem
-    }
-  ],
   allowedOrigins: [
     'http://localhost:5173',
     'https://save-up-seven.vercel.app',
@@ -61,3 +55,5 @@ app.use(transactionsRoutes);
 app.listen(Config.PORT, () => {
   console.log(`Server is running on http://localhost:${Config.PORT}`);
 });
+
+ 

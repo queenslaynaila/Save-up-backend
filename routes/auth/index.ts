@@ -1,7 +1,7 @@
 import Router from '../../core/router';
 import login from './login';
 import logout from './logout';
-import register from './register';
+import createUser from './register';
 import initiatePinReset from './initiatePinReset';
 import verifyPinResetToken from './verifyPinResetToken';
 import verifySecurityAnswers from './verifySecurityAnswers';
@@ -10,9 +10,9 @@ import getRefreshToken from './refreshToken';
 
 const router = Router.createResourceRouter('Auth');
 
-register(router);
+createUser(router);
 login(router);
-register(router);
+createUser(router);
 getRefreshToken(router);
 logout(router);
 initiatePinReset(router);
