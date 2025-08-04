@@ -305,7 +305,7 @@ export class Router {
         description: response.statusCode.toString().startsWith('2') ? 'Success' : 'Error',
         content: {
           'application/json': {
-            schema: z.toJSONSchema(response.schema)
+            schema: response.schema
           }
         }
       }
