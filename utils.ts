@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcrypt';
-import jwt, { JwtPayload } from 'jsonwebtoken';
+import jwt, { JwtPayload, SignOptions } from 'jsonwebtoken';
 import { sql } from './db';
 import HttpError from './httpError';
 import Config from './config';
@@ -9,6 +9,7 @@ import {
   PinResetState,
   Role
 } from './routes/users/schema';
+import { StringValue } from 'ms';
 
 declare module 'express-serve-static-core' {
   interface Request {
@@ -64,9 +65,10 @@ const SQL_GET_GROUP_MEMBERSHIP_STATUS = sql<{
     ) AS is_admin_member
 `);
 
+
 export function generateToken(
   userId: number,
-  expiresIn: string,
+  expiresIn: StringValue | number,
   roleOrStep: Role | number,
   isAccessToken = false
 ): string {
@@ -82,10 +84,12 @@ export function generateToken(
     ? Config.JWT_SECRET
     : Config.JWT_REFRESH_SECRET;
 
-  return jwt.sign(payload, secret, {
+  const options = {
     expiresIn,
     issuer: Config.JWT_ISSUER
-  });
+  };
+
+  return jwt.sign(payload, secret, options);
 }
 
 function validateAndDecodeJwt(headerValue: string): JwtPayload {
