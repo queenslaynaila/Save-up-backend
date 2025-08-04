@@ -1,4 +1,3 @@
-import 'express-async-errors';
 import { setupInterestJobSystem } from './jobs/bullConfig';
 import Config from './config';
 import configRouter from './routes/config/index';
@@ -58,4 +57,6 @@ app.use(expensesRouter);
 app.use(donationsRouter);
 app.use(transactionsRouter);
 
-app.listen();
+app.listen(Config.PORT, () => {
+  console.log(`Server is running on http://localhost:${Config.PORT}`);
+});
