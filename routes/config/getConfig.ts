@@ -13,7 +13,7 @@ const configSchema = z.object({
   withdrawal_charges: z.string(),
   currency: z.string()
 });
-export type Config = z.infer<typeof configSchema>;
+type Config = z.infer<typeof configSchema>;
 
 const SQL_GET_CONFIG = sql<{country_code:string}, Config>(`
   SELECT 

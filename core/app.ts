@@ -15,12 +15,12 @@ type SwaggerConfig = {
   version?: string;
 };
 
-export interface JobConfig {
+interface JobConfig {
   name: string;
   setup: () => Promise<void>;
 }
 
-export interface ApplicationOptions {
+interface ApplicationOptions {
   swagger: SwaggerConfig;
   jobs?: JobConfig[];
   allowedOrigins: string[];

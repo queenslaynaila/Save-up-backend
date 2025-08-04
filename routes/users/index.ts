@@ -9,6 +9,8 @@ import unlockUserAccount from './unlockUserAccount';
 import updateIdDetails from './updateIdentification';
 import updateUserStatus from './updateUserStatus';
 import getModerators from './getModerators';
+import getGroupActivities from './getUserActivities';
+import { get } from 'http';
 
 const router = Router.createResourceRouter('Users');
 
@@ -16,6 +18,7 @@ getModerators(router);
 getUsersBySearchCriteria(router);
 getInvites(router);
 getGroupsByUserId(router);
+getGroupActivities(router); 
 updateUserPin(router);
 updateIdDetails(router);
 updateUserRole(router);

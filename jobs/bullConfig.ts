@@ -18,11 +18,11 @@ export const DAILY_INTEREST_QUEUE_NAME = 'previous-day-interest-calculation';
 const CRON_SCHEDULE_2AM_DAILY = '0 2 * * *';
 const RETRY_DELAY_HOURS = 4;
 
-export const JOB_FIND_POCKETS_ELIGIBLE_FOR_INTEREST = 'find-interest-eligible-pockets';
+const JOB_FIND_POCKETS_ELIGIBLE_FOR_INTEREST = 'find-interest-eligible-pockets';
 export const JOB_CALCULATE_INTEREST_FOR_POCKET = 'calculate-interest-for-pocket';
 export const JOB_FINALIZE_INTEREST_SUMMARY = 'finalize-interest-summary';
 
-export const dailyInterestQueue = new Queue(DAILY_INTEREST_QUEUE_NAME, {
+const dailyInterestQueue = new Queue(DAILY_INTEREST_QUEUE_NAME, {
   connection: redis,
   defaultJobOptions: {
     attempts: 3,
@@ -69,7 +69,7 @@ async function processJob(job: Job): Promise<void> {
   }
 }
 
-export function startDailyInterestWorker() {
+function startDailyInterestWorker() {
   const interestWorker = new Worker(
     DAILY_INTEREST_QUEUE_NAME,
     processJob,

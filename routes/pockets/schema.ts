@@ -1,6 +1,5 @@
 import { z } from 'zod';
-
-export const ENUM_POCKET_TYPE = z.enum(['Standard', 'Locked']);
+const ENUM_POCKET_TYPE = z.enum(['Standard', 'Locked']);
 const ENUM_PRIORITY = z.enum(['Low', 'Intermediate', 'High']);
 const ENUM_STATUS = z.enum(['In Progress', 'Completed']);
 
