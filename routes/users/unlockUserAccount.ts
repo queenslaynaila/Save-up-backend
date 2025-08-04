@@ -34,7 +34,7 @@ const unlockUserAccount = (router: Router) => {
   router.patch({
     path: '/:user_id/unlock',
     summary: 'Unlock a locked user account.',
-    auth: [UserRole.Enum.Moderator, UserRole.Enum.Admin],
+    auth: [UserRole.enum.Moderator, UserRole.enum.Admin],
     schema: {
       params: z.object({
         user_id: z.number().int().min(1)

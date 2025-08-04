@@ -105,7 +105,7 @@ const createUser = (router: Router) => {
         ...req.body,
         country,
         currency,
-        role: UserRole.Enum.Standard,
+        role: UserRole.enum.Standard,
         pin: hashedPin,
         ip_address: ipAddress,
         user_agent: userAgent

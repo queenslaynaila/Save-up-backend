@@ -134,7 +134,7 @@ const getLoanRequests = (router: Router) => {
       const loans = await SQL_GET_LOANS({
         group_id: groupId,
         pocket_id: req.query.pocket_id,
-        debit_type: DebitType.Enum.Loan
+        debit_type: DebitType.enum.Loan
       }).many();
       res.json(loans);
     }

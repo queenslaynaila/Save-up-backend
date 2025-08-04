@@ -25,7 +25,7 @@ const getModerators = (router: Router) => {
   router.get({
     path: '/moderators',
     summary: 'Get list of moderators',
-    auth: UserRole.Enum.Admin,
+    auth: UserRole.enum.Admin,
     response: {
       schema: z.array(publicUserSchema)
     },

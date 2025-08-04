@@ -126,7 +126,7 @@ const getGrpDebitRequests = (router: Router) => {
       const withdrawals = await SQL_GET_GROUP_WITHDRAWALS({
         group_id: groupId,
         pocket_id: req.query.pocket_id,
-        debit_type: DebitType.Enum.Withdrawal
+        debit_type: DebitType.enum.Withdrawal
       }).many();
 
       res.json(withdrawals);

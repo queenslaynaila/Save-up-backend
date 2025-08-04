@@ -54,7 +54,7 @@ const getNextOfKin = (router: Router) => {
       const userId = await decodeEntityAndVerifyAccess(req, true);
       const { include_history } = req.query;
 
-      if (req.user!.role === UserRole.Enum.Standard && include_history) {
+      if (req.user!.role === UserRole.enum.Standard && include_history) {
         throw new HttpError(403);
       }
 

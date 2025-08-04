@@ -34,7 +34,7 @@ const createCategory = (router: Router) => {
         created_at: z.string().datetime()
       })
     },
-    auth: [UserRole.Enum.Admin],
+    auth: [UserRole.enum.Admin],
     handler: async (_req, res) => {
       const category = await SQL_CREATE_CATEGORY({}).one();
       res.json(category);
