@@ -15,7 +15,6 @@ import z, {
   ZodUnion
 } from 'zod';
 import { Role } from '../routes/users/schema';
-import zodToJsonSchema from 'zod-to-json-schema';
 import { extendZodWithOpenApi, OpenAPIRegistry } from '@asteasolutions/zod-to-openapi';
 import HttpError from '../httpError';
 import Ajv, { ErrorObject } from 'ajv';
@@ -42,7 +41,7 @@ const validateSchema = (
   data: unknown,
   section: 'body' | 'query' | 'params'
 ) => {
-  const jsonSchema = zodToJsonSchema(schema, { target: 'openApi3' });
+  const jsonSchema = z.toJSONSchema(schema);
   const validate = ajv.compile(jsonSchema);
   const valid = validate(data);
 
@@ -260,14 +259,14 @@ export class Router {
   }
 
   static createResponseFormatter(schema: ZodType) {
-    const jsonResponseSchema = zodToJsonSchema(schema, { target: 'openApi3' });
+    const jsonResponseSchema = z.toJSONSchema(schema);
     const stringify = fastJson(jsonResponseSchema as Schema);
 
     const errorSchema = z.union([
       z.record(z.string(), z.unknown()),
       z.array(z.record(z.string(), z.unknown()))
     ]);
-    const jsonErrorSchema = zodToJsonSchema(errorSchema, { target: 'openApi3' });
+    const jsonErrorSchema = z.toJSONSchema(errorSchema);
     const errStringify = fastJson(jsonErrorSchema as Schema);
 
     return (_req: Request, res: Response, next: NextFunction) => {
@@ -306,7 +305,7 @@ export class Router {
         description: response.statusCode.toString().startsWith('2') ? 'Success' : 'Error',
         content: {
           'application/json': {
-            schema: zodToJsonSchema(response.schema, { target: 'openApi3' })
+            schema: z.toJSONSchema(response.schema)
           }
         }
       }
