@@ -20,7 +20,8 @@ RETURNS TABLE (
     role enum_user_role,
     gender enum_gender,
     pin text,
-    created_at timestamp with time zone
+    created_at timestamp with time zone,
+    country text
 ) AS $$
 DECLARE
     v_entity_id   INT;
@@ -65,6 +66,7 @@ BEGIN
         users.id,
         users.id_type,
         users.id_number,
+        users.country,
         user_contact_details.phone_number,
         user_contact_details.full_name,
         users.role,
