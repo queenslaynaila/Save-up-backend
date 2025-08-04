@@ -1,23 +1,24 @@
 import { setupInterestJobSystem } from './jobs/bullConfig';
 import Config from './config';
-import configRouter from './routes/config/index';
-import S3Routes from './routes/generatePresignedUrl';
-import securityQuestionsRouter from './routes/securityQuestions/index';
-import categoriesRouter from './routes/categories/index';
-import authRouter from './routes/auth/index';
-import usersRouter from './routes/users/index';
-import nextOfKinRouter from './routes/nextOfKin/index';
-import groupsRouter from './routes/groups/index';
-import electionsRouter from './routes/elections/index';
-import groupWithdrawalsRouter from './routes/groupWithdrawals/index';
-import loansRouter from './routes/loans/index';
-import groupDebitsRouter from './routes/groupDebits/index';
-import pocketsRouter from './routes/pockets/index';
-import statisticsRouter from './routes/stats/index';
-import expensesRouter from './routes/expenses/index';
-import donationsRouter from './routes/donations/index';
-import transactionsRouter from './routes/transactions/index';
 import { Application } from './core/app';
+
+import configRouter from './routes/config';
+import S3Routes from './routes/generatePresignedUrl';
+import authRoutes from './routes/auth';
+import categoryRoutes from './routes/categories';
+import donationRoutes from './routes/donations';
+import electionsRoutes from './routes/elections';
+import expensesRoutes from './routes/expenses';
+import groupDebitsRoutes from './routes/groupDebits';
+import groupsRoutes from './routes/groups';
+import groupWithdrawalsRoutes from './routes/groupWithdrawals';
+import loanRoutes from './routes/loans';
+import nextOfKinRoutes from './routes/nextOfKin';
+import pocketsRoutes from './routes/pockets';
+import securityQuestionsRoutes from './routes/securityQuestions';
+import statisticsRoutes from './routes/stats';
+import transactionsRoutes from './routes/transactions';
+import usersRoutes from './routes/users';
 
 const app = new Application({
   swagger: {
@@ -41,21 +42,21 @@ const app = new Application({
 
 app.use(configRouter);
 app.use(S3Routes);
-app.use(securityQuestionsRouter);
-app.use(categoriesRouter);
-app.use(authRouter);
-app.use(usersRouter);
-app.use(nextOfKinRouter);
-app.use(groupsRouter);
-app.use(electionsRouter);
-app.use(groupWithdrawalsRouter);
-app.use(loansRouter);
-app.use(groupDebitsRouter);
-app.use(pocketsRouter);
-app.use(statisticsRouter);
-app.use(expensesRouter);
-app.use(donationsRouter);
-app.use(transactionsRouter);
+app.use(categoryRoutes);
+app.use(authRoutes);
+app.use(usersRoutes);
+app.use(nextOfKinRoutes);
+app.use(groupsRoutes);
+app.use(expensesRoutes);
+app.use(pocketsRoutes);
+app.use(donationRoutes);
+app.use(electionsRoutes);
+app.use(groupDebitsRoutes);
+app.use(groupWithdrawalsRoutes);
+app.use(loanRoutes);
+app.use(securityQuestionsRoutes);
+app.use(statisticsRoutes);
+app.use(transactionsRoutes);
 
 app.listen(Config.PORT, () => {
   console.log(`Server is running on http://localhost:${Config.PORT}`);
