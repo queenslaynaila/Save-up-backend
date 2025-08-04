@@ -12,7 +12,6 @@ const router = Router.createResourceRouter('Auth');
 
 createUser(router);
 login(router);
-createUser(router);
 getRefreshToken(router);
 logout(router);
 initiatePinReset(router);
