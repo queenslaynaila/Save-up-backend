@@ -5,7 +5,7 @@ import getGuarantorRequests from './getGuarantorRequests';
 import approveGuarantorRequest from './approveGurantorRequest';
 import getLoanRequests from './getLoanRequests';
 
-const router = Router.createResourceRouter('Loans');
+const router = Router.createResourceRouter('Loans', true);
 
 requestLoan(router);
 addLoanGuarantors(router);

@@ -4,7 +4,7 @@ import getNextOfKin from './getNextOfKin';
 import deleteNextOfKin from './deleteNextOfKin';
 import updateNextOfKin from './updateNextOfKin';
 
-const router = Router.createResourceRouter('Next of Kins');
+const router = Router.createResourceRouter('Next of Kins', true);
 
 createNextOfKin(router);
 getNextOfKin(router);

@@ -159,14 +159,18 @@ export class Router {
 
   private static routerInstances = new Map<string, Router>();
 
-  constructor(resourceName: string) {
+  constructor(resourceName: string, isResourceNameSuffixed = false) {
     this.router = ExpressRouter();
     this.resourceName = resourceName;
 
-    this.routePrefix = `/saveup/${resourceName
-      .toLowerCase()
-      .replace(/\s+/g, '-')
-      .replace(/[^a-z0-9-]/g, '')}`;
+    if (isResourceNameSuffixed) {
+      this.routePrefix   = '/saveup/'
+    } else {
+      this.routePrefix = `/saveup/${resourceName
+        .toLowerCase()
+        .replace(/\s+/g, '-')
+        .replace(/[^a-z0-9-]/g, '')}`;
+    }
 
     this.get = this.createMethodHandler('get');
     this.post = this.createMethodHandler('post');
@@ -183,12 +187,13 @@ export class Router {
     return this.routePrefix;
   }
 
-  public static createResourceRouter(resourceName: string): Router {
-    if (!this.routerInstances.has(resourceName)) {
-      this.routerInstances.set(resourceName, new Router(resourceName));
+  public static createResourceRouter(resourceName: string, suffixResource = false): Router {
+    const key = `${resourceName}-${suffixResource}`;
+    if (!this.routerInstances.has(key)) {
+      this.routerInstances.set(key, new Router(resourceName, suffixResource));
     }
 
-    return this.routerInstances.get(resourceName)!;
+    return this.routerInstances.get(key)!;
   }
 
   protected createMethodHandler(method: HttpMethod): SpecificRouteMethodHandler {

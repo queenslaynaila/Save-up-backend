@@ -5,7 +5,7 @@ import getPocketsByEntity from './getPocketsByEntity';
 import updatePocket from './updatePocket';
 import getBalanceForAnEntity from './getPocketBalance';
 
-const router = Router.createResourceRouter('Pockets');
+const router = Router.createResourceRouter('Pockets', true);
 
 createPocket(router);
 getPocketsByEntity(router);
