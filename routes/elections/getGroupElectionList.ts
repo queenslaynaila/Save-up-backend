@@ -16,7 +16,7 @@ const ongoingElectionSchema = z.object({
   status: ElectionStatus,
   initiator_id: z.number().int().min(1),
   initiator_name: z.string(),
-  nomination_ends_at: z.string()({ offset: true }),
+  nomination_ends_at: z.string(),
   admins: z.array(adminSchema).nullable()
 });
 
