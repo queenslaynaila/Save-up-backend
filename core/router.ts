@@ -40,7 +40,7 @@ const validateSchema = (
   data: unknown,
   section: 'body' | 'query' | 'params'
 ) => {
-  const jsonSchema = z.toJSONSchema(schema);
+  const jsonSchema = z.toJSONSchema(schema, {target: 'draft-7'});
   const validate = ajv.compile(jsonSchema);
   const valid = validate(data);
 
@@ -274,14 +274,14 @@ export class Router {
   }
 
   static createResponseFormatter(schema: ZodType) {
-    const jsonResponseSchema = z.toJSONSchema(schema);
+    const jsonResponseSchema = z.toJSONSchema(schema, {target: 'draft-7'});
     const stringify = fastJson(jsonResponseSchema as Schema);
 
     const errorSchema = z.union([
       z.record(z.string(), z.unknown()),
       z.array(z.record(z.string(), z.unknown()))
     ]);
-    const jsonErrorSchema = z.toJSONSchema(errorSchema);
+    const jsonErrorSchema = z.toJSONSchema(errorSchema, {target: 'draft-7'});
     const errStringify = fastJson(jsonErrorSchema as Schema);
 
     return (_req: Request, res: Response, next: NextFunction) => {
