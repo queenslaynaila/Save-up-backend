@@ -203,7 +203,7 @@ export class Router {
 
       const response = {
         statusCode: resOpt?.statusCode ?? (resOpt?.schema ? 200 : 204),
-        schema: resOpt?.schema ?? z.never()
+        schema: resOpt?.schema ?? z.object({})
       };
 
       const middlewares = this.buildMiddlewareStack(options);
