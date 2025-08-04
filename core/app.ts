@@ -5,7 +5,6 @@ import cors from 'cors';
 import Router from './router';
 import HttpError from '../httpError';
 import logger from '../logger';
-import Config from '../config';
 import { OpenApiGeneratorV3 } from '@asteasolutions/zod-to-openapi';
 
 type SwaggerConfig = {
@@ -74,7 +73,7 @@ export class Application {
     this.registeredRouters.push(router);
   }
 
-  public listen(): void {
+  public listen(PORT: number, callback: () => void): void {
     this.build();
 
     this.expressApp.use((_req: Request, _res: Response, _next: NextFunction): void => {
@@ -90,9 +89,7 @@ export class Application {
       }
     });
 
-    this.expressApp.listen(Config.PORT, () => {
-      logger.info(`Server running on port (http://localhost:${Config.PORT})`);
-    });
+    this.expressApp.listen(PORT, callback);
   }
 
   private build(): void {
