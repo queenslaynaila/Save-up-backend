@@ -22,7 +22,6 @@ import rateLimit from 'express-rate-limit';
 import addFormats from 'ajv-formats';
 import { authMiddleware } from '../utils';
 import fastJson, { Schema } from 'fast-json-stringify';
-import logger from '../logger';
 
 extendZodWithOpenApi(z);
 
