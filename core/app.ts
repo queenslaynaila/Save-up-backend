@@ -43,7 +43,7 @@ export class Application {
     this.swaggerConfig = options.swagger;
     this.allowedOrigins = options.allowedOrigins;
 
-    this.configureApp();
+    this.configureGlobalMiddlewares();
 
     if (options.jobs) {
       this.jobs.push(...options.jobs);
@@ -51,7 +51,11 @@ export class Application {
     }
   }
 
-  private configureApp(): void {
+  public getExpressApp(): Express {
+    return this.expressApp;
+  }
+
+  private configureGlobalMiddlewares(): void {
     this.expressApp.use(helmet({
       contentSecurityPolicy: {
         directives: {
@@ -173,9 +177,5 @@ export class Application {
         }
       })
     );
-  }
-
-  public getExpressApp(): Express {
-    return this.expressApp;
   }
 }
