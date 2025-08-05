@@ -19,7 +19,6 @@ import statisticsRoutes from './routes/stats';
 import transactionsRoutes from './routes/transactions';
 import usersRoutes from './routes/users';
 
-
 const app = new Application({
   swagger: {
     title: 'Save-up API',
@@ -55,5 +54,3 @@ app.use(transactionsRoutes);
 app.listen(Config.PORT, () => {
   console.log(`Server is running on http://localhost:${Config.PORT}`);
 });
-
- 
