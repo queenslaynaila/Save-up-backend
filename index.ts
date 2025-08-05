@@ -30,6 +30,12 @@ const app = new Application({
     'http://localhost:5173',
     'https://save-up-seven.vercel.app',
     'http://localhost:3003'
+  ],
+  jobs: [
+    {
+      name: 'Automated Interest Calculation',
+      setup: setupInterestJobSystem
+    }
   ]
 });
 
