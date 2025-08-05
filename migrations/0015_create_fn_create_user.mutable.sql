@@ -63,16 +63,16 @@ BEGIN
 
     RETURN QUERY
     SELECT
-        users.id,
-        users.id_type,
-        users.id_number,
-        users.country,
-        user_contact_details.phone_number,
-        user_contact_details.full_name,
-        users.role,
-        users.gender,
-        users.pin,
-        users.created_at
+        users.id,                           -- 1: int
+        users.id_type,                      -- 2: enum_id_type
+        users.id_number,                    -- 3: text
+        user_contact_details.phone_number,  -- 4: text (moved up)
+        user_contact_details.full_name,     -- 5: text (moved up)  
+        users.role,                         -- 6: enum_user_role (now correct position)
+        users.gender,                       -- 7: enum_gender
+        users.pin,                          -- 8: text
+        users.created_at,                   -- 9: timestamp with time zone
+        users.country                       -- 10: text (moved down)
     FROM
         users
     LEFT JOIN
