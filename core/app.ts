@@ -1,5 +1,6 @@
 import express, { Express, NextFunction, Request, Response } from 'express';
 import swaggerUi from 'swagger-ui-express';
+import helmet from 'helmet';
 import basicAuth from 'express-basic-auth';
 import cors from 'cors';
 import Router from './router';
@@ -51,6 +52,20 @@ export class Application {
   }
 
   private configureApp(): void {
+    this.expressApp.use(helmet({
+      contentSecurityPolicy: {
+        directives: {
+          defaultSrc: ["'self'"],
+          styleSrc: ["'self'", "'unsafe-inline'"],
+        },
+      },
+      hsts: {
+        maxAge: 31536000,
+        includeSubDomains: true,
+        preload: true
+      }
+      })
+    );
     this.expressApp.use(
       cors({
         origin: [...this.allowedOrigins],
@@ -62,11 +77,6 @@ export class Application {
     );
 
     this.expressApp.use(express.json());
-
-    this.expressApp.use((req: Request, res: Response, next: NextFunction): void => {
-      res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
-      next();
-    });
   }
 
   public use(router: Router): void {
@@ -101,7 +111,29 @@ export class Application {
   }
 
   private setupSwagger(config: SwaggerConfig): void {
-    const generator = new OpenApiGeneratorV3(Router.getOpenApiRegistry().definitions);
+    const registry = Router.getOpenApiRegistry();
+    registry.registerComponent(
+      'securitySchemes',
+      'Authorization',
+      {
+        type: 'apiKey',
+        name: 'Authorization',
+        in: 'header',
+        description: 'JWT Bearer token for authentication'
+      }
+    );
+
+    registry.registerComponent(
+      'securitySchemes',
+      'Reset',
+      {
+        type: 'apiKey',
+        name: 'Reset',
+        in: 'header',
+        description: 'JWT token for password reset process'
+      }
+    );
+    const generator = new OpenApiGeneratorV3(registry.definitions);
     const document = generator.generateDocument({
       openapi: '3.0.0',
       info: {
