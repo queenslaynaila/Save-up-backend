@@ -94,14 +94,14 @@ export class Application {
 
   private build(): void {
     this.registeredRouters.forEach(router => {
-      this.expressApp.use(router.getPrefix(), router.getRouter());
+      this.expressApp.use(router.getBasePath(), router.getExpressRouter());
     });
 
     this.setupSwagger(this.swaggerConfig);
   }
 
   private setupSwagger(config: SwaggerConfig): void {
-    const generator = new OpenApiGeneratorV3(Router.getRegistry().definitions);
+    const generator = new OpenApiGeneratorV3(Router.getOpenApiRegistry().definitions);
     const document = generator.generateDocument({
       openapi: '3.0.0',
       info: {
@@ -141,8 +141,6 @@ export class Application {
         }
       })
     );
-
-    logger.info('Job setup complete');
   }
 
   public getExpressApp(): Express {
