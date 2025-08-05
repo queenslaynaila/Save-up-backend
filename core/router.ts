@@ -17,7 +17,7 @@ import z, {
 import { Role } from '../routes/users/schema';
 import { extendZodWithOpenApi, OpenAPIRegistry } from '@asteasolutions/zod-to-openapi';
 import HttpError from '../httpError';
-import Ajv, { ErrorObject } from 'ajv';
+import Ajv, { ErrorObject, ValidateFunction } from 'ajv';
 import rateLimit from 'express-rate-limit';
 import addFormats from 'ajv-formats';
 import { authMiddleware } from '../utils';
@@ -35,17 +35,23 @@ addFormats(ajv, {
   formats: ['date-time', 'date']
 });
 
-const validateSchema = (
-  schema: ZodType,
+const precompiledValidators = new Map<string, {
+  body?: ValidateFunction;
+  query?: ValidateFunction;
+  params?: ValidateFunction;
+}>();
+
+const allRegisteredRoutes = new Map<string, { method: HttpMethod; path: string; hasValidators: boolean }>();
+
+const validateWithPrecompiledSchema = (
+  validator: ValidateFunction,
   data: unknown,
   section: 'body' | 'query' | 'params'
 ) => {
-  const jsonSchema = z.toJSONSchema(schema, {target: 'draft-7'});
-  const validate = ajv.compile(jsonSchema);
-  const valid = validate(data);
+  const valid = validator(data);
 
   if (!valid) {
-    const errors = validate.errors?.map((err: ErrorObject) => ({
+    const errors = validator.errors?.map((err: ErrorObject) => ({
       section,
       message: err.message,
       params: err.params,
@@ -55,19 +61,6 @@ const validateSchema = (
     }));
     throw new HttpError(400, errors);
   }
-};
-
-const validateRequest = (schema: {
-  body?:ZodType;
-  query?: ZodType;
-  params?:ZodType;
-}) => {
-  return (req: Request, _res: Response, next: NextFunction) => {
-    if (schema.body) validateSchema(schema.body, req.body, 'body');
-    if (schema.query) validateSchema(schema.query, req.query, 'query');
-    if (schema.params) validateSchema(schema.params, req.params, 'params');
-    next();
-  };
 };
 
 type HttpMethod = 'get' | 'post' | 'patch' | 'delete' | 'put';
@@ -116,6 +109,8 @@ type SpecificRouteMethodHandler = <
 export class Router {
   private static registry = new OpenAPIRegistry();
 
+  private static routerInstances = new Map<string, Router>();
+
   static {
     Router.registry.registerComponent(
       'securitySchemes',
@@ -155,8 +150,6 @@ export class Router {
   public readonly patch: SpecificRouteMethodHandler;
 
   public readonly delete: SpecificRouteMethodHandler;
-
-  private static routerInstances = new Map<string, Router>();
 
   /**
    * @param resourceName The name of the resource for which this router is created.
@@ -200,6 +193,10 @@ export class Router {
     return this.routePrefix;
   }
 
+  public static getRegistry(): OpenAPIRegistry {
+    return Router.registry;
+  }
+
   public static createResourceRouter(resourceName: string, suffixResource = false): Router {
     const key = `${resourceName}-${suffixResource}`;
     if (!this.routerInstances.has(key)) {
@@ -218,13 +215,23 @@ export class Router {
       Query extends ZodObject<ZodRawShape> = EmptyObjectSchema
     >(options: RouteOptions<Params, ResBody, ReqBody, Query>) => {
       const { path, handler, response: resOpt } = options;
+       const routeKey = this.generateRouteKey(method, path);
+        allRegisteredRoutes.set(routeKey, {
+        method,
+        path,
+        hasValidators: !!options.schema
+      });
+
+      if (options.schema) {
+        this.precompileSchemasForValidation(routeKey, options.schema);
+      }
 
       const response = {
         statusCode: resOpt?.statusCode ?? (resOpt?.schema ? 200 : 204),
         schema: resOpt?.schema ?? z.object({})
       };
 
-      const middlewares = this.buildMiddlewareStack(options);
+      const middlewares = this.buildMiddlewareStack(routeKey, options);
 
       if (!options.hidden) {
         this.registerWithOpenAPI(method, path, options, response, middlewares);
@@ -244,11 +251,10 @@ export class Router {
     ReqBody extends ZodObject | ZodRecord| ZodArray<ZodType> |
     ZodUnion<[ZodObject, ZodObject]> | ZodUndefined = EmptyObjectSchema,
     Query extends ZodObject<ZodRawShape> = EmptyObjectSchema
-  >(options: RouteOptions<Params, ResBody, ReqBody, Query>): RequestHandler[] {
+  >(routeKey:string, options: RouteOptions<Params, ResBody, ReqBody, Query>): RequestHandler[] {
     const middlewares: RequestHandler[] = [];
-
     if (options.schema) {
-      middlewares.push(validateRequest(options.schema));
+      middlewares.push(this.createPrecompiledValidationMiddleware(routeKey));
     }
 
     if (options.auth) {
@@ -271,6 +277,65 @@ export class Router {
     }
 
     return middlewares;
+  }
+
+  private createPrecompiledValidationMiddleware(routeKey: string): RequestHandler {
+    return (req: Request, _res: Response, next: NextFunction) => {
+      const validators = precompiledValidators.get(routeKey)!;
+
+      if (validators.body) {
+        validateWithPrecompiledSchema(validators.body, req.body, 'body');
+      }
+      if (validators.query) {
+        validateWithPrecompiledSchema(validators.query, req.query, 'query');
+      }
+      if (validators.params) {
+        validateWithPrecompiledSchema(validators.params, req.params, 'params');
+      }
+
+      next();
+    };
+  }
+  
+  private precompileSchemasForValidation<
+    Params extends ZodObject<ZodRawShape> = EmptyObjectSchema,
+    ReqBody extends ZodObject | ZodRecord| ZodArray<ZodType> |
+    ZodUnion<[ZodObject, ZodObject]> | ZodUndefined = EmptyObjectSchema,
+    Query extends ZodObject<ZodRawShape> = EmptyObjectSchema
+  >(
+    routeKey: string, 
+    schema: {
+      params?: Params;
+      body?: ReqBody;
+      query?: Query;
+    }
+  ): void {
+    const validators: {
+      params?: ValidateFunction;
+      body?: ValidateFunction;
+      query?: ValidateFunction;
+    } = {};
+
+    if (schema.params) {
+      const jsonSchema = z.toJSONSchema(schema.params, { target: 'draft-7' });
+      validators.params = ajv.compile(jsonSchema);
+    }
+
+    if (schema.body) {
+      const jsonSchema = z.toJSONSchema(schema.body, { target: 'draft-7' });
+      validators.body = ajv.compile(jsonSchema);
+    }
+
+    if (schema.query) {
+      const jsonSchema = z.toJSONSchema(schema.query, { target: 'draft-7' });
+      validators.query = ajv.compile(jsonSchema);
+    }
+
+    precompiledValidators.set(routeKey, validators);
+  }
+
+  private generateRouteKey(method: HttpMethod, path: string): string {
+    return `${method}:${this.resourceName}:${path}`;
   }
 
   static createResponseFormatter(schema: ZodType) {
@@ -352,10 +417,6 @@ export class Router {
       },
       responses: responseSchemas
     });
-  }
-
-  public static getRegistry(): OpenAPIRegistry {
-    return Router.registry;
   }
 }
 
