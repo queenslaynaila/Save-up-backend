@@ -17,13 +17,13 @@ import z, {
 import { Role } from '../routes/users/schema';
 import { extendZodWithOpenApi, OpenAPIRegistry } from '@asteasolutions/zod-to-openapi';
 import HttpError from '../httpError';
-import Ajv, { ErrorObject, ValidateFunction } from 'ajv';
+import Ajv, { ValidateFunction } from 'ajv';
 import rateLimit from 'express-rate-limit';
 import addFormats from 'ajv-formats';
 import fastJson, { Schema } from 'fast-json-stringify';
 import { validateAndDecodeJwt } from '../utils';
 
-export function authMiddleware(auth: true | Role | Role[] = true) {
+function authMiddleware(auth: true | Role | Role[] = true) {
   return (req: Request, _res: Response, next: NextFunction) => {
     if (!req.headers.authorization) {
       throw new HttpError(401);
@@ -50,15 +50,8 @@ export function authMiddleware(auth: true | Role | Role[] = true) {
 
 extendZodWithOpenApi(z);
 
-const ajv = new Ajv({
-  coerceTypes: true,
-  useDefaults: true
-});
-
-addFormats(ajv, {
-  mode: 'fast',
-  formats: ['date-time', 'date']
-});
+const ajv = new Ajv({coerceTypes: true, useDefaults: true});
+addFormats(ajv, {mode: 'fast', formats: ['date-time', 'date']});
 
 const precompiledValidators = new Map<string, {
   body?: ValidateFunction;
@@ -66,69 +59,73 @@ const precompiledValidators = new Map<string, {
   params?: ValidateFunction;
 }>();
 
-const getValidatorsForRoute = (routeKey: string) => {
-  const validators = precompiledValidators.get(routeKey);
-  if (!validators) {
-    throw new Error(`No precompiled validators found for route: ${routeKey}`);
+function compileValidationSchemas<
+  Params extends ZodObject<ZodRawShape> = EmptyObjectSchema,
+  ReqBody extends ZodObject | ZodRecord| ZodArray<ZodType> |
+  ZodUnion<[ZodObject, ZodObject]> | ZodUndefined = EmptyObjectSchema,
+  Query extends ZodObject<ZodRawShape> = EmptyObjectSchema
+>(
+  routeKey: string, 
+  schema: {
+    params?: Params;
+    body?: ReqBody;
+    query?: Query;
   }
-  return validators;
-};
+): void {
+  const validators: {
+    params?: ValidateFunction;
+    body?: ValidateFunction;
+    query?: ValidateFunction;
+  } = {};
 
-const validateRequestData = (
-  validator: ValidateFunction,
-  data: unknown,
-  section: 'body' | 'query' | 'params'
-) => {
-  const valid = validator(data);
-
-  if (!valid) {
-    const errors = validator.errors?.map((err: ErrorObject) => ({
-      section,
-      message: err.message,
-      params: err.params,
-      keyword: err.keyword,
-      dataPath: err.instancePath,
-      schemaPath: err.schemaPath
-    }));
-    throw new HttpError(400, errors);
-  }
-};
-
-const createRequestValidator = (routeKey: string): RequestHandler => {
-  return (req: Request, _res: Response, next: NextFunction) => {
-    const validators = getValidatorsForRoute(routeKey);
-    if (validators.body) {
-      validateRequestData(validators.body, req.body, 'body');
+   (['params', 'body', 'query'] as const).forEach(section => {
+    if (schema[section]) {
+      const jsonSchema = z.toJSONSchema(schema[section], { target: 'draft-7' });
+      validators[section] = ajv.compile(jsonSchema);
     }
-    if (validators.query) {
-      validateRequestData(validators.query, req.query, 'query');
-    }
-    if (validators.params) {
-      validateRequestData(validators.params, req.params, 'params');
+  });
+
+  precompiledValidators.set(routeKey, validators);
+}
+
+function createValidationMiddleware(routeKey: string): RequestHandler {
+  return (req, _res, next) => {
+    const validators = precompiledValidators.get(routeKey);
+
+    if (!validators) return next();
+
+    for (const section of ['body', 'query', 'params'] as const) {
+      const validator = validators[section];
+      if (!validator) continue;
+
+      const valid = validator(req[section]);
+      if (!valid) {
+        const errors = validator.errors?.map(err => ({
+          section,
+          message: err.message,
+          params: err.params,
+          keyword: err.keyword,
+          dataPath: err.instancePath,
+          schemaPath: err.schemaPath
+        }));
+        throw new HttpError(400, errors);
+      }
     }
 
     next();
   };
-};
+}
 
 const precompiledResponseSerializers = new Map<string, {
-  serialize: (data: any) => string;
-  serializeError: (data: any) => string;
+  serialize: (data: any) => string
 }>();
 
-const errorSchema = z.union([
-  z.record(z.string(), z.any()),
-  z.array(z.record(z.string(), z.any()))
-]);
-const errorJsonSchema = z.toJSONSchema(errorSchema, { target: 'draft-7' });
-const errorSerializer = fastJson(errorJsonSchema as Schema);
-
-const getSerializerForRoute = (routeKey: string) => {
-  const serializer = precompiledResponseSerializers.get(routeKey);
-  if (!serializer) {
-    throw new Error(`No precompiled response serializer found for route: ${routeKey}`);
-  }
-  return serializer;
+const compileSerializers = (routeKey: string, responseSchema: ZodType): void => {
+  const jsonResponseSchema = z.toJSONSchema(responseSchema, { target: 'draft-7' });
+  const serialize = fastJson(jsonResponseSchema as Schema);
+  precompiledResponseSerializers.set(routeKey, {
+    serialize
+  });
 };
 
 type HttpMethod = 'get' | 'post' | 'patch' | 'delete' | 'put';
@@ -262,7 +259,7 @@ export class Router {
       const routeKey = `${method}:${this.resourceName}:${path}`
 
       if (options.schema) {
-        this.compileValidationSchemas(routeKey, options.schema);
+        compileValidationSchemas(routeKey, options.schema);
       }
 
       const response = {
@@ -271,7 +268,7 @@ export class Router {
       };
 
       if (response.schema) {
-        this.compileResponseSerializer(routeKey, response.schema);
+        compileSerializers(routeKey, response.schema);
       }
 
 
@@ -289,53 +286,6 @@ export class Router {
     };
   }
 
-  private compileValidationSchemas<
-    Params extends ZodObject<ZodRawShape> = EmptyObjectSchema,
-    ReqBody extends ZodObject | ZodRecord| ZodArray<ZodType> |
-    ZodUnion<[ZodObject, ZodObject]> | ZodUndefined = EmptyObjectSchema,
-    Query extends ZodObject<ZodRawShape> = EmptyObjectSchema
-  >(
-    routeKey: string, 
-    schema: {
-      params?: Params;
-      body?: ReqBody;
-      query?: Query;
-    }
-  ): void {
-    const validators: {
-      params?: ValidateFunction;
-      body?: ValidateFunction;
-      query?: ValidateFunction;
-    } = {};
-
-    if (schema.params) {
-      const jsonSchema = z.toJSONSchema(schema.params, { target: 'draft-7' });
-      validators.params = ajv.compile(jsonSchema);
-    }
-
-    if (schema.body) {
-      const jsonSchema = z.toJSONSchema(schema.body, { target: 'draft-7' });
-      validators.body = ajv.compile(jsonSchema);
-    }
-
-    if (schema.query) {
-      const jsonSchema = z.toJSONSchema(schema.query, { target: 'draft-7' });
-      validators.query = ajv.compile(jsonSchema);
-    }
-
-    precompiledValidators.set(routeKey, validators);
-  }
-
-  private compileResponseSerializer(routeKey: string, responseSchema: ZodType): void {
-    const jsonResponseSchema = z.toJSONSchema(responseSchema, { target: 'draft-7' });
-    const serialize = fastJson(jsonResponseSchema as Schema);
-
-    precompiledResponseSerializers.set(routeKey, {
-      serialize,
-      serializeError: errorSerializer
-    });
-  }
-
   private buildMiddlewareStack<
     Params extends ZodObject<ZodRawShape> = EmptyObjectSchema,
     ResBody extends ZodType = EmptyObjectSchema,
@@ -345,7 +295,7 @@ export class Router {
   >(routeKey:string, options: RouteOptions<Params, ResBody, ReqBody, Query>): RequestHandler[] {
     const middlewares: RequestHandler[] = [];
     if (options.schema) {
-      middlewares.push(createRequestValidator(routeKey));
+      middlewares.push(createValidationMiddleware(routeKey));
     }
 
     if (options.auth) {
@@ -430,12 +380,12 @@ export class Router {
   }
 
   static createResponseFormatter(routeKey: string): RequestHandler {
-    const { serialize, serializeError } = getSerializerForRoute(routeKey);
+    const { serialize } = precompiledResponseSerializers.get(routeKey)!;
     return (_req: Request, res: Response, next: NextFunction) => {
       res.json = <T extends object>(data: T) => {
         res.setHeader('Content-Type', 'application/json');
         if (data instanceof HttpError) {
-          return res.send(serializeError(data.errors));
+          return res.send(JSON.stringify(data));
         }
         return res.send(serialize(data));
       };
