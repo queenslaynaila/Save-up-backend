@@ -22,6 +22,7 @@ import rateLimit from 'express-rate-limit';
 import addFormats from 'ajv-formats';
 import { authMiddleware } from '../utils';
 import fastJson, { Schema } from 'fast-json-stringify';
+import logger from '../logger';
 
 extendZodWithOpenApi(z);
 
@@ -41,9 +42,15 @@ const precompiledValidators = new Map<string, {
   params?: ValidateFunction;
 }>();
 
-const allRegisteredRoutes = new Map<string, { method: HttpMethod; path: string; hasValidators: boolean }>();
+const getValidatorsForRoute = (routeKey: string) => {
+  const validators = precompiledValidators.get(routeKey);
+  if (!validators) {
+    throw new Error(`No precompiled validators found for route: ${routeKey}`);
+  }
+  return validators;
+};
 
-const validateWithPrecompiledSchema = (
+const validateRequestData = (
   validator: ValidateFunction,
   data: unknown,
   section: 'body' | 'query' | 'params'
@@ -61,6 +68,43 @@ const validateWithPrecompiledSchema = (
     }));
     throw new HttpError(400, errors);
   }
+};
+
+const createRequestValidator = (routeKey: string): RequestHandler => {
+  return (req: Request, _res: Response, next: NextFunction) => {
+    const validators = getValidatorsForRoute(routeKey);
+    if (validators.body) {
+      validateRequestData(validators.body, req.body, 'body');
+    }
+    if (validators.query) {
+      validateRequestData(validators.query, req.query, 'query');
+    }
+    if (validators.params) {
+      validateRequestData(validators.params, req.params, 'params');
+    }
+
+    next();
+  };
+};
+
+const precompiledResponseSerializers = new Map<string, {
+  serialize: (data: any) => string;
+  serializeError: (data: any) => string;
+}>();
+
+const errorSchema = z.union([
+  z.record(z.string(), z.any()),
+  z.array(z.record(z.string(), z.any()))
+]);
+const errorJsonSchema = z.toJSONSchema(errorSchema, { target: 'draft-7' });
+const errorSerializer = fastJson(errorJsonSchema as Schema);
+
+const getSerializerForRoute = (routeKey: string) => {
+  const serializer = precompiledResponseSerializers.get(routeKey);
+  if (!serializer) {
+    throw new Error(`No precompiled response serializer found for route: ${routeKey}`);
+  }
+  return serializer;
 };
 
 type HttpMethod = 'get' | 'post' | 'patch' | 'delete' | 'put';
@@ -158,12 +202,12 @@ export class Router {
    * @example
    * // Prefix pattern (default): resource name comes first
    * new Router('Pockets', false) 
-   * // Results in URLs like: /saveup/pockets/me
+   * // Results in URLs like: /pockets/me
    * 
    * @example
    * // Suffix pattern: resource name comes after the path
    * new Router('Pockets', true)
-   * // Results in URLs like: /saveup/me/pockets
+   * // Results in URLs like:/me/pockets
    */
   constructor(resourceName: string, isResourceNameSuffixedInUrl = false) {
     this.router = ExpressRouter();
@@ -178,26 +222,26 @@ export class Router {
         .replace(/[^a-z0-9-]/g, '')}`;
     }
 
-    this.get = this.createMethodHandler('get');
-    this.post = this.createMethodHandler('post');
-    this.put = this.createMethodHandler('put');
-    this.patch = this.createMethodHandler('patch');
-    this.delete = this.createMethodHandler('delete');
+    this.get = this.buildRouteForMethod('get');
+    this.post = this.buildRouteForMethod('post');
+    this.put = this.buildRouteForMethod('put');
+    this.patch = this.buildRouteForMethod('patch');
+    this.delete = this.buildRouteForMethod('delete');
   }
 
-  public getRouter(): ExpressRouter {
+  public getExpressRouter(): ExpressRouter {
     return this.router;
   }
 
-  public getPrefix(): string {
+  public getBasePath(): string {
     return this.routePrefix;
   }
 
-  public static getRegistry(): OpenAPIRegistry {
+  public static getOpenApiRegistry(): OpenAPIRegistry {
     return Router.registry;
   }
 
-  public static createResourceRouter(resourceName: string, suffixResource = false): Router {
+  public static getOrCreateRouter(resourceName: string, suffixResource = false): Router {
     const key = `${resourceName}-${suffixResource}`;
     if (!this.routerInstances.has(key)) {
       this.routerInstances.set(key, new Router(resourceName, suffixResource));
@@ -206,7 +250,7 @@ export class Router {
     return this.routerInstances.get(key)!;
   }
 
-  protected createMethodHandler(method: HttpMethod): SpecificRouteMethodHandler {
+  protected buildRouteForMethod(method: HttpMethod): SpecificRouteMethodHandler {
     return <
       Params extends ZodObject<ZodRawShape> = EmptyObjectSchema,
       ResBody extends ZodType = EmptyObjectSchema,
@@ -215,15 +259,10 @@ export class Router {
       Query extends ZodObject<ZodRawShape> = EmptyObjectSchema
     >(options: RouteOptions<Params, ResBody, ReqBody, Query>) => {
       const { path, handler, response: resOpt } = options;
-       const routeKey = this.generateRouteKey(method, path);
-        allRegisteredRoutes.set(routeKey, {
-        method,
-        path,
-        hasValidators: !!options.schema
-      });
+      const routeKey = `${method}:${this.resourceName}:${path}`
 
       if (options.schema) {
-        this.precompileSchemasForValidation(routeKey, options.schema);
+        this.compileValidationSchemas(routeKey, options.schema);
       }
 
       const response = {
@@ -231,73 +270,26 @@ export class Router {
         schema: resOpt?.schema ?? z.object({})
       };
 
+      if (response.schema) {
+        this.compileResponseSerializer(routeKey, response.schema);
+      }
+
+
       const middlewares = this.buildMiddlewareStack(routeKey, options);
 
       if (!options.hidden) {
-        this.registerWithOpenAPI(method, path, options, response, middlewares);
+        this.registerRouteWithOpenAPI(method, path, options, response, middlewares);
       }
 
       if (response.schema) {
-        middlewares.push(Router.createResponseFormatter(response.schema));
+        middlewares.push(Router.createResponseFormatter(routeKey));
       }
 
       this.router[method](path, ...middlewares, handler as RequestHandler);
     };
   }
 
-  private buildMiddlewareStack<
-    Params extends ZodObject<ZodRawShape> = EmptyObjectSchema,
-    ResBody extends ZodType = EmptyObjectSchema,
-    ReqBody extends ZodObject | ZodRecord| ZodArray<ZodType> |
-    ZodUnion<[ZodObject, ZodObject]> | ZodUndefined = EmptyObjectSchema,
-    Query extends ZodObject<ZodRawShape> = EmptyObjectSchema
-  >(routeKey:string, options: RouteOptions<Params, ResBody, ReqBody, Query>): RequestHandler[] {
-    const middlewares: RequestHandler[] = [];
-    if (options.schema) {
-      middlewares.push(this.createPrecompiledValidationMiddleware(routeKey));
-    }
-
-    if (options.auth) {
-      middlewares.push(authMiddleware(options.auth));
-    }
-
-    if (options.rateLimit) {
-      const { limit, windowMs, message, skipForAdmins } = options.rateLimit;
-      const rateLimitOptions = {
-        windowMs,
-        max: limit,
-        message: message || 'Too many requests',
-        skip: (req: Request) => Boolean(skipForAdmins && req.user?.role === 'Admin')
-      };
-      middlewares.push(rateLimit(rateLimitOptions));
-    }
-
-    if (options.middlewares) {
-      middlewares.push(...options.middlewares);
-    }
-
-    return middlewares;
-  }
-
-  private createPrecompiledValidationMiddleware(routeKey: string): RequestHandler {
-    return (req: Request, _res: Response, next: NextFunction) => {
-      const validators = precompiledValidators.get(routeKey)!;
-
-      if (validators.body) {
-        validateWithPrecompiledSchema(validators.body, req.body, 'body');
-      }
-      if (validators.query) {
-        validateWithPrecompiledSchema(validators.query, req.query, 'query');
-      }
-      if (validators.params) {
-        validateWithPrecompiledSchema(validators.params, req.params, 'params');
-      }
-
-      next();
-    };
-  }
-  
-  private precompileSchemasForValidation<
+   private compileValidationSchemas<
     Params extends ZodObject<ZodRawShape> = EmptyObjectSchema,
     ReqBody extends ZodObject | ZodRecord| ZodArray<ZodType> |
     ZodUnion<[ZodObject, ZodObject]> | ZodUndefined = EmptyObjectSchema,
@@ -334,34 +326,52 @@ export class Router {
     precompiledValidators.set(routeKey, validators);
   }
 
-  private generateRouteKey(method: HttpMethod, path: string): string {
-    return `${method}:${this.resourceName}:${path}`;
+  private compileResponseSerializer(routeKey: string, responseSchema: ZodType): void {
+    const jsonResponseSchema = z.toJSONSchema(responseSchema, { target: 'draft-7' });
+    const serialize = fastJson(jsonResponseSchema as Schema);
+
+    precompiledResponseSerializers.set(routeKey, {
+      serialize,
+      serializeError: errorSerializer
+    });
   }
 
-  static createResponseFormatter(schema: ZodType) {
-    const jsonResponseSchema = z.toJSONSchema(schema, {target: 'draft-7'});
-    const stringify = fastJson(jsonResponseSchema as Schema);
+  private buildMiddlewareStack<
+    Params extends ZodObject<ZodRawShape> = EmptyObjectSchema,
+    ResBody extends ZodType = EmptyObjectSchema,
+    ReqBody extends ZodObject | ZodRecord| ZodArray<ZodType> |
+    ZodUnion<[ZodObject, ZodObject]> | ZodUndefined = EmptyObjectSchema,
+    Query extends ZodObject<ZodRawShape> = EmptyObjectSchema
+  >(routeKey:string, options: RouteOptions<Params, ResBody, ReqBody, Query>): RequestHandler[] {
+    const middlewares: RequestHandler[] = [];
+    if (options.schema) {
+      middlewares.push(createRequestValidator(routeKey));
+    }
 
-    const errorSchema = z.union([
-      z.record(z.string(), z.unknown()),
-      z.array(z.record(z.string(), z.unknown()))
-    ]);
-    const jsonErrorSchema = z.toJSONSchema(errorSchema, {target: 'draft-7'});
-    const errStringify = fastJson(jsonErrorSchema as Schema);
+    if (options.auth) {
+      middlewares.push(authMiddleware(options.auth));
+    }
 
-    return (_req: Request, res: Response, next: NextFunction) => {
-      res.json = <T extends object>(data: T) => {
-        res.setHeader('Content-Type', 'application/json');
-        if (data instanceof HttpError) {
-          return res.send(errStringify(data.errors));
-        }
-        return res.send(stringify(data));
+    if (options.rateLimit) {
+      const { limit, windowMs, message, skipForAdmins } = options.rateLimit;
+      const rateLimitOptions = {
+        windowMs,
+        max: limit,
+        message: message || 'Too many requests',
+        skip: (req: Request) => Boolean(skipForAdmins && req.user?.role === 'Admin')
       };
-      next();
-    };
-  }
+      middlewares.push(rateLimit(rateLimitOptions));
+    }
 
-  private registerWithOpenAPI<
+    if (options.middlewares) {
+      middlewares.push(...options.middlewares);
+    }
+
+    return middlewares;
+  }
+  
+
+  private registerRouteWithOpenAPI<
     Params extends ZodObject<ZodRawShape> = EmptyObjectSchema,
     ResBody extends ZodType = EmptyObjectSchema,
     ReqBody extends ZodObject | ZodRecord| ZodArray<ZodType> |
@@ -417,6 +427,20 @@ export class Router {
       },
       responses: responseSchemas
     });
+  }
+
+  static createResponseFormatter(routeKey: string): RequestHandler {
+    const { serialize, serializeError } = getSerializerForRoute(routeKey);
+    return (_req: Request, res: Response, next: NextFunction) => {
+      res.json = <T extends object>(data: T) => {
+        res.setHeader('Content-Type', 'application/json');
+        if (data instanceof HttpError) {
+          return res.send(serializeError(data.errors));
+        }
+        return res.send(serialize(data));
+      };
+      next();
+    };
   }
 }
 
