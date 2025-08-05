@@ -1,8 +1,9 @@
 import { z } from 'zod';
 import Router from '../../core/router';
 import { sql } from '../../db';
-import { decodeEntityAndVerifyAccess, verifyPin } from '../../utils';
+import { verifyPin } from '../../utils';
 import HttpError from '../../httpError';
+import { decodeEntityAndVerifyAccess } from '../../decodeEntityAndVerifyAccess';
 
 const SQL_CREATE_LOAN_REQUEST = sql<{
   group_id: number;

@@ -2,9 +2,10 @@ import { sql } from '../../db';
 import HttpError from '../../httpError';
 import Router from '../../core/router';
 import { z } from 'zod';
-import { decodeEntityAndVerifyAccess, verifyPin } from '../../utils';
+import { verifyPin } from '../../utils';
 import { entityIdParamsSchema } from '../users/schema';
 import logger from '../../logger';
+import { decodeEntityAndVerifyAccess } from '../../decodeEntityAndVerifyAccess';
 
 const withdrawalPayload = z.object({
   pocket_id: z.number().int().min(1),
