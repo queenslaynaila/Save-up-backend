@@ -155,30 +155,6 @@ export class Router {
 
   private static routerInstances = new Map<string, Router>();
 
-  static {
-    Router.registry.registerComponent(
-      'securitySchemes',
-      'Authorization',
-      {
-        type: 'apiKey',
-        name: 'Authorization',
-        in: 'header',
-        description: 'JWT Bearer token for authentication'
-      }
-    );
-
-    Router.registry.registerComponent(
-      'securitySchemes',
-      'Reset',
-      {
-        type: 'apiKey',
-        name: 'Reset',
-        in: 'header',
-        description: 'JWT token for password reset process'
-      }
-    );
-  }
-
   protected readonly router: ExpressRouter;
 
   protected readonly resourceName: string;
@@ -250,7 +226,7 @@ export class Router {
     return this.routerInstances.get(key)!;
   }
 
-  protected buildRouteForMethod(method: HttpMethod): SpecificRouteMethodHandler {
+  private buildRouteForMethod(method: HttpMethod): SpecificRouteMethodHandler {
     return <
       Params extends ZodObject<ZodRawShape> = EmptyObjectSchema,
       ResBody extends ZodType = EmptyObjectSchema,
@@ -289,7 +265,7 @@ export class Router {
     };
   }
 
-   private compileValidationSchemas<
+  private compileValidationSchemas<
     Params extends ZodObject<ZodRawShape> = EmptyObjectSchema,
     ReqBody extends ZodObject | ZodRecord| ZodArray<ZodType> |
     ZodUnion<[ZodObject, ZodObject]> | ZodUndefined = EmptyObjectSchema,
