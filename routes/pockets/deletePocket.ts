@@ -2,7 +2,7 @@ import Router from '../../core/router';
 import { sql } from '../../db';
 import HttpError from '../../httpError';
 import { z } from 'zod';
-import { decodeEntityAndVerifyAccess } from '../../utils';
+import { decodeEntityAndVerifyAccess } from '../../decodeEntityAndVerifyAccess';
 import { entityIdParamsSchema } from '../users/schema';
 
 const SQL_GET_BALANCE = sql<

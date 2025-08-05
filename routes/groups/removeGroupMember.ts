@@ -3,7 +3,7 @@ import { sql } from '../../db';
 import { z } from 'zod';
 import HttpError from '../../httpError';
 import { entityIdParamsSchema } from '../users/schema';
-import { decodeEntityAndVerifyAccess } from '../../utils';
+import { decodeEntityAndVerifyAccess } from '../../decodeEntityAndVerifyAccess';
 
 const SQL_MANAGE_GROUP_MEMBERSHIP = sql<
 {

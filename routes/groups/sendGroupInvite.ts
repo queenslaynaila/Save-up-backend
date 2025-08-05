@@ -3,7 +3,7 @@ import { sql } from '../../db';
 import { z } from 'zod';
 import sendSms from '../../sms';
 import HttpError from '../../httpError';
-import { decodeEntityAndVerifyAccess } from '../../utils';
+import { decodeEntityAndVerifyAccess } from '../../decodeEntityAndVerifyAccess';
 
 const SQL_SEND_INVITATION = sql<
 {

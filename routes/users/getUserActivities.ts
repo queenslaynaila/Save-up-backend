@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import Router from '../../core/router';
 import { sql } from '../../db';
-import { decodeEntityAndVerifyAccess } from '../../utils';
+import { decodeEntityAndVerifyAccess } from '../../decodeEntityAndVerifyAccess';
 import { entityIdParamsSchema } from './schema';
 
 const emptyMetadata = z.object({}).nullable();

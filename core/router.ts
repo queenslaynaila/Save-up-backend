@@ -20,9 +20,33 @@ import HttpError from '../httpError';
 import Ajv, { ErrorObject, ValidateFunction } from 'ajv';
 import rateLimit from 'express-rate-limit';
 import addFormats from 'ajv-formats';
-import { authMiddleware } from '../utils';
 import fastJson, { Schema } from 'fast-json-stringify';
-import logger from '../logger';
+import { validateAndDecodeJwt } from '../utils';
+
+export function authMiddleware(auth: true | Role | Role[] = true) {
+  return (req: Request, _res: Response, next: NextFunction) => {
+    if (!req.headers.authorization) {
+      throw new HttpError(401);
+    }
+
+    const decoded = validateAndDecodeJwt(req.headers.authorization);
+
+    if (!decoded.id || !decoded.role) {
+      throw new HttpError(400);
+    }
+
+    req.user = { id: decoded.id, role: decoded.role };
+
+    if (auth !== true) {
+      const allowedRoles = Array.isArray(auth) ? auth : [auth];
+      if (!allowedRoles.includes(req.user.role)) {
+        throw new HttpError(403);
+      }
+    }
+
+    next();
+  };
+}
 
 extendZodWithOpenApi(z);
 

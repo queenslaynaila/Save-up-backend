@@ -1,7 +1,8 @@
 import { z } from 'zod';
 import { sql } from '../../db';
-import { decodeEntityAndVerifyAccess, verifyPin } from '../../utils';
+import { verifyPin } from '../../utils';
 import Router from '../../core/router';
+import { decodeEntityAndVerifyAccess } from '../../decodeEntityAndVerifyAccess';
 
 const SQL_REVIEW_DEBIT = sql<{
   group_id:number;

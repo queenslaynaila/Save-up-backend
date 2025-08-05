@@ -1,8 +1,8 @@
 import { z } from 'zod';
 import Router from '../../core/router';
 import { sql } from '../../db';
-import { decodeEntityAndVerifyAccess } from '../../utils';
 import { entityIdParamsSchema } from '../users/schema';
+import { decodeEntityAndVerifyAccess } from '../../decodeEntityAndVerifyAccess';
 
 const SQL_GET_DONATION_POCKETS = sql<{
   entity_id: number;

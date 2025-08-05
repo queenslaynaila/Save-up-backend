@@ -3,7 +3,7 @@ import { sql } from '../../db';
 import { z } from 'zod';
 import HttpError from '../../httpError';
 import { entityIdParamsSchema, UserRole } from '../users/schema';
-import { decodeEntityAndVerifyAccess } from '../../utils';
+import { decodeEntityAndVerifyAccess } from '../../decodeEntityAndVerifyAccess';
 import { NextOfKin, nextOfKinSchema } from './schema';
 
 const SQL_GET_KIN = sql<

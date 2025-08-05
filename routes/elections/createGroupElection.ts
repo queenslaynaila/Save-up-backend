@@ -3,7 +3,7 @@ import { sql } from '../../db';
 import { z } from 'zod';
 import HttpError from '../../httpError';
 import { ElectionType } from './schema';
-import { decodeEntityAndVerifyAccess } from '../../utils';
+import { decodeEntityAndVerifyAccess } from '../../decodeEntityAndVerifyAccess';
 
 const electionsPayload = z.object({
   type: ElectionType,

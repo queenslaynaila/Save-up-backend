@@ -3,7 +3,7 @@ import { sql } from '../../db';
 import { AccountStatus, UserRole } from './schema';
 import Router from '../../core/router';
 import HttpError from '../../httpError';
-import { decodeEntityAndVerifyAccess } from '../../utils';
+import { decodeEntityAndVerifyAccess } from '../../decodeEntityAndVerifyAccess';
 
 const SQL_UPDATE_STATUS = sql<
 Pick<AccountStatus, 'user_id' | 'status' | 'admin_id' | 'reason'>,

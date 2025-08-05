@@ -2,7 +2,7 @@ import Router from '../../core/router';
 import { sql } from '../../db';
 import { z } from 'zod';
 import HttpError from '../../httpError';
-import { decodeEntityAndVerifyAccess } from '../../utils';
+import { decodeEntityAndVerifyAccess } from '../../decodeEntityAndVerifyAccess';
 
 const ballotParamsSchema = z.object({
   group_id: z.number().int().min(1),

@@ -2,7 +2,7 @@ import Router from '../../core/router';
 import { sql } from '../../db';
 import { z } from 'zod';
 import { entityIdParamsSchema } from './schema';
-import { decodeEntityAndVerifyAccess } from '../../utils';
+import { decodeEntityAndVerifyAccess } from '../../decodeEntityAndVerifyAccess';
 import { Group, groupsSchema } from '../groups/schema';
 
 const SQL_FETCH_USER_GROUPS = sql<

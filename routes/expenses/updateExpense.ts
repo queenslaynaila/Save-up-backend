@@ -6,7 +6,7 @@ import {
   Expense
 } from './schema';
 import { z } from 'zod';
-import { decodeEntityAndVerifyAccess } from '../../utils';
+import { decodeEntityAndVerifyAccess } from '../../decodeEntityAndVerifyAccess';
 import { entityIdParamsSchema } from '../users/schema';
 
 type ExpenseParams = Pick<Expense, 'entity_id'|'xid'> &

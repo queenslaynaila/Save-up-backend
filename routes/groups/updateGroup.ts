@@ -1,7 +1,7 @@
 import Router from '../../core/router';
 import { sql } from '../../db';
 import { z } from 'zod';
-import { decodeEntityAndVerifyAccess } from '../../utils';
+import { decodeEntityAndVerifyAccess } from '../../decodeEntityAndVerifyAccess';
 import { groupsSchema } from './schema';
 
 const SQL_RECORD_OLD_NAME = sql<

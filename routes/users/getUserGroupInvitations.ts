@@ -2,7 +2,7 @@ import Router from '../../core/router';
 import { sql } from '../../db';
 import { z } from 'zod';
 import { entityIdParamsSchema, invitationSchema } from './schema';
-import { decodeEntityAndVerifyAccess } from '../../utils';
+import { decodeEntityAndVerifyAccess } from '../../decodeEntityAndVerifyAccess';
 
 const pendingInvitations = invitationSchema
   .pick({

@@ -6,7 +6,8 @@ import {
   IdType,
   userSchema
 } from './schema';
-import { decodeEntityAndVerifyAccess, verifyPin } from '../../utils';
+import { verifyPin } from '../../utils';
+import { decodeEntityAndVerifyAccess } from '../../decodeEntityAndVerifyAccess';
 
 const IdParams = z.object({
   id_type: IdType,

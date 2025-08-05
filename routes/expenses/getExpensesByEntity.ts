@@ -5,7 +5,7 @@ import {
   expenseSchema
 } from './schema';
 import { z } from 'zod';
-import { decodeEntityAndVerifyAccess } from '../../utils';
+import { decodeEntityAndVerifyAccess } from '../../decodeEntityAndVerifyAccess';
 import { entityIdParamsSchema } from '../users/schema';
 
 const SQL_GET_EXPENSES = sql<{

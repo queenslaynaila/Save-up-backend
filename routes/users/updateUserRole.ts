@@ -3,7 +3,7 @@ import { sql } from '../../db';
 import { entityIdParamsSchema, UserRole } from './schema';
 import Router from '../../core/router';
 import HttpError from '../../httpError';
-import { decodeEntityAndVerifyAccess } from '../../utils';
+import { decodeEntityAndVerifyAccess } from '../../decodeEntityAndVerifyAccess';
 
 const convertToTitleCase = (str: string): string => {
   return str.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());

@@ -3,7 +3,7 @@ import { sql } from '../../db';
 import { z } from 'zod';
 import HttpError from '../../httpError';
 import { candidateSchema } from './schema';
-import { decodeEntityAndVerifyAccess } from '../../utils';
+import { decodeEntityAndVerifyAccess } from '../../decodeEntityAndVerifyAccess';
 
 const candidateParams = candidateSchema.pick({
   group_id: true,

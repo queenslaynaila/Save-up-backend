@@ -2,7 +2,7 @@ import Router from '../../core/router';
 import { sql } from '../../db';
 import { Expense, expenseSchema } from './schema';
 import { z } from 'zod';
-import { decodeEntityAndVerifyAccess } from '../../utils';
+import { decodeEntityAndVerifyAccess } from '../../decodeEntityAndVerifyAccess';
 import { entityIdParamsSchema } from '../users/schema';
 
 const expenseCreationParams = expenseSchema.pick({
