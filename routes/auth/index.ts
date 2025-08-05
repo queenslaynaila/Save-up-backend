@@ -8,7 +8,7 @@ import verifySecurityAnswers from './verifySecurityAnswers';
 import resetPin from './resetPin';
 import getRefreshToken from './refreshToken';
 
-const router = Router.createResourceRouter('Auth');
+const router = Router.getOrCreateRouter('Auth');
 
 createUser(router);
 login(router);

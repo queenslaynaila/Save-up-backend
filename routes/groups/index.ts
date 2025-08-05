@@ -6,7 +6,7 @@ import getGroupMembers from './getGroupMembers';
 import handleGroupExit from './removeGroupMember';
 import getGroupActivities from './getGroupActivities';
 
-const router = Router.createResourceRouter('Groups');
+const router = Router.getOrCreateRouter('Groups');
 
 createGroup(router);
 updateGroup(router);

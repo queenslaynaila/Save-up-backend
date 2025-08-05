@@ -8,7 +8,7 @@ import ratifyElection from './ratifyElection';
 import createBallot from './createBallot';
 import Router from '../../core/router';
 
-const router = Router.createResourceRouter('Elections', true);
+const router = Router.getOrCreateRouter('Elections', true);
 
 createGroupElection(router);
 createGroupElectionCandidates(router);

@@ -2,7 +2,7 @@ import Router from '../../core/router';
 import createFundraiser from './createDonationPockets';
 import getDonationPockets from './getDonationPockets';
 
-const router = Router.createResourceRouter('Donations', true);
+const router = Router.getOrCreateRouter('Donations', true);
 
 createFundraiser(router);
 getDonationPockets(router);

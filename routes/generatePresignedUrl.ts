@@ -46,6 +46,6 @@ const generateUrl = (router: Router) => {
   });
 };
 
-const router = Router.createResourceRouter('S3');
+const router = Router.getOrCreateRouter('S3');
 generateUrl(router);
 export default router;

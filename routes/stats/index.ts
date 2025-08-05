@@ -4,7 +4,7 @@ import getDepositStats from './getDepositStats';
 import getWithdrawalStats from './getWithdrawalStats';
 import getUserActivityStats from './getUserActivityStats';
 
-const router = Router.createResourceRouter('Stats', true);
+const router = Router.getOrCreateRouter('Stats', true);
 
 getDepositStats(router);
 getWithdrawalStats(router);

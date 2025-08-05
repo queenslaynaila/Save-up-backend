@@ -2,7 +2,7 @@ import getAllCategories from './getAllCategories';
 import createCategory from './createCategory';
 import Router from '../../core/router';
 
-const router = Router.createResourceRouter('Categories');
+const router = Router.getOrCreateRouter('Categories');
 
 createCategory(router);
 getAllCategories(router);

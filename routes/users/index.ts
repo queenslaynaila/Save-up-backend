@@ -12,7 +12,7 @@ import getModerators from './getModerators';
 import getGroupActivities from './getUserActivities';
 import { get } from 'http';
 
-const router = Router.createResourceRouter('Users');
+const router = Router.getOrCreateRouter('Users');
 
 getModerators(router);
 getUsersBySearchCriteria(router);
