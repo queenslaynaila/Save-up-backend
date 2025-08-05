@@ -41,7 +41,7 @@ const SQL_GET_GROUP_MEMBERSHIP_STATUS = sql<{
 
 const ADMIN_LIKE_ROLES: Role[] = ['Admin', 'Moderator'];
 
-function resolveUserIdParameter(id: number | 'me' | undefined, userId: number): number | undefined {
+function resolveMeAlias(id: number | 'me' | undefined, userId: number): number | undefined {
   return id === 'me' ? userId : id;
 }
 
@@ -181,9 +181,9 @@ export async function decodeEntityAndVerifyAccess<
   const isElevatedUser = allowAdminOverride && hasElevatedRole(loggedInUserRole);
 
   const params = {
-    user_id: resolveUserIdParameter(req.params.user_id, loggedInUserId),
-    member_id: resolveUserIdParameter(req.params.member_id, loggedInUserId),
-    entity_id: resolveUserIdParameter(req.params.entity_id, loggedInUserId),
+    user_id: resolveMeAlias(req.params.user_id, loggedInUserId),
+    member_id: resolveMeAlias(req.params.member_id, loggedInUserId),
+    entity_id: resolveMeAlias(req.params.entity_id, loggedInUserId),
     group_id: req.params.group_id
   };
 
