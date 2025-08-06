@@ -56,20 +56,7 @@ export class Application {
   }
 
   private configureGlobalMiddlewares(): void {
-    this.expressApp.use(helmet({
-      contentSecurityPolicy: {
-        directives: {
-          defaultSrc: ["'self'"],
-          styleSrc: ["'self'", "'unsafe-inline'"],
-        },
-      },
-      hsts: {
-        maxAge: 31536000,
-        includeSubDomains: true,
-        preload: true
-      }
-      })
-    );
+    this.expressApp.use(helmet());
     this.expressApp.use(
       cors({
         origin: [...this.allowedOrigins],
