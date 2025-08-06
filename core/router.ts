@@ -53,13 +53,13 @@ extendZodWithOpenApi(z);
 const ajv = new Ajv({coerceTypes: true, useDefaults: true});
 addFormats(ajv, {mode: 'fast', formats: ['date-time', 'date']});
 
-const precompiledValidators = new Map<string, {
+const routeRequestValidators = new Map<string, {
   body?: ValidateFunction;
   query?: ValidateFunction;
   params?: ValidateFunction;
 }>();
 
-function compileValidationSchemas<
+function buildRequestValidatorsForRoute<
   Params extends ZodObject<ZodRawShape> = EmptyObjectSchema,
   ReqBody extends ZodObject | ZodRecord| ZodArray<ZodType> |
   ZodUnion<[ZodObject, ZodObject]> | ZodUndefined = EmptyObjectSchema,
@@ -85,12 +85,12 @@ function compileValidationSchemas<
     }
   });
 
-  precompiledValidators.set(routeKey, validators);
+  routeRequestValidators.set(routeKey, validators);
 }
 
 function createValidationMiddleware(routeKey: string): RequestHandler {
   return (req, _res, next) => {
-    const validators = precompiledValidators.get(routeKey);
+    const validators = routeRequestValidators.get(routeKey);
 
     if (!validators) return next();
 
@@ -116,17 +116,17 @@ function createValidationMiddleware(routeKey: string): RequestHandler {
   };
 }
 
-const precompiledResponseSerializers = new Map<string, {
+const routeResponseSerializers = new Map<string, {
   serialize: (data: any) => string
 }>();
 
-const compileSerializers = (routeKey: string, responseSchema: ZodType): void => {
+function buildResponseSerializersForRoute(routeKey: string, responseSchema: ZodType): void {
   const jsonResponseSchema = z.toJSONSchema(responseSchema, { target: 'draft-7' });
   const serialize = fastJson(jsonResponseSchema as Schema);
-  precompiledResponseSerializers.set(routeKey, {
+  routeResponseSerializers.set(routeKey, {
     serialize
   });
-};
+}
 
 type HttpMethod = 'get' | 'post' | 'patch' | 'delete' | 'put';
 type EmptyObjectSchema = ZodObject<Record<string, never>>;
@@ -171,6 +171,8 @@ type SpecificRouteMethodHandler = <
   Query extends ZodObject<ZodRawShape> = EmptyObjectSchema
 >(options: RouteOptions<Params, ResBody, ReqBody, Query>) => void;
 
+export const BASE_PATH = '/saveup';
+
 export class Router {
   private static registry = new OpenAPIRegistry();
 
@@ -192,28 +194,14 @@ export class Router {
 
   public readonly delete: SpecificRouteMethodHandler;
 
-  /**
-   * @param resourceName The name of the resource for which this router is created.
-   * @param isResourceNameSuffixedInUrl Controls whether the resource name appears as a prefix or suffix in URLs..
-   * 
-   * @example
-   * // Prefix pattern (default): resource name comes first
-   * new Router('Pockets', false) 
-   * // Results in URLs like: /pockets/me
-   * 
-   * @example
-   * // Suffix pattern: resource name comes after the path
-   * new Router('Pockets', true)
-   * // Results in URLs like:/me/pockets
-   */
   constructor(resourceName: string, isResourceNameSuffixedInUrl = false) {
     this.router = ExpressRouter();
     this.resourceName = resourceName;
 
     if (isResourceNameSuffixedInUrl) {
-      this.routePrefix   = '/saveup/'
+      this.routePrefix   = `${BASE_PATH}`
     } else {
-      this.routePrefix = `/saveup/${resourceName
+      this.routePrefix = `${BASE_PATH}/${resourceName
         .toLowerCase()
         .replace(/\s+/g, '-')
         .replace(/[^a-z0-9-]/g, '')}`;
@@ -238,10 +226,26 @@ export class Router {
     return Router.registry;
   }
 
-  public static getOrCreateRouter(resourceName: string, suffixResource = false): Router {
-    const key = `${resourceName}-${suffixResource}`;
+   /**
+   * Creates or retrieves a Router instance for a given resource name.
+   * @param resourceName The name of the resource for which this router is created ie. "Pockets".
+   * @param isResourceNameSuffixedInUrl Controls whether the resource name appears as a prefix or suffix in URLs.
+   *
+   * @example
+   * // Prefix pattern (default): resource name comes first
+   * new Router('Pockets', false) path written as /me
+   * // Results in URLs like: /pockets/me
+   * 
+   * @example
+   * // Suffix pattern: resource name comes after the path
+   * new Router('Pockets', true) path written as /me
+   * // Results in URLs like: /me/pockets
+   */
+
+  public static getOrCreateRouter(resourceName: string, isResourceNameSuffixedInUrl = false): Router {
+    const key = `${resourceName}-${isResourceNameSuffixedInUrl}`;
     if (!this.routerInstances.has(key)) {
-      this.routerInstances.set(key, new Router(resourceName, suffixResource));
+      this.routerInstances.set(key, new Router(resourceName, isResourceNameSuffixedInUrl));
     }
 
     return this.routerInstances.get(key)!;
@@ -259,7 +263,7 @@ export class Router {
       const routeKey = `${method}:${this.resourceName}:${path}`
 
       if (options.schema) {
-        compileValidationSchemas(routeKey, options.schema);
+        buildRequestValidatorsForRoute(routeKey, options.schema);
       }
 
       const response = {
@@ -268,7 +272,7 @@ export class Router {
       };
 
       if (response.schema) {
-        compileSerializers(routeKey, response.schema);
+         buildResponseSerializersForRoute(routeKey, response.schema);
       }
 
 
@@ -320,7 +324,6 @@ export class Router {
     return middlewares;
   }
   
-
   private registerRouteWithOpenAPI<
     Params extends ZodObject<ZodRawShape> = EmptyObjectSchema,
     ResBody extends ZodType = EmptyObjectSchema,
@@ -380,7 +383,7 @@ export class Router {
   }
 
   static createResponseFormatter(routeKey: string): RequestHandler {
-    const { serialize } = precompiledResponseSerializers.get(routeKey)!;
+    const { serialize } = routeResponseSerializers.get(routeKey)!;
     return (_req: Request, res: Response, next: NextFunction) => {
       res.json = <T extends object>(data: T) => {
         res.setHeader('Content-Type', 'application/json');
