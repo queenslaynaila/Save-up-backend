@@ -1,7 +1,7 @@
 import { setupInterestJobSystem } from './jobs/bullConfig';
 import Config from './config';
 import { Application } from './core/app';
-import configRouter from './routes/config';
+import configRouter from './routes/config/';
 import S3Routes from './routes/generatePresignedUrl';
 import authRoutes from './routes/auth';
 import categoryRoutes from './routes/categories';
@@ -18,12 +18,14 @@ import securityQuestionsRoutes from './routes/securityQuestions';
 import statisticsRoutes from './routes/stats';
 import transactionsRoutes from './routes/transactions';
 import usersRoutes from './routes/users';
+import { BASE_PATH } from './core/router';
+
 
 const app = new Application({
   swagger: {
     title: 'Save-up API',
     description: 'API documentation for Save-up backend',
-    path: '/saveup/docs',
+    path: `${BASE_PATH}/docs`,
     password: Config.SWAGGER_PASSWORD
   },
   allowedOrigins: [
@@ -38,6 +40,7 @@ const app = new Application({
     }
   ]
 });
+
 
 app.use(configRouter);
 app.use(S3Routes);
