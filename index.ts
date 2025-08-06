@@ -1,4 +1,4 @@
-import { setupInterestJobSystem } from './jobs/bullConfig';
+import { JOB_FIND_POCKETS_ELIGIBLE_FOR_INTEREST, setupInterestJobSystem } from './jobs/bullConfig';
 import Config from './config';
 import { Application } from './core/app';
 import configRouter from './routes/config/';
@@ -35,7 +35,7 @@ const app = new Application({
   ],
   jobs: [
     {
-      name: 'Automated Interest Calculation',
+      name: JOB_FIND_POCKETS_ELIGIBLE_FOR_INTEREST,
       setup: setupInterestJobSystem
     }
   ]

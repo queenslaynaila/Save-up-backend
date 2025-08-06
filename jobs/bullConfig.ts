@@ -18,7 +18,7 @@ export const DAILY_INTEREST_QUEUE_NAME = 'previous-day-interest-calculation';
 const CRON_SCHEDULE_2AM_DAILY = '0 2 * * *';
 const RETRY_DELAY_HOURS = 4;
 
-const JOB_FIND_POCKETS_ELIGIBLE_FOR_INTEREST = 'find-interest-eligible-pockets';
+export const JOB_FIND_POCKETS_ELIGIBLE_FOR_INTEREST = 'find-interest-eligible-pockets';
 export const JOB_CALCULATE_INTEREST_FOR_POCKET = 'calculate-interest-for-pocket';
 export const JOB_FINALIZE_INTEREST_SUMMARY = 'finalize-interest-summary';
 
