@@ -272,9 +272,8 @@ export class Router {
       };
 
       if (response.schema) {
-         buildResponseSerializersForRoute(routeKey, response.schema);
+        buildResponseSerializersForRoute(routeKey, response.schema);
       }
-
 
       const middlewares = this.buildMiddlewareStack(routeKey, options);
 
@@ -283,7 +282,7 @@ export class Router {
       }
 
       if (response.schema) {
-        middlewares.push(Router.createResponseSerializer(routeKey));
+        middlewares.push(Router.buildSerializationMiddleware(routeKey));
       }
 
       this.router[method](path, ...middlewares, handler as RequestHandler);
@@ -382,7 +381,7 @@ export class Router {
     });
   }
 
-  static createResponseSerializer(routeKey: string): RequestHandler {
+  static buildSerializationMiddleware(routeKey: string): RequestHandler {
     const { serialize } = routeResponseSerializers.get(routeKey)!;
     return (_req: Request, res: Response, next: NextFunction) => {
       res.json = <T extends object>(data: T) => {
