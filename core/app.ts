@@ -102,6 +102,7 @@ export class Application {
 
   private setupSwagger(config: SwaggerConfig): void {
     const registry = Router.getOpenApiRegistry();
+    
     registry.registerComponent(
       'securitySchemes',
       'Authorization',
@@ -123,6 +124,7 @@ export class Application {
         description: 'JWT token for password reset process'
       }
     );
+
     const generator = new OpenApiGeneratorV3(registry.definitions);
     const document = generator.generateDocument({
       openapi: '3.0.0',
