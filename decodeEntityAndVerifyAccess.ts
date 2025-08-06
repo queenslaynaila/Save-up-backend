@@ -41,8 +41,8 @@ const SQL_GET_GROUP_MEMBERSHIP_STATUS = sql<{
 
 const ADMIN_LIKE_ROLES: Role[] = ['Admin', 'Moderator'];
 
-function resolveMeAlias(id: number | 'me' | undefined, userId: number): number | undefined {
-  return id === 'me' ? userId : id;
+function resolveMeAlias(id: number | 'me' | undefined, loggedInUserId: number): number | undefined {
+  return id === 'me' ? loggedInUserId : id;
 }
 
 async function authorizeGroupAccess(
