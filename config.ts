@@ -30,8 +30,8 @@ const Config = cleanEnv(process.env, {
   SMSLEOPARD_API_SECRET: str(),
 
   S3_REGION: str(),
-  S3_ACCESS_KEY_ID: str(),
-  S3_SECRET_ACCESS_KEY: str(),
+  S3_ACCESS_KEY: str(),
+  S3_SECRET_KEY: str(),
   S3_BUCKET_NAME: str(),
 
   REDIS_PORT: port({ default: 6379 }),
