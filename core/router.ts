@@ -283,7 +283,7 @@ export class Router {
       }
 
       if (response.schema) {
-        middlewares.push(Router.createResponseFormatter(routeKey));
+        middlewares.push(Router.createResponseSerializer(routeKey));
       }
 
       this.router[method](path, ...middlewares, handler as RequestHandler);
@@ -382,7 +382,7 @@ export class Router {
     });
   }
 
-  static createResponseFormatter(routeKey: string): RequestHandler {
+  static createResponseSerializer(routeKey: string): RequestHandler {
     const { serialize } = routeResponseSerializers.get(routeKey)!;
     return (_req: Request, res: Response, next: NextFunction) => {
       res.json = <T extends object>(data: T) => {
