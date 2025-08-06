@@ -85,7 +85,6 @@ export class Application {
       if (error instanceof HttpError) {
         res.status(error.status).json(error);
       } else {
-        logger.error(`Unhandled error: ${error.message}`);
         res.sendStatus(500);
       }
     });
