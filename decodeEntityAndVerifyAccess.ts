@@ -201,9 +201,7 @@ export async function decodeEntityAndVerifyAccess<
   }
 
   if (params.user_id !== undefined)  {
-    if (!hasElevatedAccess) {
-      throw new HttpError(403);
-    }
+    if (!hasElevatedAccess) throw new HttpError(403);
     return params.user_id as ReturnType<T>;
   }
 
