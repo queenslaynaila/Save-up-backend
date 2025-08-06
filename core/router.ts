@@ -23,6 +23,8 @@ import addFormats from 'ajv-formats';
 import fastJson, { Schema } from 'fast-json-stringify';
 import { validateAndDecodeJwt } from '../utils';
 
+extendZodWithOpenApi(z);
+
 function authMiddleware(auth: true | Role | Role[] = true) {
   return (req: Request, _res: Response, next: NextFunction) => {
     if (!req.headers.authorization) {
@@ -47,8 +49,6 @@ function authMiddleware(auth: true | Role | Role[] = true) {
     next();
   };
 }
-
-extendZodWithOpenApi(z);
 
 const ajv = new Ajv({coerceTypes: true, useDefaults: true});
 addFormats(ajv, {mode: 'fast', formats: ['date-time', 'date']});
@@ -88,6 +88,18 @@ function buildRequestValidatorsForRoute<
   routeRequestValidators.set(routeKey, validators);
 }
 
+const routeResponseSerializers = new Map<string, {
+  serialize: (data: any) => string
+}>();
+
+function buildResponseSerializersForRoute(routeKey: string, responseSchema: ZodType): void {
+  const jsonResponseSchema = z.toJSONSchema(responseSchema, { target: 'draft-7' });
+  const serialize = fastJson(jsonResponseSchema as Schema);
+  routeResponseSerializers.set(routeKey, {
+    serialize
+  });
+}
+
 function createValidationMiddleware(routeKey: string): RequestHandler {
   return (req, _res, next) => {
     const validators = routeRequestValidators.get(routeKey);
@@ -114,18 +126,6 @@ function createValidationMiddleware(routeKey: string): RequestHandler {
 
     next();
   };
-}
-
-const routeResponseSerializers = new Map<string, {
-  serialize: (data: any) => string
-}>();
-
-function buildResponseSerializersForRoute(routeKey: string, responseSchema: ZodType): void {
-  const jsonResponseSchema = z.toJSONSchema(responseSchema, { target: 'draft-7' });
-  const serialize = fastJson(jsonResponseSchema as Schema);
-  routeResponseSerializers.set(routeKey, {
-    serialize
-  });
 }
 
 type HttpMethod = 'get' | 'post' | 'patch' | 'delete' | 'put';
@@ -182,7 +182,7 @@ export class Router {
 
   protected readonly resourceName: string;
 
-  protected readonly routePrefix: string;
+  protected readonly basePath: string;
 
   public readonly get: SpecificRouteMethodHandler;
 
@@ -199,9 +199,9 @@ export class Router {
     this.resourceName = resourceName;
 
     if (isResourceNameSuffixedInUrl) {
-      this.routePrefix   = `${BASE_PATH}`
+      this.basePath   = `${BASE_PATH}`
     } else {
-      this.routePrefix = `${BASE_PATH}/${resourceName
+      this.basePath = `${BASE_PATH}/${resourceName
         .toLowerCase()
         .replace(/\s+/g, '-')
         .replace(/[^a-z0-9-]/g, '')}`;
@@ -219,7 +219,7 @@ export class Router {
   }
 
   public getBasePath(): string {
-    return this.routePrefix;
+    return this.basePath;
   }
 
   public static getOpenApiRegistry(): OpenAPIRegistry {
@@ -355,7 +355,7 @@ export class Router {
     };
 
     const transformedPath = path.replace(/:([^/]+)/g, '{$1}');
-    const fullPath = `${this.routePrefix}${transformedPath}`
+    const fullPath = `${this.basePath}${transformedPath}`
       .replace(/\/+/g, '/')
       .replace(/\/$/, '');
 
