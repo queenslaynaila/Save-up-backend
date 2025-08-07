@@ -18,8 +18,7 @@ CREATE TABLE IF NOT EXISTS users (
     gender enum_gender,
     pin TEXT NOT NULL,
     status enum_user_status  NOT NULL DEFAULT 'Active',
-    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-er
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );
 
 GRANT INSERT, SELECT, UPDATE ON users TO saveup_www;
