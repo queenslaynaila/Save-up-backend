@@ -163,7 +163,7 @@ interface RouteOptions<
   handler: RequestHandler<z.infer<Params>, z.infer<ResBody>, z.infer<ReqBody>, z.infer<Query>>;
 }
 
-type SpecificRouteMethodHandler = <
+type RouteHandler = <
   Params extends ZodObject<ZodRawShape> = EmptyObjectSchema,
   ResBody extends ZodType = EmptyObjectSchema,
   ReqBody extends ZodObject | ZodRecord| ZodArray<ZodType> |
@@ -184,15 +184,15 @@ export class Router {
 
   protected readonly basePath: string;
 
-  public readonly get: SpecificRouteMethodHandler;
+  public readonly get: RouteHandler;
 
-  public readonly post: SpecificRouteMethodHandler;
+  public readonly post: RouteHandler;
 
-  public readonly put: SpecificRouteMethodHandler;
+  public readonly put: RouteHandler;
 
-  public readonly patch: SpecificRouteMethodHandler;
+  public readonly patch: RouteHandler;
 
-  public readonly delete: SpecificRouteMethodHandler;
+  public readonly delete: RouteHandler;
 
   constructor(resourceName: string, isResourceNameSuffixedInUrl = false) {
     this.router = ExpressRouter();
@@ -251,7 +251,7 @@ export class Router {
     return this.routerInstances.get(key)!;
   }
 
-  private buildRouteForMethod(method: HttpMethod): SpecificRouteMethodHandler {
+  private buildRouteForMethod(method: HttpMethod): RouteHandler {
     return <
       Params extends ZodObject<ZodRawShape> = EmptyObjectSchema,
       ResBody extends ZodType = EmptyObjectSchema,
