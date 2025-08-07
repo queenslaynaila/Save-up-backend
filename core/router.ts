@@ -338,6 +338,7 @@ export class Router {
   ) {
     const security = [];
     if (options.auth) security.push({ Authorization: [] });
+
     if (middlewares.some(m => m.name === 'resetStepValidator')) {
       security.push({ Reset: [] });
     }
@@ -358,12 +359,18 @@ export class Router {
       .replace(/\/+/g, '/')
       .replace(/\/$/, '');
 
+    const roles = Array.isArray(options.auth) ? options.auth : [options.auth]
+    const roleDescription = `Allowed for roles: **${roles.join(', ')}**`;
+
     Router.registry.registerPath({
       tags: [this.resourceName],
       method,
       path: fullPath,
       summary: options.summary,
-      description: options.description,
+      description: [
+        roleDescription,
+        options.description
+      ].filter(Boolean).join('\n\n'),
       security,
       request: {
         params: options.schema?.params,
