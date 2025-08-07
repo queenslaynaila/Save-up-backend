@@ -1,7 +1,7 @@
 import Router from '../../core/router';
 import { sql } from '../../db';
 import { z } from 'zod';
-import { decodeEntityAndVerifyAccess } from '../../decodeEntityAndVerifyAccess';
+import { decodeParamsAndAuthorizeAccess } from '../../decodeParamsAndAuthorizeAccess';
 
 const SQL_GET_CANDIDATES = sql<
 {
@@ -43,7 +43,7 @@ const getCandidates = (router: Router) => {
       )
     },
     handler: async (req, res) => {
-      const groupId = await decodeEntityAndVerifyAccess(req, true);
+      const groupId = await decodeParamsAndAuthorizeAccess(req, true);
 
       const candidates = await SQL_GET_CANDIDATES({
         group_id: groupId,

@@ -9,7 +9,7 @@ export const entityIdParamsSchema = z.union([
 export const UserRole = z.enum(['Admin', 'Standard', 'Moderator']);
 export type Role = z.infer<typeof UserRole>;
 export const IdType = z.enum(['National', 'Passport']);
-const Gender = z.enum(['Male', 'Female']);
+export const Gender = z.enum(['Male', 'Female']);
 
 const authenticatedUser = z.object({
   id: z.number().int().min(1),

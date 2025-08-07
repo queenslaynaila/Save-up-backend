@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { verifyPin } from '../../utils';
 import { entityIdParamsSchema } from '../users/schema';
 import logger from '../../logger';
-import { decodeEntityAndVerifyAccess } from '../../decodeEntityAndVerifyAccess';
+import { decodeParamsAndAuthorizeAccess } from '../../decodeParamsAndAuthorizeAccess';
 
 const withdrawalPayload = z.object({
   pocket_id: z.number().int().min(1),
@@ -49,7 +49,7 @@ const createWithdrawal = (router: Router) => {
     },
     middlewares: [verifyPin],
     handler: async (req, res) => {
-      const userId = await decodeEntityAndVerifyAccess(req);
+      const userId = await decodeParamsAndAuthorizeAccess(req);
 
       await SQL_CREATE_WITHDRAWAL({
         ...req.body,

@@ -1,7 +1,7 @@
 import Router from '../../core/router';
 import { sql } from '../../db';
 import { z } from 'zod';
-import { decodeEntityAndVerifyAccess } from '../../decodeEntityAndVerifyAccess';
+import { decodeParamsAndAuthorizeAccess } from '../../decodeParamsAndAuthorizeAccess';
 import { entityIdParamsSchema } from '../users/schema';
 
 const SQL_DELETE_EXPENSE = sql<
@@ -26,7 +26,7 @@ const deleteExpense = (router: Router) => {
     },
     auth: true,
     handler: async (req, res) => {
-      const entityId = await decodeEntityAndVerifyAccess(req);
+      const entityId = await decodeParamsAndAuthorizeAccess(req);
       await SQL_DELETE_EXPENSE({
         xid: req.params.xid,
         entity_id: entityId

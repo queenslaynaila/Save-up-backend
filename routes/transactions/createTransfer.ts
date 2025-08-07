@@ -4,7 +4,7 @@ import HttpError from '../../httpError';
 import { z } from 'zod';
 import { verifyPin } from '../../utils';
 import { entityIdParamsSchema } from '../users/schema';
-import { decodeEntityAndVerifyAccess } from '../../decodeEntityAndVerifyAccess';
+import { decodeParamsAndAuthorizeAccess } from '../../decodeParamsAndAuthorizeAccess';
 
 const transferPayload = z.object({
   entity_id: z.number().min(1),
@@ -51,7 +51,7 @@ const createTransfer = (router: Router) => {
     },
     middlewares: [verifyPin],
     handler: async (req, res) => {
-      const entityId = await decodeEntityAndVerifyAccess(req, false, true);
+      const entityId = await decodeParamsAndAuthorizeAccess(req, false, true);
 
       await SQL_CREATE_TRANSFER({
         ...req.body,

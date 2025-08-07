@@ -2,7 +2,7 @@ import Router from '../../core/router';
 import { sql } from '../../db';
 import { z } from 'zod';
 import HttpError from '../../httpError';
-import { decodeEntityAndVerifyAccess } from '../../decodeEntityAndVerifyAccess';
+import { decodeParamsAndAuthorizeAccess } from '../../decodeParamsAndAuthorizeAccess';
 
 const ballotParamsSchema = z.object({
   group_id: z.number().int().min(1),
@@ -39,7 +39,7 @@ const createBallot = (router: Router) => {
       })
     },
     handler: async (req, res) => {
-      const groupId = await decodeEntityAndVerifyAccess(req);
+      const groupId = await decodeParamsAndAuthorizeAccess(req);
 
       await SQL_CREATE_BALLOT({
         ...req.body,

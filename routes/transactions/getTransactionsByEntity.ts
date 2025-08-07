@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { sql } from '../../db';
 import Router from '../../core/router';
-import { decodeEntityAndVerifyAccess } from '../../decodeEntityAndVerifyAccess';
+import { decodeParamsAndAuthorizeAccess } from '../../decodeParamsAndAuthorizeAccess';
 import { entityIdParamsSchema } from '../users/schema';
 import logger from '../../logger';
 
@@ -172,7 +172,7 @@ const getTransactions = (router: Router) => {
     },
     auth: true,
     handler: async (req, res) => {
-      const entityId = await decodeEntityAndVerifyAccess(req, true);
+      const entityId = await decodeParamsAndAuthorizeAccess(req, true);
       const { slug, pocket_id, from, to, limit = 10 } = req.query;
 
       const transactions = await SQL_GET_TRANSACTIONS({

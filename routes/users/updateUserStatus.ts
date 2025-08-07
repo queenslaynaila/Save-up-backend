@@ -3,7 +3,7 @@ import { sql } from '../../db';
 import { AccountStatus, UserRole } from './schema';
 import Router from '../../core/router';
 import HttpError from '../../httpError';
-import { decodeEntityAndVerifyAccess } from '../../decodeEntityAndVerifyAccess';
+import { decodeParamsAndAuthorizeAccess } from '../../decodeParamsAndAuthorizeAccess';
 
 const SQL_UPDATE_STATUS = sql<
 Pick<AccountStatus, 'user_id' | 'status' | 'admin_id' | 'reason'>,
@@ -47,7 +47,7 @@ const updateUserStatus = (router: Router) => {
       })
     },
     handler: async (req, res) => {
-      const userId = await decodeEntityAndVerifyAccess(req, true);
+      const userId = await decodeParamsAndAuthorizeAccess(req, true);
 
       if (req.user!.id === userId) {
         throw new HttpError(403, {

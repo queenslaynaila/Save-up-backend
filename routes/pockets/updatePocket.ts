@@ -2,7 +2,7 @@ import Router from '../../core/router';
 import { sql } from '../../db';
 import { z } from 'zod';
 import { Pocket, pocketSchema } from './schema';
-import { decodeEntityAndVerifyAccess } from '../../decodeEntityAndVerifyAccess';
+import { decodeParamsAndAuthorizeAccess } from '../../decodeParamsAndAuthorizeAccess';
 import { entityIdParamsSchema } from '../users/schema';
 import HttpError from '../../httpError';
 
@@ -84,7 +84,7 @@ const updatePocket = (router: Router) => {
     },
     auth: true,
     handler: async (req, res) => {
-      const entityId = await decodeEntityAndVerifyAccess(req);
+      const entityId = await decodeParamsAndAuthorizeAccess(req);
 
       const {
         name,

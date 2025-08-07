@@ -1,7 +1,7 @@
 import Router from '../../core/router';
 import { sql } from '../../db';
 import { z } from 'zod';
-import { decodeEntityAndVerifyAccess } from '../../decodeEntityAndVerifyAccess';
+import { decodeParamsAndAuthorizeAccess } from '../../decodeParamsAndAuthorizeAccess';
 import { groupsSchema } from './schema';
 
 const SQL_RECORD_OLD_NAME = sql<
@@ -51,7 +51,7 @@ const updateGroup = (router: Router) => {
       })
     },
     handler: async (req, res) => {
-      const groupId = await decodeEntityAndVerifyAccess(req);
+      const groupId = await decodeParamsAndAuthorizeAccess(req);
 
       const name = await sql.transaction(async (trx) => {
         await SQL_RECORD_OLD_NAME({

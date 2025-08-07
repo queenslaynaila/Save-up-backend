@@ -1,7 +1,7 @@
 import Router from '../../core/router';
 import { sql } from '../../db';
 import { z } from 'zod';
-import { decodeEntityAndVerifyAccess } from '../../decodeEntityAndVerifyAccess';
+import { decodeParamsAndAuthorizeAccess } from '../../decodeParamsAndAuthorizeAccess';
 
 export const DebitType = z.enum(['Loan', 'Withdrawal']);
 
@@ -122,7 +122,7 @@ const getGrpDebitRequests = (router: Router) => {
     },
     auth: true,
     handler: async (req, res) => {
-      const groupId = await decodeEntityAndVerifyAccess(req, true);
+      const groupId = await decodeParamsAndAuthorizeAccess(req, true);
       const withdrawals = await SQL_GET_GROUP_WITHDRAWALS({
         group_id: groupId,
         pocket_id: req.query.pocket_id,

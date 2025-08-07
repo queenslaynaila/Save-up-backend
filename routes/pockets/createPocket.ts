@@ -2,7 +2,7 @@ import Router from '../../core/router';
 import { sql } from '../../db';
 import { pocketSchema, Pocket } from './schema';
 import { z } from 'zod';
-import { decodeEntityAndVerifyAccess } from '../../decodeEntityAndVerifyAccess';
+import { decodeParamsAndAuthorizeAccess } from '../../decodeParamsAndAuthorizeAccess';
 import { entityIdParamsSchema } from '../users/schema';
 
 type PocketCreationParams = Pick<
@@ -106,7 +106,7 @@ const createPocket = (router: Router) => {
     },
     auth: true,
     handler: async (req, res) => {
-      const entityId = await decodeEntityAndVerifyAccess(req);
+      const entityId = await decodeParamsAndAuthorizeAccess(req);
       const pocket = await SQL_CREATE_POCKET({
         ...req.body,
         entity_id: entityId,

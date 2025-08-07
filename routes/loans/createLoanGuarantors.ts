@@ -3,7 +3,7 @@ import Router from '../../core/router';
 import { sql } from '../../db';
 import { verifyPin } from '../../utils';
 import HttpError from '../../httpError';
-import { decodeEntityAndVerifyAccess } from '../../decodeEntityAndVerifyAccess';
+import { decodeParamsAndAuthorizeAccess } from '../../decodeParamsAndAuthorizeAccess';
 
 const SQL_CREATE_LOAN_GUARANTORS = sql<{
   group_id: number;
@@ -36,7 +36,7 @@ const addLoanGuarantors = (router: Router) => {
     },
     middlewares: [verifyPin],
     handler: async (req, res) => {
-      const groupId = await decodeEntityAndVerifyAccess(req);
+      const groupId = await decodeParamsAndAuthorizeAccess(req);
 
       await SQL_CREATE_LOAN_GUARANTORS({
         group_id: groupId,

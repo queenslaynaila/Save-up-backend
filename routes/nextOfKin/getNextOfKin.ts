@@ -3,7 +3,7 @@ import { sql } from '../../db';
 import { z } from 'zod';
 import HttpError from '../../httpError';
 import { entityIdParamsSchema, UserRole } from '../users/schema';
-import { decodeEntityAndVerifyAccess } from '../../decodeEntityAndVerifyAccess';
+import { decodeParamsAndAuthorizeAccess } from '../../decodeParamsAndAuthorizeAccess';
 import { NextOfKin, nextOfKinSchema } from './schema';
 
 const SQL_GET_KIN = sql<
@@ -51,7 +51,7 @@ const getNextOfKin = (router: Router) => {
       )
     },
     handler: async (req, res) => {
-      const userId = await decodeEntityAndVerifyAccess(req, true);
+      const userId = await decodeParamsAndAuthorizeAccess(req, true);
       const { include_history } = req.query;
 
       if (req.user!.role === UserRole.enum.Standard && include_history) {

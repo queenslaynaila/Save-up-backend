@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import Router from '../../core/router';
 import { sql } from '../../db';
-import { decodeEntityAndVerifyAccess } from '../../decodeEntityAndVerifyAccess';
+import { decodeParamsAndAuthorizeAccess } from '../../decodeParamsAndAuthorizeAccess';
 import { DebitType } from '../groupWithdrawals/getWithdrawalRequests';
 
 const loanRequestSchema = z.object({
@@ -130,7 +130,7 @@ const getLoanRequests = (router: Router) => {
       schema: z.array(loanRequestSchema)
     },
     handler: async (req, res) => {
-      const groupId = await decodeEntityAndVerifyAccess(req, true);
+      const groupId = await decodeParamsAndAuthorizeAccess(req, true);
       const loans = await SQL_GET_LOANS({
         group_id: groupId,
         pocket_id: req.query.pocket_id,

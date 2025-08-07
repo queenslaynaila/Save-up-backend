@@ -1,7 +1,7 @@
 import Router from '../../core/router';
 import { sql } from '../../db';
 import { z } from 'zod';
-import { decodeEntityAndVerifyAccess } from '../../decodeEntityAndVerifyAccess';
+import { decodeParamsAndAuthorizeAccess } from '../../decodeParamsAndAuthorizeAccess';
 import { entityIdParamsSchema } from '../users/schema';
 import { pocketSchema } from './schema';
 
@@ -90,7 +90,7 @@ const getPocketsByEntity = (router: Router) => {
     },
     auth: true,
     handler: async (req, res) => {
-      const entityId = await decodeEntityAndVerifyAccess(req, true);
+      const entityId = await decodeParamsAndAuthorizeAccess(req, true);
       const {
         xid,
         category_id,

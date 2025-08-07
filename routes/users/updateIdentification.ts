@@ -7,7 +7,7 @@ import {
   userSchema
 } from './schema';
 import { verifyPin } from '../../utils';
-import { decodeEntityAndVerifyAccess } from '../../decodeEntityAndVerifyAccess';
+import { decodeParamsAndAuthorizeAccess } from '../../decodeParamsAndAuthorizeAccess';
 
 const IdParams = z.object({
   id_type: IdType,
@@ -51,7 +51,7 @@ const updateIdDetails = (router: Router) => {
     },
     middlewares: [verifyPin],
     handler: async (req, res) => {
-      const userId = await decodeEntityAndVerifyAccess(req);
+      const userId = await decodeParamsAndAuthorizeAccess(req);
 
       const { id_number } = await SQL_UPDATE_ID_NUMBER({
         ...req.body,

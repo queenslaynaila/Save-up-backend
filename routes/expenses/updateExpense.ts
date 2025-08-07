@@ -6,7 +6,7 @@ import {
   Expense
 } from './schema';
 import { z } from 'zod';
-import { decodeEntityAndVerifyAccess } from '../../decodeEntityAndVerifyAccess';
+import { decodeParamsAndAuthorizeAccess } from '../../decodeParamsAndAuthorizeAccess';
 import { entityIdParamsSchema } from '../users/schema';
 
 type ExpenseParams = Pick<Expense, 'entity_id'|'xid'> &
@@ -56,7 +56,7 @@ const updateExpense = (router: Router) => {
     },
     auth: true,
     handler: async (req, res) => {
-      const entityId = await decodeEntityAndVerifyAccess(req);
+      const entityId = await decodeParamsAndAuthorizeAccess(req);
       const { category_id, description, amount, spent_at } = req.body;
       const expense = await SQL_UPDATE_EXPENSE({
         entity_id: entityId,

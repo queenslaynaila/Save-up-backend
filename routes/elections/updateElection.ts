@@ -2,7 +2,7 @@ import Router from '../../core/router';
 import { sql } from '../../db';
 import { z } from 'zod';
 import HttpError from '../../httpError';
-import { decodeEntityAndVerifyAccess } from '../../decodeEntityAndVerifyAccess';
+import { decodeParamsAndAuthorizeAccess } from '../../decodeParamsAndAuthorizeAccess';
 
 const electionSchema = z.object({
   group_id: z.number().int().min(1),
@@ -44,7 +44,7 @@ const updateElections = (router: Router) => {
       })
     },
     handler: async (req, res) => {
-      const groupId = await decodeEntityAndVerifyAccess(req, true);
+      const groupId = await decodeParamsAndAuthorizeAccess(req, true);
 
       await SQL_UPDATE_ELECTION({
         ...req.body,

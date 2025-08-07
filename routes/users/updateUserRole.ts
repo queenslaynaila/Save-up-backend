@@ -3,7 +3,7 @@ import { sql } from '../../db';
 import { entityIdParamsSchema, UserRole } from './schema';
 import Router from '../../core/router';
 import HttpError from '../../httpError';
-import { decodeEntityAndVerifyAccess } from '../../decodeEntityAndVerifyAccess';
+import { decodeParamsAndAuthorizeAccess } from '../../decodeParamsAndAuthorizeAccess';
 
 const convertToTitleCase = (str: string): string => {
   return str.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());
@@ -38,7 +38,7 @@ const updateUserRole = (router: Router) => {
       })
     },
     handler: async (req, res) => {
-      const userId = await decodeEntityAndVerifyAccess(req, true);
+      const userId = await decodeParamsAndAuthorizeAccess(req, true);
       const role = convertToTitleCase(req.body.role);
 
       if (req.user!.id === userId) {

@@ -2,7 +2,7 @@ import Router from '../../core/router';
 import { sql } from '../../db';
 import { z } from 'zod';
 import { entityIdParamsSchema, invitationSchema } from './schema';
-import { decodeEntityAndVerifyAccess } from '../../decodeEntityAndVerifyAccess';
+import { decodeParamsAndAuthorizeAccess } from '../../decodeParamsAndAuthorizeAccess';
 
 const pendingInvitations = invitationSchema
   .pick({
@@ -57,7 +57,7 @@ const getInvites = (router: Router) => {
       }))
     },
     handler: async (req, res) => {
-      const userId = await decodeEntityAndVerifyAccess(req, true);
+      const userId = await decodeParamsAndAuthorizeAccess(req, true);
 
       const invites = await SQL_GET_PENDING_INVITATIONS({
         user_id: userId

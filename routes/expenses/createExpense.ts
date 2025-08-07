@@ -2,7 +2,7 @@ import Router from '../../core/router';
 import { sql } from '../../db';
 import { Expense, expenseSchema } from './schema';
 import { z } from 'zod';
-import { decodeEntityAndVerifyAccess } from '../../decodeEntityAndVerifyAccess';
+import { decodeParamsAndAuthorizeAccess } from '../../decodeParamsAndAuthorizeAccess';
 import { entityIdParamsSchema } from '../users/schema';
 
 const expenseCreationParams = expenseSchema.pick({
@@ -57,7 +57,7 @@ const createExpense = (router: Router) => {
     },
     auth: true,
     handler: async (req, res) => {
-      const entityId = await decodeEntityAndVerifyAccess(req);
+      const entityId = await decodeParamsAndAuthorizeAccess(req);
       const expense = await SQL_CREATE_EXPENSES({
         ...req.body,
         entity_id: entityId

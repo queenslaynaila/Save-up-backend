@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import Router from '../../core/router';
 import { sql } from '../../db';
-import { decodeEntityAndVerifyAccess } from '../../decodeEntityAndVerifyAccess';
+import { decodeParamsAndAuthorizeAccess } from '../../decodeParamsAndAuthorizeAccess';
 import { entityIdParamsSchema } from './schema';
 
 const emptyMetadata = z.object({}).nullable();
@@ -384,7 +384,7 @@ const getGroupActivities = (router: Router) => {
       schema: z.array(activitySchema)
     },
     handler: async (req, res) => {
-      const groupId = await decodeEntityAndVerifyAccess(req, true);
+      const groupId = await decodeParamsAndAuthorizeAccess(req, true);
       const size = req.query.size || 200;
 
       const activities = await SQL_GET_GROUP_ACTIVITIES({

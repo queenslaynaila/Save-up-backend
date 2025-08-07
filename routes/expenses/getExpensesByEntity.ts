@@ -5,7 +5,7 @@ import {
   expenseSchema
 } from './schema';
 import { z } from 'zod';
-import { decodeEntityAndVerifyAccess } from '../../decodeEntityAndVerifyAccess';
+import { decodeParamsAndAuthorizeAccess } from '../../decodeParamsAndAuthorizeAccess';
 import { entityIdParamsSchema } from '../users/schema';
 
 const SQL_GET_EXPENSES = sql<{
@@ -67,7 +67,7 @@ const getExpensesByEntity = (router: Router) => {
     },
     auth: true,
     handler: async (req, res) => {
-      const entityId = await decodeEntityAndVerifyAccess(req, true);
+      const entityId = await decodeParamsAndAuthorizeAccess(req, true);
       const {
         category_id,
         spent_from,

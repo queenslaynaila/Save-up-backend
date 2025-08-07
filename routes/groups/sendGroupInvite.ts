@@ -3,7 +3,7 @@ import { sql } from '../../db';
 import { z } from 'zod';
 import sendSms from '../../sms';
 import HttpError from '../../httpError';
-import { decodeEntityAndVerifyAccess } from '../../decodeEntityAndVerifyAccess';
+import { decodeParamsAndAuthorizeAccess } from '../../decodeParamsAndAuthorizeAccess';
 
 const SQL_SEND_INVITATION = sql<
 {
@@ -66,7 +66,7 @@ const createGroupInvite = (router: Router) => {
       })
     },
     handler: async (req, res) => {
-      const groupId = await decodeEntityAndVerifyAccess(req);
+      const groupId = await decodeParamsAndAuthorizeAccess(req);
 
       const {
         receiver_id,

@@ -3,7 +3,7 @@ import { sql } from '../../db';
 import HttpError from '../../httpError';
 import { z } from 'zod';
 import { verifyPin } from '../../utils';
-import { decodeEntityAndVerifyAccess } from '../../decodeEntityAndVerifyAccess';
+import { decodeParamsAndAuthorizeAccess } from '../../decodeParamsAndAuthorizeAccess';
 
 type WithdrawalParams = {
   group_id: number;
@@ -44,7 +44,7 @@ const createWithdrawalRequest = (router: Router) => {
     auth: true,
     middlewares: [verifyPin],
     handler: async (req, res) => {
-      const groupId = await decodeEntityAndVerifyAccess(req, false, true);
+      const groupId = await decodeParamsAndAuthorizeAccess(req, false, true);
       await SQL_INITIATE_GRP_WITHDRAWAL({
         ...req.body,
         group_id: groupId,

@@ -2,7 +2,7 @@ import { z } from 'zod';
 import Router from '../../core/router';
 import { sql } from '../../db';
 import { verifyPin } from '../../utils';
-import { decodeEntityAndVerifyAccess } from '../../decodeEntityAndVerifyAccess';
+import { decodeParamsAndAuthorizeAccess } from '../../decodeParamsAndAuthorizeAccess';
 
 const SQL_INSERT_APPROVAL = sql<{
   group_id: number;
@@ -64,7 +64,7 @@ const approveGuarantorRequest = (router: Router) => {
     },
     middlewares: [verifyPin],
     handler: async (req, res) => {
-      const groupId = await decodeEntityAndVerifyAccess(req);
+      const groupId = await decodeParamsAndAuthorizeAccess(req);
 
       await sql.transaction(async (trx) => {
         await SQL_INSERT_APPROVAL({

@@ -1,7 +1,7 @@
 import Router from '../../core/router';
 import { sql } from '../../db';
 import { z } from 'zod';
-import { decodeEntityAndVerifyAccess } from '../../decodeEntityAndVerifyAccess';
+import { decodeParamsAndAuthorizeAccess } from '../../decodeParamsAndAuthorizeAccess';
 import { ElectionStatus, ElectionType } from './schema';
 
 const adminSchema = z.object({
@@ -79,7 +79,7 @@ const getGroupElectionList = (router: Router) => {
       schema: z.array(ongoingElectionSchema)
     },
     handler: async (req, res) => {
-      const groupId = await decodeEntityAndVerifyAccess(req, true);
+      const groupId = await decodeParamsAndAuthorizeAccess(req, true);
 
       const elections = await SQL_GET_ONGOING_ELECTION({
         group_id: groupId

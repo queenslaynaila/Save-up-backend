@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { sql } from '../../db';
 import Router from '../../core/router';
-import { decodeEntityAndVerifyAccess } from '../../decodeEntityAndVerifyAccess';
+import { decodeParamsAndAuthorizeAccess } from '../../decodeParamsAndAuthorizeAccess';
 import { entityIdParamsSchema } from '../users/schema';
 
 const SQL_GET_BALANCE = sql<
@@ -46,7 +46,7 @@ const getBalanceForAnEntity = (router: Router) => {
       })
     },
     handler: async (req, res) => {
-      const entityId = await decodeEntityAndVerifyAccess(req, true);
+      const entityId = await decodeParamsAndAuthorizeAccess(req, true);
       const { from, to, pocket_id } = req.query;
       const balance = await SQL_GET_BALANCE({
         entity_id: entityId,

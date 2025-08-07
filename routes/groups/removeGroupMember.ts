@@ -3,7 +3,7 @@ import { sql } from '../../db';
 import { z } from 'zod';
 import HttpError from '../../httpError';
 import { entityIdParamsSchema } from '../users/schema';
-import { decodeEntityAndVerifyAccess } from '../../decodeEntityAndVerifyAccess';
+import { decodeParamsAndAuthorizeAccess } from '../../decodeParamsAndAuthorizeAccess';
 
 const SQL_MANAGE_GROUP_MEMBERSHIP = sql<
 {
@@ -37,7 +37,7 @@ const handleGroupExit = (router: Router) => {
       })
     },
     handler: async (req, res) => {
-      const { groupId, memberId } = await decodeEntityAndVerifyAccess(req);
+      const { groupId, memberId } = await decodeParamsAndAuthorizeAccess(req);
 
       await SQL_MANAGE_GROUP_MEMBERSHIP({
         group_id: groupId,

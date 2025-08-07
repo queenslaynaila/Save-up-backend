@@ -2,7 +2,7 @@ import Router from '../../core/router';
 import { sql } from '../../db';
 import HttpError from '../../httpError';
 import { z } from 'zod';
-import { decodeEntityAndVerifyAccess } from '../../decodeEntityAndVerifyAccess';
+import { decodeParamsAndAuthorizeAccess } from '../../decodeParamsAndAuthorizeAccess';
 import { entityIdParamsSchema } from '../users/schema';
 
 const SQL_GET_BALANCE = sql<
@@ -42,7 +42,7 @@ const deletePocket = (router: Router) => {
     },
     auth: true,
     handler: async (req, res) => {
-      const entityId = await decodeEntityAndVerifyAccess(req, false, true);
+      const entityId = await decodeParamsAndAuthorizeAccess(req, false, true);
 
       await sql.transaction(async (trx) => {
         const balance = await SQL_GET_BALANCE({

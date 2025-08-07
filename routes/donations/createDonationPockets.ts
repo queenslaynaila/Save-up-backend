@@ -3,7 +3,7 @@ import Router from '../../core/router';
 import { sql } from '../../db';
 import logger from '../../logger';
 import { entityIdParamsSchema } from '../users/schema';
-import { decodeEntityAndVerifyAccess } from '../../decodeEntityAndVerifyAccess';
+import { decodeParamsAndAuthorizeAccess } from '../../decodeParamsAndAuthorizeAccess';
 
 const donationParams = z.object({
   entity_id: z.number().int().min(1),
@@ -104,7 +104,7 @@ const createFundraiser = (router: Router) => {
     },
     auth: true,
     handler: async (req, res) => {
-      const entityId = await decodeEntityAndVerifyAccess(req);
+      const entityId = await decodeParamsAndAuthorizeAccess(req);
       const {
         name,
         description,

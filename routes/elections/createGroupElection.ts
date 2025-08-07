@@ -3,7 +3,7 @@ import { sql } from '../../db';
 import { z } from 'zod';
 import HttpError from '../../httpError';
 import { ElectionType } from './schema';
-import { decodeEntityAndVerifyAccess } from '../../decodeEntityAndVerifyAccess';
+import { decodeParamsAndAuthorizeAccess } from '../../decodeParamsAndAuthorizeAccess';
 
 const electionsPayload = z.object({
   type: ElectionType,
@@ -60,7 +60,7 @@ const createGroupElection = (router: Router) => {
       ])
     },
     handler: async (req, res) => {
-      const groupId = await decodeEntityAndVerifyAccess(req, false, true);
+      const groupId = await decodeParamsAndAuthorizeAccess(req, false, true);
 
       const nominationEndsAt = req.body.nomination_ends_at
         ?? new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString();

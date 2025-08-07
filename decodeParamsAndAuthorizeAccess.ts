@@ -48,11 +48,15 @@ function resolveMeAlias(id: number | 'me' | undefined, loggedInUserId: number): 
 async function authorizeGroupAccess(
   groupId: number,
   loggedInUserId: number,
-  hasElevatedAccess : boolean,
+  hasAdminByPassPriviledges : boolean,
   requiresGrpAdmin: boolean,
   targetMemberId?: number
 ): Promise<number | { groupId: number; memberId: number }> {
-  if (hasElevatedAccess ) {
+  /*
+   If the user has bypassprivileges, skip all group membership checks
+   and immediately allow access.
+  */ 
+  if (hasAdminByPassPriviledges) {
     return targetMemberId
       ? { groupId, memberId: targetMemberId }
       : groupId;
@@ -85,7 +89,7 @@ async function authorizeGroupAccess(
 async function authorizeEntityAccess(
   entityId: number,
   loggedInUserId: number,
-  hasElevatedAccess : boolean,
+  hasAdminByPassPriviledges : boolean,
   requiresGrpAdmin: boolean,
   memberId?: number
 ) {
@@ -94,9 +98,7 @@ async function authorizeEntityAccess(
   }).oneFirst(new HttpError(404));
 
   if (entityType === 'User')  {
-    if (!hasElevatedAccess) {
-      throw new HttpError(403);
-    }
+    if (!hasAdminByPassPriviledges) throw new HttpError(403);
     return entityId;
   }
 
@@ -104,7 +106,7 @@ async function authorizeEntityAccess(
     return authorizeGroupAccess(
       entityId,
       loggedInUserId,
-      hasElevatedAccess ,
+      hasAdminByPassPriviledges ,
       requiresGrpAdmin,
       memberId
     );
@@ -153,25 +155,29 @@ type ReturnType<T> = T extends GroupWithMemberParams
 
 
 /**
- * Decodes route parameters related to users, entities, or groups and verifies
- * whether the current user has access to the specified resource.
+ * Runs immediately after authentication. 
+ * 
+ * Decodes route parameters like user_id, group_id, entity_id, member_id
+ * replacing me aliases w logged in userid
+ * 
+ * Then perform access control based on resolved params.
  *
- * @param req - The incoming Express request object.
+ * @param req -  incoming Express request object.
  * 
  * @param isAdminByPassAllowed - (default: false)
- *   If set to true, users with elevated roles (Admin or Moderator) are
- *   allowed to access resources that do not belong to them. This includes:
- *     - Accessing other users' data.
+ *   If true, users with elevated roles (Admin or Moderator) are allowed to:
+ *     - Access other users' data.
  *     - Accessing any group’s data, regardless of membership.
- *   If false, access is restricted to the resource owner or group member.
+ *   If false, access is limited to the resource owner (for users) or 
+ *   a group member (for group resources).
  * 
  * @param requiresGrpAdmin - (default: false)
  *   Only applies to group-related routes.
- *   If true, the current user must be a group admin (not just a member)
- *   to access the resource.
+ *   If true, the current user must be a group admin 
+ *   to access the requested grp resource.
  */
 
-export async function decodeEntityAndVerifyAccess<
+export async function decodeParamsAndAuthorizeAccess<
   T extends RequestParams,
   ResBody = unknown,
   ReqBody = unknown,
@@ -184,7 +190,7 @@ export async function decodeEntityAndVerifyAccess<
   if (!req.user) throw new HttpError(401);
 
   const { id: loggedInUserId, role: loggedInUserRole } = req.user;
-  const hasElevatedAccess = isAdminByPassAllowed && ADMIN_LIKE_ROLES.includes(loggedInUserRole);
+  const hasAdminByPassPriviledges = isAdminByPassAllowed && ADMIN_LIKE_ROLES.includes(loggedInUserRole);
 
   const params = {
     user_id: resolveMeAlias(req.params.user_id, loggedInUserId),
@@ -193,6 +199,7 @@ export async function decodeEntityAndVerifyAccess<
     group_id: req.params.group_id
   };
 
+  // Immediately allow access if requested entity or user is logged in user.
   if (
     params.entity_id === loggedInUserId ||
     params.user_id === loggedInUserId
@@ -201,7 +208,7 @@ export async function decodeEntityAndVerifyAccess<
   }
 
   if (params.user_id !== undefined)  {
-    if (!hasElevatedAccess) throw new HttpError(403);
+    if (!hasAdminByPassPriviledges) throw new HttpError(403);
     return params.user_id as ReturnType<T>;
   }
 
@@ -209,18 +216,17 @@ export async function decodeEntityAndVerifyAccess<
     return await authorizeGroupAccess(
       params.group_id,
       loggedInUserId,
-      hasElevatedAccess,
+      hasAdminByPassPriviledges,
       requiresGrpAdmin,
       params.member_id
     ) as ReturnType<T>;
   }
    
-  // Only call authorizeEntityAccess when entity type is uknown
   if (params.entity_id !== undefined) {
     return await authorizeEntityAccess(
       params.entity_id,
       loggedInUserId,
-      hasElevatedAccess,
+      hasAdminByPassPriviledges,
       requiresGrpAdmin,
       params.member_id
     ) as ReturnType<T>;

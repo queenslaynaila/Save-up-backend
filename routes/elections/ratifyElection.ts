@@ -1,7 +1,7 @@
 import Router from '../../core/router';
 import { sql } from '../../db';
 import { z } from 'zod';
-import { decodeEntityAndVerifyAccess } from '../../decodeEntityAndVerifyAccess';
+import { decodeParamsAndAuthorizeAccess } from '../../decodeParamsAndAuthorizeAccess';
 import HttpError from '../../httpError';
 
 const SQL_RATIFY_ELECTION = sql<
@@ -36,7 +36,7 @@ const ratifyElection = (router: Router) => {
       })
     },
     handler: async (req, res) => {
-      const groupId = await decodeEntityAndVerifyAccess(req);
+      const groupId = await decodeParamsAndAuthorizeAccess(req);
 
       await SQL_RATIFY_ELECTION({
         group_id: groupId,

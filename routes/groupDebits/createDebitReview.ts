@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { sql } from '../../db';
 import { verifyPin } from '../../utils';
 import Router from '../../core/router';
-import { decodeEntityAndVerifyAccess } from '../../decodeEntityAndVerifyAccess';
+import { decodeParamsAndAuthorizeAccess } from '../../decodeParamsAndAuthorizeAccess';
 
 const SQL_REVIEW_DEBIT = sql<{
   group_id:number;
@@ -38,7 +38,7 @@ const reviewDebitRequests = (router: Router) => {
     },
     middlewares: [verifyPin],
     handler: async (req, res) => {
-      const groupId = await decodeEntityAndVerifyAccess(req, false, true);
+      const groupId = await decodeParamsAndAuthorizeAccess(req, false, true);
 
       await SQL_REVIEW_DEBIT({
         ...req.body,

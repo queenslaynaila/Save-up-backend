@@ -1,7 +1,7 @@
 import Router from '../../core/router';
 import { sql } from '../../db';
 import { z } from 'zod';
-import { decodeEntityAndVerifyAccess } from '../../decodeEntityAndVerifyAccess';
+import { decodeParamsAndAuthorizeAccess } from '../../decodeParamsAndAuthorizeAccess';
 
 const SQL_GET_ELECTION_RESULTS = sql<
 {
@@ -54,7 +54,7 @@ const getGroupElectionResults = (router: Router) => {
       )
     },
     handler: async (req, res) => {
-      const groupId = await decodeEntityAndVerifyAccess(req, true);
+      const groupId = await decodeParamsAndAuthorizeAccess(req, true);
 
       const results = await SQL_GET_ELECTION_RESULTS({
         election_id: req.params.election_id,
