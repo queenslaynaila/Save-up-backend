@@ -174,6 +174,6 @@ GRANT EXECUTE ON FUNCTION review_debit_request(
 ) TO saveup_www;
 
 SELECT create_distributed_function(
-    'review_debit_request',
-    'INT, INT, INT, enum_approval_status, TEXT'
+    'review_debit_request(INT, INT, INT, enum_approval_status, TEXT)',
+    'p_group_id'
 );

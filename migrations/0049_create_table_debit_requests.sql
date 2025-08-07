@@ -1,14 +1,7 @@
 DO $$
 BEGIN
     CREATE TYPE enum_debit_type AS ENUM ('Loan', 'Withdrawal');
-EXCEPTION
-    WHEN DUPLICATE_OBJECT THEN NULL;
-END
-$$;
-
-DO $$
-    BEGIN
-        CREATE TYPE enum_approval_status AS ENUM (
+    CREATE TYPE enum_approval_status AS ENUM (
             'Pending Guarantors',
             'Pending Guarantor Approval',
             'Pending Admin Approval',
@@ -16,10 +9,9 @@ DO $$
             'Rejected',
             'Cancelled'
             );
-    EXCEPTION
-        WHEN DUPLICATE_OBJECT THEN
-            NULL;
-    END
+EXCEPTION
+    WHEN DUPLICATE_OBJECT THEN NULL;
+END
 $$;
 
 CREATE TABLE IF NOT EXISTS debit_requests (

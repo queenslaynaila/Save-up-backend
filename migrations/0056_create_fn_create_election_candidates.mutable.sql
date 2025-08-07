@@ -39,14 +39,14 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-GRANT EXECUTE ON FUNCTION create_candidates(
+GRANT EXECUTE ON FUNCTION create_election_candidates(
     INT,
     INT,
     INT [],
     INT
 ) TO saveup_www;
 SELECT create_distributed_function(
-    'create_candidates(
+    'create_election_candidates(
         INT, 
         INT, 
         INT[], 

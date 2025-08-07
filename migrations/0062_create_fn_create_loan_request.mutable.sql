@@ -44,6 +44,6 @@ GRANT EXECUTE ON FUNCTION create_loan_request(
 ) TO saveup_www;
 
 SELECT create_distributed_function(
-    'create_loan_request',
+    'create_loan_request(INT, INT, INT, NUMERIC, TEXT, INTERVAL)',
     'p_group_id'
 );
