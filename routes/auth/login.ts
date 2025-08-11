@@ -109,11 +109,14 @@ export function getClientInfo(req: Request) {
   };
 }
 
-const SQL_GET_LOGIN_STATUS = sql<{ user_id: number }, {
-  is_locked: boolean,
-  is_unlocked: boolean,
-  failed_attempts: number
-}>(`
+type LoginStatus = {
+  is_locked: boolean;
+  is_unlocked: boolean;
+  failed_attempts: number;
+}
+
+const SQL_GET_LOGIN_STATUS = sql<{ user_id: number }, LoginStatus>(`
+  -- Check if the most recent login attempt resulted in account lock
   SELECT 
     EXISTS (
       SELECT 1
@@ -127,6 +130,8 @@ const SQL_GET_LOGIN_STATUS = sql<{ user_id: number }, {
         AND success = false
         AND reason = 'Locked'
     ) AS is_locked,
+   
+    --Check if the most recent lock has been unlocked
     
     EXISTS (
       SELECT 1
@@ -141,6 +146,7 @@ const SQL_GET_LOGIN_STATUS = sql<{ user_id: number }, {
       )
     ) AS is_unlocked,
 
+    -- Count the number of failed attempts since the last successful login or unlock(whichever is recent)
     COALESCE((
         SELECT COUNT(*)
         FROM login_attempts
@@ -161,6 +167,8 @@ const SQL_GET_LOGIN_STATUS = sql<{ user_id: number }, {
             )
    ), 0) AS failed_attempts
 `);
+
+const MAX_LOGIN_ATTEMPTS = 4;
 
 const login = (router: Router) => {
   router.post({
@@ -196,10 +204,10 @@ const login = (router: Router) => {
       }).one();
 
       const remainingAttempts = is_locked && is_unlocked
-        ? 4
-        : 4 - failed_attempts;
+        ? MAX_LOGIN_ATTEMPTS
+        : MAX_LOGIN_ATTEMPTS - failed_attempts;
 
-      if (remainingAttempts === 0) {
+      if (remainingAttempts <= 0) {
         await recordLoginAttempt(user.id, ipAddress, userAgent, false, 'Locked');
         throw new HttpError(423);
       }
