@@ -155,7 +155,7 @@ export async function findEligiblePocketsAndScheduleInterestJobs() {
       entity_id: undefined,
       pocket_id: undefined,
       locked_interest_rate: lockedRate,
-      error: `Missing or invalid interest rate(s)`,
+      error: `Missing or invalid interest rate(s).No records processed`,
       next_attempt_at: new Date(Date.now() + RETRY_DELAY_HOURS * 60 * 60 * 1000).toISOString()
     }).exec();
     return;
