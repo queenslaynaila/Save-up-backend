@@ -10,3 +10,5 @@ CREATE TABLE IF NOT EXISTS account_unlocks (
     ),
     FOREIGN KEY (admin_id) REFERENCES users (id)
 );
+
+GRANT INSERT, SELECT ON account_unlocks TO saveup_www;
