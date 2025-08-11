@@ -16,7 +16,7 @@ import { redis } from './redisConfig';
 
 export const DAILY_INTEREST_QUEUE_NAME = 'previous-day-interest-calculation';
 const CRON_SCHEDULE_2AM_DAILY = '0 2 * * *';
-const RETRY_DELAY_HOURS = 4;
+export const RETRY_DELAY_HOURS = 4;
 
 export const JOB_FIND_POCKETS_ELIGIBLE_FOR_INTEREST = 'find-interest-eligible-pockets';
 export const JOB_CALCULATE_INTEREST_FOR_POCKET = 'calculate-interest-for-pocket';
@@ -98,7 +98,7 @@ type PocketInterestFailure = {
   error: string
 };
 
-const SQL_INSERT_INTEREST_JOB_FAILURES = sql<PocketInterestFailure, Record<string, never>>(`
+export const SQL_INSERT_INTEREST_JOB_FAILURES = sql<PocketInterestFailure, Record<string, never>>(`
   INSERT INTO interest_job_failures (
     job_name, entity_id, pocket_id,  standard_interest_rate, locked_interest_rate, error, next_attempt_at
   ) VALUES (

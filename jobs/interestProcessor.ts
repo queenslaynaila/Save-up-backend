@@ -1,12 +1,14 @@
 import { FlowProducer, Job } from 'bullmq';
 import { sql } from '../db';
-import logger from '../logger';
 import { PocketType } from '../routes/pockets/schema';
 import { redis } from './redisConfig';
 import {
   DAILY_INTEREST_QUEUE_NAME,
   JOB_CALCULATE_INTEREST_FOR_POCKET,
-  JOB_FINALIZE_INTEREST_SUMMARY
+  JOB_FINALIZE_INTEREST_SUMMARY,
+  JOB_FIND_POCKETS_ELIGIBLE_FOR_INTEREST,
+  RETRY_DELAY_HOURS,
+  SQL_INSERT_INTEREST_JOB_FAILURES
 } from './bullConfig';
 
 const DAYS_PER_YEAR = 365;
@@ -140,6 +142,25 @@ export async function findEligiblePocketsAndScheduleInterestJobs() {
     interestRates.map(r => [r.pocket_type, Number(r.rate)])
   );
 
+  const standardRate = interestRateMap['Standard'];
+  const lockedRate = interestRateMap['Locked'];
+
+  if (
+    typeof standardRate !== 'number' || isNaN(standardRate) ||
+    typeof lockedRate !== 'number' || isNaN(lockedRate)
+  ) {
+    await SQL_INSERT_INTEREST_JOB_FAILURES({
+      job_name: JOB_FIND_POCKETS_ELIGIBLE_FOR_INTEREST,
+      standard_interest_rate: standardRate,
+      entity_id: undefined,
+      pocket_id: undefined,
+      locked_interest_rate: lockedRate,
+      error: `Missing or invalid interest rate(s)`,
+      next_attempt_at: new Date(Date.now() + RETRY_DELAY_HOURS * 60 * 60 * 1000).toISOString()
+    }).exec();
+    return;
+  }
+
   await storeInterestMetadata(interestRateMap, eligiblePockets.length);
 
   const calculationJobs = eligiblePockets.map(pocket => ({
@@ -207,12 +228,4 @@ export async function finalizeInterestSummary() {
     standard_interest_rate: Number(standard_interest_rate!),
     locked_interest_rate: Number(locked_interest_rate!)
   }).exec();
-
-  logger.info(`
-    [Finalizer] Summary updated: 
-      eligible=${eligible},
-      awarded=${awarded}, 
-      skipped=${skipped}, 
-      failed=${failed}
- `);
 }
