@@ -439,7 +439,7 @@ export class Router {
       res.json = <T extends object>(data: T) => {
         res.setHeader('Content-Type', 'application/json');
         if (data instanceof HttpError) {
-          return res.send(JSON.stringify(data));
+          return res.send(JSON.stringify(data.errors));
         }
         return res.send(serialize(data));
       };
