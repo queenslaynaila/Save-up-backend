@@ -49,7 +49,10 @@ const updateUserStatus = (router: Router) => {
     handler: async (req, res) => {
       const userId = await decodeParamsAndAuthorizeAccess(req, true);
 
-      if (req.user!.id === userId) {
+      if (
+        req.user!.id === userId &&
+        req.user!.role === UserRole.enum.Moderator
+      ) {
         throw new HttpError(403, {
           message: 'ERR_CANT_ACT_ON_SELF'
         });
