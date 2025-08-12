@@ -7,6 +7,7 @@ import {
 } from 'express';
 import z, {
   ZodArray,
+  ZodNever,
   ZodObject,
   ZodRawShape,
   ZodRecord,
@@ -60,10 +61,15 @@ const routeRequestValidators = new Map<string, {
 }>();
 
 function buildRequestValidatorsForRoute<
-  Params extends ZodObject<ZodRawShape> = EmptyObjectSchema,
-  ReqBody extends ZodObject | ZodRecord| ZodArray<ZodType> |
-  ZodUnion<[ZodObject, ZodObject]> | ZodUndefined = EmptyObjectSchema,
-  Query extends ZodObject<ZodRawShape> = EmptyObjectSchema
+  Params extends ZodObject<any> | undefined = undefined,
+    ReqBody extends
+    | ZodObject
+    | ZodRecord
+    | ZodArray<ZodType>
+    | ZodUnion<[ZodObject, ZodObject]>
+    | ZodUndefined
+    | undefined = undefined,
+  Query extends ZodObject<ZodRawShape> | undefined = undefined
 >(
   routeKey: string, 
   schema: {
@@ -129,14 +135,28 @@ function createValidationMiddleware(routeKey: string): RequestHandler {
 }
 
 type HttpMethod = 'get' | 'post' | 'patch' | 'delete' | 'put';
-type EmptyObjectSchema = ZodObject<Record<string, never>>;
 
+
+type InferShape<T> =
+  T extends ZodNever ? never :
+  T extends ZodObject<ZodRawShape> ? z.infer<T> :
+  T extends ZodRecord ? z.infer<T> :
+  T extends ZodArray<any> ? z.infer<T> :
+  T extends ZodUnion<[ZodObject<any>, ZodObject<any>]> ? z.infer<T> :
+  T extends ZodUndefined ? undefined :
+  {};
+  
 interface RouteOptions<
-  Params extends ZodObject<ZodRawShape> = EmptyObjectSchema,
-  ResBody extends ZodType = EmptyObjectSchema,
-  ReqBody extends ZodObject | ZodRecord| ZodArray<ZodType> |
-  ZodUnion<[ZodObject, ZodObject]> | ZodUndefined = EmptyObjectSchema,
-  Query extends ZodObject<ZodRawShape> = EmptyObjectSchema
+  Params extends ZodObject<ZodRawShape> | undefined = undefined,
+  ResBody extends ZodType | ZodNever = ZodNever,
+  ReqBody extends
+    | ZodObject
+    | ZodRecord
+    | ZodArray<ZodType>
+    | ZodUnion<[ZodObject, ZodObject]>
+    | ZodUndefined
+    | undefined = undefined,
+  Query extends ZodObject<ZodRawShape> | undefined = undefined
 > {
   path: string;
   hidden?: boolean;
@@ -160,15 +180,25 @@ interface RouteOptions<
     skipForAdmins?: boolean;
   };
   middlewares?: RequestHandler[];
-  handler: RequestHandler<z.infer<Params>, z.infer<ResBody>, z.infer<ReqBody>, z.infer<Query>>;
+  handler: RequestHandler<
+    InferShape<Params>, 
+    InferShape<ResBody>, 
+    InferShape<ReqBody>, 
+    InferShape<Query>
+  >;
 }
 
 type RouteHandler = <
-  Params extends ZodObject<ZodRawShape> = EmptyObjectSchema,
-  ResBody extends ZodType = EmptyObjectSchema,
-  ReqBody extends ZodObject | ZodRecord| ZodArray<ZodType> |
-  ZodUnion<[ZodObject, ZodObject]> | ZodUndefined = EmptyObjectSchema,
-  Query extends ZodObject<ZodRawShape> = EmptyObjectSchema
+  Params extends ZodObject<any> | undefined = undefined,
+  ResBody extends ZodType | ZodNever = ZodNever,
+  ReqBody extends
+    | ZodObject
+    | ZodRecord
+    | ZodArray<ZodType>
+    | ZodUnion<[ZodObject, ZodObject]>
+    | ZodUndefined
+    | undefined = undefined,
+  Query extends ZodObject<ZodRawShape> | undefined = undefined
 >(options: RouteOptions<Params, ResBody, ReqBody, Query>) => void;
 
 export const BASE_PATH = '/saveup';
@@ -253,11 +283,16 @@ export class Router {
 
   private buildRouteForMethod(method: HttpMethod): RouteHandler {
     return <
-      Params extends ZodObject<ZodRawShape> = EmptyObjectSchema,
-      ResBody extends ZodType = EmptyObjectSchema,
-      ReqBody extends ZodObject | ZodRecord| ZodArray<ZodType> |
-      ZodUnion<[ZodObject, ZodObject]> | ZodUndefined = EmptyObjectSchema,
-      Query extends ZodObject<ZodRawShape> = EmptyObjectSchema
+      Params extends ZodObject<any> | undefined = undefined,
+      ResBody extends ZodType | ZodNever = ZodNever,
+      ReqBody extends
+        | ZodObject
+        | ZodRecord
+        | ZodArray<ZodType>
+        | ZodUnion<[ZodObject, ZodObject]>
+        | ZodUndefined
+        | undefined = undefined,
+      Query extends ZodObject<ZodRawShape> | undefined = undefined
     >(options: RouteOptions<Params, ResBody, ReqBody, Query>) => {
       const { path, handler, response: resOpt } = options;
       const routeKey = `${method}:${this.resourceName}:${path}`
@@ -290,11 +325,16 @@ export class Router {
   }
 
   private buildMiddlewareStack<
-    Params extends ZodObject<ZodRawShape> = EmptyObjectSchema,
-    ResBody extends ZodType = EmptyObjectSchema,
-    ReqBody extends ZodObject | ZodRecord| ZodArray<ZodType> |
-    ZodUnion<[ZodObject, ZodObject]> | ZodUndefined = EmptyObjectSchema,
-    Query extends ZodObject<ZodRawShape> = EmptyObjectSchema
+    Params extends ZodObject<any> | undefined = undefined,
+    ResBody extends ZodType | ZodNever = ZodNever,
+    ReqBody extends
+      | ZodObject
+      | ZodRecord
+      | ZodArray<ZodType>
+      | ZodUnion<[ZodObject, ZodObject]>
+      | ZodUndefined
+      | undefined = undefined,
+    Query extends ZodObject<ZodRawShape> | undefined = undefined
   >(routeKey:string, options: RouteOptions<Params, ResBody, ReqBody, Query>): RequestHandler[] {
     const middlewares: RequestHandler[] = [];
     if (options.schema) {
@@ -324,11 +364,16 @@ export class Router {
   }
   
   private registerRouteWithOpenAPI<
-    Params extends ZodObject<ZodRawShape> = EmptyObjectSchema,
-    ResBody extends ZodType = EmptyObjectSchema,
-    ReqBody extends ZodObject | ZodRecord| ZodArray<ZodType> |
-    ZodUnion<[ZodObject, ZodObject]> | ZodUndefined = EmptyObjectSchema,
-    Query extends ZodObject<ZodRawShape> = EmptyObjectSchema
+    Params extends ZodObject<any> | undefined = undefined,
+    ResBody extends ZodType | ZodNever = ZodNever,
+    ReqBody extends
+      | ZodObject
+      | ZodRecord
+      | ZodArray<ZodType>
+      | ZodUnion<[ZodObject, ZodObject]>
+      | ZodUndefined
+      | undefined = undefined,
+    Query extends ZodObject<ZodRawShape> | undefined = undefined
   >(
     method: HttpMethod,
     path: string,
