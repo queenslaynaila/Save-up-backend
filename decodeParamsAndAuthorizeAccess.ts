@@ -168,13 +168,21 @@ type ReturnType<T> = T extends GroupWithMemberParams
  *   If true, users with elevated roles (Admin or Moderator) are allowed to:
  *     - Access other users' data.
  *     - Accessing any group’s data, regardless of membership.
- *   If false, access is limited to the resource owner (for users) or 
- *   a group member (for group resources).
+ *   If false, access is limited to the resource owner (
+ *    for user resources, this is the user; 
+ *    for group resources, this is a groupmember
+ *   ).
  * 
  * @param requiresGrpAdmin - (default: false)
  *   Only applies to group-related routes.
  *   If true, the current user must be a group admin 
  *   to access the requested grp resource.
+ * 
+ * @returns
+ *   - If the route has both `group_id` and `member_id` in params (i.e., targets a specific group member), 
+ *    returns an object: { groupId, memberId }.
+ *   - Otherwise, returns a single number representing the resolved user, group, or entity ID.
+ *   - Throws HttpError on unauthorized or invalid access.
  */
 
 export async function decodeParamsAndAuthorizeAccess<
