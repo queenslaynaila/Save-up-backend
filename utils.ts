@@ -60,7 +60,7 @@ export function validateAndDecodeJwt(headerValue: string): JwtPayload {
   }
   const token = parts[1];
 
-  const decoded = jwt.decode(token) as JwtPayload | null;
+  const decoded = jwt.verify(token, Config.JWT_SECRET) as JwtPayload;
 
   if (!decoded
       || !decoded.id

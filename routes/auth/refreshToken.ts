@@ -1,11 +1,10 @@
 import Router from '../../core/router';
-import { z } from 'zod';
 import { AuthenticatedUser, publicUserSchema } from './login';
 import Config from '../../config';
 import jwt from 'jsonwebtoken';
 import { sql } from '../../db';
 import HttpError from '../../httpError';
-import { generateToken } from '../../utils';
+import { generateToken, validateAndDecodeJwt } from '../../utils';
 
 const SQL_GET_USER = sql<{ id: number }, AuthenticatedUser>(`
   SELECT 
@@ -28,11 +27,6 @@ const getRefreshToken = (router: Router) => {
   router.post({
     path: '/refresh',
     summary: 'Get a refresh token',
-    schema: {
-      body: z.object({
-        token: z.string()
-      })
-    },
     response: {
       statusCode: 200,
       schema: publicUserSchema.pick({
@@ -45,10 +39,9 @@ const getRefreshToken = (router: Router) => {
       })
     },
     handler: async (req, res) => {
-      const decoded = jwt.verify(
-        req.body.token,
-        Config.JWT_REFRESH_SECRET
-      ) as { id: number, role: string };
+      const refreshTokenHeader = req.headers.refresh as string;
+      const decoded = validateAndDecodeJwt(refreshTokenHeader)
+
       const user = await SQL_GET_USER({ id: decoded.id }).one(
         new HttpError(404)
       );
