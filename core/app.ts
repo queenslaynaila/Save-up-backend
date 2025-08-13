@@ -62,15 +62,15 @@ export class Application {
         origin: [...this.allowedOrigins],
         methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS', 'PUT'],
         credentials: true,
-        exposedHeaders: ['Authorization', 'Reset', 'RefreshToken'],
-        allowedHeaders: ['Content-Type', 'Authorization', 'Reset', 'RefreshToken']
+        exposedHeaders: ['Authorization', 'Reset', 'Refresh'],
+        allowedHeaders: ['Content-Type', 'Authorization', 'Reset', 'Refresh']
       })
     );
     this.expressApp.use((_req, res, next) => {
       res.on('finish', () => {
         logger.info(`final exposed headers ${res.getHeader(`Access-Control-Expose-Headers`)}`)
       });
-     next();
+      next();
     });
 
     this.expressApp.use(express.json());

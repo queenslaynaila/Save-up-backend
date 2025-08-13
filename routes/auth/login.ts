@@ -225,7 +225,7 @@ const login = (router: Router) => {
         'Returning'
       );
 
-     res.setHeader('RefreshToken', generateToken(user.id, '7d', user.role, false));
+     res.setHeader('Refresh', generateToken(user.id, '7d', user.role, false));
      res.setHeader('Authorization', generateToken(user.id, '1h', user.role, true));
      res.json(user);
     }
