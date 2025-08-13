@@ -66,6 +66,12 @@ export class Application {
         allowedHeaders: ['Content-Type', 'Authorization', 'Reset', 'RefreshToken']
       })
     );
+    this.expressApp.use((_req, res, next) => {
+      res.on('finish', () => {
+        logger.info(`final exposed headers ${res.getHeader(`Access-Control-Expose-Headers`)}`)
+      });
+     next();
+    });
 
     this.expressApp.use(express.json());
   }
