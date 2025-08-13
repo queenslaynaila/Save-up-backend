@@ -60,16 +60,15 @@ export function validateAndDecodeJwt(headerValue: string): JwtPayload {
   }
   const token = parts[1];
 
-  const decoded = jwt.verify(token, Config.JWT_SECRET) as JwtPayload;
-
-  if (!decoded
-      || !decoded.id
-      || (decoded.exp && decoded.exp * 1000 <= Date.now())
-  ) {
+  try {
+    const decoded = jwt.verify(token, Config.JWT_SECRET) as JwtPayload;
+    if (!decoded || !decoded.id) {
+      throw new HttpError(401);
+    }
+    return decoded;
+  } catch {
     throw new HttpError(401);
   }
-
-  return decoded;
 }
 
 export function checkResetTokenValidity(requiredStep: number) {
