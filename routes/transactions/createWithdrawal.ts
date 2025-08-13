@@ -56,13 +56,6 @@ const createWithdrawal = (router: Router) => {
         user_id: userId,
         accept_penalty: req.body.accept_penalty ?? false
       }).exec().catch(err => {
-        logger.error('Error creating withdrawal', {
-          userId,
-          pocketId: req.body.pocket_id,
-          amount: req.body.amount,
-          acceptPenalty: req.body.accept_penalty,
-          error: err
-        });
         if (err.code === 'P0004') {
           throw new HttpError(400, {
             message: 'ERR_INSUFFICIENT_FUNDS'

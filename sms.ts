@@ -37,7 +37,7 @@ const sendSMS = async (
       }
 
       return res.json().then((data) => {
-        logger.info('SMS sent successfully', data);
+        logger.info('SMS sent successfully');
       });
     })
     .catch((error) => {
