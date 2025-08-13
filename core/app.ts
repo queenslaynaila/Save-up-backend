@@ -63,7 +63,7 @@ export class Application {
         methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS', 'PUT'],
         credentials: true,
         exposedHeaders: ['Authorization', 'Reset'],
-        allowedHeaders: ['Content-Type', 'Authorization', 'Reset', 'Refresh']
+        allowedHeaders: ['Content-Type', 'Authorization', 'Reset', 'RefreshToken']
       })
     );
 
