@@ -63,7 +63,7 @@ export class Application {
         methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS', 'PUT'],
         credentials: true,
         exposedHeaders: ['Authorization', 'Reset'],
-        allowedHeaders: ['Content-Type', 'Authorization', 'Reset']
+        allowedHeaders: ['Content-Type', 'Authorization', 'Reset', 'Refresh']
       })
     );
 
@@ -85,6 +85,7 @@ export class Application {
       if (error instanceof HttpError) {
         res.status(error.status).json(error);
       } else {
+        logger.error(`error is ${JSON.stringify(error)}`)
         res.sendStatus(500);
       }
     });
