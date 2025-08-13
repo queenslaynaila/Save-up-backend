@@ -62,7 +62,7 @@ export class Application {
         origin: [...this.allowedOrigins],
         methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS', 'PUT'],
         credentials: true,
-        exposedHeaders: ['Authorization', 'Reset'],
+        exposedHeaders: ['Authorization', 'Reset', 'RefreshToken'],
         allowedHeaders: ['Content-Type', 'Authorization', 'Reset', 'RefreshToken']
       })
     );
