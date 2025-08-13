@@ -56,26 +56,18 @@ const getUsersBySearchCriteria = (router: Router) => {
       const { value } = req.query;
       const sanitizedValue = value.replace(/^ /, '+');
 
-      const filters: string[] = [];
-      const filterArgs: Record<string, string | number> = {};
-
-      if (/^\+\d{10,16}$/.test(sanitizedValue)) {
-        filters.push('user_contact_details.phone_number = :phone_number');
-        filterArgs.phone_number = sanitizedValue;
-      } else if (/^(?:[A-Z]{1,2}\d{6,9}|\d{8,10}|\d{13}|\d{16})$/
-        .test(sanitizedValue)) {
-        filters.push('users.id_number = :id_number');
-        filterArgs.id_number = sanitizedValue;
-      } else if (/^\d+$/.test(sanitizedValue)) {
-        filters.push('users.id = :user_id');
-        filterArgs.user_id = parseInt(sanitizedValue, 10);
-      } else {
-        throw new HttpError(400);
+      if (!/^[\dA-Za-z+]+$/.test(sanitizedValue)) {
+       throw new HttpError(400);
       }
 
       const query = SQL_GET_USER_BY_CRITERIA({});
-      query.extend(`WHERE ${filters}`, filterArgs);
 
+      query.extend(
+        `WHERE user_contact_details.phone_number LIKE :prefix
+          OR users.id_number LIKE :prefix
+        LIMIT 10`,
+       { prefix: sanitizedValue + '%' }
+      );
       const users = await query.many();
       res.json(users);
     }
