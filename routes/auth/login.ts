@@ -226,7 +226,7 @@ const login = (router: Router) => {
       );
 
       res
-        .setHeader('RefreshToken', generateToken(user.id, '7d', user.role, false))
+        .setHeader('refreshToken', generateToken(user.id, '7d', user.role, false))
         .setHeader('Authorization', generateToken(user.id, '1h', user.role, true))
         .json(user);
     }
