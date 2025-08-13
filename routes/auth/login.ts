@@ -225,10 +225,9 @@ const login = (router: Router) => {
         'Returning'
       );
 
-      res
-        .setHeader('Authorization', generateToken(user.id, '1h', user.role, true))
-        .setHeader('RefreshToken', generateToken(user.id, '7d', user.role, false))
-        .json(user);
+     res.setHeader('RefreshToken', generateToken(user.id, '7d', user.role, false));
+     res.setHeader('Authorization', generateToken(user.id, '1h', user.role, true));
+     res.json(user);
     }
   });
 };
