@@ -3,7 +3,6 @@ import { sql } from '../../db';
 import Router from '../../core/router';
 import { decodeParamsAndAuthorizeAccess } from '../../decodeParamsAndAuthorizeAccess';
 import { entityIdParamsSchema } from '../users/schema';
-import logger from '../../logger';
 
 const ENUM_TRANSACTION_TYPE = z.enum([
   'Saving',
@@ -60,6 +59,8 @@ const SQL_GET_TRANSACTIONS = sql<
   slug?: string,
   from?: string,
   to?: string,
+  before?:number,
+  after?:number,
   limit: number
 },
 Transaction
@@ -132,6 +133,8 @@ Transaction
     AND (:pocket_id::INT IS NULL OR transactions.pocket_id = :pocket_id)
     AND (:slug::TEXT IS NULL OR transaction_types.slug = :slug)
     AND (:from::DATE IS NULL OR DATE(transactions.created_at) >= :from)
+    AND (:before::INT IS NULL OR transactions.xid < :before)
+    AND (:after::INT IS NULL OR transactions.xid > :after)
     AND (:to::DATE IS NULL OR DATE(transactions.created_at) <= :to)
   ORDER BY transactions.created_at DESC
   LIMIT :limit
@@ -150,7 +153,9 @@ const getTransactions = (router: Router) => {
         pocket_id: z.number().int().min(1).optional(),
         from: z.string().optional(),
         to: z.string().optional(),
-        limit: z.number().int().min(1).optional()
+        before: z.int().optional(),
+        after: z.int().optional(),
+        limit: z.number().int().min(1).optional(),
       }).partial()
     },
     response: {
@@ -173,7 +178,7 @@ const getTransactions = (router: Router) => {
     auth: true,
     handler: async (req, res) => {
       const entityId = await decodeParamsAndAuthorizeAccess(req, true);
-      const { slug, pocket_id, from, to, limit = 10 } = req.query;
+      const { slug, pocket_id, from, to, limit = 10, before, after } = req.query;
 
       const transactions = await SQL_GET_TRANSACTIONS({
         entity_id: entityId,
@@ -181,10 +186,10 @@ const getTransactions = (router: Router) => {
         pocket_id,
         from,
         to,
+        before,
+        after,
         limit
       }).many();
-
-      logger.info(`Fetched ${transactions.length} transactions ${JSON.stringify(transactions)}`);
 
       res.json(transactions);
     }
