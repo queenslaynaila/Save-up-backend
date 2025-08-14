@@ -40,13 +40,13 @@ const getRefreshToken = (router: Router) => {
     },
     handler: async (req, res) => {
       const refreshTokenHeader = req.headers.refresh as string;
-      const decoded = validateAndDecodeJwt(refreshTokenHeader)
+      const decoded = validateAndDecodeJwt(refreshTokenHeader, true)
 
       const user = await SQL_GET_USER({ id: decoded.id }).one(
         new HttpError(404)
       );
       res
-        .setHeader('Authorization', generateToken(user.id, '1h', user.role, false))
+        .setHeader('Authorization', generateToken(user.id, '1h', user.role, true))
         .json(user);
     }
   });
