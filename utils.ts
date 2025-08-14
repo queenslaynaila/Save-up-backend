@@ -53,15 +53,22 @@ export function generateToken(
   return jwt.sign(payload, secret, options);
 }
 
-export function validateAndDecodeJwt(headerValue: string): JwtPayload {
+export function validateAndDecodeJwt(
+  headerValue: string,
+  isRefreshToken = false
+): JwtPayload {
   const parts = headerValue.split(' ');
   if (parts.length !== 2 || parts[0] !== 'Bearer') {
     throw new HttpError(400);
   }
   const token = parts[1];
 
+   const secret = isRefreshToken
+    ? Config.JWT_REFRESH_SECRET
+    : Config.JWT_SECRET;
+
   try {
-    const decoded = jwt.verify(token, Config.JWT_SECRET) as JwtPayload;
+    const decoded = jwt.verify(token, secret) as JwtPayload;
     if (!decoded || !decoded.id) {
       throw new HttpError(401);
     }
