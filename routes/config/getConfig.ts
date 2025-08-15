@@ -15,7 +15,7 @@ const configSchema = z.object({
 });
 type Config = z.infer<typeof configSchema>;
 
-const SQL_GET_CONFIG = sql<{country_code:string}, Config>(`
+const SQL_GET_CONFIG = sql<Record<string,never>, Config>(`
   SELECT 
     country_name, 
     currency, 
@@ -30,28 +30,18 @@ const SQL_GET_CONFIG = sql<{country_code:string}, Config>(`
   WHERE country_code = :country_code
 `);
 
-const getConfig = (router: Router) => {
+const getConfigs = (router: Router) => {
   router.get({
     path: '/',
     summary: 'Get configurations',
     response: {
-      schema: configSchema
+      schema: z.array(configSchema)
     },
     handler: async (req, res) => {
-      const host = req.headers.host ?? '';
-      const countryCode = (() => {
-        if (host.includes('co.ke')) return 'ke';
-        if (host.includes('co.ug')) return 'ug';
-        if (host.includes('co.tz')) return 'tz';
-        return 'ke';
-      })();
-
-      const configurations = await SQL_GET_CONFIG({
-        country_code: countryCode
-      }).one();
+      const configurations = await SQL_GET_CONFIG({}).many();
       res.json(configurations);
     }
   });
 };
 
-export default getConfig;
+export default getConfigs;
