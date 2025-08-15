@@ -1,5 +1,5 @@
 import Router from '../../core/router';
-import getConfigs from './getConfig';
+import getConfigs from './getConfigs';
 
 const router = Router.getOrCreateRouter('Config');
 
