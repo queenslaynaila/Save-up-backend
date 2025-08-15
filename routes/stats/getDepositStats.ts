@@ -11,7 +11,7 @@ export const statsQuerySchema = z.object({
   end_date: z.string().optional()
 });
 
-export type Stats = z.infer<typeof statsQuerySchema>;
+export type Stats = z.infer<typeof statsQuerySchema> & { country? : string};
 
 const savingStatsSchema = z.object({
   pocket_name: z.string(),
@@ -50,19 +50,22 @@ const getDepositStats = (router: Router) => {
     summary: 'Get deposit stats',
     auth: true,
     schema: {
-      query: statsQuerySchema
+      query: statsQuerySchema.extend({
+        country: z.string().optional()
+      })
     },
     response: {
       statusCode: 200,
       schema: z.array(savingStatsSchema)
     },
     handler: async (req, res) => {
-      const { entity_id, agg, start_date, end_date, pocket_id } = req.query;
+      const { entity_id, agg, start_date, end_date, pocket_id, country } = req.query;
       const aggregated_savings = await SQL_GET_AGGREGATED_SAVINGS({
         slug: 'Saving',
         entity_id,
         pocket_id,
         agg,
+        country,
         start_date,
         end_date
       }).many();

@@ -7,6 +7,7 @@ const SQL_GET_AGGREGATED_EXPENSES = sql<{
   entity_id?: number;
   start_date?: string;
   end_date?: string;
+  country?: string
 }, { aggregated_expenses: number }>(`
   SELECT
     CASE
@@ -17,9 +18,14 @@ const SQL_GET_AGGREGATED_EXPENSES = sql<{
       WHEN :agg = 'max' THEN MAX(amount)
     END AS aggregated_expenses
   FROM expenses
-  WHERE (:entity_id::INT IS NULL OR entity_id = :entity_id)
-    AND (:start_date::DATE IS NULL OR spent_at >= :start_date::DATE)
-    AND (:end_date::DATE IS NULL OR spent_at <= :end_date::DATE)
+  JOIN entities
+   ON entities.id = expenses.entity_id
+  JOIN users
+    ON users.id = entities.id
+  WHERE (:entity_id::INT IS NULL OR expenses.entity_id = :entity_id)
+    AND (:start_date::DATE IS NULL OR expenses.spent_at >= :start_date::DATE)
+    AND (:end_date::DATE IS NULL OR expenses.spent_at <= :end_date::DATE)
+    AND (:country::TEXT IS NULL OR users.country = :country::TEXT)
 `);
 
 const getExpenseStats = (router: Router) => {
@@ -31,7 +37,8 @@ const getExpenseStats = (router: Router) => {
       query: z.object({
         entity_id: z.number().int().min(1),
         start_date: z.string(),
-        end_date: z.string()
+        end_date: z.string(),
+        country: z.string()
       }).partial().extend({
         agg: z.enum(['avg', 'sum', 'count', 'min', 'max']),
       })
@@ -43,12 +50,13 @@ const getExpenseStats = (router: Router) => {
       })
     },
     handler: async (req, res) => {
-      const { entity_id, agg, start_date, end_date } = req.query;
+      const { entity_id, agg, start_date, end_date, country } = req.query;
       const aggregated_expenses = await SQL_GET_AGGREGATED_EXPENSES({
         entity_id,
         agg,
         start_date,
-        end_date
+        end_date,
+        country
       }).oneFirst();
       res.json({ aggregated_expenses });
     }
