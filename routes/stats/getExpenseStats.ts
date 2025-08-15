@@ -29,10 +29,11 @@ const getExpenseStats = (router: Router) => {
     summary: 'Get aggregated expenses',
     schema: {
       query: z.object({
-        entity_id: z.number().int().min(1).optional(),
+        entity_id: z.number().int().min(1),
+        start_date: z.string(),
+        end_date: z.string()
+      }).partial().extend({
         agg: z.enum(['avg', 'sum', 'count', 'min', 'max']),
-        start_date: z.string().optional(),
-        end_date: z.string().optional()
       })
     },
     response: {

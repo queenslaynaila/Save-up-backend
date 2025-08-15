@@ -45,6 +45,7 @@ const app = new Application({
 app.use(configRouter);
 app.use(S3Routes);
 app.use(categoryRoutes);
+app.use(statisticsRoutes);
 app.use(authRoutes);
 app.use(usersRoutes);
 app.use(nextOfKinRoutes);
@@ -57,7 +58,6 @@ app.use(groupDebitsRoutes);
 app.use(groupWithdrawalsRoutes);
 app.use(loanRoutes);
 app.use(securityQuestionsRoutes);
-app.use(statisticsRoutes);
 app.use(transactionsRoutes);
 
 app.listen(Config.PORT, () => {
