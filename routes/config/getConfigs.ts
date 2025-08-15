@@ -27,7 +27,6 @@ const SQL_GET_CONFIG = sql<Record<string,never>, Config>(`
     max_withdrawal,
     withdrawal_charges
   FROM country_configurations
-  WHERE country_code = :country_code
 `);
 
 const getConfigs = (router: Router) => {
