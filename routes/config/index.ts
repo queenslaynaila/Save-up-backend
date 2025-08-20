@@ -1,8 +1,12 @@
 import Router from '../../core/router';
-import getConfigs from './getConfigs';
+import createConfiguration from './createConfig';
+import getConfiguration from './getConfigs';
+import updateConfiguration from './updateConfig';
 
 const router = Router.getOrCreateRouter('Config');
 
-getConfigs(router);
+createConfiguration(router);
+getConfiguration(router);
+updateConfiguration(router);
 
 export default router;

@@ -1,22 +1,12 @@
 import { z } from 'zod';
 import { sql } from '../../db';
 import Router from '../../core/router';
-
-const configSchema = z.object({
-  country_name: z.string(),
-  calling_code: z.number(),
-  languages: z.array(z.string()),
-  max_deposit: z.number(),
-  min_deposit: z.number(),
-  max_withdrawal: z.number(),
-  min_withdrawal: z.number(),
-  withdrawal_charges: z.string(),
-  currency: z.string()
-});
-type Config = z.infer<typeof configSchema>;
+import { Config, configSchema } from './schema';
 
 const SQL_GET_CONFIG = sql<Record<string,never>, Config>(`
   SELECT 
+    id,
+    country_code, 
     country_name, 
     currency, 
     calling_code, 
@@ -25,11 +15,12 @@ const SQL_GET_CONFIG = sql<Record<string,never>, Config>(`
     max_deposit,
     min_withdrawal,
     max_withdrawal,
-    withdrawal_charges
+    withdrawal_charges,
+    created_at
   FROM country_configurations
 `);
 
-const getConfigs = (router: Router) => {
+const getConfiguration = (router: Router) => {
   router.get({
     path: '/',
     summary: 'Get configurations',
@@ -43,4 +34,4 @@ const getConfigs = (router: Router) => {
   });
 };
 
-export default getConfigs;
+export default getConfiguration;

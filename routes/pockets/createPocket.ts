@@ -2,13 +2,13 @@ import Router from '../../core/router';
 import { sql } from '../../db';
 import { pocketSchema, Pocket } from './schema';
 import { z } from 'zod';
-import { decodeParamsAndAuthorizeAccess } from '../../decodeParamsAndAuthorizeAccess';
-import { entityIdParamsSchema } from '../users/schema';
+  import { decodeParamsAndAuthorizeAccess } from '../../decodeParamsAndAuthorizeAccess';
+  import { entityIdParamsSchema } from '../users/schema';
 
-type PocketCreationParams = Pick<
-Pocket,
-| 'entity_id'
-| 'category_id'
+  type PocketCreationParams = Pick<
+  Pocket,
+  | 'entity_id'
+  | 'category_id'
 | 'name'
 | 'priority'
 | 'pocket_type'
