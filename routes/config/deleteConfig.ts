@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { sql } from '../../db';
 import Router from '../../core/router';
+import { UserRole } from '../users/schema';
 
 const SQL_UPDATE_CONFIG = sql<{ id: number }, Record<string, never>>(`
   UPDATE country_configurations
@@ -12,6 +13,7 @@ const SQL_UPDATE_CONFIG = sql<{ id: number }, Record<string, never>>(`
 const deleteConfiguration = (router: Router) => {
   router.delete({
     path: '/:id',
+    auth: [UserRole.enum.Admin],
     summary: 'Delete a configuration',
     schema: {
       params: z.object({

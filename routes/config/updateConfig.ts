@@ -4,6 +4,7 @@ import Router from '../../core/router';
 import { ConfigPayload, configPayloadSchema } from './createConfig';
 import { Config, configSchema } from './schema';
 import logger from '../../logger';
+import { UserRole } from '../users/schema';
 
 type PartialConfigPayload = Partial<ConfigPayload>;
 
@@ -38,6 +39,7 @@ const SQL_UPDATE_CONFIG = sql<PartialConfigPayload & { id: number }, Config>(`
 const updateConfiguration = (router: Router) => {
   router.patch({
     path: '/:id',
+    auth: [UserRole.enum.Admin],
     summary: 'Update a configuration',
     schema: {
       params: z.object({

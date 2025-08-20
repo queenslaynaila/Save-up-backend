@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { sql } from '../../db';
 import Router from '../../core/router';
 import { Config, configSchema } from './schema';
+import { UserRole } from '../users/schema';
 
 export const configPayloadSchema = configSchema.pick({
   country_code: true,
@@ -61,6 +62,7 @@ const SQL_CREATE_CONFIG = sql<ConfigPayload, Config>(`
 const createConfiguration = (router: Router) => {
   router.post({
     path: '/',
+    auth: [UserRole.enum.Admin],
     summary: 'Make a configuration',
     schema: {
       body: configPayloadSchema
