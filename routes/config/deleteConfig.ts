@@ -4,7 +4,7 @@ import Router from '../../core/router';
 
 const SQL_UPDATE_CONFIG = sql<{ id: number }, Record<string, never>>(`
   UPDATE country_configurations
-    SET deleted_at = NOW
+    SET deleted_at = NOW()
   WHERE id = :id
     AND deleted_at IS NULL;
 `);
