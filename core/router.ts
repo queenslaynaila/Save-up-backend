@@ -405,7 +405,8 @@ export class Router {
       .replace(/\/$/, '');
 
     const roles = Array.isArray(options.auth) ? options.auth : [options.auth]
-    const roleDescription = `Allowed for roles: **${roles.join(', ')}**`;
+    const roleDescription = options.auth !== true ?
+    `Allowed for roles: **${roles.join(', ')}**`: '';
 
     Router.registry.registerPath({
       tags: [this.resourceName],
