@@ -1,5 +1,6 @@
 CREATE TABLE IF NOT EXISTS interest_rates (
-    pocket_type enum_pocket_type,
+    id SERIAL PRIMARY KEY,
+    pocket_type enum_pocket_type UNIQUE,
     rate decimal(4, 2)
 );
 
