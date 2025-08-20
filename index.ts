@@ -18,6 +18,7 @@ import securityQuestionsRoutes from './routes/securityQuestions';
 import statisticsRoutes from './routes/stats';
 import transactionsRoutes from './routes/transactions';
 import usersRoutes from './routes/users';
+import interestRateRoutes from './routes/interest'
 import { BASE_PATH } from './core/router';
 
 
@@ -59,6 +60,7 @@ app.use(groupWithdrawalsRoutes);
 app.use(loanRoutes);
 app.use(securityQuestionsRoutes);
 app.use(transactionsRoutes);
+app.use(interestRateRoutes);
 
 app.listen(Config.PORT, () => {
   console.log(`Server is running on http://localhost:${Config.PORT}`);
