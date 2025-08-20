@@ -18,6 +18,7 @@ const SQL_GET_CONFIG = sql<Record<string,never>, Config>(`
     withdrawal_charges,
     created_at
   FROM country_configurations
+  WHERE deleted_at IS NULL
 `);
 
 const getConfiguration = (router: Router) => {
